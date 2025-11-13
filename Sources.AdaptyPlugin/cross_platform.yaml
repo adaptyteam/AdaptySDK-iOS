@@ -359,24 +359,6 @@ $requests:
         properties:
           success: { const: true }
 
-  ### logShowOnboarding ###
-  LogShowOnboarding.Request: #request
-    type: object
-    required: [method, params]
-    properties:
-      method: { const: "log_show_onboarding" }
-      params: { $ref: "#/$defs/AdaptyOnboardingScreenParameters" }
-
-  LogShowOnboarding.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
-
   ### logShowPaywall ###
   LogShowPaywall.Request: #request
     type: object
@@ -1085,14 +1067,6 @@ $defs:
       subscription_period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
       localized_subscription_period: { type: string }
       localized_number_of_periods: { type: string }
-
-  AdaptyOnboardingScreenParameters: #request
-    type: object
-    required: [onboarding_screen_order]
-    properties:
-      onboarding_name: { type: string }
-      onboarding_screen_name: { type: string }
-      onboarding_screen_order: { type: integer, minimum: 1 }
 
   AdaptyOnboarding: #request #response
     type: object

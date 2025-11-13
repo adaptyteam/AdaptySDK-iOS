@@ -161,7 +161,7 @@ public extension AdaptyConfiguration.Builder {
 
     @discardableResult
     func with(serverCluster value: AdaptyServerCluster) -> Self {
-        serverCluster = value
+        serverCluster = AdaptyServerCluster(rawValue: value.rawValue)
         return self
     }
 

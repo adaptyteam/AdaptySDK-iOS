@@ -12,7 +12,6 @@ extension Event {
     private enum Name: String, Sendable, Hashable {
         case appOpened = "app_opened"
         case paywallShowed = "paywall_showed"
-        case legacyOnboardingScreenShowed = "onboarding_screen_showed"
 
         case system = "system_log"
         case paywallVariationAssigned = "paywall_variation_assigned"
@@ -29,8 +28,6 @@ extension Event {
                 .appOpened
             case .paywallShowed:
                 .paywallShowed
-            case .legacyOnboardingScreenShowed:
-                .legacyOnboardingScreenShowed
             case .system:
                 .system
             case .paywallVariationAssigned:

@@ -102,7 +102,6 @@ struct AdaptyBackendAPIRequestParameters: AdaptySystemEventParameters {
     }
 }
 
-
 struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
     let name: APIRequestName
     let stamp: String
@@ -194,8 +193,6 @@ enum MethodName: String {
 
     case setFallback = "set_fallback_file"
 
-    case logShowOnboarding = "log_show_onboarding"
-    case logShowOnboardingScreen = "log_show_onboarding_screen"
     case logShowPaywall = "log_show_paywall"
 
     case presentCodeRedemptionSheet = "present_code_redemption_sheet"
