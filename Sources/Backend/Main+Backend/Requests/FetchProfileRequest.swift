@@ -11,7 +11,7 @@ private struct FetchProfileRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let stamp = Log.stamp
-    let logName = APIRequestName.fetchProfile
+    let requestName = BackendRequestName.fetchProfile
 
     init(userId: AdaptyUserId, responseHash: String?) {
         endpoint = HTTPEndpoint(

@@ -14,7 +14,7 @@ private struct ValidateReceiptRequest: BackendEncodableRequest {
     )
     let headers: HTTPHeaders
     let stamp = Log.stamp
-    let logName = APIRequestName.validateReceipt
+    let requestName = BackendRequestName.validateReceipt
 
     let userId: AdaptyUserId
     let receipt: Data

@@ -9,7 +9,7 @@ import Foundation
 private struct FetchBackendStateRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let stamp = Log.stamp
-    let logName = APIRequestName.fetchNetworkConfig
+    let requestName = BackendRequestName.fetchNetworkConfig
 
     init(apiKeyPrefix: String) {
         endpoint = HTTPEndpoint(
@@ -21,17 +21,23 @@ private struct FetchBackendStateRequest: BackendRequest {
 
 private typealias ResponseBody = Backend.Response.Data<BackendState>
 
-extension Backend.StateExecutor {
-    func fetchBackendState(
+extension DefaultBackendExecutor {
+    static func fetchBackendState(
+        withBaseUrl baseUrl: URL,
+        withSession session: HTTPSession,
         apiKeyPrefix: String
     ) async throws(HTTPError) -> BackendState {
         let request = FetchBackendStateRequest(
             apiKeyPrefix: apiKeyPrefix
         )
+
         let response: HTTPResponse<ResponseBody> = try await perform(
             request,
-            withBaseUrl: baseUrl
+            withBaseUrl: baseUrl,
+            withSession: session,
+            withDecoder: HTTPDataResponse.defaultDecoder
         )
+
         return response.body.value
     }
 }

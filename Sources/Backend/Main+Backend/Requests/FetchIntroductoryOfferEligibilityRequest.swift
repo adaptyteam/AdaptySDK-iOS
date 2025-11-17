@@ -15,7 +15,7 @@ private struct FetchIntroductoryOfferEligibilityRequest: BackendRequest {
     let headers: HTTPHeaders
     let queryItems: QueryItems
     let stamp = Log.stamp
-    let logName = APIRequestName.fetchProductStates
+    let requestName = BackendRequestName.fetchProductStates
 
     init(userId: AdaptyUserId, responseHash: String?) {
         headers = HTTPHeaders()

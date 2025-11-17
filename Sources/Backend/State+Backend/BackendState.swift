@@ -41,16 +41,28 @@ extension BackendState {
         expiresAt <= Date()
     }
 
+    func mainBaseUrlsExist(by cluster: AdaptyServerCluster) -> Bool {
+        guard let baseUrls = mainBaseUrls(by: cluster),
+              baseUrls.isNotEmpty
+        else { return false }
+        return true
+    }
+
+    private func mainBaseUrls(by cluster: AdaptyServerCluster) -> [URL]? {
+        if let baseUrls = mainBaseUrls[cluster] { return baseUrls }
+        guard cluster != .default else { return nil }
+        return mainBaseUrls[.default]
+    }
+
     func mainBaseUrl(by cluster: AdaptyServerCluster, withIndex index: Int) -> URL? {
-        var baseUrls = mainBaseUrls[cluster]
-        if baseUrls == nil, cluster != .default {
-            baseUrls = mainBaseUrls[.default]
-        }
-        guard let baseUrls, baseUrls.isNotEmpty else { return nil }
+        guard let baseUrls = mainBaseUrls(by: cluster),
+              baseUrls.isNotEmpty
+        else { return nil }
+
         guard baseUrls.indices.contains(index) else {
             return baseUrls.last?.appendingDefaultPathIfNeed
         }
-        
+
         return baseUrls[index].appendingDefaultPathIfNeed
     }
 }

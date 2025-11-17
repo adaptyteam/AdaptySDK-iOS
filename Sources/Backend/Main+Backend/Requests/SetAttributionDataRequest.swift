@@ -15,7 +15,7 @@ private struct SetAttributionDataRequest: BackendEncodableRequest {
     let headers: HTTPHeaders
     let contentType: String? = "application/json"
     let stamp = Log.stamp
-    let logName = APIRequestName.setAttributionData
+    let requestName = BackendRequestName.setAttributionData
     let logParams: EventParameters?
 
     let source: String

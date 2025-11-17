@@ -12,14 +12,14 @@ private struct FetchFallbackPlacementRequest: BackendRequest {
     let queryItems: QueryItems
     let stamp = Log.stamp
     let timeoutInterval: TimeInterval?
-    let logName: APIRequestName
+    let requestName: BackendRequestName
     let logParams: EventParameters?
 
     init(
         endpoint: HTTPEndpoint,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?,
-        logName: APIRequestName,
+        logName: BackendRequestName,
         logParams: EventParameters
     ) {
         self.timeoutInterval =
@@ -32,7 +32,7 @@ private struct FetchFallbackPlacementRequest: BackendRequest {
         self.endpoint = endpoint
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
 
-        self.logName = logName
+        requestName = logName
         self.logParams = logParams
     }
 }
@@ -74,7 +74,7 @@ extension Backend.FallbackExecutor {
         _ timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let endpoint: HTTPEndpoint
-        let requestName: APIRequestName
+        let requestName: BackendRequestName
 
         if Content.self == AdaptyPaywall.self {
             endpoint = HTTPEndpoint(

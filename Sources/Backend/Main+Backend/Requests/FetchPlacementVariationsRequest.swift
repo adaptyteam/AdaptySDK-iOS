@@ -13,7 +13,7 @@ private struct FetchPaywallVariationsRequest: BackendRequest {
     let queryItems: QueryItems
     let stamp = Log.stamp
 
-    let logName = APIRequestName.fetchPaywallVariations
+    let requestName = BackendRequestName.fetchPaywallVariations
     let logParams: EventParameters?
 
     init(
@@ -62,7 +62,7 @@ private struct FetchOnboardingVariationsRequest: BackendRequest {
     let queryItems: QueryItems
     let stamp = Log.stamp
 
-    let logName = APIRequestName.fetchOnboardingVariations
+    let requestName = BackendRequestName.fetchOnboardingVariations
     let logParams: EventParameters?
 
     init(

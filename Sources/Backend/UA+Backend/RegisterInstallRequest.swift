@@ -15,7 +15,7 @@ private struct RegisterInstallRequest: BackendEncodableRequest {
 
     let headers: HTTPHeaders
     let stamp = Log.stamp
-    let logName = APIRequestName.reqisterInstall
+    let requestName = BackendRequestName.reqisterInstall
     var logParams: EventParameters?
 
     let installInfo: Environment.InstallInfo

@@ -14,7 +14,7 @@ struct SendEventsRequest: BackendEncodableRequest {
     )
     let headers: HTTPHeaders
     let stamp = Log.stamp
-    var logName = APIRequestName.sendEvents
+    var requestName = BackendRequestName.sendEvents
 
     let events: [Data]
 
@@ -69,7 +69,7 @@ extension Backend.EventsExecutor {
         do {
             let _: HTTPEmptyResponse = try await session.perform(request, baseUrl: baseUrl)
         } catch {
-            manager.handleNetworkState(kind, baseUrl, error)
+            manager.handleNetworkState(kind, request.requestName, baseUrl, error)
             throw EventsError.sending(error)
         }
     }

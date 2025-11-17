@@ -10,7 +10,7 @@ import Foundation
 private struct FetchAllProductInfoRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let stamp = Log.stamp
-    let logName = APIRequestName.fetchAllProductInfo
+    let requestName = BackendRequestName.fetchAllProductInfo
 
     init(apiKeyPrefix: String) {
         endpoint = HTTPEndpoint(

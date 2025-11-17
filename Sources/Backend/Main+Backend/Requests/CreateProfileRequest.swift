@@ -11,7 +11,7 @@ private struct CreateProfileRequest: BackendEncodableRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let stamp = Log.stamp
-    let logName = APIRequestName.createProfile
+    let requestName = BackendRequestName.createProfile
     let logParams: EventParameters?
 
     let userId: AdaptyUserId

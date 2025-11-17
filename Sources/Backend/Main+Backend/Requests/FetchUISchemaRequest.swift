@@ -13,7 +13,7 @@ struct FetchUISchemaRequest: BackendRequest {
     let headers: HTTPHeaders
     let queryItems: QueryItems
     let stamp = Log.stamp
-    let logName = APIRequestName.fetchUISchema
+    let requestName = BackendRequestName.fetchUISchema
     let logParams: EventParameters?
 
     init(

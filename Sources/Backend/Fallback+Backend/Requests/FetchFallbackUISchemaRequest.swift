@@ -12,7 +12,7 @@ private struct FetchFallbackUISchemaRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let queryItems: QueryItems
     let stamp = Log.stamp
-    let logName = APIRequestName.fetchFallbackUISchema
+    let requestName = BackendRequestName.fetchFallbackUISchema
     let logParams: EventParameters?
 
     init(

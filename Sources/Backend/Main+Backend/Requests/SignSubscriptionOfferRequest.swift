@@ -15,7 +15,7 @@ private struct SignSubscriptionOfferRequest: BackendRequest {
     let headers: HTTPHeaders
     let queryItems: QueryItems
     let stamp = Log.stamp
-    let logName = APIRequestName.signSubscriptionOffer
+    let requestName = BackendRequestName.signSubscriptionOffer
     let logParams: EventParameters?
 
     init(vendorProductId: String, offerId: String, userId: AdaptyUserId) {

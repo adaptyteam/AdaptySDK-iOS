@@ -14,7 +14,7 @@ private struct FetchCrossPlacementStateRequest: BackendRequest {
     )
     let headers: HTTPHeaders
     let stamp = Log.stamp
-    let logName = APIRequestName.fetchCrossPlacementState
+    let requestName = BackendRequestName.fetchCrossPlacementState
 
     init(userId: AdaptyUserId) {
         headers = HTTPHeaders()

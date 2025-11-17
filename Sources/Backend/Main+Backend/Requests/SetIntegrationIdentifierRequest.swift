@@ -17,7 +17,7 @@ private struct SetIntegrationIdentifierRequest: BackendEncodableRequest {
     let contentType: String? = "application/json"
 
     let stamp = Log.stamp
-    let logName = APIRequestName.setIntegrationIdentifier
+    let requestName = BackendRequestName.setIntegrationIdentifier
     let logParams: EventParameters?
 
     let userId: AdaptyUserId

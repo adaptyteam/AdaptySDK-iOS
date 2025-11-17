@@ -15,7 +15,7 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
 
     let headers: HTTPHeaders
     let stamp = Log.stamp
-    let logName = APIRequestName.validateTransaction
+    let requestName = BackendRequestName.validateTransaction
     let logParams: EventParameters?
 
     let userId: AdaptyUserId

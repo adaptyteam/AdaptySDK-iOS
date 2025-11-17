@@ -11,7 +11,7 @@ private struct UpdateProfileRequest: BackendEncodableRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let stamp = Log.stamp
-    let logName = APIRequestName.updateProfile
+    let requestName = BackendRequestName.updateProfile
 
     let userId: AdaptyUserId
     let parameters: AdaptyProfileParameters?

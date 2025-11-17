@@ -14,25 +14,21 @@ extension Backend {
 
         private let cluster: AdaptyServerCluster
         private let devBaseUrls: [AdaptyServerKind: URL]?
-        private let executor: StateExecutor
+        private let session: HTTPSession
 
         private var mainBaseUrlIndex: Int
         var currentState: BackendState
         private var storage = BackendStateStorage()
         private var syncing: Task<Void, Never>?
-        private var lastUnavailableError: BackendUnavailableError?
-        private var uaLastUnavailableError: BackendUnavailableError?
+        private var serverBlockedByKind = Set<AdaptyServerKind>()
+        private var requestBlockedUntil = [BackendRequestName: Date]()
 
         init(with configuration: AdaptyConfiguration) {
             let backend = configuration.backend
             apiKeyPrefix = configuration.apiKeyPrefix
             cluster = backend.cluster
             devBaseUrls = backend.devBaseUrls
-
-            executor = StateExecutor(
-                baseUrl: devBaseUrls[StateExecutor.kind, with: cluster],
-                session: .init(configuration: FallbackHTTPConfiguration(with: configuration))
-            )
+            session = .init(configuration: FallbackHTTPConfiguration(with: configuration))
 
             if let state = storage.state {
                 currentState = state
@@ -44,44 +40,27 @@ extension Backend {
             mainBaseUrlIndex = 0
         }
 
-        private func checkIsBlocked(_ kind: AdaptyServerKind) throws(BackendUnavailableError) {
-            guard let lastUnavailableError else {
-                if kind == .ua, let uaLastUnavailableError, uaLastUnavailableError.isBlocked {
-                    throw uaLastUnavailableError
-                }
-                return
-            }
-            switch lastUnavailableError {
-            case .unauthorized:
-                throw lastUnavailableError
-            case .blockedUntil:
-                if kind == .ua {
-                    guard let uaLastUnavailableError, uaLastUnavailableError.isBlocked else { return }
-                    throw uaLastUnavailableError
-                } else {
-                    guard lastUnavailableError.isBlocked else { return }
-                    throw lastUnavailableError
-                }
-            }
-        }
-
-        private func sync() async {
+        private func syncState() async {
             let task: Task<Void, Never>
             if let syncing {
                 task = syncing
             } else {
-                task = Task.detached { try? await self.fetch() }
+                task = Task.detached { try? await self.fetchState() }
                 syncing = task
             }
             await task.value
         }
 
-        private func fetch() async throws {
+        private func fetchState() async throws {
             defer { syncing = nil }
-            let kind = StateExecutor.kind
-            try checkIsBlocked(kind)
+
+            try checkIsBlocked(for: .fallback)
+            let baseUrl = devBaseUrls[.fallback, with: cluster]
+
             do {
-                currentState = try await executor.fetchBackendState(
+                currentState = try await DefaultBackendExecutor.fetchBackendState(
+                    withBaseUrl: baseUrl,
+                    withSession: session,
                     apiKeyPrefix: apiKeyPrefix
                 )
                 storage.set(state: currentState)
@@ -89,65 +68,104 @@ extension Backend {
             } catch {
                 currentState = currentState.extended()
                 storage.set(state: currentState)
-                _ = handleNetworkError(kind, error)
                 throw error
             }
         }
 
-        func handleNetworkState(
-            _ kind: AdaptyServerKind,
-            _ baseUrl: URL,
-            _ error: HTTPError
-        ) {
-            let handled = handleNetworkError(kind, error)
-            guard !handled, kind == .main, error.isServerUnavailable else { return }
-            mainBaseUrlIndex += 1
+        private func checkIsBlocked(
+            for serverKind: AdaptyServerKind
+        ) throws(BackendUnavailableError) {
+            switch serverKind {
+            case .ua:
+                guard !serverBlockedByKind.contains(.main),
+                      !serverBlockedByKind.contains(serverKind)
+                else { throw .unauthorized }
+            default:
+                guard !serverBlockedByKind.contains(.main) else { throw .unauthorized }
+            }
+
+            if serverKind == .main, !currentState.mainBaseUrlsExist(by: cluster) {
+                throw .blockedUntil(currentState.expiresAt)
+            }
+        }
+
+        private func checkIsBlocked(
+            _ requestName: BackendRequestName,
+            for serverKind: AdaptyServerKind
+        ) throws(BackendUnavailableError) {
+            try checkIsBlocked(for: serverKind)
+            if serverKind != .fallback,
+               let expiresAt = requestBlockedUntil[requestName], expiresAt > Date()
+            {
+                throw .blockedUntil(expiresAt)
+            }
         }
 
         private func handleNetworkError(
-            _ kind: AdaptyServerKind,
+            _ serverKind: AdaptyServerKind,
+            _ requestName: BackendRequestName,
             _ error: HTTPError
-        ) -> Bool {
-            guard case .backend(_, _, _, _, _, let error) = error, let error = error as? BackendUnavailableError else {
-                return false
+        ) {
+            guard case .backend(_, _, _, _, _, let error) = error,
+                  let error = error as? BackendUnavailableError
+            else { return }
+
+            switch error {
+            case .unauthorized:
+                serverBlockedByKind.insert(serverKind)
+            case .blockedUntil(let expiresAt):
+                guard let expiresAt else { return }
+                if let oldExpiresAt = requestBlockedUntil[requestName],
+                   oldExpiresAt > expiresAt { return }
+                requestBlockedUntil[requestName] = expiresAt
             }
-            switch kind {
-            case .main:
-                lastUnavailableError = lastUnavailableError.merge(other: error)
-                return true
-            case .ua:
-                uaLastUnavailableError = uaLastUnavailableError.merge(other: error)
-                return true
-            default:
-                return false
-            }
+        }
+
+        private func handleIsServerUnavailable(
+            _ serverKind: AdaptyServerKind,
+            _ baseUrl: URL,
+            _ error: HTTPError
+        ) {
+            guard serverKind == .main,
+                  error.isServerUnavailable,
+                  baseUrl == currentState.mainBaseUrl(by: cluster, withIndex: mainBaseUrlIndex)
+            else { return }
+
+            mainBaseUrlIndex += 1
         }
     }
 }
 
 extension Backend.StateManager {
-    private func checkIsBlocked(_ request: BackendRequest, for kind: AdaptyServerKind) throws(BackendUnavailableError) {
-        try checkIsBlocked(kind)
-        guard kind == .main else { return }
-        // TODO:
+    func handleNetworkState(
+        _ serverKind: AdaptyServerKind,
+        _ requestName: BackendRequestName,
+        _ baseUrl: URL,
+        _ error: HTTPError
+    ) {
+        handleNetworkError(serverKind, requestName, error)
+        handleIsServerUnavailable(serverKind, baseUrl, error)
     }
 
     func fetchCurrentState() async -> BackendState {
         if currentState.isExpired {
-            await sync()
+            await syncState()
         }
         return currentState
     }
 
-    func baseUrl(_ request: BackendRequest, for kind: AdaptyServerKind) async throws(BackendUnavailableError) -> URL {
-        try checkIsBlocked(request, for: kind)
-        guard kind == .main else {
-            return devBaseUrls[kind, with: cluster]
+    func baseUrl(
+        _ request: BackendRequest,
+        for serverKind: AdaptyServerKind
+    ) async throws(BackendUnavailableError) -> URL {
+        try checkIsBlocked(request.requestName, for: serverKind)
+        guard serverKind == .main else {
+            return devBaseUrls[serverKind, with: cluster]
         }
-        if let url = devBaseUrls?[kind] { return url }
+        if let url = devBaseUrls?[serverKind] { return url }
 
         if currentState.isExpired {
-            await sync()
+            await syncState()
         }
 
         guard let url = currentState.mainBaseUrl(by: cluster, withIndex: mainBaseUrlIndex) else {

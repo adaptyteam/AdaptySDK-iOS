@@ -14,7 +14,7 @@ private struct SetASATokenRequest: BackendEncodableRequest {
     )
     let headers: HTTPHeaders
     let stamp = Log.stamp
-    let logName = APIRequestName.sendASAToken
+    let requestName = BackendRequestName.sendASAToken
     let logParams: EventParameters?
 
     let token: String
