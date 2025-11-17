@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUIBuilder {
     static var mainScreenBounds: CGRect {
@@ -21,7 +20,6 @@ extension AdaptyUIBuilder {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIBottomSheetView: View {
     @EnvironmentObject var viewModel: AdaptyUIBottomSheetViewModel
 

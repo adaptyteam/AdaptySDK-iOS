@@ -9,7 +9,6 @@
 import SwiftUI
 import AdaptyUIBuilder
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension View {
     func dev_withScreenSize(_ value: CGSize) -> some View {
         withScreenSize(value)

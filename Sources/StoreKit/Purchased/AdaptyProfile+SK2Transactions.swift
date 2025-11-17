@@ -9,7 +9,6 @@ import StoreKit
 
 private let log = Log.sk2ProductManager
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyProfile {
     func added(transactions: [SK2Transaction], productManager: SK2ProductsManager) async -> AdaptyProfile {
         guard !transactions.isEmpty else { return self }

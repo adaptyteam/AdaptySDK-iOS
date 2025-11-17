@@ -109,7 +109,6 @@ extension Environment.Device {
 }
 
 #if !ADAPTY_KIDS_MODE && canImport(AppTrackingTransparency)
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *)
 private extension ATTrackingManager {
     @MainActor
     static var canTakeIdfa: Environment.Device.IdfaRetrievalStatus {

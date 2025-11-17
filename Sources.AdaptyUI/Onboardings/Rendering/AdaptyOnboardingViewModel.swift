@@ -15,7 +15,6 @@ private extension AdaptyUI {
     static let webViewEventMessageName = "postEvent"
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 final class AdaptyOnboardingViewModel: ObservableObject {
     let logId: String
@@ -141,7 +140,6 @@ final class AdaptyOnboardingViewModel: ObservableObject {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 final class AdaptyWebViewDelegate: NSObject {
     let logId: String
 
@@ -155,7 +153,6 @@ final class AdaptyWebViewDelegate: NSObject {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyWebViewDelegate: WKNavigationDelegate, WKScriptMessageHandler {
     public func webView(
         _ webView: WKWebView,

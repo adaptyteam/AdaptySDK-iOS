@@ -9,7 +9,6 @@ import Foundation
 
 private let log = Log.sk2ProductManager
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2ProductsManager {
     private let apiKeyPrefix: String
     private let storage: BackendProductInfoStorage
@@ -53,7 +52,6 @@ actor SK2ProductsManager {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager {
     func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [SK2Product] {
         let products = try await fetchSK2Products(ids: Set(productIds), fetchPolicy: fetchPolicy)

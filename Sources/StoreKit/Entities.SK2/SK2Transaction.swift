@@ -7,13 +7,10 @@
 
 import StoreKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 typealias SK2Transaction = Transaction
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 typealias SK2SignedTransaction = VerificationResult<Transaction>
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2Transaction {
     @inlinable
     var unfIdentifier: String { String(id) }

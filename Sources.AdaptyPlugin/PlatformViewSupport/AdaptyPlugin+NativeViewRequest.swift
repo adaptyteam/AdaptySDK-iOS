@@ -15,7 +15,6 @@ private let log = Log.plugin
 
 // TODO: refactor this
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyPlugin {
     static func getPaywallViewConfiguration(
         withJson jsonString: AdaptyJsonString

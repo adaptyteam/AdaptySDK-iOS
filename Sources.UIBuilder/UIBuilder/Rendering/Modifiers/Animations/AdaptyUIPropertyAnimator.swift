@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Animation.Timeline {
     @MainActor
     func animate<Value>(
@@ -106,7 +105,6 @@ extension AdaptyUIAnimationToken {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 enum AdaptyUIPropertyAnimator {
     static func animatePingPongLoop<Value>(

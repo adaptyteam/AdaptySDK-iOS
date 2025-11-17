@@ -18,7 +18,6 @@ extension SK1ProductsManager: StoreKitProductsManager {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2ProductsManager: StoreKitProductsManager {
     func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy) async throws(AdaptyError) -> AdaptyProduct? {
         try await fetchSK2Product(id: productId, fetchPolicy: fetchPolicy).asAdaptyProduct

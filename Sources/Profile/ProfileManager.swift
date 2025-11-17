@@ -172,7 +172,6 @@ extension Adapty {
         _ = try? profileManager?.saveProfileAndStartNotifyTask(response)
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func recalculateOfflineAccessLevels() async -> AdaptyProfile {
         await (transactionManager as? SK2TransactionManager)?.clearCache()
 

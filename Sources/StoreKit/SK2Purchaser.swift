@@ -9,7 +9,6 @@ import StoreKit
 
 private let log = Log.sk2TransactionManager
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2Purchaser {
     private let transactionSynchronizer: StoreKitTransactionSynchronizer
     private let subscriptionOfferSigner: StoreKitSubscriptionOfferSigner
@@ -163,7 +162,6 @@ actor SK2Purchaser {
         return try await makePurchase(product.skProduct, options, payload, for: userId)
     }
     
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
     private func makePurchase(
         _ sk2Product: SK2Product,
         _ options: Set<Product.PurchaseOption>,

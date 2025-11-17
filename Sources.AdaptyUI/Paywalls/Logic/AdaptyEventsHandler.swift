@@ -10,7 +10,6 @@
 import Adapty
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyEventsHandler: ObservableObject {
     let logId: String
@@ -139,7 +138,6 @@ package final class AdaptyEventsHandler: ObservableObject {
 
 import AdaptyUIBuilder
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUIBuilder.Action {
     var adaptyUIAction: AdaptyUI.Action {
         switch self {

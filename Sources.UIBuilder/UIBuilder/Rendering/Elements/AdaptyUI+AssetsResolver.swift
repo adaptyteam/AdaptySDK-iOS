@@ -10,7 +10,6 @@
 import AVKit
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.VideoData {
     struct Resolved {
         let player: AVQueuePlayer
@@ -38,7 +37,6 @@ extension VC.VideoData {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.ImageData {
     enum Resolved {
         case image(UIImage?)
@@ -78,7 +76,6 @@ extension VC.Font {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Filling {
     enum Resolved {
         case solidColor(VC.Color.Resolved)
@@ -119,7 +116,6 @@ extension VC.Filling {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.ColorGradient {
     typealias Resolved = AdaptyUICustomGradientAsset
 
@@ -157,7 +153,6 @@ extension VC.ColorGradient {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Color {
     typealias Resolved = SwiftUI.Color
 
@@ -177,7 +172,6 @@ extension VC.Color {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension AdaptyUICustomVideoAsset {
     var resolved: VC.VideoData.Resolved {
         switch self {
@@ -193,7 +187,6 @@ private extension AdaptyUICustomVideoAsset {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension AdaptyUICustomImageAsset {
     var resolved: VC.ImageData.Resolved? {
         switch self {
@@ -208,7 +201,6 @@ private extension AdaptyUICustomImageAsset {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension AdaptyUICustomColorAsset {
     var resolved: VC.Color.Resolved {
         switch self {

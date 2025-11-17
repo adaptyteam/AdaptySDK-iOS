@@ -8,7 +8,6 @@
 import Adapty
 import AdaptyUIBuilder
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package enum AdaptyUIViewPresentationStyle: String, Codable {
     case fullScreen = "full_screen"
     case pageSheet = "page_sheet"
@@ -18,7 +17,6 @@ package enum AdaptyUIViewPresentationStyle: String, Codable {
 
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension UIViewController {
     var isOrContainsAdaptyController: Bool {
         guard let presentedViewController = presentedViewController else {
@@ -40,7 +38,6 @@ fileprivate extension UIWindow {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUIViewPresentationStyle {
     var uiKitPresentationStyle: UIModalPresentationStyle {
         switch self {
@@ -52,7 +49,6 @@ extension AdaptyUIViewPresentationStyle {
 
 #endif
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension AdaptyUI {
     @MainActor
     class Plugin {
@@ -203,7 +199,6 @@ package extension AdaptyUI {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package extension AdaptyUI.Plugin {
     static func createOnboardingView(
@@ -276,7 +271,6 @@ package extension AdaptyUI.Plugin {
 }
 
 // TODO: Remove
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package extension AdaptyUI.Plugin {
     static func createOnboardingViewForTest(

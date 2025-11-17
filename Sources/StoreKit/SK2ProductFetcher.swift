@@ -9,7 +9,6 @@ import StoreKit
 
 private let log = Log.sk2ProductManager
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2ProductFetcher {
     func fetchProducts(ids productIds: Set<String>, retryCount: Int = 3) async throws(AdaptyError) -> [SK2Product] {
         log.verbose("Called fetch SK2Products: \(productIds) retryCount:\(retryCount)")

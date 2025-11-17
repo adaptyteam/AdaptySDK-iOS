@@ -12,7 +12,6 @@ import AdaptyUIBuilder
 import SwiftUI
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension AdaptyPaywallController {
     var paywallPlacementId: String { configuration.paywallPlacementId }
@@ -20,7 +19,6 @@ public extension AdaptyPaywallController {
     var paywallVariationId: String { configuration.paywallVariationId }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUI.PaywallConfiguration {
     var paywallPlacementId: String {
         guard
@@ -43,7 +41,6 @@ extension AdaptyUI.PaywallConfiguration {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public final class AdaptyPaywallController: UIViewController {
     public var id: String { paywallView.id }
     
@@ -217,7 +214,6 @@ public final class AdaptyPaywallController: UIViewController {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPaywallController: AdaptyPaywallViewDelegate {
     package func paywallViewDidAppear(_ view: AdaptyPaywallUIView) {
         delegate?.paywallControllerDidAppear(self)

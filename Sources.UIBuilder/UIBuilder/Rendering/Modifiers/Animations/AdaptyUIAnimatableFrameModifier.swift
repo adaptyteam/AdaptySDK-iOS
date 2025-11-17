@@ -9,19 +9,16 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 typealias FrameAnimationValue = (
     width: VC.Unit?,
     height: VC.Unit?
 )
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 typealias FrameAnimationRange = (
     start: FrameAnimationValue,
     end: FrameAnimationValue
 )
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIAnimatableFrameModifier: ViewModifier {
     private let box: VC.Box
     private let animations: [VC.Animation]?
@@ -163,7 +160,6 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func animatableFrame(

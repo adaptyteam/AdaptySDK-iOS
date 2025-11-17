@@ -12,7 +12,6 @@ import AdaptyUIBuilder
 import SwiftUI
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package final class AdaptyPaywallUIView: UIView {
     let id: String
     let configuration: AdaptyUI.PaywallConfiguration

@@ -11,7 +11,6 @@ import Foundation
 
 #if canImport(UIKit) && canImport(_Concurrency) && compiler(>=5.5.2)
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     /// Use this method to initialize the AdaptyUI SDK.
     ///

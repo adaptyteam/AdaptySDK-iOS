@@ -8,12 +8,10 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension CoordinateSpace {
     static let adaptyBasicName = "adapty.container.basic"
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIBasicContainerView: View {
     @EnvironmentObject
     private var paywallViewModel: AdaptyUIPaywallViewModel

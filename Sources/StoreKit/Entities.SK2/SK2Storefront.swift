@@ -7,10 +7,8 @@
 
 import StoreKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 typealias SK2Storefront = Storefront
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2Storefront {
     var asAdaptyStorefront: AdaptyStorefront {
         .init(id: id, countryCode: countryCode)
@@ -19,7 +17,6 @@ extension SK2Storefront {
 
 private let log = Log.storeFront
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyStorefront {
     enum StoreKit2 {
         static var current: AdaptyStorefront? {

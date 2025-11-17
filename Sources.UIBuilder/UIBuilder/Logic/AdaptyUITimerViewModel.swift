@@ -18,14 +18,12 @@ package struct AdaptyUIDefaultTimerResolver: AdaptyUITimerResolver {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension [String: Date]: AdaptyUITimerResolver {
     public func timerEndAtDate(for timerId: String) -> Date {
         self[timerId] ?? Date(timeIntervalSinceNow: 3600.0)
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyUITimerViewModel: ObservableObject {
     private let logId: String

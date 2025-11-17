@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension InsettableShape {
     @ViewBuilder
@@ -75,7 +74,6 @@ extension InsettableShape {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func clipShape(_ shape: VC.ShapeType) -> some View {
@@ -96,7 +94,6 @@ extension View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension VC.ShapeType {
     @ViewBuilder
@@ -195,7 +192,6 @@ extension VC.ShapeType {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private let decorator: VC.Decorator
@@ -359,7 +355,6 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func animatableDecorator(

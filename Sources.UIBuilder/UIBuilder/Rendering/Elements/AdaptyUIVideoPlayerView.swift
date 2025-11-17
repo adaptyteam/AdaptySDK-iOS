@@ -21,7 +21,6 @@ extension VC.AspectRatio {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
     var player: AVPlayer
     var videoGravity: AVLayerVideoGravity
@@ -81,7 +80,6 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoView: View {
     @EnvironmentObject
     private var viewModel: AdaptyUIAssetsViewModel
@@ -137,7 +135,6 @@ struct AdaptyUIVideoView: View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoColorSchemeSpecificView: View {
     @EnvironmentObject
     private var viewModel: AdaptyUIAssetsViewModel
@@ -188,7 +185,6 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
 
 #if DEBUG
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.VideoPlayer {
     private static let url1 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%201.mp4?alt=media&token=5e7ac250-091e-4bb3-8a99-6ac4f0735b37")!
 
@@ -216,7 +212,6 @@ extension VC.VideoPlayer {
     )
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 #Preview {
     VStack {
         AdaptyUIVideoView(video: .test1, colorScheme: .light)
@@ -225,7 +220,6 @@ extension VC.VideoPlayer {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public struct AdaptyUIVideoTestView: View {
     public init() {}
 

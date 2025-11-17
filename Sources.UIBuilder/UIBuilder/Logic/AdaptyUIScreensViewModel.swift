@@ -9,7 +9,6 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyUIBottomSheetViewModel: ObservableObject {
     @Published var isPresented: Bool = false
@@ -23,7 +22,6 @@ package final class AdaptyUIBottomSheetViewModel: ObservableObject {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyUIScreensViewModel: ObservableObject {
     private let logId: String

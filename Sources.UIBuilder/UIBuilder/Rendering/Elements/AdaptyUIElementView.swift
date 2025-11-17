@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func paddingIfNeeded(_ insets: EdgeInsets?) -> some View {
@@ -21,7 +20,6 @@ extension View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Element {
     var properties: VC.Element.Properties? {
         switch self {
@@ -39,7 +37,6 @@ extension VC.Element {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUIElementWithoutPropertiesView: View {
     private var element: VC.Element
@@ -103,7 +100,6 @@ struct AdaptyUIElementWithoutPropertiesView: View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package struct AdaptyUIElementView: View {
     private var element: VC.Element
     private var additionalPadding: EdgeInsets?

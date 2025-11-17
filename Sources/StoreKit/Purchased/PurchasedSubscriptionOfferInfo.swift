@@ -59,7 +59,6 @@ extension PurchasedSubscriptionOfferInfo {
         }
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     private init?(
         sk2Transaction: SK2Transaction,
         product: AdaptyProduct?
@@ -103,7 +102,6 @@ extension PurchasedSubscriptionOfferInfo {
         )
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     private init?(
         sk1Transaction: SK1TransactionWithIdentifier,
         sk2Product: SK2Product?
@@ -134,7 +132,6 @@ extension PurchasedSubscriptionOfferInfo {
         )
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     private init?(
         sk2Transaction: SK2Transaction,
         sk1Product: SK1Product?
@@ -150,7 +147,6 @@ extension PurchasedSubscriptionOfferInfo {
         )
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     init?(
         sk2Transaction: SK2Transaction,
         sk2Product: SK2Product?
@@ -166,7 +162,6 @@ extension PurchasedSubscriptionOfferInfo {
         )
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     private init?(
         identifier: AdaptySubscriptionOffer.Identifier,
         period: AdaptySubscriptionPeriod?,

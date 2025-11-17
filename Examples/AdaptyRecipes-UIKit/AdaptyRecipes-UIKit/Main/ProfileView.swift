@@ -141,7 +141,6 @@ struct ProfileView: View {
     @State private var showLogInDialog = false
     @State private var enteredUserId: String = ""
 
-    @available(iOS 15.0, *)
     @ViewBuilder func userIdSection() -> some View {
         Section {
             if let userId = viewModel.userId {

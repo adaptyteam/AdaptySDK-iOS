@@ -9,19 +9,16 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyUITagResolver: Sendable {
     func replacement(for tag: String) -> String?
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyUITimerResolver: Sendable {
     func timerEndAtDate(for timerId: String) -> Date
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension [String: String]: AdaptyUITagResolver {
     public func replacement(for tag: String) -> String? {
         self[tag]

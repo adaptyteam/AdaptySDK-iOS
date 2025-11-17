@@ -7,12 +7,10 @@
 
 import StoreKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 protocol AdaptySK2Product: AdaptyProduct {
     var skProduct: SK2Product { get }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptySK2Product {
     public var sk1Product: SK1Product? { nil }
 
@@ -54,12 +52,10 @@ extension AdaptySK2Product {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct SK2ProductWrapper: AdaptySK2Product {
     let skProduct: SK2Product
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2Product {
     var asAdaptyProduct: AdaptySK2Product { SK2ProductWrapper(skProduct: self) }
 }

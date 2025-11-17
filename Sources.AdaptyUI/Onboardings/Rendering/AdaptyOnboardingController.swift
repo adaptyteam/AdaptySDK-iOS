@@ -10,7 +10,6 @@
 import Adapty
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public final class AdaptyOnboardingController: UIViewController {
     public var id: String { onboardingView.id }
@@ -77,7 +76,6 @@ public final class AdaptyOnboardingController: UIViewController {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyOnboardingController: AdaptyOnboardingViewDelegate {
     package func onboardingView(
         _ view: AdaptyOnboardingUIView,

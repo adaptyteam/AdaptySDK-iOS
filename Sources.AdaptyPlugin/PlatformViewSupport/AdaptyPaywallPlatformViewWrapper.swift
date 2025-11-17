@@ -11,7 +11,6 @@
     import AdaptyUI
     import UIKit
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     public final class AdaptyPaywallPlatformViewWrapper: UIView {
         private let eventHandler: EventHandler
         private let paywallView: AdaptyPaywallUIView
@@ -48,7 +47,6 @@
         }
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     @MainActor
     extension AdaptyPaywallPlatformViewWrapper: AdaptyPaywallViewDelegate {
         package func paywallViewDidAppear(_ view: AdaptyPaywallUIView) {

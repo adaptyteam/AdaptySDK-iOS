@@ -20,13 +20,10 @@ protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
         payload: PurchasePayload
     ) async throws(AdaptyError) -> AdaptyProfile
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func attemptToFinish(transaction: SK2Transaction, logSource: String) async
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func finish(transaction: SK2Transaction) async
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func recalculateOfflineAccessLevels() async -> AdaptyProfile
 
     func skipSyncXcodeSK1Transaction() async -> AdaptyProfile
@@ -57,7 +54,6 @@ extension Adapty: StoreKitTransactionSynchronizer {
         }
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func attemptToFinish(transaction: SK2Transaction, logSource: String) async {
         if await purchasePayloadStorage.canFinishSyncedTransaction(transaction.unfIdentifier) {
             await finish(transaction: transaction)
@@ -67,7 +63,6 @@ extension Adapty: StoreKitTransactionSynchronizer {
         }
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func finish(transaction: SK2Transaction) async {
         await transaction.finish()
         await purchasePayloadStorage.removePurchasePayload(forTransaction: transaction)

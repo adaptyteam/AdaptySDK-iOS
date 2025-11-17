@@ -9,7 +9,6 @@ import Adapty
 import AdaptyUI
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension PaywallViewEvent {
     struct DidPurchase: AdaptyPluginEvent {
         let id = "paywall_view_did_finish_purchase"

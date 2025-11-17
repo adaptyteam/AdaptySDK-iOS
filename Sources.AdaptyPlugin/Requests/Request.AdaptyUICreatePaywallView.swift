@@ -12,7 +12,6 @@ import AdaptyUI
 import AdaptyUIBuilder
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension [AdaptyCustomAsset.Identifiable] {
     @MainActor
     func assetsResolver() throws -> [String: AdaptyCustomAsset]? {
@@ -47,7 +46,6 @@ public extension [AdaptyCustomAsset.Identifiable] {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Request {
     struct AdaptyUICreatePaywallView: AdaptyPluginRequest {
         static let method = "adapty_ui_create_paywall_view"
@@ -120,7 +118,6 @@ extension Request {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyPlugin {
     @MainActor
     fileprivate static var assetIdToFileURL: (@MainActor (String) -> URL?)?

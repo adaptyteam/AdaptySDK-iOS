@@ -91,7 +91,6 @@ public extension Adapty {
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
     ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
     /// - Throws: An ``AdaptyError`` object
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     nonisolated static func reportTransaction(
         _ transaction: StoreKit.Transaction,
         withVariationId variationId: String? = nil
@@ -107,7 +106,6 @@ public extension Adapty {
     ///   - transaction: A purchased verification result of transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/verificationresult).
     ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
     /// - Throws: An ``AdaptyError`` object
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     nonisolated static func reportTransaction(
         _ transaction: StoreKit.VerificationResult<StoreKit.Transaction>,
         withVariationId variationId: String? = nil
@@ -130,7 +128,6 @@ public extension Adapty {
     ///   - purchaseResult: A product purchase result (note, that this method is suitable only for Store Kit version 2) [Product.PurchaseResult](https://developer.apple.com/documentation/storekit/product/purchaseresult).
     ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
     /// - Throws: An ``AdaptyError`` object
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     nonisolated static func reportPurchaseResult(
         _ purchaseResult: StoreKit.Product.PurchaseResult,
         withVariationId variationId: String? = nil

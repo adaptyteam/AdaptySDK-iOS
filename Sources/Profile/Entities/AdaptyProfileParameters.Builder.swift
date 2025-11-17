@@ -130,7 +130,6 @@ extension AdaptyProfileParameters.Builder: Decodable {
 import AppTrackingTransparency
 
 public extension AdaptyProfileParameters.Builder {
-    @available(iOS 14, macOS 11.0, visionOS 1.0, *)
     @discardableResult
     func with(appTrackingTransparencyStatus value: ATTrackingManager.AuthorizationStatus?) -> Self {
         guard let value else {

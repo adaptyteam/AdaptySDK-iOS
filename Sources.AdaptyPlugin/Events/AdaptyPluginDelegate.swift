@@ -43,7 +43,6 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
 
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPlugin {
     static let xibName = "AdaptyOnboardingPlaceholderView"
     
@@ -58,7 +57,6 @@ extension AdaptyPlugin {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
     func paywallControllerDidAppear(
         _ controller: AdaptyPaywallController
@@ -193,7 +191,6 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyOnboardingControllerDelegate {
     func onboardingController(
         _ controller: AdaptyOnboardingController,

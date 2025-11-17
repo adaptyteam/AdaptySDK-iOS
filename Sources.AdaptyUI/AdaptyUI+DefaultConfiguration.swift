@@ -11,7 +11,6 @@ import Adapty
 import AdaptyUIBuilder
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyPaywallControllerDelegate {
     func paywallControllerDidAppear(_ controller: AdaptyPaywallController) {}
 

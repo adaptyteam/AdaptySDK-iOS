@@ -9,7 +9,6 @@ import StoreKit
 
 private let log = Log.sk2TransactionManager
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 actor SK2TransactionManager {
     private let httpSession: Backend.MainExecutor
     private let storage: PurchasePayloadStorage
@@ -96,7 +95,6 @@ actor SK2TransactionManager {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension Adapty {
     func sendLastTransactionOriginalId(manager: SK2TransactionManager, for userId: AdaptyUserId) async -> AdaptyResult<Void> {
         guard let originalTransactionId = await manager.getLastTransactionOriginalIdentifier() else {
@@ -170,7 +168,6 @@ private extension Adapty {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Adapty {
     func getUnfinishedTransactions() async throws(AdaptyError) -> [AdaptyUnfinishedTransaction] {
         let transactions = await SK2TransactionManager.fetchUnfinishedTransactions()
@@ -187,7 +184,6 @@ extension Adapty {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension SK2TransactionManager {
     static func fetchUnfinishedTransactions() async -> [SK2SignedTransaction] {
         let stamp = Log.stamp
@@ -259,7 +255,6 @@ private extension SK2TransactionManager {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension SK2SignedTransaction {
     var verifiedTransaction: SK2Transaction? {
         switch self {

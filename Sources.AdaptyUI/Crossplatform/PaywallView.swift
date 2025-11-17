@@ -7,7 +7,6 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     struct PaywallView: Sendable {
         package let id: String
@@ -25,7 +24,6 @@ public extension AdaptyUI {
 
 #if canImport(UIKit)
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension AdaptyPaywallUIView {
     func toAdaptyUIView() -> AdaptyUI.PaywallView {
         AdaptyUI.PaywallView(
@@ -37,7 +35,6 @@ package extension AdaptyPaywallUIView {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyPaywallController {
     func toAdaptyUIView() -> AdaptyUI.PaywallView {
         AdaptyUI.PaywallView(
@@ -49,7 +46,6 @@ public extension AdaptyPaywallController {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyOnboardingController {
     func toAdaptyUIView() -> AdaptyUI.OnboardingView {
         AdaptyUI.OnboardingView(
@@ -60,7 +56,6 @@ public extension AdaptyOnboardingController {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension AdaptyOnboardingUIView {
     func toAdaptyUIView() -> AdaptyUI.OnboardingView {
         AdaptyUI.OnboardingView(

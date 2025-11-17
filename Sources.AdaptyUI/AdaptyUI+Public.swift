@@ -29,7 +29,6 @@ public extension AdaptyUI {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     /// This enum describes user initiated actions.
     enum Action {
@@ -47,7 +46,6 @@ public extension AdaptyUI {
 import UIKit
 
 /// Implement this protocol to respond to different events happening inside the purchase screen.
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyPaywallControllerDelegate: AnyObject {
     /// This method is invoked when the paywall view was presented.
@@ -191,21 +189,16 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
 }
 
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public typealias AdaptyTimerResolver = AdaptyUITimerResolver
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public typealias AdaptyTagResolver = AdaptyUITagResolver
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public typealias AdaptyAssetsResolver = AdaptyUIAssetsResolver
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public typealias AdaptyCustomAsset = AdaptyUICustomAsset
 
 #endif
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public protocol AdaptyObserverModeResolver: Sendable {
     func observerMode(
         didInitiatePurchase product: AdaptyPaywallProduct,
@@ -214,7 +207,6 @@ public protocol AdaptyObserverModeResolver: Sendable {
     )
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension AdaptyUI {
     internal static var isActivated: Bool = false
@@ -267,7 +259,6 @@ public extension AdaptyUI {
 
 #if canImport(UIKit)
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension AdaptyUI {
     /// If you are using the [Paywall Builder](https://adapty.io/docs/3.0/adapty-paywall-builder), you can use this method to get a configuration object for your paywall.

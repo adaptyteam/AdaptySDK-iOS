@@ -11,7 +11,6 @@ import StoreKit
 import UIKit
 #endif
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension SK2Product {
     func unfPurchase(

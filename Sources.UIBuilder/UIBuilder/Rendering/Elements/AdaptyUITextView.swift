@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUITextView: View {
     @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyUITagResolverViewModel
@@ -68,14 +67,12 @@ struct AdaptyUITextView: View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUIBuilder {
     enum RichTextError: Error {
         case tagReplacementNotFound
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension Array where Element == VC.RichText.Item {
     func convertToSwiftUITextThrowingError(
@@ -143,7 +140,6 @@ extension Array where Element == VC.RichText.Item {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension VC.RichText {
     func convertToSwiftUIText(
@@ -191,7 +187,6 @@ extension VC.RichText {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.ImageData.Resolved {
     private var uiImage: UIImage? {
         switch self {
@@ -233,7 +228,6 @@ extension UIImage {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension VC.Text {
     enum ProductInfoContainer {
@@ -270,7 +264,6 @@ extension VC.Text {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AttributedString {
     static func createFrom(
@@ -312,7 +305,6 @@ extension UIFont {
     static let adaptyDefault = UIFont.systemFont(ofSize: 15.0)
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension VC.RichText.TextAttributes {
     func uiFont(_ assetsResolver: AdaptyUIAssetsResolver) -> UIFont {

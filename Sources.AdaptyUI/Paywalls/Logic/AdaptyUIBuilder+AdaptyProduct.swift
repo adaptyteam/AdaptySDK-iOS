@@ -16,7 +16,6 @@ enum AdaptyPaywallProductWrapper {
     case full(AdaptyPaywallProduct)
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyPaywallProductWrapper: ProductResolver {
     private var anyProduct: AdaptyPaywallProductWithoutDeterminingOffer {
         switch self {
@@ -82,7 +81,6 @@ extension AdaptyPaywallProductWrapper: ProductResolver {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyProduct {
     func pricePer(period: AdaptySubscriptionPeriod.Unit) -> String? {
         guard let skProduct = sk2Product else { return nil }

@@ -7,7 +7,6 @@
 
 import StoreKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyProfile.AccessLevel {
     init?(
         id: String,
@@ -119,7 +118,6 @@ private extension PurchasedSubscriptionOfferInfo {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension Product.SubscriptionInfo.RenewalInfo.ExpirationReason {
     func asString(_ isRefund: Bool) -> String {
         guard !isRefund else {

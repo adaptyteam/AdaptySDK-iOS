@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Alignment {
     static func from(
         horizontal: HorizontalAlignment,
@@ -30,7 +29,6 @@ extension Alignment {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.HorizontalAlignment {
     func swiftuiValue(with layoutDirection: LayoutDirection) -> SwiftUI.HorizontalAlignment {
         switch self {
@@ -54,7 +52,6 @@ extension VC.HorizontalAlignment {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.VerticalAlignment {
     var swiftuiValue: SwiftUI.VerticalAlignment {
         switch self {
@@ -66,7 +63,6 @@ extension VC.VerticalAlignment {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Stack {
     func swiftuiValue(with layoutDirection: LayoutDirection) -> Alignment {
         Alignment.from(

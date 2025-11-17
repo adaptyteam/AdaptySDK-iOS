@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIShadowModifier: ViewModifier {
     private let filling: VC.Mode<VC.Filling>
     private let blurRadius: Double
@@ -50,7 +49,6 @@ struct AdaptyUIShadowModifier: ViewModifier {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func shadow(

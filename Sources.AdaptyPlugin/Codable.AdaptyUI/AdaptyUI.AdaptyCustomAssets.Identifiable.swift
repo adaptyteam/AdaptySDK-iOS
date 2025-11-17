@@ -12,7 +12,6 @@ import AdaptyUI
 import AdaptyUIBuilder
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUICustomAsset {
     struct Identifiable {
         let id: String
@@ -26,7 +25,6 @@ extension AdaptyUICustomAsset {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUICustomAsset.Identifiable: Decodable {
     enum CodingKeys: String, CodingKey {
         case id

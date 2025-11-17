@@ -11,7 +11,6 @@ import Adapty
 import AdaptyUIBuilder
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public struct AdaptyLoadingPlaceholderView: View {
     public init() {}
@@ -24,7 +23,6 @@ public struct AdaptyLoadingPlaceholderView: View {
 }
 
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where AlertItem: Identifiable, Placeholder: View {
     @Environment(\.presentationMode) private var presentationMode
@@ -152,7 +150,6 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension View {
     /// Presents a paywall when a binding to a Boolean value that you

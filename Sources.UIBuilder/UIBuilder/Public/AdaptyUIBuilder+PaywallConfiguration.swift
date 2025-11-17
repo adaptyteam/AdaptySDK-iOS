@@ -9,7 +9,6 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension AdaptyUIBuilder {
     static func getPaywallConfiguration(
@@ -33,7 +32,6 @@ public extension AdaptyUIBuilder {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUIBuilder {
     @MainActor
     final class PaywallConfiguration {

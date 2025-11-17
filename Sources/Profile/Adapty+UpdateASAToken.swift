@@ -34,7 +34,6 @@ extension Adapty {
         }
     }
 
-    @available(iOS 14.3, macOS 11.1, visionOS 1.0, *)
     static func getASAToken() throws -> String {
         let stamp = Log.stamp
         Adapty.trackSystemEvent(AdaptyAppleRequestParameters(

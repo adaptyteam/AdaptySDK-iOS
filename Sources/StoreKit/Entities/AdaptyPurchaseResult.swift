@@ -61,7 +61,6 @@ public enum AdaptyPurchaseResult: Sendable {
         return sk1Transaction
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     public var sk2SignedTransaction: VerificationResult<Transaction>? {
         guard case let .success(_, transaction) = self,
               let result = transaction as? VerificationResult<Transaction>
@@ -72,12 +71,10 @@ public enum AdaptyPurchaseResult: Sendable {
     }
 
     /// A transaction object, which represents the payment.
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     public var sk2Transaction: Transaction? {
         sk2SignedTransaction?.unsafePayloadValue
     }
     
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     public var jwsTransaction: String? {
         sk2SignedTransaction?.jwsRepresentation
     }

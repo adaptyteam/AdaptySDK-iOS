@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder: View {
     @Environment(\.presentationMode) private var presentationMode
@@ -99,7 +98,6 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public extension View {
     func paywall<Placeholder: View>(
@@ -133,7 +131,6 @@ public extension View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public struct AdaptyUIPaywallView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
