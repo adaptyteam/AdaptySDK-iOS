@@ -20,11 +20,7 @@ public extension Adapty {
             Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: name, stamp: stamp))
 
             #if (os(iOS) || os(visionOS)) && !targetEnvironment(macCatalyst)
-            if #available(iOS 14.0, visionOS 1.0, *) {
-                SKPaymentQueue.default().presentCodeRedemptionSheet()
-            } else {
-                error = "Presenting code redemption sheet is available only for iOS 14 and higher."
-            }
+            SKPaymentQueue.default().presentCodeRedemptionSheet()
             #else
             error = "Presenting code redemption sheet is available only for iOS 14 and higher."
             #endif

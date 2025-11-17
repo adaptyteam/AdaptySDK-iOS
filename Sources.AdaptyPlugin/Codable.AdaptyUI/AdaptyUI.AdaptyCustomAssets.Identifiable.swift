@@ -84,7 +84,7 @@ extension AdaptyUICustomAsset.Identifiable: Decodable {
 
 private extension String {
     var asFileURL: URL {
-        if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             URL(filePath: self)
         } else {
             URL(fileURLWithPath: self)

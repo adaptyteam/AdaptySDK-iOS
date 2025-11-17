@@ -82,13 +82,13 @@ public struct AdaptyOnboardingView<Placeholder: View>: View {
     }
 
     public var body: some View {
-        if #available(iOS 14.0, *) {
+//        if #available(iOS 14.0, *) {
             zstackBody
                 .ignoresSafeArea()
-        } else {
-            zstackBody
-                .edgesIgnoringSafeArea(.all)
-        }
+//        } else {
+//            zstackBody
+//                .edgesIgnoringSafeArea(.all)
+//        }
     }
 }
 

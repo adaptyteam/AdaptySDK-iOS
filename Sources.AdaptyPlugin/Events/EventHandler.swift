@@ -25,9 +25,7 @@ public extension AdaptyPlugin {
         Adapty.delegate = delegate
 
 #if canImport(UIKit)
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            AdaptyUI.universalDelegate = delegate
-        }
+        AdaptyUI.universalDelegate = delegate
 #endif
     }
 }

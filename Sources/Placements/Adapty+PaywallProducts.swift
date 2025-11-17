@@ -21,22 +21,10 @@ public extension Adapty {
             methodName: .getPaywallProducts,
             logParams: ["placement_id": paywall.placement.id]
         ) { sdk throws(AdaptyError) in
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                if let manager = sdk.productsManager as? SK2ProductsManager {
-                    return try await sdk.getSK2PaywallProducts(
-                        paywall: paywall,
-                        productsManager: manager
-                    )
-                }
-            } else {
-                if let manager = sdk.productsManager as? SK1ProductsManager {
-                    return try await sdk.getSK1PaywallProducts(
-                        paywall: paywall,
-                        productsManager: manager
-                    )
-                }
-            }
-            return []
+            try await sdk.getSK2PaywallProducts(
+                paywall: paywall,
+                productsManager: sdk.productsManager
+            )
         }
     }
 
@@ -45,22 +33,10 @@ public extension Adapty {
             methodName: .getPaywallProductsWithoutDeterminingOffer,
             logParams: ["placement_id": paywall.placement.id]
         ) { sdk throws(AdaptyError) in
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                if let manager = sdk.productsManager as? SK2ProductsManager {
-                    return try await sdk.getSK2PaywallProductsWithoutOffers(
-                        paywall: paywall,
-                        productsManager: manager
-                    )
-                }
-            } else {
-                if let manager = sdk.productsManager as? SK1ProductsManager {
-                    return try await sdk.getSK1PaywallProductsWithoutOffers(
-                        paywall: paywall,
-                        productsManager: manager
-                    )
-                }
-            }
-            return []
+            try await sdk.getSK2PaywallProductsWithoutOffers(
+                paywall: paywall,
+                productsManager: sdk.productsManager
+            )
         }
     }
 
@@ -75,39 +51,17 @@ public extension Adapty {
         webPaywallBaseUrl: URL?
     ) async throws(AdaptyError) -> AdaptyPaywallProduct {
         let sdk = try await Adapty.activatedSDK
-
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            guard let manager = sdk.productsManager as? SK2ProductsManager else {
-                throw .cantMakePayments()
-            }
-            return try await sdk.getSK2PaywallProduct(
-                adaptyProductId: adaptyProductId,
-                productInfo: productInfo,
-                paywallProductIndex: paywallProductIndex,
-                subscriptionOfferIdentifier: subscriptionOfferIdentifier,
-                variationId: variationId,
-                paywallABTestName: paywallABTestName,
-                paywallName: paywallName,
-                webPaywallBaseUrl: webPaywallBaseUrl,
-                productsManager: manager
-            )
-
-        } else {
-            guard let manager = sdk.productsManager as? SK1ProductsManager else {
-                throw .cantMakePayments()
-            }
-            return try await sdk.getSK1PaywallProduct(
-                adaptyProductId: adaptyProductId,
-                productInfo: productInfo,
-                paywallProductIndex: paywallProductIndex,
-                subscriptionOfferIdentifier: subscriptionOfferIdentifier,
-                variationId: variationId,
-                paywallABTestName: paywallABTestName,
-                paywallName: paywallName,
-                productsManager: manager,
-                webPaywallBaseUrl: webPaywallBaseUrl
-            )
-        }
+        return try await sdk.getSK2PaywallProduct(
+            adaptyProductId: adaptyProductId,
+            productInfo: productInfo,
+            paywallProductIndex: paywallProductIndex,
+            subscriptionOfferIdentifier: subscriptionOfferIdentifier,
+            variationId: variationId,
+            paywallABTestName: paywallABTestName,
+            paywallName: paywallName,
+            webPaywallBaseUrl: webPaywallBaseUrl,
+            productsManager: sdk.productsManager
+        )
     }
 
     package nonisolated static func persistOnboardingVariationId(

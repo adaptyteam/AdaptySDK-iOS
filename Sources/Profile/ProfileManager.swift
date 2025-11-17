@@ -195,9 +195,7 @@ extension Adapty {
     }
 
     func profileWithOfflineAccessLevels(_ serverProfile: AdaptyProfile) async -> AdaptyProfile {
-        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
-              let transactionManager = transactionManager as? SK2TransactionManager,
-              let productsManager = productsManager as? SK2ProductsManager
+        guard let transactionManager = transactionManager as? SK2TransactionManager
         else {
             return serverProfile
         }

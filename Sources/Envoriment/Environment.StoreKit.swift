@@ -11,12 +11,7 @@ extension Environment {
     enum StoreKit {
         static let name = "app_store"
 
-        static let storeKit2Enabled: Bool =
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                true
-            } else {
-                false
-            }
+        static let storeKit2Enabled: Bool = true // TODO: Remove
 
         @AdaptyActor
         private static var _lastStorefront: AdaptyStorefront?

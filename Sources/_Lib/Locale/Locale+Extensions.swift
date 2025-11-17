@@ -11,7 +11,7 @@ import StoreKit
 extension Locale {
     @inlinable
     var unfCurrencyCode: String? {
-        if #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) {
+        if #available(iOS 16, macOS 13, tvOS 16, watchOS 9, visionOS 1.0, *) {
             currency?.identifier
         } else {
             currencyCode
@@ -20,7 +20,7 @@ extension Locale {
 
     @inlinable
     var unfRegionCode: String? {
-        if #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) {
+        if #available(iOS 16, macOS 13, tvOS 16, watchOS 9, visionOS 1.0, *) {
             region?.identifier
         } else {
             regionCode
@@ -29,7 +29,7 @@ extension Locale {
 
     @inlinable
     var unfLanguageCode: String? {
-        if #available(macOS 13, iOS 16, tvOS 16, watchOS 9, visionOS 1.0, *) {
+        if #available(iOS 16, macOS 13, tvOS 16, watchOS 9, visionOS 1.0, *) {
             language.languageCode?.identifier
         } else {
             languageCode

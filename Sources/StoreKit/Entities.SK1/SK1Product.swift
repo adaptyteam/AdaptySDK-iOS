@@ -11,8 +11,5 @@ typealias SK1Product = SKProduct
 
 extension SK1Product {
     @inlinable
-    var unfIsFamilyShareable: Bool {
-        guard #available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, visionOS 1.0, *) else { return false }
-        return isFamilyShareable
-    }
+    var unfIsFamilyShareable: Bool { isFamilyShareable }
 }

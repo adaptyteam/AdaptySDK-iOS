@@ -32,13 +32,9 @@ extension Environment.Device {
 
     static var appTrackingTransparencyStatus: UInt? {
         #if ADAPTY_KIDS_MODE || !canImport(AppTrackingTransparency)
-        return nil
+        nil
         #else
-        if #available(iOS 14.0, macOS 11.0, tvOS 14.0, visionOS 1.0, *) {
-            return ATTrackingManager.trackingAuthorizationStatus.rawValue
-        } else {
-            return nil
-        }
+        ATTrackingManager.trackingAuthorizationStatus.rawValue
         #endif
     }
 
@@ -50,10 +46,6 @@ extension Environment.Device {
             #else
             guard !AdaptyConfiguration.idfaCollectionDisabled else {
                 return .notAvailable
-            }
-
-            guard #available(iOS 14.5, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
-                return .allowed
             }
 
             #if !canImport(AppTrackingTransparency)
@@ -82,10 +74,6 @@ extension Environment.Device {
             // Get and return IDFA
 
             let result: String? = await MainActor.run {
-                guard #available(iOS 14.5, macOS 11.0, tvOS 14.0, visionOS 1.0, *) else {
-                    return ASIdentifierManager.shared().advertisingIdentifier.uuidString
-                }
-
                 #if canImport(AppTrackingTransparency)
                 return switch ATTrackingManager.trackingAuthorizationStatus {
                 case .authorized:

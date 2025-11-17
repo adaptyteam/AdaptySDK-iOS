@@ -33,8 +33,7 @@ extension PurchasedSubscriptionOfferInfo {
         transaction: SKTransaction,
         product: AdaptyProduct?
     ) {
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
-           let sk2Transaction = transaction as? SK2Transaction
+        if let sk2Transaction = transaction as? SK2Transaction
         {
             self.init(sk2Transaction: sk2Transaction, product: product)
         } else if let sk1Transaction = transaction as? SK1TransactionWithIdentifier {
@@ -48,8 +47,7 @@ extension PurchasedSubscriptionOfferInfo {
         sk1Transaction: SK1TransactionWithIdentifier,
         product: AdaptyProduct?
     ) {
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
-           let sk2Product = product?.sk2Product
+        if let sk2Product = product?.sk2Product
         {
             self.init(sk1Transaction: sk1Transaction, sk2Product: sk2Product)
         } else if let sk1Product = product?.sk1Product {

@@ -22,7 +22,7 @@ public final class Adapty {
 
     let receiptManager: StoreKitReceiptManager
     let transactionManager: StoreKitTransactionManager
-    let productsManager: StoreKitProductsManager
+    let productsManager: SK2ProductsManager
     var purchaser: StorekitPurchaser?
     var sk1QueueManager: SK1QueueManager?
 

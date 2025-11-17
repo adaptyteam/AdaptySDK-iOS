@@ -14,7 +14,6 @@ private let log = Log.default
 extension Adapty {
     func updateASATokenIfNeed(for profile: VH<AdaptyProfile>) {
         guard
-            #available(iOS 14.3, macOS 11.1, visionOS 1.0, *),
             (try? profileStorage.appleSearchAdsSyncDate(for: profile.userId)) == nil, // check if this is an actual first sync
             let attributionToken = try? Adapty.getASAToken()
         else { return }
