@@ -173,7 +173,7 @@ extension Adapty {
     }
 
     func recalculateOfflineAccessLevels() async -> AdaptyProfile {
-        await (transactionManager as? SK2TransactionManager)?.clearCache()
+        await transactionManager.clearCache()
 
         if let manger = profileManager {
             return await manger.notifyProfileDidChanged()
@@ -195,10 +195,6 @@ extension Adapty {
     }
 
     func profileWithOfflineAccessLevels(_ serverProfile: AdaptyProfile) async -> AdaptyProfile {
-        guard let transactionManager = transactionManager as? SK2TransactionManager
-        else {
-            return serverProfile
-        }
         var verifiedCurrentEntitlements = await transactionManager.getVerifiedCurrentEntitlements()
 
         if await !transactionManager.hasUnfinishedTransactions {

@@ -21,9 +21,9 @@ public final class Adapty {
     let httpConfigsSession: Backend.ConfigsExecutor
 
     let receiptManager: StoreKitReceiptManager
-    let transactionManager: StoreKitTransactionManager
+    let transactionManager: SK2TransactionManager
     let productsManager: SK2ProductsManager
-    var purchaser: StorekitPurchaser?
+    var purchaser: SK2Purchaser?
     var sk1QueueManager: SK1QueueManager?
 
     package let observerMode: Bool
@@ -50,70 +50,40 @@ public final class Adapty {
             _ = await PurchasePayloadStorage.removeAllUnfinishedTransactionState()
         }
 
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            self.receiptManager = StoreKitReceiptManager(
-                httpSession: httpSession,
-                refreshIfEmpty: false
-            )
-            self.transactionManager = SK2TransactionManager(
-                httpSession: httpSession,
+        self.receiptManager = StoreKitReceiptManager(
+            httpSession: httpSession
+        )
+
+        self.transactionManager = SK2TransactionManager(
+            httpSession: httpSession,
+            storage: purchasePayloadStorage
+        )
+
+        let sk2ProductsManager = SK2ProductsManager(
+            apiKeyPrefix: apiKeyPrefix,
+            session: httpSession,
+            storage: productVendorIdsStorage
+        )
+        self.productsManager = sk2ProductsManager
+
+        self.sharedProfileManager = restoreProfileManager(configuration)
+
+        if !observerMode {
+            self.purchaser = SK2Purchaser.startObserving(
+                transactionSynchronizer: self,
+                subscriptionOfferSigner: self,
+                sk2ProductsManager: sk2ProductsManager,
                 storage: purchasePayloadStorage
             )
-            let sk2ProductsManager = SK2ProductsManager(
-                apiKeyPrefix: apiKeyPrefix,
-                session: httpSession,
-                storage: productVendorIdsStorage
+
+            self.sk1QueueManager = SK1QueueManager.startObserving(
+                transactionSynchronizer: self,
+                subscriptionOfferSigner: self,
+                productsManager: sk2ProductsManager,
+                storage: purchasePayloadStorage
             )
-            self.productsManager = sk2ProductsManager
-
-            self.sharedProfileManager = restoreProfileManager(configuration)
-            if !observerMode {
-                self.purchaser = SK2Purchaser.startObserving(
-                    transactionSynchronizer: self,
-                    subscriptionOfferSigner: self,
-                    sk2ProductsManager: sk2ProductsManager,
-                    storage: purchasePayloadStorage
-                )
-
-                self.sk1QueueManager = SK1QueueManager.startObserving(
-                    transactionSynchronizer: self,
-                    subscriptionOfferSigner: self,
-                    productsManager: sk2ProductsManager,
-                    storage: purchasePayloadStorage
-                )
-            }
-
-        } else {
-            self.receiptManager = StoreKitReceiptManager(
-                httpSession: httpSession,
-                refreshIfEmpty: true
-            )
-            self.transactionManager = receiptManager
-            let sk1ProductsManager = SK1ProductsManager(
-                apiKeyPrefix: apiKeyPrefix,
-                session: httpSession,
-                storage: productVendorIdsStorage
-            )
-
-            self.productsManager = sk1ProductsManager
-
-            self.sharedProfileManager = restoreProfileManager(configuration)
-
-            if observerMode {
-                SK1TransactionObserver.startObserving(
-                    transactionSynchronizer: self,
-                    sk1ProductsManager: sk1ProductsManager
-                )
-            } else {
-                self.sk1QueueManager = SK1QueueManager.startObserving(
-                    transactionSynchronizer: self,
-                    subscriptionOfferSigner: self,
-                    productsManager: sk1ProductsManager,
-                    storage: purchasePayloadStorage
-                )
-                self.purchaser = sk1QueueManager
-            }
         }
+
         startSyncIPv4OnceIfNeeded()
     }
 

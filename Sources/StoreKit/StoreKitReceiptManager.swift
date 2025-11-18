@@ -14,14 +14,8 @@ actor StoreKitReceiptManager {
     private let refresher = ReceiptRefresher()
     private var syncing: (task: AdaptyResultTask<Void>, userId: AdaptyUserId)?
 
-    init(httpSession: Backend.MainExecutor, refreshIfEmpty: Bool) {
+    init(httpSession: Backend.MainExecutor) {
         self.httpSession = httpSession
-
-        if refreshIfEmpty {
-            Task {
-                _ = try? await getReceipt()
-            }
-        }
     }
 
     func getReceipt() async throws(AdaptyError) -> Data {

@@ -13,10 +13,6 @@ protocol StoreKitTransactionManager: Actor, Sendable {
     func syncUnfinishedTransactions()  async throws(AdaptyError)
 }
 
-extension StoreKitReceiptManager: StoreKitTransactionManager {
-    func syncUnfinishedTransactions()  async throws(AdaptyError) {}
-}
-
 extension SK2TransactionManager: StoreKitTransactionManager {}
 
 
