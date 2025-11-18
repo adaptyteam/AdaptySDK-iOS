@@ -18,12 +18,7 @@ extension View {
         case .fit:
             aspectRatio(contentMode: .fit)
         case .fill:
-            // TODO: fix incorrect centering behaviour
-            GeometryReader { proxy in
-                self
-                    .aspectRatio(contentMode: .fill)
-                    .frame(maxWidth: proxy.size.width)
-            }
+            aspectRatio(contentMode: .fill)
         case .stretch:
             self
         }
