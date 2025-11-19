@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/ui/4_4_0/schema"
+$id: "https://adapty.io/ui/4_4_1/schema"
 title: "AdaptyUI Configuration"
 type: object
 required: [format, template_id, template_revision, styles]
@@ -156,8 +156,7 @@ $defs:
             { type: integer, default: 0, description: "milliseconds" }
           duration: { type: integer, default: 300, description: "milliseconds" }
           loop: { enum: [normal, ping_pong] }
-          loop_delay:
-            { type: integer, default: 0, description: "milliseconds" }
+          loop_delay: { type: integer, default: 0, description: "milliseconds" }
           ping_pong_delay:
             { type: integer, default: 0, description: "milliseconds" }
           loop_count: { type: integer }
@@ -628,7 +627,10 @@ $defs:
       - required: [type]
         properties:
           type: { const: web_purchase_paywall }
-          open_in: {enum: [browser_out_app, browser_in_app], default: browser_out_app}  # from v4.4.1
+          open_in: {
+              enum: [browser_out_app, browser_in_app],
+              default: browser_out_app,
+            } # from v4.4.1
       - required: [type, product_id]
         properties:
           type: { const: purchase_product }
@@ -636,8 +638,11 @@ $defs:
       - required: [type, product_id]
         properties:
           type: { const: web_purchase_product }
-          product_id: { title: 'Adapty product identifier', type: string }
-          open_in: {enum: [browser_out_app, browser_in_app], default: browser_out_app}  # from v4.4.1
+          product_id: { title: "Adapty product identifier", type: string }
+          open_in: {
+              enum: [browser_out_app, browser_in_app],
+              default: browser_out_app,
+            } # from v4.4.1
       - required: [type, product_id]
         properties:
           type: { const: select_product }
@@ -654,8 +659,11 @@ $defs:
       - required: [type]
         properties:
           type: { const: web_purchase_selected_product }
-          group_id: { default: 'group_A', type: string }
-          open_in: {enum: [browser_out_app, browser_in_app], default: browser_out_app}  # from v4.4.1
+          group_id: { default: "group_A", type: string }
+          open_in: {
+              enum: [browser_out_app, browser_in_app],
+              default: browser_out_app,
+            } # from v4.4.1
       - required: [type, screen_id]
         properties:
           type: { const: open_screen }
