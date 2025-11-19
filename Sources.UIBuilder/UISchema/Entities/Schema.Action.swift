@@ -45,6 +45,7 @@ extension Schema.Action: Decodable {
         case customId = "custom_id"
         case productId = "product_id"
         case groupId = "group_id"
+        case openIn = "open_in"
         case sectionId = "section_id"
         case screenId = "screen_id"
         case index
@@ -81,16 +82,20 @@ extension Schema.Action: Decodable {
         case .custom:
             self = try .action(.custom(id: container.decode(String.self, forKey: .customId)))
         case .openWebPaywall:
-            self = .action(.openWebPaywall)
+            self = try .action(.openWebPaywall(
+                openIn: container.decodeIfPresent(Schema.WebOpenInParameter.self, forKey: .openIn) ?? .browserOutApp
+            ))
         case .purchaseSelectedProduct:
             self = try .action(.purchaseSelectedProduct(
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? Schema.StringId.Product.defaultProductGroupId,
-                provider: .storeKit
+                service: .storeKit
             ))
         case .webPurchaseSelectedProduct:
             self = try .action(.purchaseSelectedProduct(
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? Schema.StringId.Product.defaultProductGroupId,
-                provider: .openWebPaywall
+                service: .openWebPaywall(
+                    openIn: container.decodeIfPresent(Schema.WebOpenInParameter.self, forKey: .openIn) ?? .browserOutApp
+                )
             ))
         case .unselectProduct:
             self = try .action(.unselectProduct(
@@ -102,9 +107,11 @@ extension Schema.Action: Decodable {
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? Schema.StringId.Product.defaultProductGroupId
             ))
         case .purchaseProductId:
-            self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId), provider: .storeKit))
+            self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId), service: .storeKit))
         case .webPurchaseProductId:
-            self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId), provider: .openWebPaywall))
+            self = try .action(.purchaseProduct(id: container.decode(String.self, forKey: .productId), service: .openWebPaywall(
+                openIn: container.decodeIfPresent(Schema.WebOpenInParameter.self, forKey: .openIn) ?? .browserOutApp
+            )))
         case .switchSection:
             self = try .action(.switchSection(id: container.decode(String.self, forKey: .sectionId), index: container.decode(Int.self, forKey: .index)))
         case .openScreen:
