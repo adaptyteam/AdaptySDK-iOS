@@ -192,8 +192,6 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         onStart: @MainActor @escaping () -> Void,
         onFinish: @MainActor @escaping () -> Void
     ) {
-        events.event_didStartRestore()
-
         if let observerModeResolver {
             observerModeResolver.observerModeDidInitiateRestorePurchases(
                 onStartRestore: onStart,
@@ -201,6 +199,8 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
             )
         } else {
             Task { @MainActor in
+                events.event_didStartRestore()
+
                 onStart()
                 do {
                     let profile = try await Adapty.restorePurchases()
