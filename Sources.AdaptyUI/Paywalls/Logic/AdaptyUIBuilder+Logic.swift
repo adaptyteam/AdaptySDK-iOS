@@ -110,8 +110,8 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
 
     func makePurchase(
         product: ProductResolver,
-        onStart: @escaping () -> Void,
-        onFinish: @escaping () -> Void
+        onStart: @MainActor @escaping () -> Void,
+        onFinish: @MainActor @escaping () -> Void
     ) {
         guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
               case .full(let adaptyProduct) = adaptyProductWrapper
@@ -188,14 +188,28 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         }
     }
 
-    func restorePurchases() async {
+    func restorePurchases(
+        onStart: @MainActor @escaping () -> Void,
+        onFinish: @MainActor @escaping () -> Void
+    ) {
         events.event_didStartRestore()
 
-        do {
-            let profile = try await Adapty.restorePurchases()
-            events.event_didFinishRestore(with: profile)
-        } catch {
-            events.event_didFailRestore(with: error.asAdaptyError)
+        if let observerModeResolver {
+            observerModeResolver.observerModeDidInitiateRestorePurchases(
+                onStartRestore: onStart,
+                onFinishRestore: onFinish
+            )
+        } else {
+            Task { @MainActor in
+                onStart()
+                do {
+                    let profile = try await Adapty.restorePurchases()
+                    events.event_didFinishRestore(with: profile)
+                } catch {
+                    events.event_didFailRestore(with: error.asAdaptyError)
+                }
+                onFinish()
+            }
         }
     }
 

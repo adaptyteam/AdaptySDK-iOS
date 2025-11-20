@@ -179,11 +179,10 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     }
 
     func restorePurchases() {
-        Task { @MainActor [weak self] in
-            self?.restoreInProgress = true
-            await self?.logic.restorePurchases()
-            self?.restoreInProgress = false
-        }
+        logic.restorePurchases(
+            onStart: { [weak self] in self?.restoreInProgress = true },
+            onFinish: { [weak self] in self?.restoreInProgress = false }
+        )
     }
 }
 

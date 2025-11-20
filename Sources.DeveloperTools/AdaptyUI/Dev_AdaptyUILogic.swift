@@ -40,8 +40,8 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
 
     func makePurchase(
         product: ProductResolver,
-        onStart: @escaping () -> Void,
-        onFinish: @escaping () -> Void
+        onStart: @MainActor @escaping () -> Void,
+        onFinish: @MainActor @escaping () -> Void
     ) {}
 
     func openWebPaywall(
@@ -49,7 +49,10 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         in openIn: VC.WebOpenInParameter
     ) async {}
 
-    func restorePurchases() async {}
+    func restorePurchases(
+        onStart: @MainActor @escaping () -> Void,
+        onFinish: @MainActor @escaping () -> Void
+    ) {}
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {}
 }

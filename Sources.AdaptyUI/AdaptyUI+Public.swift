@@ -209,8 +209,13 @@ public typealias AdaptyCustomAsset = AdaptyUICustomAsset
 public protocol AdaptyObserverModeResolver: Sendable {
     func observerMode(
         didInitiatePurchase product: AdaptyPaywallProduct,
-        onStartPurchase: @escaping () -> Void,
-        onFinishPurchase: @escaping () -> Void
+        onStartPurchase: @MainActor @escaping () -> Void,
+        onFinishPurchase: @MainActor @escaping () -> Void
+    )
+    
+    func observerModeDidInitiateRestorePurchases(
+        onStartRestore: @MainActor @escaping () -> Void,
+        onFinishRestore: @MainActor @escaping () -> Void
     )
 }
 
