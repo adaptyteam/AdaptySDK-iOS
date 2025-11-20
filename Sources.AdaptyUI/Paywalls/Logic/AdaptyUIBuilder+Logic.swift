@@ -162,7 +162,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         }
     }
 
-    func openWebPaywall(for product: ProductResolver) async {
+    func openWebPaywall(for product: ProductResolver, in openIn: VC.WebOpenInParameter) async {
         guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
               case .full(let adaptyProduct) = adaptyProductWrapper
         else {
@@ -171,7 +171,10 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         }
 
         do {
-            try await Adapty.openWebPaywall(for: adaptyProduct)
+            try await Adapty.openWebPaywall(
+                for: adaptyProduct,
+                in: openIn.toURLOpenMode
+            )
 
             events.event_didFinishWebPaymentNavigation(
                 product: adaptyProduct,
@@ -211,6 +214,15 @@ private extension AdaptyPaywall {
                     $0.vendorProductId == vendorProductId
                 }
             )
+        }
+    }
+}
+
+private extension VC.WebOpenInParameter {
+    var toURLOpenMode: AdaptyURLOpenMode {
+        switch self {
+        case .browserInApp: .inAppBrowser
+        case .browserOutApp: .externalBrowser
         }
     }
 }

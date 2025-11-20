@@ -68,7 +68,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     }
 
     private var groupIdsForAutoNotification = Set<String>()
-    
+
     package func resetSelectedProducts() {
         Log.ui.verbose("#\(logId)# resetSelectedProducts")
 
@@ -171,10 +171,9 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
                 onStart: { [weak self] in self?.purchaseInProgress = true },
                 onFinish: { [weak self] in self?.purchaseInProgress = false }
             )
-        case .openWebPaywall( let openIn):
+        case .openWebPaywall(let openIn):
             Task { @MainActor [weak self] in
-                guard openIn == .browserOutApp else { return }
-                await self?.logic.openWebPaywall(for: product)
+                await self?.logic.openWebPaywall(for: product, in: openIn)
             }
         }
     }

@@ -6,15 +6,23 @@
 //
 
 import Foundation
+
 #if os(iOS)
-import UIKit
+    import SafariServices
+    import UIKit
 #elseif os(macOS)
-import AppKit
+    import AppKit
 #endif
+
+public enum AdaptyURLOpenMode: String, Sendable {
+    case externalBrowser
+    case inAppBrowser
+}
 
 public extension Adapty {
     nonisolated static func openWebPaywall(
-        for product: AdaptyPaywallProduct
+        for product: AdaptyPaywallProduct,
+        in mode: AdaptyURLOpenMode = .externalBrowser
     ) async throws(AdaptyError) {
         try await withActivatedSDK(
             methodName: .openWebPaywall,
@@ -24,9 +32,10 @@ public extension Adapty {
                 "product_id": product.vendorProductId,
                 "web_purchase_url": (product as? WebPaywallURLProviding)?.webPaywallBaseUrl,
                 "paywall_product_index": product.paywallProductIndex,
+                "mode": mode.rawValue,
             ]
         ) { sdk throws(AdaptyError) in
-            try await sdk.openWebPaywall(for: product)
+            try await sdk.openWebPaywall(for: product, mode: mode)
         }
     }
 
@@ -49,7 +58,8 @@ public extension Adapty {
     }
 
     nonisolated static func openWebPaywall(
-        for paywall: AdaptyPaywall
+        for paywall: AdaptyPaywall,
+        in mode: AdaptyURLOpenMode = .externalBrowser
     ) async throws(AdaptyError) {
         try await withActivatedSDK(
             methodName: .openWebPaywall,
@@ -57,9 +67,10 @@ public extension Adapty {
                 "paywall_name": paywall.name,
                 "variation_id": paywall.variationId,
                 "web_purchase_url": paywall.webPaywallBaseUrl,
+                "mode": mode.rawValue,
             ]
         ) { sdk throws(AdaptyError) in
-            try await sdk.openWebPaywall(for: paywall)
+            try await sdk.openWebPaywall(for: paywall, mode: mode)
         }
     }
 
@@ -79,20 +90,22 @@ public extension Adapty {
     }
 
     private func openWebPaywall(
-        for product: AdaptyPaywallProduct
+        for product: AdaptyPaywallProduct,
+        mode: AdaptyURLOpenMode
     ) async throws(AdaptyError) {
         let url = try createWebPaywallUrl(for: product)
-        guard await url.open() else {
+        guard await url.open(mode: mode) else {
             throw .failedOpeningWebPaywallUrl(url)
         }
         profileStorage.setLastOpenedWebPaywallDate()
     }
 
     private func openWebPaywall(
-        for paywall: AdaptyPaywall
+        for paywall: AdaptyPaywall,
+        mode: AdaptyURLOpenMode
     ) async throws(AdaptyError) {
         let url = try createWebPaywallUrl(for: paywall)
-        guard await url.open() else {
+        guard await url.open(mode: mode) else {
             throw .failedOpeningWebPaywallUrl(url)
         }
         profileStorage.setLastOpenedWebPaywallDate()
@@ -142,11 +155,23 @@ public extension Adapty {
 
 private extension URL {
     @MainActor
-    func open() async -> Bool {
+    func open(mode: AdaptyURLOpenMode) async -> Bool {
         #if os(iOS)
-        await UIApplication.shared.open(self, options: [:])
+            switch mode {
+            case .externalBrowser:
+                return await UIApplication.shared.open(self, options: [:])
+            case .inAppBrowser:
+                guard let topViewController = UIApplication.shared.topPresentedController else {
+                    return await UIApplication.shared.open(self, options: [:])
+                }
+                
+                let safariViewController = SFSafariViewController(url: self)
+                topViewController.present(safariViewController, animated: true)
+                return true
+            }
         #elseif os(macOS)
-        NSWorkspace.shared.open(self)
+            NSWorkspace.shared.open(self)
+            return true
         #endif
     }
 

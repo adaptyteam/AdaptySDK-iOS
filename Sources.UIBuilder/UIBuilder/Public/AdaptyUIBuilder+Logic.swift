@@ -63,7 +63,10 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
         events.event_didStartRestore()
     }
 
-    func openWebPaywall(for product: any ProductResolver) async {}
+    func openWebPaywall(
+        for product: ProductResolver,
+        in openIn: VC.WebOpenInParameter
+    ) async {}
     
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {
         events.event_didFailRendering(with: error)

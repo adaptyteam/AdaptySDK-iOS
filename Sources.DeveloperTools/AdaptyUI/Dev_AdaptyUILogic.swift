@@ -44,7 +44,10 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         onFinish: @escaping () -> Void
     ) {}
 
-    func openWebPaywall(for product: ProductResolver) async {}
+    func openWebPaywall(
+        for product: ProductResolver,
+        in openIn: VC.WebOpenInParameter
+    ) async {}
 
     func restorePurchases() async {}
 
