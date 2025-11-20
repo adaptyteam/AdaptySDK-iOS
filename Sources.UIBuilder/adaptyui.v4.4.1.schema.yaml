@@ -1,12 +1,12 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/ui/4_2_0/schema"
+$id: "https://adapty.io/ui/4_4_1/schema"
 title: "AdaptyUI Configuration"
 type: object
 required: [format, template_id, template_revision, styles]
 properties:
   format:
     type: string
-    const: "4.2.0-SNAPSHOT"
+    const: "4.4.1-SNAPSHOT"
   template_id:
     title: "Visual template id"
     type: string
@@ -100,8 +100,6 @@ $defs:
   Point:
     title: Point
     anyOf:
-      - type: number
-        description: "x and y same value"
       - type: array
         items: { type: number }
         description: "[y,x], default 0"
@@ -113,15 +111,14 @@ $defs:
   Offset:
     title: Offset
     anyOf:
-      - type: { $ref: "#/$defs/Unit" } # from v4.3.0
-        description: "y value, x = 0 "
+      - { $ref: "#/$defs/Unit", description: "y value, x:0" } # from v4.4.0
       - type: array
-        items: { $ref: "#/$defs/Unit" } # from v4.3.0
-        description: "[y] or [y,x], default 0"
+        items: { $ref: "#/$defs/Unit" } # from v4.4.0
+        description: "[] => y:0,x:0, [y] => x:0, [y,x]"
       - type: object
         properties:
-          y: { { $ref: "#/$defs/Unit" }, default: 0 } # from v4.3.0
-          x: { { $ref: "#/$defs/Unit" }, default: 0 } # from v4.3.0
+          y: { $ref: "#/$defs/Unit", default: 0 } # from v4.4.0
+          x: { $ref: "#/$defs/Unit", default: 0 } # from v4.4.0
 
   Unit:
     title: Unit
@@ -149,20 +146,212 @@ $defs:
           value: { type: number }
           unit: { type: string, enum: [point, screen], default: point }
 
+  Animation: # from v4.4.0
+    type: object
+    allOf:
+      - properties:
+          interpolator:
+            { $ref: "#/$defs/Animation.Interpolator", default: ease_in_out }
+          start_delay:
+            { type: integer, default: 0, description: "milliseconds" }
+          duration: { type: integer, default: 300, description: "milliseconds" }
+          loop: { enum: [normal, ping_pong] }
+          loop_delay: { type: integer, default: 0, description: "milliseconds" }
+          ping_pong_delay:
+            { type: integer, default: 0, description: "milliseconds" }
+          loop_count: { type: integer }
+      - oneOf:
+          - { $ref: "#/$defs/Animation.Opacity" }
+          - { $ref: "#/$defs/Animation.Offset" }
+          - { $ref: "#/$defs/Animation.Rotation" }
+          - { $ref: "#/$defs/Animation.Scale" }
+          - { $ref: "#/$defs/Animation.Box" }
+          - { $ref: "#/$defs/Animation.Background" }
+          - { $ref: "#/$defs/Animation.Border" }
+          - { $ref: "#/$defs/Animation.Shadow" }
+
+  Animation.Interpolator:
+    oneOf:
+      - type: string
+        enum:
+          - ease_in_out
+          - ease_in
+          - ease_out
+          - linear
+          - ease_in_elastic # from v4.4.0
+          - ease_out_elastic # from v4.4.0
+          - ease_in_out_elastic # from v4.4.0
+          - ease_in_bounce # from v4.4.0
+          - ease_out_bounce # from v4.4.0
+          - ease_in_out_bounce # from v4.4.0
+      - type: array # from v4.4.0
+        items: { type: number }
+        description: "[ x1, y1, x2, y2] 4 numbers used for 2 point Cubic-Bezier curve"
+    default: ease_in_out
+
+  Animation.Opacity:
+    type: object
+    required: [type]
+    properties:
+      type: { const: opacity }
+      opacity:
+        type: object
+        required: [start, end]
+        properties:
+          start: { type: number }
+          end: { type: number }
+        default: { “start”: 0, “end”: 1 }
+
+  Animation.Offset:
+    type: object
+    required: [type, offset]
+    properties:
+      type: { const: offset }
+      offset:
+        type: object
+        required: [start, end]
+        properties:
+          start: { $ref: "#/$defs/Offset" }
+          end: { $ref: "#/$defs/Offset" }
+
+  Animation.Rotation:
+    type: object
+    required: [type, angle]
+    properties:
+      type: { const: rotation }
+      angle:
+        type: object
+        required: [start, end]
+        properties:
+          start: { type: number, description: "degrees" }
+          end: { type: number, description: "degrees" }
+      anchor: { default: [0.5, 0.5] }
+
+  Animation.Scale:
+    type: object
+    required: [type, scale]
+    properties:
+      type: { const: scale }
+      scale:
+        type: object
+        required: [start, end]
+        properties:
+          start: { $ref: "#/$defs/Point" }
+          end: { $ref: "#/$defs/Point" }
+      anchor: { default: [0.5, 0.5] }
+
+  Animation.Box:
+    type: object
+    required: [type]
+    properties:
+      type: { const: box }
+    anyOf:
+      - required: [width]
+        properties:
+          width:
+            type: object
+            required: [start, end]
+            properties:
+              start: { $ref: "#/$defs/Unit" }
+              end: { $ref: "#/$defs/Unit" }
+      - required: [height]
+        properties:
+          height:
+            type: object
+            required: [start, end]
+            properties:
+              start: { $ref: "#/$defs/Unit" }
+              end: { $ref: "#/$defs/Unit" }
+
+  Animation.Background:
+    type: object
+    required: [type, color]
+    properties:
+      type: { const: background }
+      color:
+        type: object
+        required: [start, end]
+        properties:
+          start:
+            { type: string, description: "color[-gradient] asset identifier" }
+          end:
+            { type: string, description: "color[-gradient] asset identifier" }
+
+  Animation.Border:
+    type: object
+    required: [type]
+    properties:
+      type: { const: border }
+    anyOf:
+      - required: [color]
+        properties:
+          color:
+            type: object
+            required: [start, end]
+            properties:
+              start:
+                {
+                  type: string,
+                  description: "color[-gradient] asset identifier",
+                }
+              end:
+                {
+                  type: string,
+                  description: "color[-gradient] asset identifier",
+                }
+      - required: [thickness]
+        properties:
+          thickness:
+            type: object
+            required: [start, end]
+            properties:
+              start: { type: number }
+              end: { type: number }
+
+  Animation.Shadow:
+    type: object
+    required: [type]
+    properties:
+      type: { const: shadow }
+    anyOf:
+      - required: [color]
+        properties:
+          color:
+            type: object
+            required: [start, end]
+            properties:
+              start:
+                {
+                  type: string,
+                  description: "color[-gradient] asset identifier",
+                }
+              end:
+                {
+                  type: string,
+                  description: "color[-gradient] asset identifier",
+                }
+      - required: [blur_radius]
+        properties:
+          blur_radius:
+            type: object
+            required: [start, end]
+            properties:
+              start: { type: number }
+              end: { type: number }
+      - required: [offset]
+        properties:
+          offset:
+            type: object
+            required: [start, end]
+            properties:
+              start: { $ref: "#/$defs/Offset" }
+              end: { $ref: "#/$defs/Offset" }
+
   Transition:
     type: object
     required: [type]
     anyOf:
       - $ref: "#/$defs/Transition.Fade"
-
-  Transition.Interpolator:
-    type: string
-    enum:
-      - ease_in_out
-      - ease_in
-      - ease_out
-      - linear
-    default: ease_in_out
 
   Transition.Fade:
     type: object
@@ -171,7 +360,8 @@ $defs:
       type: { const: fade }
       start_delay: { type: number, default: 0 }
       duration: { type: number, default: 300 }
-      interpolator: { $ref: "#/$defs/Transition.Interpolator" }
+      interpolator:
+        { $ref: "#/$defs/Animation.Interpolator", default: ease_in_out }
 
   Transition.Slide:
     type: object
@@ -180,7 +370,8 @@ $defs:
       type: { const: slide }
       start_delay: { type: number, default: 0 }
       duration: { type: number, default: 300 }
-      interpolator: { $ref: "#/$defs/Transition.Interpolator" }
+      interpolator:
+        { $ref: "#/$defs/Animation.Interpolator", default: ease_in_out }
 
   ###### UI Components ######
 
@@ -237,11 +428,13 @@ $defs:
         additionalProperties: false
         properties:
           min: { $ref: "#/$defs/Unit" }
+          max: { $ref: "#/$defs/Unit" } # from v4.2.0
       - type: object
         required: [shrink]
         additionalProperties: false
         properties:
           shrink: { $ref: "#/$defs/Unit" }
+          max: { $ref: "#/$defs/Unit" } # from v4.2.0
 
   UI.Element:
     type: object
@@ -268,27 +461,12 @@ $defs:
               decorator: { $ref: "#/$defs/UI.Element.Decorator" }
               padding: { $ref: "#/$defs/EdgeInsets", default: 0 }
               offset: { $ref: "#/$defs/Offset", default: 0 }
-          - oneOf: # from v4.3.0
-              - properties:
-                  visibility: { type: boolean, default: true, deprecated: true }
-              - properties:
-                  opacity: { type: number, default: 1 }
-          - oneOf: # from v4.3.0
-              - properties:
-                  transition_in:
-                    deprecated: true
-                    anyOf:
-                      - type: array
-                        items: { $ref: "#/$defs/Transition" }
-                        minItems: 1
-                      - $ref: "#/$defs/Transition"
-              - properties:
-                  on_appiar:
-                    anyOf:
-                      - type: array
-                        items: { $ref: "#/$defs/Transition" }
-                        minItems: 1
-                      - $ref: "#/$defs/Transition"
+              opacity: { type: number, default: 1.0 } # from v4.4.0
+              on_appear: # from v4.4.0
+                type: array
+                items: { $ref: "#/$defs/Animation" }
+              visibility: { type: boolean, default: true } # deprecated from v4.4.0
+              transition_in: { $ref: "#/$defs/Transition" } # deprecated from v4.4.0
 
   UI.Element.Decorator:
     title: "Decorator for any element"
@@ -302,7 +480,7 @@ $defs:
       type: { $ref: "#/$defs/UI.Element.Decorator.ShapeType", default: rect }
       border:
         { type: string, title: "Border color[-gradient] asset identifier" }
-      shadow: {} # from v4.3.0
+      shadow: { $ref: "#/$defs/UI.Element.Decorator.Shadow" } # from v4.4.0
     dependentSchemas:
       border:
         properties:
@@ -323,13 +501,18 @@ $defs:
       - curve_up
       - curve_down
 
-  UI.Element.Decorator.Shadow: # from v4.3.0
+  UI.Element.Decorator.Shadow: # from v4.4.0
     title: "Shadow"
     type: object
     required: [color]
     properties:
-      color: { type: string, title: "Color asset identifier" }
-      blur_radius: { type: number, default: 0 }
+      color: { type: string, title: "Border color asset identifier" }
+      blur_radius:
+        {
+          type: number,
+          default: 0,
+          description: "A measure of how much to blur the shadow. Larger values result in more blur.",
+        }
       offset: { $ref: "#/$defs/Offset", default: [0, 0] }
 
   UI.Image:
@@ -441,10 +624,25 @@ $defs:
         properties:
           type: { const: custom }
           custom_id: { title: "Custom action identifier", type: string }
+      - required: [type]
+        properties:
+          type: { const: web_purchase_paywall }
+          open_in: {
+              enum: [browser_out_app, browser_in_app],
+              default: browser_out_app,
+            } # from v4.4.1
       - required: [type, product_id]
         properties:
           type: { const: purchase_product }
           product_id: { title: "Adapty product identifier", type: string }
+      - required: [type, product_id]
+        properties:
+          type: { const: web_purchase_product }
+          product_id: { title: "Adapty product identifier", type: string }
+          open_in: {
+              enum: [browser_out_app, browser_in_app],
+              default: browser_out_app,
+            } # from v4.4.1
       - required: [type, product_id]
         properties:
           type: { const: select_product }
@@ -458,6 +656,14 @@ $defs:
         properties:
           type: { const: purchase_selected_product }
           group_id: { default: "group_A", type: string }
+      - required: [type]
+        properties:
+          type: { const: web_purchase_selected_product }
+          group_id: { default: "group_A", type: string }
+          open_in: {
+              enum: [browser_out_app, browser_in_app],
+              default: browser_out_app,
+            } # from v4.4.1
       - required: [type, screen_id]
         properties:
           type: { const: open_screen }
