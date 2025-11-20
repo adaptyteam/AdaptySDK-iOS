@@ -1,0 +1,20 @@
+name: 🤔 Question
+description: Ask a question about anything that is unclear about Adapty
+labels: ["question"]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: |
+        Write down your question. Include screenshots and code snippets if needed
+      placeholder: Provide your question
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Adapty SDK Version
+      description: What version of Adapty SDK are you using?
+      placeholder: "3.0.0"
+    validations:
+      required: false
+
