@@ -1,0 +1,25 @@
+name: 💫 Feature Request
+description: Request a new feature
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Want even more? Request a feature that you think would benefit this SDK
+  - type: textarea
+    attributes:
+      label: Description
+      description: |
+        Provide a clear description of a feature. Add expected usage scenarios
+      placeholder: What is it you desire?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposed Solution
+      description: |
+        If you have a specific implementation in mind, please describe it here
+      placeholder: How do you envision this feature working?
+    validations:
+      required: false
+
