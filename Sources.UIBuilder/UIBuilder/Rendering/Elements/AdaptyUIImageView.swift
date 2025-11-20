@@ -13,12 +13,20 @@ import UIKit
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func aspectRatio(_ aspect: VC.AspectRatio) -> some View {
+    func aspectRatio(_ aspect: VC.AspectRatio, limitWidth: Bool) -> some View {
         switch aspect {
         case .fit:
             aspectRatio(contentMode: .fit)
         case .fill:
-            aspectRatio(contentMode: .fill)
+            if limitWidth {
+                GeometryReader { proxy in
+                    self
+                        .aspectRatio(contentMode: .fill)
+                        .frame(maxWidth: proxy.size.width)
+                }
+            } else {
+                aspectRatio(contentMode: .fill)
+            }
         case .stretch:
             self
         }
@@ -58,7 +66,8 @@ struct AdaptyUIImageView: View {
     private func rasterImage(
         _ uiImage: UIImage?,
         aspect: VC.AspectRatio,
-        tint: VC.Color.Resolved?
+        tint: VC.Color.Resolved?,
+        limitWidth: Bool
     ) -> some View {
         if let uiImage {
             if let tint = tint {
@@ -66,12 +75,12 @@ struct AdaptyUIImageView: View {
                     .resizable()
                     .renderingMode(.template)
                     .foregroundColor(tint)
-                    .aspectRatio(aspect)
+                    .aspectRatio(aspect, limitWidth: limitWidth)
 
             } else {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .aspectRatio(aspect)
+                    .aspectRatio(aspect, limitWidth: limitWidth)
             }
         } else {
             EmptyView()
@@ -86,7 +95,12 @@ struct AdaptyUIImageView: View {
     ) -> some View {
         switch asset {
         case let .image(image):
-            rasterImage(image, aspect: aspect, tint: tint)
+            rasterImage(
+                image,
+                aspect: aspect,
+                tint: tint,
+                limitWidth: true
+            )
         case let .remote(url, preview):
             KFImage
                 .url(url)
@@ -100,12 +114,17 @@ struct AdaptyUIImageView: View {
                 .resizable()
                 .placeholder {
                     if let preview {
-                        rasterImage(preview, aspect: aspect, tint: tint)
+                        rasterImage(
+                            preview,
+                            aspect: aspect,
+                            tint: tint,
+                            limitWidth: false
+                        )
                     } else {
                         EmptyView()
                     }
                 }
-                .aspectRatio(aspect)
+                .aspectRatio(aspect, limitWidth: true)
         }
     }
 
