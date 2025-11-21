@@ -51,7 +51,7 @@ let package = Package(
             path: "Sources.UIBuilder",
             exclude: [
                 "adaptyui.v4.3.0.schema.yaml",
-            ],
+            ]
         ),
         .target(
             name: "Adapty",
