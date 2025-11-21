@@ -20,9 +20,11 @@ This directory contains utility scripts for the Adapty iOS SDK project.
 
 **What it does**:
 - Updates version in `Sources/Versions.swift` (main SDK version constant)
+- Updates version in `Sources.AdaptyPlugin/cross_platform.yaml` (cross-platform schema version)
 - Updates version in all podspec files (CocoaPods specification)
 - Validates version format
-- Shows verification of changes
+- Verifies all changes were applied correctly
+- Shows summary of all updated files
 
 **Version format**: `x.y.z` or `x.y.z-SUFFIX` (e.g., `3.12.0`, `3.12.0-SNAPSHOT`)
 
