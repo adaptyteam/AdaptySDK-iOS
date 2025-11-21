@@ -38,9 +38,9 @@ extension SK2Product {
 
 #if canImport(UIKit)
 @MainActor
-private extension UIApplication {
+extension UIApplication {
     /// Returns the key `UIWindowScene` for the current application
-    var activeScene: UIWindowScene? {
+    private var activeScene: UIWindowScene? {
         connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .first(where: { $0.activationState == .foregroundActive })

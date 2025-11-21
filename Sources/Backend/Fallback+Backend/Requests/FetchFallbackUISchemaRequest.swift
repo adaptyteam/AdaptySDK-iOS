@@ -34,8 +34,6 @@ private struct FetchFallbackUISchemaRequest: BackendRequest {
     }
 }
 
-private typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
-
 extension Backend.FallbackExecutor {
     func fetchFallbackUISchema(
         apiKeyPrefix: String,
@@ -59,8 +57,8 @@ extension Backend.FallbackExecutor {
         )
 
         do {
-            let response: HTTPResponse<ResponseBody> = try await perform(request)
-            return response.body.value
+            let response: HTTPResponse<AdaptyUISchema> = try await perform(request, withDecoder: AdaptyUISchema.decoder)
+            return response.body
         } catch {
             guard error.statusCode == 404,
                   !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
