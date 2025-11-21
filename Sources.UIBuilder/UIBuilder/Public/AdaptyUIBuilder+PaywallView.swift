@@ -65,7 +65,7 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
                 didSelectProduct: didSelectProduct,
                 didStartPurchase: didStartPurchase,
                 didStartRestore: didStartRestore,
-                didFailRendering: didFailRendering,
+                didFailRendering: didFailRendering
             )
         } else {
             placeholderBuilder()
@@ -156,7 +156,7 @@ public struct AdaptyUIPaywallView: View {
         didSelectProduct: ((ProductResolver) -> Void)? = nil,
         didStartPurchase: ((ProductResolver) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,
-        didFailRendering: @escaping (AdaptyUIBuilderError) -> Void,
+        didFailRendering: @escaping (AdaptyUIBuilderError) -> Void
     ) {
         self.paywallConfiguration = paywallConfiguration
         self.didAppear = didAppear
