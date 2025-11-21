@@ -554,37 +554,6 @@ public extension Adapty {
         }
     }
 
-    /// Call this method to keep track of the user's steps while onboarding
-    ///
-    /// The onboarding stage is a very common situation in modern mobile apps. The quality of its implementation, content, and number of steps can have a rather significant influence on further user behavior, especially on his desire to become a subscriber or simply make some purchases.
-    ///
-    /// In order for you to be able to analyze user behavior at this critical stage without leaving Adapty, we have implemented the ability to send dedicated events every time a user visits yet another onboarding screen.
-    ///
-    /// - Parameters:
-    ///   - name: Name of your onboarding.
-    ///   - screenName: Readable name of a particular screen as part of onboarding.
-    ///   - screenOrder: An unsigned integer value representing the order of this screen in your onboarding sequence (it must me greater than 0).
-    ///   - completion: Result callback.
-    nonisolated static func logShowOnboarding(
-        name: String?,
-        screenName: String?,
-        screenOrder: UInt,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        withCompletion(completion) { () async throws(AdaptyError) in
-            try await logShowOnboarding(name: name, screenName: screenName, screenOrder: screenOrder)
-        }
-    }
-
-    nonisolated static func logShowOnboarding(
-        _ params: AdaptyOnboardingScreenParameters,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        withCompletion(completion) { () async throws(AdaptyError) in
-            try await logShowOnboarding(params)
-        }
-    }
-
     /// Call this method to update the current user's refund data consent.
     ///
     /// Read more on the [Adapty Documentation](https://adapty.io/docs/refund-saver#obtain-user-consent)

@@ -108,6 +108,7 @@ extension _SK1ProductFetcher: SKProductsRequestDelegate {
             eventName: "fetch_products_did_finish",
             stamp: stamp
         ))
+
         request.cancel()
     }
 

@@ -15,10 +15,18 @@ extension HTTPDataResponse {
     }
 }
 
+extension HTTPStringResponse {
+    static func defaultDecoder(
+        _ response: HTTPDataResponse,
+        _ configuration: HTTPCodableConfiguration?,
+        _ request: HTTPRequest
+    ) -> HTTPStringResponse {
+        response.asHTTPStringResponse
+    }
+}
+
 extension HTTPSession {
-    func perform(_ request: some HTTPRequest) async throws(HTTPError) -> HTTPStringResponse {
-        try await perform(request) { @Sendable response in
-            response.asHTTPStringResponse
-        }
+    func perform(_ request: some HTTPRequest, baseUrl: URL) async throws(HTTPError) -> HTTPStringResponse {
+        try await perform(request, withBaseUrl: baseUrl, withDecoder: HTTPStringResponse.defaultDecoder)
     }
 }

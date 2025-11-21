@@ -22,8 +22,10 @@ final class EventsManager {
     private var backendSession: Backend.EventsExecutor?
     private var sending: Bool = false
 
-    func set(backend: Backend) {
+    func set(backend: Backend) async {
         backendSession = backend.createEventsExecutor()
+        let state = await backend.networkManager.currentState
+        configuration = .init(state)
         guard eventStorages.hasEvents || configuration.isExpired else { return }
         needSendEvents()
     }
@@ -78,17 +80,8 @@ final class EventsManager {
     }
 
     private func sendEvents(_ session: Backend.EventsExecutor) async throws(EventsError) {
-        if configuration.isExpired {
-            do {
-                configuration = try await session.fetchEventsConfig(
-                    userId: ProfileStorage.userId
-                )
-            } catch .backend, .decoding {
-                configuration = .init(blacklist: Event.defaultBlackList, expiration: Date() + 24 * 60 * 60)
-            } catch {
-                throw EventsError.sending(error)
-            }
-        }
+        let currentState = await session.manager.fetchCurrentState()
+        configuration = .init(currentState)
 
         let events = eventStorages.getEvents(
             limit: Constants.sendingLimitEvents,

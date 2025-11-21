@@ -41,7 +41,7 @@ public extension Adapty {
             let userId = try await sdk.createdProfileManager.userId
 
             guard !transaction.isXcodeEnvironment else { return }
-            
+
             let productOrNil = try? await sdk.productsManager.fetchProduct(
                 id: transaction.unfProductId,
                 fetchPolicy: .returnCacheDataElseLoad

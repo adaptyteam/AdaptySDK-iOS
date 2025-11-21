@@ -17,7 +17,7 @@ extension Environment {
     enum System {
         static var timezone: String { TimeZone.current.identifier }
 
-        static var locale: AdaptyLocale { AdaptyLocale(id: Locale.preferredLanguages.first ?? Locale.current.identifier) }
+        static var locale: AdaptyLocale { AdaptyLocale(Locale.preferredLanguages.first ?? Locale.current.identifier) }
 
         @AdaptyActor
         private static var _version: String?

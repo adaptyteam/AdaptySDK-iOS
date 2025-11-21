@@ -7,6 +7,7 @@
 
 import Adapty
 import AdaptyUI
+import AdaptyUIBuilder
 
 private let log = Log.plugin
 

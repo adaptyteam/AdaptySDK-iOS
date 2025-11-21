@@ -213,13 +213,13 @@ private extension SK2TransactionManager {
         let transactions: [SK2Transaction] = signedTransactions.compactMap(\.verifiedTransaction)
 
         Adapty.trackSystemEvent(AdaptyAppleResponseParameters(methodName: .getSK2CurrentEntitlements, stamp: stamp, params: ["total_count": signedTransactions.count, "verified_count": transactions.count]))
-        
+
         let unfinishedConsumablesTransactions = await Self.fetchUnfinishedTransactions()
             .compactMap(\.verifiedTransaction)
             .filter { $0.productType == .consumable }
-        
+
         log.verbose("SK2Transaction.currentEntitlements total count: \(signedTransactions.count), verified count: \(transactions.count), unfinished consumables: \(unfinishedConsumablesTransactions.count)")
-        
+
         return transactions + unfinishedConsumablesTransactions
     }
 

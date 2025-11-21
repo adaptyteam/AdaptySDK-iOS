@@ -3,6 +3,8 @@ platform :ios, '13.0'
 target 'OnboardingsDemo-UIKit' do
   use_frameworks!
 
+  pod 'AdaptyLogger', :path => '../../' # TODO: remove this after AdaptyLogger will be published
+  pod 'AdaptyUIBuilder', :path => '../../' # TODO: remove this after AdaptyUIBuilder will be published
   pod 'Adapty', :path => '../../'
   pod 'AdaptyUI', :path => '../../'
 

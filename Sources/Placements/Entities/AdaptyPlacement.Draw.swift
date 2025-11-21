@@ -35,7 +35,7 @@ extension AdaptyPlacement.Draw: Decodable {
         let index: Int
         if let variationId = decoder.userInfo.placementVariationIdOrNil {
             guard let founded = variations.firstIndex(where: { $0.variationId == variationId }) else {
-                throw ResponseDecodingError.notFoundVariationId
+                throw PlacementDecodingError.notFoundVariationId
             }
             index = founded
         } else {

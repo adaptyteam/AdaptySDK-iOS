@@ -8,7 +8,6 @@
 import Foundation
 
 protocol HTTPConfiguration: Sendable {
-    var baseURL: URL { get }
     var sessionConfiguration: URLSessionConfiguration { get }
 }
 

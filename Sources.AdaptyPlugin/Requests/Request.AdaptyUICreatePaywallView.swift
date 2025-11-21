@@ -9,6 +9,7 @@
 
 import Adapty
 import AdaptyUI
+import AdaptyUIBuilder
 import Foundation
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
@@ -56,7 +57,7 @@ extension Request {
         let preloadProducts: Bool?
         let customTags: [String: String]?
         let customTimers: [String: Date]?
-        let customAssets: [AdaptyCustomAsset.Identifiable]?
+        let customAssets: [AdaptyUICustomAsset.Identifiable]?
 
         enum CodingKeys: String, CodingKey {
             case paywall
@@ -73,16 +74,48 @@ extension Request {
 
         @MainActor
         func executeInMainActor() async throws -> AdaptyJsonData {
-            try .success(
-                await AdaptyUI.Plugin.createPaywallView(
-                    paywall: paywall,
-                    loadTimeout: loadTimeout,
-                    preloadProducts: preloadProducts ?? false,
-                    tagResolver: customTags,
-                    timerResolver: customTimers,
-                    assetsResolver: customAssets?.assetsResolver()
-                )
+            let result: AdaptyUI.PaywallView = try await AdaptyUI.Plugin.createPaywallView(
+                paywall: paywall,
+                loadTimeout: loadTimeout,
+                preloadProducts: preloadProducts ?? false,
+                tagResolver: customTags,
+                timerResolver: customTimers,
+                assetsResolver: assetsResolver()
             )
+
+            return .success(result)
+        }
+
+        @MainActor
+        func assetsResolver() throws -> [String: AdaptyUICustomAsset]? {
+            guard let customAssets, !customAssets.isEmpty else { return nil }
+
+            var assetsResolver: [String: AdaptyUICustomAsset] = [:]
+            assetsResolver.reserveCapacity(customAssets.count)
+
+            for asset in customAssets {
+                switch asset.value {
+                case .asset(let value):
+                    assetsResolver[asset.id] = value
+                case .imageFlutterAssetId(let assetId):
+                    assetsResolver[asset.id] = try .image(.file(url: url(assetId)))
+                case .videoFlutterAssetId(let assetId):
+                    assetsResolver[asset.id] = try .video(.file(url: url(assetId), preview: nil))
+                }
+            }
+
+            return assetsResolver
+
+            func url(_ assetId: String) throws -> URL {
+                guard let assetIdToFileURL = AdaptyPlugin.assetIdToFileURL else {
+                    throw AdaptyPluginInternalError.unregister("Unregister assetIdToFileURL in AdaptyPlugin")
+                }
+                guard let url = assetIdToFileURL(assetId) else {
+                    throw AdaptyPluginInternalError.notExist("Asset \(assetId) not found")
+                }
+
+                return url
+            }
         }
     }
 }

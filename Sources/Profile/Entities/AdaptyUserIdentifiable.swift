@@ -73,7 +73,7 @@ extension ProfileManager {
     func isEqualProfileId(_ other: AdaptyUserId) -> Bool {
         userId.isEqualProfileId(other)
     }
-    
+
     func isEqualProfileId(_ other: AdaptyUserIdentifiable) -> Bool {
         userId.isEqualProfileId(other.userId)
     }

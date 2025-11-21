@@ -35,10 +35,10 @@ public final class Adapty {
         backend: Backend
     ) async {
         self.observerMode = configuration.observerMode
-        self.apiKeyPrefix = String(configuration.apiKey.prefix(while: { $0 != "." }))
+        self.apiKeyPrefix = configuration.apiKeyPrefix
         self.backend = backend
         self.profileStorage = ProfileStorage()
-        self.httpSession = backend.createMainExecutor()
+        self.httpSession = backend.createDefaultExecutor()
         self.httpFallbackSession = backend.createFallbackExecutor()
         self.httpConfigsSession = backend.createConfigsExecutor()
 
@@ -117,7 +117,7 @@ public final class Adapty {
         startSyncIPv4OnceIfNeeded()
     }
 
-    fileprivate var sharedProfileManager: ProfileManager.Shared?
+    private var sharedProfileManager: ProfileManager.Shared?
 
     private func restoreProfileManager(
         _ configuration: AdaptyConfiguration

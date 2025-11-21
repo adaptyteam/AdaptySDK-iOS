@@ -7,57 +7,25 @@
 
 import Foundation
 
-package struct Backend: HTTPCodableConfiguration {
-    let baseURL: URL
-    let sessionConfiguration: URLSessionConfiguration
-    let fallback: RemoteFilesBackend
-    let configs: RemoteFilesBackend
-    let ua: UABackend
+package struct Backend {
+    let networkManager: StateManager
 
-    let defaultEncodedContentType = "application/vnd.api+json"
+    let defaultHTTPConfiguration: HTTPCodableConfiguration
+    let uaHTTPConfiguration: HTTPCodableConfiguration
+    let fallbackHTTPConfiguration: HTTPCodableConfiguration
+    var configsHTTPConfiguration: HTTPCodableConfiguration { fallbackHTTPConfiguration }
 
-    func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
-    func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
+    init(
+        with configuration: AdaptyConfiguration,
+        environment: Environment
+    ) async {
+        defaultHTTPConfiguration = MainHTTPConfiguration(with: configuration, environment: environment)
+        fallbackHTTPConfiguration = FallbackHTTPConfiguration(with: configuration)
+        uaHTTPConfiguration = UAHTTPConfiguration(with: configuration, environment: environment)
 
-    init(with configuration: AdaptyConfiguration, environment: Environment) {
-        let backend = configuration.backend
-
-        let sessionConfiguration = URLSessionConfiguration.ephemeral
-        sessionConfiguration.httpAdditionalHeaders = Request.globalHeadersWithStoreKit(configuration, environment)
-        sessionConfiguration.timeoutIntervalForRequest = 30
-        sessionConfiguration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        sessionConfiguration.protocolClasses = (backend.protocolClasses ?? []) + (sessionConfiguration.protocolClasses ?? [])
-
-        if let (host, port) = backend.proxy {
-            sessionConfiguration.connectionProxyDictionary = [
-                String(kCFNetworkProxiesHTTPEnable): NSNumber(value: 1),
-                String(kCFNetworkProxiesHTTPProxy): host,
-                String(kCFNetworkProxiesHTTPPort): port,
-            ]
-        }
-
-        self.sessionConfiguration = sessionConfiguration
-
-        self.baseURL = backend.mainBaseUrl
-
-        self.fallback = RemoteFilesBackend(
-            with: configuration,
-            baseURL: backend.fallbackBaseUrl
-        )
-
-        self.configs = RemoteFilesBackend(
-            with: configuration,
-            baseURL: backend.configsBaseUrl
-        )
-
-        self.ua = UABackend(
-            with: configuration,
-            environment: environment
-        )
+        networkManager = await Backend.StateManager(with: configuration)
     }
-}
 
-extension Backend {
     enum Request {}
     enum Response {}
 }

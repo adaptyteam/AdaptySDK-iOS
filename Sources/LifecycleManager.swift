@@ -202,7 +202,9 @@ final class LifecycleManager {
             }
             appOpenedSentAt = Date()
 
-            await Adapty.trackEvent(.appOpened)
+            Task.detached(priority: .utility) {
+                try? await Adapty.trackEvent(.appOpened)
+            }
             log.verbose("handleDidBecomeActiveNotification track")
 
             try? await syncCrossABState()

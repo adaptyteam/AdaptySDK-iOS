@@ -12,16 +12,11 @@ private enum HeaderKey {
 }
 
 extension HTTPRequest {
-    func convertToURLRequest(configuration: HTTPConfiguration, additional: HTTPRequestAdditional?) throws -> URLRequest {
-        let preUrl = configuration.baseURL.appendingPathComponent(endpoint.path)
+    func convertToURLRequest(baseUrl: URL, configuration: HTTPConfiguration) throws -> URLRequest {
+        let preUrl = baseUrl.appendingPathComponent(endpoint.path)
 
         guard var urlComponents = URLComponents(url: preUrl, resolvingAgainstBaseURL: false) else {
             throw URLError(.badURL)
-        }
-
-        var queryItems = self.queryItems
-        if let additionalQueryItems = additional?.queryItems {
-            queryItems.append(contentsOf: additionalQueryItems)
         }
 
         if queryItems.isNotEmpty {
@@ -41,10 +36,6 @@ extension HTTPRequest {
         request.httpMethod = endpoint.method.rawValue
 
         headers.forEach {
-            request.setValue($1, forHTTPHeaderField: $0)
-        }
-
-        additional?.headers?.forEach {
             request.setValue($1, forHTTPHeaderField: $0)
         }
 

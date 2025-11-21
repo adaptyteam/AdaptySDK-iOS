@@ -4,6 +4,8 @@ target 'AdaptyRecipes-UIKit' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
+  pod 'AdaptyLogger', :path => '../../' # TODO: remove this after AdaptyLogger will be published
+  pod 'AdaptyUIBuilder', :path => '../../' # TODO: remove this after AdaptyUIBuilder will be published
   pod 'Adapty', :path => '../../'
   pod 'AdaptyUI', :path => '../../'
 

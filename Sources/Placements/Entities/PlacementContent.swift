@@ -16,14 +16,9 @@ protocol PlacementContent: Sendable, Codable {
 }
 
 extension PlacementContent {
-    private var viewConfigurationLocale: AdaptyLocale? {
-        if let paywall = self as? AdaptyPaywall {
-            paywall.viewConfiguration?.responseLocale
-        } else if self is AdaptyOnboarding {
-            nil
-        } else {
-            nil
-        }
+    var viewConfigurationLocale: AdaptyLocale? {
+        guard let paywall = self as? AdaptyPaywall else { return nil }
+        return paywall.viewConfiguration?.locale
     }
 
     var locale: AdaptyLocale? {
@@ -32,6 +27,7 @@ extension PlacementContent {
             remoteConfigLocale = nil
         }
         var viewConfigurationLocale = viewConfigurationLocale
+
         if viewConfigurationLocale?.equalLanguageCode(.defaultPlacementLocale) ?? false {
             viewConfigurationLocale = nil
         }
@@ -43,10 +39,18 @@ extension PlacementContent {
         }
     }
 
-    var localeOrDefault: AdaptyLocale { locale ?? .defaultPlacementLocale }
 
-    func equalLanguageCode(_ content: Self) -> Bool {
-        localeOrDefault.equalLanguageCode(content.localeOrDefault)
+    
+    func has(languageCode otherLocale: AdaptyLocale, orDefault: Bool = false) -> Bool {
+        let locale = locale ?? .defaultPlacementLocale
+        if locale.equalLanguageCode(otherLocale) { return true }
+        else if orDefault, locale.equalLanguageCode(.defaultPlacementLocale) { return true }
+        else { return false }
+    }
+
+    func has(variationId: String?) -> Bool {
+        guard let variationId else { return true }
+        return self.variationId == variationId
     }
 }
 
@@ -61,5 +65,13 @@ extension VH where Value: PlacementContent {
                 return content
             }
         }
+    }
+
+    func has(languageCode locale: AdaptyLocale, orDefault: Bool = false) -> Bool {
+        value.has(languageCode: locale, orDefault: orDefault)
+    }
+
+    func has(variationId: String?) -> Bool {
+        value.has(variationId: variationId)
     }
 }

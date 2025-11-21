@@ -5,6 +5,7 @@
 //  Created by Aleksei Valiano on 12.08.2024
 //
 
+import AdaptyUIBuilder
 import Foundation
 
 extension Adapty {
@@ -24,7 +25,7 @@ extension Adapty {
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
     ) async throws(AdaptyError) -> AdaptyPaywall {
-        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
 
@@ -41,7 +42,7 @@ extension Adapty {
                 fetchPolicy
             )
 
-            Adapty.sendImageUrlsToObserver(paywall)
+            AdaptyUIBuilder.sendImageUrlsToObserver(paywall)
             return paywall
         }
     }
@@ -51,7 +52,7 @@ extension Adapty {
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
     ) async throws(AdaptyError) -> AdaptyOnboarding {
-        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
 
@@ -90,7 +91,12 @@ extension Adapty {
 
         let cached: Content? = manager?
             .placementStorage
-            .getPlacementByLocale(locale, orDefaultLocale: true, withPlacementId: placementId, withVariationId: nil)?
+            .getPlacementById(
+                placementId,
+                withLocale: locale,
+                orDefaultLocale: true,
+                withVariationId: nil
+            )?
             .withFetchPolicy(fetchPolicy)?
             .value
 
@@ -110,7 +116,12 @@ extension Adapty {
         let (cached, isTestUser): (Content?, Bool) = {
             guard let manager = try? profileManager(withProfileId: userId) else { return (nil, false) }
             return (
-                manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: nil)?.value,
+                manager.placementStorage.getPlacementById(
+                    placementId,
+                    withLocale: locale,
+                    orDefaultLocale: false,
+                    withVariationId: nil
+                )?.value,
                 manager.isTestUser
             )
         }()

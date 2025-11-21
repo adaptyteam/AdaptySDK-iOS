@@ -29,7 +29,7 @@ final class ProfileStorage {
             return createAnonymousUserId()
         }
 
-        guard let profile = profile, profile.isEqualProfileId(profileId) else {
+        guard let profile, profile.isEqualProfileId(profileId) else {
             return AdaptyUserId(
                 profileId: profileId,
                 customerId: nil
@@ -54,8 +54,7 @@ final class ProfileStorage {
 
     private static var profile: VH<AdaptyProfile>? = {
         do {
-            let restoredProfile = try userDefaults.getJSON(VH<AdaptyProfile>.self, forKey: Constants.profileKey)
-            return restoredProfile
+            return try userDefaults.getJSON(VH<AdaptyProfile>.self, forKey: Constants.profileKey)
         } catch {
             log.warn(error.localizedDescription)
             return nil
@@ -197,7 +196,7 @@ extension ProfileStorage {
 
 extension ProfileStorage {
     func appAccountToken() -> UUID? {
-        return Self.appAccountToken
+        Self.appAccountToken
     }
 
     func setAppAccountToken(_ value: UUID?) {
@@ -214,7 +213,7 @@ extension ProfileStorage {
         try checkProfileId(userId)
         return profile
     }
-    
+
     func updateProfile(_ profile: VH<AdaptyProfile>) throws(WrongProfileIdError) {
         try checkProfileId(profile.userId)
         Self.setProfile(profile)

@@ -6,6 +6,7 @@
 //
 
 import AdaptyUI
+import AdaptyUIBuilder
 import Foundation
 
 extension AdaptyUI.Configuration: Decodable {
@@ -16,12 +17,12 @@ extension AdaptyUI.Configuration: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            mediaCacheConfiguration: container.decodeIfPresent(AdaptyUI.MediaCacheConfiguration.self, forKey: .mediaCache)
+            mediaCacheConfiguration: container.decodeIfPresent(AdaptyUIBuilder.MediaCacheConfiguration.self, forKey: .mediaCache)
         )
     }
 }
 
-extension AdaptyUI.MediaCacheConfiguration: Decodable {
+extension AdaptyUIBuilder.MediaCacheConfiguration: Decodable {
     private enum CodingKeys: String, CodingKey {
         case memoryStorageTotalCostLimit = "memory_storage_total_cost_limit"
         case memoryStorageCountLimit = "memory_storage_count_limit"
@@ -32,9 +33,9 @@ extension AdaptyUI.MediaCacheConfiguration: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         try self.init(
-            memoryStorageTotalCostLimit: container.decodeIfPresent(Int.self, forKey: .memoryStorageTotalCostLimit) ?? AdaptyUI.MediaCacheConfiguration.default.memoryStorageTotalCostLimit,
-            memoryStorageCountLimit: container.decodeIfPresent(Int.self, forKey: .memoryStorageCountLimit) ?? AdaptyUI.MediaCacheConfiguration.default.memoryStorageCountLimit,
-            diskStorageSizeLimit: container.decodeIfPresent(UInt.self, forKey: .diskStorageSizeLimit) ?? AdaptyUI.MediaCacheConfiguration.default.diskStorageSizeLimit
+            memoryStorageTotalCostLimit: container.decodeIfPresent(Int.self, forKey: .memoryStorageTotalCostLimit) ?? AdaptyUIBuilder.MediaCacheConfiguration.default.memoryStorageTotalCostLimit,
+            memoryStorageCountLimit: container.decodeIfPresent(Int.self, forKey: .memoryStorageCountLimit) ?? AdaptyUIBuilder.MediaCacheConfiguration.default.memoryStorageCountLimit,
+            diskStorageSizeLimit: container.decodeIfPresent(UInt.self, forKey: .diskStorageSizeLimit) ?? AdaptyUIBuilder.MediaCacheConfiguration.default.diskStorageSizeLimit
         )
     }
 }

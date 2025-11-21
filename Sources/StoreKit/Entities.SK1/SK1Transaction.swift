@@ -32,7 +32,7 @@ extension SK1Transaction {
 
     var isXcodeEnvironment: Bool {
         guard let id = unfIdentifier else { return false }
-        
+
         return id.count < 4
     }
 

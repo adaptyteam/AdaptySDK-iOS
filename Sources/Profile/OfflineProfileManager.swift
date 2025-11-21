@@ -60,7 +60,6 @@ final class OfflineProfileManager {
     }
 }
 
-
 private extension AdaptyUserId {
     func with(customerUserId newCustomerUserId: String) -> Self {
         .init(

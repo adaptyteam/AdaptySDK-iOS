@@ -1,10 +1,11 @@
 //
-//  Adapty+Paywalls.swift
+//  Adapty+Placements.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.11.2023
 //
 
+import AdaptyUIBuilder
 import Foundation
 
 private let log = Log.default
@@ -30,7 +31,7 @@ extension Adapty {
         loadTimeout: TimeInterval? = nil
     ) async throws(AdaptyError) -> AdaptyPaywall {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
-        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
 
@@ -48,7 +49,7 @@ extension Adapty {
                 fetchPolicy: fetchPolicy,
                 loadTimeout: loadTimeout
             )
-            Adapty.sendImageUrlsToObserver(paywall)
+            AdaptyUIBuilder.sendImageUrlsToObserver(paywall)
 
             return paywall
         }
@@ -61,7 +62,7 @@ extension Adapty {
         loadTimeout: TimeInterval? = nil
     ) async throws(AdaptyError) -> AdaptyOnboarding {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
-        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale(id: $0) } ?? .defaultPlacementLocale
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
 
@@ -170,10 +171,12 @@ extension Adapty {
 
         let cached: Content? = manager
             .placementStorage
-            .getPlacementByLocale(locale,
-                                  orDefaultLocale: true,
-                                  withPlacementId: placementId,
-                                  withVariationId: manager.crossPlacmentStorage.state?.variationId(placementId: placementId))?
+            .getPlacementById(
+                placementId,
+                withLocale: locale,
+                orDefaultLocale: true,
+                withVariationId: manager.crossPlacmentStorage.state?.variationId(placementId: placementId)
+            )?
             .withFetchPolicy(fetchPolicy)?
             .value
 
@@ -196,10 +199,10 @@ extension Adapty {
                 let crossPlacementState = manager.crossPlacmentStorage.state
                 let variationId = crossPlacementState?.variationId(placementId: placementId)
                 let cached: Content? = manager.placementStorage
-                    .getPlacementByLocale(
-                        locale,
+                    .getPlacementById(
+                        placementId,
+                        withLocale: locale,
                         orDefaultLocale: false,
-                        withPlacementId: placementId,
                         withVariationId: variationId
                     )?
                     .value
@@ -245,7 +248,7 @@ extension Adapty {
                                     // We are prohibited from participating in Cross AB Tests
                                     if draw.participatesInCrossPlacementABTest {
                                         Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> repeat")
-                                        throw ResponseDecodingError.crossPlacementABTestDisabled
+                                        throw PlacementDecodingError.crossPlacementABTestDisabled
                                     } else {
                                         Log.crossAB.verbose("Cross-AB-test placementId = \(placementId), DISABLED -> variationId = \(draw.content.variationId) DRAW")
                                         return draw.content.variationId
@@ -311,7 +314,7 @@ extension Adapty {
                     throw error.asAdaptyError
                 }
 
-                if error.responseDecodingError([.notFoundVariationId, .crossPlacementABTestDisabled]) { continue }
+                if error.has(decodingError: [.notFoundVariationId, .crossPlacementABTestDisabled]) { continue }
 
                 guard Backend.wrongProfileSegmentId(error),
                       try await updateSegmentId(for: userId, oldSegmentId: segmentId)
@@ -371,7 +374,12 @@ extension Adapty {
                 guard let manager = try? profileManager(withProfileId: userId) else { return nil }
                 let variationId = manager.crossPlacmentStorage.state?.variationId(placementId: placementId)
                 return (
-                    cached: manager.placementStorage.getPlacementByLocale(locale, orDefaultLocale: false, withPlacementId: placementId, withVariationId: variationId)?.value,
+                    cached: manager.placementStorage.getPlacementById(
+                        placementId,
+                        withLocale: locale,
+                        orDefaultLocale: false,
+                        withVariationId: variationId
+                    )?.value,
                     isTestUser: manager.isTestUser,
                     variationId: variationId
                 )
@@ -416,7 +424,7 @@ extension Adapty {
                 return chosen.content
 
             } catch {
-                if error.responseDecodingError([.notFoundVariationId]) {
+                if error.has(decodingError: [.notFoundVariationId]) {
                     continue
                 } else {
                     throw error.asAdaptyError
@@ -464,9 +472,9 @@ private extension AdaptyError {
 }
 
 private extension HTTPError {
-    func responseDecodingError(_ decodingError: Set<ResponseDecodingError>) -> Bool {
+    func has(decodingError: Set<PlacementDecodingError>) -> Bool {
         guard case let .decoding(_, _, _, _, _, value) = self,
-              let value = value as? ResponseDecodingError
+              let value = value as? PlacementDecodingError
         else { return false }
 
         return decodingError.contains(value)

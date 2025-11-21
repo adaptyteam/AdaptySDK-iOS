@@ -9,10 +9,8 @@ import Foundation
 
 final class HTTPSession: Sendable {
     let configuration: HTTPConfiguration
-    let requestAdditional: HTTPRequestAdditional?
 
     private let _responseValidator: HTTPDataResponse.Validator
-    private let _errorHandler: HTTPErrorHandlerActor?
     private let _session: URLSession
     private let _state: HTTPSessionState
     private let _delegate: URLSession.Delegate
@@ -22,16 +20,12 @@ final class HTTPSession: Sendable {
 
     init(
         configuration: HTTPCodableConfiguration,
-        requestAdditional: HTTPRequestAdditional? = nil,
         requestSign: Sign? = nil,
-        responseValidator: @escaping HTTPDataResponse.Validator = HTTPDataResponse.defaultValidator,
-        errorHandler: HTTPErrorHandler? = nil
+        responseValidator: @escaping HTTPDataResponse.Validator = HTTPDataResponse.defaultValidator
     ) {
         self.configuration = configuration
-        self.requestAdditional = requestAdditional
         _requestSign = requestSign
         _responseValidator = responseValidator
-        _errorHandler = errorHandler.map { HTTPErrorHandlerActor(handler: $0) }
         let state = HTTPSessionState()
         _state = state
         let delegate = URLSession.Delegate(sessionState: state, configuration: configuration)
@@ -46,23 +40,22 @@ final class HTTPSession: Sendable {
 
     func perform<Body>(
         _ request: some HTTPRequest,
+        withBaseUrl baseUrl: URL,
         withDecoder decoder: @escaping HTTPDecoder<Body>
     ) async throws(HTTPError) -> HTTPResponse<Body> {
         let state = _state
         let stamp = request.stamp
-        let errorHandler = _errorHandler
         let endpoint = request.endpoint
         var urlRequest: URLRequest
 
         do {
-            urlRequest = try request.convertToURLRequest(configuration: configuration, additional: requestAdditional)
+            urlRequest = try request.convertToURLRequest(baseUrl: baseUrl, configuration: configuration)
             if let _requestSign {
                 urlRequest = try _requestSign(urlRequest, request.endpoint)
             }
         } catch {
             let httpError = HTTPError.perform(endpoint, error: error)
             Log.encodingError(httpError, endpoint: endpoint, stamp: stamp)
-            errorHandler?.call(httpError)
             throw httpError
         }
 
@@ -76,14 +69,12 @@ final class HTTPSession: Sendable {
             let wrap = error as? URLErrorWithMetrics
             let httpError = HTTPError.network(endpoint, metrics: wrap?.metrics.map(HTTPMetrics.init), error: wrap?.error ?? error)
             Log.responseError(httpError, request: urlRequest, stamp: stamp, response: nil)
-            errorHandler?.call(httpError)
             throw httpError
         }
 
         if let error = _responseValidator(dataResponse) {
             let httpError = HTTPError.backend(dataResponse, error: error)
             Log.responseError(httpError, request: urlRequest, stamp: stamp, response: dataResponse)
-            errorHandler?.call(httpError)
             throw httpError
         }
 
@@ -91,12 +82,10 @@ final class HTTPSession: Sendable {
 
         var bodyResponse: HTTPResponse<Body>
         do {
-            bodyResponse = try await decoder(dataResponse)
-
+            bodyResponse = try await decoder(dataResponse, configuration as? HTTPCodableConfiguration, request)
         } catch {
             let httpError = HTTPError.decoding(dataResponse, error: error)
             Log.responseError(httpError, request: urlRequest, stamp: stamp, response: dataResponse)
-            errorHandler?.call(httpError)
             throw httpError
         }
         let endDecodeTime = DispatchTime.now()

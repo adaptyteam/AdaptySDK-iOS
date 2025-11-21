@@ -1,14 +1,6 @@
-#
-# Be sure to run `pod lib lint Adapty.podspec' to ensure this is a
-# valid spec before submitting.
-#
-# Any lines starting with a # are optional, but their use is encouraged
-# To learn more about a Podspec see https://guides.cocoapods.org/syntax/podspec.html
-#
-
 Pod::Spec.new do |s|
   s.name             = 'AdaptyPlugin'
-  s.version          = '3.12.1'
+  s.version          = '3.14.0'
   s.summary          = 'Common files for cross-platform SDKs Adapty'
 
   s.description      = <<-DESC
@@ -26,17 +18,19 @@ Adapty helps you track business metrics, and lets you run ad campaigns targeted 
 
   s.ios.deployment_target = '13.0'
 
-  s.swift_version = '5.9'
+  s.swift_version = '6.0'
 
   s.source_files = 'Sources.AdaptyPlugin/**/*.{h,m,mm,swift}'
 
+  s.dependency 'AdaptyLogger', s.version.to_s
+  s.dependency 'AdaptyUIBuilder', s.version.to_s
   s.dependency 'Adapty', s.version.to_s
   s.dependency 'AdaptyUI', s.version.to_s
 
   s.frameworks = 'StoreKit'
 
   s.pod_target_xcconfig = {
-    'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk -Xfrontend -enable-experimental-feature -Xfrontend StrictConcurrency'
+    'DEFINES_MODULE' => 'YES',
+    'OTHER_SWIFT_FLAGS' => '-package-name io.adapty.sdk'
   }
-
 end

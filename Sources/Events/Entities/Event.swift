@@ -12,8 +12,7 @@ enum Event: Sendable {
     case paywallShowed(AdaptyPaywallShowedParameters)
     case paywallVariationAssigned(AdaptyPaywallVariationAssignedParameters)
     case onboardingVariationAssigned(AdaptyOnboardingVariationAssignedParameters)
-    case onboardingScreenShowed(AdaptyOnboardingScreenShowedParameters)
-    case legacyOnboardingScreenShowed(AdaptyOnboardingScreenParameters)
+    case onboardingScreenShowed(AdaptyUIOnboardingScreenShowedParameters)
     case сonsentToCollectingRefundData(AdaptyConsentToCollectingDataParameters)
     case refundPreference(AdaptyRefundPreferenceParameters)
     case system(AdaptySystemEventParameters)
@@ -35,8 +34,6 @@ extension Event: Encodable {
         case .appOpened:
             break
         case let .paywallShowed(value):
-            try value.encode(to: encoder)
-        case let .legacyOnboardingScreenShowed(value):
             try value.encode(to: encoder)
         case let .paywallVariationAssigned(value):
             try value.encode(to: encoder)

@@ -6,6 +6,7 @@
 //
 
 import AdaptyUI
+import AdaptyUIBuilder
 import Foundation
 
 extension AdaptyUIError: Encodable {

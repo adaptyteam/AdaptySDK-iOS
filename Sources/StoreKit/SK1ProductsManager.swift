@@ -21,6 +21,9 @@ actor SK1ProductsManager {
         self.apiKeyPrefix = apiKeyPrefix
         self.session = session
         self.storage = storage
+        Task {
+            try? await prefetchAllProducts(maxRetries: Int.max)
+        }
     }
 
     private var fetchingAllProducts = false
@@ -29,22 +32,18 @@ actor SK1ProductsManager {
         await storage.set(productInfo: productInfo)
     }
 
-    private func fetchAllProducts() async {
+    private func prefetchAllProducts(maxRetries: Int) async throws(AdaptyError) {
         guard !fetchingAllProducts else { return }
         defer { fetchingAllProducts = false }
         fetchingAllProducts = true
 
-        while !Task.isCancelled {
-            do throws(HTTPError) {
-                let response = try await self.session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix)
-                await storage.set(allProductInfo: response)
-                let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
-                _ = try? await fetchSK1Products(ids: allProductVendorIds)
-                return
-            } catch {
-                guard !error.isCancelled else { return }
-                try? await Task.sleep(duration: .seconds(2))
-            }
+        do throws(HTTPError) {
+            let response = try await self.session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix, maxRetries: maxRetries)
+            await storage.set(allProductInfo: response)
+            let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
+            _ = try? await fetchSK1Products(ids: allProductVendorIds)
+        } catch {
+            throw error.asAdaptyError
         }
     }
 }

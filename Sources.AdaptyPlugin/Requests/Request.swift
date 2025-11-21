@@ -24,7 +24,6 @@ enum Request {
             GetProfile.self,
             Identify.self,
             Logout.self,
-            LogShowOnboarding.self,
             LogShowPaywall.self,
             MakePurchase.self,
             OpenWebPaywall.self,
@@ -89,6 +88,6 @@ public extension AdaptyPlugin {
 
     @MainActor
     static var allRequests: [String] {
-        Request.allRequests.keys.map { $0 }
+        Request.allRequests.keys.map(\.self)
     }
 }

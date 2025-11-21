@@ -1,5 +1,5 @@
 //
-//  withCheckedThrowingContinuation.swift
+//  TypedThrows+Extensions.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 11.07.2025.

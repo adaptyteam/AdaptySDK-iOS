@@ -66,6 +66,7 @@ extension Backend.Request {
 private extension Backend.Response {
     static let hashHeaderKey = "x-response-hash"
     static let requestIdHeaderKey = "request-id"
+    static let retryAfterKey = "retry-after"
 }
 
 extension HTTPHeaders {
@@ -129,6 +130,13 @@ extension HTTPHeaders {
 }
 
 extension HTTPHeaders {
+    func getRetryAfter(_ now: Date = Date()) -> Date? {
+        guard let value = value(forHTTPHeaderField: Backend.Response.retryAfterKey),
+              let duration = TimeInterval(value)
+        else { return nil }
+        return now.addingTimeInterval(duration)
+    }
+
     func getBackendResponseHash() -> String? {
         value(forHTTPHeaderField: Backend.Response.hashHeaderKey)
     }

@@ -11,16 +11,28 @@ let package = Package(
     ],
     products: [
         .library(
+            name: "AdaptyLogger",
+            targets: ["AdaptyLogger"]
+        ),
+        .library(
             name: "Adapty",
             targets: ["Adapty"]
+        ),
+        .library(
+            name: "Adapty_KidsMode",
+            targets: ["Adapty_KidsMode"]
+        ),
+        .library(
+            name: "AdaptyUIBuilder",
+            targets: ["AdaptyUIBuilder"]
         ),
         .library(
             name: "AdaptyUI",
             targets: ["AdaptyUI"]
         ),
         .library(
-            name: "AdaptyUITesting",
-            targets: ["AdaptyUITesting"]
+            name: "AdaptyDeveloperTools",
+            targets: ["AdaptyDeveloperTools"]
         ),
         .library(
             name: "AdaptyPlugin",
@@ -29,30 +41,55 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Adapty",
+            name: "AdaptyLogger",
             dependencies: [],
+            path: "Sources.Logger"
+        ),
+        .target(
+            name: "AdaptyUIBuilder",
+            dependencies: ["AdaptyLogger"],
+            path: "Sources.UIBuilder",
+            exclude: [
+                "adaptyui.v4.3.0.schema.yaml",
+            ]
+        ),
+        .target(
+            name: "Adapty",
+            dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
             path: "Sources",
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(
+            name: "Adapty_KidsMode",
+            dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
+            path: "Sources.KidsMode",
+            resources: [.copy("PrivacyInfo.xcprivacy")],
+            swiftSettings: [
+                .define("ADAPTY_KIDS_MODE"),
+            ]
+        ),
+        .target(
             name: "AdaptyUI",
-            dependencies: ["Adapty"],
-            path: "AdaptyUI",
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
+            path: "Sources.AdaptyUI",
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(
-            name: "AdaptyUITesting",
-            dependencies: ["Adapty", "AdaptyUI"],
-            path: "AdaptyUITesting"
+            name: "AdaptyDeveloperTools",
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
+            path: "Sources.DeveloperTools"
         ),
         .target(
             name: "AdaptyPlugin",
-            dependencies: ["Adapty", "AdaptyUI"],
-            path: "Sources.AdaptyPlugin"
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
+            path: "Sources.AdaptyPlugin",
+            exclude: [
+                "cross_platform.yaml",
+            ]
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["Adapty"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),
