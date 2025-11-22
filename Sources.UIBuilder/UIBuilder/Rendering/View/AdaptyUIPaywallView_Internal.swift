@@ -16,7 +16,7 @@ package struct AdaptyUIPaywallView_Internal: View {
     private let showDebugOverlay: Bool
 
     package init(
-        showDebugOverlay: Bool,
+        showDebugOverlay: Bool
     ) {
         self.showDebugOverlay = showDebugOverlay
     }

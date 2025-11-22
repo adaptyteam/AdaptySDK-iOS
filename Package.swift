@@ -7,8 +7,8 @@ let package = Package(
     platforms: [
         .iOS(.v15),
         .macOS(.v12),
-//        .tvOS(.v15),
-//        .watchOS(.v8),
+        //        .tvOS(.v15),
+        //        .watchOS(.v8),
         .visionOS(.v1),
     ],
     products: [
@@ -52,8 +52,8 @@ let package = Package(
             dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder",
             exclude: [
-                "adaptyui.v4.3.0.schema.yaml",
-            ]
+                "adaptyui.v4.4.1.schema.yaml"
+            ],
         ),
         .target(
             name: "Adapty",
@@ -67,7 +67,7 @@ let package = Package(
             path: "Sources.KidsMode",
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
-                .define("ADAPTY_KIDS_MODE"),
+                .define("ADAPTY_KIDS_MODE")
             ]
         ),
         .target(
@@ -86,7 +86,7 @@ let package = Package(
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.AdaptyPlugin",
             exclude: [
-                "cross_platform.yaml",
+                "cross_platform.yaml"
             ]
         ),
         .testTarget(

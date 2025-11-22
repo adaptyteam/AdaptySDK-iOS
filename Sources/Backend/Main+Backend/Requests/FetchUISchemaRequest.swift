@@ -40,7 +40,20 @@ struct FetchUISchemaRequest: BackendRequest {
     }
 }
 
-private typealias ResponseBody = Backend.Response.Data<AdaptyUISchema>
+extension AdaptyUISchema {
+    static func decoder(
+        _ response: HTTPDataResponse,
+        _ configuration: HTTPCodableConfiguration?,
+        _ request: HTTPRequest
+    ) throws -> HTTPResponse<AdaptyUISchema> {
+        let viewConfiguration = try response.decodeBody(Backend.Response.Data<AdaptyPaywall.ViewConfiguration>.self, with: configuration).value
+        guard case let .unpacked(schema) = viewConfiguration.schemaOrJson else {
+            let key = AdaptyPaywall.ViewConfiguration.CodingKeys.value
+            throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: [Backend.CodingKeys.data], debugDescription: "No value associated with key \(key)"))
+        }
+        return response.replaceBody(schema)
+    }
+}
 
 extension Backend.MainExecutor {
     func fetchUISchema(
@@ -68,7 +81,7 @@ extension Backend.MainExecutor {
             ]
         )
 
-        let response: HTTPResponse<ResponseBody> = try await perform(request)
-        return response.body.value
+        let response: HTTPResponse<AdaptyUISchema> = try await perform(request, withDecoder: AdaptyUISchema.decoder)
+        return response.body
     }
 }

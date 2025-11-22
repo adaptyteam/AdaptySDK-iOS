@@ -43,7 +43,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
 
     func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {
         guard let productWrapper = product as? AdaptyPaywallProductWrapper else {
-            Log.ui.verbose("#\(logId)# reportDidSelectProduct error: product is not AdaptyPaywallProductWrapper")
+            Log.ui.error("#\(logId)# reportDidSelectProduct error: product is not AdaptyPaywallProductWrapper")
             return
         }
 
@@ -109,11 +109,13 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
 
     func makePurchase(
         product: ProductResolver,
-        onStart: @escaping () -> Void,
-        onFinish: @escaping () -> Void
+        onStart: @MainActor @escaping () -> Void,
+        onFinish: @MainActor @escaping () -> Void
     ) {
-        guard let adaptyProduct = product as? AdaptyPaywallProduct else {
-            Log.ui.verbose("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
+        guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
+              case .full(let adaptyProduct) = adaptyProductWrapper
+        else {
+            Log.ui.error("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
             return
         }
 
@@ -159,14 +161,19 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         }
     }
 
-    func openWebPaywall(for product: ProductResolver) async {
-        guard let adaptyProduct = product as? AdaptyPaywallProduct else {
-            Log.ui.verbose("#\(logId)# openWebPaywall error: product is not AdaptyPaywallProduct")
+    func openWebPaywall(for product: ProductResolver, in openIn: VC.WebOpenInParameter) async {
+        guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
+              case .full(let adaptyProduct) = adaptyProductWrapper
+        else {
+            Log.ui.error("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
             return
         }
 
         do {
-            try await Adapty.openWebPaywall(for: adaptyProduct)
+            try await Adapty.openWebPaywall(
+                for: adaptyProduct,
+                in: openIn.toURLOpenMode
+            )
 
             events.event_didFinishWebPaymentNavigation(
                 product: adaptyProduct,
@@ -180,14 +187,28 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         }
     }
 
-    func restorePurchases() async {
-        events.event_didStartRestore()
+    func restorePurchases(
+        onStart: @MainActor @escaping () -> Void,
+        onFinish: @MainActor @escaping () -> Void
+    ) {
+        if let observerModeResolver {
+            observerModeResolver.observerModeDidInitiateRestorePurchases(
+                onStartRestore: onStart,
+                onFinishRestore: onFinish
+            )
+        } else {
+            Task { @MainActor in
+                events.event_didStartRestore()
 
-        do {
-            let profile = try await Adapty.restorePurchases()
-            events.event_didFinishRestore(with: profile)
-        } catch {
-            events.event_didFailRestore(with: error.asAdaptyError)
+                onStart()
+                do {
+                    let profile = try await Adapty.restorePurchases()
+                    events.event_didFinishRestore(with: profile)
+                } catch {
+                    events.event_didFailRestore(with: error.asAdaptyError)
+                }
+                onFinish()
+            }
         }
     }
 
@@ -206,6 +227,15 @@ private extension AdaptyPaywall {
                     $0.vendorProductId == vendorProductId
                 }
             )
+        }
+    }
+}
+
+private extension VC.WebOpenInParameter {
+    var toURLOpenMode: AdaptyURLOpenMode {
+        switch self {
+        case .browserInApp: .inAppBrowser
+        case .browserOutApp: .externalBrowser
         }
     }
 }

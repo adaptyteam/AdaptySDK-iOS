@@ -1,0 +1,127 @@
+name: 🐞 Bug Report
+description: File a bug report if something is not working as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |     
+        For backend, dashboard, store integration and other non-SDK issues, reach out to
+        support@adapty.io for help.
+  - type: textarea
+    attributes:
+      label: Description
+      description: |
+        Describe the issue. Explain what you _expected_ to happen and what
+        _actually_ happened.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Please provide either **steps to reproduce**
+      placeholder: |
+        1. Call `Adapty.activate(...)`
+        2. Call `Adapty.getPaywall(...)`
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Minimal reproduction code
+      description: |
+        Please provide a code example or provide a link to a repository with code that reproduces the issue. You can fork and modify our [example app](https://github.com/adaptyteam/AdaptySDK-iOS/tree/master/Examples) as a starting point. This will help us triage your issue faster.
+      value: |
+        import Adapty
+        
+        // Enable verbose logging before activation
+        Adapty.setLogLevel(.verbose)
+        
+        // Activate SDK
+        try await Adapty.activate("YOUR_API_KEY")
+        
+        // Your code that reproduces the issue
+
+      render: swift
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Relevant log output
+      description: |
+        Logs are very helpful for troubleshooting issues. To enable Adapty debug logging, use `Adapty.setLogLevel(.verbose)` before SDK activation. Don't forget to remove sensitive information.
+        
+        If logs are too large or contain sensitive information, you can send them to support@adapty.io and include a link to this GitHub issue.
+      placeholder: |
+        Adapty activated successfully. [xVPqtQ]
+        v3.12.1, Adapty/Adapty+Activate.swift#82
+        
+        LifecycleManager initialize
+        v3.12.1, Adapty/LifecycleManager.swift#40
+        
+        LifecycleManager: e9uhOn scheduleProfileUpdate
+        v3.12.1, Adapty/LifecycleManager.swift#98
+      render: shell
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        ## About SDK
+  - type: input
+    attributes:
+      label: Adapty SDK Version
+      description: What version of Adapty SDK has this issue?
+      placeholder: "3.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: SDK installation method
+      description: How did you add Adapty SDK to your project?
+      options:
+        - Swift Package Manager
+        - CocoaPods
+        - Other
+      multiple: true
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Build Settings
+  - type: input
+    attributes:
+      label: Xcode Project Swift Version
+      description: What Swift version is your Xcode project using?
+      placeholder: "5.9"
+    validations:
+      required: false
+  - type: input
+    attributes:
+      label: Xcode Version
+      description: What version of Xcode is being used?
+      placeholder: "26.0"
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## About testing Devices
+  - type: input
+    attributes:
+      label: iOS Version
+      description: What version of iOS is being used?
+      placeholder: "26.0"
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Device Type(s)
+      description: Are you using a simulator or a physical device?
+      options:
+        - Simulator
+        - Physical Device
+        - Both
+    validations:
+      required: true
