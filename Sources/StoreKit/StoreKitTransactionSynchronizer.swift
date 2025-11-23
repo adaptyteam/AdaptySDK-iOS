@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import StoreKit
 
 @AdaptyActor
 protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
@@ -20,13 +21,11 @@ protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
         payload: PurchasePayload
     ) async throws(AdaptyError) -> AdaptyProfile
 
-    func attemptToFinish(transaction: SK2Transaction, logSource: String) async
+    func attemptToFinish(transaction: StoreKit.Transaction, logSource: String) async
 
-    func finish(transaction: SK2Transaction) async
+    func finish(transaction: StoreKit.Transaction) async
 
     func recalculateOfflineAccessLevels() async -> AdaptyProfile
-
-    func skipSyncXcodeSK1Transaction() async -> AdaptyProfile
 }
 
 extension Adapty: StoreKitTransactionSynchronizer {
@@ -54,16 +53,16 @@ extension Adapty: StoreKitTransactionSynchronizer {
         }
     }
 
-    func attemptToFinish(transaction: SK2Transaction, logSource: String) async {
+    func attemptToFinish(transaction: StoreKit.Transaction, logSource: String) async {
         if await purchasePayloadStorage.canFinishSyncedTransaction(transaction.unfIdentifier) {
             await finish(transaction: transaction)
-            Log.sk2TransactionManager.info("Finish \(logSource) transaction: \(transaction) for product: \(transaction.unfProductId)")
+            Log.transactionManager.info("Finish \(logSource) transaction: \(transaction) for product: \(transaction.unfProductId)")
         } else {
-            Log.sk2TransactionManager.info("Successfully \(logSource) transaction synced: \(transaction), manual finish required for product: \(transaction.unfProductId)")
+            Log.transactionManager.info("Successfully \(logSource) transaction synced: \(transaction), manual finish required for product: \(transaction.unfProductId)")
         }
     }
 
-    func finish(transaction: SK2Transaction) async {
+    func finish(transaction: StoreKit.Transaction) async {
         await transaction.finish()
         await purchasePayloadStorage.removePurchasePayload(forTransaction: transaction)
         await purchasePayloadStorage.removeUnfinishedTransaction(transaction.unfIdentifier)

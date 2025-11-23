@@ -51,17 +51,7 @@ public enum AdaptyPurchaseResult: Sendable {
         return profile
     }
 
-    /// A transaction object, which represents the payment.
-    public var sk1Transaction: SKPaymentTransaction? {
-        guard case let .success(_, transaction) = self,
-              let sk1Transaction = transaction as? SK1Transaction
-        else {
-            return nil
-        }
-        return sk1Transaction
-    }
-
-    public var sk2SignedTransaction: VerificationResult<Transaction>? {
+    public var signedTransaction: VerificationResult<Transaction>? {
         guard case let .success(_, transaction) = self,
               let result = transaction as? VerificationResult<Transaction>
         else {
@@ -71,11 +61,11 @@ public enum AdaptyPurchaseResult: Sendable {
     }
 
     /// A transaction object, which represents the payment.
-    public var sk2Transaction: Transaction? {
-        sk2SignedTransaction?.unsafePayloadValue
+    public var transaction: Transaction? {
+        signedTransaction?.unsafePayloadValue
     }
     
     public var jwsTransaction: String? {
-        sk2SignedTransaction?.jwsRepresentation
+        signedTransaction?.jwsRepresentation
     }
 }

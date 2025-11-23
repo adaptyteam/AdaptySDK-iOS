@@ -17,7 +17,6 @@ final class ProfileManager {
 
     let crossPlacmentStorage = CrossPlacementStorage()
     let placementStorage = PlacementStorage()
-    let backendIntroductoryOfferEligibilityStorage = BackendIntroductoryOfferEligibilityStorage()
 
     var currentProfile: AdaptyProfile { cachedProfile.value }
     var isTestUser: Bool { cachedProfile.value.isTestUser }
@@ -199,7 +198,7 @@ extension Adapty {
 
         if await !transactionManager.hasUnfinishedTransactions {
             verifiedCurrentEntitlements = verifiedCurrentEntitlements.filter {
-                $0.unfEnvironment == SK2Transaction.xcodeEnvironment
+                $0.isXcodeEnvironment
             }
         }
 

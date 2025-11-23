@@ -9,17 +9,17 @@
 //
 //extension AdaptyProfile.NonSubscription {
 //    init(
-//        sk2Transaction: SK2Transaction
+//        transaction: StoreKit.Transaction
 //    ) {
 //        self.init(
 //            purchaseId: UUID().uuidString,
 //            store: "app_store",
-//            vendorProductId: sk2Transaction.unfProductID,
-//            vendorTransactionId: sk2Transaction.unfIdentifier,
-//            purchasedAt: sk2Transaction.purchaseDate,
-//            isSandbox: sk2Transaction.isSandbox,
-//            isRefund: sk2Transaction.revocationDate != nil,
-//            isConsumable: sk2Transaction.productType == .consumable
+//            vendorProductId: transaction.unfProductID,
+//            vendorTransactionId: transaction.unfIdentifier,
+//            purchasedAt: transaction.purchaseDate,
+//            isSandbox: transaction.isSandbox,
+//            isRefund: transaction.revocationDate != nil,
+//            isConsumable: transaction.productType == .consumable
 //        )
 //    }
 //}

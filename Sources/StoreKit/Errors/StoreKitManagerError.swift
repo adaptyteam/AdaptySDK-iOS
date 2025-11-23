@@ -141,15 +141,6 @@ extension StoreKitManagerError {
         .refreshReceiptFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
-    static func requestSK1ProductsFailed(
-        _ error: Error,
-        file: String = #fileID,
-        function: String = #function,
-        line: UInt = #line
-    ) -> Self {
-        .requestSKProductsFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
-    }
-
     static func requestSK2ProductsFailed(
         _ error: Error,
         file: String = #fileID,

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import StoreKit
 
 private let log = Log.storage
 
@@ -195,7 +196,10 @@ extension PurchasePayloadStorage {
         ))
     }
 
-    func purchasePayload(byTransaction transaction: SKTransaction, orCreateFor userId: AdaptyUserId) -> PurchasePayload {
+    func purchasePayload(
+        byTransaction transaction: StoreKit.Transaction,
+        orCreateFor userId: AdaptyUserId
+    ) -> PurchasePayload {
         if let payload = Self.purchasePayloadByTransactionId[transaction.unfIdentifier] {
             return payload
         }
@@ -205,7 +209,10 @@ extension PurchasePayloadStorage {
         return payload
     }
 
-    func setPurchasePayload(_ payload: PurchasePayload, forTransaction transaction: SKTransaction) {
+    func setPurchasePayload(
+        _ payload: PurchasePayload,
+        forTransaction transaction: StoreKit.Transaction
+    ) {
         if Self.setPurchasePayload(
             payload,
             forTransactionId: transaction.unfIdentifier
@@ -220,7 +227,7 @@ extension PurchasePayloadStorage {
         removePurchasePayload(forProductId: transaction.unfProductId)
     }
 
-    func removePurchasePayload(forTransaction transaction: SKTransaction) {
+    func removePurchasePayload(forTransaction transaction: StoreKit.Transaction) {
         if Self.removePurchasePayload(forTransactionId: transaction.unfIdentifier) {
             Adapty.trackSystemEvent(AdaptyInternalEventParameters(
                 eventName: "did_set_variations_ids",

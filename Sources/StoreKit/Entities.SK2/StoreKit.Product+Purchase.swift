@@ -1,5 +1,5 @@
 //
-//  SK2Product+Purchase.swift
+//  StoreKit.Product+Purchase.swift
 //  AdaptySDK
 //
 //  Created by Alexey Goncharov on 15.01.2025.
@@ -12,7 +12,7 @@ import UIKit
 #endif
 
 @MainActor
-extension SK2Product {
+extension StoreKit.Product {
     func unfPurchase(
         options: Set<Product.PurchaseOption> = []
     ) async throws -> PurchaseResult {

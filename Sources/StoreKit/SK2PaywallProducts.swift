@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import StoreKit
 
-private let log = Log.sk2ProductManager
+private let log = Log.productManager
 
 extension Adapty {
     func getSK2PaywallProductsWithoutOffers(
@@ -55,7 +56,7 @@ extension Adapty {
                 if let offer = sk2Product.subscriptionOffer(by: subscriptionOfferIdentifier) {
                     offer
                 } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit2 product don't have offer id: `\(subscriptionOfferIdentifier.offerId ?? "nil")` with type:\(subscriptionOfferIdentifier.offerType.rawValue) ").asAdaptyError
+                    throw StoreKitManagerError.invalidOffer("StoreKit product don't have offer id: `\(subscriptionOfferIdentifier.offerId ?? "nil")` with type:\(subscriptionOfferIdentifier.offerType.rawValue) ").asAdaptyError
                 }
             } else {
                 nil
@@ -98,9 +99,9 @@ extension Adapty {
             return (sk2Product, reference, offer, determinedOffer, subscriptionGroupId)
         }
 
-        let eligibleWinBackOfferIds = try await eligibleWinBackOfferIds(for: Set(products.compactMap { $0.subscriptionGroupId }))
+        let eligibleWinBackOfferIds = try await eligibleWinBackOfferIds(for: Set(products.compactMap(\.subscriptionGroupId)))
 
-        var newProducts = [(product: SK2Product, reference: AdaptyPaywall.ProductReference, offer: AdaptySubscriptionOffer?)]()
+        var newProducts = [(product: StoreKit.Product, reference: AdaptyPaywall.ProductReference, offer: AdaptySubscriptionOffer?)]()
         newProducts.reserveCapacity(products.count)
         for product in products {
             await newProducts.append(determineOfferFor(product, with: eligibleWinBackOfferIds))
@@ -122,7 +123,7 @@ extension Adapty {
     }
 
     private typealias ProductTuple = (
-        product: SK2Product,
+        product: StoreKit.Product,
         reference: AdaptyPaywall.ProductReference,
         offer: AdaptySubscriptionOffer?,
         determinedOffer: Bool,
@@ -131,7 +132,7 @@ extension Adapty {
 
     private func subscriptionOfferAvailable(
         _ reference: AdaptyPaywall.ProductReference,
-        _ sk2Product: SK2Product
+        _ sk2Product: StoreKit.Product
     ) -> (offer: AdaptySubscriptionOffer?, determinedOffer: Bool) {
         if let promotionalOffer = promotionalOffer(with: reference.promotionalOfferId, from: sk2Product) {
             (promotionalOffer, true)
@@ -145,7 +146,7 @@ extension Adapty {
     private func determineOfferFor(
         _ tuple: ProductTuple,
         with eligibleWinBackOfferIds: [String: [String]]
-    ) async -> (product: SK2Product, reference: AdaptyPaywall.ProductReference, offer: AdaptySubscriptionOffer?) {
+    ) async -> (product: StoreKit.Product, reference: AdaptyPaywall.ProductReference, offer: AdaptySubscriptionOffer?) {
         guard !tuple.determinedOffer else { return (tuple.product, tuple.reference, tuple.offer) }
 
         if let subscriptionGroupId = tuple.subscriptionGroupId,
@@ -192,7 +193,7 @@ extension Adapty {
         return (tuple.product, tuple.reference, eligible ? introductoryOffer : nil)
     }
 
-    private func winBackOffer(with offerId: String?, from sk2Product: SK2Product) -> AdaptySubscriptionOffer? {
+    private func winBackOffer(with offerId: String?, from sk2Product: StoreKit.Product) -> AdaptySubscriptionOffer? {
         guard let offerId else { return nil }
         guard let offer = sk2Product.subscriptionOffer(by: .winBack(offerId)) else {
             log.warn("no win back offer found with id:\(offerId) in productId:\(sk2Product.id)")
@@ -201,7 +202,7 @@ extension Adapty {
         return offer
     }
 
-    private func winBackOfferExist(with offerId: String?, from sk2Product: SK2Product) -> Bool {
+    private func winBackOfferExist(with offerId: String?, from sk2Product: StoreKit.Product) -> Bool {
         guard let offerId else { return false }
         guard sk2Product.sk2ProductSubscriptionOffer(by: .winBack(offerId)) != nil else {
             log.warn("no win back offer found with id:\(offerId) in productId:\(sk2Product.id)")
@@ -210,7 +211,7 @@ extension Adapty {
         return true
     }
 
-    private func promotionalOffer(with offerId: String?, from sk2Product: SK2Product) -> AdaptySubscriptionOffer? {
+    private func promotionalOffer(with offerId: String?, from sk2Product: StoreKit.Product) -> AdaptySubscriptionOffer? {
         guard let offerId else { return nil }
         guard let offer = sk2Product.subscriptionOffer(by: .promotional(offerId)) else {
             log.warn("no promotional offer found with id:\(offerId) in productId:\(sk2Product.id)")
@@ -230,7 +231,7 @@ extension Adapty {
 
     private func eligibleWinBackOfferIds(for subscriptionGroupIdentifier: String) async throws(AdaptyError) -> [String] {
         guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else { return [] }
-        let statuses: [SK2Product.SubscriptionInfo.Status]
+        let statuses: [StoreKit.Product.SubscriptionInfo.Status]
         let stamp = Log.stamp
 
         do {
@@ -242,7 +243,7 @@ extension Adapty {
                 ]
             ))
 
-            statuses = try await SK2Product.SubscriptionInfo.status(for: subscriptionGroupIdentifier)
+            statuses = try await StoreKit.Product.SubscriptionInfo.status(for: subscriptionGroupIdentifier)
 
             Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
                 methodName: .subscriptionInfoStatus,

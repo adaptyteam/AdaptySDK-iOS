@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import StoreKit
 
 struct PurchasedTransactionInfo: Sendable {
     let transactionId: String
@@ -19,7 +20,7 @@ struct PurchasedTransactionInfo: Sendable {
 
     init(
         product: AdaptyProduct?,
-        transaction: SKTransaction
+        transaction: StoreKit.Transaction
     ) {
         self.transactionId = transaction.unfIdentifier
         self.originalTransactionId = transaction.unfOriginalIdentifier
@@ -31,5 +32,3 @@ struct PurchasedTransactionInfo: Sendable {
         self.environment = transaction.unfEnvironment
     }
 }
-
-

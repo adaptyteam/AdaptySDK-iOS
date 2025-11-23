@@ -9,8 +9,8 @@
 //
 //extension AdaptyProfile.Subscription {
 //    init(
-//        sk2Transaction: SK2Transaction,
-//        sk2Product: SK2Product?,
+//        transaction: StoreKit.Transaction,
+//        sk2Product: StoreKit.Product?,
 //        productInfo: BackendProductInfo.Period?,
 //        now: Date = Date()
 //    ) {
@@ -18,9 +18,9 @@
 //
 //        self.init(
 //            store: "app_store",
-//            vendorProductId: sk2Transaction.unfProductID,
-//            vendorTransactionId: sk2Transaction.unfIdentifier,
-//            vendorOriginalTransactionId: sk2Transaction.unfOriginalIdentifier,
+//            vendorProductId: transaction.unfProductID,
+//            vendorTransactionId: transaction.unfIdentifier,
+//            vendorOriginalTransactionId: transaction.unfOriginalIdentifier,
 //            isActive: <#T##Bool#>,
 //            isLifetime: isLifetime,
 //            activatedAt: <#T##Date#>,
@@ -30,7 +30,7 @@
 //            unsubscribedAt: <#T##Date?#>,
 //            billingIssueDetectedAt: <#T##Date?#>,
 //            isInGracePeriod: <#T##Bool#>,
-//            isSandbox: sk2Transaction.isSandbox,
+//            isSandbox: transaction.isSandbox,
 //            isRefund: <#T##Bool#>,
 //            willRenew: <#T##Bool#>,
 //            activeIntroductoryOfferType: <#T##String?#>,

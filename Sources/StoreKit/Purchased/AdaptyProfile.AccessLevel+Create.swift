@@ -10,18 +10,18 @@ import StoreKit
 extension AdaptyProfile.AccessLevel {
     init?(
         id: String,
-        sk2Transaction: SK2Transaction,
-        sk2Product: SK2Product?,
+        transaction: StoreKit.Transaction,
+        sk2Product: StoreKit.Product?,
         backendPeriod: BackendProductInfo.Period?,
         now: Date = Date()
     ) async {
-        let productType = sk2Transaction.productType
-        let activatedAt = sk2Transaction.originalPurchaseDate
+        let productType = transaction.productType
+        let activatedAt = transaction.originalPurchaseDate
         let isLifetime = backendPeriod == .lifetime
-        var isRefund = sk2Transaction.revocationDate != nil
+        var isRefund = transaction.revocationDate != nil
 
         let offer = PurchasedSubscriptionOfferInfo(
-            sk2Transaction: sk2Transaction,
+            transaction: transaction,
             sk2Product: sk2Product
         )
         let expiresAt: Date?
@@ -36,7 +36,7 @@ extension AdaptyProfile.AccessLevel {
 
         switch productType {
         case .autoRenewable:
-            if let subscriptionStatus = await sk2Transaction.subscriptionStatus {
+            if let subscriptionStatus = await transaction.subscriptionStatus {
                 let state = subscriptionStatus.state
 
                 if let renewalInfo = try? subscriptionStatus.renewalInfo.payloadValue {
@@ -56,20 +56,20 @@ extension AdaptyProfile.AccessLevel {
                 isRefund = state == .revoked || isRefund
             }
 
-            subscriptionRenewedAt = sk2Transaction.purchaseDate == activatedAt ? nil : sk2Transaction.purchaseDate
+            subscriptionRenewedAt = transaction.purchaseDate == activatedAt ? nil : transaction.purchaseDate
 
-            expiresAt = sk2Transaction.revocationDate
+            expiresAt = transaction.revocationDate
                 ?? subscriptionGracePeriodExpiredAt
-                ?? sk2Transaction.expirationDate
+                ?? transaction.expirationDate
 
             if !subscriptionWillRenew, let expiresAt {
                 subscriptionUnsubscribedAt = min(now, expiresAt)
             }
 
         default:
-            expiresAt = sk2Transaction.revocationDate
-                ?? sk2Transaction.expirationDate
-                ?? backendPeriod?.expiresAt(startedAt: sk2Transaction.purchaseDate)
+            expiresAt = transaction.revocationDate
+                ?? transaction.expirationDate
+                ?? backendPeriod?.expiresAt(startedAt: transaction.purchaseDate)
         }
 
         guard expiresAt != nil || isLifetime else { return nil }
@@ -83,7 +83,7 @@ extension AdaptyProfile.AccessLevel {
                 if let expiresAt, now > expiresAt { return false }
                 return true
             }(),
-            vendorProductId: sk2Transaction.unfProductId,
+            vendorProductId: transaction.unfProductId,
             store: "app_store",
             activatedAt: activatedAt,
             renewedAt: subscriptionRenewedAt,

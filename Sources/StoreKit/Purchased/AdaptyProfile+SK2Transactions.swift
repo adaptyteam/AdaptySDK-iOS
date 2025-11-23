@@ -1,5 +1,5 @@
 //
-//  AdaptyProfile+SK2Transactions.swift
+//  AdaptyProfile+StoreKit.Transaction.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 10.08.2025.
@@ -7,10 +7,10 @@
 
 import StoreKit
 
-private let log = Log.sk2ProductManager
+private let log = Log.productManager
 
 extension AdaptyProfile {
-    func added(transactions: [SK2Transaction], productManager: SK2ProductsManager) async -> AdaptyProfile {
+    func added(transactions: [StoreKit.Transaction], productManager: SK2ProductsManager) async -> AdaptyProfile {
         guard !transactions.isEmpty else { return self }
 
         var accessLevels = [AdaptyProfile.AccessLevel]()
@@ -28,7 +28,7 @@ extension AdaptyProfile {
             }
             guard let accessLevel = await AdaptyProfile.AccessLevel(
                 id: productInfo.accessLevelId,
-                sk2Transaction: transaction,
+                transaction: transaction,
                 sk2Product: sk2Product,
                 backendPeriod: productInfo.period
             ) else { continue }

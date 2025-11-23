@@ -8,7 +8,7 @@
 import StoreKit
 
 struct AdaptySK2PaywallProduct: AdaptySK2Product, AdaptyPaywallProduct, WebPaywallURLProviding {
-    let skProduct: SK2Product
+    let skProduct: StoreKit.Product
 
     public let adaptyProductId: String
 
@@ -38,7 +38,7 @@ struct AdaptySK2PaywallProduct: AdaptySK2Product, AdaptyPaywallProduct, WebPaywa
 }
 
 struct AdaptySK2PaywallProductWithoutDeterminingOffer: AdaptySK2Product, AdaptyPaywallProductWithoutDeterminingOffer, WebPaywallURLProviding {
-    let skProduct: SK2Product
+    let skProduct: StoreKit.Product
 
     public let adaptyProductId: String
 

@@ -168,7 +168,6 @@ final class ProfileStorage {
         lastStartAcceleratedSyncProfileDate = nil
 
         CrossPlacementStorage.clear()
-        BackendIntroductoryOfferEligibilityStorage.clear()
         PlacementStorage.clear()
     }
 }

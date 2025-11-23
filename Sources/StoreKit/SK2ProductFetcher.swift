@@ -7,10 +7,10 @@
 
 import StoreKit
 
-private let log = Log.sk2ProductManager
+private let log = Log.productManager
 
 actor SK2ProductFetcher {
-    func fetchProducts(ids productIds: Set<String>, retryCount: Int = 3) async throws(AdaptyError) -> [SK2Product] {
+    func fetchProducts(ids productIds: Set<String>, retryCount: Int = 3) async throws(AdaptyError) -> [StoreKit.Product] {
         log.verbose("Called fetch SK2Products: \(productIds) retryCount:\(retryCount)")
 
         let stamp = Log.stamp
@@ -22,9 +22,9 @@ actor SK2ProductFetcher {
             ]
         ))
 
-        let sk2Products: [SK2Product]
+        let sk2Products: [StoreKit.Product]
         do {
-            sk2Products = try await SK2Product.products(for: productIds)
+            sk2Products = try await StoreKit.Product.products(for: productIds)
         } catch {
             log.error("Can't fetch SK2Products from Store \(error)")
 
@@ -42,7 +42,7 @@ actor SK2ProductFetcher {
         }
 
         for sk2Product in sk2Products {
-            log.verbose("Found SK2Product \(sk2Product.id) \(sk2Product.displayName) \(sk2Product.displayPrice)")
+            log.verbose("Found StoreKit.Product \(sk2Product.id) \(sk2Product.displayName) \(sk2Product.displayPrice)")
         }
 
         Adapty.trackSystemEvent(AdaptyAppleResponseParameters(

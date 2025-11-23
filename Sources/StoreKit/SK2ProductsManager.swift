@@ -6,15 +6,16 @@
 //
 
 import Foundation
+import StoreKit
 
-private let log = Log.sk2ProductManager
+private let log = Log.productManager
 
 actor SK2ProductsManager {
     private let apiKeyPrefix: String
     private let storage: BackendProductInfoStorage
     private let session: Backend.MainExecutor
 
-    private var products = [String: SK2Product]()
+    private var products = [String: StoreKit.Product]()
     private let sk2ProductsFetcher = SK2ProductFetcher()
 
     init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: BackendProductInfoStorage) {
@@ -53,7 +54,7 @@ actor SK2ProductsManager {
 }
 
 extension SK2ProductsManager {
-    func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [SK2Product] {
+    func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [StoreKit.Product] {
         let products = try await fetchSK2Products(ids: Set(productIds), fetchPolicy: fetchPolicy)
 
         return productIds.compactMap { id in
@@ -61,7 +62,7 @@ extension SK2ProductsManager {
         }
     }
 
-    func fetchSK2Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws(AdaptyError) -> SK2Product {
+    func fetchSK2Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws(AdaptyError) -> StoreKit.Product {
         do throws(AdaptyError) {
             let products = try await fetchSK2Products(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)
 
@@ -71,13 +72,13 @@ extension SK2ProductsManager {
 
             return product
         } catch {
-            log.error("fetch SK2Product \(productId) error: \(error)")
+            log.error("fetch StoreKit.Product \(productId) error: \(error)")
             throw error
         }
     }
 
     func fetchSK2Products(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
-        async throws(AdaptyError) -> [SK2Product]
+    async throws(AdaptyError) -> [StoreKit.Product]
     {
         guard productIds.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError

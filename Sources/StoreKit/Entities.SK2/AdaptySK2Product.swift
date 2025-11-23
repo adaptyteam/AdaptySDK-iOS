@@ -8,13 +8,11 @@
 import StoreKit
 
 protocol AdaptySK2Product: AdaptyProduct {
-    var skProduct: SK2Product { get }
+    var skProduct: StoreKit.Product { get }
 }
 
 extension AdaptySK2Product {
-    public var sk1Product: SK1Product? { nil }
-
-    public var sk2Product: SK2Product? { skProduct }
+    public var sk2Product: StoreKit.Product? { skProduct }
 
     public var vendorProductId: String { skProduct.id }
 
@@ -24,13 +22,13 @@ extension AdaptySK2Product {
 
     public var price: Decimal { skProduct.price }
 
-    public var priceLocale: Locale { skProduct.unfPriceLocale }
+    public var priceLocale: Locale { skProduct.priceFormatStyle.locale  }
 
-    public var currencyCode: String? { skProduct.unfCurrencyCode }
+    public var currencyCode: String? { skProduct.priceFormatStyle.currencyCode }
 
-    public var currencySymbol: String? { skProduct.unfPriceLocale.currencySymbol }
+    public var currencySymbol: String? { skProduct.priceFormatStyle.locale.currencySymbol }
 
-    public var regionCode: String? { skProduct.unfPriceLocale.unfRegionCode }
+    public var regionCode: String? { skProduct.priceFormatStyle.locale.unfRegionCode }
 
     public var isFamilyShareable: Bool { skProduct.isFamilyShareable }
 
@@ -44,7 +42,7 @@ extension AdaptySK2Product {
 
     public var localizedSubscriptionPeriod: String? {
         guard let period = subscriptionPeriod else { return nil }
-        return skProduct.unfPeriodLocale.localized(period: period)
+        return skProduct.subscriptionPeriodFormatStyle.locale.localized(period: period)
     }
 
     public var description: String {
@@ -53,9 +51,6 @@ extension AdaptySK2Product {
 }
 
 struct SK2ProductWrapper: AdaptySK2Product {
-    let skProduct: SK2Product
+    let skProduct: StoreKit.Product
 }
 
-extension SK2Product {
-    var asAdaptyProduct: AdaptySK2Product { SK2ProductWrapper(skProduct: self) }
-}

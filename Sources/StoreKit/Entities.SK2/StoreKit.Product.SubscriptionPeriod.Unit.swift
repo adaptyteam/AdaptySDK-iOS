@@ -1,5 +1,5 @@
 //
-//  SK1Product.SubscriptionPeriod.Unit.swift
+//  StoreKit.Product.SubscriptionPeriod.Unit.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2024
@@ -7,11 +7,7 @@
 
 import StoreKit
 
-extension SK1Product.SubscriptionPeriod {
-    typealias Unit = SKProduct.PeriodUnit
-}
-
-extension SK1Product.SubscriptionPeriod.Unit {
+extension StoreKit.Product.SubscriptionPeriod.Unit {
     var asAdaptySubscriptionPeriodUnit: AdaptySubscriptionPeriod.Unit {
         switch self {
         case .day: .day

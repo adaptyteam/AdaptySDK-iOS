@@ -6,44 +6,44 @@
 //
 import StoreKit
 
-private let log = Log.sk2TransactionManager
+private let log = Log.transactionManager
 
 public struct AdaptyUnfinishedTransaction: Sendable {
-    public let sk2SignedTransaction: VerificationResult<Transaction>
+    public let signedTransaction: VerificationResult<Transaction>
 
     public func finish() async throws(AdaptyError) {
         try await Adapty.withActivatedSDK(methodName: .manualFinishTransaction, logParams: [
-            "transaction_id": sk2Transaction.unfIdentifier,
+            "transaction_id": transaction.unfIdentifier,
         ]) { sdk throws(AdaptyError) in
             guard !sdk.observerMode else { throw AdaptyError.notAllowedInObserveMode() }
 
-            guard case let .verified(sk2Transaction) = sk2SignedTransaction else {
+            guard case let .verified(transaction) = signedTransaction else {
                 return
             }
 
-            await sdk.manualFinishTransaction(sk2Transaction)
+            await sdk.manualFinishTransaction(transaction)
         }
     }
 }
 
 private extension Adapty {
-    func manualFinishTransaction(_ sk2Transaction: SK2Transaction) async {
-        let synced = await purchasePayloadStorage.isSyncedTransaction(sk2Transaction.unfIdentifier)
-        await purchasePayloadStorage.removeUnfinishedTransaction(sk2Transaction.unfIdentifier)
+    func manualFinishTransaction(_ transaction: StoreKit.Transaction) async {
+        let synced = await purchasePayloadStorage.isSyncedTransaction(transaction.unfIdentifier)
+        await purchasePayloadStorage.removeUnfinishedTransaction(transaction.unfIdentifier)
 
         if !synced { return }
 
-        await finish(transaction: sk2Transaction)
-        log.info("Finish unfinished transaction: \(sk2Transaction) for product: \(sk2Transaction.unfProductId) after manual call method (already synchronized)")
+        await finish(transaction: transaction)
+        log.info("Finish unfinished transaction: \(transaction) for product: \(transaction.unfProductId) after manual call method (already synchronized)")
     }
 }
 
 public extension AdaptyUnfinishedTransaction {
-    var sk2Transaction: Transaction {
-        sk2SignedTransaction.unsafePayloadValue
+    var transaction: Transaction {
+        signedTransaction.unsafePayloadValue
     }
 
     var jwsTransaction: String {
-        sk2SignedTransaction.jwsRepresentation
+        signedTransaction.jwsRepresentation
     }
 }

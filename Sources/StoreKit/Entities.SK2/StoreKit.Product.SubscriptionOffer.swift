@@ -1,5 +1,5 @@
 //
-//  SK2Product.SubscriptionOffer.swift
+//  StoreKit.Product.SubscriptionOffer.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 01.02.2024
@@ -7,7 +7,7 @@
 
 import StoreKit
 
-extension SK2Product {
+extension StoreKit.Product {
     var introductoryOfferNotApplicable: Bool {
         subscription?.introductoryOffer == nil
     }
@@ -33,11 +33,11 @@ extension SK2Product {
         guard let offer: SubscriptionOffer = sk2ProductSubscriptionOffer(by: offerIdentifier) else { return nil }
 
         let period = offer.period.asAdaptySubscriptionPeriod
-        let periodLocale = unfPeriodLocale
+        let periodLocale = subscriptionPeriodFormatStyle.locale
         return AdaptySubscriptionOffer(
             price: offer.price,
-            currencyCode: unfCurrencyCode,
-//            currencySymbol: unfPriceLocale.currencySymbol,
+            currencyCode: priceFormatStyle.currencyCode,
+//            currencySymbol: priceFormatStyle.locale.currencySymbol,
             localizedPrice: offer.displayPrice,
             offerIdentifier: offerIdentifier,
             subscriptionPeriod: period,

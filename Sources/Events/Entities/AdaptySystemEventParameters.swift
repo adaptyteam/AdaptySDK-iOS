@@ -135,7 +135,6 @@ enum MethodName: String {
     case setVariationId = "set_variation_id"
     case manualFinishTransaction = "manual_finish_transaction"
 
-    case reportSK1Transaction = "report_transaction_sk1"
     case reportSK2Transaction = "report_transaction_sk2"
     case getPaywallProducts = "get_paywall_products"
     case getPaywallProductsWithoutDeterminingOffer = "get_paywall_products_without_determining_offer"
@@ -215,7 +214,6 @@ struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
 
 enum AppleMethodName: String {
     case fetchASAToken = "fetch_ASA_Token"
-    case fetchSK1Products = "fetch_sk1_products"
     case fetchSK2Products = "fetch_sk2_products"
 
     case getAllSK2Transactions = "get_all_sk2_transactions"

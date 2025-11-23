@@ -29,60 +29,6 @@ public extension Adapty {
         }
     }
 
-    private static func _reportTransaction(
-        _ transaction: SKTransaction,
-        withVariationId variationId: String?
-    ) async throws(AdaptyError) {
-        let variationId = variationId.trimmed.nonEmptyOrNil
-        try await withActivatedSDK(methodName: .reportSK1Transaction, logParams: [
-            "variation_id": variationId,
-            "transaction_id": transaction.unfIdentifier,
-        ]) { sdk throws(AdaptyError) in
-            let userId = try await sdk.createdProfileManager.userId
-
-            guard !transaction.isXcodeEnvironment else { return }
-
-            let productOrNil = try? await sdk.productsManager.fetchProduct(
-                id: transaction.unfProductId,
-                fetchPolicy: .returnCacheDataElseLoad
-            )
-
-            try await sdk.report(
-                .init(
-                    product: productOrNil,
-                    transaction: transaction
-                ),
-                payload: .init(
-                    userId: userId,
-                    paywallVariationId: variationId,
-                    persistentOnboardingVariationId: await sdk.purchasePayloadStorage.onboardingVariationId()
-                ),
-                reason: .setVariation
-            )
-        }
-    }
-
-    /// Link purchased transaction with paywall's variationId.
-    ///
-    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
-    ///
-    /// - Parameters:
-    ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 1) [SKPaymentTransaction](https://developer.apple.com/documentation/storekit/skpaymenttransaction).
-    ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of ``AdaptyPaywall``.
-    /// - Throws: An ``AdaptyError`` object
-    nonisolated static func reportTransaction(
-        _ transaction: StoreKit.SKPaymentTransaction,
-        withVariationId variationId: String? = nil
-    ) async throws(AdaptyError) {
-        guard transaction.transactionState == .purchased || transaction.transactionState == .restored,
-              let transaction = SK1TransactionWithIdentifier(transaction)
-        else {
-            throw .wrongParamPurchasedTransaction()
-        }
-
-        return try await _reportTransaction(transaction, withVariationId: variationId)
-    }
-
     /// Link purchased transaction with paywall's variationId.
     ///
     /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
@@ -95,7 +41,33 @@ public extension Adapty {
         _ transaction: StoreKit.Transaction,
         withVariationId variationId: String? = nil
     ) async throws(AdaptyError) {
-        try await _reportTransaction(transaction, withVariationId: variationId)
+        let variationId = variationId.trimmed.nonEmptyOrNil
+        try await withActivatedSDK(methodName: .reportSK2Transaction, logParams: [
+            "variation_id": variationId,
+            "transaction_id": transaction.unfIdentifier,
+        ]) { sdk throws(AdaptyError) in
+            let userId = try await sdk.createdProfileManager.userId
+
+            guard !transaction.isXcodeEnvironment else { return }
+
+            let productOrNil = try? await sdk.productsManager.fetchSK2Product(
+                id: transaction.unfProductId,
+                fetchPolicy: .returnCacheDataElseLoad
+            ).asAdaptyProduct
+
+            try await sdk.report(
+                .init(
+                    product: productOrNil,
+                    transaction: transaction
+                ),
+                payload: .init(
+                    userId: userId,
+                    paywallVariationId: variationId,
+                    persistentOnboardingVariationId: sdk.purchasePayloadStorage.onboardingVariationId()
+                ),
+                reason: .setVariation
+            )
+        }
     }
 
     /// Link purchased transaction with paywall's variationId.
@@ -107,17 +79,17 @@ public extension Adapty {
     ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func reportTransaction(
-        _ transaction: StoreKit.VerificationResult<StoreKit.Transaction>,
+        _ signedTransaction: StoreKit.VerificationResult<StoreKit.Transaction>,
         withVariationId variationId: String? = nil
     ) async throws(AdaptyError) {
-        let sk2Transaction: SK2Transaction
+        let transaction: StoreKit.Transaction
         do {
-            sk2Transaction = try transaction.payloadValue
+            transaction = try signedTransaction.payloadValue
         } catch {
             throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
         }
 
-        return try await _reportTransaction(sk2Transaction, withVariationId: variationId)
+        return try await reportTransaction(transaction, withVariationId: variationId)
     }
 
     /// Link product purchase result with paywall's variationId.

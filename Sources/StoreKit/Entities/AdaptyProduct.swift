@@ -8,9 +8,6 @@
 import StoreKit
 
 public protocol AdaptyProduct: Sendable, CustomStringConvertible {
-    /// Underlying system representation of the product.
-    var sk1Product: StoreKit.SKProduct? { get }
-
     var sk2Product: StoreKit.Product? { get }
 
     /// Unique identifier of a product from App Store Connect or Google Play Console.
@@ -55,5 +52,3 @@ public protocol AdaptyProduct: Sendable, CustomStringConvertible {
     /// The period's language is determined by the preferred language set on the device.
     var localizedSubscriptionPeriod: String? { get }
 }
-
-

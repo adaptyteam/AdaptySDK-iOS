@@ -21,10 +21,9 @@ public final class Adapty {
     let httpConfigsSession: Backend.ConfigsExecutor
 
     let receiptManager: StoreKitReceiptManager
-    let transactionManager: SK2TransactionManager
+    let transactionManager: TransactionManager
     let productsManager: SK2ProductsManager
     var purchaser: SK2Purchaser?
-    var sk1QueueManager: SK1QueueManager?
 
     package let observerMode: Bool
 
@@ -54,7 +53,7 @@ public final class Adapty {
             httpSession: httpSession
         )
 
-        self.transactionManager = SK2TransactionManager(
+        self.transactionManager = TransactionManager(
             httpSession: httpSession,
             storage: purchasePayloadStorage
         )
@@ -73,13 +72,6 @@ public final class Adapty {
                 transactionSynchronizer: self,
                 subscriptionOfferSigner: self,
                 sk2ProductsManager: sk2ProductsManager,
-                storage: purchasePayloadStorage
-            )
-
-            self.sk1QueueManager = SK1QueueManager.startObserving(
-                transactionSynchronizer: self,
-                subscriptionOfferSigner: self,
-                productsManager: sk2ProductsManager,
                 storage: purchasePayloadStorage
             )
         }

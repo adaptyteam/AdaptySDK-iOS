@@ -1,5 +1,5 @@
 //
-//  SK2Transaction.swift
+//  StoreKit.Transaction.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.10.2023
@@ -7,11 +7,7 @@
 
 import StoreKit
 
-typealias SK2Transaction = Transaction
-
-typealias SK2SignedTransaction = VerificationResult<Transaction>
-
-extension SK2Transaction {
+extension StoreKit.Transaction {
     @inlinable
     var unfIdentifier: String { String(id) }
 
@@ -79,4 +75,11 @@ extension SK2Transaction {
     static let productionEnvironment = "production"
     static let sandboxEnvironment = "sandbox"
     static let xcodeEnvironment = "xcode"
+}
+
+extension StoreKit.Transaction {
+    var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier? {
+        guard let offerType = subscriptionOfferType else { return nil }
+        return .init(offerId: unfOfferId, offerType: offerType)
+    }
 }

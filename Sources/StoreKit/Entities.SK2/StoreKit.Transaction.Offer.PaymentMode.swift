@@ -1,5 +1,5 @@
 //
-//  SK2Product.SubscriptionOffer.PaymentMode.swift
+//  StoreKit.Transaction.Offer.PaymentMode.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2024
@@ -7,7 +7,8 @@
 
 import StoreKit
 
-extension SK2Product.SubscriptionOffer.PaymentMode {
+@available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
+extension StoreKit.Transaction.Offer.PaymentMode {
     var asPaymentMode: AdaptySubscriptionOffer.PaymentMode {
         switch self {
         case .payAsYouGo: .payAsYouGo
