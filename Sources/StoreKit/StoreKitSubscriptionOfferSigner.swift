@@ -11,7 +11,8 @@ protocol StoreKitSubscriptionOfferSigner: AnyObject, Sendable {
     func sign(
         offerId: String,
         subscriptionVendorId: String,
-        for userId: AdaptyUserId
+        for userId: AdaptyUserId,
+        with appAccountToken: UUID?
     ) async throws(AdaptyError) -> AdaptySubscriptionOffer.Signature
 }
 
@@ -19,13 +20,15 @@ extension Adapty: StoreKitSubscriptionOfferSigner {
     func sign(
         offerId: String,
         subscriptionVendorId: String,
-        for userId: AdaptyUserId
+        for userId: AdaptyUserId,
+        with appAccountToken: UUID?
     ) async throws(AdaptyError) -> AdaptySubscriptionOffer.Signature {
         do {
             let response = try await httpSession.signSubscriptionOffer(
                 userId: userId,
                 vendorProductId: subscriptionVendorId,
-                offerId: offerId
+                offerId: offerId,
+                appAccountToken: appAccountToken
             )
             return response
         } catch {

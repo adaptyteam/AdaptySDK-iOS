@@ -18,7 +18,7 @@ private struct SignSubscriptionOfferRequest: BackendRequest {
     let requestName = BackendRequestName.signSubscriptionOffer
     let logParams: EventParameters?
 
-    init(vendorProductId: String, offerId: String, userId: AdaptyUserId) {
+    init(vendorProductId: String, offerId: String, userId: AdaptyUserId, appAccountToken: UUID?) {
         headers = HTTPHeaders()
             .setUserProfileId(userId)
 
@@ -26,6 +26,7 @@ private struct SignSubscriptionOfferRequest: BackendRequest {
             .setUserProfileId(userId)
             .setVendorProductId(vendorProductId)
             .setOfferId(offerId)
+            .setAppAccountToken(appAccountToken)
 
         logParams = [
             "product_id": vendorProductId,
@@ -40,12 +41,14 @@ extension Backend.MainExecutor {
     func signSubscriptionOffer(
         userId: AdaptyUserId,
         vendorProductId: String,
-        offerId: String
+        offerId: String,
+        appAccountToken: UUID?
     ) async throws(HTTPError) -> AdaptySubscriptionOffer.Signature {
         let request = SignSubscriptionOfferRequest(
             vendorProductId: vendorProductId,
             offerId: offerId,
-            userId: userId
+            userId: userId,
+            appAccountToken: appAccountToken
         )
         let response: HTTPResponse<ResponseBody> = try await perform(request)
         return response.body.value
