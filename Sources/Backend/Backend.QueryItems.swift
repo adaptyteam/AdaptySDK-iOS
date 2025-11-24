@@ -10,6 +10,7 @@ import Foundation
 private extension Backend.Request {
     static let profileIdQueryItemName = "profile_id"
     static let offerIdQueryItemName = "offer_code"
+    static let appAccountTokenItemName = "application_username"
     static let vendorProductIdQueryItemName = "product"
     static let disableServerCacheQueryItemName = "disable_cache"
 }
@@ -38,6 +39,15 @@ extension [HTTPRequest.QueryItems.Element] {
 
         if let offerId {
             queryItems.append(URLQueryItem(name: Backend.Request.offerIdQueryItemName, value: offerId))
+        }
+        return queryItems
+    }
+
+    func setAppAccountToken(_ appAccountToken: UUID?) -> Self {
+        var queryItems = filter { $0.name != Backend.Request.appAccountTokenItemName }
+
+        if let appAccountToken {
+            queryItems.append(URLQueryItem(name: Backend.Request.appAccountTokenItemName, value: appAccountToken.uuidString.lowercased()))
         }
         return queryItems
     }
