@@ -50,7 +50,7 @@ let package = Package(
             dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder",
             exclude: [
-                "adaptyui.v4.3.0.schema.yaml",
+                "adaptyui.v4.4.1.schema.yaml",
             ]
         ),
         .target(
