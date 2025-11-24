@@ -233,7 +233,7 @@ private extension AdaptyPaywall {
 }
 
 private extension VC.WebOpenInParameter {
-    var toURLOpenMode: AdaptyURLOpenMode {
+    var toURLOpenMode: AdaptyWebPresentation {
         switch self {
         case .browserInApp: .inAppBrowser
         case .browserOutApp: .externalBrowser
