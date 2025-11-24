@@ -124,7 +124,8 @@ actor StoreKitPurchaser {
                 let response = try await subscriptionOfferSigner.sign(
                     offerId: offerId,
                     subscriptionVendorId: product.vendorProductId,
-                    for: userId
+                    for: userId,
+                    with: appAccountToken
                 )
                 
                 options.insert(
