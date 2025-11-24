@@ -34,20 +34,20 @@ extension PurchasedSubscriptionOfferInfo {
         transaction: StoreKit.Transaction,
         product: AdaptyProduct?
     ) {
-        self.init(transaction: transaction, sk2Product: product?.sk2Product)
+        self.init(transaction: transaction, product: product?.skProduct)
     }
 
     init?(
         transaction: StoreKit.Transaction,
-        sk2Product: StoreKit.Product?
+        product: StoreKit.Product?
     ) {
         guard let offerIdentifier = transaction.subscriptionOfferIdentifier else { return nil }
-        let sk2ProductOffer = sk2Product?.sk2ProductSubscriptionOffer(by: offerIdentifier)
+        let subscriptionOffer = product?.subscriptionOffer(by: offerIdentifier)
         self.init(
             identifier: offerIdentifier,
-            period: sk2ProductOffer?.period.asAdaptySubscriptionPeriod,
-            paymentMode: sk2ProductOffer?.paymentMode.asPaymentMode ?? .unknown,
-            price: sk2ProductOffer?.price,
+            period: subscriptionOffer?.period.asAdaptySubscriptionPeriod,
+            paymentMode: subscriptionOffer?.paymentMode.asPaymentMode ?? .unknown,
+            price: subscriptionOffer?.price,
             for: transaction
         )
     }

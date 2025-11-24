@@ -11,7 +11,7 @@ extension AdaptyProfile.AccessLevel {
     init?(
         id: String,
         transaction: StoreKit.Transaction,
-        sk2Product: StoreKit.Product?,
+        product: StoreKit.Product?,
         backendPeriod: BackendProductInfo.Period?,
         now: Date = Date()
     ) async {
@@ -22,7 +22,7 @@ extension AdaptyProfile.AccessLevel {
 
         let offer = PurchasedSubscriptionOfferInfo(
             transaction: transaction,
-            sk2Product: sk2Product
+            product: product
         )
         let expiresAt: Date?
 
@@ -83,7 +83,7 @@ extension AdaptyProfile.AccessLevel {
                 if let expiresAt, now > expiresAt { return false }
                 return true
             }(),
-            vendorProductId: transaction.unfProductId,
+            vendorProductId: transaction.productID,
             store: "app_store",
             activatedAt: activatedAt,
             renewedAt: subscriptionRenewedAt,

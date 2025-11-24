@@ -8,14 +8,6 @@
 import StoreKit
 
 extension StoreKit.Transaction {
-    @inlinable
-    var unfIdentifier: String { String(id) }
-
-    @inlinable
-    var unfOriginalIdentifier: String { String(originalID) }
-
-    @inlinable
-    var unfProductId: String { productID }
 
     func logParams(other: EventParameters?) -> EventParameters {
         guard let other else { return logParams }
@@ -24,10 +16,10 @@ extension StoreKit.Transaction {
 
     var logParams: EventParameters {
         [
-            "product_id": unfProductId,
+            "product_id": productID,
             "transaction_is_upgraded": isUpgraded,
-            "transaction_id": unfIdentifier,
-            "original_id": unfOriginalIdentifier,
+            "transaction_id": id,
+            "original_id": originalID,
         ]
     }
 

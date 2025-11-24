@@ -9,8 +9,8 @@ import Foundation
 import StoreKit
 
 struct PurchasedTransactionInfo: Sendable {
-    let transactionId: String
-    let originalTransactionId: String
+    let transactionId: UInt64
+    let originalTransactionId: UInt64
     let vendorProductId: String
     let price: Decimal?
     let priceLocale: String?
@@ -22,9 +22,9 @@ struct PurchasedTransactionInfo: Sendable {
         product: AdaptyProduct?,
         transaction: StoreKit.Transaction
     ) {
-        self.transactionId = transaction.unfIdentifier
-        self.originalTransactionId = transaction.unfOriginalIdentifier
-        self.vendorProductId = transaction.unfProductId
+        self.transactionId = transaction.id
+        self.originalTransactionId = transaction.originalID
+        self.vendorProductId = transaction.productID
         self.price = product?.price
         self.priceLocale = product?.priceLocale.unfCurrencyCode
         self.storeCountry = product?.priceLocale.unfRegionCode

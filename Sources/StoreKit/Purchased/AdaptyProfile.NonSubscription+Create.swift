@@ -14,8 +14,8 @@
 //        self.init(
 //            purchaseId: UUID().uuidString,
 //            store: "app_store",
-//            vendorProductId: transaction.unfProductID,
-//            vendorTransactionId: transaction.unfIdentifier,
+//            vendorProductId: transaction.productID,
+//            vendorTransactionId: transaction.id,
 //            purchasedAt: transaction.purchaseDate,
 //            isSandbox: transaction.isSandbox,
 //            isRefund: transaction.revocationDate != nil,

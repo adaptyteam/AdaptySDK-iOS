@@ -70,7 +70,7 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
         case let .restore(originalTransactionId):
             try container.encode(userId.profileId, forKey: .profileId)
             try container.encode(Adapty.ValidatePurchaseReason.restoreRawString, forKey: .requestSource)
-            try container.encode(originalTransactionId, forKey: .originalTransactionId)
+            try container.encode(String(originalTransactionId), forKey: .originalTransactionId)
         case let .report(transactionId, variationId):
             try container.encode(userId.profileId, forKey: .profileId)
             try container.encode(Adapty.ValidatePurchaseReason.reportRawString, forKey: .requestSource)
@@ -80,8 +80,8 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
         case let .other(info, payload, reason):
             try container.encode(userId.profileId, forKey: .profileId)
             try container.encode(reason.rawString, forKey: .requestSource)
-            try container.encode(info.transactionId, forKey: .transactionId)
-            try container.encode(info.originalTransactionId, forKey: .originalTransactionId)
+            try container.encode(String(info.transactionId), forKey: .transactionId)
+            try container.encode(String(info.originalTransactionId), forKey: .originalTransactionId)
             try container.encode(info.vendorProductId, forKey: .vendorProductId)
             try container.encodeIfPresent(info.price, forKey: .originalPrice)
             try container.encodeIfPresent(info.subscriptionOffer?.price, forKey: .discountPrice)
@@ -104,7 +104,7 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
     }
 
     enum RequestSource: Sendable {
-        case restore(originalTransactionId: String)
+        case restore(originalTransactionId: UInt64)
         case report(transactionId: String, variationId: String?)
         case other(PurchasedTransactionInfo, PurchasePayload, reason: Adapty.ValidatePurchaseReason)
     }
@@ -128,7 +128,7 @@ private extension Adapty.ValidatePurchaseReason {
 
 extension Backend.MainExecutor {
     func syncTransactionsHistory(
-        originalTransactionId: String,
+        originalTransactionId: UInt64,
         for userId: AdaptyUserId
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(

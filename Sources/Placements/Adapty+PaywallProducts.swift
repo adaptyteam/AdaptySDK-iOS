@@ -21,7 +21,7 @@ public extension Adapty {
             methodName: .getPaywallProducts,
             logParams: ["placement_id": paywall.placement.id]
         ) { sdk throws(AdaptyError) in
-            try await sdk.getSK2PaywallProducts(
+            try await sdk.getPaywallProducts(
                 paywall: paywall,
                 productsManager: sdk.productsManager
             )
@@ -33,7 +33,7 @@ public extension Adapty {
             methodName: .getPaywallProductsWithoutDeterminingOffer,
             logParams: ["placement_id": paywall.placement.id]
         ) { sdk throws(AdaptyError) in
-            try await sdk.getSK2PaywallProductsWithoutOffers(
+            try await sdk.getPaywallProductsWithoutOffers(
                 paywall: paywall,
                 productsManager: sdk.productsManager
             )
@@ -51,7 +51,7 @@ public extension Adapty {
         webPaywallBaseUrl: URL?
     ) async throws(AdaptyError) -> AdaptyPaywallProduct {
         let sdk = try await Adapty.activatedSDK
-        return try await sdk.getSK2PaywallProduct(
+        return try await sdk.getPaywallProduct(
             adaptyProductId: adaptyProductId,
             productInfo: productInfo,
             paywallProductIndex: paywallProductIndex,

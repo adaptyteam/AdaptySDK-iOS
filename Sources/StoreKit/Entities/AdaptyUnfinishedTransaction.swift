@@ -13,7 +13,7 @@ public struct AdaptyUnfinishedTransaction: Sendable {
 
     public func finish() async throws(AdaptyError) {
         try await Adapty.withActivatedSDK(methodName: .manualFinishTransaction, logParams: [
-            "transaction_id": transaction.unfIdentifier,
+            "transaction_id": transaction.id,
         ]) { sdk throws(AdaptyError) in
             guard !sdk.observerMode else { throw AdaptyError.notAllowedInObserveMode() }
 
@@ -28,13 +28,13 @@ public struct AdaptyUnfinishedTransaction: Sendable {
 
 private extension Adapty {
     func manualFinishTransaction(_ transaction: StoreKit.Transaction) async {
-        let synced = await purchasePayloadStorage.isSyncedTransaction(transaction.unfIdentifier)
-        await purchasePayloadStorage.removeUnfinishedTransaction(transaction.unfIdentifier)
+        let synced = await purchasePayloadStorage.isSyncedTransaction(transaction.id)
+        await purchasePayloadStorage.removeUnfinishedTransaction(transaction.id)
 
         if !synced { return }
 
         await finish(transaction: transaction)
-        log.info("Finish unfinished transaction: \(transaction) for product: \(transaction.unfProductId) after manual call method (already synchronized)")
+        log.info("Finish unfinished transaction: \(transaction) for product: \(transaction.productID) after manual call method (already synchronized)")
     }
 }
 

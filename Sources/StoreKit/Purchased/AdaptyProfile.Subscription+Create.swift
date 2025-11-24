@@ -10,7 +10,7 @@
 //extension AdaptyProfile.Subscription {
 //    init(
 //        transaction: StoreKit.Transaction,
-//        sk2Product: StoreKit.Product?,
+//        product: StoreKit.Product?,
 //        productInfo: BackendProductInfo.Period?,
 //        now: Date = Date()
 //    ) {
@@ -18,9 +18,9 @@
 //
 //        self.init(
 //            store: "app_store",
-//            vendorProductId: transaction.unfProductID,
-//            vendorTransactionId: transaction.unfIdentifier,
-//            vendorOriginalTransactionId: transaction.unfOriginalIdentifier,
+//            vendorProductId: transaction.productID,
+//            vendorTransactionId: transaction.id,
+//            vendorOriginalTransactionId: transaction.originalID,
 //            isActive: <#T##Bool#>,
 //            isLifetime: isLifetime,
 //            activatedAt: <#T##Date#>,

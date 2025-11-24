@@ -141,7 +141,7 @@ extension StoreKitManagerError {
         .refreshReceiptFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
-    static func requestSK2ProductsFailed(
+    static func requestProductsFailed(
         _ error: Error,
         file: String = #fileID,
         function: String = #function,
@@ -150,7 +150,7 @@ extension StoreKitManagerError {
         .requestSKProductsFailed(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
-    static func requestSK2IsEligibleForIntroOfferFailed(
+    static func requestIsEligibleForIntroOfferFailed(
         _ error: Error,
         file: String = #fileID,
         function: String = #function,

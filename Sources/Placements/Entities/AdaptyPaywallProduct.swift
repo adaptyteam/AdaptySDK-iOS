@@ -7,6 +7,10 @@
 
 import StoreKit
 
+public protocol AdaptyPaywallProduct: AdaptyPaywallProductWithoutDeterminingOffer {
+    var subscriptionOffer: AdaptySubscriptionOffer? { get }
+}
+
 public protocol AdaptyPaywallProductWithoutDeterminingOffer: AdaptyProduct {
     /// An internal Adapty Product Identifier
     var adaptyProductId: String { get }
@@ -29,6 +33,4 @@ public protocol AdaptyPaywallProductWithoutDeterminingOffer: AdaptyProduct {
     var paywallName: String { get }
 }
 
-public protocol AdaptyPaywallProduct: AdaptyPaywallProductWithoutDeterminingOffer {
-    var subscriptionOffer: AdaptySubscriptionOffer? { get }
-}
+

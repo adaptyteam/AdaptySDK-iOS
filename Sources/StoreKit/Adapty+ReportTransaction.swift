@@ -42,16 +42,16 @@ public extension Adapty {
         withVariationId variationId: String? = nil
     ) async throws(AdaptyError) {
         let variationId = variationId.trimmed.nonEmptyOrNil
-        try await withActivatedSDK(methodName: .reportSK2Transaction, logParams: [
+        try await withActivatedSDK(methodName: .reportTransaction, logParams: [
             "variation_id": variationId,
-            "transaction_id": transaction.unfIdentifier,
+            "transaction_id": transaction.id,
         ]) { sdk throws(AdaptyError) in
             let userId = try await sdk.createdProfileManager.userId
 
             guard !transaction.isXcodeEnvironment else { return }
 
-            let productOrNil = try? await sdk.productsManager.fetchSK2Product(
-                id: transaction.unfProductId,
+            let productOrNil = try? await sdk.productsManager.fetchProduct(
+                id: transaction.productID,
                 fetchPolicy: .returnCacheDataElseLoad
             ).asAdaptyProduct
 

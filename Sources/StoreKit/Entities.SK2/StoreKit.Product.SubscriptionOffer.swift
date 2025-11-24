@@ -12,7 +12,7 @@ extension StoreKit.Product {
         subscription?.introductoryOffer == nil
     }
 
-    func sk2ProductSubscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> SubscriptionOffer? {
+    func subscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> SubscriptionOffer? {
         switch offerIdentifier {
         case .introductory:
             subscription?.introductoryOffer
@@ -29,8 +29,9 @@ extension StoreKit.Product {
         }
     }
 
-    func subscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {
-        guard let offer: SubscriptionOffer = sk2ProductSubscriptionOffer(by: offerIdentifier) else { return nil }
+    
+    func adaptySubscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {
+        guard let offer: SubscriptionOffer = subscriptionOffer(by: offerIdentifier) else { return nil }
 
         let period = offer.period.asAdaptySubscriptionPeriod
         let periodLocale = subscriptionPeriodFormatStyle.locale

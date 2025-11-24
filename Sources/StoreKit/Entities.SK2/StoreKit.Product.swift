@@ -8,8 +8,11 @@
 import StoreKit
 
 extension StoreKit.Product {
-    var asAdaptyProduct: AdaptySK2Product {
-        SK2ProductWrapper(skProduct: self)
+    var asAdaptyProduct: AdaptyProduct {
+        AdaptyProductWrapper(skProduct: self)
     }
 }
 
+struct AdaptyProductWrapper: AdaptyProduct {
+    let skProduct: StoreKit.Product
+}

@@ -83,7 +83,6 @@ extension AdaptyPaywallProductWrapper: ProductResolver {
 
 extension AdaptyProduct {
     func pricePer(period: AdaptySubscriptionPeriod.Unit) -> String? {
-        guard let skProduct = sk2Product else { return nil }
         guard let subscriptionPeriod = subscriptionPeriod else { return nil }
 
         let numberOfPeriods = subscriptionPeriod.numberOfPeriods(period)

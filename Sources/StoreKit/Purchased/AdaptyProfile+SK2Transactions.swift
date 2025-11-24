@@ -10,26 +10,26 @@ import StoreKit
 private let log = Log.productManager
 
 extension AdaptyProfile {
-    func added(transactions: [StoreKit.Transaction], productManager: SK2ProductsManager) async -> AdaptyProfile {
+    func added(transactions: [StoreKit.Transaction], productManager: ProductsManager) async -> AdaptyProfile {
         guard !transactions.isEmpty else { return self }
 
         var accessLevels = [AdaptyProfile.AccessLevel]()
 
-        let products = try? await productManager.fetchSK2Products(
-            ids: Set(transactions.map { $0.unfProductId }),
+        let products = try? await productManager.fetchProducts(
+            ids: Set(transactions.map(\.productID)),
             fetchPolicy: .returnCacheDataElseLoad
         )
 
         for transaction in transactions {
-            let sk2Product = products?.first(where: { $0.id == transaction.unfProductId })
-            guard let productInfo = await productManager.getProductInfo(vendorId: transaction.unfProductId) else {
-                log.warn("Not found product info (productVendorId:\(transaction.unfProductId))")
+            let product = products?.first(where: { $0.id == transaction.productID })
+            guard let productInfo = await productManager.getProductInfo(vendorId: transaction.productID) else {
+                log.warn("Not found product info (productVendorId:\(transaction.productID))")
                 continue
             }
             guard let accessLevel = await AdaptyProfile.AccessLevel(
                 id: productInfo.accessLevelId,
                 transaction: transaction,
-                sk2Product: sk2Product,
+                product: product,
                 backendPeriod: productInfo.period
             ) else { continue }
 

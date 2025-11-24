@@ -54,18 +54,18 @@ extension Adapty: StoreKitTransactionSynchronizer {
     }
 
     func attemptToFinish(transaction: StoreKit.Transaction, logSource: String) async {
-        if await purchasePayloadStorage.canFinishSyncedTransaction(transaction.unfIdentifier) {
+        if await purchasePayloadStorage.canFinishSyncedTransaction(transaction.id) {
             await finish(transaction: transaction)
-            Log.transactionManager.info("Finish \(logSource) transaction: \(transaction) for product: \(transaction.unfProductId)")
+            Log.transactionManager.info("Finish \(logSource) transaction: \(transaction) for product: \(transaction.productID)")
         } else {
-            Log.transactionManager.info("Successfully \(logSource) transaction synced: \(transaction), manual finish required for product: \(transaction.unfProductId)")
+            Log.transactionManager.info("Successfully \(logSource) transaction synced: \(transaction), manual finish required for product: \(transaction.productID)")
         }
     }
 
     func finish(transaction: StoreKit.Transaction) async {
         await transaction.finish()
         await purchasePayloadStorage.removePurchasePayload(forTransaction: transaction)
-        await purchasePayloadStorage.removeUnfinishedTransaction(transaction.unfIdentifier)
+        await purchasePayloadStorage.removeUnfinishedTransaction(transaction.id)
         Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .finishTransaction,
             params: transaction.logParams

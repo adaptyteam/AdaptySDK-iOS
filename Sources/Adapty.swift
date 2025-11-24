@@ -22,8 +22,8 @@ public final class Adapty {
 
     let receiptManager: StoreKitReceiptManager
     let transactionManager: TransactionManager
-    let productsManager: SK2ProductsManager
-    var purchaser: SK2Purchaser?
+    let productsManager: ProductsManager
+    var purchaser: StoreKitPurchaser?
 
     package let observerMode: Bool
 
@@ -58,20 +58,20 @@ public final class Adapty {
             storage: purchasePayloadStorage
         )
 
-        let sk2ProductsManager = SK2ProductsManager(
+        let productsManager = ProductsManager(
             apiKeyPrefix: apiKeyPrefix,
             session: httpSession,
             storage: productVendorIdsStorage
         )
-        self.productsManager = sk2ProductsManager
+        self.productsManager = productsManager
 
         self.sharedProfileManager = restoreProfileManager(configuration)
 
         if !observerMode {
-            self.purchaser = SK2Purchaser.startObserving(
+            self.purchaser = StoreKitPurchaser.startObserving(
                 transactionSynchronizer: self,
                 subscriptionOfferSigner: self,
-                sk2ProductsManager: sk2ProductsManager,
+                productsManager: productsManager,
                 storage: purchasePayloadStorage
             )
         }

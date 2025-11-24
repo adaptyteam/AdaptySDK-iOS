@@ -1,5 +1,5 @@
 //
-//  SK2ProductsManager.swift
+//  ProductsManager.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 03.10.2024
@@ -10,13 +10,13 @@ import StoreKit
 
 private let log = Log.productManager
 
-actor SK2ProductsManager {
+actor ProductsManager {
     private let apiKeyPrefix: String
     private let storage: BackendProductInfoStorage
     private let session: Backend.MainExecutor
 
     private var products = [String: StoreKit.Product]()
-    private let sk2ProductsFetcher = SK2ProductFetcher()
+    private let skProductsFetcher = StoreKitProductFetcher()
 
     init(apiKeyPrefix: String, session: Backend.MainExecutor, storage: BackendProductInfoStorage) {
         self.apiKeyPrefix = apiKeyPrefix
@@ -46,25 +46,25 @@ actor SK2ProductsManager {
             let response = try await self.session.fetchProductInfo(apiKeyPrefix: apiKeyPrefix, maxRetries: maxRetries)
             await storage.set(allProductInfo: response)
             let allProductVendorIds = await Set(storage.allProductVendorIds ?? [])
-            _ = try? await fetchSK2Products(ids: allProductVendorIds)
+            _ = try? await fetchProducts(ids: allProductVendorIds)
         } catch {
             throw error.asAdaptyError
         }
     }
 }
 
-extension SK2ProductsManager {
-    func fetchSK2ProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [StoreKit.Product] {
-        let products = try await fetchSK2Products(ids: Set(productIds), fetchPolicy: fetchPolicy)
+extension ProductsManager {
+    func fetchProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [StoreKit.Product] {
+        let products = try await fetchProducts(ids: Set(productIds), fetchPolicy: fetchPolicy)
 
         return productIds.compactMap { id in
             products.first { $0.id == id }
         }
     }
 
-    func fetchSK2Product(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws(AdaptyError) -> StoreKit.Product {
+    func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws(AdaptyError) -> StoreKit.Product {
         do throws(AdaptyError) {
-            let products = try await fetchSK2Products(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)
+            let products = try await fetchProducts(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)
 
             guard let product = products.first else {
                 throw StoreKitManagerError.noProductIDsFound().asAdaptyError
@@ -77,7 +77,7 @@ extension SK2ProductsManager {
         }
     }
 
-    func fetchSK2Products(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
+    func fetchProducts(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
     async throws(AdaptyError) -> [StoreKit.Product]
     {
         guard productIds.isNotEmpty else {
@@ -91,7 +91,7 @@ extension SK2ProductsManager {
             }
         }
 
-        let products = try await sk2ProductsFetcher.fetchProducts(ids: productIds, retryCount: retryCount)
+        let products = try await skProductsFetcher.fetchProducts(ids: productIds, retryCount: retryCount)
 
         guard products.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError
