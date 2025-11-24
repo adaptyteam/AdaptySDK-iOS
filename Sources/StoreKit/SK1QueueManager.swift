@@ -58,8 +58,13 @@ actor SK1QueueManager: Sendable {
                 let response = try await subscriptionOfferSigner.sign(
                     offerId: offerId,
                     subscriptionVendorId: product.vendorProductId,
-                    for: userId
+                    for: userId,
+                    with: appAccountToken
                 )
+
+                if appAccountToken == .none {
+                    payment.applicationUsername = ""
+                }
 
                 payment.paymentDiscount = SK1PaymentDiscount(
                     offerId: offerId,
