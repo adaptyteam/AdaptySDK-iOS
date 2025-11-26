@@ -22,7 +22,23 @@ extension BackendExecutor {
     func perform(
         _ request: some BackendRequest
     ) async throws(HTTPError) -> HTTPEmptyResponse {
-        try await perform(request, withDecoder: HTTPEmptyResponse.defaultDecoder)
+        try await perform(request, withDecoder: HTTPEmptyResponse.emptyBodyDecoder)
+    }
+
+    @BackendActor
+    @inlinable
+    func perform(
+        _ request: some BackendRequest
+    ) async throws(HTTPError) -> HTTPDataResponse {
+        try await perform(request, withDecoder: HTTPDataResponse.dataDecoder)
+    }
+
+    @BackendActor
+    @inlinable
+    func perform(
+        _ request: some BackendRequest
+    ) async throws(HTTPError) -> HTTPStringResponse {
+        try await perform(request, withDecoder: HTTPStringResponse.stringDecoder)
     }
 
     @BackendActor
@@ -30,7 +46,7 @@ extension BackendExecutor {
     func perform<Body: Decodable & Sendable>(
         _ request: some BackendRequest
     ) async throws(HTTPError) -> HTTPResponse<Body> {
-        try await perform(request, withDecoder: HTTPDataResponse.defaultDecoder)
+        try await perform(request, withDecoder: HTTPDecodableResponse.decodableBodyDecoder)
     }
 
     @BackendActor
