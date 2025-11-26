@@ -1,12 +1,12 @@
 Pod::Spec.new do |s|
   s.name         = 'AdaptyLogger'
-  s.version      = '3.15.0'
+  s.version      = '3.16.0-SNAPSHOT'
   s.summary      = 'Adapty Logger for iOS.'
   
-  s.description    = <<-DESC
+  s.description  = <<-DESC
   Win back churned subscribers in your iOS app.
   Adapty helps you track business metrics, and lets you run ad campaigns targeted at churned users faster
-             DESC
+  DESC
   
   s.homepage          = 'https://adapty.io/'
   s.license           = { :type => 'MIT', :file => 'LICENSE' }

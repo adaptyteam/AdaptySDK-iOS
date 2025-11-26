@@ -1,14 +1,14 @@
 PODS:
-  - Adapty (3.15.0):
-    - AdaptyLogger (= 3.15.0)
-    - AdaptyUIBuilder (= 3.15.0)
-  - AdaptyLogger (3.15.0)
-  - AdaptyUI (3.15.0):
-    - Adapty (= 3.15.0)
-    - AdaptyLogger (= 3.15.0)
-    - AdaptyUIBuilder (= 3.15.0)
-  - AdaptyUIBuilder (3.15.0):
-    - AdaptyLogger (= 3.15.0)
+  - Adapty (3.16.0-SNAPSHOT):
+    - AdaptyLogger (= 3.16.0-SNAPSHOT)
+    - AdaptyUIBuilder (= 3.16.0-SNAPSHOT)
+  - AdaptyLogger (3.16.0-SNAPSHOT)
+  - AdaptyUI (3.16.0-SNAPSHOT):
+    - Adapty (= 3.16.0-SNAPSHOT)
+    - AdaptyLogger (= 3.16.0-SNAPSHOT)
+    - AdaptyUIBuilder (= 3.16.0-SNAPSHOT)
+  - AdaptyUIBuilder (3.16.0-SNAPSHOT):
+    - AdaptyLogger (= 3.16.0-SNAPSHOT)
 
 DEPENDENCIES:
   - Adapty (from `../../`)
@@ -27,10 +27,10 @@ EXTERNAL SOURCES:
     :path: "../../"
 
 SPEC CHECKSUMS:
-  Adapty: 00cbfd573e784fac305dc375093c1ce980139cc8
-  AdaptyLogger: 1f7ef119f63a0b93a186acbf5767fff9ed272ec6
-  AdaptyUI: d0be4bb2589d8126e66e58bd55cda598a45766e7
-  AdaptyUIBuilder: 09c87b05fa4b9011c0067de5793b600dbc0565c7
+  Adapty: 7baccef193778926b8c0fcca75e587ec28665409
+  AdaptyLogger: 0d51816e276286ab8f5e2c8fc842222f052ea74e
+  AdaptyUI: 186a60367fdd7d7f8331776121da57790fc90e44
+  AdaptyUIBuilder: e3b81c4f36733840677145e85aa2c59c3cc31b1c
 
 PODFILE CHECKSUM: 663f358121e80dddf66068117e6aaacc6a64ac08
 
