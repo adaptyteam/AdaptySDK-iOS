@@ -35,7 +35,7 @@ extension DefaultBackendExecutor {
             request,
             withBaseUrl: baseUrl,
             withSession: session,
-            withDecoder: HTTPDataResponse.defaultDecoder
+            withDecoder: HTTPDecodableResponse.decodableBodyDecoder
         )
 
         return response.body.value

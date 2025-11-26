@@ -17,7 +17,7 @@ extension HTTPResponse {
 }
 
 extension HTTPEmptyResponse {
-    static func defaultDecoder(
+    static func emptyBodyDecoder(
         _ response: HTTPDataResponse,
         _ configuration: HTTPCodableConfiguration?,
         _ request: HTTPRequest
@@ -28,6 +28,6 @@ extension HTTPEmptyResponse {
 
 extension HTTPSession {
     func perform(_ request: some HTTPRequest, baseUrl: URL) async throws(HTTPError) -> HTTPEmptyResponse {
-        try await perform(request, withBaseUrl: baseUrl, withDecoder: HTTPEmptyResponse.defaultDecoder)
+        try await perform(request, withBaseUrl: baseUrl, withDecoder: HTTPEmptyResponse.emptyBodyDecoder)
     }
 }
