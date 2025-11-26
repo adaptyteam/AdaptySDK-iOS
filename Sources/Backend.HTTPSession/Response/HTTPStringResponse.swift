@@ -20,7 +20,7 @@ extension HTTPStringResponse {
         _ response: HTTPDataResponse,
         _ configuration: HTTPCodableConfiguration?,
         _ request: HTTPRequest
-    ) -> HTTPStringResponse {
+    ) async throws -> HTTPStringResponse {
         response.asHTTPStringResponse
     }
 }

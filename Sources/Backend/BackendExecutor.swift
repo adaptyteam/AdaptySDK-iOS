@@ -64,30 +64,6 @@ extension BackendExecutor {
     }
 }
 
-extension HTTPSession {
-    @BackendActor
-    @inlinable
-    func perform<Body>(
-        _ request: some BackendRequest,
-        withBaseUrl baseUrl: URL,
-        withSession session: HTTPSession,
-        withDecoder decoder: @escaping HTTPDecoder<Body>
-    ) async throws(HTTPError) -> HTTPResponse<Body> {
-        let stamp = request.stamp
-        let requestName = request.requestName
-
-        Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: request.logParams))
-        do {
-            let response: HTTPResponse<Body> = try await session.perform(request, withBaseUrl: baseUrl, withDecoder: decoder)
-            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
-            return response
-        } catch {
-            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
-            throw error
-        }
-    }
-}
-
 enum DefaultBackendExecutor {
     @BackendActor
     @inlinable

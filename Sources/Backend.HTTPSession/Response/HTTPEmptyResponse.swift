@@ -21,7 +21,7 @@ extension HTTPEmptyResponse {
         _ response: HTTPDataResponse,
         _ configuration: HTTPCodableConfiguration?,
         _ request: HTTPRequest
-    ) -> HTTPEmptyResponse {
+    ) async throws -> HTTPEmptyResponse {
         response.asHTTPEmptyResponse
     }
 }

@@ -42,7 +42,7 @@ extension HTTPDataResponse {
         _ response: HTTPDataResponse,
         _ configuration: HTTPCodableConfiguration?,
         _ request: HTTPRequest
-    ) throws -> HTTPResponse<T> {
+    ) async throws -> HTTPResponse<T> {
         try response.replaceBody(response.decodeBody(T.self, with: configuration))
     }
 }
