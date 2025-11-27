@@ -22,7 +22,23 @@ extension BackendExecutor {
     func perform(
         _ request: some BackendRequest
     ) async throws(HTTPError) -> HTTPEmptyResponse {
-        try await perform(request, withDecoder: HTTPEmptyResponse.defaultDecoder)
+        try await perform(request, withDecoder: HTTPEmptyResponse.emptyBodyDecoder)
+    }
+
+    @BackendActor
+    @inlinable
+    func perform(
+        _ request: some BackendRequest
+    ) async throws(HTTPError) -> HTTPDataResponse {
+        try await perform(request, withDecoder: HTTPDataResponse.dataDecoder)
+    }
+
+    @BackendActor
+    @inlinable
+    func perform(
+        _ request: some BackendRequest
+    ) async throws(HTTPError) -> HTTPStringResponse {
+        try await perform(request, withDecoder: HTTPStringResponse.stringDecoder)
     }
 
     @BackendActor
@@ -30,7 +46,7 @@ extension BackendExecutor {
     func perform<Body: Decodable & Sendable>(
         _ request: some BackendRequest
     ) async throws(HTTPError) -> HTTPResponse<Body> {
-        try await perform(request, withDecoder: HTTPDataResponse.defaultDecoder)
+        try await perform(request, withDecoder: HTTPDecodableResponse.decodableBodyDecoder)
     }
 
     @BackendActor
@@ -59,30 +75,6 @@ extension BackendExecutor {
             )
         } catch {
             manager.handleNetworkState(kind, request.requestName, baseUrl, error)
-            throw error
-        }
-    }
-}
-
-extension HTTPSession {
-    @BackendActor
-    @inlinable
-    func perform<Body>(
-        _ request: some BackendRequest,
-        withBaseUrl baseUrl: URL,
-        withSession session: HTTPSession,
-        withDecoder decoder: @escaping HTTPDecoder<Body>
-    ) async throws(HTTPError) -> HTTPResponse<Body> {
-        let stamp = request.stamp
-        let requestName = request.requestName
-
-        Adapty.trackSystemEvent(AdaptyBackendAPIRequestParameters(requestName: requestName, requestStamp: stamp, params: request.logParams))
-        do {
-            let response: HTTPResponse<Body> = try await session.perform(request, withBaseUrl: baseUrl, withDecoder: decoder)
-            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, response))
-            return response
-        } catch {
-            Adapty.trackSystemEvent(AdaptyBackendAPIResponseParameters(requestName: requestName, requestStamp: stamp, error))
             throw error
         }
     }
