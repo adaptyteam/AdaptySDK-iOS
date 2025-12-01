@@ -32,30 +32,15 @@ extension HTTPDataResponse {
 }
 
 extension HTTPDataResponse {
-    static func defaultDecoder(
+    static func dataDecoder(
         _ response: HTTPDataResponse,
         _ configuration: HTTPCodableConfiguration?,
         _ request: HTTPRequest
-    ) -> HTTPDataResponse { response }
-
-    static func defaultDecoder<T: Decodable & Sendable>(
-        _ response: HTTPDataResponse,
-        _ configuration: HTTPCodableConfiguration?,
-        _ request: HTTPRequest
-    ) throws -> HTTPResponse<T> {
-        try response.replaceBody(response.decodeBody(T.self, with: configuration))
-    }
+    ) async throws -> HTTPDataResponse { response }
 }
 
 extension HTTPSession {
     func perform(_ request: some HTTPRequest, baseUrl: URL) async throws(HTTPError) -> HTTPDataResponse {
-        try await perform(request, withBaseUrl: baseUrl, withDecoder: HTTPDataResponse.defaultDecoder)
-    }
-
-    func perform<Body: Decodable & Sendable>(
-        _ request: HTTPRequest,
-        baseUrl: URL
-    ) async throws(HTTPError) -> HTTPResponse<Body> {
-        try await perform(request, withBaseUrl: baseUrl, withDecoder: HTTPDataResponse.defaultDecoder)
+        try await perform(request, withBaseUrl: baseUrl, withDecoder: HTTPDataResponse.dataDecoder)
     }
 }

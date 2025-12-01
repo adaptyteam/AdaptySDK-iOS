@@ -24,11 +24,14 @@ This directory contains utility scripts for the Adapty iOS SDK project.
 - Updates version in all podspec files (CocoaPods specification)
 - Validates version format
 - Verifies all changes were applied correctly
-- Shows summary of all updated files
+- Updates CocoaPods dependencies in example projects (runs `pod update` for all projects in `examples/` that have a `Podfile.lock`)
+- Shows summary of all updated files and example projects
 
 **Version format**: `x.y.z` or `x.y.z-SUFFIX` (e.g., `3.12.0`, `3.12.0-SNAPSHOT`)
 
 **Note**: This script should be used whenever you need to change the SDK version. Do not manually edit version numbers in individual files.
+
+**Example projects update**: The script automatically finds all example projects in the `examples/` directory that have a `Podfile.lock` file and runs `pod update` to ensure they use the latest SDK version. If any project fails to update, a warning is shown but the script continues.
 
 ## Publishing to CocoaPods
 

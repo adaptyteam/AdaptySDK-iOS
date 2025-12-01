@@ -69,10 +69,10 @@ for file in "${PODSPEC_FILES[@]}"; do
     echo "  • $file"
     if [[ "$OSTYPE" == "darwin"* ]]; then
         # macOS
-        sed -i '' "s/s.version *= *'[^']*'/s.version          = '$NEW_VERSION'/" "$file"
+        sed -i '' "s/s.version *= *'[^']*'/s.version      = '$NEW_VERSION'/" "$file"
     else
         # Linux
-        sed -i "s/s.version *= *'[^']*'/s.version          = '$NEW_VERSION'/" "$file"
+        sed -i "s/s.version *= *'[^']*'/s.version      = '$NEW_VERSION'/" "$file"
     fi
 done
 
@@ -108,6 +108,34 @@ for file in "${PODSPEC_FILES[@]}"; do
     fi
 done
 
+
+# Update CocoaPods dependencies in example projects
+echo ""
+echo "📦 Updating CocoaPods dependencies in example projects..."
+
+UPDATED_PROJECTS=()
+EXAMPLES_DIR="examples"
+if [ -d "$EXAMPLES_DIR" ]; then
+    for project_dir in "$EXAMPLES_DIR"/*; do
+        if [ -d "$project_dir" ]; then
+            project_name=$(basename "$project_dir")
+            podfile_lock="$project_dir/Podfile.lock"
+            
+            if [ -f "$podfile_lock" ]; then
+                echo "  • Updating pods in $project_name..."
+                if (cd "$project_dir" && pod update); then
+                    UPDATED_PROJECTS+=("$project_name")
+                else
+                    echo "    ⚠️  Warning: Failed to update pods in $project_name"
+                fi
+            fi
+        fi
+    done
+    echo "✅ CocoaPods dependencies updated!"
+else
+    echo "⚠️  Warning: examples directory not found"
+fi
+
 # Show changes
 echo ""
 echo -e "  Sources/Versions.swift:"
@@ -120,6 +148,13 @@ for file in "${PODSPEC_FILES[@]}"; do
     echo -e "  $file:"
     echo -e "    ${GREEN}$(grep "s.version" "$file" | head -1)${NC}"
 done
+
+if [ ${#UPDATED_PROJECTS[@]} -gt 0 ]; then
+    echo -e "\n  Updated pods in example projects:"
+    for project in "${UPDATED_PROJECTS[@]}"; do
+        echo -e "    ${GREEN}• $project${NC}"
+    done
+fi
 
 echo ""
 echo "✅ Update completed!"

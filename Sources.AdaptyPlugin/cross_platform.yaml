@@ -401,6 +401,7 @@ $requests:
     required: [method]
     properties:
       method: { const: "open_web_paywall" }
+      open_in: { type: string, enum: ["browser_out_app", "browser_in_app"], default: "browser_out_app" }
     oneOf:
       - required: [product]
         properties:
@@ -408,6 +409,7 @@ $requests:
       - required: [paywall]
         properties:
           paywall: { $ref: "#/$defs/AdaptyPaywall" }
+
 
   OpenWebPaywall.Response: #response
     type: object

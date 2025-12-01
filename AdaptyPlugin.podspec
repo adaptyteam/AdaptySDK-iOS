@@ -1,22 +1,22 @@
 Pod::Spec.new do |s|
-  s.name             = 'AdaptyPlugin'
-  s.version          = '4.0.0-SNAPSHOT'
-  s.summary          = 'Common files for cross-platform SDKs Adapty'
+  s.name         = 'AdaptyPlugin'
+  s.version      = '4.0.0-SNAPSHOT'
+  s.summary      = 'Common files for cross-platform SDKs Adapty'
 
-  s.description      = <<-DESC
-Win back churned subscribers in your iOS app.
-Adapty helps you track business metrics, and lets you run ad campaigns targeted at churned users faster
+  s.description  = <<-DESC
+  Win back churned subscribers in your iOS app.
+  Adapty helps you track business metrics, and lets you run ad campaigns targeted at churned users faster
 
   AdaptyCrossPlatformCommon is an extension for AdaptySDK.
-                       DESC
+  DESC
 
-  s.homepage         = 'https://adapty.io/'
-  s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Adapty' => 'contact@adapty.io' }
-  s.source           = { :git => 'https://github.com/adaptyteam/AdaptySDK-iOS.git', :tag => s.version.to_s }
+  s.homepage          = 'https://adapty.io/'
+  s.license           = { :type => 'MIT', :file => 'LICENSE' }
+  s.author            = { 'Adapty' => 'contact@adapty.io' }
+  s.source            = { :git => 'https://github.com/adaptyteam/AdaptySDK-iOS.git', :tag => s.version.to_s }
   s.documentation_url = "https://docs.adapty.io"
 
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '13.0'
 
   s.swift_version = '6.0'
 

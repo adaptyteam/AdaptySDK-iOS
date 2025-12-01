@@ -45,7 +45,7 @@ extension AdaptyUISchema {
         _ response: HTTPDataResponse,
         _ configuration: HTTPCodableConfiguration?,
         _ request: HTTPRequest
-    ) throws -> HTTPResponse<AdaptyUISchema> {
+    ) async throws -> HTTPResponse<AdaptyUISchema> {
         let viewConfiguration = try response.decodeBody(Backend.Response.Data<AdaptyPaywall.ViewConfiguration>.self, with: configuration).value
         guard case let .unpacked(schema) = viewConfiguration.schemaOrJson else {
             let key = AdaptyPaywall.ViewConfiguration.CodingKeys.value

@@ -10,7 +10,7 @@ extension [BackendIntroductoryOfferEligibilityState]? {
         _ response: HTTPDataResponse,
         _ configuration: HTTPCodableConfiguration?,
         _ request: HTTPRequest
-    ) throws -> HTTPResponse<[BackendIntroductoryOfferEligibilityState]?> {
+    ) async throws -> HTTPResponse<[BackendIntroductoryOfferEligibilityState]?> {
         guard !request.headers.hasSameBackendResponseHash(response.headers) else {
             return response.replaceBody(nil)
         }
