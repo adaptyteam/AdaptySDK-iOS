@@ -60,7 +60,7 @@ package protocol AdaptyUIBuilderLogic {
         onFinish: @MainActor @escaping () -> Void
     )
 
-    func openWebPaywall(for product: ProductResolver, in openIn: VC.WebOpenInParameter) async
+    func openWebPaywall(for product: ProductResolver, in openIn: VC.Action.WebOpenInParameter) async
 
     func restorePurchases(
         onStart: @MainActor @escaping () -> Void,

@@ -268,7 +268,7 @@ extension VC.Text {
 extension AttributedString {
     static func createFrom(
         value: String,
-        attributes: VC.RichText.TextAttributes?,
+        attributes: VC.RichText.Attributes?,
         assetsResolver: AdaptyUIAssetsResolver,
         colorScheme: ColorScheme
     ) -> AttributedString {
@@ -306,7 +306,7 @@ extension UIFont {
 }
 
 @MainActor
-extension VC.RichText.TextAttributes {
+extension VC.RichText.Attributes {
     func uiFont(_ assetsResolver: AdaptyUIAssetsResolver) -> UIFont {
         font.resolve(with: assetsResolver, withSize: size)
     }

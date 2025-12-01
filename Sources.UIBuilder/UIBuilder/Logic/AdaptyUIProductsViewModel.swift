@@ -39,8 +39,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     @Published private var paywallProducts: [ProductResolver]?
 
     var products: [ProductResolver] {
-        return
-            paywallProducts ?? paywallProductsWithoutOffer ?? []
+        paywallProducts ?? paywallProductsWithoutOffer ?? []
     }
 
     @Published var selectedProductsIds: [String: String]
@@ -118,15 +117,15 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
                     determineOffers: determineOffers
                 )
                 if determineOffers {
-                    self.paywallProducts = productsResult
+                    paywallProducts = productsResult
                 } else {
-                    self.paywallProductsWithoutOffer = productsResult
-                    self.loadProducts(determineOffers: true)
+                    paywallProductsWithoutOffer = productsResult
+                    loadProducts(determineOffers: true)
                 }
             } catch {
                 Log.ui.error("#\(logId)# loadProducts determineOffers: \(determineOffers) fail: \(error)")
-                self.productsLoadingInProgress = false
-                self.retryLoadingProductsIfNeeded(error: error)
+                productsLoadingInProgress = false
+                retryLoadingProductsIfNeeded(error: error)
             }
         }
     }
@@ -139,8 +138,8 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
             try await Task.sleep(seconds: 2)
 
-            if self.presentationViewModel.presentationState == .appeared {
-                self.loadProductsIfNeeded()
+            if presentationViewModel.presentationState == .appeared {
+                loadProductsIfNeeded()
             }
         }
     }
@@ -149,13 +148,13 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
     func purchaseSelectedProduct(
         fromGroupId groupId: String,
-        service: VC.PaymentService
+        service: VC.Action.PaymentService
     ) {
         guard let productId = selectedProductId(by: groupId) else { return }
         purchaseProduct(id: productId, service: service)
     }
 
-    func purchaseProduct(id productId: String, service: VC.PaymentService) {
+    func purchaseProduct(id productId: String, service: VC.Action.PaymentService) {
         guard let product = paywallProducts?.first(where: { $0.adaptyProductId == productId }) else {
             Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(productId)")
             return

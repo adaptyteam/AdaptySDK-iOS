@@ -8,11 +8,13 @@
 import Foundation
 
 package extension VC {
-    enum AspectRatio: String {
+    enum AspectRatio: Sendable, Hashable {
         case fit
         case fill
         case stretch
     }
 }
 
-extension VC.AspectRatio: Codable {}
+extension VC.AspectRatio {
+    static let `default`: Self = .fit
+}

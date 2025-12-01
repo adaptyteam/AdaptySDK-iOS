@@ -7,6 +7,8 @@
 
 import Foundation
 
+typealias Schema = AdaptyUISchema
+
 public struct AdaptyUISchema: Sendable {
     let formatVersion: String
     let templateId: String
@@ -77,7 +79,7 @@ extension AdaptyUISchema: Codable {
         }
         self.defaultScreen = defaultScreen
         self.screens = screens.filter { $0.key != CodingKeys.defaultScreen.rawValue }
-        referencedElements = try [String: Element](screens.flatMap { $0.value.referencedElements }, uniquingKeysWith: { _, _ in
+        referencedElements = try [String: Element](screens.flatMap(\.value.referencedElements), uniquingKeysWith: { _, _ in
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate element_id"))
         })
     }

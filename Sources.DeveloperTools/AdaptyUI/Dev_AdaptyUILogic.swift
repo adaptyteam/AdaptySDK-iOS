@@ -45,7 +45,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
 
     func openWebPaywall(
         for product: ProductResolver,
-        in openIn: VC.WebOpenInParameter
+        in openIn: VC.Action.WebOpenInParameter
     ) async {}
 
     func restorePurchases(

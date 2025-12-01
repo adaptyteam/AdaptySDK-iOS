@@ -8,7 +8,7 @@
 import Foundation
 
 package extension VC {
-    enum HorizontalAlignment: String {
+    enum HorizontalAlignment: Sendable, Hashable {
         case leading
         case trailing
         case left
@@ -17,5 +17,3 @@ package extension VC {
         case justified
     }
 }
-
-extension VC.HorizontalAlignment: Codable {}

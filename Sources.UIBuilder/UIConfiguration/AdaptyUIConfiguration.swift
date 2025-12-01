@@ -7,6 +7,8 @@
 
 import Foundation
 
+package typealias VC = AdaptyUIConfiguration
+
 package struct AdaptyUIConfiguration: Sendable, Hashable {
     package let id: String
     package let locale: String

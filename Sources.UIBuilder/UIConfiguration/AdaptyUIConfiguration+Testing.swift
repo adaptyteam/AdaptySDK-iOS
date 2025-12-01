@@ -8,7 +8,6 @@
 import Foundation
 
 #if DEBUG
-
 package extension AdaptyUIConfiguration {
     static func create(
         templateId: String = "transparent",
@@ -82,5 +81,4 @@ package extension AdaptyUIConfiguration {
         return try schema.extractUIConfiguration(withLocaleId: locale)
     }
 }
-
 #endif

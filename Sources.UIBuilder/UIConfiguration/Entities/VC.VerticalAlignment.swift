@@ -8,12 +8,10 @@
 import Foundation
 
 package extension VC {
-    enum VerticalAlignment: String {
+    enum VerticalAlignment: Sendable, Hashable {
         case top
         case center
         case bottom
         case justified
     }
 }
-
-extension VC.VerticalAlignment: Codable {}
