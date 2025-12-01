@@ -54,6 +54,16 @@ else
     sed -i "s/SDKVersion = \"[^\"]*\"/SDKVersion = \"$NEW_VERSION\"/" Sources/Versions.swift
 fi
 
+# Update Sources.AdaptyPlugin/cross_platform.yaml
+echo "  • Sources.AdaptyPlugin/cross_platform.yaml"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    sed -i '' "s|\$id: \"https://adapty.io/crossPlatform/[^/]*/schema\"|\$id: \"https://adapty.io/crossPlatform/$NEW_VERSION/schema\"|" Sources.AdaptyPlugin/cross_platform.yaml
+else
+    # Linux
+    sed -i "s|\$id: \"https://adapty.io/crossPlatform/[^/]*/schema\"|\$id: \"https://adapty.io/crossPlatform/$NEW_VERSION/schema\"|" Sources.AdaptyPlugin/cross_platform.yaml
+fi
+
 # Update .podspec files
 for file in "${PODSPEC_FILES[@]}"; do
     echo "  • $file"
@@ -78,6 +88,15 @@ if [ "$ACTUAL_VERSION" != "$NEW_VERSION" ]; then
     exit 1
 fi
 
+# Check Sources.AdaptyPlugin/cross_platform.yaml
+YAML_VERSION=$(grep -o '\$id: "https://adapty.io/crossPlatform/[^/]*/schema"' Sources.AdaptyPlugin/cross_platform.yaml | sed 's|$id: "https://adapty.io/crossPlatform/\([^/]*\)/schema"|\1|')
+if [ "$YAML_VERSION" != "$NEW_VERSION" ]; then
+    echo "❌ Error: Sources.AdaptyPlugin/cross_platform.yaml version mismatch!"
+    echo "   Expected: $NEW_VERSION"
+    echo "   Actual: $YAML_VERSION"
+    exit 1
+fi
+
 # Check all podspec files
 for file in "${PODSPEC_FILES[@]}"; do
     PODSPEC_VERSION=$(grep "s.version" "$file" | head -1 | sed -n "s/.*s.version[[:space:]]*=[[:space:]]*'\([^']*\)'.*/\1/p")
@@ -93,6 +112,9 @@ done
 echo ""
 echo -e "  Sources/Versions.swift:"
 echo -e "  ${GREEN}$(grep "SDKVersion" Sources/Versions.swift)${NC}"
+
+echo -e "  Sources.AdaptyPlugin/cross_platform.yaml:"
+echo -e "  ${GREEN}$(grep '\$id:' Sources.AdaptyPlugin/cross_platform.yaml)${NC}"
 
 for file in "${PODSPEC_FILES[@]}"; do
     echo -e "  $file:"

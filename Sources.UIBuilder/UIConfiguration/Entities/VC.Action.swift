@@ -13,14 +13,14 @@ package extension VC {
         case restore
         case custom(id: String)
         case selectProduct(id: String, groupId: String)
-        case purchaseProduct(id: String, provider: PaymentServiceProvider)
+        case purchaseProduct(id: String, service: PaymentService)
         case unselectProduct(groupId: String)
-        case purchaseSelectedProduct(groupId: String, provider: PaymentServiceProvider)
+        case purchaseSelectedProduct(groupId: String, service: PaymentService)
         case close
         case switchSection(id: String, index: Int)
         case openScreen(id: String)
         case closeScreen
-        case openWebPaywall
+        case openWebPaywall(openIn: WebOpenInParameter)
     }
 }
 
@@ -61,8 +61,9 @@ extension VC.Action: Hashable {
             hasher.combine(10)
         case .closeScreen:
             hasher.combine(11)
-        case .openWebPaywall:
+        case .openWebPaywall(let openIn):
             hasher.combine(12)
+            hasher.combine(openIn)
         }
     }
 }

@@ -110,8 +110,8 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
 
     func makePurchase(
         product: ProductResolver,
-        onStart: @escaping () -> Void,
-        onFinish: @escaping () -> Void
+        onStart: @MainActor @escaping () -> Void,
+        onFinish: @MainActor @escaping () -> Void
     ) {
         guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
               case .full(let adaptyProduct) = adaptyProductWrapper
@@ -162,7 +162,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         }
     }
 
-    func openWebPaywall(for product: ProductResolver) async {
+    func openWebPaywall(for product: ProductResolver, in openIn: VC.WebOpenInParameter) async {
         guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
               case .full(let adaptyProduct) = adaptyProductWrapper
         else {
@@ -171,7 +171,10 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         }
 
         do {
-            try await Adapty.openWebPaywall(for: adaptyProduct)
+            try await Adapty.openWebPaywall(
+                for: adaptyProduct,
+                in: openIn.toURLOpenMode
+            )
 
             events.event_didFinishWebPaymentNavigation(
                 product: adaptyProduct,
@@ -185,14 +188,28 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         }
     }
 
-    func restorePurchases() async {
-        events.event_didStartRestore()
+    func restorePurchases(
+        onStart: @MainActor @escaping () -> Void,
+        onFinish: @MainActor @escaping () -> Void
+    ) {
+        if let observerModeResolver {
+            observerModeResolver.observerModeDidInitiateRestorePurchases(
+                onStartRestore: onStart,
+                onFinishRestore: onFinish
+            )
+        } else {
+            Task { @MainActor in
+                events.event_didStartRestore()
 
-        do {
-            let profile = try await Adapty.restorePurchases()
-            events.event_didFinishRestore(with: profile)
-        } catch {
-            events.event_didFailRestore(with: error.asAdaptyError)
+                onStart()
+                do {
+                    let profile = try await Adapty.restorePurchases()
+                    events.event_didFinishRestore(with: profile)
+                } catch {
+                    events.event_didFailRestore(with: error.asAdaptyError)
+                }
+                onFinish()
+            }
         }
     }
 
@@ -211,6 +228,15 @@ private extension AdaptyPaywall {
                     $0.vendorProductId == vendorProductId
                 }
             )
+        }
+    }
+}
+
+private extension VC.WebOpenInParameter {
+    var toURLOpenMode: AdaptyWebPresentation {
+        switch self {
+        case .browserInApp: .inAppBrowser
+        case .browserOutApp: .externalBrowser
         }
     }
 }

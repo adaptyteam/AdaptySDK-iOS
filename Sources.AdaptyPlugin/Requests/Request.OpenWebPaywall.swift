@@ -9,28 +9,24 @@ import Adapty
 import Foundation
 
 extension Request {
-    enum OpenWebPaywall: AdaptyPluginRequest {
+    struct OpenWebPaywall: AdaptyPluginRequest {
         static let method = "open_web_paywall"
-        case product(AdaptyPluginPaywallProduct)
-        case paywall(AdaptyPaywall)
-
-        enum CodingKeys: CodingKey {
-            case product
-            case paywall
+        let operation: Operation
+        let presentation: AdaptyWebPresentation
+        
+        enum CodingKeys: String, CodingKey {
+            case presentation = "open_in"
         }
-
+        
         init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            if container.contains(.product) {
-                self = try .product(container.decode(AdaptyPluginPaywallProduct.self, forKey: .product))
-            } else {
-                self = try .paywall(container.decode(AdaptyPaywall.self, forKey: .paywall))
-            }
+            presentation = try container.decodeIfPresent(AdaptyWebPresentation.self, forKey: .presentation) ?? .externalBrowser
+            operation = try Operation(from: decoder)
         }
-
+        
         func execute() async throws -> AdaptyJsonData {
-            switch self {
-            case .product(let product):
+            switch operation {
+            case .openProduct(let product):
                 let product = try await Adapty.getPaywallProduct(
                     adaptyProductId: product.adaptyProductId,
                     productInfo: product.productInfo,
@@ -41,11 +37,30 @@ extension Request {
                     paywallName: product.paywallName,
                     webPaywallBaseUrl: product.webPaywallBaseUrl
                 )
-                try await Adapty.openWebPaywall(for: product)
-            case .paywall(let paywall):
-                try await Adapty.openWebPaywall(for: paywall)
+                try await Adapty.openWebPaywall(for: product, in: presentation)
+            case .openPaywall(let paywall):
+                try await Adapty.openWebPaywall(for: paywall, in: presentation)
             }
             return .success()
+        }
+        
+        enum Operation {
+            case openProduct(AdaptyPluginPaywallProduct)
+            case openPaywall(AdaptyPaywall)
+            
+            enum CodingKeys: CodingKey {
+                case product
+                case paywall
+            }
+            
+            init(from decoder: any Decoder) throws {
+                let container = try decoder.container(keyedBy: CodingKeys.self)
+                if container.contains(.product) {
+                    self = try .openProduct(container.decode(AdaptyPluginPaywallProduct.self, forKey: .product))
+                } else {
+                    self = try .openPaywall(container.decode(AdaptyPaywall.self, forKey: .paywall))
+                }
+            }
         }
     }
 }

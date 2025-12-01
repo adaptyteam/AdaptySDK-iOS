@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'AdaptyPlugin'
-  s.version          = '3.14.1'
+  s.version          = '3.15.0'
   s.summary          = 'Common files for cross-platform SDKs Adapty'
 
   s.description      = <<-DESC

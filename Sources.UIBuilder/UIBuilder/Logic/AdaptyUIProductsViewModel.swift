@@ -68,7 +68,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     }
 
     private var groupIdsForAutoNotification = Set<String>()
-    
+
     package func resetSelectedProducts() {
         Log.ui.verbose("#\(logId)# resetSelectedProducts")
 
@@ -152,38 +152,37 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
     func purchaseSelectedProduct(
         fromGroupId groupId: String,
-        provider: VC.PaymentServiceProvider
+        service: VC.PaymentService
     ) {
         guard let productId = selectedProductId(by: groupId) else { return }
-        purchaseProduct(id: productId, provider: provider)
+        purchaseProduct(id: productId, service: service)
     }
 
-    func purchaseProduct(id productId: String, provider: VC.PaymentServiceProvider) {
+    func purchaseProduct(id productId: String, service: VC.PaymentService) {
         guard let product = paywallProducts?.first(where: { $0.adaptyProductId == productId }) else {
             Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(productId)")
             return
         }
 
-        switch provider {
+        switch service {
         case .storeKit:
             logic.makePurchase(
                 product: product,
                 onStart: { [weak self] in self?.purchaseInProgress = true },
                 onFinish: { [weak self] in self?.purchaseInProgress = false }
             )
-        case .openWebPaywall:
+        case .openWebPaywall(let openIn):
             Task { @MainActor [weak self] in
-                await self?.logic.openWebPaywall(for: product)
+                await self?.logic.openWebPaywall(for: product, in: openIn)
             }
         }
     }
 
     func restorePurchases() {
-        Task { @MainActor [weak self] in
-            self?.restoreInProgress = true
-            await self?.logic.restorePurchases()
-            self?.restoreInProgress = false
-        }
+        logic.restorePurchases(
+            onStart: { [weak self] in self?.restoreInProgress = true },
+            onFinish: { [weak self] in self?.restoreInProgress = false }
+        )
     }
 }
 

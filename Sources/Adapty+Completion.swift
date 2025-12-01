@@ -309,19 +309,21 @@ public extension Adapty {
 
     nonisolated static func openWebPaywall(
         for product: AdaptyPaywallProduct,
+        in presentation: AdaptyWebPresentation = .externalBrowser,
         _ completion: AdaptyErrorCompletion?
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await openWebPaywall(for: product)
+            try await openWebPaywall(for: product, in: presentation)
         }
     }
 
     nonisolated static func openWebPaywall(
         for paywall: AdaptyPaywall,
+        in presentation: AdaptyWebPresentation = .externalBrowser,
         _ completion: AdaptyErrorCompletion?
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await openWebPaywall(for: paywall)
+            try await openWebPaywall(for: paywall, in: presentation)
         }
     }
 
