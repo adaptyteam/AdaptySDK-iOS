@@ -68,7 +68,6 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     package func getProducts(
         determineOffers: Bool
     ) async throws -> [ProductResolver] {
-        let paywallProducts: [ProductResolver]
         let productsResult = try await getProductsInternal(
             determineOffers: determineOffers
         )

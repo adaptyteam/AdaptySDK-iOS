@@ -72,9 +72,9 @@ extension VC.Animation.Timeline {
             onBeforeAnimation?()
 
             if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
-                try withAnimation(animation, body, completion: { completion(token) })
+                withAnimation(animation, body, completion: { completion(token) })
             } else {
-                try withAnimation(animation, body)
+                withAnimation(animation, body)
                 try await Task.sleep(seconds: duration)
                 completion(token)
             }
@@ -107,6 +107,7 @@ extension AdaptyUIAnimationToken {
 
 @MainActor
 enum AdaptyUIPropertyAnimator {
+    @discardableResult
     static func animatePingPongLoop<Value>(
         token: AdaptyUIAnimationToken?,
         timeline: VC.Animation.Timeline,
@@ -116,7 +117,6 @@ enum AdaptyUIPropertyAnimator {
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        let duration = timeline.duration
         let loopDelay = timeline.loopDelay
         let pingPongDelay = timeline.pingPongDelay
 
@@ -159,6 +159,7 @@ enum AdaptyUIPropertyAnimator {
         )
     }
 
+    @discardableResult
     static func animateBasicLoop<Value>(
         token: AdaptyUIAnimationToken?,
         timeline: VC.Animation.Timeline,
@@ -168,9 +169,7 @@ enum AdaptyUIPropertyAnimator {
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        let duration = timeline.duration
-
-        return timeline.withAsyncAnimation(
+        timeline.withAsyncAnimation(
             token: token,
             delay: startDelay,
             onBeforeAnimation: { updateBlock(start) },
