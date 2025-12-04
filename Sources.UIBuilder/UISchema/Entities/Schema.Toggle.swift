@@ -33,8 +33,8 @@ extension Schema.Toggle: Decodable {
         case onIndex = "on_index"
         case offIndex = "off_index"
 
-        case onActions = "on_actions"
-        case offActions = "off_actions"
+        case onActions = "on_action"
+        case offActions = "off_action"
         case onCondition = "on_condition"
         case colorAssetId = "color"
     }
