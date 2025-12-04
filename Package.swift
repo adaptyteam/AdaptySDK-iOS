@@ -50,7 +50,7 @@ let package = Package(
             dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder",
             exclude: [
-                "adaptyui.v4.4.1.schema.yaml"
+                "adapty.ui.schema.yaml",
             ]
         ),
         .target(
@@ -65,7 +65,7 @@ let package = Package(
             path: "Sources.KidsMode",
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
-                .define("ADAPTY_KIDS_MODE")
+                .define("ADAPTY_KIDS_MODE"),
             ]
         ),
         .target(
@@ -84,7 +84,7 @@ let package = Package(
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.AdaptyPlugin",
             exclude: [
-                "cross_platform.yaml"
+                "cross_platform.yaml",
             ]
         ),
         .testTarget(
