@@ -33,10 +33,15 @@ struct FooterVerticalFillerView: View {
         GeometryReader { proxy in
             Color.clear
                 .frame(height: height)
-                .preference(key: AdaptyUIGeometryFramePreferenceKey.self, value: proxy.frame(in: .named(CoordinateSpace.adaptyGlobalName)))
-                .onPreferenceChange(AdaptyUIGeometryFramePreferenceKey.self) { value in
+                .preference(
+                    key: AdaptyUIGeometryFramePreferenceKey.self,
+                    value: proxy.frame(in: .named(CoordinateSpace.adaptyGlobalName))
+                )
+                .onPreferenceChange(AdaptyUIGeometryFramePreferenceKey.self) { v in
                     Task { @MainActor in
-                        onFrameChange(value)
+                        // ~1 frame wait hack to get rid of updating the UI multiple times per frame.
+                        try await Task.sleep(seconds: 0.0084)
+                        onFrameChange(v)
                     }
                 }
         }

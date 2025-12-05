@@ -268,9 +268,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
 
     @ViewBuilder
     private func bodyWithBackground(content: Content) -> some View {
-        if !self.includeBackground {
-            content
-        } else if let animatedBackgroundFilling {
+        if let animatedBackgroundFilling {
             content
                 .background {
                     self.decorator.shapeType
@@ -279,6 +277,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                             colorScheme: self.colorScheme,
                             assetsResolver: self.assetsViewModel.assetsResolver
                         )
+                        .opacity(includeBackground ? 1.0 : 0.0)
                 }
         } else if let background = self.decorator.background {
             switch background {
@@ -290,6 +289,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                             aspect: .fill,
                             tint: nil
                         )
+                        .opacity(includeBackground ? 1.0 : 0.0)
                     }
             case let .filling(fillingValue):
                 content
@@ -300,6 +300,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                                 colorScheme: self.colorScheme,
                                 assetsResolver: self.assetsViewModel.assetsResolver
                             )
+                            .opacity(includeBackground ? 1.0 : 0.0)
                     }
             }
         } else {
