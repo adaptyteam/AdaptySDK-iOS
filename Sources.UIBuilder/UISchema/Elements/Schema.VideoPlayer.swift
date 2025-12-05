@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct VideoPlayer: Hashable, Sendable {
+    struct VideoPlayer: Sendable, Hashable  {
         let assetId: String
         let aspect: AspectRatio
         let loop: Bool

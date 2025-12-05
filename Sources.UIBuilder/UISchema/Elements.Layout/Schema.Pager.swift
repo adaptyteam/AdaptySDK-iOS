@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Pager: Sendable {
+    struct Pager: Sendable, Hashable {
         let pageWidth: Length
         let pageHeight: Length
         let pagePadding: EdgeInsets
@@ -39,7 +39,7 @@ extension Schema.Localizer {
     }
 }
 
-extension Schema.Pager: Decodable {
+extension Schema.Pager: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case pageWidth = "page_width"
         case pageHeight = "page_height"
@@ -51,7 +51,7 @@ extension Schema.Pager: Decodable {
         case interactionBehavior = "interaction"
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             pageWidth: container.decodeIfPresent(Length.self, forKey: .pageWidth)
@@ -62,7 +62,7 @@ extension Schema.Pager: Decodable {
                 ?? Self.default.pagePadding,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing)
                 ?? Self.default.spacing,
-            content: container.decode([Schema.Element].self, forKey: .content),
+            content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
 
             pageControl: container.decodeIfPresent(PageControl.self, forKey: .pageControl),
 

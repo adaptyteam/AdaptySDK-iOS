@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Button: Sendable {
+    struct Button: Sendable, Hashable {
         let actions: [Schema.Action]
         let normalState: Schema.Element
         let selectedState: Schema.Element?
@@ -32,7 +32,7 @@ extension Schema.Localizer {
     }
 }
 
-extension Schema.Button: Decodable {
+extension Schema.Button: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case actions = "action"
         case normalState = "normal"
@@ -40,7 +40,7 @@ extension Schema.Button: Decodable {
         case selectedCondition = "selected_condition"
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let actions =
             if let action = try? container.decode(Schema.Action.self, forKey: .actions) {
@@ -50,8 +50,8 @@ extension Schema.Button: Decodable {
             }
         try self.init(
             actions: actions,
-            normalState: container.decode(Schema.Element.self, forKey: .normalState),
-            selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState),
+            normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
+            selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState, configuration: configuration),
             selectedCondition: container.decodeIfPresent(Schema.StateCondition.self, forKey: .selectedCondition)
         )
     }

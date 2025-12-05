@@ -14,7 +14,7 @@ extension AdaptyUISchema {
         let localization: Localization?
         let source: AdaptyUISchema
         let localeId: LocaleId
-        var elementIds = Set<String>()
+        var templateIds = Set<String>()
 
         init(id: String, source: AdaptyUISchema, withLocaleId localeId: LocaleId) {
             self.configuarationId = id
@@ -37,7 +37,7 @@ extension AdaptyUISchema.Localizer: Hashable {
 
 extension AdaptyUISchema.Localizer {
     func localize() throws -> AdaptyUIConfiguration {
-        elementIds.removeAll()
+        templateIds.removeAll()
         return try .init(
             id: configuarationId,
             locale: localeId,

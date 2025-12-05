@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    enum Animation: Sendable {
+    enum Animation: Sendable, Hashable {
         case opacity(Timeline, Range<Double>)
         case offset(Timeline, Range<Offset>)
         case rotation(Timeline, RotationParameters)

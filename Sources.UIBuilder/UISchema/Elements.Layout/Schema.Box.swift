@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Box: Sendable {
+    struct Box: Sendable, Hashable {
         let width: Length?
         let height: Length?
         let horizontalAlignment: HorizontalAlignment
@@ -33,7 +33,7 @@ extension Schema.Localizer {
     }
 }
 
-extension Schema.Box: Codable {
+extension Schema.Box: Encodable, DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case width
         case height
@@ -42,14 +42,14 @@ extension Schema.Box: Codable {
         case content
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             width: try? container.decodeIfPresent(Length.self, forKey: .width),
             height: try? container.decodeIfPresent(Length.self, forKey: .height),
             horizontalAlignment: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? Self.default.horizontalAlignment,
             verticalAlignment: container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment) ?? Self.default.verticalAlignment,
-            content: container.decodeIfPresent(Schema.Element.self, forKey: .content)
+            content: container.decodeIfPresent(Schema.Element.self, forKey: .content, configuration: configuration)
         )
     }
 

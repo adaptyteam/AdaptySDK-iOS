@@ -21,7 +21,7 @@ private extension Schema.Asset {
     var asFilling: Schema.Filling {
         get throws {
             guard case let .filling(value) = self else {
-                throw Schema.LocalizerError.wrongTypeAsset("color or any-gradient")
+                throw Schema.Error.wrongTypeAsset("color or any-gradient")
             }
             return value
         }
@@ -30,7 +30,7 @@ private extension Schema.Asset {
     var asColor: Schema.Color {
         get throws {
             guard case let .filling(.solidColor(value)) = self else {
-                throw Schema.LocalizerError.wrongTypeAsset("color")
+                throw Schema.Error.wrongTypeAsset("color")
             }
             return value
         }
@@ -39,7 +39,7 @@ private extension Schema.Asset {
     var asImageData: Schema.ImageData {
         get throws {
             guard case let .image(value) = self else {
-                throw Schema.LocalizerError.wrongTypeAsset("image")
+                throw Schema.Error.wrongTypeAsset("image")
             }
             return value
         }
@@ -48,7 +48,7 @@ private extension Schema.Asset {
     var asVideoData: Schema.VideoData {
         get throws {
             guard case let .video(value) = self else {
-                throw Schema.LocalizerError.wrongTypeAsset("video")
+                throw Schema.Error.wrongTypeAsset("video")
             }
             return value
         }
@@ -57,7 +57,7 @@ private extension Schema.Asset {
     var asFont: Schema.Font {
         get throws {
             guard case let .font(value) = self else {
-                throw Schema.LocalizerError.wrongTypeAsset("font")
+                throw Schema.Error.wrongTypeAsset("font")
             }
             return value
         }
@@ -71,7 +71,7 @@ extension Schema.Localizer {
 
     private func asset(_ assetId: String, darkMode mode: Bool = false) throws -> Schema.Asset {
         guard let value = assetOrNil(assetId, darkMode: mode) else {
-            throw Schema.LocalizerError.notFoundAsset(assetId)
+            throw Schema.Error.notFoundAsset(assetId)
         }
         return value
     }
@@ -95,7 +95,7 @@ extension Schema.Localizer {
                 dark: assetOrNil(assetId, darkMode: true)?.asImageData
             ))
         default:
-            throw Schema.LocalizerError.wrongTypeAsset("color, any-gradient, or image")
+            throw Schema.Error.wrongTypeAsset("color, any-gradient, or image")
         }
     }
 

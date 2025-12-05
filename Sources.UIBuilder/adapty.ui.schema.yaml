@@ -1,8 +1,8 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/ui/4_4_1/schema"
+$id: "https://adapty.io/ui/4_8_0/schema"
 title: "AdaptyUI Configuration"
 type: object
-required: [format, template_id, template_revision, styles]
+required: [format, template_id, template_revision, screens]
 properties:
   format:
     type: string
@@ -33,7 +33,9 @@ properties:
   default_localization:
     title: "Default localizations locale identifier"
     $ref: "#/$defs/Localizations.Identifier"
-  styles:
+  templates: # from v4.8.0
+    $ref: "#/$defs/UI.TemplatesCollection"
+  screens: # from v4.8.0
     $ref: "#/$defs/UI"
 
 $defs:
@@ -374,7 +376,7 @@ $defs:
         { $ref: "#/$defs/Animation.Interpolator", default: ease_in_out }
 
   ###### UI Components ######
-
+ 
   UI:
     title: "Screen by key"
     type: object
@@ -382,6 +384,7 @@ $defs:
     properties:
       default: { $ref: "#/$defs/UI.Screen" }
     additionalProperties: { $ref: "#/$defs/UI.SimpleScreen" }
+
 
   UI.SimpleScreen:
     type: object
@@ -402,6 +405,22 @@ $defs:
       content: { $ref: "#/$defs/UI.Element" }
       footer: { $ref: "#/$defs/UI.Element" }
       overlay: { $ref: "#/$defs/UI.Element" }
+
+  UI.TemplatesCollection: # from v4.8.0
+    title: "Templates by key"
+    type: object
+    patternProperties:
+      '^\$':
+        type: object
+        required: [content]
+        properties:
+          content: { $ref: "#/$defs/UI.Element" }
+
+  UI.Template: # from v4.8.0
+    type: object
+    required: [type]
+    properties:
+      type: { type: string, pattern: '^\$' }
 
   UI.Box:
     type: object
@@ -440,7 +459,7 @@ $defs:
     type: object
     required: [type]
     oneOf:
-      - { $ref: "#/$defs/UI.Reference" }
+      - { $ref: "#/$defs/UI.Template" }
       - { $ref: "#/$defs/UI.If.Them.Else" }
       - allOf:
           - oneOf:
@@ -457,7 +476,6 @@ $defs:
               - { $ref: "#/$defs/UI.Timer" }
               - { $ref: "#/$defs/UI.Pager" }
           - properties:
-              element_id: { type: string }
               decorator: { $ref: "#/$defs/UI.Element.Decorator" }
               padding: { $ref: "#/$defs/EdgeInsets", default: 0 }
               offset: { $ref: "#/$defs/Offset", default: 0 }
@@ -854,13 +872,6 @@ $defs:
         additionalProperties: false
         properties:
           parent: { type: number }
-
-  UI.Reference:
-    type: object
-    required: [type, element_id]
-    properties:
-      type: { const: reference }
-      element_id: { type: string }
 
   UI.If.Them.Else:
     type: object

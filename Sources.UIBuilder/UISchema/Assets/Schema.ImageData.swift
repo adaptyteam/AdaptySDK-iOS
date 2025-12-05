@@ -32,15 +32,32 @@ extension Schema.ImageData: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let customId = try container.decodeIfPresent(String.self, forKey: .customId)
-        if let data = try container.decodeIfPresent(Data.self, forKey: .data) {
+
+        if let base64EncodedData = try container.decodeIfPresent(String.self, forKey: .data),
+           !base64EncodedData.isEmpty
+        {
+            guard let data = Data(base64Encoded: base64EncodedData) else {
+                throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.data], debugDescription: "must base64 encoded data"))
+            }
             self = .raster(customId: customId, data)
             return
+        }
+
+        var previewRaster: Data? = nil
+
+        if let base64EncodedData = try container.decodeIfPresent(String.self, forKey: .previewData),
+           !base64EncodedData.isEmpty
+        {
+            guard let data = Data(base64Encoded: base64EncodedData) else {
+                throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.previewData], debugDescription: "must base64 encoded data"))
+            }
+            previewRaster = data
         }
 
         self = try .url(
             customId: customId,
             container.decode(URL.self, forKey: .url),
-            previewRaster: container.decodeIfPresent(Data.self, forKey: .previewData)
+            previewRaster: previewRaster
         )
     }
 
@@ -51,11 +68,11 @@ extension Schema.ImageData: Codable {
         switch self {
         case let .raster(customId, value):
             try container.encodeIfPresent(customId, forKey: .customId)
-            try container.encode(value, forKey: .data)
+            try container.encode(value.base64EncodedString(), forKey: .data)
         case let .url(customId, url, previewRaster):
             try container.encodeIfPresent(customId, forKey: .customId)
             try container.encode(url, forKey: .url)
-            try container.encodeIfPresent(previewRaster, forKey: .previewData)
+            try container.encodeIfPresent(previewRaster?.base64EncodedString(), forKey: .previewData)
         }
     }
 }

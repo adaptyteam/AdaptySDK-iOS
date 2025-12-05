@@ -10,7 +10,7 @@ import Foundation
 typealias Schema = AdaptyUISchema
 
 public struct AdaptyUISchema: Sendable {
-    let formatVersion: String
+    let formatVersion: Version
     let templateId: String
     let templateRevision: Int64
     let assets: [String: Asset]
@@ -18,7 +18,7 @@ public struct AdaptyUISchema: Sendable {
     let defaultLocalization: Localization?
     let defaultScreen: Screen
     let screens: [String: Screen]
-    let referencedElements: [String: Element]
+    let templates: any AdaptyUISchemaTemplates
     let selectedProducts: [String: String]
 }
 
@@ -28,7 +28,23 @@ extension AdaptyUISchema: CustomStringConvertible {
     }
 }
 
+public extension AdaptyUISchema {
+    init(from jsonData: Data) throws {
+        self = try JSONDecoder().decode(AdaptyUISchema.self, from: jsonData)
+    }
+
+    init(from jsonData: String) throws {
+        try self.init(from: jsonData.data(using: .utf8) ?? Data())
+    }
+}
+
+
 extension AdaptyUISchema: Codable {
+    struct DecodingConfiguration {
+        let isLegacy: Bool
+        var insideTemplate = false
+    }
+
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
         case templateId = "template_id"
@@ -36,8 +52,10 @@ extension AdaptyUISchema: Codable {
         case assets
         case localizations
         case defaultLocalId = "default_localization"
-        case screens = "styles"
-        case defaultScreen = "default"
+        case templates
+        case legacyScreens = "styles"
+        case screens
+
         case products
         case selected
     }
@@ -47,7 +65,9 @@ extension AdaptyUISchema: Codable {
 
         templateId = try container.decode(String.self, forKey: .templateId)
         templateRevision = try container.decode(Int64.self, forKey: .templateRevision)
-        formatVersion = try container.decode(String.self, forKey: .formatVersion)
+        formatVersion = try container.decode(Version.self, forKey: .formatVersion)
+
+        let configuration = DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion)
 
         if container.contains(.products) {
             let products = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .products)
@@ -73,15 +93,29 @@ extension AdaptyUISchema: Codable {
             defaultLocalization = nil
         }
 
-        let screens = try container.decode([String: Screen].self, forKey: .screens)
-        guard let defaultScreen = screens[CodingKeys.defaultScreen.rawValue] else {
-            throw DecodingError.valueNotFound(Screen.self, DecodingError.Context(codingPath: container.codingPath + [CodingKeys.screens, CodingKeys.defaultScreen], debugDescription: "Expected Screen value but do not found"))
+        let screensCollection = try container.decode(
+            ScreensCollection.self,
+            forKey: configuration.isLegacy ? .legacyScreens : .screens,
+            configuration: configuration
+        )
+
+        let templatesCollection = try container.decode(
+            TemplatesCollection.self,
+            forKey: .templates,
+            configuration: configuration
+        )
+
+        guard let defaultScreen = screensCollection.defaultScreen else {
+            throw DecodingError.valueNotFound(Screen.self, DecodingError.Context(codingPath: container.codingPath + [CodingKeys.screens, AnyCodingKey(stringValue: ScreensCollection.defaultScreenKey)], debugDescription: "Expected Screen value but do not found"))
         }
         self.defaultScreen = defaultScreen
-        self.screens = screens.filter { $0.key != CodingKeys.defaultScreen.rawValue }
-        referencedElements = try [String: Element](screens.flatMap(\.value.referencedElements), uniquingKeysWith: { _, _ in
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate element_id"))
-        })
+        screens = screensCollection.values
+
+        templates = try Schema.createTemplates(
+            formatVersion: formatVersion,
+            templatesCollection: templatesCollection,
+            screens: screensCollection.values
+        )
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -100,8 +134,6 @@ extension AdaptyUISchema: Codable {
         try container.encode(Array(localizations.values), forKey: .localizations)
         try container.encodeIfPresent(defaultLocalization?.id, forKey: .defaultLocalId)
 
-        var screens = screens
-        screens[CodingKeys.defaultScreen.rawValue] = defaultScreen
         try container.encode(screens, forKey: .screens)
     }
 }

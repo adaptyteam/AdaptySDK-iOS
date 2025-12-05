@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Screen: Sendable {
+    struct Screen: Sendable, Hashable {
         let backgroundAssetId: String?
         let cover: Box?
         let content: Element
@@ -37,7 +37,7 @@ extension Schema.Localizer {
     }
 }
 
-extension Schema.Screen: Codable {
+extension Schema.Screen: Encodable, DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case backgroundAssetId = "background"
         case cover
@@ -46,4 +46,17 @@ extension Schema.Screen: Codable {
         case overlay
         case selectedAdaptyProductId = "selected_product"
     }
+
+    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        try self.init(
+            backgroundAssetId: container.decodeIfPresent(String.self, forKey: .backgroundAssetId),
+            cover: container.decodeIfPresent(Schema.Box.self, forKey: .cover, configuration: configuration),
+            content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
+            footer: container.decodeIfPresent(Schema.Element.self, forKey: .footer, configuration: configuration),
+            overlay: container.decodeIfPresent(Schema.Element.self, forKey: .overlay, configuration: configuration),
+            selectedAdaptyProductId: container.decodeIfPresent(String.self, forKey: .selectedAdaptyProductId)
+        )
+    }
 }
+

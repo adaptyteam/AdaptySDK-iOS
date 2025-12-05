@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Section: Sendable {
+    struct Section: Sendable, Hashable {
         let id: String
         let index: Int
         let content: [Schema.Element]
@@ -25,19 +25,19 @@ extension Schema.Localizer {
     }
 }
 
-extension Schema.Section: Decodable {
+extension Schema.Section: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case id
         case index
         case content
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             id: container.decode(String.self, forKey: .id),
             index: container.decodeIfPresent(Int.self, forKey: .index) ?? 0,
-            content: container.decode([Schema.Element].self, forKey: .content)
+            content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
         )
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct GridItem: Sendable {
+    struct GridItem: Sendable, Hashable {
         let length: Length
         let horizontalAlignment: HorizontalAlignment
         let verticalAlignment: VerticalAlignment
@@ -31,7 +31,7 @@ extension Schema.Localizer {
     }
 }
 
-extension Schema.GridItem: Decodable {
+extension Schema.GridItem: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case fixed
         case weight
@@ -40,7 +40,7 @@ extension Schema.GridItem: Decodable {
         case content
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let length: Schema.GridItem.Length =
             if let value = try container.decodeIfPresent(Int.self, forKey: .weight) {
@@ -53,7 +53,7 @@ extension Schema.GridItem: Decodable {
             length: length,
             horizontalAlignment: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? Self.default.horizontalAlignment,
             verticalAlignment: container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment) ?? Self.default.verticalAlignment,
-            content: container.decode(Schema.Element.self, forKey: .content)
+            content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration)
         )
     }
 }

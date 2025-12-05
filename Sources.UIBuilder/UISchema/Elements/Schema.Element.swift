@@ -8,8 +8,9 @@
 import Foundation
 
 extension Schema {
-    enum Element: Sendable {
-        case reference(String)
+    enum Element: Sendable, Hashable {
+        case legacyReference(String)
+        case template(id: String)
         indirect case stack(Schema.Stack, Properties?)
         case text(Schema.Text, Properties?)
         case image(Schema.Image, Properties?)
@@ -30,8 +31,10 @@ extension Schema {
 extension Schema.Localizer {
     func element(_ from: Schema.Element) throws -> VC.Element {
         switch from {
-        case let .reference(id):
-            try reference(id)
+        case let .legacyReference(id):
+            try legacyReference(id)
+        case let .template(id):
+            try templateInstance(id)
         case let .stack(value, properties):
             try .stack(stack(value), properties.flatMap(elementProperties))
         case let .text(value, properties):
@@ -62,11 +65,11 @@ extension Schema.Localizer {
     }
 }
 
-extension Schema.Element: Codable {
+extension Schema.Element: Encodable, DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case type
         case count
-        case elementId = "element_id"
+        case legacyElementId = "element_id"
     }
 
     enum ContentType: String, Codable {
@@ -84,30 +87,38 @@ extension Schema.Element: Codable {
         case toggle
         case timer
         case `if`
-        case reference
+        case legacyReference
         case pager
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
 
         guard let contentType = ContentType(rawValue: type) else {
-            self = .unknown(type, propertyOrNil())
+            if !configuration.isLegacy, type.hasPrefix(Schema.Template.keyPrefix) {
+                self = .template(id: String(type.dropFirst()))
+            } else {
+                self = .unknown(type, propertyOrNil())
+            }
             return
         }
 
         switch contentType {
         case .if:
-            self = try Schema.If(from: decoder).content
-        case .reference:
-            self = try .reference(container.decode(String.self, forKey: .elementId))
+            self = try Schema.If(from: decoder, configuration: configuration).content
+        case .legacyReference:
+            if configuration.isLegacy {
+                self = try .legacyReference(container.decode(String.self, forKey: .legacyElementId))
+            } else {
+                throw Schema.Error.unsupportedElement(type)
+            }
         case .box:
-            self = try .box(Schema.Box(from: decoder), propertyOrNil())
+            self = try .box(Schema.Box(from: decoder, configuration: configuration), propertyOrNil())
         case .vStack, .hStack, .zStack:
-            self = try .stack(Schema.Stack(from: decoder), propertyOrNil())
+            self = try .stack(Schema.Stack(from: decoder, configuration: configuration), propertyOrNil())
         case .button:
-            self = try .button(Schema.Button(from: decoder), propertyOrNil())
+            self = try .button(Schema.Button(from: decoder, configuration: configuration), propertyOrNil())
         case .text:
             self = try .text(Schema.Text(from: decoder), propertyOrNil())
         case .image:
@@ -115,17 +126,17 @@ extension Schema.Element: Codable {
         case .video:
             self = try .video(Schema.VideoPlayer(from: decoder), propertyOrNil())
         case .row:
-            self = try .row(Schema.Row(from: decoder), propertyOrNil())
+            self = try .row(Schema.Row(from: decoder, configuration: configuration), propertyOrNil())
         case .column:
-            self = try .column(Schema.Column(from: decoder), propertyOrNil())
+            self = try .column(Schema.Column(from: decoder, configuration: configuration), propertyOrNil())
         case .section:
-            self = try .section(Schema.Section(from: decoder), propertyOrNil())
+            self = try .section(Schema.Section(from: decoder, configuration: configuration), propertyOrNil())
         case .toggle:
             self = try .toggle(Schema.Toggle(from: decoder), propertyOrNil())
         case .timer:
             self = try .timer(Schema.Timer(from: decoder), propertyOrNil())
         case .pager:
-            self = try .pager(Schema.Pager(from: decoder), propertyOrNil())
+            self = try .pager(Schema.Pager(from: decoder, configuration: configuration), propertyOrNil())
         }
 
         func propertyOrNil() -> Properties? {
@@ -134,7 +145,7 @@ extension Schema.Element: Codable {
         }
     }
 
-    func encode(to _: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         // TODO: implement
     }
 }

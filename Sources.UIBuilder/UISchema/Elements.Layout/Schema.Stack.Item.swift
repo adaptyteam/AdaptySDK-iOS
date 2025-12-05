@@ -8,13 +8,13 @@
 import Foundation
 
 extension Schema.Stack {
-    enum Item: Sendable {
+    enum Item: Sendable, Hashable {
         case space(Int)
         case element(Schema.Element)
     }
 }
 
-extension Schema.Stack.Item: Decodable {
+extension Schema.Stack.Item: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case type
         case count
@@ -24,12 +24,12 @@ extension Schema.Stack.Item: Decodable {
         case space
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
 
         guard let contentType = ContentType(rawValue: type) else {
-            self = try .element(Schema.Element(from: decoder))
+            self = try .element(Schema.Element(from: decoder, configuration: configuration))
             return
         }
 

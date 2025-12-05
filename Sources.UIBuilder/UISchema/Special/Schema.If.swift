@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct If: Decodable {
+    struct If: DecodableWithConfiguration {
         let content: Schema.Element
 
         enum CodingKeys: String, CodingKey {
@@ -18,44 +18,16 @@ extension Schema {
             case `else`
         }
 
-        init(from decoder: Decoder) throws {
+        init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             content =
                 if
                     try container.decodeIfPresent(String.self, forKey: .platform).map({ $0 == "ios" }) ?? true,
-                    try container.decodeIfPresent(String.self, forKey: .version).map(Schema.formatVersion.isSameOrNewerVersion) ?? true {
-                    try container.decode(Schema.Element.self, forKey: .then)
+                    try container.decodeIfPresent(Version.self, forKey: .version).map(Schema.formatVersion.isSameOrNewerVersion) ?? true {
+                    try container.decode(Schema.Element.self, forKey: .then, configuration: configuration)
                 } else {
-                    try container.decode(Schema.Element.self, forKey: .else)
+                    try container.decode(Schema.Element.self, forKey: .else, configuration: configuration)
                 }
         }
-    }
-}
-
-extension String {
-    func isSameOrNewerVersion(than older: Self) -> Bool {
-        func stringVersionToArray(_ value: String) -> [Int] {
-            value.components(separatedBy: CharacterSet(charactersIn: " -.")).map { Int($0) ?? 0 }
-        }
-        return stringVersionToArray(self).isSameOrNewerVersion(than: stringVersionToArray(older))
-    }
-}
-
-private extension [Int] {
-    func isSameOrNewerVersion(than older: Self) -> Bool {
-        var newer = self
-        let diffCount = older.count - newer.count
-        if diffCount > 0 {
-            newer.append(contentsOf: repeatElement(0, count: diffCount))
-        }
-
-        for (index, newerElement) in newer.enumerated() {
-            guard older.indices.contains(index) else { return true }
-            let olderElement = older[index]
-            if newerElement > olderElement { return true }
-            if newerElement < olderElement { return false }
-        }
-
-        return true
     }
 }

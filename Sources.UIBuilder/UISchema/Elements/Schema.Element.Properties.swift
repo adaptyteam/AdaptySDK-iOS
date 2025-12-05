@@ -8,23 +8,25 @@
 import Foundation
 
 extension Schema.Element {
-    struct Properties: Sendable {
-        let elementId: String?
+    struct Properties: Sendable, Hashable {
+        let legacyElementId: String?
         let decorator: Schema.Decorator?
         let padding: Schema.EdgeInsets
         let offset: Schema.Offset
 
         let opacity: Double
         let onAppear: [Schema.Animation]
+    }
+}
 
-        var isZero: Bool {
-            elementId == nil
-                && decorator == nil
-                && padding.isZero
-                && offset.isZero
-                && opacity == 0
-                && onAppear.isEmpty
-        }
+extension Schema.Element.Properties {
+    var isZero: Bool {
+        legacyElementId == nil
+            && decorator == nil
+            && padding.isZero
+            && offset.isZero
+            && opacity == 0
+            && onAppear.isEmpty
     }
 }
 
@@ -47,7 +49,7 @@ extension Schema.Localizer {
 
 extension Schema.Element.Properties: Decodable {
     enum CodingKeys: String, CodingKey {
-        case elementId = "element_id"
+        case legacyElementId = "element_id"
         case decorator
         case padding
         case offset
@@ -76,7 +78,7 @@ extension Schema.Element.Properties: Decodable {
         }
 
         try self.init(
-            elementId: container.decodeIfPresent(String.self, forKey: .elementId),
+            legacyElementId: container.decodeIfPresent(String.self, forKey: .legacyElementId),
             decorator: container.decodeIfPresent(Schema.Decorator.self, forKey: .decorator),
             padding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .padding) ?? Self.default.padding,
             offset: container.decodeIfPresent(Schema.Offset.self, forKey: .offset) ?? Self.default.offset,

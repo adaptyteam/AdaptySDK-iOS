@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Row: Sendable {
+    struct Row: Sendable, Hashable {
         let spacing: Double
         let items: [GridItem]
     }
@@ -23,17 +23,17 @@ extension Schema.Localizer {
     }
 }
 
-extension Schema.Row: Decodable {
+extension Schema.Row: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case spacing
         case items
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
-            items: container.decode([Schema.GridItem].self, forKey: .items)
+            items: container.decode([Schema.GridItem].self, forKey: .items, configuration: configuration)
         )
     }
 }

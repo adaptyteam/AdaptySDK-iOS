@@ -20,6 +20,8 @@
 
 Adapty SDK is an open-source framework that makes implementing in-app subscriptions for iOS fast and easy. It’s 100% open-source, native, and lightweight.
 
+
+
 ## Why Adapty?
 
 - [No server code implementation](https://docs.adapty.io/v3.0/docs/ios-installation?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). ntegrate in-app purchases with server-side receipt validation in minutes — in your own paywall or one created in the no-code builder.
