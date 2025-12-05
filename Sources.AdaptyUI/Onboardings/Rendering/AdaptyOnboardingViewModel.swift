@@ -51,6 +51,7 @@ final class AdaptyOnboardingViewModel: ObservableObject {
         }
 
         webView.navigationDelegate = webViewDelegate
+        webView.uiDelegate = webViewDelegate
         webView.configuration.userContentController.add(
             webViewDelegate,
             name: AdaptyUI.webViewEventMessageName
@@ -156,7 +157,7 @@ final class AdaptyWebViewDelegate: NSObject {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyWebViewDelegate: WKNavigationDelegate, WKScriptMessageHandler {
+extension AdaptyWebViewDelegate: WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
     public func webView(
         _ webView: WKWebView,
         didStartProvisionalNavigation _: WKNavigation!
@@ -198,6 +199,23 @@ extension AdaptyWebViewDelegate: WKNavigationDelegate, WKScriptMessageHandler {
         didReceive wkMessage: WKScriptMessage
     ) {
         onMessage?(wkMessage.name, wkMessage.body)
+    }
+
+    public func webView(
+        _: WKWebView,
+        createWebViewWith _: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures _: WKWindowFeatures
+    ) -> WKWebView? {
+        if !(navigationAction.targetFrame?.isMainFrame ?? false) {
+            if let url = navigationAction.request.url {
+                UIApplication.shared.open(url)
+            }
+            
+            print("")
+        }
+
+        return nil
     }
 }
 
