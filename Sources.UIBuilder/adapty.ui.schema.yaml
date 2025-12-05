@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/ui/4_4_1/schema"
+$id: "https://adapty.io/ui/4_4_2/schema"
 title: "AdaptyUI Configuration"
 type: object
 required: [format, template_id, template_revision, styles]
@@ -869,6 +869,8 @@ $defs:
       type: { const: if }
       platform: { type: string, enum: [ios, android] }
       version:
+        { type: string, pattern: "^[0-9]+(.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
+      to_version: # from v4.4.2
         { type: string, pattern: "^[0-9]+(.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
       then: { $ref: "#/$defs/UI.Element" }
       else: { $ref: "#/$defs/UI.Element" }
