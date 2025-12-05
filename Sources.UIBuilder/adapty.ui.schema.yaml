@@ -881,6 +881,8 @@ $defs:
       platform: { type: string, enum: [ios, android] }
       version:
         { type: string, pattern: "^[0-9]+(.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
+      to_version: # from v4.4.2
+        { type: string, pattern: "^[0-9]+(.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
       then: { $ref: "#/$defs/UI.Element" }
       else: { $ref: "#/$defs/UI.Element" }
 

@@ -34,7 +34,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     @State private var animationTokens = Set<AdaptyUIAnimationToken>()
 
     init(_ properties: VC.Element.Properties) {
-        self.opacity = properties.opacity ?? 1.0
+        self.opacity = properties.opacity
 
         self.scaleX = 1.0
         self.scaleY = 1.0
@@ -43,7 +43,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.rotation = .zero
         self.rotationAnchor = .center
 
-        self.initialOffset = properties.offset ?? .zero
+        self.initialOffset = properties.offset
 
         self.initialShadowFilling = properties.decorator?.shadow?.filling
         self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
@@ -57,8 +57,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     private var resolvedOffset: CGSize {
         CGSize(
-            width: animatedOffsetX ?? initialOffset.x.points(.horizontal, screenSize, safeArea) ?? 0.0,
-            height: animatedOffsetY ?? initialOffset.y.points(.vertical, screenSize, safeArea) ?? 0.0
+            width: animatedOffsetX ?? initialOffset.x.points(.horizontal, screenSize, safeArea),
+            height: animatedOffsetY ?? initialOffset.y.points(.vertical, screenSize, safeArea)
         )
     }
 
@@ -75,10 +75,17 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     }
 
     private var resolvedShadowOffset: CGSize {
-        CGSize(
-            width: animatedShadowOffset?.width ?? initialShadowOffset.x.points(.horizontal, screenSize, safeArea) ?? 0.0,
-            height: animatedShadowOffset?.height ?? initialShadowOffset.y.points(.vertical, screenSize, safeArea) ?? 0.0
-        )
+        if let animatedShadowOffset {
+            CGSize(
+                width: animatedShadowOffset.width,
+                height: animatedShadowOffset.height
+            )
+        } else {
+            CGSize(
+                width: initialShadowOffset.x.points(.horizontal, screenSize, safeArea),
+                height: initialShadowOffset.y.points(.vertical, screenSize, safeArea)
+            )
+        }
     }
 
     func body(content: Content) -> some View {

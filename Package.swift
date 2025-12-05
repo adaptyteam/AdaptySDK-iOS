@@ -39,7 +39,7 @@ let package = Package(
         .library(
             name: "AdaptyPlugin",
             targets: ["AdaptyPlugin"]
-        ),
+        )
     ],
     targets: [
         .target(
@@ -52,7 +52,7 @@ let package = Package(
             dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder",
             exclude: [
-                "adapty.ui.schema.yaml",
+                "adapty.ui.schema.yaml"
             ]
         ),
         .target(
@@ -67,7 +67,7 @@ let package = Package(
             path: "Sources.KidsMode",
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
-                .define("ADAPTY_KIDS_MODE"),
+                .define("ADAPTY_KIDS_MODE")
             ]
         ),
         .target(
@@ -86,7 +86,7 @@ let package = Package(
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.AdaptyPlugin",
             exclude: [
-                "cross_platform.yaml",
+                "cross_platform.yaml"
             ]
         ),
         .testTarget(
@@ -95,7 +95,7 @@ let package = Package(
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),
-                .process("Placements/fallback_large.json"),
+                .process("Placements/fallback_large.json")
             ]
         ),
     ]

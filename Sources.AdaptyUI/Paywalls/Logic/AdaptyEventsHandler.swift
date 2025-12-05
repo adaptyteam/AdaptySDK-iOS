@@ -89,7 +89,7 @@ package final class AdaptyEventsHandler: ObservableObject {
             Log.ui.verbose("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null")")
         }
 
-        guard let product = product as? AdaptyPaywallProduct else {
+        guard let product else {
             Log.ui.error("#\(logId)# event_didFinishWebPaymentNavigation: WRONG INJECTION")
             return
         }
