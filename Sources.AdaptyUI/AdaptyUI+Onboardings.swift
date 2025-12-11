@@ -21,6 +21,7 @@ public extension AdaptyUI {
         init(
             logId: String,
             onboarding: AdaptyOnboarding,
+            externalUrlsPresentation: AdaptyWebPresentation,
             inspectWebView: Bool
         ) {
             Log.ui.verbose("#\(logId)# init onboarding: \(onboarding.placement.id)")
@@ -28,6 +29,7 @@ public extension AdaptyUI {
             self.viewModel = AdaptyOnboardingViewModel(
                 logId: logId,
                 onboarding: onboarding,
+                externalUrlsPresentation: externalUrlsPresentation,
                 inspectWebView: inspectWebView
             )
         }
@@ -38,7 +40,8 @@ public extension AdaptyUI {
 @MainActor
 public extension AdaptyUI {
     static func getOnboardingConfiguration(
-        forOnboarding onboarding: AdaptyOnboarding
+        forOnboarding onboarding: AdaptyOnboarding,
+        externalUrlsPresentation: AdaptyWebPresentation = .inAppBrowser
     ) throws -> OnboardingConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivated
@@ -46,10 +49,11 @@ public extension AdaptyUI {
 
             throw err
         }
-        
+
         return OnboardingConfiguration(
             logId: Log.stamp,
             onboarding: onboarding,
+            externalUrlsPresentation: externalUrlsPresentation,
             inspectWebView: false
         )
     }
@@ -65,7 +69,7 @@ public extension AdaptyUI {
             Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
             throw err
         }
-        
+
         return AdaptyOnboardingController(
             configuration: onboardingConfiguration,
             delegate: delegate,
@@ -79,18 +83,20 @@ public extension AdaptyUI {
 package extension AdaptyUI {
     static func getOnboardingConfiguration(
         forOnboarding onboarding: AdaptyOnboarding,
+        externalUrlsPresentation: AdaptyWebPresentation,
         inspectWebView: Bool
     ) throws -> OnboardingConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivated
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
-            
+
             throw err
         }
-        
+
         return OnboardingConfiguration(
             logId: Log.stamp,
             onboarding: onboarding,
+            externalUrlsPresentation: externalUrlsPresentation,
             inspectWebView: inspectWebView
         )
     }
