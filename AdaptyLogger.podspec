@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'AdaptyLogger'
-  s.version      = '3.15.0'
+  s.version      = '3.15.1'
   s.summary      = 'Adapty Logger for iOS.'
   
   s.description    = <<-DESC
