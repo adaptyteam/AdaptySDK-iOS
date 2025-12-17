@@ -10,6 +10,6 @@ import Foundation
 package extension VC {
     struct Action: Sendable, Hashable {
         let function: String
-        let params: [String: String]?
+        let params: [String: Parameter]?
     }
 }

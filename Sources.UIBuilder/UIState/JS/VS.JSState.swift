@@ -54,7 +54,7 @@ extension VS.JSState {
         return T.fromJSValue(value)
     }
         
-    func callFunction<T: JSValueRepresentable>(
+    private func callFunction<T: JSValueRepresentable>(
         _ type: T.Type,
         _ functionName: String,
         args functionArguments: [any JSValueRepresentable] = []
@@ -74,13 +74,13 @@ extension VS.JSState {
         } else {
             log.debug("function called \(functionName) -> \(String(describing: value))")
         }
-        objectWillChange.send()
         return T.fromJSValue(value)
     }
         
     func setValue(_ key: String, _ value: any JSValueRepresentable) throws(VS.Error) {
         do {
             _ = try callFunction(Bool.self, "set" + key.capitalizedFirst, args: [value])
+            objectWillChange.send()
             return
         } catch {
             guard case .jsFunctionNotFound = error else { throw error }
@@ -91,7 +91,12 @@ extension VS.JSState {
         objectWillChange.send()
     }
     
-    func execute(actions: [VC.Action]) {}
+    func execute(actions: [VC.Action]) {
+        for actions in actions {
+            
+        }
+        
+    }
 }
 
 private extension String {

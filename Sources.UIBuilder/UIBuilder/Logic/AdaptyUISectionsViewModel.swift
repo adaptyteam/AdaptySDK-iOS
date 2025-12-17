@@ -17,17 +17,17 @@ package final class AdaptyUISectionsViewModel: ObservableObject {
         self.logId = logId
     }
 
-    @Published var sectionsStates = [String: Int]()
+    @Published var sectionsStates = [String: Int32]()
 
-    func updateSelection(for sectionId: String, index: Int) {
+    func updateSelection(for sectionId: String, index: Int32) {
         sectionsStates[sectionId] = index
     }
 
-    func selectedIndex(for sectionId: String) -> Int? {
+    func selectedIndex(for sectionId: String) -> Int32? {
         sectionsStates[sectionId]
     }
 
-    func selectedIndex(for section: VC.Section) -> Int {
+    func selectedIndex(for section: VC.Section) -> Int32 {
         if let stateIndex = sectionsStates[section.id] {
             return stateIndex
         } else {

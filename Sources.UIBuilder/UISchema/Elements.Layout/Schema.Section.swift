@@ -10,7 +10,7 @@ import Foundation
 extension Schema {
     struct Section: Sendable, Hashable {
         let id: String
-        let index: Int
+        let index: Int32
         let content: [Schema.Element]
     }
 }
@@ -36,7 +36,7 @@ extension Schema.Section: DecodableWithConfiguration {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             id: container.decode(String.self, forKey: .id),
-            index: container.decodeIfPresent(Int.self, forKey: .index) ?? 0,
+            index: container.decodeIfPresent(Int32.self, forKey: .index) ?? 0,
             content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
         )
     }

@@ -21,7 +21,7 @@ struct AdaptyUISectionView: View {
     var body: some View {
         let index = viewModel.selectedIndex(for: section)
 
-        if let content = section.content[safe: index] {
+        if let content = section.content[safe: Int(index)] {
             AdaptyUIElementView(content)
         }
     }

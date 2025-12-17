@@ -33,7 +33,7 @@ extension Schema.StateCondition: Codable {
         case .selectedSection:
             self = try .selectedSection(
                 id: container.decode(String.self, forKey: .sectionId),
-                index: container.decode(Int.self, forKey: .index)
+                index: container.decode(Int32.self, forKey: .index)
             )
         case .selectedProduct:
             self = try .selectedProduct(

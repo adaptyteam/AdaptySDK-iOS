@@ -44,17 +44,17 @@ extension Schema.Toggle: Decodable {
         let colorAssetId = try container.decodeIfPresent(String.self, forKey: .colorAssetId)
 
         if let sectionId = try container.decodeIfPresent(String.self, forKey: .sectionId) {
-            let onIndex = try container.decodeIfPresent(Int.self, forKey: .onIndex) ?? 0
-            let offIndex = try container.decodeIfPresent(Int.self, forKey: .offIndex) ?? -1
+            let onIndex = try container.decodeIfPresent(Int32.self, forKey: .onIndex) ?? 0
+            let offIndex = try container.decodeIfPresent(Int32.self, forKey: .offIndex) ?? -1
 
             self.init(
                 onActions: [.init(function: "Legacy.switchSection", params: [
-                    "sectionId": sectionId,
-                    "index": String(onIndex)
+                    "sectionId": .string(sectionId),
+                    "index": .int32(onIndex)
                 ])],
                 offActions: [.init(function: "Legacy.switchSection", params: [
-                    "sectionId": sectionId,
-                    "index": String(offIndex)
+                    "sectionId": .string(sectionId),
+                    "index": .int32(offIndex)
                 ])],
                 onCondition: .selectedSection(id: sectionId, index: onIndex),
                 colorAssetId: colorAssetId
