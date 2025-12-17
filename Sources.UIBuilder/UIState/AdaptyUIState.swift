@@ -54,7 +54,7 @@ final class AdaptyUIState: ObservableObject {
         try jsState.setValue(key, value)
     }
 
-    func execute(actions: [VC.Action]) {
+    func execute(actions: [VC.Action]) throws(VS.Error) {
         try jsState.execute(actions: actions)
     }
 }

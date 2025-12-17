@@ -13,7 +13,7 @@ private let log = Log.viewState
 extension VS {
     final class JSState: ObservableObject {
         private let context: JSContext
-        
+        private let actionDispatcher: JSActionDispatcher
         init(
             name: String = "AdaptyJSState",
             isInspectable: Bool = false,
@@ -32,9 +32,9 @@ extension VS {
             }
             context.exceptionHandler = exceptionHandler
             
-            let bridge = JSActionDispatcher(actionHandler)
+            actionDispatcher = JSActionDispatcher(actionHandler)
             
-            context.setObject(bridge, forKeyedSubscript: "SDK" as NSString)
+            context.setObject(actionDispatcher, forKeyedSubscript: "SDK" as NSString)
             
             context.evaluateScript(Self.legacyActions)
         }
@@ -57,7 +57,7 @@ extension VS.JSState {
     private func callFunction<T: JSValueRepresentable>(
         _ type: T.Type,
         _ functionName: String,
-        args functionArguments: [any JSValueRepresentable] = []
+        args functionArguments: [any JSValueConvertable] = []
     ) throws(VS.Error) -> T? {
         guard let function = context.objectForKeyedSubscript(functionName),
               !function.isUndefined
@@ -77,7 +77,7 @@ extension VS.JSState {
         return T.fromJSValue(value)
     }
         
-    func setValue(_ key: String, _ value: any JSValueRepresentable) throws(VS.Error) {
+    func setValue(_ key: String, _ value: any JSValueConvertable) throws(VS.Error) {
         do {
             _ = try callFunction(Bool.self, "set" + key.capitalizedFirst, args: [value])
             objectWillChange.send()
@@ -91,11 +91,13 @@ extension VS.JSState {
         objectWillChange.send()
     }
     
-    func execute(actions: [VC.Action]) {
-        for actions in actions {
-            
+    func execute(actions: [VC.Action]) throws(VS.Error) {
+        guard !actions.isEmpty else { return }
+        for action in actions {
+            guard !actionDispatcher.execute(action, in: context) else { continue }
+            _ = try callFunction(Bool.self, action.function, args: [action.params])
         }
-        
+        objectWillChange.send()
     }
 }
 

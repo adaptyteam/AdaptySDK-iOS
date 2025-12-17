@@ -8,9 +8,8 @@
 import Foundation
 import JavaScriptCore
 
-protocol JSValueRepresentable: Sendable, Hashable {
+protocol JSValueRepresentable: Sendable, Hashable, JSValueConvertable {
     static func fromJSValue(_: JSValue) -> Self?
-    func toJSValue(in: JSContext) -> JSValue
 }
 
 extension JSValueRepresentable {
@@ -26,14 +25,6 @@ extension JSValueRepresentable {
 extension Optional: JSValueRepresentable where Wrapped: JSValueRepresentable {
     static func fromJSValue(_ value: JSValue) -> Self? {
         Wrapped.fromJSValue(value)
-    }
-
-    func toJSValue(in context: JSContext) -> JSValue {
-        if case .some(let value) = self {
-            value.toJSValue(in: context)
-        } else {
-            .init(nullIn: context)
-        }
     }
 }
 

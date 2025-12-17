@@ -32,6 +32,12 @@ extension VS {
     func closeCurrentScreen()
 }
 
+extension VS.JSActionDispatcher {
+    func execute(_ action: VC.Action, in context: JSContext) -> Bool {
+        false
+    }
+}
+
 extension VS.JSActionDispatcher: JSActionBridge {
     func log(_ params: JSValue) {
         var message = params.toString() ?? "null"
@@ -135,7 +141,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
 
         if params.isString {
             productId = params.toString()
-        } else if params.isObject, let dict = params.toDictionary() as? [String: Any]  {
+        } else if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             productId = dict["productId"] as? String
         }
 
@@ -151,7 +157,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
 
         if params.isString {
             screenId = params.toString()
-        } else if params.isObject, let dict = params.toDictionary() as? [String: Any]  {
+        } else if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             screenId = dict["screenId"] as? String
         }
 
