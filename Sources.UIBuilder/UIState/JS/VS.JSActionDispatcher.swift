@@ -27,7 +27,7 @@ extension VS {
     func webPurchaseProduct(_ params: JSValue)
     func restorePurchases()
     func closeAll()
-    func selectProduct(_ params: JSValue)
+    func onSelectProduct(_ params: JSValue)
     func openScreen(_ params: JSValue)
     func closeCurrentScreen()
 }
@@ -136,7 +136,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         handler?.closeAll()
     }
 
-    func selectProduct(_ params: JSValue) {
+    func onSelectProduct(_ params: JSValue) {
         var productId: String?
 
         if params.isString {
@@ -146,7 +146,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let productId else {
-            Log.viewState.warn("SDK.selectProduct: required parameter \"productId\" is missing")
+            Log.viewState.warn("SDK.onSelectProduct: required parameter \"productId\" is missing")
             return
         }
         handler?.selectProduct(productId: productId)

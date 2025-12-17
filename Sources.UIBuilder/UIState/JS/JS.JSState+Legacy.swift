@@ -12,9 +12,9 @@ extension VS.JSState {
     class Legacy {}
     Legacy.productGroup = Object.create(null);
     Legacy.sections = Object.create(null);
-    Legacy.selectProduct = function ({ adaptyProductId, groupId }) {
-          Legacy.productGroup[groupId] = adaptyProductId;
-          SDK.selectProduct(adaptyProductId);
+    Legacy.selectProduct = function ({ productId, groupId }) {
+          Legacy.productGroup[groupId] = productId;
+          SDK.onSelectProduct(adaptyProductId);
     };
     Legacy.unselectProduct = function ({ groupId }) {
           delete Legacy.productGroup[groupId]
