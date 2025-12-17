@@ -14,7 +14,7 @@ extension VS.JSState {
     Legacy.sections = Object.create(null);
     Legacy.selectProduct = function ({ productId, groupId }) {
           Legacy.productGroup[groupId] = productId;
-          SDK.onSelectProduct(adaptyProductId);
+          SDK.onSelectProduct({ productId: productId });
     };
     Legacy.unselectProduct = function ({ groupId }) {
           delete Legacy.productGroup[groupId]
@@ -22,12 +22,12 @@ extension VS.JSState {
     Legacy.purchaseSelectedProduct = function ({ groupId }) {
          const productId = Legacy.productGroup[groupId];
          if (!productId) { return; }
-         SDK.purchaseProduct( productId );
+         SDK.purchaseProduct({ productId: productId });
     };
     Legacy.webPurchaseSelectedProduct = function ({ groupId, openIn }) {
          const productId = Legacy.productGroup[groupId];
          if (!productId) { return; }
-         SDK.webPurchasePaywall( productId, openIn );
+         SDK.webPurchaseProduct({ productId: productId, openIn: openIn });
     };
     Legacy.switchSection = function ({ sectionId, index }) {
          Legacy.sections[sectionId] = index;

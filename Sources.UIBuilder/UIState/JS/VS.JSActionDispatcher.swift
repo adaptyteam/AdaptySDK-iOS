@@ -93,8 +93,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         handler?.userCustomAction(id: userCustomId)
     }
 
-    func purchaseProduct(_ params: JSValue) { // string | productId: string
-
+    func purchaseProduct(_ params: JSValue) {
         var productId: String?
 
         if params.isString {
@@ -110,7 +109,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         handler?.purchaseProduct(productId: productId, service: .storeKit)
     }
 
-    func webPurchaseProduct(_ params: JSValue) { // string | productId: string [, openIn: string]
+    func webPurchaseProduct(_ params: JSValue) {
         var productId: String?
         var openIn = VC.Action.WebOpenInParameter.browserOutApp
 
@@ -152,7 +151,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         handler?.selectProduct(productId: productId)
     }
 
-    func openScreen(_ params: JSValue) { // string | screenId: string
+    func openScreen(_ params: JSValue) {
         var screenId: String?
 
         if params.isString {
