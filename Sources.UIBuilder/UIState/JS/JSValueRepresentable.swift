@@ -22,21 +22,17 @@ extension JSValueRepresentable {
     }
 }
 
-extension Optional: JSValueRepresentable where Wrapped: JSValueRepresentable {
-    static func fromJSValue(_ value: JSValue) -> Self? {
-        Wrapped.fromJSValue(value)
-    }
-}
+//extension Optional: JSValueRepresentable where Wrapped: JSValueRepresentable {
+//    static func fromJSValue(_ value: JSValue) -> Self? {
+//        Wrapped.fromJSValue(value)
+//    }
+//}
 
 extension Bool: JSValueRepresentable {
     static func fromJSValue(_ value: JSValue) -> Bool? {
         if value.isUndefined { nil }
         else if value.isNull { nil }
         else { value.toBool() }
-    }
-
-    func toJSValue(in context: JSContext) -> JSValue {
-        .init(bool: self, in: context)
     }
 }
 
@@ -46,10 +42,6 @@ extension Int32: JSValueRepresentable {
         else if value.isNull { nil }
         else { value.toInt32() }
     }
-
-    func toJSValue(in context: JSContext) -> JSValue {
-        .init(int32: self, in: context)
-    }
 }
 
 extension UInt32: JSValueRepresentable {
@@ -57,10 +49,6 @@ extension UInt32: JSValueRepresentable {
         if value.isUndefined { nil }
         else if value.isNull { nil }
         else { value.toUInt32() }
-    }
-
-    func toJSValue(in context: JSContext) -> JSValue {
-        .init(uInt32: self, in: context)
     }
 }
 
@@ -70,10 +58,6 @@ extension Double: JSValueRepresentable {
         else if value.isNull { nil }
         else { value.toDouble() }
     }
-
-    func toJSValue(in context: JSContext) -> JSValue {
-        .init(double: self, in: context)
-    }
 }
 
 extension String: JSValueRepresentable {
@@ -81,9 +65,5 @@ extension String: JSValueRepresentable {
         if value.isUndefined { nil }
         else if value.isNull { nil }
         else { value.toString() }
-    }
-
-    func toJSValue(in context: JSContext) -> JSValue {
-        .init(object: self, in: context)
     }
 }

@@ -22,32 +22,55 @@ extension Optional: JSValueConvertable where Wrapped: JSValueConvertable {
     }
 }
 
-extension JSValue: JSValueConvertable {
-    func toJSValue(in _: JSContext) -> JSValue {
-        self
+extension Bool: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        .init(bool: self, in: context)
+    }
+}
+
+extension Int32: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        .init(int32: self, in: context)
+    }
+}
+
+extension UInt32: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        .init(uInt32: self, in: context)
+    }
+}
+
+extension Double: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        .init(double: self, in: context)
+    }
+}
+
+extension String: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        .init(object: self, in: context)
+    }
+}
+
+extension VC.Action.Parameter: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        switch self {
+        case .null:
+            .init(nullIn: context)
+        case let .string(v): v.toJSValue(in: context)
+        case let .bool(v): v.toJSValue(in: context)
+        case let .int32(v): v.toJSValue(in: context)
+        case let .uint32(v): v.toJSValue(in: context)
+        case let .double(v): v.toJSValue(in: context)
+        }
     }
 }
 
 extension [String: VC.Action.Parameter]: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-
-        for (key, parameter) in self {
-            let value: JSValue = switch parameter {
-            case .null:
-                .init(nullIn: context)
-            case let .string(v):
-                .init(object: v, in: context)
-            case let .bool(v):
-                .init(bool: v, in: context)
-            case let .int32(v):
-                .init(int32: v, in: context)
-            case let .uint32(v):
-                .init(uInt32: v, in: context)
-            case let .double(v):
-                .init(double: v, in: context)
-            }
-            object.setObject(value, forKeyedSubscript: key as NSString)
+        for (key, value) in self {
+            object.setObject(value.toJSValue(in: context), forKeyedSubscript: key as NSString)
         }
         return object
     }
