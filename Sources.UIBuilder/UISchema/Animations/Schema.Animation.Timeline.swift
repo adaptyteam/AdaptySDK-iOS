@@ -11,6 +11,18 @@ extension Schema.Animation {
     typealias Timeline = VC.Animation.Timeline
 }
 
+extension Schema.Animation.Timeline {
+    static let `default` = Self(
+        duration: 0.3,
+        interpolator: .default,
+        startDelay: 0.0,
+        loop: nil,
+        loopDelay: 0.0,
+        pingPongDelay: 0.0,
+        loopCount: nil
+    )
+}
+
 extension Schema.Animation.Timeline: Codable {
     enum CodingKeys: String, CodingKey {
         case startDelay = "start_delay"

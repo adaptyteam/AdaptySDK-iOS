@@ -98,38 +98,38 @@ extension VC.Action {
         sectionsViewModel: AdaptyUISectionsViewModel,
         screensViewModel: AdaptyUIScreensViewModel
     ) {
-        switch self {
-        case let .selectProduct(id, groupId):
-            withAnimation(.linear(duration: 0.0)) {
-                productsViewModel.selectProduct(id: id, forGroupId: groupId)
-            }
-        case let .unselectProduct(groupId):
-            productsViewModel.unselectProduct(forGroupId: groupId)
-        case let .purchaseSelectedProduct(groupId, service):
-            productsViewModel.purchaseSelectedProduct(fromGroupId: groupId, service: service)
-        case let .purchaseProduct(productId, service):
-            productsViewModel.purchaseProduct(id: productId, service: service)
-        case .openWebPaywall:
-            break
-        case .restore:
-            productsViewModel.restorePurchases()
-        case let .switchSection(sectionId, index):
-            withAnimation(.linear(duration: 0.0)) {
-                sectionsViewModel.updateSelection(for: sectionId, index: index)
-            }
-        case let .openScreen(id):
-            withAnimation(.linear(duration: 0.3)) {
-                screensViewModel.presentScreen(id: id)
-            }
-        case .closeScreen:
-            screensViewModel.dismissScreen(id: screenId)
-        case .close:
-            actionsViewModel.closeActionOccurred()
-        case let .openUrl(url):
-            actionsViewModel.openUrlActionOccurred(url: url)
-        case let .custom(id):
-            actionsViewModel.customActionOccurred(id: id)
-        }
+//        switch self {
+//        case let .selectProduct(id, groupId):
+//            withAnimation(.linear(duration: 0.0)) {
+//                productsViewModel.selectProduct(id: id, forGroupId: groupId)
+//            }
+//        case let .unselectProduct(groupId):
+//            productsViewModel.unselectProduct(forGroupId: groupId)
+//        case let .purchaseSelectedProduct(groupId, service):
+//            productsViewModel.purchaseSelectedProduct(fromGroupId: groupId, service: service)
+//        case let .purchaseProduct(productId, service):
+//            productsViewModel.purchaseProduct(id: productId, service: service)
+//        case .openWebPaywall:
+//            break
+//        case .restore:
+//            productsViewModel.restorePurchases()
+//        case let .switchSection(sectionId, index):
+//            withAnimation(.linear(duration: 0.0)) {
+//                sectionsViewModel.updateSelection(for: sectionId, index: index)
+//            }
+//        case let .openScreen(id):
+//            withAnimation(.linear(duration: 0.3)) {
+//                screensViewModel.presentScreen(id: id)
+//            }
+//        case .closeScreen:
+//            screensViewModel.dismissScreen(id: screenId)
+//        case .close:
+//            actionsViewModel.closeActionOccurred()
+//        case let .openUrl(url):
+//            actionsViewModel.openUrlActionOccurred(url: url)
+//        case let .custom(id):
+//            actionsViewModel.customActionOccurred(id: id)
+//        }
     }
 }
 

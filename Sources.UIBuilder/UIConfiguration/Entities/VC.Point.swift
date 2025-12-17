@@ -19,23 +19,3 @@ package extension VC.Point {
         x == 0.0 && y == 0.0
     }
 }
-
-package extension VC.Point {
-    static let zero = Self(x: 0.0, y: 0.0)
-    static let one = Self(x: 1.0, y: 1.0)
-    static let center = Self(x: 0.5, y: 0.5)
-}
-
-#if DEBUG
-package extension VC.Point {
-    static func create(
-        x: Double = 0.0,
-        y: Double = 0.0
-    ) -> Self {
-        .init(
-            x: x,
-            y: y
-        )
-    }
-}
-#endif

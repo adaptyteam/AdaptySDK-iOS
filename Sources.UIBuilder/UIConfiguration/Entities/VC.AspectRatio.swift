@@ -15,6 +15,4 @@ package extension VC {
     }
 }
 
-extension VC.AspectRatio {
-    static let `default`: Self = .fit
-}
+

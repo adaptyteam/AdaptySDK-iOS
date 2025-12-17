@@ -29,7 +29,3 @@ package extension VC.Background {
         }
     }
 }
-
-extension VC.Background {
-    static let `default` = Self.filling(.same(.default))
-}

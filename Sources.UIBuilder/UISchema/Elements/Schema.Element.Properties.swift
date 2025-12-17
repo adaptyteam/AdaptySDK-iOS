@@ -31,7 +31,11 @@ extension Schema.Element.Properties {
 }
 
 extension Schema.Element.Properties {
-    static let `default` = VC.Element.Properties.default
+    static let `default` = (
+        padding: VC.EdgeInsets.zero,
+        offset: VC.Offset.zero,
+        opacity: 1.0
+    )
 }
 
 extension Schema.Localizer {

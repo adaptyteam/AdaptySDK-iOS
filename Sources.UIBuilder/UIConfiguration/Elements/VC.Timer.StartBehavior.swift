@@ -15,7 +15,3 @@ package extension VC.Timer {
         case custom
     }
 }
-
-extension VC.Timer.StartBehavior {
-    static let `default` = Self.firstAppear
-}

@@ -23,6 +23,10 @@ extension Schema {
     }
 }
 
+extension VC.Timer.StartBehavior {
+    static let `default` = Self.firstAppear
+}
+
 extension Schema.Localizer {
     func timer(_ from: Schema.Timer) -> VC.Timer {
         .init(
@@ -39,7 +43,7 @@ extension Schema.Localizer {
                     value: value
                 )
             },
-            actions: from.actions.map(action),
+            actions: from.actions,
             horizontalAlign: from.horizontalAlign
         )
     }

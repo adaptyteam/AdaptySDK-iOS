@@ -18,7 +18,13 @@ extension Schema {
 }
 
 extension Schema.Stack {
-    static let `default` = VC.Stack.default
+    static let `default` = Self(
+        type: .vertical,
+        horizontalAlignment: .center,
+        verticalAlignment: .center,
+        spacing: 0,
+        items: []
+    )
 }
 
 extension Schema.Localizer {

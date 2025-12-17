@@ -11,6 +11,10 @@ extension Schema {
     typealias ShapeType = VC.ShapeType
 }
 
+extension Schema.ShapeType {
+    static let `default` = Self.rectangle(cornerRadius: .zero)
+}
+
 extension Schema.ShapeType: Codable {
     enum Types: String {
         case circle

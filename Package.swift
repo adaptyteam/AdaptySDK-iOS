@@ -39,7 +39,7 @@ let package = Package(
         .library(
             name: "AdaptyPlugin",
             targets: ["AdaptyPlugin"]
-        )
+        ),
     ],
     targets: [
         .target(
@@ -52,7 +52,7 @@ let package = Package(
             dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder",
             exclude: [
-                "adapty.ui.schema.yaml"
+                "adapty.uibuilder.schema.yaml"
             ]
         ),
         .target(
@@ -95,7 +95,7 @@ let package = Package(
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),
-                .process("Placements/fallback_large.json")
+                .process("Placements/fallback_large.json"),
             ]
         ),
     ]

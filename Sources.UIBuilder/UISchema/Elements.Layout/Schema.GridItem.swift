@@ -17,7 +17,10 @@ extension Schema {
 }
 
 extension Schema.GridItem {
-    static let `default` = VC.GridItem.default
+    static let `default` = (
+        horizontalAlignment: VC.HorizontalAlignment.center,
+        verticalAlignment: VC.VerticalAlignment.center
+    )
 }
 
 extension Schema.Localizer {

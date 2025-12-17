@@ -11,6 +11,10 @@ extension Schema {
     typealias EdgeInsets = VC.EdgeInsets
 }
 
+package extension Schema.EdgeInsets {
+    static let zero = Self(same: .zero)
+}
+
 extension Schema.EdgeInsets: Codable {
     enum CodingKeys: String, CodingKey {
         case top

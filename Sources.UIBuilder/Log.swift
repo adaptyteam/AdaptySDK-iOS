@@ -25,4 +25,10 @@ enum Log {
     static let ui = Category(name: "ui")
     static let cache = Category(name: "AdaptyMediaCache")
     static let prefetcher = Category(name: "ImageUrlPrefetcher")
+    
+    static let viewState = Category(name: "viewState")
+    static let viewConfiguration = Category(name: "viewConfiguration")
+    static let viewSchema = Category(name: "viewSchema")
+    static let js = Category(name: "js")
+
 }

@@ -11,6 +11,14 @@ extension Schema {
     typealias TransitionSlide = VC.TransitionSlide
 }
 
+extension Schema.TransitionSlide {
+    static let `default` = Self(
+        startDelay: 0.0,
+        duration: 0.3,
+        interpolator: VC.Animation.Interpolator.default
+    )
+}
+
 extension Schema.TransitionSlide: Codable {
     enum CodingKeys: String, CodingKey {
         case type

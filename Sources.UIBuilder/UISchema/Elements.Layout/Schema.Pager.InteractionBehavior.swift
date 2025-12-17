@@ -11,6 +11,10 @@ extension Schema.Pager {
     typealias InteractionBehavior = VC.Pager.InteractionBehavior
 }
 
+extension Schema.Pager.InteractionBehavior {
+    static let `default` = Self.pauseAnimation
+}
+
 extension Schema.Pager.InteractionBehavior: RawRepresentable {
     private enum Key {
         static let none = "none"

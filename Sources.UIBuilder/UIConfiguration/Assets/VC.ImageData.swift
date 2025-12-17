@@ -30,22 +30,3 @@ extension VC.ImageData {
         }
     }
 }
-
-#if DEBUG
-package extension VC.ImageData {
-    static func create(
-        customId: String? = nil,
-        rasterData: Data
-    ) -> Self {
-        .raster(customId: customId, rasterData)
-    }
-
-    static func create(
-        customId: String? = nil,
-        url: URL,
-        previewRasterData: Data? = nil
-    ) -> Self {
-        .url(customId: customId, url, previewRaster: previewRasterData)
-    }
-}
-#endif

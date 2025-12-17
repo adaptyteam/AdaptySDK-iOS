@@ -13,17 +13,3 @@ package extension VC.Animation {
         package let end: T
     }
 }
-
-#if DEBUG
-package extension VC.Animation.Range {
-    static func create(
-        start: T,
-        end: T
-    ) -> Self {
-        .init(
-            start: start,
-            end: end
-        )
-    }
-}
-#endif

@@ -39,31 +39,3 @@ extension VC.EdgeInsets {
             && (top == trailing)
     }
 }
-
-package extension VC.EdgeInsets {
-    static let zero = Self(same: .zero)
-}
-
-#if DEBUG
-package extension VC.EdgeInsets {
-    static func create(
-        same: VC.Unit = .zero
-    ) -> Self {
-        .init(same: same)
-    }
-
-    static func create(
-        leading: VC.Unit = .zero,
-        top: VC.Unit = .zero,
-        trailing: VC.Unit = .zero,
-        bottom: VC.Unit = .zero
-    ) -> Self {
-        .init(
-            leading: leading,
-            top: top,
-            trailing: trailing,
-            bottom: bottom
-        )
-    }
-}
-#endif

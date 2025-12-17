@@ -12,6 +12,18 @@ extension Schema {
 }
 
 extension Schema.Font {
+    static let `default` = Self(
+        customId: nil,
+        alias: "adapty_system",
+        familyName: "adapty_system",
+        weight: 400,
+        italic: false,
+        defaultSize: 15,
+        defaultColor: .solidColor(.black)
+    )
+}
+
+extension Schema.Font {
     static let assetType = "font"
 
     static func assetType(_ type: String) -> Bool {

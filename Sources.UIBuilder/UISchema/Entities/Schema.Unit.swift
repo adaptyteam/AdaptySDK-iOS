@@ -9,6 +9,10 @@ extension Schema {
     typealias Unit = VC.Unit
 }
 
+package extension Schema.Unit {
+    static let zero = Self.point(0.0)
+}
+
 extension Schema.Unit: Codable {
     enum CodingKeys: String, CodingKey {
         case value

@@ -2,29 +2,11 @@ $schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://adapty.io/ui/4_8_0/schema"
 title: "AdaptyUI Configuration"
 type: object
-required: [format, template_id, template_revision, screens]
+required: [format, screens, script]
 properties:
   format:
     type: string
-    const: "4.4.1-SNAPSHOT"
-  template_id:
-    title: "Visual template id"
-    type: string
-  template_revision:
-    title: "Visual template version"
-    type: integer
-    minimum: 0
-  products:
-    type: object
-    required: [selected]
-    properties:
-      selected:
-        oneOf:
-          - type: string
-            description: "Adapty product id, selected in group_A"
-          - type: object
-            additionalProperties: { type: string }
-            description: "key is group id, value is Adapty product id"
+    const: "5.0.0-SNAPSHOT"
   assets:
     title: "Default assets"
     $ref: "#/$defs/Assets"
@@ -37,6 +19,11 @@ properties:
     $ref: "#/$defs/UI.TemplatesCollection"
   screens: # from v4.8.0
     $ref: "#/$defs/UI"
+  script: # from v4.8.0
+    type: object
+    required: [content]
+    properties:
+      content: { type: string }
 
 $defs:
   ###### Common Types ######

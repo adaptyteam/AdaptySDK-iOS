@@ -49,11 +49,12 @@ extension Schema.TextAttributes? {
     var nonEmptyOrNil: Self { self?.nonEmptyOrNil }
 }
 
+extension VC.RichText {
+    static let empty = Self(items: [], fallback: nil)
+}
+
 extension Schema.Localizer {
-    func urlIfPresent(_ stringId: String?) -> String? {
-        guard let stringId, let item = localization?.strings?[stringId] else { return nil }
-        return item.value.asString ?? item.fallback?.asString
-    }
+   
 
     func richText(
         stringId: String,

@@ -22,8 +22,8 @@ extension Schema.Localizer {
         .init(
             shapeType: from.shapeType,
             background: from.backgroundAssetId.flatMap { try? background($0) },
-            border: from.borderAssetId.map { (try? filling($0)) ?? VC.Border.default.filling }.map {
-                VC.Border(filling: $0, thickness: from.borderThickness ?? VC.Border.default.thickness)
+            border: from.borderAssetId.map { (try? filling($0)) ?? Schema.Border.default.filling }.map {
+                VC.Border(filling: $0, thickness: from.borderThickness ?? Schema.Border.default.thickness)
             },
             shadow: from.shadow.flatMap { try? shadow($0) }
         )

@@ -14,19 +14,3 @@ package extension VC {
         package let loop: Bool
     }
 }
-
-#if DEBUG
-package extension VC.VideoPlayer {
-    static func create(
-        asset: VC.Mode<VC.VideoData>,
-        aspect: VC.AspectRatio = .default,
-        loop: Bool = true
-    ) -> Self {
-        .init(
-            asset: asset,
-            aspect: aspect,
-            loop: loop
-        )
-    }
-}
-#endif

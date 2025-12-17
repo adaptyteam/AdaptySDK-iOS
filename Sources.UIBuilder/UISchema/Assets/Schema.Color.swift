@@ -12,6 +12,13 @@ extension Schema {
 }
 
 extension Schema.Color {
+    static let transparent = Self(customId: nil, data: 0x00000000)
+    static let white = Self(customId: nil, data: 0xFFFFFFFF)
+    static let lightGray = Self(customId: nil, data: 0xD3D3D3FF)
+    static let black = Self(customId: nil, data: 0x000000FF)
+}
+
+extension Schema.Color {
     static let assetType = "color"
 
     static func assetType(_ type: String) -> Bool {

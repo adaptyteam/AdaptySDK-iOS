@@ -16,6 +16,3 @@ package extension VC {
     }
 }
 
-extension VC.ShapeType {
-    static let `default` = Self.rectangle(cornerRadius: .zero)
-}

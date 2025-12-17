@@ -11,6 +11,12 @@ extension Schema {
     typealias Point = VC.Point
 }
 
+package extension Schema.Point {
+    static let zero = Self(x: 0.0, y: 0.0)
+    static let one = Self(x: 1.0, y: 1.0)
+    static let center = Self(x: 0.5, y: 0.5)
+}
+
 extension Schema.Point: Codable {
     enum CodingKeys: String, CodingKey {
         case x

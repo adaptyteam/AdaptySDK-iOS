@@ -15,21 +15,3 @@ package extension VC {
         package let shadow: Shadow?
     }
 }
-
-#if DEBUG
-package extension VC.Decorator {
-    static func create(
-        shapeType: VC.ShapeType = .default,
-        background: VC.Background? = nil,
-        border: VC.Border? = nil,
-        shadow: VC.Shadow? = nil
-    ) -> Self {
-        .init(
-            shapeType: shapeType,
-            background: background,
-            border: border,
-            shadow: shadow
-        )
-    }
-}
-#endif

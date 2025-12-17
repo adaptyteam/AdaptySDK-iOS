@@ -9,6 +9,11 @@ extension Schema {
     typealias Offset = VC.Offset
 }
 
+package extension Schema.Offset {
+    static let zero = Self(x: .zero, y: .zero)
+    static let one = Self(x: .point(1.0), y: .point(1.0))
+}
+
 extension Schema.Offset: Codable {
     enum CodingKeys: String, CodingKey {
         case x

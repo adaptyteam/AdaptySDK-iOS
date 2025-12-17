@@ -16,7 +16,6 @@ extension Schema {
 
 extension Schema.StringId {
     struct Product: Sendable, Hashable {
-        static let defaultProductGroupId = "group_A"
         let adaptyProductId: String?
         let productGroupId: String?
         let suffix: String?

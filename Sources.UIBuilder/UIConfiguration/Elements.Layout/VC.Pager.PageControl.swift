@@ -18,39 +18,3 @@ package extension VC.Pager {
         package let selectedColor: VC.Mode<VC.Color>
     }
 }
-
-extension VC.Pager.PageControl {
-    static let `default`: Self = Self(
-        layout: .stacked,
-        verticalAlignment: .bottom,
-        padding: .init(same: .point(6)),
-        dotSize: 6,
-        spacing: 6,
-        color: .same(VC.Color.white),
-        selectedColor: .same(.lightGray)
-    )
-}
-
-#if DEBUG
-package extension VC.Pager.PageControl {
-    static func create(
-        layout: Layout = `default`.layout,
-        verticalAlignment: VC.VerticalAlignment = `default`.verticalAlignment,
-        padding: VC.EdgeInsets = `default`.padding,
-        dotSize: Double = `default`.dotSize,
-        spacing: Double = `default`.spacing,
-        color: VC.Mode<VC.Color> = `default`.color,
-        selectedColor: VC.Mode<VC.Color> = `default`.selectedColor
-    ) -> Self {
-        .init(
-            layout: layout,
-            verticalAlignment: verticalAlignment,
-            padding: padding,
-            dotSize: dotSize,
-            spacing: spacing,
-            color: color,
-            selectedColor: selectedColor
-        )
-    }
-}
-#endif

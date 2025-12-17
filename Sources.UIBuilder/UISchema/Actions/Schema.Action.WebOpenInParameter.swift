@@ -5,9 +5,7 @@
 //  Created by Aleksei Valiano on 19.11.2025.
 //
 
-extension Schema.Action {
-    typealias WebOpenInParameter = VC.Action.WebOpenInParameter
-}
+import Foundation
 
 extension Schema.Action.WebOpenInParameter: RawRepresentable {
     private enum Key {

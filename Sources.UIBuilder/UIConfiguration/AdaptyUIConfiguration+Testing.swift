@@ -7,39 +7,26 @@
 
 import Foundation
 
-#if DEBUG
 package extension AdaptyUIConfiguration {
     static func create(
-        formatVersion: AdaptyUISchema.Version = AdaptyUISchema.formatVersion,
-        templateId: String = "transparent",
-        locale: LocaleId = AdaptyUISchema.defaultLocaleId,
-        isRightToLeft: Bool = false,
-        images: [String] = [],
-        colors: [String: Filling] = [:],
-        strings: [String: [String]] = [:],
-        templatesCollection: String? = nil,
-        content: String,
-        selectedProducts: [String: String] = [:]
+        templateId: String,
+        assets: String,
+        localization: String,
+        templates templatesCollection: String? = nil,
+        content: String
     ) throws -> Self {
+        let formatVersion = AdaptyUISchema.formatVersion
         let configuration = Schema.DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion)
-
-        let colors = colors
-            .mapValues { Schema.Asset.filling($0) }
-
-        let assets = Dictionary(
-            images.map { ($0, Schema.Asset.image(
-                .url(
-                    customId: $0,
-                    URL(string: "https://unknown.image.com")!,
-                    previewRaster: nil
-                )
-            )) }
-        ) { current, _ in current }
-            .merging(colors) { current, _ in current }
-
         let jsonDecoder = JSONDecoder()
 
         let dataContent = content.data(using: .utf8) ?? Data()
+        let dataAssets = assets.data(using: .utf8)  ?? Data()
+        let dataLocalization = localization.data(using: .utf8)  ?? Data()
+
+        let assets =  try jsonDecoder.decode(Schema.AssetsContainer.self, from: dataAssets)
+
+        let localiation = try jsonDecoder.decode(Schema.Localization.self, from: dataLocalization)
+        
         let screen =
             if let element = try? jsonDecoder.decode(Schema.Element.self, from: dataContent, with: configuration) {
                 Schema.Screen(
@@ -66,35 +53,18 @@ package extension AdaptyUIConfiguration {
             templatesCollection: templatesCollection,
             screens: scrrens
         )
-
+        
         let schema = AdaptyUISchema(
             formatVersion: formatVersion,
             templateId: templateId,
-            templateRevision: 0,
-            assets: assets,
-            localizations: [locale: .init(
-                id: locale,
-                isRightToLeft: isRightToLeft,
-                strings: strings.mapValues { items in
-                    .init(value: .init(items: items.map {
-                        var v = $0
-                        return if v.remove(at: v.startIndex) == "#" {
-                            .tag(v, nil)
-                        } else {
-                            .text($0, nil)
-                        }
-                    }), fallback: nil)
-                },
-                assets: nil
-            )],
-            defaultLocalization: nil,
+            assets: assets.value,
+            localizations: [localiation.id: localiation],
+            defaultLocalization: localiation,
             defaultScreen: screen,
             screens: scrrens,
-            templates: templates,
-            selectedProducts: selectedProducts
+            templates: templates
         )
 
-        return try schema.extractUIConfiguration(withLocaleId: locale)
+        return try schema.extractUIConfiguration(withLocaleId: localiation.id)
     }
 }
-#endif

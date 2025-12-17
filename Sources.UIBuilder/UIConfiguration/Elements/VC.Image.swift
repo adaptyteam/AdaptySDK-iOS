@@ -14,19 +14,3 @@ package extension VC {
         package let tint: Mode<Filling>?
     }
 }
-
-#if DEBUG
-package extension VC.Image {
-    static func create(
-        asset: VC.Mode<VC.ImageData>,
-        aspect: VC.AspectRatio = .default,
-        tint: VC.Mode<VC.Filling>? = nil
-    ) -> Self {
-        .init(
-            asset: asset,
-            aspect: aspect,
-            tint: tint
-        )
-    }
-}
-#endif

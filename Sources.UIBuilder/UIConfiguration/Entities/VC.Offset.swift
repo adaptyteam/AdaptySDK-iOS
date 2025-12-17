@@ -19,22 +19,3 @@ package extension VC.Offset {
         x.isZero && y.isZero
     }
 }
-
-package extension VC.Offset {
-    static let zero = Self(x: .zero, y: .zero)
-    static let one = Self(x: .point(1.0), y: .point(1.0))
-}
-
-#if DEBUG
-package extension VC.Offset {
-    static func create(
-        x: VC.Unit = .zero,
-        y: VC.Unit = .zero
-    ) -> Self {
-        .init(
-            x: x,
-            y: y
-        )
-    }
-}
-#endif

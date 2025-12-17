@@ -60,7 +60,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         self.paywallViewModel = paywallViewModel
 
         paywallProducts = products
-        selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
+        selectedProductsIds = [:] // TODO: use JS
     }
 
     private var groupIdsForAutoNotification = Set<String>()
@@ -69,7 +69,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         Log.ui.verbose("#\(logId)# resetSelectedProducts")
 
         groupIdsForAutoNotification.removeAll()
-        selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
+        selectedProductsIds = [:] // TODO: use JS
     }
 
     package func loadProductsIfNeeded() {

@@ -39,31 +39,3 @@ extension VC.CornerRadius {
             && (topLeading == bottomLeading)
     }
 }
-
-package extension VC.CornerRadius {
-    static let zero = Self(same: .zero)
-}
-
-#if DEBUG
-package extension VC.CornerRadius {
-    static func create(
-        same: Double = .zero
-    ) -> Self {
-        .init(same: same)
-    }
-
-    static func create(
-        topLeading: Double = .zero,
-        topTrailing: Double = .zero,
-        bottomTrailing: Double = .zero,
-        bottomLeading: Double = .zero
-    ) -> Self {
-        .init(
-            topLeading: topLeading,
-            topTrailing: topTrailing,
-            bottomTrailing: bottomTrailing,
-            bottomLeading: bottomLeading
-        )
-    }
-}
-#endif

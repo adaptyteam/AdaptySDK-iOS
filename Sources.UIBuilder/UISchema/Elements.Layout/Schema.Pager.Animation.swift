@@ -11,6 +11,13 @@ extension Schema.Pager {
     typealias Animation = VC.Pager.Animation
 }
 
+extension Schema.Pager.Animation {
+    static let `default` = (
+        startDelay: 0.0,
+        afterInteractionDelay: 3.0
+    )
+}
+
 extension Schema.Pager.Animation: Codable {
     enum CodingKeys: String, CodingKey {
         case startDelay = "start_delay"

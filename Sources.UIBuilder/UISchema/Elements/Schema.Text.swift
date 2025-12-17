@@ -37,7 +37,7 @@ extension Schema.Localizer {
                     ))
                 } else {
                     .selectedProductText(VC.LazyLocalizedUnknownProductText(
-                        productGroupId: info.productGroupId ?? Schema.StringId.Product.defaultProductGroupId,
+                        productGroupId: info.productGroupId ?? "group_A",
                         suffix: info.suffix,
                         localizer: self,
                         defaultTextAttributes: textBlock.defaultTextAttributes

@@ -11,6 +11,10 @@ extension Schema {
     typealias CornerRadius = VC.CornerRadius
 }
 
+package extension Schema.CornerRadius {
+    static let zero = Self(same: .zero)
+}
+
 extension Schema.CornerRadius: Codable {
     enum CodingKeys: String, CodingKey {
         case topLeading = "top_leading"

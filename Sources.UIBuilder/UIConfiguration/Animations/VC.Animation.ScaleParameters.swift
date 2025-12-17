@@ -13,17 +13,3 @@ package extension VC.Animation {
         package let anchor: VC.Point
     }
 }
-
-#if DEBUG
-package extension VC.Animation.ScaleParameters {
-    static func create(
-        scale: VC.Animation.Range<VC.Point>,
-        anchor: VC.Point = .center
-    ) -> Self {
-        .init(
-            scale: scale,
-            anchor: anchor
-        )
-    }
-}
-#endif

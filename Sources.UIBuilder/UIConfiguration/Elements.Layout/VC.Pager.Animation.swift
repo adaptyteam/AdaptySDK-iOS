@@ -15,28 +15,3 @@ package extension VC.Pager {
         package let afterInteractionDelay: TimeInterval
     }
 }
-
-extension VC.Pager.Animation {
-    static let `default` = (
-        startDelay: 0.0,
-        afterInteractionDelay: 3.0
-    )
-}
-
-#if DEBUG
-package extension VC.Pager.Animation {
-    static func create(
-        startDelay: TimeInterval = `default`.startDelay,
-        pageTransition: VC.TransitionSlide = .create(),
-        repeatTransition: VC.TransitionSlide? = nil,
-        afterInteractionDelay: TimeInterval = `default`.afterInteractionDelay
-    ) -> Self {
-        .init(
-            startDelay: startDelay,
-            pageTransition: pageTransition,
-            repeatTransition: repeatTransition,
-            afterInteractionDelay: afterInteractionDelay
-        )
-    }
-}
-#endif

@@ -18,39 +18,3 @@ package extension VC.Animation {
         package let loopCount: Int?
     }
 }
-
-extension VC.Animation.Timeline {
-    static let `default` = Self(
-        duration: 0.3,
-        interpolator: .default,
-        startDelay: 0.0,
-        loop: nil,
-        loopDelay: 0.0,
-        pingPongDelay: 0.0,
-        loopCount: nil
-    )
-}
-
-#if DEBUG
-package extension VC.Animation.Timeline {
-    static func create(
-        startDelay: TimeInterval = Self.default.startDelay,
-        duration: TimeInterval = Self.default.duration,
-        interpolator: VC.Animation.Interpolator = Self.default.interpolator,
-        loop: Loop? = Self.default.loop,
-        loopDelay: TimeInterval = Self.default.loopDelay,
-        pingPongDelay: TimeInterval = Self.default.pingPongDelay,
-        loopCount: Int? = Self.default.loopCount
-    ) -> Self {
-        .init(
-            duration: duration,
-            interpolator: interpolator,
-            startDelay: startDelay,
-            loop: loop,
-            loopDelay: loopDelay,
-            pingPongDelay: pingPongDelay,
-            loopCount: loopCount
-        )
-    }
-}
-#endif

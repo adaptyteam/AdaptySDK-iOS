@@ -20,7 +20,15 @@ extension Schema.Pager {
 }
 
 extension Schema.Pager.PageControl {
-    static let `default` = VC.Pager.PageControl.default
+    static let `default` = VC.Pager.PageControl(
+        layout: .stacked,
+        verticalAlignment: .bottom,
+        padding: .init(same: .point(6)),
+        dotSize: 6,
+        spacing: 6,
+        color: .same(.white),
+        selectedColor: .same(.lightGray)
+    )
 }
 
 extension Schema.Localizer {
@@ -31,8 +39,8 @@ extension Schema.Localizer {
             padding: from.padding,
             dotSize: from.dotSize,
             spacing: from.spacing,
-            color: from.colorAssetId.flatMap { try? color($0) } ?? VC.Pager.PageControl.default.color,
-            selectedColor: from.selectedColorAssetId.flatMap { try? color($0) } ?? VC.Pager.PageControl.default.selectedColor
+            color: from.colorAssetId.flatMap { try? color($0) } ?? Schema.Pager.PageControl.default.color,
+            selectedColor: from.selectedColorAssetId.flatMap { try? color($0) } ?? Schema.Pager.PageControl.default.selectedColor
         )
     }
 }

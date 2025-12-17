@@ -13,17 +13,3 @@ package extension VC.Animation {
         package let anchor: VC.Point
     }
 }
-
-#if DEBUG
-package extension VC.Animation.RotationParameters {
-    static func create(
-        angle: VC.Animation.Range<Double>,
-        anchor: VC.Point = .center
-    ) -> Self {
-        .init(
-            angle: angle,
-            anchor: anchor
-        )
-    }
-}
-#endif

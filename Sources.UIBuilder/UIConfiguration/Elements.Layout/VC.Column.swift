@@ -13,17 +13,3 @@ package extension VC {
         package let items: [GridItem]
     }
 }
-
-#if DEBUG
-package extension VC.Column {
-    static func create(
-        spacing: Double = 0,
-        items: [VC.GridItem]
-    ) -> Self {
-        .init(
-            spacing: spacing,
-            items: items
-        )
-    }
-}
-#endif

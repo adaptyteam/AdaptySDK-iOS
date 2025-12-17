@@ -13,7 +13,3 @@ package extension VC.Pager {
         case parent(Double)
     }
 }
-
-extension VC.Pager.Length {
-    static let `default` = Self.parent(1)
-}

@@ -13,17 +13,3 @@ package extension VC.Timer {
         package let value: VC.RichText
     }
 }
-
-#if DEBUG
-package extension VC.Timer.Item {
-    static func create(
-        from: TimeInterval,
-        value: VC.RichText
-    ) -> Self {
-        .init(
-            from: from,
-            value: value
-        )
-    }
-}
-#endif

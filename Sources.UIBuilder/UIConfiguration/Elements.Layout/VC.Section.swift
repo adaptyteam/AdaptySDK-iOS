@@ -14,19 +14,3 @@ package extension VC {
         package let content: [Element]
     }
 }
-
-#if DEBUG
-package extension VC.Section {
-    static func create(
-        id: String = UUID().uuidString,
-        index: Int = 0,
-        content: [VC.Element]
-    ) -> Self {
-        .init(
-            id: id,
-            index: index,
-            content: content
-        )
-    }
-}
-#endif

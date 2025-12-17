@@ -21,7 +21,16 @@ extension Schema {
 }
 
 extension Schema.Pager {
-    static let `default` = VC.Pager.default
+    static let `default` = Self(
+        pageWidth: .default,
+        pageHeight: .default,
+        pagePadding: .zero,
+        spacing: 0,
+        content: [],
+        pageControl: nil,
+        animation: nil,
+        interactionBehavior: .default
+    )
 }
 
 extension Schema.Localizer {

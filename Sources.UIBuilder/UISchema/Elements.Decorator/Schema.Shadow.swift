@@ -17,13 +17,16 @@ extension Schema {
 }
 
 extension Schema.Shadow {
-    static let `default` = VC.Shadow.default
+    static let `default` = (
+        blurRadius: 0.0,
+        offset: Schema.Offset.zero
+    )
 }
 
 extension Schema.Localizer {
     func shadow(_ from: Schema.Shadow) throws -> VC.Shadow {
         .init(
-            filling: (try? filling(from.colorAssetId)) ?? VC.Shadow.default.filling,
+            filling: (try? filling(from.colorAssetId)) ?? .same(Schema.Filling.transparent),
             blurRadius: from.blurRadius,
             offset: from.offset
         )
@@ -45,7 +48,7 @@ extension Schema.Shadow: Decodable {
             blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius)
                 ?? Schema.Shadow.default.blurRadius,
             offset: container.decodeIfPresent(VC.Offset.self, forKey: .offset)
-                ?? VC.Shadow.default.offset
+                ?? Schema.Shadow.default.offset
         )
     }
 }

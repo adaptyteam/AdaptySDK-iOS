@@ -11,6 +11,10 @@ extension Schema {
     typealias AspectRatio = VC.AspectRatio
 }
 
+extension Schema.AspectRatio {
+    static let `default`: Self = .fit
+}
+
 extension Schema.AspectRatio: RawRepresentable {
     private enum Key {
         static let fit = "fit"

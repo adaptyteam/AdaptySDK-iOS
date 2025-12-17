@@ -14,19 +14,3 @@ package extension VC.Animation {
         package let offset: Range<VC.Offset>?
     }
 }
-
-#if DEBUG
-package extension VC.Animation.ShadowParameters {
-    static func create(
-        color: VC.Animation.Range<VC.Mode<VC.Filling>>? = nil,
-        blurRadius: VC.Animation.Range<Double>? = nil,
-        offset: VC.Animation.Range<VC.Offset>? = nil
-    ) -> Self {
-        .init(
-            color: color,
-            blurRadius: blurRadius,
-            offset: offset
-        )
-    }
-}
-#endif

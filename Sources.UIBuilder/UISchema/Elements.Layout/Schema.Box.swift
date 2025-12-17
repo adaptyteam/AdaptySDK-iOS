@@ -18,7 +18,10 @@ extension Schema {
 }
 
 extension Schema.Box {
-    static let `default` = VC.Box.default
+    static let `default` = (
+        horizontalAlignment: VC.HorizontalAlignment.center,
+        verticalAlignment: VC.VerticalAlignment.center
+    )
 }
 
 extension Schema.Localizer {

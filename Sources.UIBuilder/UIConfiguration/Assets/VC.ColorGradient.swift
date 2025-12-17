@@ -16,23 +16,3 @@ package extension VC {
         package let items: [Item]
     }
 }
-
-#if DEBUG
-package extension VC.ColorGradient {
-    static func create(
-        customId: String? = nil,
-        kind: Kind,
-        start: VC.Point,
-        end: VC.Point,
-        items: [Item]
-    ) -> Self {
-        .init(
-            customId: customId,
-            kind: kind,
-            start: start,
-            end: end,
-            items: items
-        )
-    }
-}
-#endif

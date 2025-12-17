@@ -9,6 +9,10 @@ extension Schema.Animation {
     typealias Interpolator = VC.Animation.Interpolator
 }
 
+extension Schema.Animation.Interpolator {
+    static let `default` = Self.easeInOut
+}
+
 extension Schema.Animation.Interpolator: Codable {
     enum Values: String {
         case easeInOut = "ease_in_out"

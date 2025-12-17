@@ -17,29 +17,4 @@ package extension VC {
     }
 }
 
-extension VC.Box {
-    static let `default` = (
-        horizontalAlignment: VC.HorizontalAlignment.center,
-        verticalAlignment: VC.VerticalAlignment.center
-    )
-}
 
-#if DEBUG
-package extension VC.Box {
-    static func create(
-        width: Length? = nil,
-        height: Length? = nil,
-        horizontalAlignment: VC.HorizontalAlignment = `default`.horizontalAlignment,
-        verticalAlignment: VC.VerticalAlignment = `default`.verticalAlignment,
-        content: VC.Element? = nil
-    ) -> Self {
-        .init(
-            width: width,
-            height: height,
-            horizontalAlignment: horizontalAlignment,
-            verticalAlignment: verticalAlignment,
-            content: content
-        )
-    }
-}
-#endif

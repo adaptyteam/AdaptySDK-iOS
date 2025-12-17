@@ -14,118 +14,110 @@ public struct Dev_AdaptyUIConfiguration {
 
 #if DEBUG
 public extension Dev_AdaptyUIConfiguration {
+    static let `default` = (
+        assets: """
+        [
+            { "type":"image", "id":"star.fill", "custom_id":"star.fill", "url":"https://unknown.image.com" },
+            { "type":"image", "id":"beagle", "custom_id":"beagle", "url":"https://unknown.image.com" },
+            { "type":"image", "id":"close", "custom_id":"close", "url":"https://unknown.image.com" },
+            { "type":"image", "id":"coast-bg", "custom_id":"coast-bg", "url":"https://unknown.image.com" },
+            { "type":"image", "id":"coast-bg", "custom_id":"coast-bg", "url":"https://unknown.image.com" },
+            { "type":"color", "id":"$green_figma", "value": "#3EBD78FF"},
+            { "type":"color", "id":"$green_figma_cc", "value": "#3EBD78CC"},
+            { "type":"color", "id":"$black20", "value": "#01010138"},
+            { "type":"color", "id":"$black80", "value": "#010101CC"},
+            { "type":"color", "id":"$black", "value": "#000000FF"},
+            { "type":"color", "id":"$black@dark", "value": "#FFFFFFFF"},
+            { "type":"color", "id":"$white", "value": "#FFFFFFFF"},
+            { "type":"color", "id":"$white@dark", "value": "#000000FF"},
+            { "type":"color", "id":"$red", "value": "#FF0000FF"},
+            { "type":"color", "id":"$red_2", "value": "#F3227AFF"},
+            { "type":"color", "id":"$red_2_transparent", "value": "#F3227A44"},
+            { "type":"color", "id":"$green", "value": "#00FF00FF"},
+            { "type":"color", "id":"$blue", "value": "#0000FFFF"},
+            { "type":"color", "id":"$light", "value": "#F4D13BFF"},
+            { "type":"linear-gradient", "id":"$red_to_transparent_top_to_bottom", "values": [
+                    { "color": "#FF000099", "p": 0 },
+                    { "color": "#FF000000", "p": 1 }
+            ], "points": { "x0": 0.5, "y0": 0, "x1": 0.5, "y1": 1}},
+            { "type":"linear-gradient", "id":"$blue_to_transparent_top_to_bottom", "values": [
+                    { "color": "#0000FF99", "p": 0 },
+                    { "color": "#0000FF00", "p": 1 }
+            ], "points": { "x0": 0.5, "y0": 0, "x1": 0.5, "y1": 1}},
+            { "type":"linear-gradient", "id":"$green_to_transparent_top_to_bottom", "values": [
+                    { "color": "#00FF0099", "p": 0 },
+                    { "color": "#00FF0000", "p": 1 }
+            ], "points": { "x0": 0.5, "y0": 0, "x1": 0.5, "y1": 1}},
+            { "type":"linear-gradient", "id":"$yellow_to_purple_top_to_bottom", "values": [
+                    { "color": "#F9B61AFF", "p": 0 },
+                    { "color": "#8A4DECFF", "p": 1 }
+            ], "points": { "x0": 0.5, "y0": 0, "x1": 0.5, "y1": 1}},
+            { "type":"linear-gradient", "id":"$pink_to_red_top_to_bottom", "values": [
+                    { "color": "#B577BFFF", "p": 0 },
+                    { "color": "#F3227AFF", "p": 1 }
+            ], "points": { "x0": 0.5, "y0": 0, "x1": 0.5, "y1": 1}},
+            { "type":"linear-gradient", "id":"$shimmer_gradient", "values": [
+                    { "color": "#FFFFFF00", "p": 0 },
+                    { "color": "#FFFFFF00", "p": 0.35 },
+                    { "color": "#FFFFFFFF", "p": 0.5 },
+                    { "color": "#FFFFFF00", "p": 0.65 },
+                    { "color": "#FFFFFF00", "p": 1 }
+            ], "points": { "x0": 0, "y0": 1, "x1": 1, "y1": 0}}
+        ]
+        """,
+        localization: """
+        {
+            "id": "en",
+            "is_right_to_left": false,
+            "strings": [
+                { "id": "$short", "value": "Article." },
+                { "id": "$medium", "value": "Article nor prepare chicken you him now." },
+                { "id": "$long", "value": "Article nor prepare chicken you him now. Shy merits say advice ten before lovers innate add." },
+                { "id": "$timer_basic", "value": [
+                        {"tag": "TIMER_Total_Days_1"}, 
+                        {"text": "d "}, 
+                        {"tag": "TIMER_hh"}, 
+                        {"text": ":"},
+                        {"tag": "TIMER_mm"}, 
+                        {"text": ":"},
+                        {"tag": "TIMER_ss"}
+                ]},
+                { "id": "$countdown", "value": {"tag": "TIMER_Total_Seconds_1"}},
+                { "id": "$card_title", "value": "Before this app I wasn't able to do anything by myself. Now I am, wow! Highly recommend!" },
+                { "id": "$card_subtitle", "value": "App Store review" },
+                { "id": "$footer_restore", "value": "Restore Purchases" },
+                { "id": "$footer_terms", "value": "Terms & Conditions." },
+                { "id": "$footer_privacy", "value": "Privacy Policy" },
+                { "id": "$footer_support", "value": "Support" },
+                { "id": "$product_title_1", "value": "Weekly" },
+                { "id": "$product_title_2", "value": "Offer Text"},
+                { "id": "$product_title_3", "value": "$99.99"},
+                { "id": "$product_title_4", "value": "$9.99 / week"},
+                { "id": "$string_section_button_a", "value": "Section A"},
+                { "id": "$section_a_title", "value": "Selected Section A Content"},
+                { "id": "$string_section_button_b", "value": "Section B"],
+                { "id": "$section_b_title", "value": "Selected Section B Content"}
+            ]
+        }
+        """,
+        templates: String?.none,
+        templateId: "basic"
+    )
+
     static func create(
-        templateId: String = "basic",
-        locale: String = "en",
-        isRightToLeft: Bool = false,
+        templateId: String = Self.default.templateId,
+        assets: String = Self.default.assets,
+        localization: String = Self.default.localization,
+        templates: String? = Self.default.templates,
         content: String
     ) throws -> Self {
         let configuration = try AdaptyUIConfiguration.create(
             templateId: templateId,
-            locale: locale,
-            isRightToLeft: isRightToLeft,
-            images: [
-                "star.fill", "beagle", "close", "coast-bg",
-            ],
-            colors: [
-                "$green_figma": .solidColor(.create(data: 0x3EBD78FF)),
-                "$green_figma_cc": .solidColor(.create(data: 0x3EBD78CC)),
-                "$black20": .solidColor(.create(data: 0x01010138)),
-                "$black80": .solidColor(.create(data: 0x010101CC)),
-                "$black": .solidColor(.create(data: 0x000000FF)),
-                "$black@dark": .solidColor(.create(data: 0xFFFFFFFF)),
-                "$white": .solidColor(.create(data: 0xFFFFFFFF)),
-                "$white@dark": .solidColor(.create(data: 0x000000FF)),
-                "$red": .solidColor(.create(data: 0xFF0000FF)),
-                "$red_2": .solidColor(.create(data: 0xF3227AFF)),
-                "$red_2_transparent": .solidColor(.create(data: 0xF3227A44)),
-                "$green": .solidColor(.create(data: 0x00FF00FF)),
-                "$blue": .solidColor(.create(data: 0x0000FFFF)),
-                "$light": .solidColor(.create(data: 0xF4D13BFF)),
-                "$red_to_transparent_top_to_bottom": .colorGradient(.create(
-                    kind: .linear,
-                    start: .create(x: 0.5, y: 0.0),
-                    end: .create(x: 0.5, y: 1.0),
-                    items: [
-                        .create(color: .create(data: 0xFF000099), p: 0.0),
-                        .create(color: .create(data: 0xFF000000), p: 1.0),
-                    ]
-                )),
-                "$blue_to_transparent_top_to_bottom": .colorGradient(.create(
-                    kind: .linear,
-                    start: .create(x: 0.5, y: 0.0),
-                    end: .create(x: 0.5, y: 1.0),
-                    items: [
-                        .create(color: .create(data: 0x0000FF99), p: 0.0),
-                        .create(color: .create(data: 0x0000FF00), p: 1.0),
-                    ]
-                )),
-                "$green_to_transparent_top_to_bottom": .colorGradient(.create(
-                    kind: .linear,
-                    start: .create(x: 0.5, y: 0.0),
-                    end: .create(x: 0.5, y: 1.0),
-                    items: [
-                        .create(color: .create(data: 0x00FF0099), p: 0.0),
-                        .create(color: .create(data: 0x00FF0000), p: 1.0),
-                    ]
-                )),
-                "$yellow_to_purple_top_to_bottom": .colorGradient(.create(
-                    kind: .linear,
-                    start: .create(x: 0.5, y: 0.0),
-                    end: .create(x: 0.5, y: 1.0),
-                    items: [
-                        .create(color: .create(data: 0xF9B61AFF), p: 0.0),
-                        .create(color: .create(data: 0x8A4DECFF), p: 1.0),
-                    ]
-                )),
-                "$pink_to_red_top_to_bottom": .colorGradient(.create(
-                    kind: .linear,
-                    start: .create(x: 0.5, y: 0.0),
-                    end: .create(x: 0.5, y: 1.0),
-                    items: [
-                        .create(color: .create(data: 0xB577BFFF), p: 0.0),
-                        .create(color: .create(data: 0xF3227AFF), p: 1.0),
-                    ]
-                )),
-                "$shimmer_gradient": .colorGradient(.create(
-                    kind: .linear,
-                    start: .create(x: 0.0, y: 1.0),
-                    end: .create(x: 1.0, y: 0.0),
-                    items: [
-                        .create(color: .create(data: 0xFFFFFF00), p: 0.0),
-                        .create(color: .create(data: 0xFFFFFF00), p: 0.35),
-                        .create(color: .create(data: 0xFFFFFFFF), p: 0.5),
-                        .create(color: .create(data: 0xFFFFFF00), p: 0.65),
-                        .create(color: .create(data: 0xFFFFFF00), p: 1.0),
-                    ]
-                )),
-            ],
-            strings: [
-                "$short": ["Article."],
-                "$medium": ["Article nor prepare chicken you him now."],
-                "$long": ["Article nor prepare chicken you him now. Shy merits say advice ten before lovers innate add. "],
-                "$timer_basic": ["#TIMER_Total_Days_1", "d ", "#TIMER_hh", ":", "#TIMER_mm", ":", "#TIMER_ss"],
-                "$countdown": ["#TIMER_Total_Seconds_1"],
-                "$card_title": ["Before this app I wasn't able to do anything by myself. Now I am, wow! Highly recommend!"],
-                "$card_subtitle": ["App Store review"],
-                "$footer_restore": ["Restore Purchases"],
-                "$footer_terms": ["Terms & Conditions"],
-                "$footer_privacy": ["Privacy Policy"],
-                "$footer_support": ["Support"],
-
-                "$product_title_1": ["Weekly"],
-                "$product_title_2": ["Offer Text"],
-                "$product_title_3": ["$99.99"],
-                "$product_title_4": ["$9.99 / week"],
-
-                "$string_section_button_a": ["Section A"],
-                "$section_a_title": ["Selected Section A Content"],
-                "$string_section_button_b": ["Section B"],
-                "$section_b_title": ["Selected Section B Content"],
-            ],
+            assets: assets,
+            localization: localization,
+            templates: templates,
             content: content
         )
-
         return .init(wrapped: configuration)
     }
 }

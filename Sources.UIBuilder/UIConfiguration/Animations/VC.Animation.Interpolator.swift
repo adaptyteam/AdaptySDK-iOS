@@ -22,7 +22,3 @@ package extension VC.Animation {
         case cubicBezier(Double, Double, Double, Double)
     }
 }
-
-extension VC.Animation.Interpolator {
-    static let `default` = Self.easeInOut
-}

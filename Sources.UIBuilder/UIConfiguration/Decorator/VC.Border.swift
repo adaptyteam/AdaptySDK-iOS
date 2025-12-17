@@ -13,24 +13,3 @@ package extension VC {
         package let thickness: Double
     }
 }
-
-extension VC.Border {
-    static let `default` = Self(
-        filling: .same(.solidColor(VC.Color.transparent)),
-        thickness: 1.0
-    )
-}
-
-#if DEBUG
-package extension VC.Border {
-    static func create(
-        filling: VC.Mode<VC.Filling> = `default`.filling,
-        thickness: Double = `default`.thickness
-    ) -> Self {
-        .init(
-            filling: filling,
-            thickness: thickness
-        )
-    }
-}
-#endif

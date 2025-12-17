@@ -25,7 +25,3 @@ extension VC.Unit {
         }
     }
 }
-
-package extension VC.Unit {
-    static let zero = Self.point(0.0)
-}

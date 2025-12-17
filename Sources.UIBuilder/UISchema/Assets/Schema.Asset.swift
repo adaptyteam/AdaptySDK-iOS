@@ -7,6 +7,10 @@
 
 import Foundation
 
+extension VC.Background {
+    static let `default` = Self.filling(.same(.default))
+}
+
 extension Schema {
     enum Asset: Sendable, Hashable {
         case filling(Filling)

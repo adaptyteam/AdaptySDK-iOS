@@ -44,9 +44,7 @@ extension AdaptyUISchema.Localizer {
             isRightToLeft: localization?.isRightToLeft ?? false,
             templateId: source.templateId,
             screen: screen(source.defaultScreen),
-            bottomSheets: source.screens.mapValues(bottomSheet),
-            templateRevision: source.templateRevision,
-            selectedProducts: source.selectedProducts
+            bottomSheets: source.screens.mapValues(bottomSheet)
         )
     }
 }

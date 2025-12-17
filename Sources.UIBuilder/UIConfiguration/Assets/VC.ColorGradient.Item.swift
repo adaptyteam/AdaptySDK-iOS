@@ -13,17 +13,3 @@ package extension VC.ColorGradient {
         package let p: Double
     }
 }
-
-#if DEBUG
-package extension VC.ColorGradient.Item {
-    static func create(
-        color: VC.Color,
-        p: Double
-    ) -> Self {
-        .init(
-            color: color,
-            p: p
-        )
-    }
-}
-#endif

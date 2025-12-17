@@ -32,7 +32,7 @@ extension Schema {
                 result = !endVersion.isSameOrNewerVersion(than: Schema.formatVersion)
             }
 
-            content = try container.decode(Schema.Element.self, forKey: result ? .then : .else)
+            content = try container.decode(Schema.Element.self, forKey: result ? .then : .else, configuration: configuration)
         }
     }
 }

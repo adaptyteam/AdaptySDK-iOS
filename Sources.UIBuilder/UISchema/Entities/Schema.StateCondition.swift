@@ -38,7 +38,7 @@ extension Schema.StateCondition: Codable {
         case .selectedProduct:
             self = try .selectedProduct(
                 id: container.decode(String.self, forKey: .productId),
-                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? Schema.StringId.Product.defaultProductGroupId
+                groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? "group_A"
             )
         }
     }
@@ -53,7 +53,7 @@ extension Schema.StateCondition: Codable {
         case let .selectedProduct(productId, groupId):
             try container.encode(Types.selectedProduct.rawValue, forKey: .type)
             try container.encode(productId, forKey: .productId)
-            if groupId != Schema.StringId.Product.defaultProductGroupId {
+            if groupId != "group_A" {
                 try container.encode(groupId, forKey: .groupId)
             }
         }

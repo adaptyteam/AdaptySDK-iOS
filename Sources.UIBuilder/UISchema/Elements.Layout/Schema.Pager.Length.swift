@@ -11,6 +11,10 @@ extension Schema.Pager {
     typealias Length = VC.Pager.Length
 }
 
+extension Schema.Pager.Length {
+    static let `default` = Self.parent(1)
+}
+
 extension Schema.Pager.Length: Decodable {
     enum CodingKeys: String, CodingKey {
         case parent

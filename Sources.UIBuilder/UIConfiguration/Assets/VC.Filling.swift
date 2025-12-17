@@ -9,8 +9,8 @@ import Foundation
 
 package extension VC {
     enum Filling: Sendable, Hashable {
-        case solidColor(VC.Color)
-        case colorGradient(VC.ColorGradient)
+        case solidColor(Color)
+        case colorGradient(ColorGradient)
     }
 }
 
@@ -21,8 +21,4 @@ package extension VC.Filling {
         default: nil
         }
     }
-}
-
-extension VC.Filling {
-    static let `default` = Self.solidColor(VC.Color.black)
 }

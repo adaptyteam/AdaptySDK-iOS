@@ -19,8 +19,8 @@ extension Schema {
 extension Schema.Localizer {
     func toggle(_ from: Schema.Toggle) -> VC.Toggle {
         .init(
-            onActions: from.onActions.map(action),
-            offActions: from.offActions.map(action),
+            onActions: from.onActions,
+            offActions: from.offActions,
             onCondition: from.onCondition,
             color: from.colorAssetId.flatMap { try? color($0) }
         )
@@ -48,8 +48,14 @@ extension Schema.Toggle: Decodable {
             let offIndex = try container.decodeIfPresent(Int.self, forKey: .offIndex) ?? -1
 
             self.init(
-                onActions: [.action(.switchSection(id: sectionId, index: onIndex))],
-                offActions: [.action(.switchSection(id: sectionId, index: offIndex))],
+                onActions: [.init(function: "Legacy.switchSection", params: [
+                    "sectionId": sectionId,
+                    "index": String(onIndex)
+                ])],
+                offActions: [.init(function: "Legacy.switchSection", params: [
+                    "sectionId": sectionId,
+                    "index": String(offIndex)
+                ])],
                 onCondition: .selectedSection(id: sectionId, index: onIndex),
                 colorAssetId: colorAssetId
             )

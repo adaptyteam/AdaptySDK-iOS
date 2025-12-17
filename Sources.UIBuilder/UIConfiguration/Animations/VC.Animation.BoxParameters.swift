@@ -13,17 +13,3 @@ package extension VC.Animation {
         package let height: Range<VC.Unit>?
     }
 }
-
-#if DEBUG
-package extension VC.Animation.BoxParameters {
-    static func create(
-        width: VC.Animation.Range<VC.Unit>? = nil,
-        height: VC.Animation.Range<VC.Unit>? = nil
-    ) -> Self {
-        .init(
-            width: width,
-            height: height
-        )
-    }
-}
-#endif

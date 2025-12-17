@@ -14,7 +14,3 @@ package extension VC.Pager {
         case pauseAnimation
     }
 }
-
-extension VC.Pager.InteractionBehavior {
-    static let `default` = Self.pauseAnimation
-}

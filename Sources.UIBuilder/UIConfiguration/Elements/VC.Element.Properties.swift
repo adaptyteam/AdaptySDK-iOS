@@ -18,30 +18,4 @@ package extension VC.Element {
     }
 }
 
-package extension VC.Element.Properties {
-    static let `default` = (
-        padding: VC.EdgeInsets.zero,
-        offset: VC.Offset.zero,
-        opacity: 1.0
-    )
-}
 
-#if DEBUG
-package extension VC.Element.Properties {
-    static func create(
-        decorator: VC.Decorator? = nil,
-        padding: VC.EdgeInsets = `default`.padding,
-        offset: VC.Offset = `default`.offset,
-        opacity: Double = `default`.opacity,
-        onAppear: [VC.Animation] = []
-    ) -> Self {
-        .init(
-            decorator: decorator,
-            padding: padding,
-            offset: offset,
-            opacity: opacity,
-            onAppear: onAppear
-        )
-    }
-}
-#endif

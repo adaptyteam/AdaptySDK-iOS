@@ -14,19 +14,3 @@ package extension VC {
         package let image: ImageData
     }
 }
-
-#if DEBUG
-package extension VC.VideoData {
-    static func create(
-        customId: String? = nil,
-        url: URL,
-        image: VC.ImageData
-    ) -> Self {
-        .init(
-            customId: customId,
-            url: url,
-            image: image
-        )
-    }
-}
-#endif

@@ -12,6 +12,11 @@ extension Schema {
 }
 
 extension Schema.Filling {
+    static let `default` = Self.solidColor(.black)
+    static let transparent = Self.solidColor(.transparent)
+}
+
+extension Schema.Filling {
     static func assetType(_ type: String) -> Bool {
         type == Schema.Color.assetType || Schema.ColorGradient.assetType(type)
     }

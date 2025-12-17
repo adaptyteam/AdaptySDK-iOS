@@ -15,21 +15,3 @@ package extension VC {
         package let selectedCondition: StateCondition?
     }
 }
-
-#if DEBUG
-package extension VC.Button {
-    static func create(
-        actions: [VC.Action],
-        normalState: VC.Element,
-        selectedState: VC.Element? = nil,
-        selectedCondition: VC.StateCondition? = nil
-    ) -> Self {
-        .init(
-            actions: actions,
-            normalState: normalState,
-            selectedState: selectedState,
-            selectedCondition: selectedCondition
-        )
-    }
-}
-#endif
