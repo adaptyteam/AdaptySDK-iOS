@@ -21,7 +21,6 @@ public extension Dev_AdaptyUIConfiguration {
             { "type":"image", "id":"beagle", "custom_id":"beagle", "url":"https://unknown.image.com" },
             { "type":"image", "id":"close", "custom_id":"close", "url":"https://unknown.image.com" },
             { "type":"image", "id":"coast-bg", "custom_id":"coast-bg", "url":"https://unknown.image.com" },
-            { "type":"image", "id":"coast-bg", "custom_id":"coast-bg", "url":"https://unknown.image.com" },
             { "type":"color", "id":"$green_figma", "value": "#3EBD78FF"},
             { "type":"color", "id":"$green_figma_cc", "value": "#3EBD78CC"},
             { "type":"color", "id":"$black20", "value": "#01010138"},
@@ -95,7 +94,7 @@ public extension Dev_AdaptyUIConfiguration {
                 { "id": "$product_title_4", "value": "$9.99 / week"},
                 { "id": "$string_section_button_a", "value": "Section A"},
                 { "id": "$section_a_title", "value": "Selected Section A Content"},
-                { "id": "$string_section_button_b", "value": "Section B"],
+                { "id": "$string_section_button_b", "value": "Section B"},
                 { "id": "$section_b_title", "value": "Selected Section B Content"}
             ]
         }
