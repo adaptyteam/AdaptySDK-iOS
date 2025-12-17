@@ -9,33 +9,32 @@ import Foundation
 
 extension VS.JSState {
     static let legacyActions = """
-        class Legacy {
-          static productGroup = {};
-          static sections = {};
-        }
+    class Legacy {}
+    Legacy.productGroup = Object.create(null);
+    Legacy.sections = Object.create(null);
 
-        Legacy.selectProduct = function ( adaptyProductId, groupId ) {
-              Legacy.productGroup[groupId] = adaptyProductId;
-              SDK.selectProduct(adaptyProductId);
-        };
-        
-        Legacy.unselectProduct = function ( groupId ) {
-              delete Legacy.productGroup[groupId]
-        };
-        
-        Legacy.purchaseSelectedProduct = function ( groupId ) {
-             const productId = Legacy.productGroup[groupId];
-             SDK.purchaseProduct( productId );
-        };
-        
-        Legacy.webPurchaseSelectedProduct = function ( groupId, openIn ) {
-             const productId = Legacy.productGroup[groupId];
-             SDK.webPurchasePaywall( productId, openIn );
-        };
-        
-        Legacy.switchSection = function ( sectionId, index ) {
-             const i = parseInt(index, 10);
-             Legacy.sections[sectionId] = i;
-        };
-        """
+    Legacy.selectProduct = function ( adaptyProductId, groupId ) {
+          Legacy.productGroup[groupId] = adaptyProductId;
+          SDK.selectProduct(adaptyProductId);
+    };
+
+    Legacy.unselectProduct = function ( groupId ) {
+          delete Legacy.productGroup[groupId]
+    };
+
+    Legacy.purchaseSelectedProduct = function ( groupId ) {
+         const productId = Legacy.productGroup[groupId];
+         SDK.purchaseProduct( productId );
+    };
+
+    Legacy.webPurchaseSelectedProduct = function ( groupId, openIn ) {
+         const productId = Legacy.productGroup[groupId];
+         SDK.webPurchasePaywall( productId, openIn );
+    };
+
+    Legacy.switchSection = function ( sectionId, index ) {
+         const i = parseInt(index, 10);
+         Legacy.sections[sectionId] = i;
+    };
+    """
 }
