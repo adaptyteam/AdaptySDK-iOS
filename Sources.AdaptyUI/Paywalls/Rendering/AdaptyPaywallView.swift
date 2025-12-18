@@ -108,9 +108,9 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
             showDebugOverlay: false
         )
         .environmentObject(paywallConfiguration.eventsHandler)
+        .environmentObject(paywallConfiguration.stateViewModel)
         .environmentObject(paywallConfiguration.paywallViewModel)
         .environmentObject(paywallConfiguration.productsViewModel)
-        .environmentObject(paywallConfiguration.actionsViewModel)
         .environmentObject(paywallConfiguration.sectionsViewModel)
         .environmentObject(paywallConfiguration.tagResolverViewModel)
         .environmentObject(paywallConfiguration.timerViewModel)

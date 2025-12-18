@@ -33,26 +33,26 @@ package final class AdaptyUITimerViewModel: ObservableObject {
 
     private let timerResolver: AdaptyUITimerResolver
 
+    private let stateViewModel: AdaptyUIStateViewModel
     private let paywallViewModel: AdaptyUIPaywallViewModel
     private let productsViewModel: AdaptyUIProductsViewModel
-    private let actionsViewModel: AdaptyUIActionsViewModel
     private let sectionsViewModel: AdaptyUISectionsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
 
     package init(
         logId: String,
         timerResolver: AdaptyUITimerResolver,
+        stateViewModel: AdaptyUIStateViewModel,
         paywallViewModel: AdaptyUIPaywallViewModel,
         productsViewModel: AdaptyUIProductsViewModel,
-        actionsViewModel: AdaptyUIActionsViewModel,
         sectionsViewModel: AdaptyUISectionsViewModel,
         screensViewModel: AdaptyUIScreensViewModel
     ) {
         self.logId = logId
         self.timerResolver = timerResolver
+        self.stateViewModel = stateViewModel
         self.paywallViewModel = paywallViewModel
         self.productsViewModel = productsViewModel
-        self.actionsViewModel = actionsViewModel
         self.sectionsViewModel = sectionsViewModel
         self.screensViewModel = screensViewModel
     }
@@ -108,14 +108,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         let timeLeft = max(0.0, timerEndAt.timeIntervalSince1970 - Date().timeIntervalSince1970)
 
         if timeLeft <= 0.0 {
-            timer.actions.fire(
-                screenId: screenId,
-                paywallViewModel: paywallViewModel,
-                productsViewModel: productsViewModel,
-                actionsViewModel: actionsViewModel,
-                sectionsViewModel: sectionsViewModel,
-                screensViewModel: screensViewModel
-            )
+            stateViewModel.execute(actions: timer.actions)
         }
 
         return timeLeft

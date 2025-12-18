@@ -22,9 +22,9 @@ public extension AdaptyUI {
         package let eventsHandler: AdaptyEventsHandler
 
         package let presentationViewModel: AdaptyUIPresentationViewModel
+        package let stateViewModel: AdaptyUIStateViewModel
         package let paywallViewModel: AdaptyUIPaywallViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
-        package let actionsViewModel: AdaptyUIActionsViewModel
         package let sectionsViewModel: AdaptyUISectionsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
         package let timerViewModel: AdaptyUITimerViewModel
@@ -72,7 +72,6 @@ public extension AdaptyUI {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
-            actionsViewModel = AdaptyUIActionsViewModel(logId: logId, logic: logic)
             sectionsViewModel = AdaptyUISectionsViewModel(logId: logId)
             paywallViewModel = AdaptyUIPaywallViewModel(
                 logId: logId,
@@ -90,12 +89,24 @@ public extension AdaptyUI {
                 logId: logId,
                 viewConfiguration: viewConfiguration
             )
+            let actionHandler = AdaptyUIStateActionHandler(
+                productsViewModel: productsViewModel,
+                screensViewModel: screensViewModel,
+                logic: logic
+            )
+            stateViewModel = AdaptyUIStateViewModel(
+                logId: logId,
+                logic: logic,
+                actionHandler: actionHandler,
+                viewConfiguration: viewConfiguration,
+                isInspectable: false
+            )
             timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
+                stateViewModel: stateViewModel,
                 paywallViewModel: paywallViewModel,
                 productsViewModel: productsViewModel,
-                actionsViewModel: actionsViewModel,
                 sectionsViewModel: sectionsViewModel,
                 screensViewModel: screensViewModel
             )
@@ -103,6 +114,7 @@ public extension AdaptyUI {
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver()
             )
 
+            stateViewModel.start()
             productsViewModel.loadProductsIfNeeded()
         }
 
