@@ -38,9 +38,9 @@ public extension AdaptyUIBuilder {
         let eventsHandler: AdaptyUIEventsHandler
 
         let presentationViewModel: AdaptyUIPresentationViewModel
+        let stateViewModel: AdaptyUIStateViewModel
         let paywallViewModel: AdaptyUIPaywallViewModel
         let productsViewModel: AdaptyUIProductsViewModel
-        let actionsViewModel: AdaptyUIActionsViewModel
         let sectionsViewModel: AdaptyUISectionsViewModel
         let tagResolverViewModel: AdaptyUITagResolverViewModel
         let timerViewModel: AdaptyUITimerViewModel
@@ -66,7 +66,7 @@ public extension AdaptyUIBuilder {
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
-
+            
             eventsHandler = AdaptyUIEventsHandler(logId: logId)
             logic = AdaptyUIBuilderAppLogic(
                 logId: logId,
@@ -75,7 +75,6 @@ public extension AdaptyUIBuilder {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
-            actionsViewModel = AdaptyUIActionsViewModel(logId: logId, logic: logic)
             sectionsViewModel = AdaptyUISectionsViewModel(logId: logId)
             paywallViewModel = AdaptyUIPaywallViewModel(
                 logId: logId,
@@ -93,12 +92,24 @@ public extension AdaptyUIBuilder {
                 logId: logId,
                 viewConfiguration: viewConfiguration
             )
+            let actionHandler = AdaptyUIStateActionHandler(
+                productsViewModel: productsViewModel,
+                screensViewModel: screensViewModel,
+                logic: logic
+            )
+            stateViewModel = AdaptyUIStateViewModel(
+                logId: logId,
+                logic: logic,
+                actionHandler: actionHandler,
+                viewConfiguration: viewConfiguration,
+                isInspectable: false
+            )
             timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
+                stateViewModel: stateViewModel,
                 paywallViewModel: paywallViewModel,
                 productsViewModel: productsViewModel,
-                actionsViewModel: actionsViewModel,
                 sectionsViewModel: sectionsViewModel,
                 screensViewModel: screensViewModel
             )

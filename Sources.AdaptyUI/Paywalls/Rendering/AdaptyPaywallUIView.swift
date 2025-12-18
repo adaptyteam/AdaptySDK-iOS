@@ -149,9 +149,9 @@ package final class AdaptyPaywallUIView: UIView {
                 showDebugOverlay: showDebugOverlay
             )
             .environmentObject(configuration.eventsHandler)
+            .environmentObject(configuration.stateViewModel)
             .environmentObject(configuration.paywallViewModel)
             .environmentObject(configuration.productsViewModel)
-            .environmentObject(configuration.actionsViewModel)
             .environmentObject(configuration.sectionsViewModel)
             .environmentObject(configuration.tagResolverViewModel)
             .environmentObject(configuration.timerViewModel)

@@ -15,9 +15,9 @@ struct AdaptyUIToggleView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
+    @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
     @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
     @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
-    @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
     @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
     @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
     @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
@@ -29,23 +29,22 @@ struct AdaptyUIToggleView: View {
     }
 
     var body: some View {
-        Toggle(isOn: .init(get: {
-            switch toggle.onCondition {
-            case let .selectedSection(sectionId, sectionIndex):
-                sectionIndex == sectionsViewModel.selectedIndex(for: sectionId)
-            default: false
-            }
-        }, set: { value in
-            (value ? toggle.onActions : toggle.offActions)
-                .fire(
-                    screenId: screenId,
-                    paywallViewModel: paywallViewModel,
-                    productsViewModel: productsViewModel,
-                    actionsViewModel: actionsViewModel,
-                    sectionsViewModel: sectionsViewModel,
-                    screensViewModel: screensViewModel
-                )
-        })) {
+        Toggle(
+            isOn: .init(
+                get: {
+                    switch toggle.onCondition {
+                    case let .selectedSection(sectionId, sectionIndex):
+                        sectionIndex == sectionsViewModel.selectedIndex(for: sectionId)
+                    default: false
+                    }
+                },
+                set: { value in
+                    stateViewModel.execute(
+                        actions: value ? toggle.onActions : toggle.offActions
+                    )
+                }
+            )
+        ) {
             EmptyView()
         }
         .tint(

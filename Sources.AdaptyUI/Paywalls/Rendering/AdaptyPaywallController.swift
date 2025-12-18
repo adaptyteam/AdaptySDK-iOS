@@ -91,108 +91,10 @@ public final class AdaptyPaywallController: UIViewController {
 
         Log.ui.verbose("#\(logId)# viewDidLoad begin")
 
-//<<<<<<< HEAD:Sources.AdaptyUI/Paywalls/Rendering/AdaptyPaywallController.swift
         view.backgroundColor = .systemBackground
 
-//        paywallConfiguration.eventsHandler.didAppear = { [weak self] in
-//            guard let self else { return }
-//            self.delegate?.paywallControllerDidAppear(self)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didDisappear = { [weak self] in
-//            guard let self else { return }
-//            self.delegate?.paywallControllerDidDisappear(self)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didPerformAction = { [weak self] action in
-//            guard let self else { return }
-//            self.delegate?.paywallController(self, didPerform: action)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didSelectProduct = { [weak self] underlying in
-//            guard let self else { return }
-//            self.delegate?.paywallController(self, didSelectProduct: underlying)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didStartPurchase = { [weak self] underlying in
-//            guard let self else { return }
-//            self.delegate?.paywallController(self, didStartPurchase: underlying)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didFinishPurchase = { [weak self] underlying, purchaseResult in
-//            guard let self else { return }
-//            self.delegate?.paywallController(
-//                self,
-//                didFinishPurchase: underlying,
-//                purchaseResult: purchaseResult
-//            )
-//        }
-//
-//        paywallConfiguration.eventsHandler.didFailPurchase = { [weak self] underlying, error in
-//            guard let self else { return }
-//            self.delegate?.paywallController(self, didFailPurchase: underlying, error: error)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didStartRestore = { [weak self] in
-//            guard let self else { return }
-//            self.delegate?.paywallControllerDidStartRestore(self)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didFinishRestore = { [weak self] profile in
-//            guard let self else { return }
-//            self.delegate?.paywallController(self, didFinishRestoreWith: profile)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didFailRestore = { [weak self] error in
-//            guard let self else { return }
-//            self.delegate?.paywallController(self, didFailRestoreWith: error)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didFailRendering = { [weak self] error in
-//            guard let self else { return }
-//            self.delegate?.paywallController(self, didFailRenderingWith: error)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didFailLoadingProducts = { [weak self] error in
-//            guard let self else { return false }
-//            guard let delegate = self.delegate else { return true }
-//            return delegate.paywallController(self, didFailLoadingProductsWith: error)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didPartiallyLoadProducts = { [weak self] failedIds in
-//            guard let self else { return }
-//            self.delegate?.paywallController(self, didPartiallyLoadProducts: failedIds)
-//        }
-//
-//        paywallConfiguration.eventsHandler.didFinishWebPaymentNavigation = { [weak self] product, error in
-//            guard let self else { return }
-//
-//            self.delegate?.paywallController(
-//                self,
-//                didFinishWebPaymentNavigation: product,
-//                error: error
-//            )
-//        }
-//
-//        addSubSwiftUIView(
-//            AdaptyUIPaywallView_Internal(
-//                showDebugOverlay: showDebugOverlay
-//            )
-//            .environmentObject(paywallConfiguration.eventsHandler)
-//            .environmentObject(paywallConfiguration.paywallViewModel)
-//            .environmentObject(paywallConfiguration.productsViewModel)
-//            .environmentObject(paywallConfiguration.actionsViewModel)
-//            .environmentObject(paywallConfiguration.sectionsViewModel)
-//            .environmentObject(paywallConfiguration.tagResolverViewModel)
-//            .environmentObject(paywallConfiguration.timerViewModel)
-//            .environmentObject(paywallConfiguration.screensViewModel)
-//            .environmentObject(paywallConfiguration.assetsViewModel),
-//            to: view
-//        )
-//=======
         paywallView.configure(delegate: self)
         paywallView.layout(in: view, parentVC: self)
-//>>>>>>> origin/release/3.12.0:AdaptyUI/Rendering/Wrappers/AdaptyPaywallController.swift
 
         Log.ui.verbose("#\(logId)# viewDidLoad end")
     }

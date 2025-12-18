@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol AdaptyUIActionHandler: AnyObject {
+package protocol AdaptyUIActionHandler: AnyObject {
     func openUrl(url: URL, openIn: VC.Action.WebOpenInParameter)
     func userCustomAction(id: String)
     func purchaseProduct(productId: String, service: VC.Action.PaymentService)

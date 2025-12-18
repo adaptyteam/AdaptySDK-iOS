@@ -15,9 +15,9 @@ struct AdaptyUIButtonView: View {
 
     private var button: VC.Button
 
+    @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
     @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
     @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
-    @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
     @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
     @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
 
@@ -48,88 +48,11 @@ struct AdaptyUIButtonView: View {
 
     public var body: some View {
         Button {
-            for action in button.actions {
-                action.fire(
-                    screenId: screenId,
-                    paywallViewModel: paywallViewModel,
-                    productsViewModel: productsViewModel,
-                    actionsViewModel: actionsViewModel,
-                    sectionsViewModel: sectionsViewModel,
-                    screensViewModel: screensViewModel
-                )
-            }
+            stateViewModel.execute(actions: button.actions)
         } label: {
             AdaptyUIElementView(currentStateView)
         }
         .buttonStyle(.plain)
-    }
-}
-
-@MainActor
-extension [VC.Action] {
-    func fire(
-        screenId: String,
-        paywallViewModel: AdaptyUIPaywallViewModel,
-        productsViewModel: AdaptyUIProductsViewModel,
-        actionsViewModel: AdaptyUIActionsViewModel,
-        sectionsViewModel: AdaptyUISectionsViewModel,
-        screensViewModel: AdaptyUIScreensViewModel
-    ) {
-        forEach {
-            $0.fire(
-                screenId: screenId,
-                paywallViewModel: paywallViewModel,
-                productsViewModel: productsViewModel,
-                actionsViewModel: actionsViewModel,
-                sectionsViewModel: sectionsViewModel,
-                screensViewModel: screensViewModel
-            )
-        }
-    }
-}
-
-@MainActor
-extension VC.Action {
-    func fire(
-        screenId: String,
-        paywallViewModel: AdaptyUIPaywallViewModel,
-        productsViewModel: AdaptyUIProductsViewModel,
-        actionsViewModel: AdaptyUIActionsViewModel,
-        sectionsViewModel: AdaptyUISectionsViewModel,
-        screensViewModel: AdaptyUIScreensViewModel
-    ) {
-//        switch self {
-//        case let .selectProduct(id, groupId):
-//            withAnimation(.linear(duration: 0.0)) {
-//                productsViewModel.selectProduct(id: id, forGroupId: groupId)
-//            }
-//        case let .unselectProduct(groupId):
-//            productsViewModel.unselectProduct(forGroupId: groupId)
-//        case let .purchaseSelectedProduct(groupId, service):
-//            productsViewModel.purchaseSelectedProduct(fromGroupId: groupId, service: service)
-//        case let .purchaseProduct(productId, service):
-//            productsViewModel.purchaseProduct(id: productId, service: service)
-//        case .openWebPaywall:
-//            break
-//        case .restore:
-//            productsViewModel.restorePurchases()
-//        case let .switchSection(sectionId, index):
-//            withAnimation(.linear(duration: 0.0)) {
-//                sectionsViewModel.updateSelection(for: sectionId, index: index)
-//            }
-//        case let .openScreen(id):
-//            withAnimation(.linear(duration: 0.3)) {
-//                screensViewModel.presentScreen(id: id)
-//            }
-//        case .closeScreen:
-//            screensViewModel.dismissScreen(id: screenId)
-//        case .close:
-//            actionsViewModel.closeActionOccurred()
-//        case let .openUrl(url):
-//            actionsViewModel.openUrlActionOccurred(url: url)
-//        case let .custom(id):
-//            actionsViewModel.customActionOccurred(id: id)
-//        }
     }
 }
 

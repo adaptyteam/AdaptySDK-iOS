@@ -16,8 +16,6 @@ package final class AdaptyUIPaywallViewModel: ObservableObject {
 
     @Published package var viewConfiguration: AdaptyUIConfiguration
 
-    var onViewConfigurationUpdate: ((AdaptyUIConfiguration) -> Void)?
-
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,

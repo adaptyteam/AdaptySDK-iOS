@@ -16,9 +16,9 @@ public extension AdaptyUI {
         package let eventsHandler: AdaptyEventsHandler
 
         package let presentationViewModel: AdaptyUIPresentationViewModel
+        package let stateViewModel: AdaptyUIStateViewModel
         package let paywallViewModel: AdaptyUIPaywallViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
-        package let actionsViewModel: AdaptyUIActionsViewModel
         package let sectionsViewModel: AdaptyUISectionsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
         package let timerViewModel: AdaptyUITimerViewModel
@@ -50,8 +50,8 @@ public extension AdaptyUI {
             eventsHandler = AdaptyEventsHandler(logId: logId)
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
-            actionsViewModel = AdaptyUIActionsViewModel(logId: logId, logic: logic)
             sectionsViewModel = AdaptyUISectionsViewModel(logId: logId)
+
             paywallViewModel = AdaptyUIPaywallViewModel(
                 logId: logId,
                 logic: logic,
@@ -68,12 +68,24 @@ public extension AdaptyUI {
                 logId: logId,
                 viewConfiguration: viewConfiguration
             )
+            let actionHandler = AdaptyUIStateActionHandler(
+                productsViewModel: productsViewModel,
+                screensViewModel: screensViewModel,
+                logic: logic
+            )
+            stateViewModel = AdaptyUIStateViewModel(
+                logId: logId,
+                logic: logic,
+                actionHandler: actionHandler,
+                viewConfiguration: viewConfiguration,
+                isInspectable: false
+            )
             timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
+                stateViewModel: stateViewModel,
                 paywallViewModel: paywallViewModel,
                 productsViewModel: productsViewModel,
-                actionsViewModel: actionsViewModel,
                 sectionsViewModel: sectionsViewModel,
                 screensViewModel: screensViewModel
             )
@@ -107,7 +119,6 @@ public struct Dev_AdaptyUIRendererView: View {
         AdaptyUIElementView(viewConfiguration.deprecated_defaultScreen.content)
             .environmentObject(galleryConfiguration.eventsHandler)
             .environmentObject(galleryConfiguration.paywallViewModel)
-            .environmentObject(galleryConfiguration.actionsViewModel)
             .environmentObject(galleryConfiguration.sectionsViewModel)
             .environmentObject(galleryConfiguration.productsViewModel)
             .environmentObject(galleryConfiguration.tagResolverViewModel)
