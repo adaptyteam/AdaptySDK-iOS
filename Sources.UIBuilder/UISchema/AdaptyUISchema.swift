@@ -93,7 +93,7 @@ extension AdaptyUISchema: Codable {
 
         let scripts: [String] = try (container.decodeIfPresent(String.self, forKey: .script)).map { [$0] } ?? []
 
-        self.scripts = try decoder.decodingLegacy() + scripts
+        self.scripts = try decoder.decodingLegacy(isLegacy: configuration.isLegacy) + scripts
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -112,23 +112,27 @@ private enum LegacyCodingKeys: String, CodingKey {
 }
 
 private extension Decoder {
-    func decodingLegacy() throws -> [String] {
+    func decodingLegacy(isLegacy: Bool) throws -> [String] {
         let container = try container(keyedBy: LegacyCodingKeys.self)
 
+        var scripts = [Schema.LegacyScripts.actions]
+
         if container.contains(.products) {
-            let selectedProducts: [String: String]
             let container = try container.nestedContainer(keyedBy: LegacyCodingKeys.self, forKey: .products)
             if let selected = try? container.decodeIfPresent(String.self, forKey: .selected) {
-                selectedProducts = ["group_A": selected]
+                scripts += [Schema.LegacyScripts.legacySelectProductScript(productId: selected)]
             } else {
-                selectedProducts = try container.decode([String: String].self, forKey: .selected)
-            }
-
-            return selectedProducts.map { groupId, productId in
-                "Legacy.productGroup[\(groupId)] = \(productId);"
+                let selectedProducts = try container.decode([String: String].self, forKey: .selected)
+                scripts += selectedProducts.map { groupId, productId in
+                    Schema.LegacyScripts.legacySelectProductScript(groupId: groupId, productId: productId)
+                }
             }
         }
 
-        return []
+        if isLegacy {
+            scripts += [Schema.LegacyScripts.legacyOpenScreen()]
+        }
+
+        return scripts
     }
 }

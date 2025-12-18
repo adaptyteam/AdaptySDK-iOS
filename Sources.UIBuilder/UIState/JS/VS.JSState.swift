@@ -35,8 +35,6 @@ extension VS {
             actionDispatcher = JSActionDispatcher(actionHandler)
             
             context.setObject(actionDispatcher, forKeyedSubscript: "SDK" as NSString)
-            
-            context.evaluateScript(Self.legacyActions)
         }
     }
 }

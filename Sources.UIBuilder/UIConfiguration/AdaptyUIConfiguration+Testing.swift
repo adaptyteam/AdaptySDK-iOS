@@ -42,7 +42,8 @@ package extension AdaptyUIConfiguration {
                 try jsonDecoder.decode(Schema.Screen.self, from: dataContent, with: configuration)
             }
 
-        let scrrens = ["default": screen]
+        let scrrenMainName = "main"
+        let scrrens = [scrrenMainName: screen]
 
         let templatesCollection = try templatesCollection.map { value in
             let data = value.data(using: .utf8) ?? Data()
@@ -62,7 +63,7 @@ package extension AdaptyUIConfiguration {
             defaultLocalization: localiation,
             screens: scrrens,
             templates: templates,
-            scripts: script.map { [$0] } ?? []
+            scripts: script.map { [$0] } ?? [] + [Schema.LegacyScripts.legacyOpenScreen(screenId: scrrenMainName)]
         )
 
         return try schema.extractUIConfiguration(withLocaleId: localiation.id)
