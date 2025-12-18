@@ -14,9 +14,9 @@ package final class AdaptyUIBottomSheetViewModel: ObservableObject {
     @Published var isPresented: Bool = false
 
     var id: String
-    var bottomSheet: VC.BottomSheet
+    var bottomSheet: VC.Screen
 
-    init(id: String, bottomSheet: VC.BottomSheet) {
+    init(id: String, bottomSheet: VC.Screen) {
         self.id = id
         self.bottomSheet = bottomSheet
     }
@@ -37,7 +37,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         self.logId = logId
         self.viewConfiguration = viewConfiguration
 
-        bottomSheetsViewModels = viewConfiguration.bottomSheets.map {
+        bottomSheetsViewModels = viewConfiguration.screens.map {
             .init(id: $0.key, bottomSheet: $0.value)
         }
     }

@@ -109,14 +109,16 @@ public extension Dev_AdaptyUIConfiguration {
         assets: String = Self.default.assets,
         localization: String = Self.default.localization,
         templates: String? = Self.default.templates,
-        content: String
+        content: String,
+        script: String? = nil
     ) throws -> Self {
         let configuration = try AdaptyUIConfiguration.create(
             templateId: templateId,
             assets: assets,
             localization: localization,
             templates: templates,
-            content: content
+            content: content,
+            script: script
         )
         return .init(wrapped: configuration)
     }

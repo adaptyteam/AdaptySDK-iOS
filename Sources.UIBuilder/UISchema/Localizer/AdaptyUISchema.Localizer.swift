@@ -42,9 +42,8 @@ extension AdaptyUISchema.Localizer {
             id: configuarationId,
             locale: localeId,
             isRightToLeft: localization?.isRightToLeft ?? false,
-            templateId: source.templateId,
-            screen: screen(source.defaultScreen),
-            bottomSheets: source.screens.mapValues(bottomSheet)
+            screens: source.screens.mapValues(screen),
+            scripts: source.scripts
         )
     }
 }

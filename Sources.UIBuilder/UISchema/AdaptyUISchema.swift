@@ -11,19 +11,12 @@ typealias Schema = AdaptyUISchema
 
 public struct AdaptyUISchema: Sendable {
     let formatVersion: Version
-    let templateId: String
     let assets: [String: Asset]
     let localizations: [LocaleId: Localization]
     let defaultLocalization: Localization?
-    let defaultScreen: Screen
     let screens: [String: Screen]
     let templates: any AdaptyUISchemaTemplates
-}
-
-extension AdaptyUISchema: CustomStringConvertible {
-    public var description: String {
-        "(formatVersion: \(formatVersion), templateId: \(templateId))"
-    }
+    let scripts: [String]
 }
 
 public extension AdaptyUISchema {
@@ -40,39 +33,30 @@ extension AdaptyUISchema: Codable {
     struct DecodingConfiguration {
         let isLegacy: Bool
         var insideTemplate = false
+        let legacyTemplateId: String?
     }
 
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
-        case templateId = "template_id"
+        case legacyTemplateId = "template_id"
+
         case assets
         case localizations
         case defaultLocalId = "default_localization"
         case templates
         case legacyScreens = "styles"
         case screens
-
-        case products
-        case selected
+        case script
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        templateId = try container.decode(String.self, forKey: .templateId)
         formatVersion = try container.decode(Version.self, forKey: .formatVersion)
 
-        let configuration = DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion)
-
-        if container.contains(.products) {
-            var selectedProducts = [String: String]()
-            let products = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .products)
-            if let selected = try? products.decodeIfPresent(String.self, forKey: .selected) {
-                selectedProducts = ["group_A": selected]
-            } else {
-                selectedProducts = try products.decode([String: String].self, forKey: .selected)
-            }
-        }
+        let configuration = try DecodingConfiguration(
+            isLegacy: !formatVersion.isNotLegacyVersion,
+            legacyTemplateId: container.decodeIfPresent(String.self, forKey: .legacyTemplateId)
+        )
 
         assets = try (container.decodeIfPresent(AssetsContainer.self, forKey: .assets))?.value ?? [:]
 
@@ -93,35 +77,58 @@ extension AdaptyUISchema: Codable {
             configuration: configuration
         )
 
+        screens = screensCollection.values
+
         let templatesCollection = try container.decode(
             TemplatesCollection.self,
             forKey: .templates,
             configuration: configuration
         )
 
-        guard let defaultScreen = screensCollection.defaultScreen else {
-            throw DecodingError.valueNotFound(Screen.self, DecodingError.Context(codingPath: container.codingPath + [CodingKeys.screens, AnyCodingKey(stringValue: ScreensCollection.defaultScreenKey)], debugDescription: "Expected Screen value but do not found"))
-        }
-        self.defaultScreen = defaultScreen
-        screens = screensCollection.values
-
         templates = try Schema.createTemplates(
             formatVersion: formatVersion,
             templatesCollection: templatesCollection,
             screens: screensCollection.values
         )
+
+        let scripts: [String] = try (container.decodeIfPresent(String.self, forKey: .script)).map { [$0] } ?? []
+
+        self.scripts = try decoder.decodingLegacy() + scripts
     }
 
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(templateId, forKey: .templateId)
         try container.encode(formatVersion, forKey: .formatVersion)
-
         try container.encode(AssetsContainer(value: assets), forKey: .assets)
-
         try container.encode(Array(localizations.values), forKey: .localizations)
         try container.encodeIfPresent(defaultLocalization?.id, forKey: .defaultLocalId)
-
         try container.encode(screens, forKey: .screens)
+    }
+}
+
+private enum LegacyCodingKeys: String, CodingKey {
+    case products
+    case selected
+}
+
+private extension Decoder {
+    func decodingLegacy() throws -> [String] {
+        let container = try container(keyedBy: LegacyCodingKeys.self)
+
+        if container.contains(.products) {
+            let selectedProducts: [String: String]
+            let container = try container.nestedContainer(keyedBy: LegacyCodingKeys.self, forKey: .products)
+            if let selected = try? container.decodeIfPresent(String.self, forKey: .selected) {
+                selectedProducts = ["group_A": selected]
+            } else {
+                selectedProducts = try container.decode([String: String].self, forKey: .selected)
+            }
+
+            return selectedProducts.map { groupId, productId in
+                "Legacy.productGroup[\(groupId)] = \(productId);"
+            }
+        }
+
+        return []
     }
 }

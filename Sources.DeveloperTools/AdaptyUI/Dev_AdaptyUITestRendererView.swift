@@ -104,7 +104,7 @@ public struct Dev_AdaptyUIRendererView: View {
     }
 
     public var body: some View {
-        AdaptyUIElementView(viewConfiguration.screen.content)
+        AdaptyUIElementView(viewConfiguration.deprecated_defaultScreen.content)
             .environmentObject(galleryConfiguration.eventsHandler)
             .environmentObject(galleryConfiguration.paywallViewModel)
             .environmentObject(galleryConfiguration.actionsViewModel)

@@ -12,30 +12,31 @@ package extension AdaptyUIConfiguration {
         templateId: String,
         assets: String,
         localization: String,
-        templates templatesCollection: String? = nil,
-        content: String
+        templates templatesCollection: String?,
+        content: String,
+        script: String?
     ) throws -> Self {
         let formatVersion = AdaptyUISchema.formatVersion
-        let configuration = Schema.DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion)
+        let configuration = Schema.DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion, legacyTemplateId: templateId)
         let jsonDecoder = JSONDecoder()
 
         let dataContent = content.data(using: .utf8) ?? Data()
-        let dataAssets = assets.data(using: .utf8)  ?? Data()
-        let dataLocalization = localization.data(using: .utf8)  ?? Data()
+        let dataAssets = assets.data(using: .utf8) ?? Data()
+        let dataLocalization = localization.data(using: .utf8) ?? Data()
 
-        let assets =  try jsonDecoder.decode(Schema.AssetsContainer.self, from: dataAssets)
+        let assets = try jsonDecoder.decode(Schema.AssetsContainer.self, from: dataAssets)
 
         let localiation = try jsonDecoder.decode(Schema.Localization.self, from: dataLocalization)
-        
+
         let screen =
             if let element = try? jsonDecoder.decode(Schema.Element.self, from: dataContent, with: configuration) {
                 Schema.Screen(
+                    templateId: templateId,
                     backgroundAssetId: "$black",
                     cover: nil,
                     content: element,
                     footer: nil,
-                    overlay: nil,
-                    selectedAdaptyProductId: nil
+                    overlay: nil
                 )
             } else {
                 try jsonDecoder.decode(Schema.Screen.self, from: dataContent, with: configuration)
@@ -53,16 +54,15 @@ package extension AdaptyUIConfiguration {
             templatesCollection: templatesCollection,
             screens: scrrens
         )
-        
+
         let schema = AdaptyUISchema(
             formatVersion: formatVersion,
-            templateId: templateId,
             assets: assets.value,
             localizations: [localiation.id: localiation],
             defaultLocalization: localiation,
-            defaultScreen: screen,
             screens: scrrens,
-            templates: templates
+            templates: templates,
+            scripts: script.map { [$0] } ?? []
         )
 
         return try schema.extractUIConfiguration(withLocaleId: localiation.id)

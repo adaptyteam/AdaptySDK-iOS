@@ -28,7 +28,7 @@ package extension AdaptyPaywallUIView {
     func toAdaptyUIView() -> AdaptyUI.PaywallView {
         AdaptyUI.PaywallView(
             id: id,
-            templateId: configuration.paywallViewModel.viewConfiguration.templateId,
+            templateId: configuration.paywallViewModel.viewConfiguration.deprecated_defaultScreen.templateId,
             placementId: configuration.paywallPlacementId,
             variationId: configuration.paywallVariationId
         )
@@ -39,7 +39,7 @@ public extension AdaptyPaywallController {
     func toAdaptyUIView() -> AdaptyUI.PaywallView {
         AdaptyUI.PaywallView(
             id: id,
-            templateId: configuration.paywallViewModel.viewConfiguration.templateId,
+            templateId: configuration.paywallViewModel.viewConfiguration.deprecated_defaultScreen.templateId,
             placementId: configuration.paywallVariationId,
             variationId: configuration.paywallVariationId
         )

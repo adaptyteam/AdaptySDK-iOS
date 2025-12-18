@@ -43,7 +43,9 @@ extension VS {
 
 extension VS.JSState {
     func evaluateScripts(_ scripts: [String]) {
-        scripts.forEach { context.evaluateScript($0) }
+        let script = scripts.filter { !$0.isEmpty }.joined(separator: "\n")
+        context.evaluateScript(script)
+        objectWillChange.send()
     }
         
     func getValue<T: JSValueRepresentable>(_ type: T.Type, _ key: String) throws(VS.Error) -> T? {

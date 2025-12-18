@@ -13,13 +13,14 @@ package struct AdaptyUIConfiguration: Sendable, Hashable {
     package let id: String
     package let locale: String
     package let isRightToLeft: Bool
-    package let templateId: String
-    package let screen: Screen
-    package let bottomSheets: [String: BottomSheet]
+    
+    package var deprecated_defaultScreen: Screen { screens["default"]! }
+    package let screens: [String: Screen]
+    package let scripts: [String]
 }
 
 extension AdaptyUIConfiguration: CustomStringConvertible {
     public var description: String {
-        "(id: \(id), templateId: \(templateId), locale: \(locale), isRightToLeft: \(isRightToLeft))"
+        "(id: \(id), locale: \(locale), isRightToLeft: \(isRightToLeft))"
     }
 }

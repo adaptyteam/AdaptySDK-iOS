@@ -42,8 +42,7 @@ final class AdaptyUIState: ObservableObject {
     func startOnce() {
         guard !started else { return }
         started = true
-
-        jsState.evaluateScripts([])
+        jsState.evaluateScripts(configuration.scripts)
     }
 
     func getValue<T: JSValueRepresentable>(_ type: T.Type, _ key: String) throws(VS.Error) -> T? {
