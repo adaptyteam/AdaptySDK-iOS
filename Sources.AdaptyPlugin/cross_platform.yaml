@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/3.15.0/schema"
+$id: "https://adapty.io/crossPlatform/3.15.1/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -56,6 +56,8 @@ $requests:
       - onboarding
     properties:
       method: { const: "adapty_ui_create_onboarding_view" }
+      onboarding: { $ref: "#/$defs/AdaptyOnboarding" }
+      external_urls_presentation: { $ref: "#/$defs/AdaptyWebPresentation" }
 
   AdaptyUICreateOnboardingView.Response: #response
     type: object
@@ -401,7 +403,7 @@ $requests:
     required: [method]
     properties:
       method: { const: "open_web_paywall" }
-      open_in: { type: string, enum: ["browser_out_app", "browser_in_app"], default: "browser_out_app" }
+      open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
     oneOf:
       - required: [product]
         properties:
@@ -1482,6 +1484,12 @@ $defs:
     enum:
       - full_screen
       - page_sheet
+
+  AdaptyWebPresentation: #request
+    type: string
+    enum:
+      - browser_out_app
+      - browser_in_app
 
   AdaptyUI.DialogConfiguration: #request
     type: object

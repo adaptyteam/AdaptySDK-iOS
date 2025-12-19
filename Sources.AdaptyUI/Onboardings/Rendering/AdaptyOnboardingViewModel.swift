@@ -29,12 +29,16 @@ final class AdaptyOnboardingViewModel: ObservableObject {
     init(
         logId: String,
         onboarding: AdaptyOnboarding,
+        externalUrlsPresentation: AdaptyWebPresentation,
         inspectWebView: Bool
     ) {
         self.logId = logId
         self.onboarding = onboarding
         self.inspectWebView = inspectWebView
-        self.webViewDelegate = AdaptyWebViewDelegate(logId: logId)
+        self.webViewDelegate = AdaptyWebViewDelegate(
+            logId: logId,
+            externalUrlsPresentation: externalUrlsPresentation
+        )
     }
 
     private weak var webView: WKWebView?
@@ -51,6 +55,7 @@ final class AdaptyOnboardingViewModel: ObservableObject {
         }
 
         webView.navigationDelegate = webViewDelegate
+        webView.uiDelegate = webViewDelegate
         webView.configuration.userContentController.add(
             webViewDelegate,
             name: AdaptyUI.webViewEventMessageName
@@ -144,19 +149,21 @@ final class AdaptyOnboardingViewModel: ObservableObject {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 final class AdaptyWebViewDelegate: NSObject {
     let logId: String
+    let externalUrlsPresentation: AdaptyWebPresentation
 
     var onError: ((Error) -> Void)?
     var onMessage: ((String, Any) -> Void)?
 
-    init(logId: String) {
+    init(logId: String, externalUrlsPresentation: AdaptyWebPresentation) {
         self.logId = logId
+        self.externalUrlsPresentation = externalUrlsPresentation
 
         super.init()
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyWebViewDelegate: WKNavigationDelegate, WKScriptMessageHandler {
+extension AdaptyWebViewDelegate: WKNavigationDelegate, WKScriptMessageHandler, WKUIDelegate {
     public func webView(
         _ webView: WKWebView,
         didStartProvisionalNavigation _: WKNavigation!
@@ -198,6 +205,24 @@ extension AdaptyWebViewDelegate: WKNavigationDelegate, WKScriptMessageHandler {
         didReceive wkMessage: WKScriptMessage
     ) {
         onMessage?(wkMessage.name, wkMessage.body)
+    }
+
+    public func webView(
+        _: WKWebView,
+        createWebViewWith _: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures _: WKWindowFeatures
+    ) -> WKWebView? {
+        let isMainFrame = navigationAction.targetFrame?.isMainFrame ?? false
+        guard !isMainFrame, let url = navigationAction.request.url else { return nil }
+
+        Log.onboardings.verbose("\(logId) webView navigating to external url: \(url), \(externalUrlsPresentation)")
+
+        Task { @MainActor in
+            await url.open(presentation: externalUrlsPresentation)
+        }
+
+        return nil
     }
 }
 

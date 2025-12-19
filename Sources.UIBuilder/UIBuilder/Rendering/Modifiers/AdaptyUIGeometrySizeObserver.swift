@@ -50,8 +50,8 @@ extension View {
         if #available(iOS 18.0, visionOS 2.0, *) {
             onGeometryChange(
                 for: CGSize.self,
-                of: { $0.frame(in: .global).size },
-                action: { _, x in DispatchQueue.main.async { action(x) } }
+                of: { $0.frame(in: .local).size },
+                action: { _, x in Task { @MainActor in action(x) } }
             )
         } else {
             modifier(AdaptyUIGeometrySizeObserver(action))
