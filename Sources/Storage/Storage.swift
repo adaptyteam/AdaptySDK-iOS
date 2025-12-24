@@ -95,6 +95,7 @@ final class Storage {
         await EventsStorage.clearAll()
         await BackendProductInfoStorage.clear()
         await PurchasePayloadStorage.clear()
+        UserAcquisitionStorage.clear()
         userDefaults.set(hash, forKey: Constants.appKeyHash)
         log.verbose("changing apiKeyHash = \(hash).")
         return true

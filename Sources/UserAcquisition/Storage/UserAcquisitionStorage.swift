@@ -59,6 +59,16 @@ final class UserAcquisitionStorage {
         }
     }
 
+    static func clear() {
+        hasRegistrationInstallResponse = false
+        userDefaults.removeObject(forKey: Constants.registrationInstallSaved)
+        userDefaults.removeObject(forKey: Constants.registrationInstallId)
+        userDefaults.removeObject(forKey: Constants.registrationInstallPayload)
+    }
+}
+
+@AdaptyActor
+extension UserAcquisitionStorage {
     var version: Int { Self.version }
 
     var hasRegistrationInstallResponse: Bool {
