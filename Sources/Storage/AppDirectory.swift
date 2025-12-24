@@ -7,6 +7,8 @@
 
 import Foundation
 
+private let log = Log.storage
+
 @AdaptyActor
 enum AppDirectory {
     static func applicationSupport(fileName: String) throws -> Data? {
@@ -32,6 +34,8 @@ enum AppDirectory {
 
     private static func write(_ data: Data, _ fileName: String, for dir: FileManager.SearchPathDirectory, isExcludedFromBackup: Bool) throws {
         let fileURL = try fileUrl(fileName, for: dir)
+        
+        log.debug("AppDirectory write to \(fileURL)")
 
         try data.write(
             to: fileURL,
