@@ -15,13 +15,14 @@ final class Storage {
         static let appInstallationIdentifier = "AdaptySDK_Application_Install_Identifier"
         static let appInstallationTime = "AdaptySDK_Application_Install_Time"
         static let appLaunchCount = "AdaptySDK_Application_Launch_Count"
+        static let persistedInstallationIdentifierToAppSupportStorage = "AdaptySDK_AppSupport_Install_Identifier"
     }
 
     static var userDefaults: UserDefaults { .standard }
 
     @AdaptyActor
-    fileprivate static let appInstallation: (identifier: String, time: Date?, appLaunchCount: Int?) =
-    if let identifier = userDefaults.string(forKey: Constants.appInstallationIdentifier).nonEmptyOrNil {
+    fileprivate static var appInstallation: (identifier: String, time: Date?, appLaunchCount: Int?) =
+        if let identifier = userDefaults.string(forKey: Constants.appInstallationIdentifier).nonEmptyOrNil {
             continueSession(installIdentifier: identifier)
         } else {
             createAppInstallation()
@@ -49,22 +50,47 @@ final class Storage {
         userDefaults.set(identifier, forKey: Constants.appInstallationIdentifier)
         userDefaults.set(time, forKey: Constants.appInstallationTime)
         userDefaults.set(appLaunchCount, forKey: Constants.appLaunchCount)
-
         return (identifier, time, appLaunchCount)
     }
 
-    @discardableResult
     @AdaptyActor
-    static func clearAllDataIfDifferent(apiKey: String) async -> Bool {
-        let hash = apiKey.sha256.hexString
+    private static func checkIsInstallIdentifierDifferent() -> Bool {
+        let identifier = appInstallation.identifier
+        guard userDefaults.bool(forKey: Constants.persistedInstallationIdentifierToAppSupportStorage) else {
+            if AppSupportStorage.setTnstallIdentifier(identifier) {
+                userDefaults.setValue(true, forKey: Constants.persistedInstallationIdentifierToAppSupportStorage)
+            }
+            return false
+        }
 
+        return identifier != AppSupportStorage.getTnstallIdentifier()
+    }
+
+    @AdaptyActor
+    private static func checkIsApiKeyDifferent(hash: String) -> Bool {
         guard let value = userDefaults.string(forKey: Constants.appKeyHash) else {
             userDefaults.set(hash, forKey: Constants.appKeyHash)
             return false
         }
+        return value != hash
+    }
 
-        if value == hash { return false }
+    @discardableResult
+    @AdaptyActor
+    static func clearAllDataIf(differentApiKey apiKey: String, onRestoreFromBackup: Bool) async -> Bool {
+        let clearInstallId = checkIsInstallIdentifierDifferent() && onRestoreFromBackup
 
+        if clearInstallId {
+            appInstallation = createAppInstallation()
+            if AppSupportStorage.setTnstallIdentifier(appInstallation.identifier) {
+                userDefaults.setValue(true, forKey: Constants.persistedInstallationIdentifierToAppSupportStorage)
+            }
+        }
+
+        let hash = apiKey.sha256.hexString
+        let clearData = checkIsApiKeyDifferent(hash: hash) || clearInstallId
+
+        guard clearData else { return false }
         ProfileStorage.clearProfile()
         await EventsStorage.clearAll()
         await BackendProductInfoStorage.clear()
