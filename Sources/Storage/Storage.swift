@@ -57,7 +57,7 @@ final class Storage {
     private static func checkIsInstallIdentifierDifferent() -> Bool {
         let identifier = appInstallation.identifier
         guard userDefaults.bool(forKey: Constants.persistedInstallationIdentifierToAppSupportStorage) else {
-            if AppSupportStorage.setTnstallIdentifier(identifier) {
+            if AppSupportStorage.setInstallIdentifier(identifier) {
                 userDefaults.setValue(true, forKey: Constants.persistedInstallationIdentifierToAppSupportStorage)
             }
             return false
@@ -82,7 +82,7 @@ final class Storage {
 
         if clearInstallId {
             appInstallation = createAppInstallation()
-            if AppSupportStorage.setTnstallIdentifier(appInstallation.identifier) {
+            if AppSupportStorage.setInstallIdentifier(appInstallation.identifier) {
                 userDefaults.setValue(true, forKey: Constants.persistedInstallationIdentifierToAppSupportStorage)
             }
         }

@@ -34,7 +34,7 @@ enum AppSupportStorage {
     }
 
     @AdaptyActor
-    static func setTnstallIdentifier(_ value: String) -> Bool {
+    static func setInstallIdentifier(_ value: String) -> Bool {
         do {
             let data = try JSONEncoder().encode(SDKInfo(installIdentifier: value))
             try AppDirectory.setApplicationSupport(data: data, fileName: Constants.fileName)
