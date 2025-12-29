@@ -50,7 +50,8 @@ struct AdaptyUIBasicContainerView: View {
                     .ignoresSafeArea()
                     .scrollIndicatorsHidden_compatible()
                 } else {
-                    EmptyView()
+                    Rectangle()
+                        .hidden()
                         .onAppear {
                             paywallViewModel.reportDidFailRendering(
                                 with: .wrongComponentType("screen.cover")

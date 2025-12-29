@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/3.15.1/schema"
+$id: "https://adapty.io/crossPlatform/3.15.2/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -932,6 +932,7 @@ $defs:
       google_enable_pending_prepaid_plans: { type: boolean, default: false }
       google_local_access_level_allowed: { type: boolean, default: false }
       ip_address_collection_disabled: { type: boolean, default: false }
+      clear_data_on_backup: { type: boolean, default: false }
       server_cluster: { type: string, enum: ["default", "eu", "cn"] }
       backend_proxy_host: { type: string }
       backend_proxy_port: { type: integer }
