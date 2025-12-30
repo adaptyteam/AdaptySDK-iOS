@@ -107,15 +107,16 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false
         )
-        .environmentObject(paywallConfiguration.eventsHandler)
-        .environmentObject(paywallConfiguration.stateViewModel)
-        .environmentObject(paywallConfiguration.paywallViewModel)
-        .environmentObject(paywallConfiguration.productsViewModel)
-        .environmentObject(paywallConfiguration.sectionsViewModel)
-        .environmentObject(paywallConfiguration.tagResolverViewModel)
-        .environmentObject(paywallConfiguration.timerViewModel)
-        .environmentObject(paywallConfiguration.screensViewModel)
-        .environmentObject(paywallConfiguration.assetsViewModel)
+        .environmentObjects(
+            stateViewModel: paywallConfiguration.stateViewModel,
+            paywallViewModel: paywallConfiguration.paywallViewModel,
+            productsViewModel: paywallConfiguration.productsViewModel,
+            sectionsViewModel: paywallConfiguration.sectionsViewModel,
+            tagResolverViewModel: paywallConfiguration.tagResolverViewModel,
+            timerViewModel: paywallConfiguration.timerViewModel,
+            screensViewModel: paywallConfiguration.screensViewModel,
+            assetsViewModel: paywallConfiguration.assetsViewModel
+        )
         .onAppear {
             paywallConfiguration.reportOnAppear()
         }

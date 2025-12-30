@@ -11,7 +11,7 @@ import Adapty
 import Foundation
 
 @MainActor
-package final class AdaptyEventsHandler: ObservableObject {
+package final class AdaptyEventsHandler {
     let logId: String
 
     var didAppear: (() -> Void)?

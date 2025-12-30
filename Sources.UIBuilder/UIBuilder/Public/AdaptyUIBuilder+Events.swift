@@ -10,7 +10,7 @@
 import Foundation
 
 @MainActor
-package final class AdaptyUIEventsHandler: ObservableObject {
+package final class AdaptyUIEventsHandler {
     let logId: String
 
     var didAppear: (() -> Void)?

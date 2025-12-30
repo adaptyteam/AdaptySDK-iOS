@@ -148,15 +148,16 @@ package final class AdaptyPaywallUIView: UIView {
             AdaptyUIPaywallView_Internal(
                 showDebugOverlay: showDebugOverlay
             )
-            .environmentObject(configuration.eventsHandler)
-            .environmentObject(configuration.stateViewModel)
-            .environmentObject(configuration.paywallViewModel)
-            .environmentObject(configuration.productsViewModel)
-            .environmentObject(configuration.sectionsViewModel)
-            .environmentObject(configuration.tagResolverViewModel)
-            .environmentObject(configuration.timerViewModel)
-            .environmentObject(configuration.screensViewModel)
-            .environmentObject(configuration.assetsViewModel),
+            .environmentObjects(
+                stateViewModel: configuration.stateViewModel,
+                paywallViewModel: configuration.paywallViewModel,
+                productsViewModel: configuration.productsViewModel,
+                sectionsViewModel: configuration.sectionsViewModel,
+                tagResolverViewModel: configuration.tagResolverViewModel,
+                timerViewModel: configuration.timerViewModel,
+                screensViewModel: configuration.screensViewModel,
+                assetsViewModel: configuration.assetsViewModel
+            ),
             to: self
         )
     }

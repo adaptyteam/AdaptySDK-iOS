@@ -116,17 +116,21 @@ public struct Dev_AdaptyUIRendererView: View {
     }
 
     public var body: some View {
-        AdaptyUIElementView(viewConfiguration.deprecated_defaultScreen.content)
-            .environmentObject(galleryConfiguration.eventsHandler)
-            .environmentObject(galleryConfiguration.paywallViewModel)
-            .environmentObject(galleryConfiguration.sectionsViewModel)
-            .environmentObject(galleryConfiguration.productsViewModel)
-            .environmentObject(galleryConfiguration.tagResolverViewModel)
-            .environmentObject(galleryConfiguration.timerViewModel)
-            .environmentObject(galleryConfiguration.screensViewModel)
-            .environmentObject(galleryConfiguration.assetsViewModel)
+        AdaptyUIElementView(viewConfiguration.screens["main"]!.content)
+            .environmentObjects(
+                stateViewModel: galleryConfiguration.stateViewModel,
+                paywallViewModel: galleryConfiguration.paywallViewModel,
+                productsViewModel: galleryConfiguration.productsViewModel,
+                sectionsViewModel: galleryConfiguration.sectionsViewModel,
+                tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
+                timerViewModel: galleryConfiguration.timerViewModel,
+                screensViewModel: galleryConfiguration.screensViewModel,
+                assetsViewModel: galleryConfiguration.assetsViewModel
+            )
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
     }
 }
+
+
 
 #endif
