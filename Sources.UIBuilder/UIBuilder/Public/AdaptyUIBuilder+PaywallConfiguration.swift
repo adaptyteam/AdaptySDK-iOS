@@ -39,6 +39,7 @@ public extension AdaptyUIBuilder {
 
         let presentationViewModel: AdaptyUIPresentationViewModel
         let stateViewModel: AdaptyUIStateViewModel
+        let actionHandler: AdaptyUIStateActionHandler
         let paywallViewModel: AdaptyUIPaywallViewModel
         let productsViewModel: AdaptyUIProductsViewModel
         let sectionsViewModel: AdaptyUISectionsViewModel
@@ -46,7 +47,7 @@ public extension AdaptyUIBuilder {
         let timerViewModel: AdaptyUITimerViewModel
         let screensViewModel: AdaptyUIScreensViewModel
         let assetsViewModel: AdaptyUIAssetsViewModel
-
+        
         let logic: AdaptyUIBuilderAppLogic
 
         fileprivate let logId: String
@@ -92,7 +93,7 @@ public extension AdaptyUIBuilder {
                 logId: logId,
                 viewConfiguration: viewConfiguration
             )
-            let actionHandler = AdaptyUIStateActionHandler(
+            actionHandler = AdaptyUIStateActionHandler(
                 productsViewModel: productsViewModel,
                 screensViewModel: screensViewModel,
                 logic: logic
@@ -117,6 +118,7 @@ public extension AdaptyUIBuilder {
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver()
             )
 
+            stateViewModel.start()
             productsViewModel.loadProductsIfNeeded()
         }
 

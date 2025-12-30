@@ -17,6 +17,7 @@ public extension AdaptyUI {
 
         package let presentationViewModel: AdaptyUIPresentationViewModel
         package let stateViewModel: AdaptyUIStateViewModel
+        package let actionHandler: AdaptyUIStateActionHandler
         package let paywallViewModel: AdaptyUIPaywallViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
         package let sectionsViewModel: AdaptyUISectionsViewModel
@@ -68,7 +69,7 @@ public extension AdaptyUI {
                 logId: logId,
                 viewConfiguration: viewConfiguration
             )
-            let actionHandler = AdaptyUIStateActionHandler(
+            actionHandler = AdaptyUIStateActionHandler(
                 productsViewModel: productsViewModel,
                 screensViewModel: screensViewModel,
                 logic: logic
@@ -92,6 +93,8 @@ public extension AdaptyUI {
             assetsViewModel = AdaptyUIAssetsViewModel(
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver()
             )
+            
+            stateViewModel.start()
         }
     }
 }
