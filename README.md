@@ -22,7 +22,7 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 
 ## Why Adapty?
 
-- [No server code implementation](https://docs.adapty.io/v3.0/docs/ios-installation?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). ntegrate in-app purchases with server-side receipt validation in minutes — in your own paywall or one created in the no-code builder.
+- [No server code implementation](https://docs.adapty.io/v3.0/docs/ios-installation?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Integrate in-app purchases with server-side receipt validation in minutes — in your own paywall or one created in the no-code builder.
 - [No-code paywall builder](https://adapty.io/docs/adapty-paywall-builder). Create a beautiful, natively rendered paywall in the no-code editor and display it in your app to start getting paid instantly.
 - [On-the-fly paywalls price testing](https://docs.adapty.io/v3.0/docs/ab-tests?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Test different prices, duration, offers, messages, and designs simultaneously, all without new app releases.
 - [Beautiful onboardings](https://adapty.io/docs/onboardings). Design onboardings in the no-code editor and guide users through their first app experience.
