@@ -43,7 +43,7 @@ public extension AdaptyPaywallController {
         AdaptyUI.PaywallView(
             id: id,
             templateId: configuration.paywallViewModel.viewConfiguration.templateId,
-            placementId: configuration.paywallVariationId,
+            placementId: configuration.paywallPlacementId,
             variationId: configuration.paywallVariationId
         )
     }
