@@ -17,3 +17,16 @@ extension VC {
         case unknown(String?)
     }
 }
+
+extension VC.Asset {
+    var customId: String? {
+        switch self {
+        case .solidColor(let v): v.customId
+        case .colorGradient(let v): v.customId
+        case .image(let v): v.customId
+        case .video(let v): v.customId
+        case .font(let v): v.customId
+        case .unknown: nil
+        }
+    }
+}

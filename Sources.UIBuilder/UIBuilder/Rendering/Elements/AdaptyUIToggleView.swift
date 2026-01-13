@@ -47,12 +47,13 @@ struct AdaptyUIToggleView: View {
         ) {
             EmptyView()
         }
-        .tint(
-            toggle.color?.resolve(
-                with: assetsViewModel.assetsResolver,
-                colorScheme: colorScheme
-            )
-        )
+        // TODO: refactor this
+//        .tint(
+//            toggle.color?.resolve(
+//                with: assetsViewModel.assetsResolver,
+//                colorScheme: colorScheme
+//            )
+//        )
     }
 }
 

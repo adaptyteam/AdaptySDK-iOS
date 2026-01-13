@@ -230,12 +230,12 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
 
             stopTimer()
 
-            text = timer.format(byValue: timeLeft)
+            text = timer.format.item(byValue: timeLeft)
             self.timeLeft = timeLeft
             return
         }
 
-        text = timer.format(byValue: timeLeft)
+        text = timer.format.item(byValue: timeLeft)
         currentTimerUpdatesPerSecond = text?.timerUpdatesPerSecond ?? 1
 
         self.timeLeft = timeLeft

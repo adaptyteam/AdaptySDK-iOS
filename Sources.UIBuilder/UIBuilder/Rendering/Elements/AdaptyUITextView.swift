@@ -83,6 +83,8 @@ extension Array where Element == VC.RichText.Item {
     ) throws -> Text {
         try reduce(Text("")) { partialResult, item in
             switch item {
+            case .unknown:
+                return partialResult
             case let .text(value, attr):
                 return partialResult + Text(
                     AttributedString.createFrom(
@@ -120,21 +122,22 @@ extension Array where Element == VC.RichText.Item {
                     )
                 )
             case let .image(value, attr):
-                guard let uiImage = value?.resolve(with: assetsResolver, colorScheme: colorScheme).textAttachmentImage(
-                    font: attr.uiFont(assetsResolver),
-                    tint: attr.imageTintColor?.asSolidColor?.resolve(
-                        with: assetsResolver,
-                        colorScheme: colorScheme
-                    ).uiColor
-                ) else {
-                    return partialResult
-                }
-
-                return partialResult + Text(
-                    Image(
-                        uiImage: uiImage
-                    )
-                )
+                return partialResult // TODO: refactor
+//                guard let uiImage = value?.resolve(with: assetsResolver, colorScheme: colorScheme).textAttachmentImage(
+//                    font: attr.uiFont(assetsResolver),
+//                    tint: attr.imageTintColor?.asSolidColor?.resolve(
+//                        with: assetsResolver,
+//                        colorScheme: colorScheme
+//                    ).uiColor
+//                ) else {
+//                    return partialResult
+//                }
+//
+//                return partialResult + Text(
+//                    Image(
+//                        uiImage: uiImage
+//                    )
+//                )
             }
         }
     }
@@ -238,6 +241,8 @@ extension VC.Text {
 
     func extract(productsInfoProvider: ProductsInfoProvider) -> (VC.RichText, ProductInfoContainer) {
         switch value {
+        case let .value(path):
+            return (.empty, .notApplicable) // TODO: implement
         case let .text(value):
             return (value, .notApplicable)
         case let .productText(value):
@@ -266,6 +271,7 @@ extension VC.Text {
 
 @MainActor
 extension AttributedString {
+    // TODO: refactor
     static func createFrom(
         value: String,
         attributes: VC.RichText.Attributes?,
@@ -274,19 +280,21 @@ extension AttributedString {
     ) -> AttributedString {
         var result = AttributedString(value)
 
-        result.foregroundColor = attributes?.txtColor.asSolidColor?.resolve(
-            with: assetsResolver,
-            colorScheme: colorScheme
-        ).uiColor ?? .darkText
+//        result.foregroundColor = attributes?.txtColor.asSolidColor?.resolve(
+//            with: assetsResolver,
+//            colorScheme: colorScheme
+//        ).uiColor ?? .darkText
 
-        result.font = attributes?.uiFont(assetsResolver) ?? .adaptyDefault
+        result.foregroundColor = .darkText
 
-        if let background = attributes?.background?.asSolidColor {
-            result.backgroundColor = background.resolve(
-                with: assetsResolver,
-                colorScheme: colorScheme
-            )
-        }
+        result.font = .adaptyDefault // attributes?.uiFont(assetsResolver) ?? .adaptyDefault
+
+//        if let background = attributes?.background?.asSolidColor {
+//            result.backgroundColor = background.resolve(
+//                with: assetsResolver,
+//                colorScheme: colorScheme
+//            )
+//        }
 
         if attributes?.strike ?? false {
             result.strikethroughStyle = .single
@@ -305,11 +313,12 @@ extension UIFont {
     static let adaptyDefault = UIFont.systemFont(ofSize: 15.0)
 }
 
-@MainActor
-extension VC.RichText.Attributes {
-    func uiFont(_ assetsResolver: AdaptyUIAssetsResolver) -> UIFont {
-        font.resolve(with: assetsResolver, withSize: size)
-    }
-}
+// @MainActor
+// extension VC.RichText.Attributes {
+//    // TODO: ???
+//    func uiFont(_ assetsResolver: AdaptyUIAssetsResolver) -> UIFont {
+//        font.resolve(with: assetsResolver, withSize: size)
+//    }
+// }
 
 #endif

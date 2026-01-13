@@ -7,26 +7,8 @@
 
 import Foundation
 
+@available(*, deprecated, renamed: "test", message: "test")
 package extension VC {
-    enum Background: Sendable, Hashable {
-        case filling(Filling)
-        case image(ImageData)
-
-        var asFilling: VC.Filling? {
-            switch self {
-            case let .filling(value): value
-            default: nil
-            }
-        }
-
-        var asImage: VC.ImageData? {
-            switch self {
-            case let .image(value): value
-            default: nil
-            }
-        }
-    }
-
     enum Filling: Sendable, Hashable {
         case solidColor(Color)
         case colorGradient(ColorGradient)
@@ -47,21 +29,8 @@ package extension VC {
     }
 }
 
+@available(*, deprecated, renamed: "test", message: "test")
 extension VC.Asset {
-    @inlinable
-    var asBackground: VC.Background? {
-        switch self {
-        case let .solidColor(value):
-            .filling(.solidColor(value))
-        case let .colorGradient(value):
-            .filling(.colorGradient(value))
-        case let .image(value):
-            .image(value)
-        default:
-            nil
-        }
-    }
-
     @inlinable
     var asFilling: VC.Filling? {
         switch self {

@@ -12,7 +12,7 @@ import SwiftUI
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private let animations: [VC.Animation]
 
-    private let initialShadowFilling: VC.Mode<VC.Filling>?
+    private let initialShadowFilling: VC.AssetReference?
     private let initialOffset: VC.Offset
     private let initialShadowOffset: VC.Offset
     private let initialShadowBlurRadius: Double
@@ -62,11 +62,11 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         )
     }
 
-    @State private var animatedShadowFilling: VC.Mode<VC.Filling>?
+    @State private var animatedShadowFilling: VC.AssetReference?
     @State private var animatedShadowBlurRadius: Double?
     @State private var animatedShadowOffset: CGSize?
 
-    private var resolvedShadowFilling: VC.Mode<VC.Filling>? {
+    private var resolvedShadowFilling: VC.AssetReference? {
         animatedShadowFilling ?? initialShadowFilling
     }
 
@@ -91,7 +91,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .shadow(
-                filling: resolvedShadowFilling,
+                asset: resolvedShadowFilling,
                 blurRadius: resolvedShadowBlurRadius,
                 offset: resolvedShadowOffset
             )

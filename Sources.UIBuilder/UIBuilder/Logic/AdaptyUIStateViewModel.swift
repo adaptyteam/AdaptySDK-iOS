@@ -55,4 +55,37 @@ package final class AdaptyUIStateViewModel: ObservableObject {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
         }
     }
+
+    // MARK: Refactor --
+
+    func asset(
+        _ ref: AdaptyUIConfiguration.AssetReference?,
+        mode: VC.Mode,
+        defaultValue: VC.Asset?
+    ) -> VC.Asset? {
+        guard let assetId = ref?.getAssetId(state: state) else {
+            return defaultValue
+        }
+
+        return try? state.asset(assetId, for: mode) ?? defaultValue
+    }
+}
+
+extension VC.Asset {
+    static var defaultScreenBackground: Self {
+        .solidColor(.black)
+    }
+}
+
+@MainActor
+extension AdaptyUIConfiguration.AssetReference {
+    func getAssetId(state: AdaptyUIState) -> String? {
+        switch self {
+        case let .assetId(id):
+            return id
+        case let .value(path):
+            // TODO: think about fallback value?
+            return try? state.getValue(String.self, path: path)
+        }
+    }
 }

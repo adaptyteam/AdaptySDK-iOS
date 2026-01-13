@@ -115,23 +115,24 @@ struct AdaptyUIVideoView: View {
     }
 
     var body: some View {
-        switch colorScheme {
-        case .light:
-            colorSchemeVideoView(
-                videoData: video.asset.mode(.light),
-                id: id
-            )
-        case .dark:
-            colorSchemeVideoView(
-                videoData: video.asset.mode(.dark),
-                id: id
-            )
-        @unknown default:
-            colorSchemeVideoView(
-                videoData: video.asset.mode(.light),
-                id: id
-            )
-        }
+        Text("TODO: !!!") // TODO: refactor this
+//        switch colorScheme {
+//        case .light:
+//            colorSchemeVideoView(
+//                videoData: video.asset.mode(.light),
+//                id: id
+//            )
+//        case .dark:
+//            colorSchemeVideoView(
+//                videoData: video.asset.mode(.dark),
+//                id: id
+//            )
+//        @unknown default:
+//            colorSchemeVideoView(
+//                videoData: video.asset.mode(.light),
+//                id: id
+//            )
+//        }
     }
 }
 
@@ -172,13 +173,13 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
                 )
             }
 
-            if showPlaceholder {
-                AdaptyUIImageView(
-                    asset: placeholder,
-                    aspect: aspect,
-                    tint: nil
-                )
-            }
+            // TODO: refactor this
+//            if showPlaceholder {
+//                AdaptyUIImageView(
+//                    asset: placeholder,
+//                    aspect: aspect
+//                )
+//            }
         }
     }
 }

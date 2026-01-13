@@ -24,7 +24,7 @@ extension VC.VideoData {
         return asset.resolved
     }
 
-    private var resolved: Resolved {
+    var resolved: Resolved {
         let item = AVPlayerItem(url: url)
         let player = AVQueuePlayer(items: [item])
         player.isMuted = true
@@ -51,7 +51,7 @@ extension VC.ImageData {
         return resolved
     }
 
-    fileprivate var resolved: Resolved {
+    var resolved: Resolved {
         switch self {
         case let .raster(_, data):
             return .image(UIImage(data: data))
@@ -71,7 +71,7 @@ extension VC.Font {
         return value.withSize(size)
     }
 
-    private func resolved(withSize size: Double) -> Resolved {
+    func resolved(withSize size: Double) -> Resolved {
         UIFont.create(self, withSize: size)
     }
 }
@@ -106,7 +106,7 @@ extension VC.Filling {
         }
     }
 
-    private var resolved: Resolved {
+    var resolved: Resolved {
         switch self {
         case let .solidColor(color):
             return .solidColor(color.resolved)
@@ -119,7 +119,7 @@ extension VC.Filling {
 extension VC.ColorGradient {
     typealias Resolved = AdaptyUICustomGradientAsset
 
-    fileprivate var resolved: Resolved {
+    var resolved: Resolved {
         switch kind {
         case .linear: .linear(
                 gradient: .init(stops: stops),
@@ -156,14 +156,17 @@ extension VC.ColorGradient {
 extension VC.Color {
     typealias Resolved = SwiftUI.Color
 
-    func resolve(with resolver: AdaptyUIAssetsResolver) -> Resolved {
+    func resolve(
+        with resolver: AdaptyUIAssetsResolver,
+        stateViewModel: AdaptyUIStateViewModel
+    ) -> Resolved {
         guard let customId,
               case let .color(asset) = resolver.asset(for: customId)
         else { return resolved }
         return asset.resolved
     }
 
-    fileprivate var resolved: Resolved {
+    var resolved: Resolved {
         SwiftUI.Color(.sRGB, red: red, green: green, blue: blue, opacity: alpha)
     }
 
@@ -172,7 +175,38 @@ extension VC.Color {
     }
 }
 
-private extension AdaptyUICustomVideoAsset {
+@MainActor
+extension VC.AssetReference {
+    func resolveSolidColor(
+        with resolver: AdaptyUIAssetsResolver,
+        stateViewModel: AdaptyUIStateViewModel,
+        mode: VC.Mode
+    ) -> SwiftUI.Color? {
+        guard let asset = stateViewModel.asset(
+            self,
+            mode: mode,
+            defaultValue: nil
+        ) else {
+            return nil
+        }
+
+        if let customId = asset.customId,
+           let customAsset = resolver.asset(for: customId),
+           case let .color(customAssetColor) = customAsset
+        {
+            return customAssetColor.resolved
+        }
+
+        guard case let .solidColor(color) = asset else {
+            // TODO: warning
+            return nil
+        }
+
+        return color.resolved
+    }
+}
+
+extension AdaptyUICustomVideoAsset {
     var resolved: VC.VideoData.Resolved {
         switch self {
         case let .file(url, preview),
@@ -187,7 +221,7 @@ private extension AdaptyUICustomVideoAsset {
     }
 }
 
-private extension AdaptyUICustomImageAsset {
+extension AdaptyUICustomImageAsset {
     var resolved: VC.ImageData.Resolved? {
         switch self {
         case let .file(url):
@@ -201,7 +235,7 @@ private extension AdaptyUICustomImageAsset {
     }
 }
 
-private extension AdaptyUICustomColorAsset {
+extension AdaptyUICustomColorAsset {
     var resolved: VC.Color.Resolved {
         switch self {
         case let .uiColor(color):
@@ -211,5 +245,25 @@ private extension AdaptyUICustomColorAsset {
         }
     }
 }
+
+// extension AdaptyUICustomGradientAsset {
+//    var resolved: VC.ColorGradient.Resolved {
+//        switch self {
+//        case .linear(let gradient, let startPoint, let endPoint):
+//            <#code#>
+//        case .angular(let gradient, let center, let angle):
+//            <#code#>
+//        case .radial(let gradient, let center, let startRadius, let endRadius):
+//            <#code#>
+//        }
+//
+//        switch self {
+//        case let .uiColor(color):
+//            SwiftUI.Color(color)
+//        case let .swiftUIColor(color):
+//            color
+//        }
+//    }
+// }
 
 #endif

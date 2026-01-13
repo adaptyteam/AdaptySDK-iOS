@@ -10,22 +10,24 @@
 import SwiftUI
 
 struct AdaptyUIShadowModifier: ViewModifier {
-    private let filling: VC.Mode<VC.Filling>
+    private let asset: VC.AssetReference
     private let blurRadius: Double
     private let offset: CGSize
 
     init(
-        filling: VC.Mode<VC.Filling>,
+        asset: VC.AssetReference,
         blurRadius: Double,
         offset: CGSize
     ) {
-        self.filling = filling
+        self.asset = asset
         self.blurRadius = blurRadius
         self.offset = offset
     }
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenSize)
@@ -36,11 +38,11 @@ struct AdaptyUIShadowModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .shadow(
-                color: self.filling
-                    .asSolidColor?
-                    .resolve(
+                color: self.asset
+                    .resolveSolidColor(
                         with: self.assetsViewModel.assetsResolver,
-                        colorScheme: self.colorScheme
+                        stateViewModel: self.stateViewModel,
+                        mode: self.colorScheme.toVCMode
                     ) ?? .clear,
                 radius: self.blurRadius,
                 x: self.offset.width,
@@ -52,14 +54,14 @@ struct AdaptyUIShadowModifier: ViewModifier {
 extension View {
     @ViewBuilder
     func shadow(
-        filling: VC.Mode<VC.Filling>?,
+        asset: VC.AssetReference?,
         blurRadius: Double?,
         offset: CGSize?
     ) -> some View {
-        if let filling, let blurRadius, let offset {
+        if let asset, let blurRadius, let offset {
             self.modifier(
                 AdaptyUIShadowModifier(
-                    filling: filling,
+                    asset: asset,
                     blurRadius: blurRadius,
                     offset: offset
                 )

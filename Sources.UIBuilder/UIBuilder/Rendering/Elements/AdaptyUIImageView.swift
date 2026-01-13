@@ -36,17 +36,16 @@ extension View {
 struct AdaptyUIImageView: View {
     enum InitializationMode {
         case image(VC.Image)
-        case raw(VC.ImageData, VC.AspectRatio, VC.Filling?)
+        case raw(VC.ImageData.Resolved, VC.AspectRatio)
     }
 
     private var data: InitializationMode
 
     init(
-        asset: VC.ImageData,
-        aspect: VC.AspectRatio,
-        tint: VC.Filling? = nil
+        asset: VC.ImageData.Resolved,
+        aspect: VC.AspectRatio
     ) {
-        data = .raw(asset, aspect, tint)
+        data = .raw(asset, aspect)
     }
 
     init(
@@ -59,6 +58,8 @@ struct AdaptyUIImageView: View {
     private var colorScheme: ColorScheme
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
 
     @ViewBuilder
     private func rasterImage(
@@ -129,16 +130,53 @@ struct AdaptyUIImageView: View {
     var body: some View {
         switch data {
         case let .image(image):
-            resolvedSchemeBody(
-                asset: image.asset.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme),
-                aspect: image.aspect,
-                tint: image.tint?.asSolidColor?.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme)
+            let imageAsset = stateViewModel.asset(
+                image.asset,
+                mode: colorScheme.toVCMode,
+                defaultValue: nil
             )
-        case let .raw(asset, aspect, tint):
+
+            let tintAsset = stateViewModel.asset(
+                image.tint,
+                mode: colorScheme.toVCMode,
+                defaultValue: nil
+            )
+
+            var tintAssetResolvedColor: VC.Color.Resolved? =
+                if let tintCustomId = tintAsset?.customId,
+                case let .color(tintCustomColorAsset) = assetsViewModel.assetsResolver.asset(for: tintCustomId) {
+                    tintCustomColorAsset.resolved
+                } else {
+                    tintAsset?.asColor?.resolved
+                }
+
+            if let imageAsset,
+               case let .image(imageData) = imageAsset
+            {
+                if let customId = imageData.customId,
+                   case let .image(customImageAsset) = assetsViewModel.assetsResolver.asset(for: customId),
+                   let resolvedCustomAsset = customImageAsset.resolved
+                {
+                    resolvedSchemeBody(
+                        asset: resolvedCustomAsset,
+                        aspect: image.aspect,
+                        tint: tintAssetResolvedColor
+                    )
+                } else {
+                    resolvedSchemeBody(
+                        asset: imageData.resolved,
+                        aspect: image.aspect,
+                        tint: tintAssetResolvedColor
+                    )
+                }
+            } else {
+                Rectangle()
+            }
+        case let .raw(asset, aspect):
             resolvedSchemeBody(
-                asset: asset.resolve(with: assetsViewModel.assetsResolver),
+                asset: asset,
                 aspect: aspect,
-                tint: tint?.asSolidColor?.resolve(with: assetsViewModel.assetsResolver)
+                tint: nil
             )
         }
     }

@@ -59,6 +59,8 @@ struct AdaptyUIPagerView: View {
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
     @Environment(\.adaptyScreenSize)
@@ -242,14 +244,19 @@ struct AdaptyUIPagerView: View {
     }
 
     @ViewBuilder
-    private func pageControlView(_ pageControl: VC.Pager.PageControl, onDotTap: @escaping (Int) -> Void) -> some View {
+    private func pageControlView(
+        _ pageControl: VC.Pager.PageControl,
+        onDotTap: @escaping (Int) -> Void
+    ) -> some View {
         HStack(spacing: pageControl.spacing) {
             ForEach(0 ..< pager.content.count, id: \.self) { idx in
                 Circle()
                     .fill(
-                        idx == currentPageSelectedIndex ?
-                            pageControl.selectedColor.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme) :
-                            pageControl.color.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme)
+                        // TODO: refactor this
+                        idx == currentPageSelectedIndex ? Color(UIColor.lightGray) : Color.white
+//                        idx == currentPageSelectedIndex ?
+//                            pageControl.selectedColor.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme) :
+//                            pageControl.color.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme)
                     )
                     .frame(width: pageControl.dotSize,
                            height: pageControl.dotSize)

@@ -12,61 +12,207 @@ import SwiftUI
 @MainActor
 extension InsettableShape {
     @ViewBuilder
-    func fill(
-        _ filling: VC.Mode<VC.Filling>,
-        colorScheme: ColorScheme,
-        assetsResolver: AdaptyUIAssetsResolver
+    func fillImage(
+        _ image: VC.ImageData.Resolved
     ) -> some View {
-        switch filling.resolve(with: assetsResolver, colorScheme: colorScheme) {
-        case let .solidColor(color):
-            self.fill(color)
-        case let .colorGradient(gradient):
-            switch gradient {
-            case let .linear(gradient, start, stop):
-                self.fill(
-                    LinearGradient(
-                        gradient: gradient,
-                        startPoint: start,
-                        endPoint: stop
-                    )
+        self.background {
+            AdaptyUIImageView(
+                asset: image,
+                aspect: .fill
+            )
+        }
+    }
+
+    @ViewBuilder
+    func fillSolidColor(
+        _ color: VC.Color.Resolved
+    ) -> some View {
+        self.fill(color)
+    }
+
+    @ViewBuilder
+    func fillColorGradient(
+        _ gradient: VC.ColorGradient.Resolved
+    ) -> some View {
+        switch gradient {
+        case let .linear(gradient, start, stop):
+            self.fill(
+                LinearGradient(
+                    gradient: gradient,
+                    startPoint: start,
+                    endPoint: stop
                 )
-            case let .angular(gradient, center, angle):
-                self.fill(
-                    AngularGradient(
-                        gradient: gradient,
-                        center: center,
-                        angle: angle
-                    )
+            )
+        case let .angular(gradient, center, angle):
+            self.fill(
+                AngularGradient(
+                    gradient: gradient,
+                    center: center,
+                    angle: angle
                 )
-            case let .radial(gradient, center, startRadius, endRadius):
-                self.fill(
-                    RadialGradient(
-                        gradient: gradient,
-                        center: center,
-                        startRadius: startRadius,
-                        endRadius: endRadius
-                    )
+            )
+        case let .radial(gradient, center, startRadius, endRadius):
+            self.fill(
+                RadialGradient(
+                    gradient: gradient,
+                    center: center,
+                    startRadius: startRadius,
+                    endRadius: endRadius
                 )
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func fill(
+        asset: VC.Asset,
+        mode: VC.Mode
+    ) -> some View {
+        background {
+            switch asset {
+            case let .solidColor(color):
+                self.fillSolidColor(color.resolved)
+            case let .colorGradient(colorGradient):
+                self.fillColorGradient(colorGradient.resolved)
+            case let .image(imageData):
+                self.fillImage(imageData.resolved)
+            case .video, .font, .unknown:
+                self
             }
         }
     }
 
     @ViewBuilder
-    func stroke(
-        filling: VC.Filling.Resolved?,
-        lineWidth: CGFloat,
-        assetsResolver: AdaptyUIAssetsResolver
+    func fill(
+        assetReference: VC.AssetReference?,
+        mode: VC.Mode,
+        assetsResolver: AdaptyUIAssetsResolver,
+        stateViewModel: AdaptyUIStateViewModel
     ) -> some View {
-        if let filling {
-            switch filling {
-            case let .solidColor(color):
-                self.strokeBorder(color, lineWidth: lineWidth)
-            case let .colorGradient(.linear(gradient, startPoint, endPoint)):
-                self.strokeBorder(LinearGradient(gradient: gradient, startPoint: startPoint, endPoint: endPoint))
-            case let .colorGradient(.angular(gradient, center, angle)):
-                self.strokeBorder(AngularGradient(gradient: gradient, center: center, angle: angle))
-            case let .colorGradient(.radial(gradient, center, startRadius, endRadius)):
-                self.strokeBorder(RadialGradient(gradient: gradient, center: center, startRadius: startRadius, endRadius: endRadius))
+        if let asset = stateViewModel.asset(assetReference, mode: mode, defaultValue: nil) {
+            if let customId = asset.customId,
+               let customAsset = assetsResolver.asset(for: customId)
+            {
+                switch customAsset {
+                case let .color(customColorAsset):
+                    self.fillSolidColor(customColorAsset.resolved)
+                case let .gradient(customGradientAsset):
+                    self.fillColorGradient(customGradientAsset)
+                case let .image(customImageAsset):
+                    if let resolvedCustomAsset = customImageAsset.resolved {
+                        self.fillImage(resolvedCustomAsset)
+                    } else {
+                        self.fill(
+                            asset: asset,
+                            mode: mode
+                        )
+                    }
+                default:
+                    self.fill(
+                        asset: asset,
+                        mode: mode
+                    )
+                }
+            } else {
+                self.fill(
+                    asset: asset,
+                    mode: mode
+                )
+            }
+        } else {
+            self
+        }
+    }
+}
+
+@MainActor
+extension InsettableShape {
+    @ViewBuilder
+    func strokeSolidColor(
+        _ color: VC.Color.Resolved,
+        lineWidth: CGFloat
+    ) -> some View {
+        self.strokeBorder(color, lineWidth: lineWidth)
+    }
+
+    @ViewBuilder
+    func strokeColorGradient(
+        _ gradient: VC.ColorGradient.Resolved,
+        lineWidth: CGFloat
+    ) -> some View {
+        switch gradient {
+        case let .linear(gradient, startPoint, endPoint):
+            self.strokeBorder(
+                LinearGradient(
+                    gradient: gradient,
+                    startPoint: startPoint,
+                    endPoint: endPoint
+                )
+            )
+        case let .angular(gradient, center, angle):
+            self.strokeBorder(
+                AngularGradient(
+                    gradient: gradient,
+                    center: center,
+                    angle: angle
+                )
+            )
+        case let .radial(gradient, center, startRadius, endRadius):
+            self.strokeBorder(
+                RadialGradient(
+                    gradient: gradient,
+                    center: center,
+                    startRadius: startRadius,
+                    endRadius: endRadius
+                )
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func stroke(
+        asset: VC.Asset,
+        mode: VC.Mode,
+        lineWidth: CGFloat
+    ) -> some View {
+        switch asset {
+        case let .solidColor(color):
+            self.strokeSolidColor(color.resolved, lineWidth: lineWidth)
+        case let .colorGradient(colorGradient):
+            self.strokeColorGradient(colorGradient.resolved, lineWidth: lineWidth)
+        case .image, .video, .font, .unknown:
+            self
+        }
+    }
+
+    @ViewBuilder
+    func stroke(
+        assetReference: VC.AssetReference?,
+        mode: VC.Mode,
+        lineWidth: CGFloat,
+        assetsResolver: AdaptyUIAssetsResolver,
+        stateViewModel: AdaptyUIStateViewModel
+    ) -> some View {
+        if let asset = stateViewModel.asset(assetReference, mode: mode, defaultValue: nil) {
+            if let customId = asset.customId,
+               let customAsset = assetsResolver.asset(for: customId)
+            {
+                switch customAsset {
+                case let .color(customColorAsset):
+                    self.strokeSolidColor(
+                        customColorAsset.resolved,
+                        lineWidth: lineWidth
+                    )
+                case let .gradient(customGradientAsset):
+                    self.strokeColorGradient(
+                        customGradientAsset,
+                        lineWidth: lineWidth
+                    )
+                default:
+                    self.stroke(asset: asset, mode: mode, lineWidth: lineWidth)
+                }
+            } else {
+                self.stroke(asset: asset, mode: mode, lineWidth: lineWidth)
             }
         } else {
             self
@@ -80,7 +226,7 @@ extension View {
         switch shape {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
-                clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
+                self.clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
             } else {
                 self.clipShape(UnevenRoundedRectangleFallback(cornerRadii: radii))
             }
@@ -98,95 +244,113 @@ extension View {
 extension VC.ShapeType {
     @ViewBuilder
     func swiftUIShapeFill(
-        _ filling: VC.Mode<VC.Filling>,
-        colorScheme: ColorScheme,
-        assetsResolver: AdaptyUIAssetsResolver
+        assetReference: VC.AssetReference?,
+        mode: VC.Mode,
+        assetsResolver: AdaptyUIAssetsResolver,
+        stateViewModel: AdaptyUIStateViewModel
     ) -> some View {
         switch self {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
                     .fill(
-                        filling,
-                        colorScheme: colorScheme,
-                        assetsResolver: assetsResolver
+                        assetReference: assetReference,
+                        mode: mode,
+                        assetsResolver: assetsResolver,
+                        stateViewModel: stateViewModel
                     )
             } else {
                 UnevenRoundedRectangleFallback(cornerRadii: radii)
                     .fill(
-                        filling,
-                        colorScheme: colorScheme,
-                        assetsResolver: assetsResolver
+                        assetReference: assetReference,
+                        mode: mode,
+                        assetsResolver: assetsResolver,
+                        stateViewModel: stateViewModel
                     )
             }
         case .circle:
             Circle()
                 .fill(
-                    filling,
-                    colorScheme: colorScheme,
-                    assetsResolver: assetsResolver
+                    assetReference: assetReference,
+                    mode: mode,
+                    assetsResolver: assetsResolver,
+                    stateViewModel: stateViewModel
                 )
         case .curveUp:
             CurveUpShape()
                 .fill(
-                    filling,
-                    colorScheme: colorScheme,
-                    assetsResolver: assetsResolver
+                    assetReference: assetReference,
+                    mode: mode,
+                    assetsResolver: assetsResolver,
+                    stateViewModel: stateViewModel
                 )
         case .curveDown:
             CurveDownShape()
                 .fill(
-                    filling,
-                    colorScheme: colorScheme,
-                    assetsResolver: assetsResolver
+                    assetReference: assetReference,
+                    mode: mode,
+                    assetsResolver: assetsResolver,
+                    stateViewModel: stateViewModel
                 )
         }
     }
 
     @ViewBuilder
     func swiftUIShapeStroke(
-        _ filling: VC.Filling.Resolved?,
+        _ assetReference: VC.AssetReference?,
+        mode: VC.Mode,
         lineWidth: CGFloat,
-        assetsResolver: AdaptyUIAssetsResolver
+        assetsResolver: AdaptyUIAssetsResolver,
+        stateViewModel: AdaptyUIStateViewModel
     ) -> some View {
         switch self {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
                     .stroke(
-                        filling: filling,
+                        assetReference: assetReference,
+                        mode: mode,
                         lineWidth: lineWidth,
-                        assetsResolver: assetsResolver
+                        assetsResolver: assetsResolver,
+                        stateViewModel: stateViewModel
                     )
             } else {
                 UnevenRoundedRectangleFallback(cornerRadii: radii)
                     .stroke(
-                        filling: filling,
+                        assetReference: assetReference,
+                        mode: mode,
                         lineWidth: lineWidth,
-                        assetsResolver: assetsResolver
+                        assetsResolver: assetsResolver,
+                        stateViewModel: stateViewModel
                     )
             }
         case .circle:
             Circle()
                 .stroke(
-                    filling: filling,
+                    assetReference: assetReference,
+                    mode: mode,
                     lineWidth: lineWidth,
-                    assetsResolver: assetsResolver
+                    assetsResolver: assetsResolver,
+                    stateViewModel: stateViewModel
                 )
         case .curveUp:
             // Since there is no way to implement InsettableShape in a correct way, we make this hack with doubling the lineWidth
             CurveUpShape()
                 .stroke(
-                    filling: filling,
-                    lineWidth: lineWidth * 2.0,
-                    assetsResolver: assetsResolver
+                    assetReference: assetReference,
+                    mode: mode,
+                    lineWidth: lineWidth,
+                    assetsResolver: assetsResolver,
+                    stateViewModel: stateViewModel
                 )
         case .curveDown:
             CurveDownShape()
                 .stroke(
-                    filling: filling,
-                    lineWidth: lineWidth * 2.0,
-                    assetsResolver: assetsResolver
+                    assetReference: assetReference,
+                    mode: mode,
+                    lineWidth: lineWidth,
+                    assetsResolver: assetsResolver,
+                    stateViewModel: stateViewModel
                 )
         }
     }
@@ -198,22 +362,18 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private let includeBackground: Bool
     private let animations: [VC.Animation]?
 
-    @State private var animatedBackgroundFilling: VC.Mode<VC.Filling>?
+    @State private var animatedBackgroundFilling: VC.AssetReference?
 
-    private var initialBorderFilling: VC.Mode<VC.Filling>?
+    private var initialBorderFilling: VC.AssetReference?
     private var initialBorderThickness: Double?
 
-    @State private var animatedBorderFilling: VC.Mode<VC.Filling>?
+    @State private var animatedBorderFilling: VC.AssetReference?
     @State private var animatedBorderThickness: Double?
 
     @State private var animationTokens = Set<AdaptyUIAnimationToken>()
 
-    private var resolvedBorderFilling: VC.Filling.Resolved? {
-        (self.animatedBorderFilling ?? self.initialBorderFilling)?
-            .resolve(
-                with: self.assetsViewModel.assetsResolver,
-                colorScheme: self.colorScheme
-            )
+    private var resolvedBorderFilling: VC.AssetReference? {
+        self.animatedBorderFilling ?? self.initialBorderFilling
     }
 
     private var resolvedBorderThickness: Double? {
@@ -235,6 +395,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 
@@ -247,8 +409,10 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                 self.decorator.shapeType
                     .swiftUIShapeStroke(
                         borderFilling,
+                        mode: self.colorScheme.toVCMode,
                         lineWidth: borderThickness,
-                        assetsResolver: self.assetsViewModel.assetsResolver
+                        assetsResolver: self.assetsViewModel.assetsResolver,
+                        stateViewModel: self.stateViewModel
                     )
             }
         }
@@ -271,33 +435,45 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                 .background {
                     self.decorator.shapeType
                         .swiftUIShapeFill(
-                            animatedBackgroundFilling,
-                            colorScheme: self.colorScheme,
-                            assetsResolver: self.assetsViewModel.assetsResolver
+                            assetReference: animatedBackgroundFilling,
+                            mode: self.colorScheme.toVCMode,
+                            assetsResolver: self.assetsViewModel.assetsResolver,
+                            stateViewModel: self.stateViewModel
                         )
                 }
         } else if let background = self.decorator.background {
-            switch background {
-            case let .image(imageData):
-                content
-                    .background {
-                        AdaptyUIImageView(
-                            asset: imageData.usedColorScheme(self.colorScheme),
-                            aspect: .fill,
-                            tint: nil
+            content
+                .background {
+                    self.decorator.shapeType
+                        .swiftUIShapeFill(
+                            assetReference: background,
+                            mode: self.colorScheme.toVCMode,
+                            assetsResolver: self.assetsViewModel.assetsResolver,
+                            stateViewModel: self.stateViewModel
                         )
-                    }
-            case let .filling(fillingValue):
-                content
-                    .background {
-                        self.decorator.shapeType
-                            .swiftUIShapeFill(
-                                fillingValue,
-                                colorScheme: self.colorScheme,
-                                assetsResolver: self.assetsViewModel.assetsResolver
-                            )
-                    }
-            }
+                }
+//
+//            switch background {
+//            case let .image(imageData):
+//                content
+//                    .background {
+//                        AdaptyUIImageView(
+//                            asset: imageData.usedColorScheme(self.colorScheme),
+//                            aspect: .fill
+//                        )
+//                    }
+//            case let .filling(fillingValue):
+//                content
+//                    .background {
+//                        self.decorator.shapeType
+//                            .swiftUIShapeFill(
+//                                animatedBackgroundFilling,
+//                                mode: self.colorScheme.toVCMode,
+//                                assetsResolver: self.assetsViewModel.assetsResolver,
+//                                stateViewModel: self.stateViewModel
+//                            )
+//                    }
+//            }
         } else {
             content
         }

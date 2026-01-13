@@ -40,8 +40,10 @@ struct AdaptyUIPaywallRendererView: View {
         if let template = VC.Template(rawValue: viewConfiguration.deprecated_defaultScreen.templateId) {
             ZStack(alignment: .bottom) {
                 templateResolverView(template, screen: viewConfiguration.deprecated_defaultScreen)
-                    .staticBackground(viewConfiguration.deprecated_defaultScreen.background)
-
+                    .staticBackground(
+                        viewConfiguration.deprecated_defaultScreen.background,
+                        defaultValue: .defaultScreenBackground
+                    )
                 Color.black
                     .opacity(!screensViewModel.presentedScreensStack.isEmpty ? 0.4 : 0.0)
                     .onTapGesture {
