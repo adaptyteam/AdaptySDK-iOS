@@ -17,6 +17,7 @@ public extension AdaptyUI {
 
         package let presentationViewModel: AdaptyUIPresentationViewModel
         package let stateViewModel: AdaptyUIStateViewModel
+        package let actionHandler: AdaptyUIStateActionHandler
         package let paywallViewModel: AdaptyUIPaywallViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
         package let sectionsViewModel: AdaptyUISectionsViewModel
@@ -68,7 +69,7 @@ public extension AdaptyUI {
                 logId: logId,
                 viewConfiguration: viewConfiguration
             )
-            let actionHandler = AdaptyUIStateActionHandler(
+            actionHandler = AdaptyUIStateActionHandler(
                 productsViewModel: productsViewModel,
                 screensViewModel: screensViewModel,
                 logic: logic
@@ -92,6 +93,8 @@ public extension AdaptyUI {
             assetsViewModel = AdaptyUIAssetsViewModel(
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver()
             )
+            
+            stateViewModel.start()
         }
     }
 }
@@ -116,17 +119,21 @@ public struct Dev_AdaptyUIRendererView: View {
     }
 
     public var body: some View {
-        AdaptyUIElementView(viewConfiguration.deprecated_defaultScreen.content)
-            .environmentObject(galleryConfiguration.eventsHandler)
-            .environmentObject(galleryConfiguration.paywallViewModel)
-            .environmentObject(galleryConfiguration.sectionsViewModel)
-            .environmentObject(galleryConfiguration.productsViewModel)
-            .environmentObject(galleryConfiguration.tagResolverViewModel)
-            .environmentObject(galleryConfiguration.timerViewModel)
-            .environmentObject(galleryConfiguration.screensViewModel)
-            .environmentObject(galleryConfiguration.assetsViewModel)
+        AdaptyUIElementView(viewConfiguration.screens["main"]!.content)
+            .environmentObjects(
+                stateViewModel: galleryConfiguration.stateViewModel,
+                paywallViewModel: galleryConfiguration.paywallViewModel,
+                productsViewModel: galleryConfiguration.productsViewModel,
+                sectionsViewModel: galleryConfiguration.sectionsViewModel,
+                tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
+                timerViewModel: galleryConfiguration.timerViewModel,
+                screensViewModel: galleryConfiguration.screensViewModel,
+                assetsViewModel: galleryConfiguration.assetsViewModel
+            )
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
     }
 }
+
+
 
 #endif
