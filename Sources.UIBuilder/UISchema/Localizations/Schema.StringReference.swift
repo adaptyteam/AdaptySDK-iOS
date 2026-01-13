@@ -18,6 +18,11 @@ extension Schema.StringReference: Codable {
     }
 
     package init(from decoder: Decoder) throws {
+        if let stringId = try? decoder.singleValueContainer().decode(String.self) {
+            self = .stringId(stringId)
+            return
+        }
+
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         if container.contains(.value) {
@@ -26,18 +31,12 @@ extension Schema.StringReference: Codable {
             return
         }
 
-        if container.contains(.type) {
-            let type = try container.decode(String.self, forKey: .type)
-            guard type == Product.typeValue else {
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [Product.CodingKeys.type], debugDescription: "unknown value"))
-            }
-
-            self = try .product(Product(from: decoder))
-            return
+        let type = try container.decode(String.self, forKey: .type)
+        guard type == Product.typeValue else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [Product.CodingKeys.type], debugDescription: "unknown value"))
         }
 
-        let stringId = try decoder.singleValueContainer().decode(String.self)
-        self = .stringId(stringId)
+        self = try .product(Product(from: decoder))
     }
 
     package func encode(to encoder: any Encoder) throws {

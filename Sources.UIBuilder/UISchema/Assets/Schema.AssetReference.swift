@@ -17,15 +17,14 @@ extension Schema.AssetReference: Codable {
     }
 
     package init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        if container.contains(.value) {
-            let value = try container.decode(String.self, forKey: .value)
-            self = .value(path: value.split(separator: ".").map(String.init))
-        } else {
-            let assetId = try decoder.singleValueContainer().decode(String.self)
+        if let assetId = try? decoder.singleValueContainer().decode(String.self) {
             self = .assetId(assetId)
+            return
         }
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let value = try container.decode(String.self, forKey: .value)
+        self = .value(path: value.split(separator: ".").map(String.init))
     }
 
     package func encode(to encoder: Encoder) throws {
