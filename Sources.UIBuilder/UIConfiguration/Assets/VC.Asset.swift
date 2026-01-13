@@ -11,12 +11,9 @@ extension VC {
     enum Asset: Sendable, Hashable {
         case solidColor(Color)
         case colorGradient(ColorGradient)
-//        case filling(Filling)
         case image(ImageData)
         case video(VideoData)
         case font(Font)
         case unknown(String?)
     }
 }
-
-
