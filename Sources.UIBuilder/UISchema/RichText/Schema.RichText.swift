@@ -24,18 +24,6 @@ extension Schema.RichText {
     }
 }
 
-extension Schema.Localizer {
-    func richText(
-        stringId: String
-    ) -> VC.RichText? {
-        guard let item = localization?.strings?[stringId] else { return nil }
-        return .init(
-            items: item.value.items,
-            fallback: item.fallback?.items
-        )
-    }
-}
-
 extension Schema.RichText: Codable {
     init(from decoder: Decoder) throws {
         items =

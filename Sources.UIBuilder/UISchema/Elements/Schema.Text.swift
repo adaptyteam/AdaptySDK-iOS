@@ -22,9 +22,7 @@ extension Schema.Localizer {
         let value: VC.Text.Value =
             switch textBlock.stringId {
             case let .stringId(stringId):
-                .text(richText(
-                    stringId: stringId
-                ) ?? .empty)
+                .text(strings[stringId] ?? .empty)
             case let .value(path):
                 .value(path: path)
             case let .product(info):

@@ -23,13 +23,4 @@ extension VS {
 
         return configuration.assets[assetId]
     }
-
-//    private func id(from assetReference: VC.AssetReference) throws(VS.Error) -> String {
-//        guard case let .assetId(assetId) = assetReference else {
-//            throw .referenceWithoutAssetId
-//        }
-//        return assetId
-//    }
-//
-
 }

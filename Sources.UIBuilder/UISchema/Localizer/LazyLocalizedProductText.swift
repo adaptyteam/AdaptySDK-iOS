@@ -57,12 +57,9 @@ package extension VC {
         }
 
         package func richText() -> RichText {
-            localizer.richText(
-                stringId: Schema.StringReference.Product.calculate(
-                    suffix: suffix
-                )
-//                ,defaultTextAttributes: defaultTextAttributes
-            ) ?? .empty
+            localizer.strings[
+                Schema.StringReference.Product.calculate(suffix: suffix)
+            ] ?? .empty
         }
 
         package func richText(
@@ -86,36 +83,38 @@ private extension Schema.Localizer {
         suffix: String?,
         defaultTextAttributes: Schema.RichText.Attributes?
     ) -> VC.RichText {
-        if let value = richText(
-            stringId: Schema.StringReference.Product.calculate(
+        if let value = strings[
+            Schema.StringReference.Product.calculate(
                 adaptyProductId: adaptyProductId,
                 byPaymentMode: paymentMode,
                 suffix: suffix
             )
-//            ,defaultTextAttributes: defaultTextAttributes
-        ) { return value }
-        if paymentMode != nil, let value = richText(
-            stringId: Schema.StringReference.Product.calculate(
+//          ,defaultTextAttributes: defaultTextAttributes
+        ] { return value }
+
+        if paymentMode != nil, let value = strings[
+            Schema.StringReference.Product.calculate(
                 adaptyProductId: adaptyProductId,
                 byPaymentMode: nil,
                 suffix: suffix
             )
-//            ,defaultTextAttributes: defaultTextAttributes
-        ) { return value }
-        if let value = richText(
-            stringId: Schema.StringReference.Product.calculate(
+//          ,defaultTextAttributes: defaultTextAttributes
+        ] { return value }
+
+        if let value = strings[
+            Schema.StringReference.Product.calculate(
                 byPaymentMode: paymentMode,
                 suffix: suffix
             )
-//            ,defaultTextAttributes: defaultTextAttributes
-        ) { return value }
-        if paymentMode != nil, let value = richText(
-            stringId: Schema.StringReference.Product.calculate(
+//          ,defaultTextAttributes: defaultTextAttributes
+        ] { return value }
+        if paymentMode != nil, let value = strings[
+            Schema.StringReference.Product.calculate(
                 byPaymentMode: nil,
                 suffix: suffix
             )
 //            ,defaultTextAttributes: defaultTextAttributes
-        ) { return value }
+        ] { return value }
         return .empty
     }
 }

@@ -34,9 +34,7 @@ extension Schema.Localizer {
             state: from.state,
             format: .init(
                 items: from.format.compactMap {
-                    guard let value = richText(
-                        stringId: $0.stringId
-                    ) else { return nil }
+                    guard let value = strings[$0.stringId] else { return nil }
 
                     return .init(
                         from: $0.from,

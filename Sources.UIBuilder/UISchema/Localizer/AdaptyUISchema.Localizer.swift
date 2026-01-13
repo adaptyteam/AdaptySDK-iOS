@@ -11,16 +11,33 @@ extension AdaptyUISchema {
     final class Localizer: @unchecked Sendable {
         let id = UUID()
         let configuarationId: String
-        let localization: Localization?
-        let source: AdaptyUISchema
         let localeId: LocaleId
+        let isRightToLeft: Bool
+        let assets: [String: Asset]
+        let strings: [String: VC.RichText]
+
+        let source: AdaptyUISchema
         var templateIds = Set<String>()
 
         init(id: String, source: AdaptyUISchema, withLocaleId localeId: LocaleId) {
+            let localization = source.localization(by: localeId)
+
+            var assets = source.assets
+            if let other = localization?.assets {
+                assets = assets.merging(other, uniquingKeysWith: { _, other in other })
+            }
+
             self.configuarationId = id
             self.source = source
-            self.localization = source.localization(by: localeId)
-            self.localeId = self.localization?.id ?? localeId
+            self.localeId = localization?.id ?? localeId
+            self.isRightToLeft = localization?.isRightToLeft ?? false
+            self.assets = assets
+            self.strings = localization?.strings?.mapValues {
+                VC.RichText(
+                    items: $0.value.items,
+                    fallback: $0.fallback?.items
+                )
+            } ?? [:]
         }
     }
 }
@@ -41,7 +58,9 @@ extension AdaptyUISchema.Localizer {
         return try .init(
             id: configuarationId,
             locale: localeId,
-            isRightToLeft: localization?.isRightToLeft ?? false,
+            isRightToLeft: isRightToLeft,
+            assets: assets,
+            strings: strings,
             screens: source.screens.mapValues(screen),
             scripts: source.scripts
         )
