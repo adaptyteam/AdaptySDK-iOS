@@ -9,8 +9,9 @@ import Foundation
 
 package extension VC.RichText {
     enum Item: Sendable, Hashable {
-        case text(String, Attributes)
-        case tag(String, Attributes)
-        case image(VC.Mode<VC.ImageData>?, Attributes)
+        case text(String, Attributes?)
+        case tag(String, Attributes?)
+        case image(VC.AssetReference, Attributes?)
+        case unknown
     }
 }

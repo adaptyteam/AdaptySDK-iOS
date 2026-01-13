@@ -8,21 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct VideoPlayer: Sendable, Hashable  {
-        let assetId: String
-        let aspect: AspectRatio
-        let loop: Bool
-    }
-}
-
-extension Schema.Localizer {
-    func videoPlayer(_ from: Schema.VideoPlayer) throws -> VC.VideoPlayer {
-        try .init(
-            asset: videoData(from.assetId),
-            aspect: from.aspect,
-            loop: from.loop
-        )
-    }
+    typealias VideoPlayer = VC.VideoPlayer
 }
 
 extension Schema.VideoPlayer: Codable {
@@ -32,10 +18,10 @@ extension Schema.VideoPlayer: Codable {
         case loop
     }
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            assetId: container.decode(String.self, forKey: .assetId),
+            asset: container.decode(Schema.AssetReference.self, forKey: .assetId),
             aspect: container.decodeIfPresent(Schema.AspectRatio.self, forKey: .aspect)
                 ?? .default,
             loop: container.decodeIfPresent(Bool.self, forKey: .loop)
@@ -43,9 +29,9 @@ extension Schema.VideoPlayer: Codable {
         )
     }
 
-    func encode(to encoder: any Encoder) throws {
+    package func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(assetId, forKey: .assetId)
+        try container.encode(asset, forKey: .assetId)
         if aspect != .default {
             try container.encode(aspect, forKey: .aspect)
         }

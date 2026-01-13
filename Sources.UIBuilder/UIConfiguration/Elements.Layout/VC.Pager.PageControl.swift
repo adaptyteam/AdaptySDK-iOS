@@ -14,7 +14,7 @@ package extension VC.Pager {
         package let padding: VC.EdgeInsets
         package let dotSize: Double
         package let spacing: Double
-        package let color: VC.Mode<VC.Color>
-        package let selectedColor: VC.Mode<VC.Color>
+        package let color: VC.AssetReference?
+        package let selectedColor: VC.AssetReference?
     }
 }

@@ -7,8 +7,7 @@
 
 package extension Schema {
     enum Error: Swift.Error {
-        case notFoundAsset(String)
-        case wrongTypeAsset(String)
+
 
         case unsupportedElement(String)
         case elementsTreeCycle(String)

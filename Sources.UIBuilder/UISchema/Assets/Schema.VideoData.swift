@@ -38,9 +38,7 @@ extension Schema.VideoData: Codable {
 
     package func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-
         try container.encode(Self.assetType, forKey: .type)
-
         try container.encodeIfPresent(customId, forKey: .customId)
         try container.encode(url, forKey: .url)
         try container.encode(image, forKey: .image)

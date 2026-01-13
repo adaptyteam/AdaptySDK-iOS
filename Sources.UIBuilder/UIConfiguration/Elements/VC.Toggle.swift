@@ -12,6 +12,6 @@ package extension VC {
         package let onActions: [Action]
         package let offActions: [Action]
         package let onCondition: StateCondition
-        package let color: Mode<Color>?
+        package let color: AssetReference?
     }
 }

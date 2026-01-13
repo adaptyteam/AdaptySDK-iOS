@@ -8,15 +8,7 @@
 import Foundation
 
 extension Schema.Pager {
-    struct PageControl: Sendable, Hashable {
-        let layout: Layout
-        let verticalAlignment: Schema.VerticalAlignment
-        let padding: Schema.EdgeInsets
-        let dotSize: Double
-        let spacing: Double
-        let colorAssetId: String?
-        let selectedColorAssetId: String?
-    }
+    typealias PageControl = VC.Pager.PageControl
 }
 
 extension Schema.Pager.PageControl {
@@ -26,23 +18,9 @@ extension Schema.Pager.PageControl {
         padding: .init(same: .point(6)),
         dotSize: 6,
         spacing: 6,
-        color: .same(.white),
-        selectedColor: .same(.lightGray)
+        color: nil,
+        selectedColor: nil
     )
-}
-
-extension Schema.Localizer {
-    func pageControl(_ from: Schema.Pager.PageControl) -> VC.Pager.PageControl {
-        .init(
-            layout: from.layout,
-            verticalAlignment: from.verticalAlignment,
-            padding: from.padding,
-            dotSize: from.dotSize,
-            spacing: from.spacing,
-            color: from.colorAssetId.flatMap { try? color($0) } ?? Schema.Pager.PageControl.default.color,
-            selectedColor: from.selectedColorAssetId.flatMap { try? color($0) } ?? Schema.Pager.PageControl.default.selectedColor
-        )
-    }
 }
 
 extension Schema.Pager.PageControl: Decodable {
@@ -69,9 +47,9 @@ extension Schema.Pager.PageControl: Decodable {
                 ?? Self.default.dotSize,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing)
                 ?? Self.default.spacing,
-            colorAssetId: container.decodeIfPresent(String.self, forKey: .colorAssetId),
+            color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId),
 
-            selectedColorAssetId: container.decodeIfPresent(String.self, forKey: .selectedColorAssetId)
+            selectedColor: container.decodeIfPresent(Schema.AssetReference.self, forKey: .selectedColorAssetId)
         )
     }
 }

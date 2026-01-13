@@ -19,7 +19,7 @@ extension Schema.Font {
         weight: 400,
         italic: false,
         defaultSize: 15,
-        defaultColor: .solidColor(.black)
+        defaultColor: .black
     )
 }
 
@@ -61,7 +61,7 @@ extension Schema.Font: Codable {
 
         defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? Self.default.defaultSize
 
-        defaultColor = try container.decodeIfPresent(Schema.Color.self, forKey: .defaultColor).map { .solidColor($0) } ?? Self.default.defaultColor
+        defaultColor = try container.decodeIfPresent(Schema.Color.self, forKey: .defaultColor) ?? Self.default.defaultColor
     }
 
     package func encode(to encoder: any Encoder) throws {
@@ -83,10 +83,9 @@ extension Schema.Font: Codable {
         if defaultSize != Self.default.defaultSize {
             try container.encode(defaultSize, forKey: .defaultSize)
         }
-        if case let .solidColor(color) = defaultColor,
-           defaultColor != Self.default.defaultColor
+        if  defaultColor != Self.default.defaultColor
         {
-            try container.encode(color, forKey: .defaultColor)
+            try container.encode(defaultColor, forKey: .defaultColor)
         }
     }
 }

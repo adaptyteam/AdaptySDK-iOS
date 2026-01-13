@@ -11,7 +11,6 @@ package protocol AdaptyUIActionHandler: AnyObject {
     func openUrl(url: URL, openIn: VC.Action.WebOpenInParameter)
     func userCustomAction(id: String)
     func purchaseProduct(productId: String, service: VC.Action.PaymentService)
-    func openWebPaywall(openIn: VC.Action.WebOpenInParameter) // TODO: Deprecated ??
     func restorePurchases()
     func closeAll()
     func selectProduct(productId: String)

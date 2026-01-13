@@ -15,7 +15,7 @@ package extension VC.Action {
         var components = URLComponents()
         components.scheme = Self.scheme
         components.host = Self.host
-        components.path = "/" + function
+        components.path = "/" + path.joined(separator: "/")
 
         guard let params, !params.isEmpty else {
             return components.url
@@ -40,19 +40,16 @@ package extension VC.Action {
                 .init(codingPath: [], debugDescription: "wrong schema or host of url: \(url)"))
         }
 
-        var function = components.path
-        if function.hasPrefix("/") {
-            function = String(function.dropFirst())
-        }
+        let path = components.path.split(separator: "/").map(String.init)
 
-        guard !function.isEmpty else {
+        guard !path.isEmpty else {
             throw DecodingError.dataCorrupted(
                 .init(
                     codingPath: [], debugDescription: "wrong function name in path of url: \(url)"
                 ))
         }
 
-        self.function = function
+        self.path = path
 
         guard let queryItems = components.queryItems, !queryItems.isEmpty else {
             self.params = nil

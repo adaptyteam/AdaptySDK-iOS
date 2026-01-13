@@ -18,4 +18,12 @@ package extension VC.Element {
     }
 }
 
-
+package extension VC.Element.Properties {
+    var isEmpty: Bool {
+        decorator == nil
+            && padding.isZero
+            && offset.isZero
+            && opacity == 1.0
+            && onAppear.isEmpty
+    }
+}

@@ -9,12 +9,28 @@ import Foundation
 
 package extension VC.RichText {
     struct Attributes: Sendable, Hashable {
-        package let font: VC.Font
-        package let size: Double
-        package let txtColor: VC.Mode<VC.Filling>
-        package let imageTintColor: VC.Mode<VC.Filling>?
-        package let background: VC.Mode<VC.Filling>?
-        package let strike: Bool
-        package let underline: Bool
+        package let font: VC.AssetReference? // default?
+        package let size: Double? // default?
+        package let txtColor: VC.AssetReference? // default?
+        package let imageTintColor: VC.AssetReference?
+        package let background: VC.AssetReference?
+        package let strike: Bool? // default: false
+        package let underline: Bool? // default: false
     }
 }
+
+extension VC.RichText.Attributes {
+    var isEmpty: Bool {
+        font == nil
+            && size == nil
+            && txtColor == nil
+            && imageTintColor == nil
+            && background == nil
+            && (strike ?? false) == false
+            && (underline ?? false) == false
+    }
+
+    var nonEmptyOrNil: Self? { isEmpty ? nil : self }
+}
+
+

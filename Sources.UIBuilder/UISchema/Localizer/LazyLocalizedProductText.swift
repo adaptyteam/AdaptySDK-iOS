@@ -12,13 +12,13 @@ package extension VC {
         package let adaptyProductId: String
         private let suffix: String?
         private let localizer: Schema.Localizer
-        private let defaultTextAttributes: Schema.TextAttributes?
+        private let defaultTextAttributes: Schema.RichText.Attributes?
 
         init(
             adaptyProductId: String,
             suffix: String?,
             localizer: Schema.Localizer,
-            defaultTextAttributes: Schema.TextAttributes?
+            defaultTextAttributes: Schema.RichText.Attributes?
         ) {
             self.adaptyProductId = adaptyProductId
             self.suffix = suffix
@@ -42,13 +42,13 @@ package extension VC {
         package let productGroupId: String
         private let suffix: String?
         private let localizer: Schema.Localizer
-        private let defaultTextAttributes: Schema.TextAttributes?
+        private let defaultTextAttributes: Schema.RichText.Attributes?
 
         init(
             productGroupId: String,
             suffix: String?,
             localizer: Schema.Localizer,
-            defaultTextAttributes: Schema.TextAttributes?
+            defaultTextAttributes: Schema.RichText.Attributes?
         ) {
             self.productGroupId = productGroupId
             self.suffix = suffix
@@ -58,10 +58,10 @@ package extension VC {
 
         package func richText() -> RichText {
             localizer.richText(
-                stringId: Schema.StringId.Product.calculate(
+                stringId: Schema.StringReference.Product.calculate(
                     suffix: suffix
-                ),
-                defaultTextAttributes: defaultTextAttributes
+                )
+//                ,defaultTextAttributes: defaultTextAttributes
             ) ?? .empty
         }
 
@@ -84,37 +84,37 @@ private extension Schema.Localizer {
         adaptyProductId: String,
         byPaymentMode paymentMode: PaymentModeValue = nil,
         suffix: String?,
-        defaultTextAttributes: Schema.TextAttributes?
+        defaultTextAttributes: Schema.RichText.Attributes?
     ) -> VC.RichText {
         if let value = richText(
-            stringId: Schema.StringId.Product.calculate(
+            stringId: Schema.StringReference.Product.calculate(
                 adaptyProductId: adaptyProductId,
                 byPaymentMode: paymentMode,
                 suffix: suffix
-            ),
-            defaultTextAttributes: defaultTextAttributes
+            )
+//            ,defaultTextAttributes: defaultTextAttributes
         ) { return value }
         if paymentMode != nil, let value = richText(
-            stringId: Schema.StringId.Product.calculate(
+            stringId: Schema.StringReference.Product.calculate(
                 adaptyProductId: adaptyProductId,
                 byPaymentMode: nil,
                 suffix: suffix
-            ),
-            defaultTextAttributes: defaultTextAttributes
+            )
+//            ,defaultTextAttributes: defaultTextAttributes
         ) { return value }
         if let value = richText(
-            stringId: Schema.StringId.Product.calculate(
+            stringId: Schema.StringReference.Product.calculate(
                 byPaymentMode: paymentMode,
                 suffix: suffix
-            ),
-            defaultTextAttributes: defaultTextAttributes
+            )
+//            ,defaultTextAttributes: defaultTextAttributes
         ) { return value }
         if paymentMode != nil, let value = richText(
-            stringId: Schema.StringId.Product.calculate(
+            stringId: Schema.StringReference.Product.calculate(
                 byPaymentMode: nil,
                 suffix: suffix
-            ),
-            defaultTextAttributes: defaultTextAttributes
+            )
+//            ,defaultTextAttributes: defaultTextAttributes
         ) { return value }
         return .empty
     }

@@ -8,13 +8,13 @@
 import Foundation
 
 package extension VC {
-    struct Font: CustomAsset, Sendable, Hashable {
+    struct Font: Sendable, Hashable {
         package let customId: String?
         package let alias: String
         package let familyName: String
         package let weight: Int
         package let italic: Bool
         let defaultSize: Double
-        let defaultColor: Filling
+        let defaultColor: Color
     }
 }

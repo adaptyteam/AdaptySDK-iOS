@@ -32,7 +32,7 @@ package extension AdaptyUIConfiguration {
             if let element = try? jsonDecoder.decode(Schema.Element.self, from: dataContent, with: configuration) {
                 Schema.Screen(
                     templateId: templateId,
-                    backgroundAssetId: "$black",
+                    background: .assetId("$black"),
                     cover: nil,
                     content: element,
                     footer: nil,

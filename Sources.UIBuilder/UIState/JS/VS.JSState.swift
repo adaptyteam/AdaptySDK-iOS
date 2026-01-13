@@ -45,49 +45,91 @@ extension VS.JSState {
         context.evaluateScript(script)
         objectWillChange.send()
     }
-        
-    func getValue<T: JSValueRepresentable>(_ type: T.Type, _ key: String) throws(VS.Error) -> T? {
-        guard let value = context.objectForKeyedSubscript(key) else {
-            throw .jsVariableNotFound(key)
+
+    private func findObject(rootObject: JSValue?, path: [String]) throws(VS.Error) -> JSValue {
+        guard let rootObject = rootObject ?? context.globalObject else {
+            throw .jsGlobalObjectNotFound
         }
-        log.debug("get variable \(key) = \(value)")
-        return T.fromJSValue(value)
+
+        var current = rootObject
+        for component in path {
+            guard let value = current.objectForKeyedSubscript(component), value.isObject
+            else {
+                throw .jsObjectNotFound(path.joined(separator: "."))
+            }
+            current = value
+        }
+
+        return current
     }
-        
-    private func callFunction<T: JSValueRepresentable>(
+
+    func getValue<T: JSValueRepresentable>(_ type: T.Type, rootObject: JSValue?, path: [String]) throws(VS.Error) -> T? {
+        let name = path.last
+        let parent = try findObject(rootObject: rootObject, path: path.dropLast())
+
+        let result: JSValue
+
+        if let name {
+            guard let value = parent.objectForKeyedSubscript(name) else {
+                throw .jsObjectNotFound(path.joined(separator: "."))
+            }
+            result = value
+        } else {
+            result = parent
+        }
+
+        log.debug("get variable \(path.joined(separator: ".")) = \(result)")
+        return T.fromJSValue(result)
+    }
+
+    private func invokeMethod<T: JSValueRepresentable>(
         _ type: T.Type,
-        _ functionName: String,
+        rootObject: JSValue?,
+        path: [String],
         args functionArguments: [any JSValueConvertable] = []
     ) throws(VS.Error) -> T? {
-        guard let function = context.objectForKeyedSubscript(functionName),
-              !function.isUndefined
-        else {
-            throw .jsFunctionNotFound(functionName)
+        guard let name = path.last, path.count > 0 else { throw .jsPathToObjectIsEmpty }
+
+        let parent = try findObject(rootObject: rootObject, path: path.dropLast())
+
+        guard parent.hasProperty(name) else {
+            throw .jsMethodNotFound(path.joined(separator: "."))
         }
-            
-        let value = function.call(
+        let value: JSValue? = parent.invokeMethod(
+            name,
             withArguments: functionArguments.map { $0.toJSValue(in: context) }
-        )!
-            
-        if value.isUndefined {
-            log.debug("function called \(functionName)")
+        )
+
+        if let value = T.fromJSValue(value) {
+            log.debug("method called \(path.joined(separator: ".")) -> \(String(describing: value))")
+            return value
         } else {
-            log.debug("function called \(functionName) -> \(String(describing: value))")
+            log.debug("method called \(path.joined(separator: "."))")
+            return nil
         }
-        return T.fromJSValue(value)
     }
-        
-    func setValue(_ key: String, _ value: any JSValueConvertable) throws(VS.Error) {
+
+    func setValue(
+        rootObject: JSValue?,
+        path: [String],
+        value: any JSValueConvertable
+    ) throws(VS.Error) {
+        guard let name = path.last, path.count > 0 else { throw .jsPathToObjectIsEmpty }
+
+        let parent = try findObject(rootObject: rootObject, path: path.dropLast())
+
         do {
-            _ = try callFunction(Bool.self, "set" + key.capitalizedFirst, args: [value])
+            var path = path
+            path[path.count - 1] = "set" + name.capitalizedFirst
+            _ = try invokeMethod(Bool.self, rootObject: rootObject, path: path, args: [value])
             objectWillChange.send()
             return
         } catch {
-            guard case .jsFunctionNotFound = error else { throw error }
+            guard case .jsMethodNotFound = error else { throw error }
         }
-            
-        context.setObject(value, forKeyedSubscript: key as NSString)
-        log.debug("set variable \(key) = \(value)")
+
+        parent.setObject(value, forKeyedSubscript: name as NSString)
+        log.debug("set variable \(path.joined(separator: ".")) = \(value)")
         objectWillChange.send()
     }
     
@@ -95,7 +137,7 @@ extension VS.JSState {
         guard !actions.isEmpty else { return }
         for action in actions {
             guard !actionDispatcher.execute(action, in: context) else { continue }
-            _ = try callFunction(Bool.self, action.function, args: [action.params])
+            _ = try invokeMethod(Bool.self, rootObject: nil, path: action.path, args: [action.params])
         }
         objectWillChange.send()
     }

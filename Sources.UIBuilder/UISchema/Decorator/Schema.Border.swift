@@ -11,9 +11,6 @@ extension Schema {
     typealias Border = VC.Border
 }
 
-extension VC.Border {
-    static let `default` = Self(
-        filling: .same(.solidColor(.transparent)),
-        thickness: 1.0
-    )
+extension Schema.Border {
+    static let defaultThickness = 1.0
 }

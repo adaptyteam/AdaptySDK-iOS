@@ -9,11 +9,7 @@
 import Foundation
 
 extension Schema {
-    struct Shadow: Sendable, Hashable {
-        let colorAssetId: String
-        let blurRadius: Double
-        let offset: Offset
-    }
+    typealias Shadow = VC.Shadow
 }
 
 extension Schema.Shadow {
@@ -23,16 +19,6 @@ extension Schema.Shadow {
     )
 }
 
-extension Schema.Localizer {
-    func shadow(_ from: Schema.Shadow) throws -> VC.Shadow {
-        .init(
-            filling: (try? filling(from.colorAssetId)) ?? .same(Schema.Filling.transparent),
-            blurRadius: from.blurRadius,
-            offset: from.offset
-        )
-    }
-}
-
 extension Schema.Shadow: Decodable {
     enum CodingKeys: String, CodingKey {
         case colorAssetId = "color"
@@ -40,11 +26,11 @@ extension Schema.Shadow: Decodable {
         case offset
     }
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         try self.init(
-            colorAssetId: container.decode(String.self, forKey: .colorAssetId),
+            filling: container.decode(Schema.AssetReference.self, forKey: .colorAssetId),
             blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius)
                 ?? Schema.Shadow.default.blurRadius,
             offset: container.decodeIfPresent(VC.Offset.self, forKey: .offset)

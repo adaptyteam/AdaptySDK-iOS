@@ -8,7 +8,7 @@
 import Foundation
 
 package extension VC {
-    struct VideoData: CustomAsset, Sendable, Hashable {
+    struct VideoData: Sendable, Hashable {
         package let customId: String?
         package let url: URL
         package let image: ImageData

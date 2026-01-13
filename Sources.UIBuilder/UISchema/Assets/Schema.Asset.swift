@@ -7,145 +7,19 @@
 
 import Foundation
 
-extension VC.Background {
-    static let `default` = Self.filling(.same(.default))
-}
-
 extension Schema {
-    enum Asset: Sendable, Hashable {
-        case filling(Filling)
-        case image(ImageData)
-        case video(VideoData)
-        case font(Font)
-        case unknown(String?)
-    }
-}
-
-private extension Schema.Asset {
-    var asFilling: Schema.Filling {
-        get throws {
-            guard case let .filling(value) = self else {
-                throw Schema.Error.wrongTypeAsset("color or any-gradient")
-            }
-            return value
-        }
-    }
-
-    var asColor: Schema.Color {
-        get throws {
-            guard case let .filling(.solidColor(value)) = self else {
-                throw Schema.Error.wrongTypeAsset("color")
-            }
-            return value
-        }
-    }
-
-    var asImageData: Schema.ImageData {
-        get throws {
-            guard case let .image(value) = self else {
-                throw Schema.Error.wrongTypeAsset("image")
-            }
-            return value
-        }
-    }
-
-    var asVideoData: Schema.VideoData {
-        get throws {
-            guard case let .video(value) = self else {
-                throw Schema.Error.wrongTypeAsset("video")
-            }
-            return value
-        }
-    }
-
-    var asFont: Schema.Font {
-        get throws {
-            guard case let .font(value) = self else {
-                throw Schema.Error.wrongTypeAsset("font")
-            }
-            return value
-        }
-    }
-}
-
-extension Schema.Localizer {
-    private enum AssetIdentifySuffix: String {
-        case darkMode = "@dark"
-    }
-
-    private func asset(_ assetId: String, darkMode mode: Bool = false) throws -> Schema.Asset {
-        guard let value = assetOrNil(assetId, darkMode: mode) else {
-            throw Schema.Error.notFoundAsset(assetId)
-        }
-        return value
-    }
-
-    private func assetOrNil(_ assetId: String, darkMode mode: Bool) -> Schema.Asset? {
-        let assetId = mode ? assetId + AssetIdentifySuffix.darkMode.rawValue : assetId
-        return localization?.assets?[assetId] ?? source.assets[assetId]
-    }
-
-    @inlinable
-    func background(_ assetId: String) throws -> VC.Background {
-        switch try asset(assetId) {
-        case let .filling(value):
-            try .filling(.init(
-                light: value,
-                dark: assetOrNil(assetId, darkMode: true)?.asFilling
-            ))
-        case let .image(value):
-            try .image(.init(
-                light: value,
-                dark: assetOrNil(assetId, darkMode: true)?.asImageData
-            ))
-        default:
-            throw Schema.Error.wrongTypeAsset("color, any-gradient, or image")
-        }
-    }
-
-    @inlinable
-    func filling(_ assetId: String) throws -> VC.Mode<VC.Filling> {
-        try VC.Mode(
-            light: asset(assetId).asFilling,
-            dark: assetOrNil(assetId, darkMode: true)?.asFilling
-        )
-    }
-
-    @inlinable
-    func color(_ assetId: String) throws -> VC.Mode<VC.Color> {
-        try VC.Mode(
-            light: asset(assetId).asColor,
-            dark: try? assetOrNil(assetId, darkMode: true)?.asColor
-        )
-    }
-
-    @inlinable
-    func imageData(_ assetId: String) throws -> VC.Mode<VC.ImageData> {
-        try VC.Mode(
-            light: asset(assetId).asImageData,
-            dark: assetOrNil(assetId, darkMode: true)?.asImageData
-        )
-    }
-
-    @inlinable
-    func videoData(_ assetId: String) throws -> VC.Mode<VC.VideoData> {
-        try VC.Mode(
-            light: asset(assetId).asVideoData,
-            dark: assetOrNil(assetId, darkMode: true)?.asVideoData
-        )
-    }
-
-    @inlinable
-    func font(_ assetId: String) throws -> VC.Font {
-        try asset(assetId).asFont
-    }
+    typealias Asset = VC.Asset
 }
 
 extension Schema.Asset: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case type
+
+        case value
+        case customId = "custom_id"
     }
+
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -156,8 +30,15 @@ extension Schema.Asset: Codable {
         }
 
         switch type {
-        case let type where Schema.Filling.assetType(type):
-            self = try .filling(Schema.Filling(from: decoder))
+        case VC.Color.assetType:
+            self = try .solidColor(.init(
+                customId: container.decodeIfPresent(String.self, forKey: .customId),
+                data: container.decode(Schema.Color.self, forKey: .value).data
+            ))
+        case let type where Schema.ColorGradient.assetType(type):
+            self = try .colorGradient(Schema.ColorGradient(from: decoder))
+//        case let type where Schema.Filling.assetType(type):
+//            self = try .filling(Schema.Filling(from: decoder))
         case VC.Font.assetType:
             self = try .font(Schema.Font(from: decoder))
         case VC.ImageData.assetType:
@@ -171,8 +52,16 @@ extension Schema.Asset: Codable {
 
     func encode(to encoder: any Encoder) throws {
         switch self {
-        case let .filling(value):
-            try value.encode(to: encoder)
+        case let .solidColor(color):
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            try container.encode(Schema.Color.assetType, forKey: .type)
+            try container.encodeIfPresent(color.customId, forKey: .customId)
+            try container.encode(color, forKey: .value)
+        case let .colorGradient(gradient):
+            try gradient.encode(to: encoder)
+
+//        case let .filling(value):
+//            try value.encode(to: encoder)
         case let .image(data):
             try data.encode(to: encoder)
         case let .video(data):

@@ -7,10 +7,6 @@
 
 import Foundation
 
-extension Schema.Animation {
-    typealias Timeline = VC.Animation.Timeline
-}
-
 extension Schema.Animation.Timeline {
     static let `default` = Self(
         duration: 0.3,

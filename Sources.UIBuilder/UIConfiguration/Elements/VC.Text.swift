@@ -13,5 +13,7 @@ package extension VC {
         package let horizontalAlign: HorizontalAlignment
         package let maxRows: Int?
         package let overflowMode: Set<OverflowMode>
+        package let defaultTextAttributes: RichText.Attributes?
+
     }
 }

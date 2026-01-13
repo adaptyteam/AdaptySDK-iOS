@@ -9,7 +9,7 @@ import Foundation
 
 package extension VC {
     struct VideoPlayer: Hashable, Sendable {
-        package let asset: Mode<VideoData>
+        package let asset: AssetReference
         package let aspect: AspectRatio
         package let loop: Bool
     }

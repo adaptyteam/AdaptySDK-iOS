@@ -7,19 +7,6 @@
 
 import Foundation
 
-extension Schema.Animation {
-    typealias Range = VC.Animation.Range
-}
-
-extension Schema.Localizer {
-    func animationFillingValue(_ from: Schema.Animation.Range<String>) throws -> VC.Animation.Range<VC.Mode<VC.Filling>> {
-        try .init(
-            start: filling(from.start),
-            end: filling(from.end)
-        )
-    }
-}
-
 extension Schema.Animation.Range: Codable where T: Codable {
     enum CodingKeys: String, CodingKey {
         case start

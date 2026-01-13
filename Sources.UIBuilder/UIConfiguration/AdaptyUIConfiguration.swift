@@ -16,6 +16,8 @@ package struct AdaptyUIConfiguration: Sendable, Hashable {
 
     @available(*, deprecated, message: "use screens ")
     package var deprecated_defaultScreen: Screen { screens["default"]! }
+    
+    let assets: [String: Asset]
     package let screens: [String: Screen]
     package let scripts: [String]
 }

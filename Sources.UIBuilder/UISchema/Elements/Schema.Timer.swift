@@ -14,7 +14,7 @@ extension Schema {
         let format: [Item]
         let actions: [Schema.Action]
         let horizontalAlign: HorizontalAlignment
-        let defaultTextAttributes: TextAttributes?
+        let defaultTextAttributes: RichText.Attributes?
 
         struct Item: Sendable, Hashable {
             let from: TimeInterval
@@ -32,17 +32,20 @@ extension Schema.Localizer {
         .init(
             id: from.id,
             state: from.state,
-            format: from.format.compactMap {
-                guard let value = richText(
-                    stringId: $0.stringId,
-                    defaultTextAttributes: from.defaultTextAttributes
-                ) else { return nil }
+            format: .init(
+                items: from.format.compactMap {
+                    guard let value = richText(
+                        stringId: $0.stringId
+                    ) else { return nil }
 
-                return .init(
-                    from: $0.from,
-                    value: value
-                )
-            },
+                    return .init(
+                        from: $0.from,
+                        value: value
+                    )
+                },
+                textAttributes: from.defaultTextAttributes
+            ),
+
             actions: from.actions,
             horizontalAlign: from.horizontalAlign
         )
@@ -111,7 +114,7 @@ extension Schema.Timer: Decodable {
             }
 
         horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
-        let textAttributes = try Schema.TextAttributes(from: decoder)
+        let textAttributes = try Schema.RichText.Attributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil
     }
 }

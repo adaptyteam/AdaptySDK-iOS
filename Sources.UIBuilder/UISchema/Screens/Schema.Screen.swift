@@ -10,7 +10,7 @@ import Foundation
 extension Schema {
     struct Screen: Sendable, Hashable {
         let templateId: String
-        let backgroundAssetId: String?
+        let background: AssetReference?
         let cover: Box?
         let content: Element
         let footer: Element?
@@ -22,7 +22,7 @@ extension Schema.Localizer {
     func screen(_ from: Schema.Screen) throws -> VC.Screen {
         try .init(
             templateId: from.templateId,
-            background: from.backgroundAssetId.flatMap { try? background($0) } ?? .default,
+            background: from.background,
             cover: from.cover.map(box),
             content: element(from.content),
             footer: from.footer.map(element),
@@ -34,7 +34,7 @@ extension Schema.Localizer {
 extension Schema.Screen: Encodable, DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case templateId = "template_id"
-        case backgroundAssetId = "background"
+        case background
         case cover
         case content
         case footer
@@ -55,7 +55,7 @@ extension Schema.Screen: Encodable, DecodableWithConfiguration {
 
         try self.init(
             templateId: templateId,
-            backgroundAssetId: container.decodeIfPresent(String.self, forKey: .backgroundAssetId),
+            background: container.decodeIfPresent(Schema.AssetReference.self, forKey: .background),
             cover: container.decodeIfPresent(Schema.Box.self, forKey: .cover, configuration: configuration),
             content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
             footer: container.decodeIfPresent(Schema.Element.self, forKey: .footer, configuration: configuration),

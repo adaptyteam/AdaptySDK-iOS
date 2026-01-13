@@ -7,10 +7,6 @@
 
 import Foundation
 
-extension Schema.Animation {
-    typealias RotationParameters = VC.Animation.RotationParameters
-}
-
 extension Schema.Animation.RotationParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case angle

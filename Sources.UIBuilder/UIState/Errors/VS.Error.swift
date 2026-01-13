@@ -9,7 +9,13 @@ import Foundation
 
 extension VS {
     enum Error: Swift.Error {
-        case jsFunctionNotFound(String)
-        case jsVariableNotFound(String)
+        case referenceWithoutAssetId
+        case notFoundAsset(String)
+        case wrongTypeAsset(String)
+
+        case jsGlobalObjectNotFound
+        case jsPathToObjectIsEmpty
+        case jsObjectNotFound(String)
+        case jsMethodNotFound(String)
     }
 }

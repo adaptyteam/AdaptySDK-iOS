@@ -9,8 +9,8 @@ import Foundation
 
 package extension VC {
     struct Image: Sendable, Hashable {
-        package let asset: Mode<ImageData>
+        package let asset: AssetReference
         package let aspect: AspectRatio
-        package let tint: Mode<Filling>?
+        package let tint: AssetReference?
     }
 }

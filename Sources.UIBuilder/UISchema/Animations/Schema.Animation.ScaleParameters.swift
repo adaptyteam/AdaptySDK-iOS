@@ -7,10 +7,6 @@
 
 import Foundation
 
-extension Schema.Animation {
-    typealias ScaleParameters = VC.Animation.ScaleParameters
-}
-
 extension Schema.Animation.ScaleParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case scale

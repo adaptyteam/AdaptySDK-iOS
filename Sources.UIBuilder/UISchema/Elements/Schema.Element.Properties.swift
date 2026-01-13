@@ -10,23 +10,7 @@ import Foundation
 extension Schema.Element {
     struct Properties: Sendable, Hashable {
         let legacyElementId: String?
-        let decorator: Schema.Decorator?
-        let padding: Schema.EdgeInsets
-        let offset: Schema.Offset
-
-        let opacity: Double
-        let onAppear: [Schema.Animation]
-    }
-}
-
-extension Schema.Element.Properties {
-    var isZero: Bool {
-        legacyElementId == nil
-            && decorator == nil
-            && padding.isZero
-            && offset.isZero
-            && opacity == 0
-            && onAppear.isEmpty
+        let value: VC.Element.Properties?
     }
 }
 
@@ -36,19 +20,6 @@ extension Schema.Element.Properties {
         offset: VC.Offset.zero,
         opacity: 1.0
     )
-}
-
-extension Schema.Localizer {
-    func elementProperties(_ from: Schema.Element.Properties) throws -> VC.Element.Properties? {
-        guard !from.isZero else { return nil }
-        return try .init(
-            decorator: from.decorator.map(decorator),
-            padding: from.padding,
-            offset: from.offset,
-            opacity: from.opacity,
-            onAppear: from.onAppear.map(animation)
-        )
-    }
 }
 
 extension Schema.Element.Properties: Decodable {
@@ -81,13 +52,17 @@ extension Schema.Element.Properties: Decodable {
             try container.decodeIfPresent(Double.self, forKey: .opacity) ?? Self.default.opacity
         }
 
-        try self.init(
-            legacyElementId: container.decodeIfPresent(String.self, forKey: .legacyElementId),
+        let value = try VC.Element.Properties(
             decorator: container.decodeIfPresent(Schema.Decorator.self, forKey: .decorator),
             padding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .padding) ?? Self.default.padding,
             offset: container.decodeIfPresent(Schema.Offset.self, forKey: .offset) ?? Self.default.offset,
             opacity: opacity,
             onAppear: onAppear
+        )
+
+        try self.init(
+            legacyElementId: container.decodeIfPresent(String.self, forKey: .legacyElementId),
+            value: value.isEmpty ? nil : value
         )
     }
 }

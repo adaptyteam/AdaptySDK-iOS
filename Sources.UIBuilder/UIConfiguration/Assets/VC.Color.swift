@@ -8,7 +8,7 @@
 import Foundation
 
 package extension VC {
-    struct Color: CustomAsset, Sendable, Hashable {
+    struct Color: Sendable, Hashable {
         package let customId: String?
         let data: UInt64
     }

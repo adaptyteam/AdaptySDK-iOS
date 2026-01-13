@@ -8,7 +8,7 @@
 import Foundation
 
 package extension VC {
-    struct ColorGradient: CustomAsset, Sendable, Hashable {
+    struct ColorGradient: Sendable, Hashable {
         package let customId: String?
         package let kind: Kind
         package let start: Point

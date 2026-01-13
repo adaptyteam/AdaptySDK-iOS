@@ -36,31 +36,31 @@ extension Schema.Localizer {
         case let .template(id):
             try templateInstance(id)
         case let .stack(value, properties):
-            try .stack(stack(value), properties.flatMap(elementProperties))
+            try .stack(stack(value), properties?.value)
         case let .text(value, properties):
-            try .text(text(value), properties.flatMap(elementProperties))
+            .text(text(value), properties?.value)
         case let .image(value, properties):
-            try .image(image(value), properties.flatMap(elementProperties))
+            .image(value, properties?.value)
         case let .video(value, properties):
-            try .video(videoPlayer(value), properties.flatMap(elementProperties))
+            .video(value, properties?.value)
         case let .button(value, properties):
-            try .button(button(value), properties.flatMap(elementProperties))
+            try .button(button(value), properties?.value)
         case let .box(value, properties):
-            try .box(box(value), properties.flatMap(elementProperties))
+            try .box(box(value), properties?.value)
         case let .row(value, properties):
-            try .row(row(value), properties.flatMap(elementProperties))
+            try .row(row(value), properties?.value)
         case let .column(value, properties):
-            try .column(column(value), properties.flatMap(elementProperties))
+            try .column(column(value), properties?.value)
         case let .section(value, properties):
-            try .section(section(value), properties.flatMap(elementProperties))
+            try .section(section(value), properties?.value)
         case let .toggle(value, properties):
-            try .toggle(toggle(value), properties.flatMap(elementProperties))
+            .toggle(value, properties?.value)
         case let .timer(value, properties):
-            try .timer(timer(value), properties.flatMap(elementProperties))
+            .timer(timer(value), properties?.value)
         case let .pager(value, properties):
-            try .pager(pager(value), properties.flatMap(elementProperties))
+            try .pager(pager(value), properties?.value)
         case let .unknown(value, properties):
-            try .unknown(value, properties.flatMap(elementProperties))
+            .unknown(value, properties?.value)
         }
     }
 }
@@ -140,8 +140,8 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         }
 
         func propertyOrNil() -> Properties? {
-            guard let value = try? Properties(from: decoder) else { return nil }
-            return value.isZero ? nil : value
+            guard let properties = try? Properties(from: decoder) else { return nil }
+            return (properties.legacyElementId == nil && properties.value == nil) ? nil : properties
         }
     }
 

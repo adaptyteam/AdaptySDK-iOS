@@ -7,10 +7,6 @@
 
 import Foundation
 
-extension Schema.Animation {
-    typealias BoxParameters = VC.Animation.BoxParameters
-}
-
 extension Schema.Animation.BoxParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case width

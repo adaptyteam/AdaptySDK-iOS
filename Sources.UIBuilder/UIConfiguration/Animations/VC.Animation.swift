@@ -14,7 +14,7 @@ package extension VC {
         case rotation(Timeline, RotationParameters)
         case scale(Timeline, ScaleParameters)
         case box(Timeline, BoxParameters)
-        case background(Timeline, Range<Mode<Filling>>)
+        case background(Timeline, Range<AssetReference>)
         case border(Timeline, BorderParameters)
         case shadow(Timeline, ShadowParameters)
     }

@@ -21,8 +21,9 @@ extension Schema.Action: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         if container.contains(.function) {
+            let function = try container.decode(String.self, forKey: .function)
             try self.init(
-                function: container.decode(String.self, forKey: .function),
+                path: function.split(separator: ".").map(String.init),
                 params: container.decodeIfPresent([String: Parameter].self, forKey: .params)
             )
         } else {
@@ -52,56 +53,56 @@ extension Schema.Action {
 
         switch try container.decode(String.self, forKey: .type) {
         case "open_url":
-            try self.init(function: "SDK.openUrl", params: [
+            try self.init(path: ["SDK", "openUrl"], params: [
                 "url": .string(container.decode(String.self, forKey: .url))
             ])
         case "restore":
-            self.init(function: "SDK.restorePurchases", params: nil)
+            self.init(path: ["SDK", "restorePurchases"], params: nil)
         case "close":
-            self.init(function: "SDK.closeAll", params: nil)
+            self.init(path: ["SDK", "closeAll"], params: nil)
         case "custom":
-            try self.init(function: "SDK.userCustomAction", params: [
+            try self.init(path: ["SDK", "userCustomAction"], params: [
                 "userCustomId": .string(container.decode(String.self, forKey: .customId))
             ])
         case "web_purchase_paywall":
-            try self.init(function: "SDK.webPurchasePaywall", params: [
+            try self.init(path: ["SDK", "webPurchasePaywall"], params: [
                 "openIn": .string(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn)
             ])
         case "purchase_product":
-            try self.init(function: "SDK.purchaseProduct", params: [
+            try self.init(path: ["SDK", "purchaseProduct"], params: [
                 "productId": .string(container.decode(String.self, forKey: .productId))
             ])
         case "web_purchase_product":
-            try self.init(function: "SDK.webPurchaseProduct", params: [
+            try self.init(path: ["SDK", "webPurchaseProduct"], params: [
                 "productId": .string(container.decode(String.self, forKey: .productId)),
                 "openIn": .string(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn)
             ])
         case "open_screen":
-            try self.init(function: "SDK.openScreen", params: [
+            try self.init(path: ["SDK", "openScreen"], params: [
                 "screenId": .string(container.decode(String.self, forKey: .screenId))
             ])
         case "close_screen":
-            self.init(function: "SDK.closeCurrentScreen", params: nil)
+            self.init(path: ["SDK", "closeCurrentScreen"], params: nil)
         case "select_product":
-            try self.init(function: "Legacy.selectProduct", params: [
+            try self.init(path: ["Legacy", "selectProduct"], params: [
                 "productId": .string(container.decode(String.self, forKey: .productId)),
                 "groupId": .string(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId)
             ])
         case "unselect_product":
-            try self.init(function: "Legacy.unselectProduct", params: [
+            try self.init(path: ["Legacy", "unselectProduct"], params: [
                 "groupId": .string(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId)
             ])
         case "purchase_selected_product":
-            try self.init(function: "Legacy.purchaseSelectedProduct", params: [
+            try self.init(path: ["Legacy", "purchaseSelectedProduct"], params: [
                 "groupId": .string(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId)
             ])
         case "web_purchase_selected_product":
-            try self.init(function: "Legacy.webPurchaseSelectedProduct", params: [
+            try self.init(path: ["Legacy", "webPurchaseSelectedProduct"], params: [
                 "groupId": .string(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
                 "openIn": .string(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn)
             ])
         case "switch":
-            try self.init(function: "Legacy.switchSection", params: [
+            try self.init(path: ["Legacy", "switchSection"], params: [
                 "sectionId": .string(container.decode(String.self, forKey: .sectionId)),
                 "index": .int32(container.decode(Int32.self, forKey: .index))
             ])

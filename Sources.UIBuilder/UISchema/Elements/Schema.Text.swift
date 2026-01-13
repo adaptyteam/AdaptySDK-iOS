@@ -9,11 +9,11 @@ import Foundation
 
 extension Schema {
     struct Text: Sendable, Hashable {
-        let stringId: StringId
+        let stringId: StringReference
         let horizontalAlign: HorizontalAlignment
         let maxRows: Int?
         let overflowMode: Set<OverflowMode>
-        let defaultTextAttributes: TextAttributes?
+        let defaultTextAttributes: RichText.Attributes?
     }
 }
 
@@ -21,12 +21,12 @@ extension Schema.Localizer {
     func text(_ textBlock: Schema.Text) -> VC.Text {
         let value: VC.Text.Value =
             switch textBlock.stringId {
-            case let .basic(stringId):
+            case let .stringId(stringId):
                 .text(richText(
-                    stringId: stringId,
-                    defaultTextAttributes: textBlock.defaultTextAttributes
+                    stringId: stringId
                 ) ?? .empty)
-
+            case let .value(path):
+                .value(path: path)
             case let .product(info):
                 if let adaptyProductId = info.adaptyProductId {
                     .productText(VC.LazyLocalizedProductText(
@@ -49,7 +49,8 @@ extension Schema.Localizer {
             value: value,
             horizontalAlign: textBlock.horizontalAlign,
             maxRows: textBlock.maxRows,
-            overflowMode: textBlock.overflowMode
+            overflowMode: textBlock.overflowMode,
+            defaultTextAttributes: textBlock.defaultTextAttributes
         )
     }
 }
@@ -64,7 +65,7 @@ extension Schema.Text: Codable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        stringId = try container.decode(Schema.StringId.self, forKey: .stringId)
+        stringId = try container.decode(Schema.StringReference.self, forKey: .stringId)
         horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         maxRows = try container.decodeIfPresent(Int.self, forKey: .maxRows)
         overflowMode =
@@ -73,7 +74,7 @@ extension Schema.Text: Codable {
             } else {
                 try Set(container.decodeIfPresent([OverflowMode].self, forKey: .overflowMode) ?? [])
             }
-        let textAttributes = try Schema.TextAttributes(from: decoder)
+        let textAttributes = try Schema.RichText.Attributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil
     }
 

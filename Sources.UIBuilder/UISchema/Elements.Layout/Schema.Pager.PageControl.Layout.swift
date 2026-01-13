@@ -7,10 +7,6 @@
 
 import Foundation
 
-extension Schema.Pager.PageControl {
-    typealias Layout = VC.Pager.PageControl.Layout
-}
-
 extension Schema.Pager.PageControl.Layout: RawRepresentable {
     private enum Key {
         static let overlaid = "overlaid"

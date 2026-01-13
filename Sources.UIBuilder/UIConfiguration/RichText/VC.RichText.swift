@@ -15,5 +15,6 @@ package extension VC {
 }
 
 package extension VC.RichText {
+    static let empty: Self = .init(items: [], fallback: nil)
     var isEmpty: Bool { items.isEmpty }
 }

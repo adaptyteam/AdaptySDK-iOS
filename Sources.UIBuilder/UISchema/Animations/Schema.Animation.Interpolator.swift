@@ -5,9 +5,7 @@
 //  Created by Aleksei Valiano on 25.11.2025.
 //
 
-extension Schema.Animation {
-    typealias Interpolator = VC.Animation.Interpolator
-}
+import Foundation
 
 extension Schema.Animation.Interpolator {
     static let `default` = Self.easeInOut

@@ -8,21 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Image: Sendable, Hashable {
-        let assetId: String
-        let aspect: AspectRatio
-        let tintAssetId: String?
-    }
-}
-
-extension Schema.Localizer {
-    func image(_ from: Schema.Image) throws -> VC.Image {
-        try .init(
-            asset: imageData(from.assetId),
-            aspect: from.aspect,
-            tint: from.tintAssetId.flatMap { try? filling($0) }
-        )
-    }
+    typealias Image = VC.Image
 }
 
 extension Schema.Image: Decodable {
@@ -32,10 +18,12 @@ extension Schema.Image: Decodable {
         case tintAssetId = "tint"
     }
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        assetId = try container.decode(String.self, forKey: .assetId)
-        aspect = try container.decodeIfPresent(Schema.AspectRatio.self, forKey: .aspect) ?? Schema.AspectRatio.default
-        tintAssetId = try container.decodeIfPresent(String.self, forKey: .tintAssetId)
+        try self.init(
+            asset: container.decode(Schema.AssetReference.self, forKey: .assetId),
+            aspect: container.decodeIfPresent(Schema.AspectRatio.self, forKey: .aspect) ?? Schema.AspectRatio.default,
+            tint: container.decodeIfPresent(Schema.AssetReference.self, forKey: .tintAssetId)
+        )
     }
 }

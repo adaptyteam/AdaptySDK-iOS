@@ -41,7 +41,7 @@ extension Schema.Localizer {
             pagePadding: from.pagePadding,
             spacing: from.spacing,
             content: from.content.map(element),
-            pageControl: from.pageControl.map(pageControl),
+            pageControl: from.pageControl,
             animation: from.animation,
             interactionBehavior: from.interactionBehavior
         )

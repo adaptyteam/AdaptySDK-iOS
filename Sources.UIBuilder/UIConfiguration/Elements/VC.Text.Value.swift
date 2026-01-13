@@ -12,5 +12,6 @@ package extension VC.Text {
         case text(VC.RichText)
         case productText(VC.LazyLocalizedProductText)
         case selectedProductText(VC.LazyLocalizedUnknownProductText)
+        case value(path: [String])
     }
 }

@@ -8,23 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Toggle: Sendable, Hashable {
-        let onActions: [Action]
-        let offActions: [Action]
-        let onCondition: StateCondition
-        let colorAssetId: String?
-    }
-}
-
-extension Schema.Localizer {
-    func toggle(_ from: Schema.Toggle) -> VC.Toggle {
-        .init(
-            onActions: from.onActions,
-            offActions: from.offActions,
-            onCondition: from.onCondition,
-            color: from.colorAssetId.flatMap { try? color($0) }
-        )
-    }
+    typealias Toggle = VC.Toggle
 }
 
 extension Schema.Toggle: Decodable {
@@ -39,25 +23,25 @@ extension Schema.Toggle: Decodable {
         case colorAssetId = "color"
     }
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let colorAssetId = try container.decodeIfPresent(String.self, forKey: .colorAssetId)
+        let colorAssetId = try container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)
 
         if let sectionId = try container.decodeIfPresent(String.self, forKey: .sectionId) {
             let onIndex = try container.decodeIfPresent(Int32.self, forKey: .onIndex) ?? 0
             let offIndex = try container.decodeIfPresent(Int32.self, forKey: .offIndex) ?? -1
 
             self.init(
-                onActions: [.init(function: "Legacy.switchSection", params: [
+                onActions: [.init(path: ["Legacy", "switchSection"], params: [
                     "sectionId": .string(sectionId),
                     "index": .int32(onIndex)
                 ])],
-                offActions: [.init(function: "Legacy.switchSection", params: [
+                offActions: [.init(path: ["Legacy", "switchSection"], params: [
                     "sectionId": .string(sectionId),
                     "index": .int32(offIndex)
                 ])],
                 onCondition: .selectedSection(id: sectionId, index: onIndex),
-                colorAssetId: colorAssetId
+                color: colorAssetId
             )
             return
         }
@@ -78,7 +62,7 @@ extension Schema.Toggle: Decodable {
             onActions: onActions,
             offActions: offActions,
             onCondition: container.decode(Schema.StateCondition.self, forKey: .onCondition),
-            colorAssetId: colorAssetId
+            color: colorAssetId
         )
     }
 }

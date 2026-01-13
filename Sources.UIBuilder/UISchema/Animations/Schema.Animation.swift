@@ -8,39 +8,7 @@
 import Foundation
 
 extension Schema {
-    enum Animation: Sendable, Hashable {
-        case opacity(Timeline, Range<Double>)
-        case offset(Timeline, Range<Offset>)
-        case rotation(Timeline, RotationParameters)
-        case scale(Timeline, ScaleParameters)
-        case box(Timeline, BoxParameters)
-        case background(Timeline, Range<String>)
-        case border(Timeline, BorderParameters)
-        case shadow(Timeline, ShadowParameters)
-    }
-}
-
-extension Schema.Localizer {
-    func animation(_ from: Schema.Animation) throws -> VC.Animation {
-        switch from {
-        case let .opacity(timeline, value):
-            .opacity(timeline, value)
-        case let .offset(timeline, value):
-            .offset(timeline, value)
-        case let .rotation(timeline, value):
-            .rotation(timeline, value)
-        case let .scale(timeline, value):
-            .scale(timeline, value)
-        case let .box(timeline, value):
-            .box(timeline, value)
-        case let .background(timeline, value):
-            try .background(timeline, animationFillingValue(value))
-        case let .border(timeline, value):
-            try .border(timeline, animationBorderParameters(value))
-        case let .shadow(timeline, value):
-            try .shadow(timeline, animationShadowParameters(value))
-        }
-    }
+    typealias Animation = VC.Animation
 }
 
 extension Schema.Animation: Codable {
@@ -67,7 +35,7 @@ extension Schema.Animation: Codable {
         case shadow
     }
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let typeName = try container.decode(String.self, forKey: .type)
         switch Types(rawValue: typeName) {
@@ -98,7 +66,7 @@ extension Schema.Animation: Codable {
         case .background:
             self = try .background(
                 .init(from: decoder),
-                container.decode(Range<String>.self, forKey: .color)
+                container.decode(Range<Schema.AssetReference>.self, forKey: .color)
             )
         case .border:
             self = try .border(.init(from: decoder), .init(from: decoder))
@@ -107,7 +75,7 @@ extension Schema.Animation: Codable {
         }
     }
 
-    func encode(to encoder: any Encoder) throws {
+    package func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         switch self {
