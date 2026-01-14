@@ -13,6 +13,7 @@ package extension VC {
         indirect case stack(Stack, Properties?)
         case text(Text, Properties?)
         case textField(TextField, Properties?)
+        case slider(Slider, Properties?)
         case image(Image, Properties?)
         case video(VideoPlayer, Properties?)
         indirect case button(Button, Properties?)

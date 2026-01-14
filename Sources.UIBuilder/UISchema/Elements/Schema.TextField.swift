@@ -9,13 +9,6 @@ import Foundation
 
 extension Schema {
     typealias TextField = VC.TextField
-//    struct TextField: Sendable, Hashable {
-//        let value: Variable
-//        let horizontalAlign: HorizontalAlignment
-//        let maxRows: Int?
-//        let overflowMode: Set<Text.OverflowMode>
-//        let defaultTextAttributes: RichText.Attributes?
-//    }
 }
 
 extension Schema.TextField: Codable {

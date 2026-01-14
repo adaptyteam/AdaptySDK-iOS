@@ -22,6 +22,7 @@ extension Schema {
         indirect case column(Schema.Column, Properties?)
         indirect case section(Schema.Section, Properties?)
         case toggle(Schema.Toggle, Properties?)
+        case slider(Schema.Slider, Properties?)
         case timer(Schema.Timer, Properties?)
         indirect case pager(Schema.Pager, Properties?)
 
@@ -58,6 +59,8 @@ extension Schema.Localizer {
             try .section(section(value), properties?.value)
         case let .toggle(value, properties):
             .toggle(value, properties?.value)
+        case let .slider(value, properties):
+            .slider(value, properties?.value)
         case let .timer(value, properties):
             .timer(timer(value), properties?.value)
         case let .pager(value, properties):
@@ -89,6 +92,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         case column
         case section
         case toggle
+        case slider
         case timer
         case `if`
         case legacyReference
@@ -139,6 +143,8 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
             self = try .section(Schema.Section(from: decoder, configuration: configuration), propertyOrNil())
         case .toggle:
             self = try .toggle(Schema.Toggle(from: decoder), propertyOrNil())
+        case .slider:
+            self = try .slider(Schema.Slider(from: decoder), propertyOrNil())
         case .timer:
             self = try .timer(Schema.Timer(from: decoder), propertyOrNil())
         case .pager:
