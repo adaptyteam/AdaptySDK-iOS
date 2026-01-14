@@ -46,16 +46,17 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     private var playerStatusObservation: NSKeyValueObservation?
 
     init(
-        video: VC.VideoData,
+        video: AdaptyUIResolvedVideoAsset,
         loop: Bool,
-        assetsResolver: AdaptyUIAssetsResolver,
         onStateUpdated: @escaping (PlayerState) -> Void
     ) {
-        let video = video.resolve(with: assetsResolver)
         player = video.player
-        // preview image : video.image
+
         if loop {
-            playerLooper = AVPlayerLooper(player: video.player, templateItem: video.item)
+            playerLooper = AVPlayerLooper(
+                player: video.player,
+                templateItem: video.item
+            )
         } else {
             playerLooper = nil
         }
@@ -76,7 +77,10 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         player?.play()
     }
 
-    private func playerStatusDidChange(_ status: AVPlayerItem.Status, item: AVPlayerItem) {
+    private func playerStatusDidChange(
+        _ status: AVPlayerItem.Status,
+        item: AVPlayerItem
+    ) {
         switch status {
         case .unknown:
             Log.ui.verbose("#AdaptyUIVideoPlayerManager# playerStatusDidChange = unknown")

@@ -10,24 +10,22 @@
 import SwiftUI
 
 struct AdaptyUIShadowModifier: ViewModifier {
-    private let asset: VC.AssetReference
+    private let color: AdaptyUIResolvedColorAsset?
     private let blurRadius: Double
     private let offset: CGSize
 
     init(
-        asset: VC.AssetReference,
+        color: AdaptyUIResolvedColorAsset?,
         blurRadius: Double,
         offset: CGSize
     ) {
-        self.asset = asset
+        self.color = color
         self.blurRadius = blurRadius
         self.offset = offset
     }
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
-    @EnvironmentObject
-    private var stateViewModel: AdaptyUIStateViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenSize)
@@ -38,12 +36,7 @@ struct AdaptyUIShadowModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .shadow(
-                color: self.asset
-                    .resolveSolidColor(
-                        with: self.assetsViewModel.assetsResolver,
-                        stateViewModel: self.stateViewModel,
-                        mode: self.colorScheme.toVCMode
-                    ) ?? .clear,
+                color: self.color ?? .clear,
                 radius: self.blurRadius,
                 x: self.offset.width,
                 y: self.offset.height
@@ -54,14 +47,14 @@ struct AdaptyUIShadowModifier: ViewModifier {
 extension View {
     @ViewBuilder
     func shadow(
-        asset: VC.AssetReference?,
+        color: AdaptyUIResolvedColorAsset?,
         blurRadius: Double?,
         offset: CGSize?
     ) -> some View {
-        if let asset, let blurRadius, let offset {
+        if let color, let blurRadius, let offset {
             self.modifier(
                 AdaptyUIShadowModifier(
-                    asset: asset,
+                    color: color,
                     blurRadius: blurRadius,
                     offset: offset
                 )

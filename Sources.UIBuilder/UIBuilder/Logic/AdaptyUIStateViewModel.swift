@@ -11,9 +11,8 @@ import Foundation
 @MainActor
 package final class AdaptyUIStateViewModel: ObservableObject {
     let logId: String
-
-    private let isInspectable: Bool
-    private let state: AdaptyUIState
+    let isInspectable: Bool
+    let state: AdaptyUIState
 
     package var viewConfiguration: VC { state.configuration }
     package let logic: any AdaptyUIBuilderLogic
@@ -53,39 +52,6 @@ package final class AdaptyUIStateViewModel: ObservableObject {
             try state.execute(actions: actions)
         } catch {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
-        }
-    }
-
-    // MARK: Refactor --
-
-    func asset(
-        _ ref: AdaptyUIConfiguration.AssetReference?,
-        mode: VC.Mode,
-        defaultValue: VC.Asset?
-    ) -> VC.Asset? {
-        guard let assetId = ref?.getAssetId(state: state) else {
-            return defaultValue
-        }
-
-        return try? state.asset(assetId, for: mode) ?? defaultValue
-    }
-}
-
-extension VC.Asset {
-    static var defaultScreenBackground: Self {
-        .solidColor(.black)
-    }
-}
-
-@MainActor
-extension AdaptyUIConfiguration.AssetReference {
-    func getAssetId(state: AdaptyUIState) -> String? {
-        switch self {
-        case let .assetId(id):
-            id
-        case let .variable(variable):
-            // TODO: think about fallback value?
-            try? state.getValue(String.self, variable: variable)
         }
     }
 }

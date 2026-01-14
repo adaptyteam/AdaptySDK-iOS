@@ -7,23 +7,39 @@
 
 #if canImport(UIKit)
 
+import SwiftUI
 import UIKit
 
 @MainActor
 package class AdaptyUIAssetsViewModel: ObservableObject {
     let assetsResolver: AdaptyUIAssetsResolver
+    let cache: AdaptyUIAssetCache
 
     package init(
-        assetsResolver: AdaptyUIAssetsResolver
+        assetsResolver: AdaptyUIAssetsResolver,
+        stateViewModel: AdaptyUIStateViewModel
     ) {
         self.assetsResolver = assetsResolver
+        cache = AdaptyUIAssetCache(
+            state: stateViewModel.state,
+            customAssetsResolver: assetsResolver
+        )
     }
+    
+    func resolvedAsset(
+        _ ref: AdaptyUIConfiguration.AssetReference?,
+        mode: VC.Mode
+    ) -> AdaptyUIResolvedAsset {
+        cache.cachedAsset(ref, mode: mode).value
+    }
+
+    // MARK: - Video Player Logic
 
     @Published var playerStates = [String: AdaptyUIVideoPlayerManager.PlayerState]()
     @Published var playerManagers = [String: AdaptyUIVideoPlayerManager]()
 
     func getOrCreatePlayerManager(
-        for video: VC.VideoData,
+        for video: AdaptyUIResolvedVideoAsset,
         loop: Bool,
         id: String
     ) -> AdaptyUIVideoPlayerManager {
@@ -33,8 +49,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
         let manager = AdaptyUIVideoPlayerManager(
             video: video,
-            loop: loop,
-            assetsResolver: assetsResolver
+            loop: loop
         ) { [weak self] state in
             DispatchQueue.main.async { [weak self] in
                 self?.playerStates[id] = state

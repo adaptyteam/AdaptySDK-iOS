@@ -21,6 +21,10 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
     private var safeArea: EdgeInsets
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyUIAssetsViewModel
 
     @State private var scaleX: CGFloat
     @State private var scaleY: CGFloat
@@ -91,7 +95,10 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .shadow(
-                asset: resolvedShadowFilling,
+                color: assetsViewModel.resolvedAsset(
+                    resolvedShadowFilling,
+                    mode: colorScheme.toVCMode
+                ).asColorAsset,
                 blurRadius: resolvedShadowBlurRadius,
                 offset: resolvedShadowOffset
             )

@@ -68,7 +68,10 @@ struct AdaptyUIElementWithoutPropertiesView: View {
             }
         case let .box(box, props):
             elementOrEmpty(box.content)
-                .animatableFrame(box: box, animations: props?.onAppear)
+                .animatableFrame(
+                    box: box,
+                    animations: props?.onAppear
+                )
                 .rangedFrame(box: box)
         case let .stack(stack, _):
             AdaptyUIStackView(stack)
@@ -79,7 +82,7 @@ struct AdaptyUIElementWithoutPropertiesView: View {
         case let .slider(slider):
             AdaptyUIUnknownElementView(value: "slider")
         case let .image(image, _):
-            AdaptyUIImageView(image)
+            AdaptyUIImageView(.unresolvedAsset(image))
         case let .video(video, _):
             AdaptyUIVideoView(video: video, colorScheme: colorScheme)
         case let .button(button, _):
