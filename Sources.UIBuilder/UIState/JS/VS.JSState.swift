@@ -63,7 +63,8 @@ extension VS.JSState {
         return current
     }
 
-    func getValue<T: JSValueRepresentable>(_ type: T.Type, rootObject: JSValue?, path: [String]) throws(VS.Error) -> T? {
+    func getValue<T: JSValueRepresentable>(_ type: T.Type, rootObject: JSValue?, variable: VC.Variable) throws(VS.Error) -> T? {
+        let path = variable.path
         let name = path.last
         let parent = try findObject(rootObject: rootObject, path: path.dropLast())
 
@@ -111,9 +112,10 @@ extension VS.JSState {
 
     func setValue(
         rootObject: JSValue?,
-        path: [String],
+        variable: VC.Variable,
         value: any JSValueConvertable
     ) throws(VS.Error) {
+        let path = variable.path
         guard let name = path.last, path.count > 0 else { throw .jsPathToObjectIsEmpty }
 
         let parent = try findObject(rootObject: rootObject, path: path.dropLast())

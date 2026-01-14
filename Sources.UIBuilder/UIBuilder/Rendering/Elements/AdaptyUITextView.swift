@@ -74,7 +74,7 @@ extension AdaptyUIBuilder {
 }
 
 @MainActor
-extension Array where Element == VC.RichText.Item {
+extension [VC.RichText.Item] {
     func convertToSwiftUITextThrowingError(
         assetsResolver: AdaptyUIAssetsResolver,
         tagResolver: AdaptyUITagResolver,
@@ -156,9 +156,9 @@ extension VC.RichText {
             let reducedString = items.reduce("") { partialResult, item in
                 switch item {
                 case let .text(value, _), let .tag(value, _):
-                    return partialResult + value
+                    partialResult + value
                 default:
-                    return partialResult
+                    partialResult
                 }
             }
             return Text(reducedString)
@@ -241,7 +241,7 @@ extension VC.Text {
 
     func extract(productsInfoProvider: ProductsInfoProvider) -> (VC.RichText, ProductInfoContainer) {
         switch value {
-        case let .value(path):
+        case let .variable(variable):
             return (.empty, .notApplicable) // TODO: implement
         case let .text(value):
             return (value, .notApplicable)

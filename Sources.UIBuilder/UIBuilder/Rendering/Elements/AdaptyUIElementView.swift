@@ -24,15 +24,16 @@ extension VC.Element {
     var properties: VC.Element.Properties? {
         switch self {
         case .space:
-            return nil
+            nil
         case let .box(_, properties), let .stack(_, properties),
              let .text(_, properties), let .image(_, properties),
+             let .textField(_, properties),
              let .button(_, properties), let .row(_, properties),
              let .column(_, properties), let .section(_, properties),
              let .toggle(_, properties), let .timer(_, properties),
              let .pager(_, properties), let .unknown(_, properties),
              let .video(_, properties):
-            return properties
+            properties
         }
     }
 }
@@ -66,6 +67,8 @@ struct AdaptyUIElementWithoutPropertiesView: View {
             AdaptyUIStackView(stack)
         case let .text(text, _):
             AdaptyUITextView(text)
+        case let .textField(textField):
+            AdaptyUIUnknownElementView(value: "textField")
         case let .image(image, _):
             AdaptyUIImageView(image)
         case let .video(video, _):

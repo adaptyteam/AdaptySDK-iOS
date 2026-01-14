@@ -82,10 +82,10 @@ extension AdaptyUIConfiguration.AssetReference {
     func getAssetId(state: AdaptyUIState) -> String? {
         switch self {
         case let .assetId(id):
-            return id
-        case let .value(path):
+            id
+        case let .variable(variable):
             // TODO: think about fallback value?
-            return try? state.getValue(String.self, path: path)
+            try? state.getValue(String.self, variable: variable)
         }
     }
 }

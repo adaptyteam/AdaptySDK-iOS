@@ -13,6 +13,7 @@ extension Schema {
         case template(id: String)
         indirect case stack(Schema.Stack, Properties?)
         case text(Schema.Text, Properties?)
+        case textField(Schema.TextField, Properties?)
         case image(Schema.Image, Properties?)
         case video(Schema.VideoPlayer, Properties?)
         indirect case button(Schema.Button, Properties?)
@@ -39,6 +40,8 @@ extension Schema.Localizer {
             try .stack(stack(value), properties?.value)
         case let .text(value, properties):
             .text(text(value), properties?.value)
+        case let .textField(value, properties):
+            .textField(value, properties?.value)
         case let .image(value, properties):
             .image(value, properties?.value)
         case let .video(value, properties):
@@ -74,6 +77,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
 
     enum ContentType: String, Codable {
         case text
+        case textField = "text_field"
         case image
         case video
         case button
@@ -121,6 +125,8 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
             self = try .button(Schema.Button(from: decoder, configuration: configuration), propertyOrNil())
         case .text:
             self = try .text(Schema.Text(from: decoder), propertyOrNil())
+        case .textField:
+            self = try .textField(Schema.TextField(from: decoder), propertyOrNil())
         case .image:
             self = try .image(Schema.Image(from: decoder), propertyOrNil())
         case .video:

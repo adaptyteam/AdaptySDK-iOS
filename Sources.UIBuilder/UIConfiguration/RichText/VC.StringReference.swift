@@ -11,7 +11,7 @@ package extension VC {
     enum StringReference: Sendable, Hashable {
         case stringId(String)
         case product(Product)
-        case value(path: [String])
+        case variable(Variable)
     }
 }
 

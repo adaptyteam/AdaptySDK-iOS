@@ -10,6 +10,6 @@ import Foundation
 package extension VC {
     enum AssetReference: Sendable, Hashable {
         case assetId(String)
-        case value(path: [String])
+        case variable(Variable)
     }
 }

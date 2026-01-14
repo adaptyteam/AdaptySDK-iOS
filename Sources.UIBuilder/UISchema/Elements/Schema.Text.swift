@@ -23,8 +23,8 @@ extension Schema.Localizer {
             switch textBlock.stringId {
             case let .stringId(stringId):
                 .text(strings[stringId] ?? .empty)
-            case let .value(path):
-                .value(path: path)
+            case let .variable(variable):
+                .variable(variable)
             case let .product(info):
                 if let adaptyProductId = info.adaptyProductId {
                     .productText(VC.LazyLocalizedProductText(

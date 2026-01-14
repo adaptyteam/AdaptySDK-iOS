@@ -13,21 +13,18 @@ extension Schema {
 
 extension Schema.StringReference: Codable {
     enum CodingKeys: String, CodingKey {
-        case value = "var"
+        case variable = "var"
         case type
     }
 
     package init(from decoder: Decoder) throws {
-        if let stringId = try? decoder.singleValueContainer().decode(String.self) {
-            self = .stringId(stringId)
+        guard let container = try? decoder.container(keyedBy: CodingKeys.self) else {
+            self = try .stringId(decoder.singleValueContainer().decode(String.self))
             return
         }
 
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        if container.contains(.value) {
-            let value = try container.decode(String.self, forKey: .value)
-            self = .value(path: value.split(separator: ".").map(String.init))
+        guard !container.contains(.variable) else {
+            self = try .variable(Schema.Variable(from: decoder))
             return
         }
 
@@ -47,9 +44,8 @@ extension Schema.StringReference: Codable {
             try container.encode(string)
         case let .product(product):
             try container.encode(product)
-        case let .value(path):
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(path.joined(separator: "."), forKey: .value)
+        case let .variable(variable):
+            try container.encode(variable)
         }
     }
 }
