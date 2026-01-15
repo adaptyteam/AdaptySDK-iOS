@@ -16,10 +16,7 @@ struct AdaptyUIToggleView: View {
     private var colorScheme: ColorScheme
 
     @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
-    @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
-    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
     @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
-    @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
     @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
 
     private var toggle: VC.Toggle
@@ -47,13 +44,12 @@ struct AdaptyUIToggleView: View {
         ) {
             EmptyView()
         }
-        // TODO: refactor this
-//        .tint(
-//            toggle.color?.resolve(
-//                with: assetsViewModel.assetsResolver,
-//                colorScheme: colorScheme
-//            )
-//        )
+        .tint(
+            assetsViewModel.resolvedAsset(
+                toggle.color,
+                mode: colorScheme.toVCMode
+            ).asColorAsset
+        )
     }
 }
 

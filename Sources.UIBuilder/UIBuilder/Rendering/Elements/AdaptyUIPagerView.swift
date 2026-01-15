@@ -59,8 +59,6 @@ struct AdaptyUIPagerView: View {
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
-    @EnvironmentObject
-    private var stateViewModel: AdaptyUIStateViewModel
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
     @Environment(\.adaptyScreenSize)
@@ -252,11 +250,10 @@ struct AdaptyUIPagerView: View {
             ForEach(0 ..< pager.content.count, id: \.self) { idx in
                 Circle()
                     .fill(
-                        // TODO: refactor this
-                        idx == currentPageSelectedIndex ? Color(UIColor.lightGray) : Color.white
-//                        idx == currentPageSelectedIndex ?
-//                            pageControl.selectedColor.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme) :
-//                            pageControl.color.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme)
+                        asset: assetsViewModel.resolvedAsset(
+                            idx == currentPageSelectedIndex ? pageControl.selectedColor : pageControl.color,
+                            mode: colorScheme.toVCMode
+                        )
                     )
                     .frame(width: pageControl.dotSize,
                            height: pageControl.dotSize)

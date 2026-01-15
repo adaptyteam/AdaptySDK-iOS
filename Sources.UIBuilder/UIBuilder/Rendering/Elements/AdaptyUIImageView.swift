@@ -56,7 +56,9 @@ struct AdaptyUIImageView: View {
     private var colorScheme: ColorScheme
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
-
+    @EnvironmentObject
+    private var paywallViewModel: AdaptyUIPaywallViewModel
+    
     @ViewBuilder
     private func rasterImage(
         _ uiImage: UIImage?,
@@ -137,7 +139,12 @@ struct AdaptyUIImageView: View {
                 tint: tint
             )
         default:
-            Rectangle() // TODO: warning or rendering error
+            Rectangle()
+                .onAppear {
+                    paywallViewModel.reportDidFailRendering(
+                        with: .wrongAssetType("Expected image, got \(asset.typeName)")
+                    )
+                }
         }
     }
 

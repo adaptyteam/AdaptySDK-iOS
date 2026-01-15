@@ -28,7 +28,7 @@ extension AdaptyUICachedAsset {
     }
 }
 
-@MainActor
+@MainActor // TODO: x rename AdaptyUIAssetsCache
 final class AdaptyUIAssetCache {
     private let state: AdaptyUIState
     private let customAssetsResolver: AdaptyUIAssetsResolver
@@ -81,12 +81,6 @@ final class AdaptyUIAssetCache {
         )
 
         return newAsset
-    }
-}
-
-extension VC.Asset {
-    static var defaultScreenBackground: Self {
-        .solidColor(.black)
     }
 }
 

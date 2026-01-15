@@ -44,6 +44,19 @@ enum AdaptyUIResolvedAsset {
 }
 
 extension AdaptyUIResolvedAsset {
+    var typeName: String {
+        switch self {
+        case .color: "color"
+        case .colorGradient: "colorGradient"
+        case .image: "image"
+        case .video: "video"
+        case .font: "font"
+        case .nothing: "nothing"
+        }
+    }
+}
+
+extension AdaptyUIResolvedAsset {
     var asColorAsset: AdaptyUIResolvedColorAsset? {
         guard case let .color(asset) = self else {
             return nil
@@ -51,9 +64,17 @@ extension AdaptyUIResolvedAsset {
 
         return asset
     }
-    
+
     var asImageAsset: AdaptyUIResolvedImageAsset? {
         guard case let .image(asset) = self else {
+            return nil
+        }
+
+        return asset
+    }
+    
+    var asFontAsset: AdaptyUIResolvedFontAsset? {
+        guard case let .font(asset) = self else {
             return nil
         }
 

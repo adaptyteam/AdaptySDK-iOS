@@ -25,6 +25,8 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "The template with ID '\(templateId)' is not supported or not found. Please contact support."
         case let .wrongComponentType(componentId):
             "Invalid component type for component with ID '\(componentId)'. Please contact support."
+        case let .wrongAssetType(assetType):
+            "Invalid asset type '\(assetType)'. Please contact support."
         }
     }
 
@@ -44,6 +46,8 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "AdaptyUIError.unsupportedTemplate (Code: 4100): Template with ID '\(templateId)' is not available or not supported in the current configuration. This may indicate a missing template, version mismatch, or configuration issue. Please contact support."
         case let .wrongComponentType(componentId):
             "AdaptyUIError.wrongComponentType (Code: 4103): Component with ID '\(componentId)' has an invalid or unsupported type configuration. This typically indicates a template structure issue or version incompatibility. Please contact support."
+        case let .wrongAssetType(assetType):
+            "AdaptyUIError.wrongAssetType (Code: 4104): Asset with type '\(assetType)' is incompatible with element. This typically indicates a template structure issue or version incompatibility. Please contact support."
         }
     }
 }

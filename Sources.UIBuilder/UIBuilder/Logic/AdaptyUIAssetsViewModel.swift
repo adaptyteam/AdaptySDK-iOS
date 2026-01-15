@@ -15,6 +15,7 @@ import UIKit
 package class AdaptyUIAssetsViewModel: ObservableObject {
     let assetsResolver: AdaptyUIAssetsResolver
     let cache: AdaptyUIAssetCache
+    
     private var cancellables = Set<AnyCancellable>()
 
     package init(

@@ -58,7 +58,7 @@ extension InsettableShape {
         case let .colorGradient(colorGradient):
             self.fillColorGradient(colorGradient)
         case let .image(imageData):
-            self.fillImage(imageData, tint: nil) // TODO: check tint
+            self.fillImage(imageData, tint: nil)
         case .video, .font, .nothing, .none:
             self
         }

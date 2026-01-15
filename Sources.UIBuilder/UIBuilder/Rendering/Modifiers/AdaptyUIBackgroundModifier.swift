@@ -9,15 +9,6 @@
 
 import SwiftUI
 
-extension ColorScheme {
-    var toVCMode: VC.Mode {
-        switch self {
-        case .dark: .dark
-        default: .light
-        }
-    }
-}
-
 struct AdaptyUIBackgroundModifier: ViewModifier {
     var background: VC.AssetReference?
     var defaultValue: VC.Asset?
