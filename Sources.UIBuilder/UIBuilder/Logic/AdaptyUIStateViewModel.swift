@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import SwiftUI
 
 @MainActor
 package final class AdaptyUIStateViewModel: ObservableObject {
@@ -53,5 +54,26 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         } catch {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
         }
+    }
+    
+    func createBinding<T: JSValueRepresentable>(
+        _ variable: VC.Variable,
+        defaultValue: T
+    ) -> Binding<T> {
+        .init(
+            get: {
+                (try? self.state.getValue(T.self, variable: variable)) ?? defaultValue
+            },
+            set: { value in
+                do {
+                    try self.state.setValue(
+                        variable: variable,
+                        value: value
+                    )
+                } catch {
+                    Log.ui.error("#\(self.logId)# variable error: \(error)")
+                }
+            }
+        )
     }
 }
