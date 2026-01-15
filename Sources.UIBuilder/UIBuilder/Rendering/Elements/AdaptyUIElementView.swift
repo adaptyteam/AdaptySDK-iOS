@@ -78,7 +78,7 @@ struct AdaptyUIElementWithoutPropertiesView: View {
         case let .text(text, _):
             AdaptyUITextView(text)
         case let .textField(textField, _):
-            AdaptyUIUnknownElementView(value: "textField")
+            AdaptyUITextField(textField)
         case let .slider(slider, _):
             AdaptyUISliderView(slider)
         case let .image(image, _):
