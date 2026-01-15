@@ -7,6 +7,7 @@
 
 #if canImport(UIKit)
 
+import Combine
 import SwiftUI
 import UIKit
 
@@ -14,6 +15,7 @@ import UIKit
 package class AdaptyUIAssetsViewModel: ObservableObject {
     let assetsResolver: AdaptyUIAssetsResolver
     let cache: AdaptyUIAssetCache
+    private var cancellables = Set<AnyCancellable>()
 
     package init(
         assetsResolver: AdaptyUIAssetsResolver,
@@ -24,8 +26,14 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
             state: stateViewModel.state,
             customAssetsResolver: assetsResolver
         )
+
+        stateViewModel.state.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
-    
+
     func resolvedAsset(
         _ ref: AdaptyUIConfiguration.AssetReference?,
         mode: VC.Mode

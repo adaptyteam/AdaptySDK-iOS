@@ -220,8 +220,6 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
-    @EnvironmentObject
-    private var stateViewModel: AdaptyUIStateViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
 

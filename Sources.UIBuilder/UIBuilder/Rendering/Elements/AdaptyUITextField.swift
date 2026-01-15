@@ -30,13 +30,15 @@ struct AdaptyUITextField: View {
 
     var body: some View {
         TextField(
-            "Text",
+            "Placeholder",
             text: stateViewModel.createBinding(
                 textField.value,
                 defaultValue: ""
             )
         )
         .multilineTextAlignment(textField.horizontalAlign)
+        .lineLimit(textField.maxRows)
+        .minimumScaleFactor(textField.overflowMode.contains(.scale) ? 0.1 : 1.0)
     }
 }
 

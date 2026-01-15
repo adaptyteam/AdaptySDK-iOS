@@ -60,18 +60,28 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         _ variable: VC.Variable,
         defaultValue: T
     ) -> Binding<T> {
-        .init(
-            get: {
-                (try? self.state.getValue(T.self, variable: variable)) ?? defaultValue
+        Binding(
+            get: { [weak self] in
+                guard let self else { return defaultValue }
+                
+                do {
+                    let value = try self.state.getValue(T.self, variable: variable)
+                    return value ?? defaultValue
+                } catch {
+                    Log.ui.error("#\(self.logId)# getValue error: \(error)")
+                    return defaultValue
+                }
             },
-            set: { value in
+            set: { [weak self] value in
+                guard let self else { return }
+                
                 do {
                     try self.state.setValue(
                         variable: variable,
                         value: value
                     )
                 } catch {
-                    Log.ui.error("#\(self.logId)# variable error: \(error)")
+                    Log.ui.error("#\(self.logId)# setValue error: \(error)")
                 }
             }
         )
