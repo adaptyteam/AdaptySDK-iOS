@@ -64,7 +64,11 @@ extension UIFont {
         }
 
         if font.familyName == systemFontReservedName {
-            return .systemFont(ofSize: size, weight: .fromInteger(font.weight), italic: font.italic)
+            return .systemFont(
+                ofSize: size,
+                weight: .fromInteger(font.weight),
+                italic: font.italic
+            )
         }
 
         return .customFont(ofSize: size,

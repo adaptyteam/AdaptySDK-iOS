@@ -82,36 +82,4 @@ extension AdaptyUIResolvedAsset {
     }
 }
 
-// TODO: extract out of here
-extension AdaptyUIResolvedImageAsset {
-    private var uiImage: UIImage? {
-        switch self {
-        case let .image(image):
-            image
-        case .remote(_, preview: _): // TODO: implement this
-            nil
-        }
-    }
-
-    func textAttachmentImage(
-        font: UIFont,
-        tint: UIColor?
-    ) -> UIImage? {
-        guard var image = uiImage else { return nil }
-
-        let size = CGSize(width: image.size.width * font.capHeight / image.size.height,
-                          height: font.capHeight)
-
-        image = image.imageWith(newSize: size)
-
-        if let tint {
-            image = image
-                .withRenderingMode(.alwaysTemplate)
-                .withTintColor(tint, renderingMode: .alwaysTemplate)
-        }
-
-        return image
-    }
-}
-
 #endif

@@ -14,7 +14,7 @@ import UIKit
 @MainActor
 package class AdaptyUIAssetsViewModel: ObservableObject {
     let assetsResolver: AdaptyUIAssetsResolver
-    let cache: AdaptyUIAssetCache
+    let cache: AdaptyUIAssetsCache
     
     private var cancellables = Set<AnyCancellable>()
 
@@ -23,7 +23,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
         stateViewModel: AdaptyUIStateViewModel
     ) {
         self.assetsResolver = assetsResolver
-        cache = AdaptyUIAssetCache(
+        cache = AdaptyUIAssetsCache(
             state: stateViewModel.state,
             customAssetsResolver: assetsResolver
         )

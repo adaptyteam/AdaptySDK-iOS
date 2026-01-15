@@ -76,14 +76,14 @@ extension AdaptyUIBuilder {
 @MainActor
 extension [VC.RichText.Item] {
     func convertToSwiftUITextThrowingError(
-        assetsCache: AdaptyUIAssetCache,
+        assetsCache: AdaptyUIAssetsCache,
         tagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme
     ) throws -> Text {
         try reduce(Text("")) {
             partialResult,
-            item in
+                item in
             switch item {
             case .unknown:
                 return partialResult
@@ -98,7 +98,7 @@ extension [VC.RichText.Item] {
                 )
             case let .tag(value, attr):
                 let tagReplacementResult: String
-                
+
                 if let customTagResult = tagResolver.replacement(for: value) {
                     tagReplacementResult = customTagResult
                 } else if let productTag = TextProductTag(rawValue: value),
@@ -110,11 +110,11 @@ extension [VC.RichText.Item] {
                     case let .value(string):
                         tagReplacementResult = string
                     }
-                    
+
                 } else {
                     throw AdaptyUIBuilder.RichTextError.tagReplacementNotFound
                 }
-                
+
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: tagReplacementResult,
@@ -128,20 +128,20 @@ extension [VC.RichText.Item] {
                     value,
                     mode: colorScheme.toVCMode
                 ).value.asImageAsset
-                
+
                 let fontResolvedAsset = assetsCache.cachedAsset(
                     attr?.font,
                     mode: colorScheme.toVCMode
                 ).value.asFontAsset
-                
+
                 let tintResolvedAsset = assetsCache.cachedAsset(
                     attr?.imageTintColor,
                     mode: colorScheme.toVCMode
                 ).value.asColorAsset?.uiColor
-                
+
                 guard let uiImage = imageResolvedAsset?.textAttachmentImage(
                     font: fontResolvedAsset ?? .adaptyDefaultFont,
-                    tint: tintResolvedAsset,
+                    tint: tintResolvedAsset
                 ) else {
                     return partialResult
                 }
@@ -159,7 +159,7 @@ extension [VC.RichText.Item] {
 @MainActor
 extension VC.RichText {
     func convertToSwiftUIText(
-        assetsCache: AdaptyUIAssetCache,
+        assetsCache: AdaptyUIAssetsCache,
         tagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
@@ -256,21 +256,25 @@ extension AttributedString {
     static func createFrom(
         value: String,
         attributes: VC.RichText.Attributes?,
-        assetsCache: AdaptyUIAssetCache,
+        assetsCache: AdaptyUIAssetsCache,
         colorScheme: ColorScheme
     ) -> AttributedString {
+        let foregroundColorAsset = assetsCache.cachedAsset(
+            attributes?.txtColor,
+            mode: colorScheme.toVCMode
+        ).value.asColorAsset
+
+        let fontAsset = assetsCache.cachedAsset(
+            attributes?.txtColor,
+            mode: colorScheme.toVCMode
+        ).value.asFontAsset
+
         var result = AttributedString(value)
 
-        result.foregroundColor = assetsCache.cachedAsset(
-            attributes?.txtColor,
-            mode: colorScheme.toVCMode
-        ).value.asColorAsset?.uiColor ?? .adaptyDefaultTextColor
-        
-        result.font = assetsCache.cachedAsset(
-            attributes?.txtColor,
-            mode: colorScheme.toVCMode
-        ).value.asFontAsset ?? .adaptyDefaultFont
-        
+        result.foregroundColor = foregroundColorAsset?.uiColor ?? .adaptyDefaultTextColor
+        result.font = (fontAsset ?? .adaptyDefaultFont)
+            .withSize(attributes?.size ?? .adaptyDefaultFontSize)
+
         if let backgroundColor = assetsCache.cachedAsset(
             attributes?.txtColor,
             mode: colorScheme.toVCMode
@@ -290,6 +294,35 @@ extension AttributedString {
     }
 }
 
+extension AdaptyUIResolvedImageAsset {
+    private var uiImage: UIImage? {
+        switch self {
+        case let .image(image):
+            image
+        case .remote(_, preview: _): // TODO: implement this
+            nil
+        }
+    }
 
+    func textAttachmentImage(
+        font: UIFont,
+        tint: UIColor?
+    ) -> UIImage? {
+        guard var image = uiImage else { return nil }
+
+        let size = CGSize(width: image.size.width * font.capHeight / image.size.height,
+                          height: font.capHeight)
+
+        image = image.imageWith(newSize: size)
+
+        if let tint {
+            image = image
+                .withRenderingMode(.alwaysTemplate)
+                .withTintColor(tint, renderingMode: .alwaysTemplate)
+        }
+
+        return image
+    }
+}
 
 #endif

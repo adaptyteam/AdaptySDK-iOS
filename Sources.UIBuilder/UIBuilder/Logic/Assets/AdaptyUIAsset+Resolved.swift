@@ -87,12 +87,6 @@ extension VC.VideoData {
     }
 }
 
-extension VC.Font {
-    func resolvedFont(withSize size: Double) -> AdaptyUIResolvedFontAsset {
-        UIFont.create(self, withSize: size)
-    }
-}
-
 extension VC.Asset {
     func resolved() -> AdaptyUIResolvedAsset {
         switch self {
@@ -105,8 +99,7 @@ extension VC.Asset {
         case .video(let video):
             .video(video.resolvedVideo)
         case .font(let font):
-            // TODO: check size
-            .font(font.resolvedFont(withSize: font.defaultSize))
+            .font(.create(font, withSize: font.defaultSize))
         case .unknown:
             .nothing
         }

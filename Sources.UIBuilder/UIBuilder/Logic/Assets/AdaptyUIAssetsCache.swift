@@ -1,5 +1,5 @@
 //
-//  AdaptyUIAssetCache.swift
+//  AdaptyUIAssetsCache.swift
 //  Adapty
 //
 //  Created by Alex Goncharov on 14/01/2026.
@@ -28,8 +28,8 @@ extension AdaptyUICachedAsset {
     }
 }
 
-@MainActor // TODO: x rename AdaptyUIAssetsCache
-final class AdaptyUIAssetCache {
+@MainActor
+final class AdaptyUIAssetsCache {
     private let state: AdaptyUIState
     private let customAssetsResolver: AdaptyUIAssetsResolver
 
