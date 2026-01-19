@@ -14,7 +14,16 @@ struct AdaptyUICachedAsset {
     fileprivate let stateValue: AdaptyUIResolvedAsset
     fileprivate let customValue: AdaptyUIResolvedAsset?
 
-    var value: AdaptyUIResolvedAsset { customValue ?? stateValue }
+    // TODO: x refactor this asset consumption logic
+    // first try to convert custom asset to expected
+    // then try to convert state asset to expected
+    var value: AdaptyUIResolvedAsset {
+        if let customValue, !customValue.isNothing {
+            customValue
+        } else {
+            stateValue
+        }
+    }
 }
 
 extension AdaptyUICachedAsset {
@@ -91,7 +100,6 @@ extension AdaptyUIConfiguration.AssetReference {
         case .assetId(let id):
             id
         case .variable(let variable):
-            // TODO: think about fallback value?
             try? state.getValue(String.self, variable: variable)
         }
     }

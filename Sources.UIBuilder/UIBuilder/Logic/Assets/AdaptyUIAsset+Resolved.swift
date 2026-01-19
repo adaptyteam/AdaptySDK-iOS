@@ -59,7 +59,6 @@ extension VC.ColorGradient {
 extension VC.ImageData {
     var resolvedImage: AdaptyUIResolvedImageAsset {
         switch self {
-        // TODO: check customId here
         case .raster(_, let data):
             return .image(image: UIImage(data: data))
         case .url(_, let url, previewRaster: let previewRaster):

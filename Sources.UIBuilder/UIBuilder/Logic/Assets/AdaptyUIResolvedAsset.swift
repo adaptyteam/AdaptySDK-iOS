@@ -41,6 +41,14 @@ enum AdaptyUIResolvedAsset {
     case font(AdaptyUIResolvedFontAsset)
 
     case nothing
+    
+    var isNothing: Bool {
+        if case .nothing = self {
+            true
+        } else {
+            false
+        }
+    }
 }
 
 extension AdaptyUIResolvedAsset {

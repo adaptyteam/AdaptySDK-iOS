@@ -28,6 +28,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     private let viewConfiguration: AdaptyUIConfiguration
     let bottomSheetsViewModels: [AdaptyUIBottomSheetViewModel]
 
+    @Published var currentScreenId: String?
     @Published var presentedScreensStack = [String]()
 
     package init(
@@ -40,6 +41,10 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         bottomSheetsViewModels = viewConfiguration.screens.map {
             .init(id: $0.key, bottomSheet: $0.value)
         }
+    }
+    
+    func openScreen(id: String) {
+        currentScreenId = id
     }
 
     func presentScreen(id: String) {

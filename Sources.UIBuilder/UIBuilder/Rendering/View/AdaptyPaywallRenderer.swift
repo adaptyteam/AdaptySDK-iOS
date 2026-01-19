@@ -37,11 +37,14 @@ struct AdaptyUIPaywallRendererView: View {
     var body: some View {
         let viewConfiguration = paywallViewModel.viewConfiguration
 
-        if let template = VC.Template(rawValue: viewConfiguration.deprecated_defaultScreen.templateId) {
+        if let currentScreenId = screensViewModel.currentScreenId,
+           let screen = viewConfiguration.screens[currentScreenId],
+           let template = VC.Template(rawValue: screen.templateId)
+        {
             ZStack(alignment: .bottom) {
-                templateResolverView(template, screen: viewConfiguration.deprecated_defaultScreen)
+                templateResolverView(template, screen: screen)
                     .staticBackground(
-                        viewConfiguration.deprecated_defaultScreen.background,
+                        screen.background,
                         defaultValue: .defaultScreenBackground
                     )
                 Color.black
@@ -66,10 +69,11 @@ struct AdaptyUIPaywallRendererView: View {
                 paywallViewModel.logShowPaywall()
             }
         } else {
-            EmptyView()
+            Rectangle()
+                .hidden()
                 .onAppear {
                     paywallViewModel.reportDidFailRendering(
-                        with: .unsupportedTemplate(viewConfiguration.deprecated_defaultScreen.templateId)
+                        with: .unsupportedTemplate("// TODO: todo")
                     )
                 }
         }
