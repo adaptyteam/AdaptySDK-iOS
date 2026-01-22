@@ -22,7 +22,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
         let asset = assetsViewModel.resolvedAsset(
             background,
             mode: colorScheme.toVCMode
-        )
+        ).asColorOrGradientOrImageAsset
 
         switch asset {
         case .color(let color):
@@ -51,7 +51,7 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
                     )
                     .ignoresSafeArea()
                 }
-        case .nothing, .video, .font:
+        case .none:
             content
         }
     }

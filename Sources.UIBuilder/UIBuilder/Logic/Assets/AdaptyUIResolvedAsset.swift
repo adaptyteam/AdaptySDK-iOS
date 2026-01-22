@@ -32,6 +32,17 @@ struct AdaptyUIResolvedVideoAsset {
     let image: AdaptyUIResolvedImageAsset?
 }
 
+enum AdaptyUIResolvedColorOrGradientAsset {
+    case color(AdaptyUIResolvedColorAsset)
+    case colorGradient(AdaptyUIResolvedGradientAsset)
+}
+
+enum AdaptyUIResolvedColorOrGradientOrImageAsset {
+    case color(AdaptyUIResolvedColorAsset)
+    case colorGradient(AdaptyUIResolvedGradientAsset)
+    case image(AdaptyUIResolvedImageAsset)
+}
+
 enum AdaptyUIResolvedAsset {
     case color(AdaptyUIResolvedColorAsset)
     case colorGradient(AdaptyUIResolvedGradientAsset)
@@ -39,16 +50,6 @@ enum AdaptyUIResolvedAsset {
 
     case video(AdaptyUIResolvedVideoAsset)
     case font(AdaptyUIResolvedFontAsset)
-
-    case nothing
-    
-    var isNothing: Bool {
-        if case .nothing = self {
-            true
-        } else {
-            false
-        }
-    }
 }
 
 extension AdaptyUIResolvedAsset {
@@ -59,7 +60,6 @@ extension AdaptyUIResolvedAsset {
         case .image: "image"
         case .video: "video"
         case .font: "font"
-        case .nothing: "nothing"
         }
     }
 }
@@ -80,7 +80,32 @@ extension AdaptyUIResolvedAsset {
 
         return asset
     }
+
+    var asVideoAsset: AdaptyUIResolvedVideoAsset? {
+        guard case let .video(asset) = self else {
+            return nil
+        }
+
+        return asset
+    }
     
+    var asColorOrGradientAsset: AdaptyUIResolvedColorOrGradientAsset? {
+        switch self {
+        case let .color(v): .color(v)
+        case let .colorGradient(v): .colorGradient(v)
+        default: nil
+        }
+    }
+
+    var asColorOrGradientOrImageAsset: AdaptyUIResolvedColorOrGradientOrImageAsset? {
+        switch self {
+        case let .color(v): .color(v)
+        case let .colorGradient(v): .colorGradient(v)
+        case let .image(v): .image(v)
+        default: nil
+        }
+    }
+
     var asFontAsset: AdaptyUIResolvedFontAsset? {
         guard case let .font(asset) = self else {
             return nil

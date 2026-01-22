@@ -38,8 +38,8 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
     func resolvedAsset(
         _ ref: AdaptyUIConfiguration.AssetReference?,
         mode: VC.Mode
-    ) -> AdaptyUIResolvedAsset {
-        cache.cachedAsset(ref, mode: mode).value
+    ) -> AdaptyUICachedAsset {
+        cache.cachedAsset(ref, mode: mode)
     }
 
     // MARK: - Video Player Logic

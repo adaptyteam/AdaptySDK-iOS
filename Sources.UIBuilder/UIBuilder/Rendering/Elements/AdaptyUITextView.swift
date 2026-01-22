@@ -127,17 +127,17 @@ extension [VC.RichText.Item] {
                 let imageResolvedAsset = assetsCache.cachedAsset(
                     value,
                     mode: colorScheme.toVCMode
-                ).value.asImageAsset
+                ).asImageAsset
 
                 let fontResolvedAsset = assetsCache.cachedAsset(
                     attr?.font,
                     mode: colorScheme.toVCMode
-                ).value.asFontAsset
+                ).asFontAsset
 
                 let tintResolvedAsset = assetsCache.cachedAsset(
                     attr?.imageTintColor,
                     mode: colorScheme.toVCMode
-                ).value.asColorAsset?.uiColor
+                ).asColorAsset?.uiColor
 
                 guard let uiImage = imageResolvedAsset?.textAttachmentImage(
                     font: fontResolvedAsset ?? .adaptyDefaultFont,
@@ -272,12 +272,12 @@ extension AttributedString {
         let foregroundColorAsset = assetsCache.cachedAsset(
             attributes?.txtColor,
             mode: colorScheme.toVCMode
-        ).value.asColorAsset
+        ).asColorAsset
 
         let fontAsset = assetsCache.cachedAsset(
             attributes?.txtColor,
             mode: colorScheme.toVCMode
-        ).value.asFontAsset
+        ).asFontAsset
 
         var result = AttributedString(value)
 
@@ -288,7 +288,7 @@ extension AttributedString {
         if let backgroundColor = assetsCache.cachedAsset(
             attributes?.txtColor,
             mode: colorScheme.toVCMode
-        ).value.asColorAsset?.uiColor {
+        ).asColorAsset?.uiColor {
             result.backgroundColor = backgroundColor
         }
 

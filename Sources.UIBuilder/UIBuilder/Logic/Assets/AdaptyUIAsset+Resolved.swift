@@ -87,7 +87,7 @@ extension VC.VideoData {
 }
 
 extension VC.Asset {
-    func resolved() -> AdaptyUIResolvedAsset {
+    func resolved() -> AdaptyUIResolvedAsset? {
         switch self {
         case .solidColor(let color):
             .color(color.resolvedColor)
@@ -100,7 +100,7 @@ extension VC.Asset {
         case .font(let font):
             .font(.create(font, withSize: font.defaultSize))
         case .unknown:
-            .nothing
+            nil
         }
     }
 }

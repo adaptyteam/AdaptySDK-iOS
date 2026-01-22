@@ -11,19 +11,8 @@ struct AdaptyUICachedAsset {
     fileprivate let customId: String?
     fileprivate let mode: VC.Mode
 
-    fileprivate let stateValue: AdaptyUIResolvedAsset
+    fileprivate let stateValue: AdaptyUIResolvedAsset?
     fileprivate let customValue: AdaptyUIResolvedAsset?
-
-    // TODO: x refactor this asset consumption logic
-    // first try to convert custom asset to expected
-    // then try to convert state asset to expected
-    var value: AdaptyUIResolvedAsset {
-        if let customValue, !customValue.isNothing {
-            customValue
-        } else {
-            stateValue
-        }
-    }
 }
 
 extension AdaptyUICachedAsset {
@@ -31,9 +20,33 @@ extension AdaptyUICachedAsset {
         .init(
             customId: nil,
             mode: mode,
-            stateValue: .nothing,
+            stateValue: nil,
             customValue: nil
         )
+    }
+
+    var asColorAsset: AdaptyUIResolvedColorAsset? {
+        customValue?.asColorAsset ?? stateValue?.asColorAsset
+    }
+
+    var asImageAsset: AdaptyUIResolvedImageAsset? {
+        customValue?.asImageAsset ?? stateValue?.asImageAsset
+    }
+
+    var asColorOrGradientAsset: AdaptyUIResolvedColorOrGradientAsset? {
+        customValue?.asColorOrGradientAsset ?? stateValue?.asColorOrGradientAsset
+    }
+
+    var asColorOrGradientOrImageAsset: AdaptyUIResolvedColorOrGradientOrImageAsset? {
+        customValue?.asColorOrGradientOrImageAsset ?? stateValue?.asColorOrGradientOrImageAsset
+    }
+
+    var asFontAsset: AdaptyUIResolvedFontAsset? {
+        customValue?.asFontAsset ?? stateValue?.asFontAsset
+    }
+
+    var asVideoAsset: AdaptyUIResolvedVideoAsset? {
+        customValue?.asVideoAsset ?? stateValue?.asVideoAsset
     }
 }
 
@@ -51,7 +64,7 @@ final class AdaptyUIAssetsCache {
         self.state = state
         self.customAssetsResolver = customAssetsResolver
     }
-    
+
     func cachedAsset(
         _ ref: AdaptyUIConfiguration.AssetReference?,
         mode: VC.Mode

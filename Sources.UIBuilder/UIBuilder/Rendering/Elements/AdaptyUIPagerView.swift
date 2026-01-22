@@ -253,7 +253,7 @@ struct AdaptyUIPagerView: View {
                         asset: assetsViewModel.resolvedAsset(
                             idx == currentPageSelectedIndex ? pageControl.selectedColor : pageControl.color,
                             mode: colorScheme.toVCMode
-                        )
+                        ).asColorOrGradientOrImageAsset
                     )
                     .frame(width: pageControl.dotSize,
                            height: pageControl.dotSize)
