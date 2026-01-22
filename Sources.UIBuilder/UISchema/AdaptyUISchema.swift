@@ -11,10 +11,10 @@ typealias Schema = AdaptyUISchema
 
 public struct AdaptyUISchema: Sendable {
     let formatVersion: Version
-    let assets: [String: Asset]
+    let assets: [AssetIdentifier: Asset]
     let localizations: [LocaleId: Localization]
     let defaultLocalization: Localization?
-    let screens: [String: Screen]
+    let screens: [ScreenIdentifier: Screen]
     let templates: any AdaptyUISchemaTemplates
     let scripts: [String]
 }

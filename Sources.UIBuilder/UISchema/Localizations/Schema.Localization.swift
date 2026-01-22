@@ -11,8 +11,8 @@ extension Schema {
     struct Localization: Sendable, Hashable {
         let id: LocaleId
         let isRightToLeft: Bool?
-        let strings: [String: Item]?
-        let assets: [String: Asset]?
+        let strings: [StringIdentifier: Item]?
+        let assets: [AssetIdentifier: Asset]?
 
         struct Item: Sendable, Hashable {
             let value: RichText
@@ -43,13 +43,13 @@ extension Schema.Localization: Codable {
         assets = try (container.decodeIfPresent(Schema.AssetsContainer.self, forKey: .assets))?.value
 
         var stringsContainer = try container.nestedUnkeyedContainer(forKey: .strings)
-        var strings = [String: Item]()
+        var strings = [Schema.StringIdentifier: Item]()
         if let count = stringsContainer.count {
             strings.reserveCapacity(count)
         }
         while !stringsContainer.isAtEnd {
             let item = try stringsContainer.nestedContainer(keyedBy: ItemCodingKeys.self)
-            try strings[item.decode(String.self, forKey: .id)] = try Item(
+            try strings[item.decode(Schema.StringIdentifier.self, forKey: .id)] = try Item(
                 value: item.decode(Schema.RichText.self, forKey: .value),
                 fallback: item.decodeIfPresent(Schema.RichText.self, forKey: .fallback)
             )

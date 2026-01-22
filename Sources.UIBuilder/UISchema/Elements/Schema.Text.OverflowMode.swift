@@ -7,10 +7,6 @@
 
 import Foundation
 
-extension Schema.Text {
-    typealias OverflowMode = VC.Text.OverflowMode
-}
-
 extension Schema.Text.OverflowMode: RawRepresentable {
     private enum Key {
         static let scale = "scale"

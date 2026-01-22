@@ -20,7 +20,6 @@ extension Schema.Asset: Codable {
         case customId = "custom_id"
     }
 
-
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -37,8 +36,6 @@ extension Schema.Asset: Codable {
             ))
         case let type where Schema.ColorGradient.assetType(type):
             self = try .colorGradient(Schema.ColorGradient(from: decoder))
-//        case let type where Schema.Filling.assetType(type):
-//            self = try .filling(Schema.Filling(from: decoder))
         case VC.Font.assetType:
             self = try .font(Schema.Font(from: decoder))
         case VC.ImageData.assetType:
@@ -59,9 +56,6 @@ extension Schema.Asset: Codable {
             try container.encode(color, forKey: .value)
         case let .colorGradient(gradient):
             try gradient.encode(to: encoder)
-
-//        case let .filling(value):
-//            try value.encode(to: encoder)
         case let .image(data):
             try data.encode(to: encoder)
         case let .video(data):
@@ -76,15 +70,15 @@ extension Schema.Asset: Codable {
 
 extension Schema {
     struct AssetsContainer: Codable {
-        let value: [String: Asset]
+        let value: [AssetIdentifier: Asset]
 
-        init(value: [String: Asset]) {
+        init(value: [AssetIdentifier: Asset]) {
             self.value = value
         }
 
         init(from decoder: Decoder) throws {
             let array = try decoder.singleValueContainer().decode([Item].self)
-            value = try [String: Asset](array.map { ($0.id, $0.value) }, uniquingKeysWith: { _, _ in
+            value = try [AssetIdentifier: Asset](array.map { ($0.id, $0.value) }, uniquingKeysWith: { _, _ in
                 throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Duplicate key"))
             })
         }
@@ -95,10 +89,10 @@ extension Schema {
         }
 
         private struct Item: Codable {
-            let id: String
+            let id: AssetIdentifier
             let value: Asset
 
-            init(id: String, value: Asset) {
+            init(id: AssetIdentifier, value: Asset) {
                 self.id = id
                 self.value = value
             }

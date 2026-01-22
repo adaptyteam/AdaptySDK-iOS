@@ -14,14 +14,16 @@ extension Schema {
 extension Schema.Variable: Codable {
     private enum CodingKeys: String, CodingKey {
         case path = "var"
+        case context
     }
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let path = try container.decode(String.self, forKey: .path)
-        self.init(
-            path: path.split(separator: ".").map(String.init)
+        try self.init(
+            path: path.split(separator: ".").map(String.init),
+            context: container.decodeIfPresent(Schema.Context.self, forKey: .context) ?? .default
         )
     }
 

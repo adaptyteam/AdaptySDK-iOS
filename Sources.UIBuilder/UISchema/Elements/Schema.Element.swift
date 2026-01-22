@@ -40,7 +40,7 @@ extension Schema.Localizer {
         case let .stack(value, properties):
             try .stack(stack(value), properties?.value)
         case let .text(value, properties):
-            .text(text(value), properties?.value)
+            .text(value, properties?.value)
         case let .textField(value, properties):
             .textField(value, properties?.value)
         case let .image(value, properties):

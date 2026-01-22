@@ -16,12 +16,12 @@ package struct AdaptyUIConfiguration: Sendable, Hashable {
 
     @available(*, deprecated, message: "use screens ")
     package var deprecated_defaultScreen: Screen { screens["default"]! }
-    
-    let assets: [String: Asset]
-    let strings: [String: RichText]
 
-    package let screens: [String: Screen]
-    package let scripts: [String]
+    let assets: [AssetIdentifier: Asset]
+    let strings: [StringIdentifier: RichText]
+
+    package let screens: [ScreenIdentifier: Screen]
+    let scripts: [String]
 }
 
 extension AdaptyUIConfiguration: CustomStringConvertible {

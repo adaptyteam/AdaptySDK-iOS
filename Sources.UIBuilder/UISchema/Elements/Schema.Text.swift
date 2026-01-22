@@ -8,49 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Text: Sendable, Hashable {
-        let stringId: StringReference
-        let horizontalAlign: HorizontalAlignment
-        let maxRows: Int?
-        let overflowMode: Set<OverflowMode>
-        let defaultTextAttributes: RichText.Attributes?
-    }
-}
-
-extension Schema.Localizer {
-    func text(_ textBlock: Schema.Text) -> VC.Text {
-        let value: VC.Text.Value =
-            switch textBlock.stringId {
-            case let .stringId(stringId):
-                .text(strings[stringId] ?? .empty)
-            case let .variable(variable):
-                .variable(variable)
-            case let .product(info):
-                if let adaptyProductId = info.adaptyProductId {
-                    .productText(VC.LazyLocalizedProductText(
-                        adaptyProductId: adaptyProductId,
-                        suffix: info.suffix,
-                        localizer: self,
-                        defaultTextAttributes: textBlock.defaultTextAttributes
-                    ))
-                } else {
-                    .selectedProductText(VC.LazyLocalizedUnknownProductText(
-                        productGroupId: info.productGroupId ?? "group_A",
-                        suffix: info.suffix,
-                        localizer: self,
-                        defaultTextAttributes: textBlock.defaultTextAttributes
-                    ))
-                }
-            }
-
-        return .init(
-            value: value,
-            horizontalAlign: textBlock.horizontalAlign,
-            maxRows: textBlock.maxRows,
-            overflowMode: textBlock.overflowMode,
-            defaultTextAttributes: textBlock.defaultTextAttributes
-        )
-    }
+    typealias Text = VC.Text
 }
 
 extension Schema.Text: Codable {
@@ -61,27 +19,33 @@ extension Schema.Text: Codable {
         case overflowMode = "on_overflow"
     }
 
-    init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        stringId = try container.decode(Schema.StringReference.self, forKey: .stringId)
-        horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
-        maxRows = try container.decodeIfPresent(Int.self, forKey: .maxRows)
-        overflowMode =
+
+        let overflowMode =
             if let value = try? container.decode(OverflowMode.self, forKey: .overflowMode) {
                 Set([value])
             } else {
                 try Set(container.decodeIfPresent([OverflowMode].self, forKey: .overflowMode) ?? [])
             }
+
         let textAttributes = try Schema.RichText.Attributes(from: decoder)
-        defaultTextAttributes = textAttributes.nonEmptyOrNil
+
+        try self.init(
+            value: container.decode(Schema.StringReference.self, forKey: .stringId),
+            horizontalAlign: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading,
+            maxRows: container.decodeIfPresent(Int.self, forKey: .maxRows),
+            overflowMode: overflowMode,
+            defaultTextAttributes: textAttributes.nonEmptyOrNil
+        )
     }
 
-    func encode(to encoder: any Encoder) throws {
+    package func encode(to encoder: any Encoder) throws {
         if let defaultTextAttributes = defaultTextAttributes.nonEmptyOrNil {
             try defaultTextAttributes.encode(to: encoder)
         }
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(stringId, forKey: .stringId)
+        try container.encode(value, forKey: .stringId)
         if horizontalAlign != .leading {
             try container.encode(horizontalAlign, forKey: .horizontalAlign)
         }

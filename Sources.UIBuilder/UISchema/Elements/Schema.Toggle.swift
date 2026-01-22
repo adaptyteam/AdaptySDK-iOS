@@ -35,11 +35,11 @@ extension Schema.Toggle: Decodable {
                 onActions: [.init(path: ["Legacy", "switchSection"], params: [
                     "sectionId": .string(sectionId),
                     "index": .int32(onIndex)
-                ])],
+                ], context: .global)],
                 offActions: [.init(path: ["Legacy", "switchSection"], params: [
                     "sectionId": .string(sectionId),
                     "index": .int32(offIndex)
-                ])],
+                ], context: .global)],
                 onCondition: .selectedSection(id: sectionId, index: onIndex),
                 color: colorAssetId
             )

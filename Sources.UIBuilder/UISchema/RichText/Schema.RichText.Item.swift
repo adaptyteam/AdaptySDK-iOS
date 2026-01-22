@@ -11,38 +11,6 @@ extension Schema.RichText {
     typealias Item = VC.RichText.Item
 }
 
-extension Schema.RichText.Attributes {
-    func add(
-        _ other: Schema.RichText.Attributes?
-    ) -> Schema.RichText.Attributes {
-        guard let other else { return self }
-        return .init(
-            font: font ?? other.font,
-            size: size ?? other.size,
-            txtColor: txtColor ?? other.txtColor,
-            imageTintColor: imageTintColor ?? other.imageTintColor,
-            background: background ?? other.background,
-            strike: strike ?? other.strike,
-            underline: underline ?? other.underline
-        )
-    }
-}
-
-extension Schema.RichText.Attributes? {
-    func add(
-        _ other: Schema.RichText.Attributes?
-    ) -> Schema.RichText.Attributes? {
-        switch self {
-        case nil:
-            other
-        case let value?:
-            value.add(other)
-        }
-    }
-}
-
-
-
 extension Schema.RichText.Item: Codable {
     enum CodingKeys: String, CodingKey {
         case text

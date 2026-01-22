@@ -28,12 +28,12 @@ extension Schema.StringReference: Codable {
             return
         }
 
-        let type = try container.decode(String.self, forKey: .type)
-        guard type == Product.typeValue else {
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [Product.CodingKeys.type], debugDescription: "unknown value"))
+        guard !container.contains(.type) else {
+            self = try .product(Product(from: decoder))
+            return
         }
 
-        self = try .product(Product(from: decoder))
+        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "unknown value"))
     }
 
     package func encode(to encoder: any Encoder) throws {

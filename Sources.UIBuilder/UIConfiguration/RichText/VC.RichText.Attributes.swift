@@ -31,6 +31,28 @@ extension VC.RichText.Attributes {
     }
 
     var nonEmptyOrNil: Self? { isEmpty ? nil : self }
+
+    func apply(
+        default other: Self?
+    ) -> Self {
+        guard let other else { return self }
+        return .init(
+            font: font ?? other.font,
+            size: size ?? other.size,
+            txtColor: txtColor ?? other.txtColor,
+            imageTintColor: imageTintColor ?? other.imageTintColor,
+            background: background ?? other.background,
+            strike: strike ?? other.strike,
+            underline: underline ?? other.underline
+        )
+    }
 }
 
-
+extension VC.RichText.Attributes? {
+    func apply(
+        default other: VC.RichText.Attributes?
+    ) -> VC.RichText.Attributes? {
+        guard let attributes = self else { return other }
+        return attributes.apply(default: other)
+    }
+}

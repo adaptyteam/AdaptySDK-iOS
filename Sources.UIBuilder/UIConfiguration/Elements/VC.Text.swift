@@ -9,7 +9,7 @@ import Foundation
 
 package extension VC {
     struct Text: Sendable, Hashable {
-        package let value: Value
+        package let value: StringReference
         package let horizontalAlign: HorizontalAlignment
         package let maxRows: Int?
         package let overflowMode: Set<OverflowMode>

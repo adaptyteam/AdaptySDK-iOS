@@ -17,32 +17,15 @@ package extension VC {
 package extension VC.RichText {
     static let empty: Self = .init(items: [], fallback: nil)
     var isEmpty: Bool { items.isEmpty }
+}
 
-//    @inlinable
-//    func items(with attributes: Attributes?) {
-//        guard let attributes, !items.isEmpty else { return items }
-//    }
-//
-//    @inlinable
-//    func fallback(with attributes: Attributes?) {
-//        guard let attributes, let fallback = fallback, !fallback.isEmpty else { return fallback }
-//    }
-//
-//
-//    private func convert(
-//        defaultTextAttributes: Schema.TextAttributes?
-//    ) -> [VC.RichText.Item] {
-//        items.compactMap { item in
-//            switch item {
-//            case let .text(value, attributes):
-//                .text(value, attributes.add(defaultTextAttributes).convert(localizer))
-//            case let .tag(value, attributes):
-//                .tag(value, attributes.add(defaultTextAttributes).convert(localizer))
-//            case let .image(assetId, attributes):
-//                .image(try? localizer.imageData(assetId), attributes.add(defaultTextAttributes).convert(localizer))
-//            default:
-//                nil
-//            }
-//        }
-//    }
+package extension VC.RichText {
+    func apply(defaultAttributes: VC.RichText.Attributes?) -> Self {
+        guard let defaultAttributes, !defaultAttributes.isEmpty else { return self }
+
+        return Self(
+            items: self.items.map { $0.apply(defaultAttributes: defaultAttributes) },
+            fallback: self.fallback?.map { $0.apply(defaultAttributes: defaultAttributes) }
+        )
+    }
 }

@@ -15,3 +15,20 @@ package extension VC.RichText {
         case unknown
     }
 }
+
+package extension VC.RichText.Item {
+    func apply(defaultAttributes: VC.RichText.Attributes?) -> Self {
+        guard let defaultAttributes, !defaultAttributes.isEmpty else { return self }
+
+        return switch self {
+        case let .text(value, attributes):
+            .text(value, attributes.apply(default: defaultAttributes))
+        case let .tag(value, attributes):
+            .tag(value, attributes.apply(default: defaultAttributes))
+        case let .image(assetId, attributes):
+            .image(assetId, attributes.apply(default: defaultAttributes))
+        default:
+            .unknown
+        }
+    }
+}

@@ -152,7 +152,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
     }
 
     func openScreen(_ params: JSValue) {
-        var screenId: String?
+        var screenId: VC.ScreenIdentifier?
 
         if params.isString {
             screenId = params.toString()

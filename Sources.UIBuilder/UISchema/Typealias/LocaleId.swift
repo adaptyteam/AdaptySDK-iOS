@@ -7,6 +7,6 @@
 
 public typealias LocaleId = String
 
-extension AdaptyUISchema {
+extension Schema {
     static let defaultLocaleId: LocaleId = "en"
 }

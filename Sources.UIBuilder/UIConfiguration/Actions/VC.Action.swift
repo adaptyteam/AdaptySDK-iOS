@@ -11,5 +11,6 @@ package extension VC {
     struct Action: Sendable, Hashable {
         let path: [String]
         let params: [String: Parameter]?
+        let context: Context
     }
 }

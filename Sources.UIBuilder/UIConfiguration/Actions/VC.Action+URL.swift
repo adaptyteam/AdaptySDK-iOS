@@ -14,7 +14,7 @@ package extension VC.Action {
     var asURL: URL? {
         var components = URLComponents()
         components.scheme = Self.scheme
-        components.host = Self.host
+        components.host = [context.rawValue, Self.host].joined(separator: ".")
         components.path = "/" + path.joined(separator: "/")
 
         guard let params, !params.isEmpty else {
@@ -35,11 +35,18 @@ package extension VC.Action {
                 .init(codingPath: [], debugDescription: "wrong url: \(url)"))
         }
 
-        guard components.scheme == Self.scheme, components.host == Self.host else {
+        guard components.scheme == Self.scheme else {
             throw DecodingError.dataCorrupted(
-                .init(codingPath: [], debugDescription: "wrong schema or host of url: \(url)"))
+                .init(codingPath: [], debugDescription: "wrong schema of url: \(url) use: \(Self.scheme)"))
         }
 
+        guard let rawValue = components.host?.split(separator: ".").first.map(String.init),
+              let context = VC.Context(rawValue: rawValue) else {
+            throw DecodingError.dataCorrupted(
+                .init(codingPath: [], debugDescription: "wrong host, unknown context of action: \(components.host ?? "nil")"))
+        }
+
+        self.context = context
         let path = components.path.split(separator: "/").map(String.init)
 
         guard !path.isEmpty else {
