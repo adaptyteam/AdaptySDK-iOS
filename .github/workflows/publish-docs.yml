@@ -3,8 +3,6 @@ name: Publish docs
 on:
   workflow_dispatch:
   push:
-    branches:
-      - master
     tags:
       - '[0-9]*.[0-9]*.[0-9]*'
 
@@ -29,10 +27,8 @@ jobs:
         run: bash scripts/docs-generator/build.sh
 
       - name: Publish docs to Netlify
-        # No published tags in netlify/actions, master is recommended.
-        uses: netlify/actions/cli@master
-        with:
-          args: deploy --dir=docs --prod
+        # Use Netlify CLI directly to avoid container actions on macOS.
+        run: npx --yes netlify-cli@latest deploy --dir=docs --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
