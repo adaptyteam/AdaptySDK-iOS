@@ -25,6 +25,20 @@ extension AdaptyUICustomAsset {
     }
 }
 
+extension VC.Color {
+    var asCustomAsset: AdaptyUICustomAsset {
+        // TODO: x implement
+        .color(.swiftUIColor(.clear))
+    }
+}
+
+extension VC.ColorGradient {
+    var asCustomAsset: AdaptyUICustomAsset {
+        // TODO: x implement
+        .gradient(.angular(gradient: .init(colors: []), center: .center, angle: .zero))
+    }
+}
+
 extension AdaptyUICustomAsset.Identifiable: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
