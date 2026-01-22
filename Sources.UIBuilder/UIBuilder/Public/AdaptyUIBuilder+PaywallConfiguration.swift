@@ -115,7 +115,8 @@ public extension AdaptyUIBuilder {
                 screensViewModel: screensViewModel
             )
             assetsViewModel = AdaptyUIAssetsViewModel(
-                assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver()
+                assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
+                stateViewModel: stateViewModel
             )
 
             stateViewModel.start()

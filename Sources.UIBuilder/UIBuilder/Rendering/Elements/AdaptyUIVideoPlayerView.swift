@@ -92,47 +92,36 @@ struct AdaptyUIVideoView: View {
         self.video = video
     }
 
+    // TODO: refactor this
     private let id: String = UUID().uuidString
 
-    @ViewBuilder
-    private func colorSchemeVideoView(videoData: VC.VideoData, id: String) -> some View {
-        AdaptyUIVideoColorSchemeSpecificView(
-            video: videoData,
-            aspect: video.aspect,
-            loop: video.loop
-        )
-        .environmentObject(viewModel)
-        .environmentObject(
-            viewModel.getOrCreatePlayerManager(
-                for: videoData,
-                loop: video.loop,
-                id: id
-            )
-        )
-        .onDisappear {
-            viewModel.dismissPlayerManager(id: id)
-        }
-    }
-
     var body: some View {
-        Text("TODO: !!!") // TODO: refactor this
-//        switch colorScheme {
-//        case .light:
-//            colorSchemeVideoView(
-//                videoData: video.asset.mode(.light),
-//                id: id
-//            )
-//        case .dark:
-//            colorSchemeVideoView(
-//                videoData: video.asset.mode(.dark),
-//                id: id
-//            )
-//        @unknown default:
-//            colorSchemeVideoView(
-//                videoData: video.asset.mode(.light),
-//                id: id
-//            )
-//        }
+        let asset = viewModel.resolvedAsset(
+            video.asset,
+            mode: colorScheme.toVCMode
+        )
+
+        switch asset {
+        case .video(let videoAsset):
+            AdaptyUIVideoColorSchemeSpecificView(
+                video: videoAsset,
+                aspect: video.aspect,
+                loop: video.loop
+            )
+            .environmentObject(viewModel)
+            .environmentObject(
+                viewModel.getOrCreatePlayerManager(
+                    for: videoAsset,
+                    loop: video.loop,
+                    id: id
+                )
+            )
+            .onDisappear {
+                viewModel.dismissPlayerManager(id: id)
+            }
+        default:
+            Rectangle()
+        }
     }
 }
 
@@ -145,20 +134,18 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
     @State
     private var showPlaceholder = true
 
-    private let video: VC.VideoData
+    private let video: AdaptyUIResolvedVideoAsset
     private let aspect: VC.AspectRatio
     private let loop: Bool
-    private let placeholder: VC.ImageData
 
     init(
-        video: VC.VideoData,
+        video: AdaptyUIResolvedVideoAsset,
         aspect: VC.AspectRatio,
         loop: Bool
     ) {
         self.video = video
         self.aspect = aspect
         self.loop = loop
-        self.placeholder = video.image
     }
 
     var body: some View {
@@ -173,20 +160,22 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
                 )
             }
 
-            // TODO: refactor this
-//            if showPlaceholder {
-//                AdaptyUIImageView(
-//                    asset: placeholder,
-//                    aspect: aspect
-//                )
-//            }
+            if showPlaceholder, let placeholder = video.image {
+                AdaptyUIImageView(
+                    .resolvedImageAsset(
+                        asset: placeholder,
+                        aspect: aspect,
+                        tint: nil
+                    )
+                )
+            }
         }
     }
 }
 
 #if DEBUG
 
-//extension VC.VideoPlayer {
+// extension VC.VideoPlayer {
 //    private static let url1 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%201.mp4?alt=media&token=5e7ac250-091e-4bb3-8a99-6ac4f0735b37")!
 //
 //    private static let imgUrl = URL(string: "http://www.libpng.org/pub/png/img_png/OwlAlpha.png")!
@@ -211,17 +200,17 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
 //        aspect: .fill,
 //        loop: true
 //    )
-//}
+// }
 
-//#Preview {
+// #Preview {
 //    VStack {
 //        AdaptyUIVideoView(video: .test1, colorScheme: .light)
 //        AdaptyUIVideoView(video: .test2, colorScheme: .light)
 //        AdaptyUIVideoView(video: .test3, colorScheme: .light)
 //    }
-//}
+// }
 
-//public struct AdaptyUIVideoTestView: View {
+// public struct AdaptyUIVideoTestView: View {
 //    public init() {}
 //
 //    public var body: some View {
@@ -231,7 +220,7 @@ struct AdaptyUIVideoColorSchemeSpecificView: View {
 //            AdaptyUIVideoView(video: .test3, colorScheme: .light)
 //        }
 //    }
-//}
+// }
 
 #endif
 

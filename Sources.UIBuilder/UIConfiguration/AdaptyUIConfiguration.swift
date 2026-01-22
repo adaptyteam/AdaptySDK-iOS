@@ -14,9 +14,6 @@ package struct AdaptyUIConfiguration: Sendable, Hashable {
     package let locale: String
     package let isRightToLeft: Bool
 
-    @available(*, deprecated, message: "use screens ")
-    package var deprecated_defaultScreen: Screen { screens["default"]! }
-
     let assets: [AssetIdentifier: Asset]
     let strings: [StringIdentifier: RichText]
 

@@ -14,20 +14,20 @@ public struct Dev_AdaptyUIConfiguration {
 
 public extension Dev_AdaptyUIConfiguration {
     static func create(
-        templateId: String,
         assets: String,
         localization: String,
         templates: String?,
-        content: String,
-        script: String? = nil
+        contents: [AdaptyUIExampleContent],
+        script: String? = nil,
+        startScreenName: String
     ) throws -> Self {
         let configuration = try AdaptyUIConfiguration.create(
-            templateId: templateId,
             assets: assets,
             localization: localization,
             templates: templates,
-            content: content,
-            script: script
+            contents: contents,
+            script: script,
+            startScreenName: startScreenName
         )
         return .init(wrapped: configuration)
     }

@@ -91,9 +91,10 @@ public extension AdaptyUI {
                 screensViewModel: screensViewModel
             )
             assetsViewModel = AdaptyUIAssetsViewModel(
-                assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver()
+                assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
+                stateViewModel: stateViewModel
             )
-            
+
             stateViewModel.start()
         }
     }
@@ -119,21 +120,21 @@ public struct Dev_AdaptyUIRendererView: View {
     }
 
     public var body: some View {
-        AdaptyUIElementView(viewConfiguration.screens["main"]!.content)
-            .environmentObjects(
-                stateViewModel: galleryConfiguration.stateViewModel,
-                paywallViewModel: galleryConfiguration.paywallViewModel,
-                productsViewModel: galleryConfiguration.productsViewModel,
-                sectionsViewModel: galleryConfiguration.sectionsViewModel,
-                tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
-                timerViewModel: galleryConfiguration.timerViewModel,
-                screensViewModel: galleryConfiguration.screensViewModel,
-                assetsViewModel: galleryConfiguration.assetsViewModel
-            )
-            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
+//        AdaptyUIElementView(viewConfiguration.screens["main"]!.content)
+        AdaptyUIPaywallView_Internal(
+            showDebugOverlay: false
+        )
+        .environmentObjects(
+            stateViewModel: galleryConfiguration.stateViewModel,
+            paywallViewModel: galleryConfiguration.paywallViewModel,
+            productsViewModel: galleryConfiguration.productsViewModel,
+            sectionsViewModel: galleryConfiguration.sectionsViewModel,
+            tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
+            timerViewModel: galleryConfiguration.timerViewModel,
+            screensViewModel: galleryConfiguration.screensViewModel,
+            assetsViewModel: galleryConfiguration.assetsViewModel
+        )
     }
 }
-
-
 
 #endif

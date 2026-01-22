@@ -50,7 +50,7 @@ public extension AdaptyUI {
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyUIAssetsResolver?
         ) {
-            Log.ui.verbose("#\(logId)# init template: \(viewConfiguration.deprecated_defaultScreen.templateId), products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
+            Log.ui.verbose("#\(logId)# init products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
 
             if AdaptyUI.isObserverModeEnabled, observerModeResolver == nil {
                 Log.ui.warn("In order to handle purchases in Observer Mode enabled, provide the observerModeResolver!")
@@ -112,7 +112,8 @@ public extension AdaptyUI {
                 screensViewModel: screensViewModel
             )
             assetsViewModel = AdaptyUIAssetsViewModel(
-                assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver()
+                assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
+                stateViewModel: stateViewModel
             )
 
             stateViewModel.start()

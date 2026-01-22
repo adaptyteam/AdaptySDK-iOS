@@ -170,7 +170,7 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
         if let text {
             text
                 .convertToSwiftUIText(
-                    assetsResolver: assetsViewModel.assetsResolver,
+                    assetsCache: assetsViewModel.cache,
                     tagResolver: self,
                     productInfo: nil,
                     colorScheme: colorScheme

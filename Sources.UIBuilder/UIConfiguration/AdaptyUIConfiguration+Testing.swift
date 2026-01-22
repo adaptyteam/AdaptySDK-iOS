@@ -7,20 +7,27 @@
 
 import Foundation
 
+public enum AdaptyUIExampleContent {
+    case screen(name: String, value: String)
+    case element(name: String, value: String, templateId: String)
+}
+
 package extension AdaptyUIConfiguration {
     static func create(
-        templateId: String,
         assets: String,
         localization: String,
         templates templatesCollection: String?,
-        content: String,
-        script: String?
+        contents: [AdaptyUIExampleContent],
+        script: String?,
+        startScreenName: String
     ) throws -> Self {
         let formatVersion = AdaptyUISchema.formatVersion
-        let configuration = Schema.DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion, legacyTemplateId: templateId)
+        let configuration = Schema.DecodingConfiguration(
+            isLegacy: !formatVersion.isNotLegacyVersion,
+            legacyTemplateId: nil
+        )
         let jsonDecoder = JSONDecoder()
 
-        let dataContent = content.data(using: .utf8) ?? Data()
         let dataAssets = assets.data(using: .utf8) ?? Data()
         let dataLocalization = localization.data(using: .utf8) ?? Data()
 
@@ -28,22 +35,27 @@ package extension AdaptyUIConfiguration {
 
         let localiation = try jsonDecoder.decode(Schema.Localization.self, from: dataLocalization)
 
-        let screen =
-            if let element = try? jsonDecoder.decode(Schema.Element.self, from: dataContent, with: configuration) {
-                Schema.Screen(
+        let screensArr: [(String, Schema.Screen)] = try contents.map { content in
+            switch content {
+            case let .screen(name, value):
+                let contentData = value.data(using: .utf8) ?? Data()
+                return try (name, jsonDecoder.decode(Schema.Screen.self, from: contentData, with: configuration))
+            case let .element(name, value, templateId):
+                let contentData = value.data(using: .utf8) ?? Data()
+                let element = try jsonDecoder.decode(Schema.Element.self, from: contentData, with: configuration)
+
+                return (name, Schema.Screen(
                     templateId: templateId,
-                    background: .assetId("$black"),
+                    background: nil,
                     cover: nil,
                     content: element,
                     footer: nil,
                     overlay: nil
-                )
-            } else {
-                try jsonDecoder.decode(Schema.Screen.self, from: dataContent, with: configuration)
+                ))
             }
+        }
 
-        let screenMainName = "main"
-        let screens = [screenMainName: screen]
+        let screens = Dictionary(screensArr) { first, _ in first }
 
         let templatesCollection = try templatesCollection.map { value in
             let data = value.data(using: .utf8) ?? Data()
@@ -63,7 +75,7 @@ package extension AdaptyUIConfiguration {
             defaultLocalization: localiation,
             screens: screens,
             templates: templates,
-            scripts: script.map { [$0] } ?? [] + [Schema.LegacyScripts.legacyOpenScreen(screenId: screenMainName)]
+            scripts: (script.map { [$0] } ?? []) + [Schema.LegacyScripts.legacyOpenScreen(screenId: startScreenName)]
         )
 
         return try schema.extractUIConfiguration(withLocaleId: localiation.id)

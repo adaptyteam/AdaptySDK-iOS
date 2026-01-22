@@ -10,4 +10,5 @@ import Foundation
 public enum AdaptyUIBuilderError: Error {
     case unsupportedTemplate(String)
     case wrongComponentType(String)
+    case wrongAssetType(String)
 }
