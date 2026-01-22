@@ -14,7 +14,7 @@ package extension VC.Action {
     var asURL: URL? {
         var components = URLComponents()
         components.scheme = Self.scheme
-        components.host = [context.rawValue, Self.host].joined(separator: ".")
+        components.host = [scope.rawValue, Self.host].joined(separator: ".")
         components.path = "/" + path.joined(separator: "/")
 
         guard let params, !params.isEmpty else {
@@ -41,12 +41,13 @@ package extension VC.Action {
         }
 
         guard let rawValue = components.host?.split(separator: ".").first.map(String.init),
-              let context = VC.Context(rawValue: rawValue) else {
+              let scope = VC.Scope(rawValue: rawValue)
+        else {
             throw DecodingError.dataCorrupted(
-                .init(codingPath: [], debugDescription: "wrong host, unknown context of action: \(components.host ?? "nil")"))
+                .init(codingPath: [], debugDescription: "wrong host, unknown scope of action: \(components.host ?? "nil")"))
         }
 
-        self.context = context
+        self.scope = scope
         let path = components.path.split(separator: "/").map(String.init)
 
         guard !path.isEmpty else {

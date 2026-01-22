@@ -10,6 +10,6 @@ import Foundation
 package extension VC {
     struct Variable: Sendable, Hashable {
         let path: [String]
-        let context: Context
+        let scope: Scope
     }
 }

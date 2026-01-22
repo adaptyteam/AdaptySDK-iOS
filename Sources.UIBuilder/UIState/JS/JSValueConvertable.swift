@@ -75,3 +75,15 @@ extension [String: VC.Action.Parameter]: JSValueConvertable {
         return object
     }
 }
+
+extension VC.AssetIdentifierOrValue: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        let value =
+            switch self {
+            case let .assetId(value): value
+            case let .color(color): color.rawValue
+            }
+
+        return .init(object: value, in: context)
+    }
+}

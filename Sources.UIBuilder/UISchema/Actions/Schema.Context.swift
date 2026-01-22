@@ -8,11 +8,11 @@
 import Foundation
 
 extension Schema {
-    typealias Context = VC.Context
+    typealias Context = VC.Scope
 }
 
 extension Schema.Context {
-    static let `default`: Self = .window
+    static let `default`: Self = .screen
 }
 
 extension Schema.Context: RawRepresentable {
@@ -23,7 +23,7 @@ extension Schema.Context: RawRepresentable {
 
     package init?(rawValue value: String) {
         switch value {
-        case Key.window: self = .window
+        case Key.window: self = .screen
         case Key.global: self = .global
         default: return nil
         }
@@ -31,7 +31,7 @@ extension Schema.Context: RawRepresentable {
 
     package var rawValue: String {
         switch self {
-        case .window: Key.window
+        case .screen: Key.window
         case .global: Key.global
         }
     }

@@ -22,11 +22,11 @@ extension JSValueRepresentable {
     }
 }
 
-//extension Optional: JSValueRepresentable where Wrapped: JSValueRepresentable {
+// extension Optional: JSValueRepresentable where Wrapped: JSValueRepresentable {
 //    static func fromJSValue(_ value: JSValue) -> Self? {
 //        Wrapped.fromJSValue(value)
 //    }
-//}
+// }
 
 extension Bool: JSValueRepresentable {
     static func fromJSValue(_ value: JSValue) -> Bool? {
@@ -65,5 +65,21 @@ extension String: JSValueRepresentable {
         if value.isUndefined { nil }
         else if value.isNull { nil }
         else { value.toString() }
+    }
+}
+
+extension VC.AssetIdentifierOrValue: JSValueRepresentable {
+    static func fromJSValue(_ value: JSValue) -> VC.AssetIdentifierOrValue? {
+        if value.isUndefined { nil }
+        else if value.isNull { nil }
+        else if let value = value.toString() {
+            if let color = VC.Color(rawValue: value) {
+                .color(color)
+            } else {
+                .assetId(value)
+            }
+        } else {
+            nil
+        }
     }
 }

@@ -14,7 +14,7 @@ extension Schema {
 extension Schema.Variable: Codable {
     private enum CodingKeys: String, CodingKey {
         case path = "var"
-        case context
+        case scope
     }
 
     package init(from decoder: Decoder) throws {
@@ -23,7 +23,7 @@ extension Schema.Variable: Codable {
         let path = try container.decode(String.self, forKey: .path)
         try self.init(
             path: path.split(separator: ".").map(String.init),
-            context: container.decodeIfPresent(Schema.Context.self, forKey: .context) ?? .default
+            scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default
         )
     }
 

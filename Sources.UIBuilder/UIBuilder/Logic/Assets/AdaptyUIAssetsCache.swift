@@ -51,12 +51,17 @@ final class AdaptyUIAssetsCache {
         self.state = state
         self.customAssetsResolver = customAssetsResolver
     }
-    
+
     func cachedAsset(
         _ ref: AdaptyUIConfiguration.AssetReference?,
         mode: VC.Mode
     ) -> AdaptyUICachedAsset {
-        guard let assetId = ref?.getAssetId(state: state) else {
+        guard let assetIdOrColor = ref?.getAssetId(state: state) else {
+            return .empty(mode: mode)
+        }
+
+        guard case .assetId(let assetId) = assetIdOrColor else {
+            // TODO: assetIdOrColor has color case, we dont need use cache for this asset
             return .empty(mode: mode)
         }
 
@@ -95,12 +100,12 @@ final class AdaptyUIAssetsCache {
 
 @MainActor
 extension AdaptyUIConfiguration.AssetReference {
-    func getAssetId(state: AdaptyUIState) -> String? {
+    func getAssetId(state: AdaptyUIState) -> VC.AssetIdentifierOrValue? {
         switch self {
-        case .assetId(let id):
-            id
+        case .assetId(let id): .assetId(id)
+        case .color(let color): .color(color)
         case .variable(let variable):
-            try? state.getValue(String.self, variable: variable)
+            try? state.getValue(VC.AssetIdentifierOrValue.self, variable: variable)
         }
     }
 }

@@ -13,11 +13,17 @@ extension Schema {
 
 extension Schema.AssetReference: Codable {
     package init(from decoder: Decoder) throws {
-        guard let assetId = try? decoder.singleValueContainer().decode(String.self) else {
+        guard let value = try? decoder.singleValueContainer().decode(String.self) else {
             self = try .variable(Schema.Variable(from: decoder))
             return
         }
-        self = .assetId(assetId)
+
+        self =
+            if let color = Schema.Color(rawValue: value) {
+                .color(color)
+            } else {
+                .assetId(value)
+            }
     }
 
     package func encode(to encoder: Encoder) throws {
@@ -26,6 +32,8 @@ extension Schema.AssetReference: Codable {
         switch self {
         case .assetId(let value):
             try container.encode(value)
+        case .color(let color):
+            try container.encode(color)
         case .variable(let variable):
             try container.encode(variable)
         }

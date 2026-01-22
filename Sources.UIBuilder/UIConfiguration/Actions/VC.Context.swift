@@ -8,8 +8,8 @@
 import Foundation
 
 package extension VC {
-    enum Context: Sendable, Hashable {
-        case window
+    enum Scope: Sendable, Hashable {
+        case screen
         case global
     }
 }
