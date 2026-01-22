@@ -58,7 +58,7 @@ struct AdaptyUIImageView: View {
     private var assetsViewModel: AdaptyUIAssetsViewModel
     @EnvironmentObject
     private var paywallViewModel: AdaptyUIPaywallViewModel
-    
+
     @ViewBuilder
     private func rasterImage(
         _ uiImage: UIImage?,
@@ -127,22 +127,21 @@ struct AdaptyUIImageView: View {
 
     @ViewBuilder
     private func resolvedAssetBody(
-        asset: AdaptyUIResolvedAsset,
+        imageAsset: AdaptyUIResolvedImageAsset?,
         aspect: VC.AspectRatio,
-        tint: AdaptyUIResolvedColorAsset?
+        tintAsset: AdaptyUIResolvedColorAsset?
     ) -> some View {
-        switch asset {
-        case .image(let resolvedImageAsset):
+        if let imageAsset {
             resolvedImageAssetBody(
-                asset: resolvedImageAsset,
-                aspect: aspect ?? .fill,
-                tint: tint
+                asset: imageAsset,
+                aspect: aspect,
+                tint: tintAsset
             )
-        default:
+        } else {
             Rectangle()
                 .onAppear {
                     paywallViewModel.reportDidFailRendering(
-                        with: .wrongAssetType("Expected image, got \(asset.typeName)")
+                        with: .wrongAssetType("Expected image")
                     )
                 }
         }
@@ -151,26 +150,26 @@ struct AdaptyUIImageView: View {
     var body: some View {
         switch initializtion {
         case .unresolvedAsset(let image):
-            let asset = assetsViewModel.resolvedAsset(
+            let imageAsset = assetsViewModel.resolvedAsset(
                 image.asset,
                 mode: colorScheme.toVCMode
-            )
+            ).asImageAsset
 
             let tintAsset = assetsViewModel.resolvedAsset(
                 image.tint,
                 mode: colorScheme.toVCMode
-            )
+            ).asColorAsset
 
             resolvedAssetBody(
-                asset: asset,
+                imageAsset: imageAsset,
                 aspect: image.aspect,
-                tint: tintAsset.asColorAsset
+                tintAsset: tintAsset
             )
-        case .resolvedAsset(let asset):
+        case .resolvedAsset(let imageAsset):
             resolvedAssetBody(
-                asset: asset,
+                imageAsset: imageAsset.asImageAsset,
                 aspect: .fill,
-                tint: nil
+                tintAsset: nil
             )
         case .resolvedImageAsset(let asset, let aspect, let tint):
             resolvedImageAssetBody(

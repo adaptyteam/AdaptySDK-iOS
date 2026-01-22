@@ -50,7 +50,7 @@ extension InsettableShape {
 
     @ViewBuilder
     func fill(
-        asset: AdaptyUIResolvedAsset?
+        asset: AdaptyUIResolvedColorOrGradientOrImageAsset?
     ) -> some View {
         switch asset {
         case let .color(color):
@@ -59,7 +59,7 @@ extension InsettableShape {
             self.fillColorGradient(colorGradient)
         case let .image(imageData):
             self.fillImage(imageData, tint: nil)
-        case .video, .font, .nothing, .none:
+        case .none:
             self
         }
     }
@@ -92,7 +92,7 @@ extension InsettableShape {
 
     @ViewBuilder
     func stroke(
-        asset: AdaptyUIResolvedAsset?,
+        asset: AdaptyUIResolvedColorOrGradientAsset?,
         lineWidth: CGFloat
     ) -> some View {
         switch asset {
@@ -100,7 +100,7 @@ extension InsettableShape {
             self.strokeSolidColor(color, lineWidth: lineWidth)
         case let .colorGradient(gradient):
             self.strokeColorGradient(gradient, lineWidth: lineWidth)
-        case .image, .video, .font, .nothing, .none:
+        case .none:
             self
         }
     }
@@ -130,7 +130,7 @@ extension View {
 extension VC.ShapeType {
     @ViewBuilder
     func swiftUIShapeFill(
-        asset: AdaptyUIResolvedAsset?
+        asset: AdaptyUIResolvedColorOrGradientOrImageAsset?
     ) -> some View {
         switch self {
         case let .rectangle(radii):
@@ -155,7 +155,7 @@ extension VC.ShapeType {
 
     @ViewBuilder
     func swiftUIShapeStroke(
-        asset: AdaptyUIResolvedAsset?,
+        asset: AdaptyUIResolvedColorOrGradientAsset?,
         lineWidth: CGFloat
     ) -> some View {
         switch self {
@@ -234,7 +234,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                         asset: self.assetsViewModel.resolvedAsset(
                             borderFilling,
                             mode: self.colorScheme.toVCMode
-                        ),
+                        ).asColorOrGradientAsset,
                         lineWidth: borderThickness
                     )
             }
@@ -261,7 +261,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                             asset: self.assetsViewModel.resolvedAsset(
                                 animatedBackgroundFilling,
                                 mode: self.colorScheme.toVCMode
-                            )
+                            ).asColorOrGradientOrImageAsset
                         )
                 }
         } else if let background = self.decorator.background {
@@ -272,7 +272,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                             asset: self.assetsViewModel.resolvedAsset(
                                 background,
                                 mode: self.colorScheme.toVCMode
-                            )
+                            ).asColorOrGradientOrImageAsset
                         )
                 }
         } else {

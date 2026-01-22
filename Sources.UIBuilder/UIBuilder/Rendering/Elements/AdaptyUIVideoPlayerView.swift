@@ -96,13 +96,10 @@ struct AdaptyUIVideoView: View {
     private let id: String = UUID().uuidString
 
     var body: some View {
-        let asset = viewModel.resolvedAsset(
+        if let videoAsset = viewModel.resolvedAsset(
             video.asset,
             mode: colorScheme.toVCMode
-        )
-
-        switch asset {
-        case .video(let videoAsset):
+        ).asVideoAsset {
             AdaptyUIVideoColorSchemeSpecificView(
                 video: videoAsset,
                 aspect: video.aspect,
@@ -119,7 +116,7 @@ struct AdaptyUIVideoView: View {
             .onDisappear {
                 viewModel.dismissPlayerManager(id: id)
             }
-        default:
+        } else {
             Rectangle()
         }
     }
