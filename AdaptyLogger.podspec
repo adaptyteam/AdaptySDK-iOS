@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
-  s.name         = 'AdaptyLogger'
-  s.version      = '3.15.3'
-  s.summary      = 'Adapty Logger for iOS.'
+  s.name             = 'AdaptyLogger'
+  s.version          = '3.15.4'
+  s.summary          = 'Adapty Logger for iOS.'
   
   s.description    = <<-DESC
   Win back churned subscribers in your iOS app.
