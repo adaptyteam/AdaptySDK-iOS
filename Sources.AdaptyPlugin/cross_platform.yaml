@@ -56,6 +56,8 @@ $requests:
       - onboarding
     properties:
       method: { const: "adapty_ui_create_onboarding_view" }
+      onboarding: { $ref: "#/$defs/AdaptyOnboarding" }
+      external_urls_presentation: { $ref: "#/$defs/AdaptyWebPresentation" }
 
   AdaptyUICreateOnboardingView.Response: #response
     type: object
@@ -401,7 +403,7 @@ $requests:
     required: [method]
     properties:
       method: { const: "open_web_paywall" }
-      open_in: { type: string, enum: ["browser_out_app", "browser_in_app"], default: "browser_out_app" }
+      open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
     oneOf:
       - required: [product]
         properties:
@@ -930,6 +932,7 @@ $defs:
       google_enable_pending_prepaid_plans: { type: boolean, default: false }
       google_local_access_level_allowed: { type: boolean, default: false }
       ip_address_collection_disabled: { type: boolean, default: false }
+      clear_data_on_backup: { type: boolean, default: false }
       server_cluster: { type: string, enum: ["default", "eu", "cn"] }
       backend_proxy_host: { type: string }
       backend_proxy_port: { type: integer }
@@ -1482,6 +1485,12 @@ $defs:
     enum:
       - full_screen
       - page_sheet
+
+  AdaptyWebPresentation: #request
+    type: string
+    enum:
+      - browser_out_app
+      - browser_in_app
 
   AdaptyUI.DialogConfiguration: #request
     type: object
