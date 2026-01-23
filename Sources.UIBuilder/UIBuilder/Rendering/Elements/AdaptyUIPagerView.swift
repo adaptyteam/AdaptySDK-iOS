@@ -210,7 +210,7 @@ struct AdaptyUIPagerView: View {
             HStack(spacing: pager.spacing) {
                 ForEach(0 ..< pages.count, id: \.self) { idx in
                     AdaptyUIElementView(pages[idx])
-                        .frame(width: width, height: height)
+                        .frame(width: max(width, 0), height: max(height, 0))
                         .clipped()
                         .padding(.leading, idx == 0 ? hPadding : 0)
                         .padding(.trailing, idx == pages.count - 1 ? hPadding : 0)

@@ -48,7 +48,8 @@ struct AdaptyUIBasicContainerView: View {
                     .ignoresSafeArea()
                     .scrollIndicatorsHidden_compatible()
                 } else {
-                    EmptyView()
+                    Rectangle()
+                        .hidden()
                         .onAppear {
                             paywallViewModel.reportDidFailRendering(
                                 with: .wrongComponentType("screen.cover")
@@ -87,9 +88,10 @@ struct AdaptyUIBasicContainerView: View {
 
         GeometryReader { p in
             let minY = p.frame(in: .named(CoordinateSpace.adaptyBasicName)).minY
+            let height = p.size.height
             let isScrollingDown = minY > 0
             let isScrollingUp = minY < 0
-            let scale = max(1.0, 1.0 + minY / p.size.height)
+            let scale = height > 0.0 ? max(1.0, 1.0 + minY / height) : 1.0
 
             AdaptyUIElementView(content)
                 .frame(

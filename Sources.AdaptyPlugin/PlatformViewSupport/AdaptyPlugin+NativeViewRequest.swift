@@ -13,8 +13,8 @@ import Foundation
 
 private let log = Log.plugin
 
-// TODO: refactor this
-
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@MainActor
 public extension AdaptyPlugin {
     static func getPaywallViewConfiguration(
         withJson jsonString: AdaptyJsonString
@@ -33,17 +33,18 @@ public extension AdaptyPlugin {
         )
     }
 
-    static func executeCreateNativeOnboardingView(withJson jsonString: AdaptyJsonString) async -> AdaptyOnboarding? {
-        do {
-            return try AdaptyPlugin.decoder.decode(
-                AdaptyOnboarding.self,
-                from: jsonString.asAdaptyJsonData
-            )
-        } catch {
-            let error = AdaptyPluginError.decodingFailed(message: "Request params of method: create_native_onboarding_view is invalid", error)
-            log.error(error.message)
-            return nil
-        }
+    static func getOnboardingViewConfiguration(
+        withJson jsonString: AdaptyJsonString
+    ) async throws -> AdaptyUI.OnboardingConfiguration {
+        let request = try AdaptyPlugin.decoder.decode(
+            Request.AdaptyUICreateOnboardingView.self,
+            from: jsonString.asAdaptyJsonData
+        )
+
+        return try AdaptyUI.getOnboardingConfiguration(
+            forOnboarding: request.onboarding,
+            externalUrlsPresentation: request.externalUrlsPresentation
+        )
     }
 }
 

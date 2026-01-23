@@ -202,10 +202,14 @@ package extension AdaptyUI {
 @MainActor
 package extension AdaptyUI.Plugin {
     static func createOnboardingView(
-        onboarding: AdaptyOnboarding
+        onboarding: AdaptyOnboarding,
+        externalUrlsPresentation: AdaptyWebPresentation
     ) async throws -> AdaptyUI.OnboardingView {
 #if canImport(UIKit)
-        let configuration = try AdaptyUI.getOnboardingConfiguration(forOnboarding: onboarding)
+        let configuration = try AdaptyUI.getOnboardingConfiguration(
+            forOnboarding: onboarding,
+            externalUrlsPresentation: externalUrlsPresentation
+        )
         let vc = try AdaptyUI.onboardingControllerWithUniversalDelegate(
             configuration
         )
@@ -274,13 +278,15 @@ package extension AdaptyUI.Plugin {
 @MainActor
 package extension AdaptyUI.Plugin {
     static func createOnboardingViewForTest(
-        placementId: String
+        placementId: String,
+        externalUrlsPresentation: AdaptyWebPresentation
     ) async throws -> AdaptyUI.OnboardingView {
         let onboarding = try await Adapty.getOnboarding(
             placementId: placementId
         )
         return try await AdaptyUI.Plugin.createOnboardingView(
-            onboarding: onboarding
+            onboarding: onboarding,
+            externalUrlsPresentation: externalUrlsPresentation
         )
     }
 }

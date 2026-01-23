@@ -1,0 +1,34 @@
+name: Publish docs
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '[0-9]*.[0-9]*.[0-9]*'
+
+jobs:
+  publish-docs:
+    runs-on: macos-15
+    name: Publish docs
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26.2'
+
+      - name: Resolve dependencies
+        run: swift package resolve
+
+      - name: Build documentation
+        run: bash scripts/docs-generator/build.sh
+
+      - name: Publish docs to Netlify
+        # Use Netlify CLI directly to avoid container actions on macOS.
+        run: npx --yes netlify-cli@latest deploy --dir=docs --prod
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

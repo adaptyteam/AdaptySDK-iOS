@@ -32,7 +32,8 @@ extension AdaptyConfiguration {
             crossPlatformSDK: builder.crossPlatformSDK.map {
                 (name: $0.name.trimmed, version: $0.version.trimmed)
             },
-            transactionFinishBehavior: builder.transactionFinishBehavior ?? defaultValue.transactionFinishBehavior
+            transactionFinishBehavior: builder.transactionFinishBehavior ?? defaultValue.transactionFinishBehavior,
+            clearDataOnBackup: builder.clearDataOnBackup ?? defaultValue.clearDataOnBackup
         )
     }
 
@@ -45,6 +46,7 @@ extension AdaptyConfiguration {
             idfaCollectionDisabled: nil,
             ipAddressCollectionDisabled: nil,
             callbackDispatchQueue: nil,
+            clearDataOnBackup: nil,
             serverCluster: nil,
             devBaseUrls: [:],
             backendProxy: nil,
@@ -66,6 +68,8 @@ public extension AdaptyConfiguration {
         public private(set) var ipAddressCollectionDisabled: Bool?
         public private(set) var callbackDispatchQueue: DispatchQueue?
 
+        public private(set) var clearDataOnBackup: Bool?
+
         public private(set) var serverCluster: AdaptyServerCluster?
         package private(set) var devBaseUrls: [AdaptyServerKind: URL]
         public private(set) var backendProxy: (host: String, port: Int)?
@@ -84,6 +88,7 @@ public extension AdaptyConfiguration {
             idfaCollectionDisabled: Bool?,
             ipAddressCollectionDisabled: Bool?,
             callbackDispatchQueue: DispatchQueue?,
+            clearDataOnBackup: Bool?,
             serverCluster: AdaptyServerCluster?,
             devBaseUrls: [AdaptyServerKind: URL],
             backendProxy: (host: String, port: Int)?,
@@ -99,6 +104,7 @@ public extension AdaptyConfiguration {
             self.idfaCollectionDisabled = idfaCollectionDisabled
             self.ipAddressCollectionDisabled = ipAddressCollectionDisabled
             self.callbackDispatchQueue = callbackDispatchQueue
+            self.clearDataOnBackup = clearDataOnBackup
             self.serverCluster = serverCluster ?? .default
             self.devBaseUrls = devBaseUrls
             self.backendProxy = backendProxy
@@ -149,6 +155,12 @@ public extension AdaptyConfiguration.Builder {
     @discardableResult
     func with(ipAddressCollectionDisabled value: Bool) -> Self {
         ipAddressCollectionDisabled = value
+        return self
+    }
+    
+    @discardableResult
+    func with(clearDataOnBackup value: Bool) -> Self {
+        clearDataOnBackup = value
         return self
     }
 
