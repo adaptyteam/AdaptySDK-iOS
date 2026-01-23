@@ -10,22 +10,36 @@
 import SwiftUI
 
 struct AdaptyUITextView: View {
-    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
-    @EnvironmentObject var customTagResolverViewModel: AdaptyUITagResolverViewModel
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var productsViewModel: AdaptyUIProductsViewModel
+    @EnvironmentObject
+    private var customTagResolverViewModel: AdaptyUITagResolverViewModel
 
     private var text: VC.Text
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
-    @EnvironmentObject
-    private var assetsViewModel: AdaptyUIAssetsViewModel
 
     init(_ text: VC.Text) {
         self.text = text
     }
 
     var body: some View {
-        let (richText, productInfo) = text.extract(productsInfoProvider: productsViewModel)
+        let (richText, productInfo) = assetsViewModel.resolvedText(
+            text.value,
+            defaultAttributes: .init(
+                font: nil,
+                size: 12,
+                txtColor: .color(.white),
+                imageTintColor: nil,
+                background: nil,
+                strike: nil,
+                underline: nil
+            ) // TODO: x check this
+//            defaultAttributes: text.defaultTextAttributes
+        )
 
         switch productInfo {
         case .notApplicable:
@@ -213,26 +227,26 @@ extension UIImage {
     }
 }
 
-@MainActor
-extension VC.Text {
-    enum ProductInfoContainer {
-        case notApplicable
-        case notFound
-        case found(ProductResolver)
-    }
-
-    func extract(productsInfoProvider: ProductsInfoProvider) -> (VC.RichText, ProductInfoContainer) {
-
-        switch value {
-        case .stringId(let stringId):
-            return (.empty, .notApplicable) // TODO: implement
-        case .variable(let variableStringId):
-            return (.empty, .notApplicable) // TODO: implement
-        case .product(.id(let productId, let sufix)):
-            return (.empty, .notApplicable) // TODO: implement
-        case .product(.variable(let variableProductId, let sufix)):
-            return (.empty, .notApplicable) // TODO: implement
-
+// @MainActor
+// extension VC.Text {
+//    enum ProductInfoContainer {
+//        case notApplicable
+//        case notFound
+//        case found(ProductResolver)
+//    }
+//
+//    func extract(
+//        _productsInfoProvider: ProductsInfoProvider
+//    ) -> (VC.RichText, ProductInfoContainer) {
+//        switch value {
+//        case let .stringId(stringId):
+//            return (.empty, .notApplicable) // TODO: implement
+//        case let .variable(variableStringId):
+//            return (.empty, .notApplicable) // TODO: implement
+//        case let .product(.id(productId, sufix)):
+//            return (.empty, .notApplicable) // TODO: implement
+//        case let .product(.variable(variableProductId, sufix)):
+//            return (.empty, .notApplicable) // TODO: implement
 
 //
 //        case let .text(value):
@@ -257,9 +271,9 @@ extension VC.Text {
 //                               byPaymentMode: underlying.paymentMode),
 //                .found(underlying)
 //            )
-        }
-    }
-}
+//        }
+//    }
+// }
 
 @MainActor
 extension AttributedString {
@@ -336,4 +350,3 @@ extension AdaptyUIResolvedImageAsset {
 }
 
 #endif
-

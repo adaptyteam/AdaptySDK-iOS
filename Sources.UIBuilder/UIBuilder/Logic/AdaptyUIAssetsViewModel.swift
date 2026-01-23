@@ -15,7 +15,7 @@ import UIKit
 package class AdaptyUIAssetsViewModel: ObservableObject {
     let assetsResolver: AdaptyUIAssetsResolver
     let cache: AdaptyUIAssetsCache
-    
+
     private var cancellables = Set<AnyCancellable>()
 
     package init(
@@ -27,6 +27,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
             state: stateViewModel.state,
             customAssetsResolver: assetsResolver
         )
+        _state = stateViewModel.state
 
         stateViewModel.state.objectWillChange
             .sink { [weak self] _ in
@@ -40,6 +41,73 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
         mode: VC.Mode
     ) -> AdaptyUICachedAsset {
         cache.cachedAsset(ref, mode: mode)
+    }
+
+    // MARK: - Strings Assets Logic
+
+    private let _state: VS // TODO: x remove
+
+    enum ProductInfoContainer {
+        case notApplicable
+        case notFound
+        case found(ProductResolver)
+    }
+
+    func resolvedText(
+        _ ref: VC.StringReference,
+        defaultAttributes: VC.RichText.Attributes?
+    ) -> (VC.RichText, ProductInfoContainer) {
+        switch ref {
+        case let .stringId(stringId):
+            let text = try? _state.richText(
+                stringId,
+                defaultAttributes: defaultAttributes
+            )
+
+            return (text ?? .empty, .notApplicable)
+        case let .variable(variable):
+            if let text = try? _state.getValue(
+                String.self,
+                variable: variable
+            ) {
+                let text = VC.RichText(
+                    items: [.text(text, defaultAttributes)],
+                    fallback: nil
+                )
+
+                return (text, .notApplicable)
+            } else {
+                return (.empty, .notApplicable)
+            }
+        case let .product(product):
+            switch product {
+            case let .id(productId, sufix):
+                let text = try? _state.richText(
+                    adaptyProductId: productId,
+                    byPaymentMode: nil, // TODO: x use productsInfoProvider
+                    suffix: sufix,
+                    defaultAttributes: defaultAttributes
+                )
+
+                return (text ?? .empty, .notApplicable)
+            case let .variable(variable, sufix):
+                guard let productId = try? _state.getValue(
+                    String.self,
+                    variable: variable
+                ) else {
+                    return (.empty, .notApplicable)
+                }
+
+                let text = try? _state.richText(
+                    adaptyProductId: productId,
+                    byPaymentMode: nil, // TODO: x use productsInfoProvider
+                    suffix: sufix,
+                    defaultAttributes: defaultAttributes
+                )
+
+                return (text ?? .empty, .notApplicable)
+            }
+        }
     }
 
     // MARK: - Video Player Logic
