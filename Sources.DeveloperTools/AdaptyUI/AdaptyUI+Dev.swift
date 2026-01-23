@@ -15,10 +15,12 @@ import AdaptyUI
 public extension AdaptyUI {
     static func dev_getOnboardingConfiguration(
         forOnboarding onboarding: AdaptyOnboarding,
+        externalUrlsPresentation: AdaptyWebPresentation,
         inspectWebView: Bool
     ) throws -> OnboardingConfiguration {
         try AdaptyUI.getOnboardingConfiguration(
             forOnboarding: onboarding,
+            externalUrlsPresentation: externalUrlsPresentation,
             inspectWebView: inspectWebView
         )
     }

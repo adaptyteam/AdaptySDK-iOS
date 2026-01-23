@@ -61,7 +61,10 @@ public extension Adapty {
         let task = Task<Adapty, Never>.detached { @AdaptyActor @Sendable () async -> Adapty in
             if let logLevel = configuration.logLevel { Adapty.logLevel = logLevel }
 
-            await Storage.clearAllDataIfDifferent(apiKey: configuration.apiKey)
+            await Storage.clearAllDataIf(
+                differentApiKey: configuration.apiKey,
+                onRestoreFromBackup: configuration.clearDataOnBackup
+            )
 
             AdaptyConfiguration.transactionFinishBehavior = configuration.transactionFinishBehavior
             AdaptyConfiguration.callbackDispatchQueue = configuration.callbackDispatchQueue // TODO: Refactoring

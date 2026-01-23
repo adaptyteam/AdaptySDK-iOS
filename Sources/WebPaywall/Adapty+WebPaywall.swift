@@ -148,9 +148,9 @@ public extension Adapty {
     }
 }
 
-private extension URL {
+extension URL {
     @MainActor
-    func open(presentation: AdaptyWebPresentation) async -> Bool {
+    package func open(presentation: AdaptyWebPresentation) async -> Bool {
         #if os(iOS)
             switch presentation {
             case .externalBrowser:

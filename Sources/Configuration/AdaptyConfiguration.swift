@@ -13,7 +13,8 @@ public struct AdaptyConfiguration: Sendable {
         observerMode: false,
         idfaCollectionDisabled: false,
         ipAddressCollectionDisabled: false,
-        transactionFinishBehavior: TransactionFinishBehavior.default
+        transactionFinishBehavior: TransactionFinishBehavior.default,
+        clearDataOnBackup: false
     )
 
     let apiKey: String
@@ -27,6 +28,7 @@ public struct AdaptyConfiguration: Sendable {
     let logLevel: AdaptyLog.Level?
     let crossPlatformSDK: (name: String, version: String)?
     let transactionFinishBehavior: TransactionFinishBehavior
+    let clearDataOnBackup: Bool
 }
 
 extension AdaptyConfiguration {

@@ -66,7 +66,8 @@ struct AdaptyUIPaywallRendererView: View {
                 paywallViewModel.logShowPaywall()
             }
         } else {
-            EmptyView()
+            Rectangle()
+                .hidden()
                 .onAppear {
                     paywallViewModel.reportDidFailRendering(
                         with: .unsupportedTemplate(viewConfiguration.templateId)

@@ -89,3 +89,4 @@ builds/
 .ruby-version
 Examples/OnboardingsDemo-UIKit/Podfile.lock
 Examples/AdaptyRecipes-UIKit/Podfile.lock
+docs/
