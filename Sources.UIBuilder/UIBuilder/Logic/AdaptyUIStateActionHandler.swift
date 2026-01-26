@@ -79,19 +79,22 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     }
 
     package nonisolated func openScreen(instance: VC.ScreenInstance) {
-        Task { @MainActor in
-//            withAnimation(.linear(duration: 0.3)) {
-            screensViewModel.openScreen(id: instance.type)
-//            }
+        Task { @MainActor in // TODO: use instance: VC.ScreenInstance
+            screensViewModel.navigate(
+                destinationId: instance.type,
+                transitionType: .directional,
+                transitionDirection: .rightToLeft,
+                transitionStyle: .slide
+            )
         }
     }
     
     package nonisolated func closeScreen(instanceId: String) {
-        Task { @MainActor in
+        Task { @MainActor in // TODO: close instanceId
             screensViewModel.dismissTopScreen()
         }
     }
 }
 
-@available(*, deprecated, message: "Dont use fakeScreenInstance")
+@available(*, deprecated, message: "Dont use fakeScreenInstance") // TODO: remove this
 let fakeScreenInstance = VC.ScreenInstance(id: "fake", type: "fake", contextPath: [])

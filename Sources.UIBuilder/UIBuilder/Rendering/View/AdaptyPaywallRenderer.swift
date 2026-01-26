@@ -37,6 +37,47 @@ struct AdaptyUIPaywallRendererView: View {
     var body: some View {
         let viewConfiguration = paywallViewModel.viewConfiguration
 
+        ZStack(alignment: .bottom) {
+            AdaptyNavigationView { screen, _ in
+                if let template = VC.Template(rawValue: screen.templateId) {
+                    templateResolverView(template, screen: screen.screen)
+                        .staticBackground(
+                            screen.screen.background,
+                            defaultValue: .defaultScreenBackground
+                        )
+                } else {
+                    Rectangle()
+                        .hidden()
+                        .onAppear {
+                            paywallViewModel.reportDidFailRendering(
+                                with: .unsupportedTemplate("// TODO: todo")
+                            )
+                        }
+                }
+            }
+
+            Color.black
+                .opacity(!screensViewModel.presentedScreensStack.isEmpty ? 0.4 : 0.0)
+                .onTapGesture {
+                    screensViewModel.dismissTopScreen()
+                }
+
+            ForEach(screensViewModel.bottomSheetsViewModels, id: \.id) { vm in
+                AdaptyUIBottomSheetView()
+                    .environmentObject(vm)
+            }
+
+            if productsViewModel.purchaseInProgress || productsViewModel.restoreInProgress {
+                AdaptyUILoaderView()
+                    .transition(.opacity)
+            }
+        }
+        .ignoresSafeArea()
+        .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
+        .onAppear {
+            paywallViewModel.logShowPaywall()
+        }
+
         if let currentScreenId = screensViewModel.currentScreenId,
            let screen = viewConfiguration.screens[currentScreenId],
            let template = VC.Template(rawValue: screen.templateId)
@@ -63,11 +104,7 @@ struct AdaptyUIPaywallRendererView: View {
                         .transition(.opacity)
                 }
             }
-            .ignoresSafeArea()
-            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
-            .onAppear {
-                paywallViewModel.logShowPaywall()
-            }
+
         } else {
             Rectangle()
                 .hidden()
