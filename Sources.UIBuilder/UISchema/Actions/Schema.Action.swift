@@ -23,8 +23,12 @@ extension Schema.Action: Decodable {
 
         if container.contains(.function) {
             let function = try container.decode(String.self, forKey: .function)
+            let path = function.split(separator: ".").map(String.init)
+            guard !path.isEmpty else {
+                throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.function], debugDescription: "not found function name"))
+            }
             try self.init(
-                path: function.split(separator: ".").map(String.init),
+                path: path,
                 params: container.decodeIfPresent([String: Parameter].self, forKey: .params),
                 scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default
             )
@@ -43,7 +47,7 @@ extension Schema.Action {
         case groupId = "group_id"
         case openIn = "open_in"
         case sectionId = "section_id"
-        case screenId = "screen_id"
+        case screenType = "screen_id"
         case index
     }
 
@@ -81,10 +85,13 @@ extension Schema.Action {
             ], scope: .global)
         case "open_screen":
             try self.init(path: ["SDK", "openScreen"], params: [
-                "screenId": .string(container.decode(String.self, forKey: .screenId))
+                "type": .string(container.decode(String.self, forKey: .screenType)),
+                "instanceId": .string("legacy-bottom-sheet")
             ], scope: .global)
         case "close_screen":
-            self.init(path: ["SDK", "closeCurrentScreen"], params: nil, scope: .global)
+            self.init(path: ["SDK", "closeScreen"], params: [
+                "instanceId": .string("legacy-bottom-sheet")
+            ], scope: .global)
         case "select_product":
             try self.init(path: ["Legacy", "selectProduct"], params: [
                 "productId": .string(container.decode(String.self, forKey: .productId)),

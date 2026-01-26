@@ -50,12 +50,12 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     func execute(actions: [VC.Action]) {
         do {
-            try state.execute(actions: actions)
+            try state.execute(actions: actions, screenInstance: fakeScreenInstance)
         } catch {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
         }
     }
-    
+
     func createBinding<T: JSValueRepresentable>(
         _ variable: VC.Variable,
         defaultValue: T
@@ -63,25 +63,26 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         Binding(
             get: { [weak self] in
                 guard let self else { return defaultValue }
-                
+
                 do {
-                    let value = try self.state.getValue(T.self, variable: variable)
+                    let value = try state.getValue(T.self, variable: variable, screenInstance: fakeScreenInstance)
                     return value ?? defaultValue
                 } catch {
-                    Log.ui.error("#\(self.logId)# getValue error: \(error)")
+                    Log.ui.error("#\(logId)# getValue error: \(error)")
                     return defaultValue
                 }
             },
             set: { [weak self] value in
                 guard let self else { return }
-                
+
                 do {
-                    try self.state.setValue(
+                    try state.setValue(
                         variable: variable,
-                        value: value
+                        value: value,
+                        screenInstance: fakeScreenInstance
                     )
                 } catch {
-                    Log.ui.error("#\(self.logId)# setValue error: \(error)")
+                    Log.ui.error("#\(logId)# setValue error: \(error)")
                 }
             }
         )

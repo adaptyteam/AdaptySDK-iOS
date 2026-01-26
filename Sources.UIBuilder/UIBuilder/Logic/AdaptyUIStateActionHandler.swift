@@ -77,18 +77,21 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             }
         }
     }
-    
-    package nonisolated func openScreen(screenId: String) {
+
+    package nonisolated func openScreen(instance: VC.ScreenInstance) {
         Task { @MainActor in
 //            withAnimation(.linear(duration: 0.3)) {
-            screensViewModel.openScreen(id: screenId)
+            screensViewModel.openScreen(id: instance.type)
 //            }
         }
     }
     
-    package nonisolated func closeCurrentScreen() {
+    package nonisolated func closeScreen(instanceId: String) {
         Task { @MainActor in
             screensViewModel.dismissTopScreen()
         }
     }
 }
+
+@available(*, deprecated, message: "Dont use fakeScreenInstance")
+let fakeScreenInstance = VC.ScreenInstance(id: "fake", type: "fake", contextPath: [])

@@ -14,3 +14,13 @@ package extension VC {
         let scope: Scope
     }
 }
+
+extension VC.Action {
+    func pathWithScreenContext(_ contextPath: [String]) -> [String] {
+        if scope == .screen, !contextPath.isEmpty  {
+            contextPath + path
+        } else {
+            path
+        }
+    }
+}

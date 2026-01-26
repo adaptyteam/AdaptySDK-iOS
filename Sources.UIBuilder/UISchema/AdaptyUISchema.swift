@@ -14,7 +14,7 @@ public struct AdaptyUISchema: Sendable {
     let assets: [AssetIdentifier: Asset]
     let localizations: [LocaleId: Localization]
     let defaultLocalization: Localization?
-    let screens: [ScreenIdentifier: Screen]
+    let screens: [ScreenType: Screen]
     let templates: any AdaptyUISchemaTemplates
     let scripts: [String]
 }

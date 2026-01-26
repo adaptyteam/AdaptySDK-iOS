@@ -29,7 +29,7 @@ extension VS {
     func closeAll()
     func onSelectProduct(_ params: JSValue)
     func openScreen(_ params: JSValue)
-    func closeCurrentScreen()
+    func closeScreen(_ params: JSValue)
 }
 
 extension VS.JSActionDispatcher {
@@ -63,9 +63,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         var url: URL?
         var openIn = VC.Action.WebOpenInParameter.browserOutApp
 
-        if params.isString {
-            url = params.toString().flatMap(URL.init)
-        } else if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             url = (dict["url"] as? String).flatMap(URL.init)
             openIn = (dict["openIn"] as? String).flatMap(VC.Action.WebOpenInParameter.init) ?? openIn
         }
@@ -80,9 +78,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
     func userCustomAction(_ params: JSValue) {
         var userCustomId: String?
 
-        if params.isString {
-            userCustomId = params.toString()
-        } else if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             userCustomId = dict["userCustomId"] as? String
         }
 
@@ -96,9 +92,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
     func purchaseProduct(_ params: JSValue) {
         var productId: String?
 
-        if params.isString {
-            productId = params.toString()
-        } else if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             productId = dict["productId"] as? String
         }
 
@@ -113,9 +107,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         var productId: String?
         var openIn = VC.Action.WebOpenInParameter.browserOutApp
 
-        if params.isString {
-            productId = params.toString()
-        } else if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             productId = dict["productId"] as? String
             openIn = (dict["openIn"] as? String).flatMap(VC.Action.WebOpenInParameter.init) ?? openIn
         }
@@ -138,9 +130,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
     func onSelectProduct(_ params: JSValue) {
         var productId: String?
 
-        if params.isString {
-            productId = params.toString()
-        } else if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             productId = dict["productId"] as? String
         }
 
@@ -152,22 +142,46 @@ extension VS.JSActionDispatcher: JSActionBridge {
     }
 
     func openScreen(_ params: JSValue) {
-        var screenId: VC.ScreenIdentifier?
+        var instanceId: String?
+        var screenType: VC.ScreenType?
+        var contextPath: [String]?
 
-        if params.isString {
-            screenId = params.toString()
-        } else if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            screenId = dict["screenId"] as? String
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+            instanceId = dict["instanceId"] as? String
+            screenType = dict["type"] as? String
+            if let path = dict["contextPath"] as? String {
+                contextPath = path.split(separator: ".").map(String.init)
+            }
         }
 
-        guard let screenId else {
-            Log.viewState.warn("SDK.openScreen: required parameter \"screenId\" is missing")
+        guard let screenType else {
+            Log.viewState.warn("SDK.openScreen: required parameter \"type\" is missing")
             return
         }
-        handler?.openScreen(screenId: screenId)
+
+        guard let instanceId else {
+            Log.viewState.warn("SDK.openScreen: required parameter \"instanceId\" is missing")
+            return
+        }
+
+        handler?.openScreen(instance: .init(
+            id: instanceId,
+            type: screenType,
+            contextPath: contextPath ?? []
+        ))
     }
 
-    func closeCurrentScreen() {
-        handler?.closeCurrentScreen()
+    func closeScreen(_ params: JSValue) {
+        var instanceId: String?
+
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+            instanceId = dict["instanceId"] as? String
+        }
+
+        guard let instanceId else {
+            Log.viewState.warn("SDK.closeScreen: required parameter \"instanceId\" is missing")
+            return
+        }
+        handler?.closeScreen(instanceId: instanceId)
     }
 }

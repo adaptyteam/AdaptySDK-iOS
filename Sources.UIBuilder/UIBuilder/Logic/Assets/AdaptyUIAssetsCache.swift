@@ -118,7 +118,7 @@ extension AdaptyUIConfiguration.AssetReference {
         case .assetId(let id): .assetId(id)
         case .color(let color): .color(color)
         case .variable(let variable):
-            try? state.getValue(VC.AssetIdentifierOrValue.self, variable: variable)
+            try? state.getValue(VC.AssetIdentifierOrValue.self, variable: variable, screenInstance: fakeScreenInstance)
         }
     }
 }

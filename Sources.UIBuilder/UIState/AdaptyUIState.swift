@@ -45,15 +45,15 @@ final class AdaptyUIState: ObservableObject {
         jsState.evaluateScripts(configuration.scripts)
     }
 
-    func getValue<T: JSValueRepresentable>(_ type: T.Type, variable: VC.Variable) throws(VS.Error) -> T? {
-        try jsState.getValue(type, rootObject: nil, variable: variable)
+    func getValue<T: JSValueRepresentable>(_ type: T.Type, variable: VC.Variable, screenInstance: VC.ScreenInstance) throws(VS.Error) -> T? {
+        try jsState.getValue(type, variable: variable, screenInstance: screenInstance)
     }
 
-    func setValue(variable: VC.Variable, value: any JSValueRepresentable) throws(VS.Error) {
-        try jsState.setValue(rootObject: nil, variable: variable, value: value)
+    func setValue(variable: VC.Variable, value: any JSValueRepresentable, screenInstance: VC.ScreenInstance) throws(VS.Error) {
+        try jsState.setValue(variable: variable, value: value, screenInstance: screenInstance)
     }
 
-    func execute(actions: [VC.Action]) throws(VS.Error) {
-        try jsState.execute(actions: actions)
+    func execute(actions: [VC.Action], screenInstance: VC.ScreenInstance) throws(VS.Error) {
+        try jsState.execute(actions: actions, screenInstance: screenInstance)
     }
 }
