@@ -80,9 +80,12 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     
     package nonisolated func openScreen(screenId: String) {
         Task { @MainActor in
-//            withAnimation(.linear(duration: 0.3)) {
-            screensViewModel.openScreen(id: screenId)
-//            }
+            screensViewModel.navigate(
+                destinationId: screenId,
+                transitionType: .directional,
+                transitionDirection: .rightToLeft,
+                transitionStyle: .slide
+            )
         }
     }
     
