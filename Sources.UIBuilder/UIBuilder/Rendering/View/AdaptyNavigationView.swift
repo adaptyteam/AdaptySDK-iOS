@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AdaptyNavigationView</* Header: View, */ Body: View /* , Footer: View */>: View {
-    @ViewBuilder var screenBuilder: (ScreenInstance, ScreenContext) -> Body
+    @ViewBuilder var screenBuilder: (ScreenUIInstance) -> Body
 //    @ViewBuilder var headerBuilder: () -> Header
 //    @ViewBuilder var footerBuilder: () -> Footer
 
@@ -41,13 +41,10 @@ struct AdaptyNavigationView</* Header: View, */ Body: View /* , Footer: View */>
         GeometryReader { geometry in
             ZStack {
                 ForEach(screensViewModel.screensInstances) { screen in
-                    screenBuilder(
-                        screen,
-                        screensViewModel.getContext(forScreenId: screen.id)
-                    )
-                    .offset(screen.offset)
-                    .opacity(screen.opacity)
-                    .zIndex(screen.zIndex)
+                    screenBuilder(screen)
+                        .offset(screen.offset)
+                        .opacity(screen.opacity)
+                        .zIndex(screen.zIndex)
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)

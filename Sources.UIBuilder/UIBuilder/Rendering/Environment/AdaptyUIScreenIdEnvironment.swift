@@ -14,6 +14,7 @@ struct AdaptyUIScreenIdKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
+    // TODO: x remove?
     var adaptyScreenId: String {
         get { self[AdaptyUIScreenIdKey.self] }
         set { self[AdaptyUIScreenIdKey.self] = newValue }

@@ -94,20 +94,8 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 
     // MARK: - New Navigation Logic, TODO: x refactor
 
-    @Published var screensInstances: [ScreenInstance]
-    @Published var popupInstance: ScreenInstance?
-
-    private var screenContexts: [String: ScreenContext] = [:]
-
-    func getContext(forScreenId screenId: String) -> ScreenContext {
-        if let existingState = screenContexts[screenId] {
-            return existingState
-        }
-
-        let newState = ScreenContext()
-        screenContexts[screenId] = newState
-        return newState
-    }
+    @Published var screensInstances: [ScreenUIInstance]
+    @Published var popupInstance: ScreenUIInstance?
 
     private var viewportSize: CGSize = .zero
 
@@ -130,13 +118,13 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     }
     
     private func initialNavigate(
-        destinationId: String,
-        destination: VC.Screen
+        destination screen: VC.ScreenInstance,
+        vcScreen: VC.Screen
     ) {
         
-        var newInstance = ScreenInstance(
-            id: destinationId,
-            screen: destination,
+        var newInstance = ScreenUIInstance(
+            instance: screen,
+            screen: vcScreen,
             offset: .zero,
             opacity: 1.0,
             zIndex: .zero
@@ -146,18 +134,18 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     }
 
     func navigate(
-        destinationId: String,
+        destination screen: VC.ScreenInstance,
         inAnimation: ScreenTransitionAnimation,
         outAnimation: ScreenTransitionAnimation
     ) {
-        guard let screenVC = viewConfiguration.screens[destinationId] else {
+        guard let vcScreen = viewConfiguration.screens[screen.type] else {
             return // TODO: x throw error?
         }
         
         if screensInstances.isEmpty {
             initialNavigate(
-                destinationId: destinationId,
-                destination: screenVC
+                destination: screen,
+                vcScreen: vcScreen
             )
 
             return
@@ -167,7 +155,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
             return // in the process of animation, TODO: x think about force replacement?
         }
 
-        guard screensInstances[0].id != destinationId else {
+        guard screensInstances[0].id != screen.id else {
             return // TODO: x think about instanceId ?
         }
 
@@ -177,9 +165,9 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         currentInstance.opacity = outAnimation.startOpacity
         currentInstance.zIndex = outAnimation.startZIndex
 
-        var newInstance = ScreenInstance(
-            id: destinationId,
-            screen: screenVC,
+        var newInstance = ScreenUIInstance(
+            instance: screen,
+            screen: vcScreen,
             offset: inAnimation.startOffset,
             opacity: inAnimation.startOpacity,
             zIndex: inAnimation.startZIndex
@@ -215,7 +203,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 
     // TODO: x remove
     func navigate(
-        destinationId: String,
+        destination screen: VC.ScreenInstance,
         transitionType: TransitionTypeCategory,
         transitionDirection: TransitionDirection,
         transitionStyle: TransitionStyle
@@ -224,7 +212,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         let screenSize = viewportSize
 
         navigate(
-            destinationId: destinationId,
+            destination: screen,
             inAnimation: .inAnimation(
                 transitionType: transitionType,
                 transitionDirection: transitionDirection,
@@ -245,21 +233,17 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 import Combine
 import SwiftUI
 
-class ScreenContext: ObservableObject {
-//    @Published var progress: Double = 0.0
-//    @Published var toggleEnabled: Bool = false
-}
+struct ScreenUIInstance: Identifiable {
+    var id: String { instance.id } // TODO: x Identifiable?
+    var templateId: String { screen.templateId } // TODO: x move to navigate?
 
-struct ScreenInstance: Identifiable {
-    let id: String // TODO: x Identifiable?
-    let instanceId: UUID = .init()
+    //    let instanceId: UUID = .init()
+    let instance: VC.ScreenInstance
     let screen: VC.Screen
 
     var offset: CGSize = .zero
     var opacity: Double = 1.0
     var zIndex: Double = 1.0
-
-    var templateId: String { screen.templateId } // TODO: x move to navigate?
 }
 
 // MARK: TODO: x remove models

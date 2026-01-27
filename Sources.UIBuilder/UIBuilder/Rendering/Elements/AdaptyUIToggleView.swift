@@ -10,10 +10,10 @@
 import SwiftUI
 
 struct AdaptyUIToggleView: View {
-    @Environment(\.adaptyScreenId)
-    private var screenId: String
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VC.ScreenInstance
 
     @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
     @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
@@ -37,7 +37,8 @@ struct AdaptyUIToggleView: View {
                 },
                 set: { value in
                     stateViewModel.execute(
-                        actions: value ? toggle.onActions : toggle.offActions
+                        actions: value ? toggle.onActions : toggle.offActions,
+                        screen: screen
                     )
                 }
             )
@@ -47,7 +48,8 @@ struct AdaptyUIToggleView: View {
         .tint(
             assetsViewModel.resolvedAsset(
                 toggle.color,
-                mode: colorScheme.toVCMode
+                mode: colorScheme.toVCMode,
+                screen: screen
             ).asColorAsset
         )
     }

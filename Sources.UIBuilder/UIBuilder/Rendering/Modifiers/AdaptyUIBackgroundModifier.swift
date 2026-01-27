@@ -17,11 +17,14 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
     private var assetsViewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VC.ScreenInstance
 
     func body(content: Content) -> some View {
         let asset = assetsViewModel.resolvedAsset(
             background,
-            mode: colorScheme.toVCMode
+            mode: colorScheme.toVCMode,
+            screen: screen
         ).asColorOrGradientOrImageAsset
 
         switch asset {

@@ -12,6 +12,8 @@ import SwiftUI
 struct AdaptyUITextField: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VC.ScreenInstance
 
     @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
     @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
@@ -33,7 +35,8 @@ struct AdaptyUITextField: View {
             "Placeholder",
             text: stateViewModel.createBinding(
                 textField.value,
-                defaultValue: ""
+                defaultValue: "",
+                screen: screen
             )
         )
         .multilineTextAlignment(textField.horizontalAlign)

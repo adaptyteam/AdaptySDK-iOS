@@ -17,10 +17,25 @@ package extension VC {
 
 extension VC.Action {
     func pathWithScreenContext(_ contextPath: [String]) -> [String] {
-        if scope == .screen, !contextPath.isEmpty  {
+        if scope == .screen, !contextPath.isEmpty {
             contextPath + path
         } else {
             path
         }
+    }
+
+    // TODO: refactor
+    func paramsWithScreenInstance(_ instance: VC.ScreenInstance) -> [String: Parameter] {
+        guard var params, params.isNotEmpty else {
+            return [
+                "screenInstanceId": .string(instance.id),
+                "screenContextPath": .string(instance.contextPath.joined(separator: "."))
+            ]
+        }
+
+        params["screenInstanceId"] = .string(instance.id)
+        params["screenContextPath"] = .string(instance.contextPath.joined(separator: "."))
+
+        return params
     }
 }

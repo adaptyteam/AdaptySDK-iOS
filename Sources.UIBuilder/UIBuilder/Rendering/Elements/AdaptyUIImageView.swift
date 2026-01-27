@@ -54,6 +54,8 @@ struct AdaptyUIImageView: View {
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VC.ScreenInstance
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
     @EnvironmentObject
@@ -152,12 +154,14 @@ struct AdaptyUIImageView: View {
         case .unresolvedAsset(let image):
             let imageAsset = assetsViewModel.resolvedAsset(
                 image.asset,
-                mode: colorScheme.toVCMode
+                mode: colorScheme.toVCMode,
+                screen: screen
             ).asImageAsset
 
             let tintAsset = assetsViewModel.resolvedAsset(
                 image.tint,
-                mode: colorScheme.toVCMode
+                mode: colorScheme.toVCMode,
+                screen: screen
             ).asColorAsset
 
             resolvedAssetBody(

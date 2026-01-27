@@ -40,7 +40,7 @@ extension Schema {
         }
 
         static func legacyOpenScreen(screenId: ScreenType = "default") -> String {
-            "SDK.openScreen({ screenId: \"\(screenId)\" })"
+            "SDK.openScreen({ instanceId: \"\(screenId)\", type: \"\(screenId)\" })"
         }
     }
 }

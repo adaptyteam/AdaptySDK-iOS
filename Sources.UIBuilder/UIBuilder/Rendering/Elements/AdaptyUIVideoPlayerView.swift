@@ -85,6 +85,8 @@ struct AdaptyUIVideoView: View {
     private var viewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VC.ScreenInstance
 
     private let video: VC.VideoPlayer
 
@@ -98,7 +100,8 @@ struct AdaptyUIVideoView: View {
     var body: some View {
         if let videoAsset = viewModel.resolvedAsset(
             video.asset,
-            mode: colorScheme.toVCMode
+            mode: colorScheme.toVCMode,
+            screen: screen
         ).asVideoAsset {
             AdaptyUIVideoColorSchemeSpecificView(
                 video: videoAsset,

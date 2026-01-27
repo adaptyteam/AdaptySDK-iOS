@@ -12,6 +12,8 @@ import SwiftUI
 struct AdaptyUIButtonView: View {
     @Environment(\.adaptyScreenId)
     private var screenId: String
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VC.ScreenInstance
 
     private var button: VC.Button
 
@@ -48,7 +50,10 @@ struct AdaptyUIButtonView: View {
 
     public var body: some View {
         Button {
-            stateViewModel.execute(actions: button.actions)
+            stateViewModel.execute(
+                actions: button.actions,
+                screen: screen
+            )
         } label: {
             AdaptyUIElementView(currentStateView)
         }

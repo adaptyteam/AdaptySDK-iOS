@@ -222,6 +222,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private var assetsViewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VC.ScreenInstance
 
     func body(content: Content) -> some View {
         self.bodyWithBackground(
@@ -233,7 +235,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                     .swiftUIShapeStroke(
                         asset: self.assetsViewModel.resolvedAsset(
                             borderFilling,
-                            mode: self.colorScheme.toVCMode
+                            mode: self.colorScheme.toVCMode,
+                            screen: screen
                         ).asColorOrGradientAsset,
                         lineWidth: borderThickness
                     )
@@ -258,7 +261,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                         .swiftUIShapeFill(
                             asset: self.assetsViewModel.resolvedAsset(
                                 animatedBackgroundFilling,
-                                mode: self.colorScheme.toVCMode
+                                mode: self.colorScheme.toVCMode,
+                                screen: screen
                             ).asColorOrGradientOrImageAsset
                         )
                         .opacity(includeBackground ? 1.0 : 0.0)
@@ -270,7 +274,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                         .swiftUIShapeFill(
                             asset: self.assetsViewModel.resolvedAsset(
                                 background,
-                                mode: self.colorScheme.toVCMode
+                                mode: self.colorScheme.toVCMode,
+                                screen: screen
                             ).asColorOrGradientOrImageAsset
                         )
                 }
