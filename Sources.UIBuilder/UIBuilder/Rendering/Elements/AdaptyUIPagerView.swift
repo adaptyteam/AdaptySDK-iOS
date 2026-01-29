@@ -67,6 +67,8 @@ struct AdaptyUIPagerView: View {
     private var safeArea: EdgeInsets
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
     var pager: VC.Pager
 
@@ -252,7 +254,8 @@ struct AdaptyUIPagerView: View {
                     .fill(
                         asset: assetsViewModel.resolvedAsset(
                             idx == currentPageSelectedIndex ? pageControl.selectedColor : pageControl.color,
-                            mode: colorScheme.toVCMode
+                            mode: colorScheme.toVCMode,
+                            screen: screen
                         ).asColorOrGradientOrImageAsset
                     )
                     .frame(width: pageControl.dotSize,

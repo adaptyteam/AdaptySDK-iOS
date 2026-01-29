@@ -23,6 +23,9 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private var safeArea: EdgeInsets
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
+
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
 
@@ -97,7 +100,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             .shadow(
                 color: assetsViewModel.resolvedAsset(
                     resolvedShadowFilling,
-                    mode: colorScheme.toVCMode
+                    mode: colorScheme.toVCMode,
+                    screen: screen
                 ).asColorAsset,
                 blurRadius: resolvedShadowBlurRadius,
                 offset: resolvedShadowOffset

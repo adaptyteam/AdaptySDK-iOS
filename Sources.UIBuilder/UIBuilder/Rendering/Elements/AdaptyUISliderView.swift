@@ -13,6 +13,8 @@ import SwiftUI
 struct AdaptyUISliderView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
     @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
     @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
@@ -33,7 +35,8 @@ struct AdaptyUISliderView: View {
         Slider(
             value: stateViewModel.createBinding(
                 slider.value,
-                defaultValue: 0.0
+                defaultValue: 0.0,
+                screen: screen
             ),
             in: slider.minValue ... slider.maxValue,
             step: slider.stepValue ?? 0.1

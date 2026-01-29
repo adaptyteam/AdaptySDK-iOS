@@ -38,9 +38,10 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     func resolvedAsset(
         _ ref: AdaptyUIConfiguration.AssetReference?,
-        mode: VC.Mode
+        mode: VC.Mode,
+        screen: VS.ScreenInstance
     ) -> AdaptyUICachedAsset {
-        cache.cachedAsset(ref, mode: mode)
+        cache.cachedAsset(ref, mode: mode, screen: screen)
     }
 
     // MARK: - Strings Assets Logic
@@ -55,28 +56,29 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     func resolvedText(
         _ ref: VC.StringReference,
-        defaultAttributes: VC.RichText.Attributes?
+        defaultAttributes: VC.RichText.Attributes?,
+        screen: VS.ScreenInstance
     ) -> (VC.RichText, ProductInfoContainer) {
         switch ref {
         case let .stringId(stringId):
             let text = try? _state.richText(
                 stringId,
                 defaultAttributes: defaultAttributes
-            )
+            )?.apply(defaultAttributes: defaultAttributes)
 
             return (text ?? .empty, .notApplicable)
         case let .variable(variable):
-            if let text = try? _state.getValue(
+            if let stringId = try? _state.getValue(
                 String.self,
                 variable: variable,
-                screenInstance: fakeScreenInstance
+                screenInstance: screen
             ) {
-                let text = VC.RichText(
-                    items: [.text(text, defaultAttributes)],
-                    fallback: nil
-                )
+                let text = try? _state.richText(
+                    stringId,
+                    defaultAttributes: defaultAttributes
+                )?.apply(defaultAttributes: defaultAttributes)
 
-                return (text, .notApplicable)
+                return (text ?? .empty, .notApplicable)
             } else {
                 return (.empty, .notApplicable)
             }
@@ -88,14 +90,14 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                     byPaymentMode: nil, // TODO: x use productsInfoProvider
                     suffix: sufix,
                     defaultAttributes: defaultAttributes
-                )
+                )?.apply(defaultAttributes: defaultAttributes)
 
                 return (text ?? .empty, .notApplicable)
             case let .variable(variable, sufix):
                 guard let productId = try? _state.getValue(
                     String.self,
                     variable: variable,
-                    screenInstance: fakeScreenInstance
+                    screenInstance: screen
                 ) else {
                     return (.empty, .notApplicable)
                 }
@@ -105,7 +107,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                     byPaymentMode: nil, // TODO: x use productsInfoProvider
                     suffix: sufix,
                     defaultAttributes: defaultAttributes
-                )
+                )?.apply(defaultAttributes: defaultAttributes)
 
                 return (text ?? .empty, .notApplicable)
             }

@@ -38,13 +38,14 @@ struct AdaptyUIPaywallRendererView: View {
         let viewConfiguration = paywallViewModel.viewConfiguration
 
         ZStack(alignment: .bottom) {
-            AdaptyNavigationView { screen, _ in
-                if let template = VC.Template(rawValue: screen.templateId) {
-                    templateResolverView(template, screen: screen.screen)
+            AdaptyNavigationView { screenInstance in
+                if let template = VC.Template(rawValue: screenInstance.templateId) {
+                    templateResolverView(template, screen: screenInstance.screen)
                         .staticBackground(
-                            screen.screen.background,
+                            screenInstance.screen.background,
                             defaultValue: .defaultScreenBackground
                         )
+                        .withScreenInstance(screenInstance.instance)
                 } else {
                     Rectangle()
                         .hidden()

@@ -175,12 +175,15 @@ extension VS.JSState {
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
         guard !actions.isEmpty else { return }
+
         for action in actions {
             guard !actionDispatcher.execute(action, in: context) else { continue }
             _ = try invokeMethod(
-                Bool.self, path: action.pathWithScreenContext(screenInstance.contextPath),
-                args: [action.params])
+                Bool.self,
+                path: action.pathWithScreenContext(screenInstance.contextPath),
+                args: [action.paramsWithScreenInstance(screenInstance)])
         }
+
         objectWillChange.send()
     }
 }

@@ -21,6 +21,8 @@ struct AdaptyUITextView: View {
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
     init(_ text: VC.Text) {
         self.text = text
@@ -29,16 +31,8 @@ struct AdaptyUITextView: View {
     var body: some View {
         let (richText, productInfo) = assetsViewModel.resolvedText(
             text.value,
-            defaultAttributes: .init(
-                font: nil,
-                size: 12,
-                txtColor: .color(.white),
-                imageTintColor: nil,
-                background: nil,
-                strike: nil,
-                underline: nil
-            ) // TODO: x check this
-//            defaultAttributes: text.defaultTextAttributes
+            defaultAttributes: text.defaultTextAttributes,
+            screen: screen
         )
 
         switch productInfo {
@@ -48,7 +42,8 @@ struct AdaptyUITextView: View {
                     assetsCache: assetsViewModel.cache,
                     tagResolver: customTagResolverViewModel,
                     productInfo: nil,
-                    colorScheme: colorScheme
+                    colorScheme: colorScheme,
+                    screen: screen
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -60,6 +55,7 @@ struct AdaptyUITextView: View {
                     tagResolver: customTagResolverViewModel,
                     productInfo: nil,
                     colorScheme: colorScheme,
+                    screen: screen,
                     placeholder: true
                 )
                 .multilineTextAlignment(text.horizontalAlign)
@@ -72,7 +68,8 @@ struct AdaptyUITextView: View {
                     assetsCache: assetsViewModel.cache,
                     tagResolver: customTagResolverViewModel,
                     productInfo: productInfoModel,
-                    colorScheme: colorScheme
+                    colorScheme: colorScheme,
+                    screen: screen
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -93,7 +90,8 @@ extension [VC.RichText.Item] {
         assetsCache: AdaptyUIAssetsCache,
         tagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
-        colorScheme: ColorScheme
+        colorScheme: ColorScheme,
+        screen: VS.ScreenInstance
     ) throws -> Text {
         try reduce(Text("")) {
             partialResult,
@@ -107,7 +105,8 @@ extension [VC.RichText.Item] {
                         value: value,
                         attributes: attr,
                         assetsCache: assetsCache,
-                        colorScheme: colorScheme
+                        colorScheme: colorScheme,
+                        screen: screen
                     )
                 )
             case let .tag(value, attr):
@@ -134,23 +133,27 @@ extension [VC.RichText.Item] {
                         value: tagReplacementResult,
                         attributes: attr,
                         assetsCache: assetsCache,
-                        colorScheme: colorScheme
+                        colorScheme: colorScheme,
+                        screen: screen
                     )
                 )
             case let .image(value, attr):
                 let imageResolvedAsset = assetsCache.cachedAsset(
                     value,
-                    mode: colorScheme.toVCMode
+                    mode: colorScheme.toVCMode,
+                    screen: screen
                 ).asImageAsset
 
                 let fontResolvedAsset = assetsCache.cachedAsset(
                     attr?.font,
-                    mode: colorScheme.toVCMode
+                    mode: colorScheme.toVCMode,
+                    screen: screen
                 ).asFontAsset
 
                 let tintResolvedAsset = assetsCache.cachedAsset(
                     attr?.imageTintColor,
-                    mode: colorScheme.toVCMode
+                    mode: colorScheme.toVCMode,
+                    screen: screen
                 ).asColorAsset?.uiColor
 
                 guard let uiImage = imageResolvedAsset?.textAttachmentImage(
@@ -177,6 +180,7 @@ extension VC.RichText {
         tagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
+        screen: VS.ScreenInstance,
         placeholder: Bool = false
     ) -> Text {
         if placeholder {
@@ -197,14 +201,16 @@ extension VC.RichText {
                     assetsCache: assetsCache,
                     tagResolver: tagResolver,
                     productInfo: productInfo,
-                    colorScheme: colorScheme
+                    colorScheme: colorScheme,
+                    screen: screen
                 )
             } catch {
                 if let fallback, let fallbackText = try? fallback.convertToSwiftUITextThrowingError(
                     assetsCache: assetsCache,
                     tagResolver: tagResolver,
                     productInfo: productInfo,
-                    colorScheme: colorScheme
+                    colorScheme: colorScheme,
+                    screen: screen
                 ) {
                     result = fallbackText
                 } else {
@@ -281,16 +287,19 @@ extension AttributedString {
         value: String,
         attributes: VC.RichText.Attributes?,
         assetsCache: AdaptyUIAssetsCache,
-        colorScheme: ColorScheme
+        colorScheme: ColorScheme,
+        screen: VS.ScreenInstance
     ) -> AttributedString {
         let foregroundColorAsset = assetsCache.cachedAsset(
             attributes?.txtColor,
-            mode: colorScheme.toVCMode
+            mode: colorScheme.toVCMode,
+            screen: screen
         ).asColorAsset
 
         let fontAsset = assetsCache.cachedAsset(
             attributes?.txtColor,
-            mode: colorScheme.toVCMode
+            mode: colorScheme.toVCMode,
+            screen: screen
         ).asFontAsset
 
         var result = AttributedString(value)
@@ -300,8 +309,9 @@ extension AttributedString {
             .withSize(attributes?.size ?? .adaptyDefaultFontSize)
 
         if let backgroundColor = assetsCache.cachedAsset(
-            attributes?.txtColor,
-            mode: colorScheme.toVCMode
+            attributes?.background,
+            mode: colorScheme.toVCMode,
+            screen: screen
         ).asColorAsset?.uiColor {
             result.backgroundColor = backgroundColor
         }

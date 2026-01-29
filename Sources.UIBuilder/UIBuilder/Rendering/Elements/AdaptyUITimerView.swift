@@ -136,8 +136,8 @@ extension VC.RichText {
 
 @MainActor
 struct AdaptyUITimerView: View, AdaptyUITagResolver {
-    @Environment(\.adaptyScreenId)
-    private var screenId: String
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
     @EnvironmentObject var viewModel: AdaptyUITimerViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyUITagResolverViewModel
@@ -173,7 +173,8 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
                     assetsCache: assetsViewModel.cache,
                     tagResolver: self,
                     productInfo: nil,
-                    colorScheme: colorScheme
+                    colorScheme: colorScheme,
+                    screen: screen
                 )
                 .multilineTextAlignment(timer.horizontalAlign)
                 .lineLimit(1)
@@ -221,9 +222,11 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
     }
 
     private func updateTime() {
-        var timeLeft = viewModel.timeLeft(for: timer,
-                                          at: Date(),
-                                          screenId: screenId)
+        var timeLeft = viewModel.timeLeft(
+            for: timer,
+            at: Date(),
+            screen: screen
+        )
 
         guard timeLeft > 0 else {
             timeLeft = 0
