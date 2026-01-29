@@ -56,7 +56,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         }
     }
 
-    func createBinding<T: JSValueRepresentable>(
+    func createBinding<T: JSValueRepresentable & JSValueConvertable>(
         _ variable: VC.Variable,
         defaultValue: T
     ) -> Binding<T> {

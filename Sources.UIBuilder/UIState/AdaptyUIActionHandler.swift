@@ -15,6 +15,6 @@ package protocol AdaptyUIActionHandler: AnyObject {
     func closeAll()
     func selectProduct(productId: String)
 
-    func openScreen(instance: VC.ScreenInstance)
+    func openScreen(instance: VS.ScreenInstance)
     func closeScreen(instanceId: String)
 }

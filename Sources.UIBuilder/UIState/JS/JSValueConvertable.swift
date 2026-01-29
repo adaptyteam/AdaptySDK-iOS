@@ -8,7 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-protocol JSValueConvertable {
+protocol JSValueConvertable: Sendable, Hashable {
     func toJSValue(in: JSContext) -> JSValue
 }
 

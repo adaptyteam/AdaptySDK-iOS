@@ -78,7 +78,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
 
-    package nonisolated func openScreen(instance: VC.ScreenInstance) {
+    package nonisolated func openScreen(instance: VS.ScreenInstance) {
         Task { @MainActor in // TODO: use instance: VC.ScreenInstance
             screensViewModel.navigate(
                 destinationId: instance.type,
@@ -97,4 +97,4 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 }
 
 @available(*, deprecated, message: "Dont use fakeScreenInstance") // TODO: remove this
-let fakeScreenInstance = VC.ScreenInstance(id: "fake", type: "fake", contextPath: [])
+let fakeScreenInstance = VS.ScreenInstance(id: "fake", type: "fake", contextPath: [])

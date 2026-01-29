@@ -69,7 +69,7 @@ private extension Schema.StringReference.Product {
 
         guard !container.contains(.productGroupId) else {
             return try .variable(
-                .init(path: ["Legacy", "productGroup", container.decode(String.self, forKey: .productGroupId)], scope: .global),
+                .init(path: ["Legacy", "productGroup", container.decode(String.self, forKey: .productGroupId)], setter: nil, scope: .global),
                 sufix: suffix
             )
         }
