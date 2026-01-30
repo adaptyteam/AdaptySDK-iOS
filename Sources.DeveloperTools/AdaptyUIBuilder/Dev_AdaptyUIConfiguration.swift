@@ -17,7 +17,7 @@ public extension Dev_AdaptyUIConfiguration {
         assets: String,
         localization: String,
         templates: String? = nil,
-        navigators: String? = nil,
+        navigators: [String: String]? = nil,
         contents: [AdaptyUIExampleContent],
         script: String? = nil,
         startScreenName: String?

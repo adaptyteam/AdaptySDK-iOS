@@ -10,6 +10,16 @@ import Foundation
 extension Schema {
     struct NavigatorsCollection: Sendable, Hashable {
         let values: [NavigatorIdentifier: Navigator]
+
+        init(values: [Schema.NavigatorIdentifier: Schema.Navigator]? = nil) {
+            var values = values ?? [:]
+            if !values.keys.contains(Schema.Navigator.default.id) {
+                values.reserveCapacity(values.count + 1)
+                values[Schema.Navigator.default.id] = Schema.Navigator.default
+            }
+
+            self.values = values
+        }
     }
 }
 
@@ -26,11 +36,26 @@ extension Schema.NavigatorsCollection: DecodableWithConfiguration {
             values[value.id] = value
         }
 
-        if !values.keys.contains(Schema.Navigator.default.id) {
-            values.reserveCapacity(values.count + 1)
-            values[Schema.Navigator.default.id] = Schema.Navigator.default
+        self.init(values: values)
+    }
+}
+
+extension Schema.NavigatorsCollection {
+    init(data: [String: String]?, from decoder: JSONDecoder, configuration: Schema.DecodingConfiguration) throws {
+        guard let data, !data.isEmpty else {
+            self.init()
+            return
         }
 
-        self.init(values: values)
+        let array = try data.compactMapValues {
+            $0.data(using: .utf8)
+        }.map { id, data in
+            var nestedConfiguration = configuration
+            nestedConfiguration.insideNavigatorId = id
+            let navigator = try decoder.decode(Schema.Navigator.self, from: data, with: nestedConfiguration)
+            return (id, navigator)
+        }
+
+        self.init(values: Dictionary(array) { first, _ in first })
     }
 }

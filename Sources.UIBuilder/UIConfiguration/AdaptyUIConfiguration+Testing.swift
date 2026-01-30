@@ -17,7 +17,7 @@ package extension AdaptyUIConfiguration {
         assets: String,
         localization: String,
         templates templatesCollection: String?,
-        navigators navigatorsCollection: String?,
+        navigators: [String: String]?,
         contents: [AdaptyUIExampleContent],
         script: String?,
         startScreenName: String?
@@ -70,27 +70,18 @@ package extension AdaptyUIConfiguration {
             screens: screens
         )
 
-        var navigators: [Schema.NavigatorIdentifier: Schema.Navigator] = try navigatorsCollection.map { value in
-            let data = value.data(using: .utf8) ?? Data()
-            return try jsonDecoder.decode(Schema.NavigatorsCollection.self, from: data, with: configuration)
-        }?.values ?? [:]
-
-        if !navigators.keys.contains(Schema.Navigator.default.id) {
-            navigators.reserveCapacity(navigators.count + 1)
-            navigators[Schema.Navigator.default.id] = Schema.Navigator.default
-        }
-
         var scripts = script.map { [$0] } ?? []
 
         if let startScreenName {
             scripts += [Schema.LegacyScripts.legacyOpenScreen(screenId: startScreenName)]
         }
-        let schema = AdaptyUISchema(
+
+        let schema = try AdaptyUISchema(
             formatVersion: formatVersion,
             assets: assets.value,
             localizations: [localiation.id: localiation],
             defaultLocalization: localiation,
-            navigators: navigators,
+            navigators: Schema.NavigatorsCollection(data: navigators, from: jsonDecoder, configuration: configuration).values,
             screens: screens,
             templates: templates,
             scripts: scripts

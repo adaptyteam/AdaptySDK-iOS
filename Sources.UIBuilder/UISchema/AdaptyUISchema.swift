@@ -83,11 +83,11 @@ extension AdaptyUISchema: Codable {
             defaultLocalization = nil
         }
 
-        let navigatorCollection = try container.decode(
+        let navigatorCollection = try container.decodeIfPresent(
             NavigatorsCollection.self,
             forKey: .navigators,
             configuration: configuration
-        )
+        ) ?? .init()
 
         navigators = navigatorCollection.values
 
