@@ -9,15 +9,7 @@ import Foundation
 
 extension Schema {
     struct ScreensCollection: Sendable, Hashable {
-        let values: [String: Screen]
-    }
-}
-
-extension Schema.ScreensCollection {
-    static let defaultScreenKey = "default"
-
-    var defaultScreen: Schema.Screen? {
-        values[Self.defaultScreenKey]
+        let values: [ScreenType: Screen]
     }
 }
 

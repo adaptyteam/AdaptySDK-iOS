@@ -25,6 +25,7 @@ package extension VC {
         case timer(Timer, Properties?)
         indirect case pager(Pager, Properties?)
 
+        case screenHolder
         case unknown(String, Properties?)
     }
 }

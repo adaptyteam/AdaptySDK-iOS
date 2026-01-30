@@ -23,7 +23,7 @@ extension View {
 extension VC.Element {
     var properties: VC.Element.Properties? {
         switch self {
-        case .space:
+        case .space, .screenHolder:
             nil
         case let .box(_, properties),
              let .stack(_, properties),
@@ -101,6 +101,8 @@ struct AdaptyUIElementWithoutPropertiesView: View {
             AdaptyUIPagerView(pager)
         case let .unknown(value, _):
             AdaptyUIUnknownElementView(value: value)
+        case .screenHolder:
+            AdaptyUIUnknownElementView(value: "screen_holder")
         }
     }
 

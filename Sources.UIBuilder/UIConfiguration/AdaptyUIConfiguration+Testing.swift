@@ -17,9 +17,10 @@ package extension AdaptyUIConfiguration {
         assets: String,
         localization: String,
         templates templatesCollection: String?,
+        navigators navigatorsCollection: String?,
         contents: [AdaptyUIExampleContent],
         script: String?,
-        startScreenName: String
+        startScreenName: String?
     ) throws -> Self {
         let formatVersion = AdaptyUISchema.formatVersion
         let configuration = Schema.DecodingConfiguration(
@@ -69,14 +70,30 @@ package extension AdaptyUIConfiguration {
             screens: screens
         )
 
+        var navigators: [Schema.NavigatorIdentifier: Schema.Navigator] = try navigatorsCollection.map { value in
+            let data = value.data(using: .utf8) ?? Data()
+            return try jsonDecoder.decode(Schema.NavigatorsCollection.self, from: data, with: configuration)
+        }?.values ?? [:]
+
+        if !navigators.keys.contains(Schema.Navigator.default.id) {
+            navigators.reserveCapacity(navigators.count + 1)
+            navigators[Schema.Navigator.default.id] = Schema.Navigator.default
+        }
+
+        var scripts = script.map { [$0] } ?? []
+
+        if let startScreenName {
+            scripts += [Schema.LegacyScripts.legacyOpenScreen(screenId: startScreenName)]
+        }
         let schema = AdaptyUISchema(
             formatVersion: formatVersion,
             assets: assets.value,
             localizations: [localiation.id: localiation],
             defaultLocalization: localiation,
+            navigators: navigators,
             screens: screens,
             templates: templates,
-            scripts: (script.map { [$0] } ?? []) + [Schema.LegacyScripts.legacyOpenScreen(screenId: startScreenName)]
+            scripts: scripts
         )
 
         return try schema.extractUIConfiguration(withLocaleId: localiation.id)

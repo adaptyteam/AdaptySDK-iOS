@@ -58,7 +58,7 @@ extension Schema.Screen: Encodable, DecodableWithConfiguration {
             if let value = configuration.insideScreenId {
                 value
             } else {
-                throw DecodingError.keyNotFound(CodingKeys.templateId, .init(codingPath: decoder.codingPath, debugDescription: "Unknown screen id"))
+                throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown screen id"))
             }
 
         try self.init(

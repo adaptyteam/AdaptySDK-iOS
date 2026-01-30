@@ -11,6 +11,7 @@ extension Schema {
     enum Element: Sendable, Hashable {
         case legacyReference(String)
         case template(id: String)
+        case scrrenHolder
         indirect case stack(Schema.Stack, Properties?)
         case text(Schema.Text, Properties?)
         case textField(Schema.TextField, Properties?)
@@ -37,6 +38,8 @@ extension Schema.Localizer {
             try legacyReference(id)
         case let .template(id):
             try templateInstance(id)
+        case .scrrenHolder:
+            .screenHolder
         case let .stack(value, properties):
             try .stack(stack(value), properties?.value)
         case let .text(value, properties):
@@ -97,6 +100,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         case `if`
         case legacyReference
         case pager
+        case screenHolder = "screen_holder"
     }
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -118,6 +122,12 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         case .legacyReference:
             if configuration.isLegacy {
                 self = try .legacyReference(container.decode(String.self, forKey: .legacyElementId))
+            } else {
+                throw Schema.Error.unsupportedElement(type)
+            }
+        case .screenHolder:
+            if configuration.isNavigator {
+                self = .scrrenHolder
             } else {
                 throw Schema.Error.unsupportedElement(type)
             }

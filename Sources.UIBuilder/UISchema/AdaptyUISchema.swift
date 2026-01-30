@@ -14,6 +14,7 @@ public struct AdaptyUISchema: Sendable {
     let assets: [AssetIdentifier: Asset]
     let localizations: [LocaleId: Localization]
     let defaultLocalization: Localization?
+    let navigators: [NavigatorIdentifier: Navigator]
     let screens: [ScreenType: Screen]
     let templates: any AdaptyUISchemaTemplates
     let scripts: [String]
@@ -36,6 +37,14 @@ extension AdaptyUISchema: Codable {
         var insideScreenId: String?
         var insideNavigatorId: String?
         let legacyTemplateId: String?
+
+        var isNavigator: Bool {
+            insideNavigatorId != nil
+        }
+
+        var isTemplate: Bool {
+            insideTemplateId != nil
+        }
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -48,6 +57,7 @@ extension AdaptyUISchema: Codable {
         case templates
         case legacyScreens = "styles"
         case screens
+        case navigators
         case script
     }
 
@@ -72,6 +82,14 @@ extension AdaptyUISchema: Codable {
         } else {
             defaultLocalization = nil
         }
+
+        let navigatorCollection = try container.decode(
+            NavigatorsCollection.self,
+            forKey: .navigators,
+            configuration: configuration
+        )
+
+        navigators = navigatorCollection.values
 
         let screensCollection = try container.decode(
             ScreensCollection.self,
