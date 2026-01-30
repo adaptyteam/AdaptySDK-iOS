@@ -28,8 +28,9 @@ package final class AdaptyUIState: ObservableObject {
         self.configuration = configuration
         self.jsState = .init(
             name: name,
-            isInspectable: isInspectable,
-            actionHandler: actionHandler
+            configuration: configuration,
+            actionHandler: actionHandler,
+            isInspectable: isInspectable
         )
 
         jsState.objectWillChange

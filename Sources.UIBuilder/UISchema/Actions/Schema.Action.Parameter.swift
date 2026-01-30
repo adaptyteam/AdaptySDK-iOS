@@ -23,6 +23,8 @@ extension Schema.Action.Parameter: Codable {
             self = .double(v)
         } else if let v = try? container.decode(String.self) {
             self = .string(v)
+        } else if let v = try? container.decode([String: Schema.Action.Parameter].self) {
+            self = .object(v)
         } else {
             throw DecodingError.typeMismatch(
                 Schema.Action.Parameter.self,
@@ -48,6 +50,8 @@ extension Schema.Action.Parameter: Codable {
         case .double(let value):
             try container.encode(value)
         case .string(let value):
+            try container.encode(value)
+        case .object(let value):
             try container.encode(value)
         }
     }

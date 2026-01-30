@@ -45,6 +45,7 @@ package extension AdaptyUIConfiguration {
                 let element = try jsonDecoder.decode(Schema.Element.self, from: contentData, with: configuration)
 
                 return (name, Schema.Screen(
+                    id: name,
                     templateId: templateId,
                     background: nil,
                     cover: nil,

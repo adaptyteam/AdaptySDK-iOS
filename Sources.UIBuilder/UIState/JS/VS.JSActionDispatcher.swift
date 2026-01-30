@@ -12,8 +12,13 @@ import JavaScriptCore
 extension VS {
     final class JSActionDispatcher: NSObject {
         private weak var handler: AdaptyUIActionHandler?
+        private let configuration: AdaptyUIConfiguration
 
-        init(_ handler: AdaptyUIActionHandler?) {
+        init(
+            _ handler: AdaptyUIActionHandler?,
+            _ configuration: AdaptyUIConfiguration
+        ) {
+            self.configuration = configuration
             self.handler = handler
         }
     }
@@ -69,7 +74,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let url else {
-            Log.viewState.warn("SDK.openUrl: required parameter \"url\" is missing or not is URL")
+            Log.viewState.error("SDK.openUrl: required parameter \"url\" is missing or not is URL")
             return
         }
         handler?.openUrl(url: url, openIn: openIn)
@@ -83,7 +88,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let userCustomId else {
-            Log.viewState.warn("SDK.userCustomAction: required parameter \"userCustomId\" is missing")
+            Log.viewState.error("SDK.userCustomAction: required parameter \"userCustomId\" is missing")
             return
         }
         handler?.userCustomAction(id: userCustomId)
@@ -97,7 +102,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let productId else {
-            Log.viewState.warn("SDK.purchaseProduct: required parameter \"productId\" is missing")
+            Log.viewState.error("SDK.purchaseProduct: required parameter \"productId\" is missing")
             return
         }
         handler?.purchaseProduct(productId: productId, service: .storeKit)
@@ -113,7 +118,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let productId else {
-            Log.viewState.warn("SDK.webPurchaseProduct: required parameter \"productId\" is missing")
+            Log.viewState.error("SDK.webPurchaseProduct: required parameter \"productId\" is missing")
             return
         }
         handler?.purchaseProduct(productId: productId, service: .openWebPaywall(openIn: openIn))
@@ -135,7 +140,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let productId else {
-            Log.viewState.warn("SDK.onSelectProduct: required parameter \"productId\" is missing")
+            Log.viewState.error("SDK.onSelectProduct: required parameter \"productId\" is missing")
             return
         }
         handler?.selectProduct(productId: productId)
@@ -145,9 +150,11 @@ extension VS.JSActionDispatcher: JSActionBridge {
         var instanceId: String?
         var screenType: VC.ScreenType?
         var contextPath: [String]?
+        var navigatorId: String?
 
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             instanceId = dict["instanceId"] as? String
+            navigatorId = dict["navigatorId"].flatMap { $0 as? String }
             screenType = dict["type"] as? String
             if let path = dict["contextPath"] as? String {
                 contextPath = path.split(separator: ".").map(String.init)
@@ -155,33 +162,33 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let screenType else {
-            Log.viewState.warn("SDK.openScreen: required parameter \"type\" is missing")
+            Log.viewState.error("SDK.openScreen: required parameter \"type\" is missing")
             return
         }
-
+        guard let configuration = configuration.screens[screenType] else {
+            Log.viewState.error("SDK.openScreen: not found screen type: \(screenType)")
+            return
+        }
         guard let instanceId else {
-            Log.viewState.warn("SDK.openScreen: required parameter \"instanceId\" is missing")
+            Log.viewState.error("SDK.openScreen: required parameter \"instanceId\" is missing")
             return
         }
 
         handler?.openScreen(instance: .init(
             id: instanceId,
-            type: screenType,
+            navigatorId: navigatorId ?? "default",
+            configuration: configuration,
             contextPath: contextPath ?? []
         ))
     }
 
     func closeScreen(_ params: JSValue) {
-        var instanceId: String?
+        var navigatorId: String?
 
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            instanceId = dict["instanceId"] as? String
+            navigatorId = dict["navigatorId"] as? String
         }
 
-        guard let instanceId else {
-            Log.viewState.warn("SDK.closeScreen: required parameter \"instanceId\" is missing")
-            return
-        }
-        handler?.closeScreen(instanceId: instanceId)
+        handler?.closeScreen(navigatorId: navigatorId ?? "default")
     }
 }

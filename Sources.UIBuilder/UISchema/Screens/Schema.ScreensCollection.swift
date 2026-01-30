@@ -24,12 +24,14 @@ extension Schema.ScreensCollection {
 extension Schema.ScreensCollection: DecodableWithConfiguration {
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: AnyCodingKey.self)
+        var nestedConfiguration = configuration
 
         var values = [String: Schema.Screen]()
         values.reserveCapacity(container.allKeys.count)
         try container.allKeys.forEach { key in
-            let value = try container.decode(Schema.Screen.self, forKey: key, configuration: configuration)
-            values[key.stringValue] = value
+            nestedConfiguration.insideScreenId = key.stringValue
+            let value = try container.decode(Schema.Screen.self, forKey: key, configuration: nestedConfiguration)
+            values[value.id] = value
         }
 
         self.init(values: values)

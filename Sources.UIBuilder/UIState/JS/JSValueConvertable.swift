@@ -14,7 +14,7 @@ protocol JSValueConvertable: Sendable, Hashable {
 
 extension Optional: JSValueConvertable where Wrapped: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
-        if case let .some(value) = self {
+        if case .some(let value) = self {
             value.toJSValue(in: context)
         } else {
             .init(nullIn: context)
@@ -57,11 +57,12 @@ extension VC.Action.Parameter: JSValueConvertable {
         switch self {
         case .null:
             .init(nullIn: context)
-        case let .string(v): v.toJSValue(in: context)
-        case let .bool(v): v.toJSValue(in: context)
-        case let .int32(v): v.toJSValue(in: context)
-        case let .uint32(v): v.toJSValue(in: context)
-        case let .double(v): v.toJSValue(in: context)
+        case .string(let v): v.toJSValue(in: context)
+        case .bool(let v): v.toJSValue(in: context)
+        case .int32(let v): v.toJSValue(in: context)
+        case .uint32(let v): v.toJSValue(in: context)
+        case .double(let v): v.toJSValue(in: context)
+        case .object(let v): v.toJSValue(in: context)
         }
     }
 }
@@ -76,14 +77,35 @@ extension [String: VC.Action.Parameter]: JSValueConvertable {
     }
 }
 
-extension VC.AssetIdentifierOrValue: JSValueConvertable {
-    func toJSValue(in context: JSContext) -> JSValue {
-        let value =
-            switch self {
-            case let .assetId(value): value
-            case let .color(color): color.rawValue
-            }
+// extension VC.AssetIdentifierOrValue: JSValueConvertable {
+//    func toJSValue(in context: JSContext) -> JSValue {
+//        let value =
+//            switch self {
+//            case .assetId(let value): value
+//            case .color(let color): color.rawValue
+//            }
+//
+//        return .init(object: value, in: context)
+//    }
+// }
 
-        return .init(object: value, in: context)
+extension VS.ScreenInstance: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        let object = JSValue(newObjectIn: context)!
+        object.setObject(id, forKeyedSubscript: "instanceId" as NSString)
+        object.setObject(navigatorId, forKeyedSubscript: "navigatorId" as NSString)
+        object.setObject(configuration.id, forKeyedSubscript: "type" as NSString)
+        object.setObject(contextPath.joined(separator: "."), forKeyedSubscript: "contextPath" as NSString)
+        return object
+    }
+}
+
+extension VS.SetterParameters: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        let object = JSValue(newObjectIn: context)!
+        object.setObject(name, forKeyedSubscript: "name" as NSString)
+        object.setObject(value.toJSValue(in: context), forKeyedSubscript: "value" as NSString)
+        object.setObject(screenInstance.toJSValue(in: context), forKeyedSubscript: "_screen" as NSString)
+        return object
     }
 }

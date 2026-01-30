@@ -23,19 +23,4 @@ extension VC.Action {
             path
         }
     }
-
-    // TODO: refactor
-    func paramsWithScreenInstance(_ instance: VS.ScreenInstance) -> [String: Parameter] {
-        guard var params, params.isNotEmpty else {
-            return [
-                "screenInstanceId": .string(instance.id),
-                "screenContextPath": .string(instance.contextPath.joined(separator: "."))
-            ]
-        }
-
-        params["screenInstanceId"] = .string(instance.id)
-        params["screenContextPath"] = .string(instance.contextPath.joined(separator: "."))
-
-        return params
-    }
 }

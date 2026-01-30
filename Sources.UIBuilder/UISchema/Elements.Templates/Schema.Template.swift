@@ -25,11 +25,8 @@ extension Schema.Template: Encodable, DecodableWithConfiguration {
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        var nestedConfiguration = configuration
-        nestedConfiguration.insideTemplate = true
-
         try self.init(
-            content: container.decode(Schema.Element.self, forKey: .content, configuration: nestedConfiguration)
+            content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration)
         )
     }
 }

@@ -16,8 +16,9 @@ extension VS {
         private let actionDispatcher: JSActionDispatcher
         init(
             name: String = "AdaptyJSState",
-            isInspectable: Bool = false,
-            actionHandler: AdaptyUIActionHandler?
+            configuration: AdaptyUIConfiguration,
+            actionHandler: AdaptyUIActionHandler?,
+            isInspectable: Bool
         ) {
             context = JSContext()!
 
@@ -32,7 +33,9 @@ extension VS {
             }
             context.exceptionHandler = exceptionHandler
 
-            actionDispatcher = JSActionDispatcher(actionHandler)
+            actionDispatcher = JSActionDispatcher(
+                actionHandler,
+                configuration)
 
             context.setObject(actionDispatcher, forKeyedSubscript: "SDK" as NSString)
         }
@@ -147,23 +150,28 @@ extension VS.JSState {
 
     func setValue(
         variable: VC.Variable,
-        value: any JSValueConvertable,
+        value: some JSValueConvertable,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
         let path = variable.pathWithScreenContext(screenInstance.contextPath)
         guard let name = path.last, path.count > 0 else { throw .jsPathToObjectIsEmpty }
 
-        let parent = try findObject(path: path.dropLast())
+        var setter = path
+        setter[setter.count - 1] = variable.setter ?? ("set" + name.capitalizedFirst)
 
         do {
-            var path = path
-            path[path.count - 1] = "set" + name.capitalizedFirst
-            _ = try invokeMethod(Bool.self, path: path, args: [value])
+            let object = VS.SetterParameters(screenInstance: screenInstance, name: name, value: value)
+            _ = try invokeMethod(Bool.self, path: setter, args: [object])
             objectWillChange.send()
             return
         } catch {
             guard case .jsMethodNotFound = error else { throw error }
+            if variable.setter != nil {
+                log.warn("not found setter \(setter.joined(separator: "."))")
+            }
         }
+
+        let parent = try findObject(path: path.dropLast(), createIfNeeded: true)
 
         parent.setObject(value, forKeyedSubscript: name as NSString)
         log.debug("set variable \(path.joined(separator: ".")) = \(value)")
@@ -181,10 +189,24 @@ extension VS.JSState {
             _ = try invokeMethod(
                 Bool.self,
                 path: action.pathWithScreenContext(screenInstance.contextPath),
-                args: [action.paramsWithScreenInstance(screenInstance)])
+                args: [screenInstance.mearge(with: action.params)])
         }
 
         objectWillChange.send()
+    }
+}
+
+private extension VS.ScreenInstance {
+    func mearge(with params: [String: VC.Action.Parameter]?) -> [String: VC.Action.Parameter] {
+        var params = params ?? [:]
+        params.reserveCapacity(params.count + 1)
+        params["_screen"] = .object([
+            "navigatorId": .string(navigatorId),
+            "instanceid": .string(id),
+            "type": .string(configuration.id),
+            "contextPath": .string(contextPath.joined(separator: ".")),
+        ])
+        return params
     }
 }
 

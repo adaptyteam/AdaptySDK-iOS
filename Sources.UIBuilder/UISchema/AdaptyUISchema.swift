@@ -32,7 +32,9 @@ public extension AdaptyUISchema {
 extension AdaptyUISchema: Codable {
     struct DecodingConfiguration {
         let isLegacy: Bool
-        var insideTemplate = false
+        var insideTemplateId: String?
+        var insideScreenId: String?
+        var insideNavigatorId: String?
         let legacyTemplateId: String?
     }
 

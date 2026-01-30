@@ -9,6 +9,7 @@ import Foundation
 
 package extension VC {
     struct Screen: Sendable, Hashable {
+        package let id: String
         package let templateId: String
         package let background: AssetReference?
         package let cover: Box?

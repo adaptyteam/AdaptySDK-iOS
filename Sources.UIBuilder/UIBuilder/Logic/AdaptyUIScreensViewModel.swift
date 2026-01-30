@@ -116,15 +116,13 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 //            screen: newScreenModel
 //        )
     }
-    
+
     private func initialNavigate(
-        destination screen: VS.ScreenInstance,
-        vcScreen: VC.Screen
+        destination screen: VS.ScreenInstance
     ) {
         
         var newInstance = ScreenUIInstance(
             instance: screen,
-            screen: vcScreen,
             offset: .zero,
             opacity: 1.0,
             zIndex: .zero
@@ -138,19 +136,14 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         inAnimation: ScreenTransitionAnimation,
         outAnimation: ScreenTransitionAnimation
     ) {
-        guard let vcScreen = viewConfiguration.screens[screen.type] else {
-            return // TODO: x throw error?
-        }
-        
         if screensInstances.isEmpty {
             initialNavigate(
-                destination: screen,
-                vcScreen: vcScreen
+                destination: screen
             )
 
             return
         }
-        
+
         guard screensInstances.count == 1 else {
             return // in the process of animation, TODO: x think about force replacement?
         }
@@ -167,7 +160,6 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 
         var newInstance = ScreenUIInstance(
             instance: screen,
-            screen: vcScreen,
             offset: inAnimation.startOffset,
             opacity: inAnimation.startOpacity,
             zIndex: inAnimation.startZIndex
@@ -239,7 +231,7 @@ struct ScreenUIInstance: Identifiable {
 
     //    let instanceId: UUID = .init()
     let instance: VS.ScreenInstance
-    let screen: VC.Screen
+    var screen: VC.Screen { instance.configuration }
 
     var offset: CGSize = .zero
     var opacity: Double = 1.0
@@ -368,15 +360,15 @@ extension ScreenTransitionAnimation {
     ) -> ScreenTransitionAnimation {
         switch (transitionType, transitionDirection, transitionStyle) {
         case (.none, _, _):
-            return .init()
+            .init()
         case (.fade, _, _):
-            return .init(
+            .init(
                 startOpacity: 0.0,
                 startZIndex: 1.0,
                 endZIndex: 1.0
             )
         case (_, .leftToRight, let style):
-            return .init(
+            .init(
                 startOffset: .init(
                     width: style == .move ? -screenSize.width : -screenSize.width / 2, height: 0.0
                 ),
@@ -384,19 +376,19 @@ extension ScreenTransitionAnimation {
                 endZIndex: 0.0
             )
         case (_, .rightToLeft, _):
-            return .init(
+            .init(
                 startOffset: .init(width: screenSize.width, height: 0.0),
                 startZIndex: 1.0,
                 endZIndex: 1.0
             )
         case (_, .topToBottom, _):
-            return .init(
+            .init(
                 startOffset: .init(width: 0.0, height: -screenSize.height),
                 startZIndex: 1.0,
                 endZIndex: 1.0
             )
         case (_, .bottomToTop, _):
-            return .init(
+            .init(
                 startOffset: .init(width: 0.0, height: screenSize.height),
                 startZIndex: 1.0,
                 endZIndex: 1.0
@@ -412,15 +404,15 @@ extension ScreenTransitionAnimation {
     ) -> ScreenTransitionAnimation {
         switch (transitionType, transitionDirection, transitionStyle) {
         case (.none, _, _):
-            return .init()
+            .init()
         case (.fade, _, _):
-            return .init(
+            .init(
                 startZIndex: 0.0,
                 endOpacity: 0.0,
                 endZIndex: 0.0
             )
         case (_, .leftToRight, let style):
-            return .init(
+            .init(
                 startZIndex: 1.0,
                 endOffset: .init(
                     width: screenSize.width,
@@ -429,7 +421,7 @@ extension ScreenTransitionAnimation {
                 endZIndex: 1.0
             )
         case (_, .rightToLeft, let style):
-            return .init(
+            .init(
                 startZIndex: 0.0,
                 endOffset: .init(
                     width: style == .move ? -screenSize.width : -screenSize.width / 2,
@@ -438,7 +430,7 @@ extension ScreenTransitionAnimation {
                 endZIndex: 0.0
             )
         case (_, .topToBottom, let style):
-            return .init(
+            .init(
                 startZIndex: 0.0,
                 endOffset: .init(
                     width: 0.0,
@@ -447,7 +439,7 @@ extension ScreenTransitionAnimation {
                 endZIndex: 0.0
             )
         case (_, .bottomToTop, let style):
-            return .init(
+            .init(
                 startZIndex: 0.0,
                 endOffset: .init(
                     width: 0.0,
