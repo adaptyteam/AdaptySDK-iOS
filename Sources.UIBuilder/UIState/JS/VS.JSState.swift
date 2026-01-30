@@ -186,27 +186,14 @@ extension VS.JSState {
 
         for action in actions {
             guard !actionDispatcher.execute(action, in: context) else { continue }
+            let object = VS.ActionParameters(screenInstance: screenInstance, params: action.params)
             _ = try invokeMethod(
                 Bool.self,
                 path: action.pathWithScreenContext(screenInstance.contextPath),
-                args: [screenInstance.mearge(with: action.params)])
+                args: [object])
         }
 
         objectWillChange.send()
-    }
-}
-
-private extension VS.ScreenInstance {
-    func mearge(with params: [String: VC.Action.Parameter]?) -> [String: VC.Action.Parameter] {
-        var params = params ?? [:]
-        params.reserveCapacity(params.count + 1)
-        params["_screen"] = .object([
-            "navigatorId": .string(navigatorId),
-            "instanceid": .string(id),
-            "type": .string(configuration.id),
-            "contextPath": .string(contextPath.joined(separator: ".")),
-        ])
-        return params
     }
 }
 

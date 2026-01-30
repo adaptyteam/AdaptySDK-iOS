@@ -14,5 +14,3 @@ extension VS {
         case withFunctionCode
     }
 }
-
-

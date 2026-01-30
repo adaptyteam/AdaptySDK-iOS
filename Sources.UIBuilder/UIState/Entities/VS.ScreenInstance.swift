@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import JavaScriptCore
 
 package extension VS {
     struct ScreenInstance: Sendable, Hashable {
@@ -16,3 +17,13 @@ package extension VS {
     }
 }
 
+extension VS.ScreenInstance: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        let object = JSValue(newObjectIn: context)!
+        object.setObject(id, forKeyedSubscript: "instanceId" as NSString)
+        object.setObject(navigatorId, forKeyedSubscript: "navigatorId" as NSString)
+        object.setObject(configuration.id, forKeyedSubscript: "type" as NSString)
+        object.setObject(contextPath.joined(separator: "."), forKeyedSubscript: "contextPath" as NSString)
+        return object
+    }
+}
