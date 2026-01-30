@@ -23,7 +23,7 @@ extension VS {
             context = JSContext()!
 
             context.name = name
-            if isInspectable, #available(iOS 16.4, *) {
+            if isInspectable, #available(iOS 16.4, macOS 13.3, *) {
                 context.isInspectable = true
             }
 
