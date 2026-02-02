@@ -9,7 +9,27 @@
 
 import Foundation
 
-@MainActor
+// TODO: x move out
+extension Array {
+    var firstIfSingle: Element? {
+        guard count == 1 else { return nil }
+        return first
+    }
+}
+
+struct AdaptyUIScreenInstance: Identifiable {
+    var id: String { instance.id }
+
+    let instance: VC.ScreenInstance
+    let configuration: VC.Screen
+    let template: VC.Template_legacy
+
+    var offset: CGSize = .zero
+    var opacity: Double = 1.0
+    var zIndex: Double = 1.0
+}
+
+@MainActor // TODO: x deprecated
 package final class AdaptyUIBottomSheetViewModel: ObservableObject {
     @Published var isPresented: Bool = false
 
@@ -22,14 +42,106 @@ package final class AdaptyUIBottomSheetViewModel: ObservableObject {
     }
 }
 
+typealias AdaptyUINavigatorId = String
+
+@MainActor
+package final class AdaptyUINavigatorViewModel: ObservableObject {
+    let id: AdaptyUINavigatorId
+    let zIndexBase: Double
+
+    @Published
+    private(set) var screens: [AdaptyUIScreenInstance]
+
+    private var viewportSize: CGSize = .zero
+
+    init(
+        id: String,
+        zIndexBase: Double,
+        screen: AdaptyUIScreenInstance
+    ) {
+        self.id = id
+        self.zIndexBase = zIndexBase
+
+        screens = [screen]
+    }
+
+    func setViewPortSize(_ size: CGSize) {
+        viewportSize = size
+    }
+
+    func reportOnAppear(_ animationBuilder: (CGSize) -> ScreenTransitionAnimation) {
+        // TODO: x implement
+    }
+
+    func present(
+        screen: AdaptyUIScreenInstance,
+        inAnimation inAnimationBuilder: (CGSize) -> ScreenTransitionAnimation,
+        outAnimation outAnimation: (CGSize) -> ScreenTransitionAnimation
+    ) {
+        guard var currentScreen = screens.firstIfSingle else {
+            // TODO: x throw error?
+            return // in the process of animation, TODO: x think about force replacement?
+        }
+
+        guard currentScreen.id != screen.id else {
+            return // TODO: x throw error?
+        }
+
+        let inAnimation = inAnimationBuilder(viewportSize)
+        let outAnimation = outAnimation(viewportSize)
+
+        currentScreen.offset = outAnimation.startOffset
+        currentScreen.opacity = outAnimation.startOpacity
+        currentScreen.zIndex = outAnimation.startZIndex
+
+        var newScreen = screen
+
+        newScreen.offset = inAnimation.startOffset
+        newScreen.opacity = inAnimation.startOpacity
+        newScreen.zIndex = inAnimation.startZIndex
+
+        screens[0] = currentScreen
+        screens.append(newScreen)
+
+        withAnimation(inAnimation.animation) {
+            newScreen.offset = inAnimation.endOffset
+            newScreen.opacity = inAnimation.endOpacity
+            newScreen.zIndex = inAnimation.endZIndex
+
+            screens[1] = newScreen
+        }
+
+        withAnimation(outAnimation.animation) {
+            currentScreen.offset = outAnimation.endOffset
+            currentScreen.opacity = outAnimation.endOpacity
+            currentScreen.zIndex = outAnimation.endZIndex
+
+            screens[0] = currentScreen
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.screens.remove(at: 0)
+//            completion()
+            //            guard let transitioning = self.transitioningScreenInstance else { return }
+            //            self.currentScreenInstance = transitioning
+            //            self.transitioningScreenInstance = nil
+        }
+    }
+}
+
 @MainActor
 package final class AdaptyUIScreensViewModel: ObservableObject {
     private let logId: String
     private let viewConfiguration: AdaptyUIConfiguration
-    let bottomSheetsViewModels: [AdaptyUIBottomSheetViewModel]
 
-    @Published var currentScreenId: String?
-    @Published var presentedScreensStack = [String]()
+    var isRightToLeft: Bool { viewConfiguration.isRightToLeft }
+
+    @Published
+    private(set) var presentedScreensStack = [String]() // TODO: x deprecated
+    let bottomSheetsViewModels: [AdaptyUIBottomSheetViewModel] // TODO: x deprecated
+
+    @Published
+    private(set) var navigators: [AdaptyUINavigatorViewModel]
 
     package init(
         logId: String,
@@ -42,12 +154,54 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
             .init(id: $0.key, bottomSheet: $0.value)
         }
 
-        screensInstances = []
+        navigators = []
     }
 
-//    func openScreen(id: String) {
-//        currentScreenId = id
-//    }
+    func setViewPortSize(_ size: CGSize) {
+        navigators.forEach { $0.setViewPortSize(size) }
+    }
+
+    // TODO: x refactor
+    func present(
+        screen: VC.ScreenInstance,
+        in navigatorId: AdaptyUINavigatorId,
+        inAnimation: (CGSize) -> ScreenTransitionAnimation,
+        outAnimation: (CGSize) -> ScreenTransitionAnimation
+    ) {
+        // TODO: extract
+        guard let screenConfiguration = viewConfiguration.screens[screen.type],
+              let screenTemplate = VC.Template_legacy(rawValue: screenConfiguration.templateId)
+        else {
+            // no screen found or unsupported template
+            return // TODO: x throw error?
+        }
+
+        let screen = AdaptyUIScreenInstance(
+            instance: screen,
+            configuration: screenConfiguration,
+            template: screenTemplate
+        )
+
+        guard let navigator = navigators.first(where: { $0.id == navigatorId }) else {
+            navigators.append(
+                AdaptyUINavigatorViewModel(
+                    id: navigatorId,
+                    zIndexBase: Double(navigators.count * 1_000),
+                    screen: screen
+                )
+            )
+
+            return
+        }
+
+        navigator.present(
+            screen: screen,
+            inAnimation: inAnimation,
+            outAnimation: outAnimation
+        )
+    }
+
+    // MARK: - Old Deprecated Logic
 
     // TODO: x deprecate
     func presentScreen(id: String) {
@@ -91,242 +245,42 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         presentedScreensStack.removeAll()
         bottomSheetsViewModels.forEach { $0.isPresented = false }
     }
-
-    // MARK: - New Navigation Logic, TODO: x refactor
-
-    @Published var screensInstances: [ScreenUIInstance]
-    @Published var popupInstance: ScreenUIInstance?
-
-    private var viewportSize: CGSize = .zero
-
-    func setViewPortSize(_ size: CGSize) {
-        viewportSize = size
-    }
-
-    func presentPopup(
-        destinationId: String
-    ) {
-//        guard let newScreenModel = screens.first(where: { $0.id == destinationId }) else {
-//            // TODO: throw error!
-//
-//            return
-//        }
-//
-//        popupInstance = ScreenInstance(
-//            screen: newScreenModel
-//        )
-    }
-    
-    private func initialNavigate(
-        destination screen: VC.ScreenInstance,
-        vcScreen: VC.Screen
-    ) {
-        
-        var newInstance = ScreenUIInstance(
-            instance: screen,
-            screen: vcScreen,
-            offset: .zero,
-            opacity: 1.0,
-            zIndex: .zero
-        )
-
-        screensInstances.append(newInstance)
-    }
-
-    func navigate(
-        destination screen: VC.ScreenInstance,
-        inAnimation: ScreenTransitionAnimation,
-        outAnimation: ScreenTransitionAnimation
-    ) {
-        guard let vcScreen = viewConfiguration.screens[screen.type] else {
-            return // TODO: x throw error?
-        }
-        
-        if screensInstances.isEmpty {
-            initialNavigate(
-                destination: screen,
-                vcScreen: vcScreen
-            )
-
-            return
-        }
-        
-        guard screensInstances.count == 1 else {
-            return // in the process of animation, TODO: x think about force replacement?
-        }
-
-        guard screensInstances[0].id != screen.id else {
-            return // TODO: x think about instanceId ?
-        }
-
-        var currentInstance = screensInstances[0]
-
-        currentInstance.offset = outAnimation.startOffset
-        currentInstance.opacity = outAnimation.startOpacity
-        currentInstance.zIndex = outAnimation.startZIndex
-
-        var newInstance = ScreenUIInstance(
-            instance: screen,
-            screen: vcScreen,
-            offset: inAnimation.startOffset,
-            opacity: inAnimation.startOpacity,
-            zIndex: inAnimation.startZIndex
-        )
-
-        screensInstances[0] = currentInstance
-        screensInstances.append(newInstance)
-
-        withAnimation(inAnimation.animation) {
-            newInstance.offset = inAnimation.endOffset
-            newInstance.opacity = inAnimation.endOpacity
-            newInstance.zIndex = inAnimation.endZIndex
-
-            screensInstances[1] = newInstance
-        }
-
-        withAnimation(outAnimation.animation) {
-            currentInstance.offset = outAnimation.endOffset
-            currentInstance.opacity = outAnimation.endOpacity
-            currentInstance.zIndex = outAnimation.endZIndex
-
-            screensInstances[0] = currentInstance
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.screensInstances.remove(at: 0)
-//            completion()
-            //            guard let transitioning = self.transitioningScreenInstance else { return }
-            //            self.currentScreenInstance = transitioning
-            //            self.transitioningScreenInstance = nil
-        }
-    }
-
-    // TODO: x remove
-    func navigate(
-        destination screen: VC.ScreenInstance,
-        transitionType: TransitionTypeCategory,
-        transitionDirection: TransitionDirection,
-        transitionStyle: TransitionStyle
-//        completion: @escaping () -> Void
-    ) {
-        let screenSize = viewportSize
-
-        navigate(
-            destination: screen,
-            inAnimation: .inAnimation(
-                transitionType: transitionType,
-                transitionDirection: transitionDirection,
-                transitionStyle: transitionStyle,
-                screenSize: screenSize
-            ),
-            outAnimation: .outAnimation(
-                transitionType: transitionType,
-                transitionDirection: transitionDirection,
-                transitionStyle: transitionStyle,
-                screenSize: screenSize
-            )
-//            completion: completion
-        )
-    }
 }
+
+// MARK: TODO: x remove animations
 
 import Combine
 import SwiftUI
 
-struct ScreenUIInstance: Identifiable {
-    var id: String { instance.id } // TODO: x Identifiable?
-    var templateId: String { screen.templateId } // TODO: x move to navigate?
-
-    //    let instanceId: UUID = .init()
-    let instance: VC.ScreenInstance
-    let screen: VC.Screen
-
-    var offset: CGSize = .zero
-    var opacity: Double = 1.0
-    var zIndex: Double = 1.0
-}
-
-// MARK: TODO: x remove models
-
-struct ScreenModel: Identifiable {
-    let id: String
-    let title: String
-    let body: String
-    let backgroundColor: Color
-
-    let previousScreenId: String?
-    let nextScreenId: String?
-
-    init(
-        id: String,
-        title: String,
-        body: String,
-        backgroundColor: Color,
-        previousScreenId: String? = nil,
-        nextScreenId: String? = nil
-    ) {
-        self.id = id
-        self.title = title
-        self.body = body
-        self.backgroundColor = backgroundColor
-        self.previousScreenId = previousScreenId
-        self.nextScreenId = nextScreenId
-    }
-}
-
 enum TransitionType: String, CaseIterable {
-    case none = "None"
-    case fade = "Fade"
-    case slideUp = "Slide Up"
-    case slideDown = "Slide Down"
-    case slideLeft = "Slide Left"
-    case slideRight = "Slide Right"
-    case moveUp = "Move Up"
-    case moveDown = "Move Down"
-    case moveLeft = "Move Left"
-    case moveRight = "Move Right"
+    case none
+    case fade
+    case slideUp
+    case slideDown
+    case slideLeft
+    case slideRight
+    case moveUp
+    case moveDown
+    case moveLeft
+    case moveRight
 }
 
 enum TransitionTypeCategory: String, CaseIterable {
-    case none = "None"
-    case fade = "Fade"
-    case directional = "Directional"
+    case none
+    case fade
+    case directional
 }
 
 enum TransitionDirection: String, CaseIterable {
-    case rightToLeft = "Right to Left"
-    case leftToRight = "Left to Right"
-    case bottomToTop = "Bottom to Top"
-    case topToBottom = "Top to Bottom"
-
-    var title: String {
-        switch self {
-        case .rightToLeft: "⬅️"
-        case .leftToRight: "➡️"
-        case .bottomToTop: "⬆️"
-        case .topToBottom: "⬇️"
-        }
-    }
+    case rightToLeft
+    case leftToRight
+    case bottomToTop
+    case topToBottom
 }
 
 enum TransitionStyle: String, CaseIterable {
     case slide
     case move
-
-    var title: String {
-        switch self {
-        case .slide: "Slide Over"
-        case .move: "Move"
-        }
-    }
-}
-
-// MARK: TODO: x remove animations
-
-struct ScreenTransition {
-    var screenId: String // destination screen id
-    var outAnimation: ScreenTransitionAnimation
-    var inAnimation: ScreenTransitionAnimation
 }
 
 struct ScreenTransitionAnimation {
@@ -360,101 +314,103 @@ struct ScreenTransitionAnimation {
 }
 
 extension ScreenTransitionAnimation {
-    static func inAnimation(
+    static func inAnimationBuilder(
         transitionType: TransitionTypeCategory,
         transitionDirection: TransitionDirection,
-        transitionStyle: TransitionStyle,
-        screenSize: CGSize
-    ) -> ScreenTransitionAnimation {
-        switch (transitionType, transitionDirection, transitionStyle) {
-        case (.none, _, _):
-            return .init()
-        case (.fade, _, _):
-            return .init(
-                startOpacity: 0.0,
-                startZIndex: 1.0,
-                endZIndex: 1.0
-            )
-        case (_, .leftToRight, let style):
-            return .init(
-                startOffset: .init(
-                    width: style == .move ? -screenSize.width : -screenSize.width / 2, height: 0.0
-                ),
-                startZIndex: 0.0,
-                endZIndex: 0.0
-            )
-        case (_, .rightToLeft, _):
-            return .init(
-                startOffset: .init(width: screenSize.width, height: 0.0),
-                startZIndex: 1.0,
-                endZIndex: 1.0
-            )
-        case (_, .topToBottom, _):
-            return .init(
-                startOffset: .init(width: 0.0, height: -screenSize.height),
-                startZIndex: 1.0,
-                endZIndex: 1.0
-            )
-        case (_, .bottomToTop, _):
-            return .init(
-                startOffset: .init(width: 0.0, height: screenSize.height),
-                startZIndex: 1.0,
-                endZIndex: 1.0
-            )
+        transitionStyle: TransitionStyle
+    ) -> (CGSize) -> ScreenTransitionAnimation {
+        { screenSize in
+            switch (transitionType, transitionDirection, transitionStyle) {
+            case (.none, _, _):
+                return .init()
+            case (.fade, _, _):
+                return .init(
+                    startOpacity: 0.0,
+                    startZIndex: 1.0,
+                    endZIndex: 1.0
+                )
+            case (_, .leftToRight, let style):
+                return .init(
+                    startOffset: .init(
+                        width: style == .move ? -screenSize.width : -screenSize.width / 2, height: 0.0
+                    ),
+                    startZIndex: 0.0,
+                    endZIndex: 0.0
+                )
+            case (_, .rightToLeft, _):
+                return .init(
+                    startOffset: .init(width: screenSize.width, height: 0.0),
+                    startZIndex: 1.0,
+                    endZIndex: 1.0
+                )
+            case (_, .topToBottom, _):
+                return .init(
+                    startOffset: .init(width: 0.0, height: -screenSize.height),
+                    startZIndex: 1.0,
+                    endZIndex: 1.0
+                )
+            case (_, .bottomToTop, _):
+                return .init(
+                    startOffset: .init(width: 0.0, height: screenSize.height),
+                    startZIndex: 1.0,
+                    endZIndex: 1.0
+                )
+            }
         }
     }
 
-    static func outAnimation(
+    static func outAnimationBuilder(
         transitionType: TransitionTypeCategory,
         transitionDirection: TransitionDirection,
-        transitionStyle: TransitionStyle,
-        screenSize: CGSize
-    ) -> ScreenTransitionAnimation {
-        switch (transitionType, transitionDirection, transitionStyle) {
-        case (.none, _, _):
-            return .init()
-        case (.fade, _, _):
-            return .init(
-                startZIndex: 0.0,
-                endOpacity: 0.0,
-                endZIndex: 0.0
-            )
-        case (_, .leftToRight, let style):
-            return .init(
-                startZIndex: 1.0,
-                endOffset: .init(
-                    width: screenSize.width,
-                    height: 0.0
-                ),
-                endZIndex: 1.0
-            )
-        case (_, .rightToLeft, let style):
-            return .init(
-                startZIndex: 0.0,
-                endOffset: .init(
-                    width: style == .move ? -screenSize.width : -screenSize.width / 2,
-                    height: 0.0
-                ),
-                endZIndex: 0.0
-            )
-        case (_, .topToBottom, let style):
-            return .init(
-                startZIndex: 0.0,
-                endOffset: .init(
-                    width: 0.0,
-                    height: style == .move ? screenSize.height : screenSize.height / 2
-                ),
-                endZIndex: 0.0
-            )
-        case (_, .bottomToTop, let style):
-            return .init(
-                startZIndex: 0.0,
-                endOffset: .init(
-                    width: 0.0,
-                    height: style == .move ? -screenSize.height : -screenSize.height / 2
-                ),
-                endZIndex: 0.0
-            )
+        transitionStyle: TransitionStyle
+    ) -> (CGSize) -> ScreenTransitionAnimation {
+        { screenSize in
+            switch (transitionType, transitionDirection, transitionStyle) {
+            case (.none, _, _):
+                return .init()
+            case (.fade, _, _):
+                return .init(
+                    startZIndex: 0.0,
+                    endOpacity: 0.0,
+                    endZIndex: 0.0
+                )
+            case (_, .leftToRight, let style):
+                return .init(
+                    startZIndex: 1.0,
+                    endOffset: .init(
+                        width: screenSize.width,
+                        height: 0.0
+                    ),
+                    endZIndex: 1.0
+                )
+            case (_, .rightToLeft, let style):
+                return .init(
+                    startZIndex: 0.0,
+                    endOffset: .init(
+                        width: style == .move ? -screenSize.width : -screenSize.width / 2,
+                        height: 0.0
+                    ),
+                    endZIndex: 0.0
+                )
+            case (_, .topToBottom, let style):
+                return .init(
+                    startZIndex: 0.0,
+                    endOffset: .init(
+                        width: 0.0,
+                        height: style == .move ? screenSize.height : screenSize.height / 2
+                    ),
+                    endZIndex: 0.0
+                )
+            case (_, .bottomToTop, let style):
+                return .init(
+                    startZIndex: 0.0,
+                    endOffset: .init(
+                        width: 0.0,
+                        height: style == .move ? -screenSize.height : -screenSize.height / 2
+                    ),
+                    endZIndex: 0.0
+                )
+            }
         }
     }
 }

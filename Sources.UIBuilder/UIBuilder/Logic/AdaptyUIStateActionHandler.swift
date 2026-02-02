@@ -79,19 +79,27 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     }
 
     package nonisolated func openScreen(instance: VC.ScreenInstance) {
-        Task { @MainActor in // TODO: use instance: VC.ScreenInstance
-            screensViewModel.navigate(
-                destination: instance,
-                transitionType: .directional,
-                transitionDirection: .rightToLeft,
-                transitionStyle: .slide
+        Task { @MainActor in
+            screensViewModel.present(
+                screen: instance,
+                in: "root",
+                inAnimation: ScreenTransitionAnimation.inAnimationBuilder(
+                    transitionType: .directional,
+                    transitionDirection: .rightToLeft,
+                    transitionStyle: .slide
+                ),
+                outAnimation: ScreenTransitionAnimation.outAnimationBuilder(
+                    transitionType: .directional,
+                    transitionDirection: .rightToLeft,
+                    transitionStyle: .slide
+                )
             )
         }
     }
     
     package nonisolated func closeScreen(instanceId: String) {
         Task { @MainActor in // TODO: close instanceId
-            screensViewModel.dismissTopScreen()
+//            screensViewModel.dismissTopScreen()
         }
     }
 }

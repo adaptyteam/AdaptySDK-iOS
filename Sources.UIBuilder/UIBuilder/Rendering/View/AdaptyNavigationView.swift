@@ -7,44 +7,46 @@
 
 import SwiftUI
 
-struct AdaptyNavigationView</* Header: View, */ Body: View /* , Footer: View */>: View {
-    @ViewBuilder var screenBuilder: (ScreenUIInstance) -> Body
-//    @ViewBuilder var headerBuilder: () -> Header
-//    @ViewBuilder var footerBuilder: () -> Footer
+private struct AdaptyNavigatorView<Body: View>: View {
+    @ViewBuilder
+    var screenBuilder: (AdaptyUIScreenInstance) -> Body
+
+    @EnvironmentObject
+    private var navigatorViewModel: AdaptyUINavigatorViewModel
+
+    var body: some View {
+        ForEach(navigatorViewModel.screens) { screen in
+            screenBuilder(screen)
+                .offset(screen.offset)
+                .opacity(screen.opacity)
+                .zIndex(navigatorViewModel.zIndexBase + screen.zIndex)
+        }
+        .onAppear {
+            navigatorViewModel.reportOnAppear(
+                ScreenTransitionAnimation.inAnimationBuilder(
+                    transitionType: .directional,
+                    transitionDirection: .bottomToTop,
+                    transitionStyle: .move
+                )
+            )
+        }
+    }
+}
+
+struct AdaptyNavigationView<Body: View>: View {
+    @ViewBuilder var screenBuilder: (AdaptyUIScreenInstance) -> Body
 
     @EnvironmentObject
     private var screensViewModel: AdaptyUIScreensViewModel
 
-//    @ViewBuilder
-//    var popup: some View {
-//        if let popupInstance = navigationManager.popupInstance {
-//            ZStack {
-//                Color.black.opacity(0.5)
-//                    .ignoresSafeArea()
-//                    .onTapGesture {
-//                        navigationManager.popupInstance = nil
-//                    }
-//
-//                screenBuilder(popupInstance, navigationManager.getState(forScreenId: popupInstance.id))
-//                    .cornerRadius(24.0)
-//                    .frame(height: 400)
-//                    .padding()
-//            }
-//        }
-//    }
-
     var body: some View {
-//        ZStack {
-//            VStack(spacing: 0) {
-//                headerBuilder()
-
         GeometryReader { geometry in
             ZStack {
-                ForEach(screensViewModel.screensInstances) { screen in
-                    screenBuilder(screen)
-                        .offset(screen.offset)
-                        .opacity(screen.opacity)
-                        .zIndex(screen.zIndex)
+                ForEach(screensViewModel.navigators, id: \.id) { navigator in
+                    AdaptyNavigatorView(
+                        screenBuilder: screenBuilder
+                    )
+                    .environmentObject(navigator)
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
@@ -56,11 +58,9 @@ struct AdaptyNavigationView</* Header: View, */ Body: View /* , Footer: View */>
             }
         }
         .clipped()
-//
-//                footerBuilder()
-//            }
-//
-//            popup
-//        }
+        .environment(
+            \.layoutDirection,
+            screensViewModel.isRightToLeft ? .rightToLeft : .leftToRight
+        )
     }
 }

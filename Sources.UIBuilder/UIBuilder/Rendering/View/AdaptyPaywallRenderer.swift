@@ -10,7 +10,7 @@
 import SwiftUI
 
 package extension VC {
-    enum Template: String {
+    enum Template_legacy: String {
         case basic
         case flat
         case transparent
@@ -23,7 +23,10 @@ struct AdaptyUIPaywallRendererView: View {
     @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
 
     @ViewBuilder
-    private func templateResolverView(_ template: VC.Template, screen: VC.Screen) -> some View {
+    private func templateResolverView(
+        _ template: VC.Template_legacy,
+        screen: VC.Screen
+    ) -> some View {
         switch template {
         case .basic:
             AdaptyUIBasicContainerView(screen: screen)
@@ -39,22 +42,15 @@ struct AdaptyUIPaywallRendererView: View {
 
         ZStack(alignment: .bottom) {
             AdaptyNavigationView { screenInstance in
-                if let template = VC.Template(rawValue: screenInstance.templateId) {
-                    templateResolverView(template, screen: screenInstance.screen)
-                        .staticBackground(
-                            screenInstance.screen.background,
-                            defaultValue: .defaultScreenBackground
-                        )
-                        .withScreenInstance(screenInstance.instance)
-                } else {
-                    Rectangle()
-                        .hidden()
-                        .onAppear {
-                            paywallViewModel.reportDidFailRendering(
-                                with: .unsupportedTemplate("// TODO: todo")
-                            )
-                        }
-                }
+                templateResolverView(
+                    screenInstance.template,
+                    screen: screenInstance.configuration
+                )
+                .staticBackground(
+                    screenInstance.configuration.background,
+                    defaultValue: .defaultScreenBackground
+                )
+                .withScreenInstance(screenInstance.instance)
             }
 
             Color.black
@@ -63,6 +59,7 @@ struct AdaptyUIPaywallRendererView: View {
                     screensViewModel.dismissTopScreen()
                 }
 
+            // TODO: x deprecated, remove
             ForEach(screensViewModel.bottomSheetsViewModels, id: \.id) { vm in
                 AdaptyUIBottomSheetView()
                     .environmentObject(vm)
@@ -74,46 +71,10 @@ struct AdaptyUIPaywallRendererView: View {
             }
         }
         .ignoresSafeArea()
+        // TODO: x remove?
         .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
         .onAppear {
             paywallViewModel.logShowPaywall()
-        }
-
-        if let currentScreenId = screensViewModel.currentScreenId,
-           let screen = viewConfiguration.screens[currentScreenId],
-           let template = VC.Template(rawValue: screen.templateId)
-        {
-            ZStack(alignment: .bottom) {
-                templateResolverView(template, screen: screen)
-                    .staticBackground(
-                        screen.background,
-                        defaultValue: .defaultScreenBackground
-                    )
-                Color.black
-                    .opacity(!screensViewModel.presentedScreensStack.isEmpty ? 0.4 : 0.0)
-                    .onTapGesture {
-                        screensViewModel.dismissTopScreen()
-                    }
-
-                ForEach(screensViewModel.bottomSheetsViewModels, id: \.id) { vm in
-                    AdaptyUIBottomSheetView()
-                        .environmentObject(vm)
-                }
-
-                if productsViewModel.purchaseInProgress || productsViewModel.restoreInProgress {
-                    AdaptyUILoaderView()
-                        .transition(.opacity)
-                }
-            }
-
-        } else {
-            Rectangle()
-                .hidden()
-                .onAppear {
-                    paywallViewModel.reportDidFailRendering(
-                        with: .unsupportedTemplate("// TODO: todo")
-                    )
-                }
         }
     }
 }
