@@ -46,6 +46,7 @@ public extension Adapty {
             "app_account_token": configuration.appAccountToken?.uuidString,
             "idfa_collection_disabled": configuration.idfaCollectionDisabled,
             "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
+            "clear_data_on_backup": configuration.clearDataOnBackup,
         ]
 
         trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: .activate, stamp: stamp, params: logParams))
