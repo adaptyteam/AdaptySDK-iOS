@@ -78,7 +78,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
 
-    package nonisolated func openScreen(instance: VC.ScreenInstance) {
+    package nonisolated func openScreen(instance: VS.ScreenInstance) {
         Task { @MainActor in
             screensViewModel.present(
                 screen: instance,
@@ -97,9 +97,9 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
     
-    package nonisolated func closeScreen(instanceId: String) {
-        Task { @MainActor in // TODO: close instanceId
-//            screensViewModel.dismissTopScreen()
+    package nonisolated func closeScreen(navigatorId: String) {
+        Task { @MainActor in // TODO: close all screen in navigatorId
+            screensViewModel.dismissTopScreen()
         }
     }
 }

@@ -86,11 +86,12 @@ extension Schema.Action {
         case "open_screen":
             try self.init(path: ["SDK", "openScreen"], params: [
                 "type": .string(container.decode(String.self, forKey: .screenType)),
-                "instanceId": .string("legacy-bottom-sheet")
+                "instanceId": .string("legacy-bottom-sheet"),
+                "navigatorId": .string("legacy-bottom-sheet")
             ], scope: .global)
         case "close_screen":
             self.init(path: ["SDK", "closeScreen"], params: [
-                "instanceId": .string("legacy-bottom-sheet")
+                "navigatorId": .string("legacy-bottom-sheet")
             ], scope: .global)
         case "select_product":
             try self.init(path: ["Legacy", "selectProduct"], params: [

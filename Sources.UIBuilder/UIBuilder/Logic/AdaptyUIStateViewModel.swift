@@ -48,7 +48,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         state.startOnce()
     }
 
-    func execute(actions: [VC.Action], screen: VC.ScreenInstance) {
+    func execute(actions: [VC.Action], screen: VS.ScreenInstance) {
         do {
             try state.execute(actions: actions, screenInstance: screen)
         } catch {
@@ -56,10 +56,10 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         }
     }
 
-    func createBinding<T: JSValueRepresentable>(
+    func createBinding<T: JSValueRepresentable & JSValueConvertable>(
         _ variable: VC.Variable,
         defaultValue: T,
-        screen: VC.ScreenInstance
+        screen: VS.ScreenInstance
     ) -> Binding<T> {
         Binding(
             get: { [weak self] in

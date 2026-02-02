@@ -8,10 +8,10 @@
 import Combine
 import Foundation
 
-typealias VS = AdaptyUIState
+package typealias VS = AdaptyUIState
 
 @MainActor
-final class AdaptyUIState: ObservableObject {
+package final class AdaptyUIState: ObservableObject {
     let configuration: AdaptyUIConfiguration
     private let jsState: VS.JSState
 
@@ -28,8 +28,9 @@ final class AdaptyUIState: ObservableObject {
         self.configuration = configuration
         self.jsState = .init(
             name: name,
-            isInspectable: isInspectable,
-            actionHandler: actionHandler
+            configuration: configuration,
+            actionHandler: actionHandler,
+            isInspectable: isInspectable
         )
 
         jsState.objectWillChange
@@ -45,15 +46,27 @@ final class AdaptyUIState: ObservableObject {
         jsState.evaluateScripts(configuration.scripts)
     }
 
-    func getValue<T: JSValueRepresentable>(_ type: T.Type, variable: VC.Variable, screenInstance: VC.ScreenInstance) throws(VS.Error) -> T? {
+    func debug(path: String, filter: VS.DebugFilter = .withoutFunction) -> String {
+        jsState.debug(path: path, filter: filter)
+    }
+
+    func debug(path: [String] = [], filter: VS.DebugFilter = .withoutFunction) -> String {
+        jsState.debug(path: path.joined(separator: "."), filter: filter)
+    }
+
+    func debug(variable: VC.Variable, screenInstance: VS.ScreenInstance? = nil, filter: VS.DebugFilter = .withoutFunction) -> String {
+        jsState.debug(variable: variable, screenInstance: screenInstance, filter: filter)
+    }
+
+    func getValue<T: JSValueRepresentable>(_ type: T.Type, variable: VC.Variable, screenInstance: VS.ScreenInstance) throws(VS.Error) -> T? {
         try jsState.getValue(type, variable: variable, screenInstance: screenInstance)
     }
 
-    func setValue(variable: VC.Variable, value: any JSValueRepresentable, screenInstance: VC.ScreenInstance) throws(VS.Error) {
+    func setValue(variable: VC.Variable, value: any JSValueConvertable, screenInstance: VS.ScreenInstance) throws(VS.Error) {
         try jsState.setValue(variable: variable, value: value, screenInstance: screenInstance)
     }
 
-    func execute(actions: [VC.Action], screenInstance: VC.ScreenInstance) throws(VS.Error) {
+    func execute(actions: [VC.Action], screenInstance: VS.ScreenInstance) throws(VS.Error) {
         try jsState.execute(actions: actions, screenInstance: screenInstance)
     }
 }

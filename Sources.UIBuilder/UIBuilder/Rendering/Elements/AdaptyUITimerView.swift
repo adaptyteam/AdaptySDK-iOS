@@ -137,7 +137,7 @@ extension VC.RichText {
 @MainActor
 struct AdaptyUITimerView: View, AdaptyUITagResolver {
     @Environment(\.adaptyScreenInstance)
-    private var screen: VC.ScreenInstance
+    private var screen: VS.ScreenInstance
 
     @EnvironmentObject var viewModel: AdaptyUITimerViewModel
     @EnvironmentObject var customTagResolverViewModel: AdaptyUITagResolverViewModel

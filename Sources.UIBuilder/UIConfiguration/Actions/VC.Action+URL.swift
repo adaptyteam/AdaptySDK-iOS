@@ -7,11 +7,11 @@
 
 import Foundation
 
-package extension VC.Action {
+extension VC.Action {
     private static let scheme = "sdk"
     private static let host = "action"
 
-    var asURL: URL? {
+    package var asURL: URL? {
         var components = URLComponents()
         components.scheme = Self.scheme
         components.host = [scope.rawValue, Self.host].joined(separator: ".")
@@ -23,28 +23,41 @@ package extension VC.Action {
 
         components.queryItems =
             params
-                .sorted(by: { $0.key < $1.key })
-                .map { URLQueryItem(name: $0.key + ($0.value.keySuffix?.rawValue ?? ""), value: $0.value.asQueryValue) }
+            .sorted(by: { $0.key < $1.key })
+            .flatMap { $0.value.asQueryItems(name: $0.key) }
 
         return components.url
     }
 
-    init(url: URL, autodetectType: Bool = false) throws {
+    package init(
+        url: URL,
+        autodetectType: Bool = false
+    ) throws {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             throw DecodingError.dataCorrupted(
-                .init(codingPath: [], debugDescription: "wrong url: \(url)"))
+                .init(
+                    codingPath: [],
+                    debugDescription: "wrong url: \(url)"
+                ))
         }
 
         guard components.scheme == Self.scheme else {
             throw DecodingError.dataCorrupted(
-                .init(codingPath: [], debugDescription: "wrong schema of url: \(url) use: \(Self.scheme)"))
+                .init(
+                    codingPath: [],
+                    debugDescription: "wrong schema of url: \(url) use: \(Self.scheme)"
+                ))
         }
 
         guard let rawValue = components.host?.split(separator: ".").first.map(String.init),
-              let scope = VC.Scope(rawValue: rawValue)
+            let scope = VC.Scope(rawValue: rawValue)
         else {
             throw DecodingError.dataCorrupted(
-                .init(codingPath: [], debugDescription: "wrong host, unknown scope of action: \(components.host ?? "nil")"))
+                .init(
+                    codingPath: [],
+                    debugDescription:
+                        "wrong host, unknown scope of action: \(components.host ?? "nil")"
+                ))
         }
 
         self.scope = scope
@@ -66,12 +79,17 @@ package extension VC.Action {
 
         var params = [String: Parameter]()
         for item in queryItems {
-            let (key, suffix) = item.name.extractSuffix()
-            if autodetectType {
-                params[key] = (try? Parameter(key: key, suffix: suffix, value: item.value)) ?? Parameter(string: item.value)
-            } else {
-                params[key] = try Parameter(key: key, suffix: suffix, value: item.value)
-            }
+            let (fullPath, suffix) = item.name.extractSuffix()
+            let path = fullPath.split(separator: ".").map(String.init)
+
+            let value: Parameter =
+                if autodetectType {
+                    (try? Parameter(key: fullPath, suffix: suffix, value: item.value))
+                        ?? Parameter(string: item.value)
+                } else {
+                    try Parameter(key: fullPath, suffix: suffix, value: item.value)
+                }
+            params.setParameter(value, for: path)
         }
         self.params = params
     }
@@ -85,8 +103,8 @@ private enum Suffix: String, CaseIterable {
     case double = "_d"
 }
 
-private extension String {
-    func extractSuffix() -> (String, Suffix?) {
+extension String {
+    fileprivate func extractSuffix() -> (String, Suffix?) {
         for suffix in Suffix.allCases {
             let raw = suffix.rawValue
             guard hasSuffix(raw) else { continue }
@@ -96,30 +114,33 @@ private extension String {
     }
 }
 
-private extension VC.Action.Parameter {
-    var keySuffix: Suffix? {
+extension VC.Action.Parameter {
+    fileprivate func asQueryItems(name: String) -> [URLQueryItem] {
         switch self {
-        case .null: nil
-        case .string: .string
-        case .bool: .bool
-        case .int32: .int32
-        case .uint32: .uint32
-        case .double: .double
+        case .null:
+            [URLQueryItem(name: name, value: nil)]
+        case .string(let value):
+            [URLQueryItem(name: name + Suffix.string.rawValue, value: value)]
+        case .bool(let value):
+            [URLQueryItem(name: name + Suffix.bool.rawValue, value: value.description)]
+        case .int32(let value):
+            [URLQueryItem(name: name + Suffix.int32.rawValue, value: value.description)]
+        case .uint32(let value):
+            [URLQueryItem(name: name + Suffix.uint32.rawValue, value: value.description)]
+        case .double(let value):
+            [URLQueryItem(name: name + Suffix.double.rawValue, value: value.description)]
+        case .object(let dict):
+            dict
+                .sorted(by: { $0.key < $1.key })
+                .flatMap { $0.value.asQueryItems(name: "\(name).\($0.key)") }
         }
     }
 
-    var asQueryValue: String? {
-        switch self {
-        case .null: nil
-        case .string(let s): s
-        case .bool(let b): b.description
-        case .int32(let i): i.description
-        case .uint32(let u): u.description
-        case .double(let d): d.description
-        }
-    }
-
-    init(key: String, suffix: Suffix?, value: String?) throws {
+    fileprivate init(
+        key: String,
+        suffix: Suffix?,
+        value: String?
+    ) throws {
         guard let value else {
             self = .null
             return
@@ -139,7 +160,9 @@ private extension VC.Action.Parameter {
             guard let v = Bool(value) else {
                 throw DecodingError.dataCorrupted(
                     .init(
-                        codingPath: [], debugDescription: "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
+                        codingPath: [],
+                        debugDescription:
+                            "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
                     ))
             }
             self = .bool(v)
@@ -147,7 +170,9 @@ private extension VC.Action.Parameter {
             guard let v = Int32(value) else {
                 throw DecodingError.dataCorrupted(
                     .init(
-                        codingPath: [], debugDescription: "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
+                        codingPath: [],
+                        debugDescription:
+                            "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
                     ))
             }
             self = .int32(v)
@@ -155,7 +180,9 @@ private extension VC.Action.Parameter {
             guard let v = UInt32(value) else {
                 throw DecodingError.dataCorrupted(
                     .init(
-                        codingPath: [], debugDescription: "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
+                        codingPath: [],
+                        debugDescription:
+                            "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
                     ))
             }
             self = .uint32(v)
@@ -163,14 +190,16 @@ private extension VC.Action.Parameter {
             guard let v = Double(value) else {
                 throw DecodingError.dataCorrupted(
                     .init(
-                        codingPath: [], debugDescription: "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
+                        codingPath: [],
+                        debugDescription:
+                            "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
                     ))
             }
             self = .double(v)
         }
     }
 
-    init(string: String?) {
+    fileprivate init(string: String?) {
         guard let string else {
             self = .null
             return
@@ -186,6 +215,25 @@ private extension VC.Action.Parameter {
             self = .double(doubleValue)
         } else {
             self = .string(string)
+        }
+    }
+}
+
+extension [String: VC.Action.Parameter] {
+    fileprivate mutating func setParameter(_ value: VC.Action.Parameter, for path: [String]) {
+        guard !path.isEmpty else { return }
+        let key = path[0]
+        if path.count == 1 {
+            self[key] = value
+        } else {
+            var subParams: [String: VC.Action.Parameter] =
+                if case .object(let existing) = self[key] {
+                    existing
+                } else {
+                    [:]
+                }
+            subParams.setParameter(value, for: Array(path.dropFirst()))
+            self[key] = .object(subParams)
         }
     }
 }

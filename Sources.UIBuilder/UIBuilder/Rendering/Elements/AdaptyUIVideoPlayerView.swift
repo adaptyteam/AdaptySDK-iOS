@@ -86,7 +86,7 @@ struct AdaptyUIVideoView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
-    private var screen: VC.ScreenInstance
+    private var screen: VS.ScreenInstance
 
     private let video: VC.VideoPlayer
 

@@ -61,6 +61,7 @@ extension AdaptyUISchema.Localizer {
             isRightToLeft: isRightToLeft,
             assets: assets,
             strings: strings,
+            navigators: source.navigators.mapValues(navigator),
             screens: source.screens.mapValues(screen),
             scripts: source.scripts
         )

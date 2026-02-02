@@ -24,7 +24,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
-    private var screen: VC.ScreenInstance
+    private var screen: VS.ScreenInstance
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel

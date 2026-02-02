@@ -68,7 +68,7 @@ struct AdaptyUIPagerView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
-    private var screen: VC.ScreenInstance
+    private var screen: VS.ScreenInstance
 
     var pager: VC.Pager
 

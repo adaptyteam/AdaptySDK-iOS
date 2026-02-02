@@ -16,15 +16,17 @@ public extension Dev_AdaptyUIConfiguration {
     static func create(
         assets: String,
         localization: String,
-        templates: String?,
+        templates: String? = nil,
+        navigators: [String: String]? = nil,
         contents: [AdaptyUIExampleContent],
         script: String? = nil,
-        startScreenName: String
+        startScreenName: String?
     ) throws -> Self {
         let configuration = try AdaptyUIConfiguration.create(
             assets: assets,
             localization: localization,
             templates: templates,
+            navigators: navigators,
             contents: contents,
             script: script,
             startScreenName: startScreenName

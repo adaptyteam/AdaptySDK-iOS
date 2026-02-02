@@ -13,7 +13,7 @@ struct AdaptyUIToggleView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
-    private var screen: VC.ScreenInstance
+    private var screen: VS.ScreenInstance
 
     @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
     @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel

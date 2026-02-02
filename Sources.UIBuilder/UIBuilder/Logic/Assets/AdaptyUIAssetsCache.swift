@@ -68,7 +68,7 @@ final class AdaptyUIAssetsCache {
     func cachedAsset(
         _ ref: AdaptyUIConfiguration.AssetReference?,
         mode: VC.Mode,
-        screen: VC.ScreenInstance
+        screen: VS.ScreenInstance
     ) -> AdaptyUICachedAsset {
         guard let assetIdOrColor = ref?.getAssetId(
             state: state,
@@ -119,7 +119,7 @@ final class AdaptyUIAssetsCache {
 extension AdaptyUIConfiguration.AssetReference {
     func getAssetId(
         state: AdaptyUIState,
-        screen: VC.ScreenInstance
+        screen: VS.ScreenInstance
     ) -> VC.AssetIdentifierOrValue? {
         switch self {
         case .assetId(let id): .assetId(id)

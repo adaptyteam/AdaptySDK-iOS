@@ -14,9 +14,18 @@ struct AdaptyUIScreenSizeKey: EnvironmentKey {
 }
 
 struct AdaptyUIScreenInstanceKey: EnvironmentKey {
-    static let defaultValue: VC.ScreenInstance = .init(
+    static let defaultValue: VS.ScreenInstance = .init(
         id: "fake",
-        type: "fake",
+        navigatorId: "default",
+        configuration: .init(
+            id: "fake",
+            templateId: "fake",
+            background: nil,
+            cover: nil,
+            content: .unknown("fake", nil),
+            footer: nil,
+            overlay: nil
+        ),
         contextPath: []
     )
 }
@@ -26,8 +35,8 @@ extension EnvironmentValues {
         get { self[AdaptyUIScreenSizeKey.self] }
         set { self[AdaptyUIScreenSizeKey.self] = newValue }
     }
-    
-    var adaptyScreenInstance: VC.ScreenInstance {
+
+    var adaptyScreenInstance: VS.ScreenInstance {
         get { self[AdaptyUIScreenInstanceKey.self] }
         set { self[AdaptyUIScreenInstanceKey.self] = newValue }
     }
@@ -37,8 +46,8 @@ package extension View {
     func withScreenSize(_ value: CGSize) -> some View {
         environment(\.adaptyScreenSize, value)
     }
-    
-    func withScreenInstance(_ value: VC.ScreenInstance) -> some View {
+
+    func withScreenInstance(_ value: VS.ScreenInstance) -> some View {
         environment(\.adaptyScreenInstance, value)
     }
 }

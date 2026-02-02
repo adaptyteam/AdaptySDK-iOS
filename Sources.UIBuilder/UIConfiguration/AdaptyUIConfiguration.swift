@@ -17,6 +17,7 @@ package struct AdaptyUIConfiguration: Sendable, Hashable {
     let assets: [AssetIdentifier: Asset]
     let strings: [StringIdentifier: RichText]
 
+    package let navigators: [NavigatorIdentifier: Navigator]
     package let screens: [ScreenType: Screen]
     let scripts: [String]
 }

@@ -39,7 +39,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
     func resolvedAsset(
         _ ref: AdaptyUIConfiguration.AssetReference?,
         mode: VC.Mode,
-        screen: VC.ScreenInstance
+        screen: VS.ScreenInstance
     ) -> AdaptyUICachedAsset {
         cache.cachedAsset(ref, mode: mode, screen: screen)
     }
@@ -57,7 +57,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
     func resolvedText(
         _ ref: VC.StringReference,
         defaultAttributes: VC.RichText.Attributes?,
-        screen: VC.ScreenInstance
+        screen: VS.ScreenInstance
     ) -> (VC.RichText, ProductInfoContainer) {
         switch ref {
         case let .stringId(stringId):

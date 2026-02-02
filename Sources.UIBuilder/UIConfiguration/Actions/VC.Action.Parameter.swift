@@ -15,5 +15,6 @@ extension VC.Action {
         case int32(Int32)
         case uint32(UInt32)
         case double(Double)
+        case object([String: Self])
     }
 }

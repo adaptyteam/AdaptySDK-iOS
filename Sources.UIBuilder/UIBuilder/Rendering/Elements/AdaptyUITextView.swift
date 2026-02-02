@@ -22,7 +22,7 @@ struct AdaptyUITextView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
-    private var screen: VC.ScreenInstance
+    private var screen: VS.ScreenInstance
 
     init(_ text: VC.Text) {
         self.text = text
@@ -91,7 +91,7 @@ extension [VC.RichText.Item] {
         tagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
-        screen: VC.ScreenInstance
+        screen: VS.ScreenInstance
     ) throws -> Text {
         try reduce(Text("")) {
             partialResult,
@@ -180,7 +180,7 @@ extension VC.RichText {
         tagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
-        screen: VC.ScreenInstance,
+        screen: VS.ScreenInstance,
         placeholder: Bool = false
     ) -> Text {
         if placeholder {
@@ -288,7 +288,7 @@ extension AttributedString {
         attributes: VC.RichText.Attributes?,
         assetsCache: AdaptyUIAssetsCache,
         colorScheme: ColorScheme,
-        screen: VC.ScreenInstance
+        screen: VS.ScreenInstance
     ) -> AttributedString {
         let foregroundColorAsset = assetsCache.cachedAsset(
             attributes?.txtColor,

@@ -223,7 +223,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
-    private var screen: VC.ScreenInstance
+    private var screen: VS.ScreenInstance
 
     func body(content: Content) -> some View {
         self.bodyWithBackground(

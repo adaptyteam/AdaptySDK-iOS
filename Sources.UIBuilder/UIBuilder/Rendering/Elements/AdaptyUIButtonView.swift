@@ -13,7 +13,7 @@ struct AdaptyUIButtonView: View {
     @Environment(\.adaptyScreenId)
     private var screenId: String
     @Environment(\.adaptyScreenInstance)
-    private var screen: VC.ScreenInstance
+    private var screen: VS.ScreenInstance
 
     private var button: VC.Button
 

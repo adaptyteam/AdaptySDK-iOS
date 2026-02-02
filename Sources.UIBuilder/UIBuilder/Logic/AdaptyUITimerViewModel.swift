@@ -102,7 +102,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
     func timeLeft(
         for timer: VC.Timer,
         at: Date,
-        screen: VC.ScreenInstance
+        screen: VS.ScreenInstance
     ) -> TimeInterval {
         let timerEndAt = timers[timer.id] ?? initializeTimer(timer, at: at)
         let timeLeft = max(0.0, timerEndAt.timeIntervalSince1970 - Date().timeIntervalSince1970)

@@ -20,8 +20,8 @@ extension Array {
 struct AdaptyUIScreenInstance: Identifiable {
     var id: String { instance.id }
 
-    let instance: VC.ScreenInstance
-    let configuration: VC.Screen
+    let instance: VS.ScreenInstance
+    let configuration: VC.Screen // TODO: x remove
     let template: VC.Template_legacy
 
     var offset: CGSize = .zero
@@ -163,14 +163,15 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 
     // TODO: x refactor
     func present(
-        screen: VC.ScreenInstance,
+        screen: VS.ScreenInstance,
         in navigatorId: AdaptyUINavigatorId,
         inAnimation: (CGSize) -> ScreenTransitionAnimation,
         outAnimation: (CGSize) -> ScreenTransitionAnimation
     ) {
         // TODO: extract
-        guard let screenConfiguration = viewConfiguration.screens[screen.type],
-              let screenTemplate = VC.Template_legacy(rawValue: screenConfiguration.templateId)
+        let screenConfiguration = screen.configuration
+
+        guard let screenTemplate = VC.Template_legacy(rawValue: screenConfiguration.templateId)
         else {
             // no screen found or unsupported template
             return // TODO: x throw error?

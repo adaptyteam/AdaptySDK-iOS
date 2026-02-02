@@ -8,7 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-protocol JSValueRepresentable: Sendable, Hashable, JSValueConvertable {
+protocol JSValueRepresentable: Sendable, Hashable {
     static func fromJSValue(_: JSValue) -> Self?
 }
 

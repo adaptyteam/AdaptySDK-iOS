@@ -9,6 +9,7 @@ import Foundation
 
 extension Schema {
     struct Screen: Sendable, Hashable {
+        let id: String
         let templateId: String
         let background: AssetReference?
         let cover: Box?
@@ -21,6 +22,7 @@ extension Schema {
 extension Schema.Localizer {
     func screen(_ from: Schema.Screen) throws -> VC.Screen {
         try .init(
+            id: from.id,
             templateId: from.templateId,
             background: from.background,
             cover: from.cover.map(box),
@@ -43,17 +45,24 @@ extension Schema.Screen: Encodable, DecodableWithConfiguration {
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let templateId: String
+        let templateId: String =
+            if container.contains(.templateId) {
+                try container.decode(String.self, forKey: .templateId)
+            } else if let value = configuration.legacyTemplateId {
+                value
+            } else {
+                throw DecodingError.keyNotFound(CodingKeys.templateId, .init(codingPath: decoder.codingPath, debugDescription: "Not found required key: template_id"))
+            }
 
-        if container.contains(.templateId) {
-            templateId = try container.decode(String.self, forKey: .templateId)
-        } else if let value = configuration.legacyTemplateId {
-            templateId = value
-        } else {
-            throw DecodingError.keyNotFound(CodingKeys.templateId, .init(codingPath: decoder.codingPath, debugDescription: "Not found required key: template_id"))
-        }
+        let screenId =
+            if let value = configuration.insideScreenId {
+                value
+            } else {
+                throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown screen id"))
+            }
 
         try self.init(
+            id: screenId,
             templateId: templateId,
             background: container.decodeIfPresent(Schema.AssetReference.self, forKey: .background),
             cover: container.decodeIfPresent(Schema.Box.self, forKey: .cover, configuration: configuration),
