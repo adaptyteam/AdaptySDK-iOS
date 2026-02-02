@@ -27,10 +27,13 @@ struct AdaptyUITransparentContainerView: View {
 
         ScrollViewReader { scrollProxy in
             ScrollView {
-                AdaptyUIElementView(element)
-                    .id("content")
-                    .onGeometrySizeChange { footerSize = $0 }
-                    .padding(.top, additionalTopPadding > 0.0 ? additionalTopPadding : nil)
+                AdaptyUIElementView(
+                    element,
+                    screenHolderBuilder: { EmptyView() } // TODO: x check
+                )
+                .id("content")
+                .onGeometrySizeChange { footerSize = $0 }
+                .padding(.top, additionalTopPadding > 0.0 ? additionalTopPadding : nil)
             }
             .scrollIndicatorsHidden_compatible()
             .onAppear {
@@ -44,7 +47,10 @@ struct AdaptyUITransparentContainerView: View {
     var body: some View {
         GeometryReader { p in
             ZStack(alignment: .bottom) {
-                AdaptyUIElementView(screen.content)
+                AdaptyUIElementView(
+                    screen.content,
+                    screenHolderBuilder: { EmptyView() } // TODO: x check
+                )
 
                 if let footer = screen.footer {
                     scrollableFooterView(
@@ -54,7 +60,10 @@ struct AdaptyUITransparentContainerView: View {
                 }
 
                 if let overlay = screen.overlay {
-                    AdaptyUIElementView(overlay)
+                    AdaptyUIElementView(
+                        overlay,
+                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                    )
                 }
             }
             .ignoresSafeArea()

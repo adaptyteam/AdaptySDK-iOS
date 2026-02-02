@@ -63,7 +63,10 @@ struct AdaptyUIBasicContainerView: View {
                 }
 
                 if let overlay = screen.overlay {
-                    AdaptyUIElementView(overlay)
+                    AdaptyUIElementView(
+                        overlay,
+                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                    )
                 }
             }
             .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
@@ -80,7 +83,11 @@ struct AdaptyUIBasicContainerView: View {
     ) -> some View {
         let height: CGFloat = {
             if let boxHeight = box.height, case let .fixed(unit) = boxHeight {
-                return unit.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom)
+                return unit.points(
+                    screenSize: screenSize.height,
+                    safeAreaStart: safeArea.top,
+                    safeAreaEnd: safeArea.bottom
+                )
             } else {
                 return 0.0
             }
@@ -93,30 +100,33 @@ struct AdaptyUIBasicContainerView: View {
             let isScrollingUp = minY < 0
             let scale = height > 0.0 ? max(1.0, 1.0 + minY / height) : 1.0
 
-            AdaptyUIElementView(content)
-                .frame(
-                    width: p.size.width,
-                    height: {
-                        if isScrollingDown {
-                            return height + minY
-                        } else {
-                            return height
-                        }
-                    }()
-                )
-                .scaleEffect(x: scale, y: scale, anchor: .center)
-                .clipped()
-                .offset(
-                    y: {
-                        if isScrollingUp {
-                            return -minY / 2.0
-                        } else if isScrollingDown {
-                            return -minY
-                        } else {
-                            return 0.0
-                        }
-                    }()
-                )
+            AdaptyUIElementView(
+                content,
+                screenHolderBuilder: { EmptyView() } // TODO: x check
+            )
+            .frame(
+                width: p.size.width,
+                height: {
+                    if isScrollingDown {
+                        return height + minY
+                    } else {
+                        return height
+                    }
+                }()
+            )
+            .scaleEffect(x: scale, y: scale, anchor: .center)
+            .clipped()
+            .offset(
+                y: {
+                    if isScrollingUp {
+                        return -minY / 2.0
+                    } else if isScrollingDown {
+                        return -minY
+                    } else {
+                        return 0.0
+                    }
+                }()
+            )
         }
         .frame(height: height)
     }
@@ -136,7 +146,10 @@ struct AdaptyUIBasicContainerView: View {
         ) ?? 0.0
 
         VStack(spacing: 0) {
-            AdaptyUIElementWithoutPropertiesView(content)
+            AdaptyUIElementWithoutPropertiesView(
+                content,
+                screenHolderBuilder: { EmptyView() } // TODO: x check
+            )
 
             FooterVerticalFillerView(height: footerSize.height) { frame in
                 withAnimation {
@@ -162,11 +175,19 @@ struct AdaptyUIBasicContainerView: View {
     ) -> some View {
         if footerSize.height >= globalProxy.size.height {
             ScrollView {
-                AdaptyUIElementView(element, drawDecoratorBackground: drawFooterBackground)
+                AdaptyUIElementView(
+                    element,
+                    screenHolderBuilder: { EmptyView() }, // TODO: x check
+                    drawDecoratorBackground: drawFooterBackground
+                )
             }
             .scrollIndicatorsHidden_compatible()
         } else {
-            AdaptyUIElementView(element, drawDecoratorBackground: drawFooterBackground)
+            AdaptyUIElementView(
+                element,
+                screenHolderBuilder: { EmptyView() }, // TODO: x check
+                drawDecoratorBackground: drawFooterBackground
+            )
         }
     }
 }

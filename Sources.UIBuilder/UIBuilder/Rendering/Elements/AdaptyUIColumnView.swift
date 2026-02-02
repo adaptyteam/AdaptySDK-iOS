@@ -9,7 +9,7 @@
 
 import SwiftUI
 
-struct AdaptyUIColumnView: View {
+struct AdaptyUIColumnView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
@@ -17,10 +17,15 @@ struct AdaptyUIColumnView: View {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    private var column: VC.Column
+    private let column: VC.Column
+    private let screenHolderBuilder: () -> ScreenHolderContent
 
-    init(_ column: VC.Column) {
+    init(
+        _ column: VC.Column,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
+    ) {
         self.column = column
+        self.screenHolderBuilder = screenHolderBuilder
     }
 
     private func calculateTotalWeight(
@@ -84,7 +89,16 @@ struct AdaptyUIColumnView: View {
                 spacing: 0.0,
                 content: {
                     ForEach(0 ..< column.items.count, id: \.self) { idx in
-                        AdaptyUIElementView(column.items[idx].content)
+                        AdaptyUIElementView(
+                            column.items[idx].content,
+                            screenHolderBuilder: {
+                                if idx == 0 {
+                                    screenHolderBuilder() // TODO: x check
+                                } else {
+                                    EmptyView()
+                                }
+                            }
+                        )
                     }
                 }
             )

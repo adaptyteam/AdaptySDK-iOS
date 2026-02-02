@@ -131,7 +131,6 @@ public extension AdaptyUI {
             productsViewModel.resetSelectedProducts()
             sectionsViewModel.resetSectionsState()
             timerViewModel.resetTimersState()
-            screensViewModel.resetScreensStack()
         }
     }
 }

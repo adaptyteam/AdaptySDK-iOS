@@ -97,9 +97,5 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
     
-    package nonisolated func closeScreen(navigatorId: String) {
-        Task { @MainActor in // TODO: close all screen in navigatorId
-            screensViewModel.dismissTopScreen()
-        }
-    }
+    package nonisolated func closeScreen(navigatorId: String) {}
 }

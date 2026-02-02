@@ -48,14 +48,19 @@ struct AdaptyUIButtonView: View {
         }
     }
 
-    public var body: some View {
+    var body: some View {
         Button {
             stateViewModel.execute(
                 actions: button.actions,
                 screen: screen
             )
         } label: {
-            AdaptyUIElementView(currentStateView)
+            AdaptyUIElementView(
+                currentStateView,
+                screenHolderBuilder: {
+                    EmptyView() // TODO: x check if is ok
+                }
+            )
         }
         .buttonStyle(.plain)
     }

@@ -53,9 +53,10 @@ extension View {
     }
 }
 
+fileprivate let pageControllTapAnimationDuration = 0.3
+
 @MainActor
-struct AdaptyUIPagerView: View {
-    private static let pageControllTapAnimationDuration = 0.3
+struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
@@ -70,7 +71,8 @@ struct AdaptyUIPagerView: View {
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
 
-    var pager: VC.Pager
+    private let pager: VC.Pager
+    private let screenHolderBuilder: () -> ScreenHolderContent
 
     // We had to introduce this additional State variable to workaround weird SwiftUI crash caused animated currentPage change
     // PageControl now relies on currentPageSelectedIndex variable which is updating outside of withAnimation block
@@ -87,8 +89,12 @@ struct AdaptyUIPagerView: View {
     @State private var isInteracting = false
     @State private var timer: Timer?
 
-    init(_ pager: VC.Pager) {
+    init(
+        _ pager: VC.Pager,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
+    ) {
         self.pager = pager
+        self.screenHolderBuilder = screenHolderBuilder
     }
 
     @ViewBuilder
@@ -148,12 +154,16 @@ struct AdaptyUIPagerView: View {
         }
 
         if pager.animation != nil {
-            withAnimation(.easeInOut(duration: Self.pageControllTapAnimationDuration)) {
+            withAnimation(
+                .easeInOut(
+                    duration: pageControllTapAnimationDuration
+                )
+            ) {
                 currentPage = index
             }
             if shouldScheduleAutoscroll {
                 Task {
-                    try await Task.sleep(seconds: Self.pageControllTapAnimationDuration)
+                    try await Task.sleep(seconds: pageControllTapAnimationDuration)
                     scheduleAutoScroll()
                 }
             }
@@ -211,11 +221,20 @@ struct AdaptyUIPagerView: View {
             let pages = pager.content
             HStack(spacing: pager.spacing) {
                 ForEach(0 ..< pages.count, id: \.self) { idx in
-                    AdaptyUIElementView(pages[idx])
-                        .frame(width: max(width, 0), height: max(height, 0))
-                        .clipped()
-                        .padding(.leading, idx == 0 ? hPadding : 0)
-                        .padding(.trailing, idx == pages.count - 1 ? hPadding : 0)
+                    AdaptyUIElementView(
+                        pages[idx],
+                        screenHolderBuilder: {
+                            if idx == 0 {
+                                screenHolderBuilder() // TODO: x check
+                            } else {
+                                EmptyView()
+                            }
+                        }
+                    )
+                    .frame(width: max(width, 0), height: max(height, 0))
+                    .clipped()
+                    .padding(.leading, idx == 0 ? hPadding : 0)
+                    .padding(.trailing, idx == pages.count - 1 ? hPadding : 0)
                 }
             }
             .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)

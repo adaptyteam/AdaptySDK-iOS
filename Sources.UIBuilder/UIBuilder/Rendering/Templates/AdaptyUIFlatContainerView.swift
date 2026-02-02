@@ -13,7 +13,6 @@ import SwiftUI
 struct AdaptyUIFlatContainerView: View {
     @State
     private var footerSize: CGSize = .zero
-
     @State
     private var drawFooterBackground = false
 
@@ -26,11 +25,19 @@ struct AdaptyUIFlatContainerView: View {
     ) -> some View {
         if footerSize.height >= globalProxy.size.height {
             ScrollView {
-                AdaptyUIElementView(element, drawDecoratorBackground: drawFooterBackground)
+                AdaptyUIElementView(
+                    element,
+                    screenHolderBuilder: { EmptyView() }, // TODO: x check
+                    drawDecoratorBackground: drawFooterBackground
+                )
             }
             .scrollIndicatorsHidden_compatible()
         } else {
-            AdaptyUIElementView(element, drawDecoratorBackground: drawFooterBackground)
+            AdaptyUIElementView(
+                element,
+                screenHolderBuilder: { EmptyView() }, // TODO: x check
+                drawDecoratorBackground: drawFooterBackground
+            )
         }
     }
 
@@ -39,8 +46,11 @@ struct AdaptyUIFlatContainerView: View {
             ZStack(alignment: .bottom) {
                 ScrollView {
                     VStack {
-                        AdaptyUIElementView(screen.content)
-                            .frame(maxWidth: .infinity)
+                        AdaptyUIElementView(
+                            screen.content,
+                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                        )
+                        .frame(maxWidth: .infinity)
 
                         FooterVerticalFillerView(height: footerSize.height) { frame in
                             withAnimation {
@@ -57,7 +67,10 @@ struct AdaptyUIFlatContainerView: View {
                 }
 
                 if let overlay = screen.overlay {
-                    AdaptyUIElementView(overlay)
+                    AdaptyUIElementView(
+                        overlay,
+                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                    )
                 }
             }
             .ignoresSafeArea()

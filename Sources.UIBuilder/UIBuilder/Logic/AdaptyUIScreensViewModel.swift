@@ -19,35 +19,21 @@ extension Array {
 
 struct AdaptyUIScreenInstance: Identifiable {
     var id: String { instance.id }
+    var configuration: VC.Screen { instance.configuration }
 
     let instance: VS.ScreenInstance
-    let configuration: VC.Screen // TODO: x remove
-    let template: VC.Template_legacy
 
     var offset: CGSize = .zero
     var opacity: Double = 1.0
     var zIndex: Double = 1.0
 }
 
-@MainActor // TODO: x deprecated
-package final class AdaptyUIBottomSheetViewModel: ObservableObject {
-    @Published var isPresented: Bool = false
-
-    var id: String
-    var bottomSheet: VC.Screen
-
-    init(id: String, bottomSheet: VC.Screen) {
-        self.id = id
-        self.bottomSheet = bottomSheet
-    }
-}
-
-typealias AdaptyUINavigatorId = String
-
 @MainActor
 package final class AdaptyUINavigatorViewModel: ObservableObject {
-    let id: AdaptyUINavigatorId
-    let zIndexBase: Double
+    var id: VC.NavigatorIdentifier { navigator.id }
+    var order: Double { if let order = navigator.order { Double(order) } else { 0.0 } }
+
+    let navigator: VC.Navigator
 
     @Published
     private(set) var screens: [AdaptyUIScreenInstance]
@@ -55,12 +41,10 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     private var viewportSize: CGSize = .zero
 
     init(
-        id: String,
-        zIndexBase: Double,
+        navigator: VC.Navigator,
         screen: AdaptyUIScreenInstance
     ) {
-        self.id = id
-        self.zIndexBase = zIndexBase
+        self.navigator = navigator
 
         screens = [screen]
     }
@@ -137,11 +121,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     var isRightToLeft: Bool { viewConfiguration.isRightToLeft }
 
     @Published
-    private(set) var presentedScreensStack = [String]() // TODO: x deprecated
-    let bottomSheetsViewModels: [AdaptyUIBottomSheetViewModel] // TODO: x deprecated
-
-    @Published
-    private(set) var navigators: [AdaptyUINavigatorViewModel]
+    private(set) var navigatorsViewModels: [AdaptyUINavigatorViewModel]
 
     package init(
         logId: String,
@@ -149,45 +129,30 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     ) {
         self.logId = logId
         self.viewConfiguration = viewConfiguration
-
-        bottomSheetsViewModels = viewConfiguration.screens.map {
-            .init(id: $0.key, bottomSheet: $0.value)
-        }
-
-        navigators = []
+        navigatorsViewModels = []
     }
 
     func setViewPortSize(_ size: CGSize) {
-        navigators.forEach { $0.setViewPortSize(size) }
+        navigatorsViewModels.forEach { $0.setViewPortSize(size) }
     }
 
     // TODO: x refactor
     func present(
         screen: VS.ScreenInstance,
-        in navigatorId: AdaptyUINavigatorId,
+        in navigatorId: VC.NavigatorIdentifier,
         inAnimation: (CGSize) -> ScreenTransitionAnimation,
         outAnimation: (CGSize) -> ScreenTransitionAnimation
     ) {
-        // TODO: extract
-        let screenConfiguration = screen.configuration
-
-        guard let screenTemplate = VC.Template_legacy(rawValue: screenConfiguration.templateId)
-        else {
-            // no screen found or unsupported template
-            return // TODO: x throw error?
+        guard let navigatorConfig = viewConfiguration.navigators[navigatorId] else {
+            return // TODO: x error?
         }
 
-        let screen = AdaptyUIScreenInstance(
-            instance: screen,
-            configuration: screenConfiguration,
-            template: screenTemplate
-        )
+        let screen = AdaptyUIScreenInstance(instance: screen)
 
-        guard let navigator = navigators.first(where: { $0.id == navigatorId }) else {
-            navigators.append(
+        guard let navigatorVM = navigatorsViewModels.first(where: { $0.id == navigatorId }) else {
+            navigatorsViewModels.append(
                 AdaptyUINavigatorViewModel(
-                    id: navigatorId,
-                    zIndexBase: Double(navigators.count * 1_000),
+                    navigator: navigatorConfig,
                     screen: screen
                 )
             )
@@ -195,56 +160,11 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
             return
         }
 
-        navigator.present(
+        navigatorVM.present(
             screen: screen,
             inAnimation: inAnimation,
             outAnimation: outAnimation
         )
-    }
-
-    // MARK: - Old Deprecated Logic
-
-    // TODO: x deprecate
-    func presentScreen(id: String) {
-        Log.ui.verbose("#\(logId)# presentScreen \(id)")
-
-        if presentedScreensStack.contains(where: { $0 == id }) {
-            Log.ui.warn("#\(logId)# presentScreen \(id) Already Presented!")
-            return
-        }
-
-        for bottomSheetVM in bottomSheetsViewModels {
-            if bottomSheetVM.id == id {
-                bottomSheetVM.isPresented = true
-                presentedScreensStack.append(id)
-            }
-        }
-    }
-
-    // TODO: x deprecate
-    func dismissScreen(id: String) {
-        Log.ui.verbose("#\(logId)# dismissScreen \(id)")
-        presentedScreensStack.removeAll(where: { $0 == id })
-
-        for bottomSheetVM in bottomSheetsViewModels {
-            if bottomSheetVM.id == id {
-                bottomSheetVM.isPresented = false
-            }
-        }
-    }
-
-    // TODO: x deprecate
-    func dismissTopScreen() {
-        guard let topScreenId = presentedScreensStack.last else { return }
-
-        dismissScreen(id: topScreenId)
-    }
-
-    // TODO: x deprecate
-    package func resetScreensStack() {
-        Log.ui.verbose("#\(logId)# resetScreensStack")
-        presentedScreensStack.removeAll()
-        bottomSheetsViewModels.forEach { $0.isPresented = false }
     }
 }
 

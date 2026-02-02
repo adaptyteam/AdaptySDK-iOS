@@ -9,7 +9,7 @@
 
 import SwiftUI
 
-struct AdaptyUIRowView: View {
+struct AdaptyUIRowView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
@@ -17,10 +17,15 @@ struct AdaptyUIRowView: View {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    private var row: VC.Row
+    private let row: VC.Row
+    private let screenHolderBuilder: () -> ScreenHolderContent
 
-    init(_ row: VC.Row) {
+    init(
+        _ row: VC.Row,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
+    ) {
         self.row = row
+        self.screenHolderBuilder = screenHolderBuilder
     }
 
     private func calculateTotalWeight(
@@ -82,7 +87,16 @@ struct AdaptyUIRowView: View {
                 spacing: 0.0,
                 content: {
                     ForEach(0 ..< row.items.count, id: \.self) { idx in
-                        AdaptyUIElementView(row.items[idx].content)
+                        AdaptyUIElementView(
+                            row.items[idx].content,
+                            screenHolderBuilder: {
+                                if idx == 0 {
+                                    screenHolderBuilder() // TODO: x check
+                                } else {
+                                    EmptyView()
+                                }
+                            }
+                        )
                     }
                 }
             )

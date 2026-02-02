@@ -9,20 +9,35 @@
 
 import SwiftUI
 
-struct AdaptyUISectionView: View {
-    @EnvironmentObject var viewModel: AdaptyUISectionsViewModel
+struct AdaptyUISectionView<ScreenHolderContent: View>: View {
+    @EnvironmentObject
+    private var viewModel: AdaptyUISectionsViewModel
 
-    var section: VC.Section
+    private let section: VC.Section
+    private let screenHolderBuilder: () -> ScreenHolderContent
 
-    init(_ section: VC.Section) {
+    init(
+        _ section: VC.Section,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
+    ) {
         self.section = section
+        self.screenHolderBuilder = screenHolderBuilder
     }
 
     var body: some View {
         let index = viewModel.selectedIndex(for: section)
 
         if let content = section.content[safe: Int(index)] {
-            AdaptyUIElementView(content)
+            AdaptyUIElementView(
+                content,
+                screenHolderBuilder: {
+                    if index == 0 {
+                        screenHolderBuilder() // TODO: x check
+                    } else {
+                        EmptyView()
+                    }
+                }
+            )
         }
     }
 }

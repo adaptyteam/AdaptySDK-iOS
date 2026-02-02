@@ -9,14 +9,19 @@
 
 import SwiftUI
 
-struct AdaptyUIStackView: View {
+struct AdaptyUIStackView<ScreenHolderContent: View>: View {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    private var stack: VC.Stack
+    private let stack: VC.Stack
+    private let screenHolderBuilder: () -> ScreenHolderContent
 
-    init(_ stack: VC.Stack) {
+    init(
+        _ stack: VC.Stack,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
+    ) {
         self.stack = stack
+        self.screenHolderBuilder = screenHolderBuilder
     }
 
     var body: some View {
@@ -25,14 +30,32 @@ struct AdaptyUIStackView: View {
             VStack(alignment: stack.horizontalAlignment.swiftuiValue(with: layoutDirection),
                    spacing: stack.spacing)
             {
-                ForEach(0 ..< stack.content.count, id: \.self) {
-                    AdaptyUIElementView(stack.content[$0])
+                ForEach(0 ..< stack.content.count, id: \.self) { idx in
+                    AdaptyUIElementView(
+                        stack.content[idx],
+                        screenHolderBuilder: {
+                            if idx == 0 {
+                                screenHolderBuilder() // TODO: x check
+                            } else {
+                                EmptyView()
+                            }
+                        }
+                    )
                 }
             }
         case .horizontal:
             HStack(alignment: stack.verticalAlignment.swiftuiValue, spacing: stack.spacing) {
-                ForEach(0 ..< stack.content.count, id: \.self) {
-                    AdaptyUIElementView(stack.content[$0])
+                ForEach(0 ..< stack.content.count, id: \.self) { idx in
+                    AdaptyUIElementView(
+                        stack.content[idx],
+                        screenHolderBuilder: {
+                            if idx == 0 {
+                                screenHolderBuilder() // TODO: x check
+                            } else {
+                                EmptyView()
+                            }
+                        }
+                    )
                 }
             }
         case .z:
@@ -42,8 +65,17 @@ struct AdaptyUIStackView: View {
                     vertical: stack.verticalAlignment.swiftuiValue
                 )
             ) {
-                ForEach(0 ..< stack.content.count, id: \.self) {
-                    AdaptyUIElementView(stack.content[$0])
+                ForEach(0 ..< stack.content.count, id: \.self) { idx in
+                    AdaptyUIElementView(
+                        stack.content[idx],
+                        screenHolderBuilder: {
+                            if idx == 0 {
+                                screenHolderBuilder() // TODO: x check
+                            } else {
+                                EmptyView()
+                            }
+                        }
+                    )
                 }
             }
         }
