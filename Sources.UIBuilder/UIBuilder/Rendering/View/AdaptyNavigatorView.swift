@@ -54,6 +54,9 @@ struct AdaptyNavigatorView: View {
             defaultValue: VC.Asset.defaultScreenBackground
         )
         .withScreenInstance(screenInstance.instance)
+        .offset(screenInstance.offset)
+        .opacity(screenInstance.opacity)
+        .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
     }
 
     var body: some View {
@@ -63,9 +66,6 @@ struct AdaptyNavigatorView: View {
                 ZStack {
                     ForEach(navigatorViewModel.screens) { screen in
                         screenBuilder(screenInstance: screen)
-                            .offset(screen.offset)
-                            .opacity(screen.opacity)
-                            .zIndex(navigatorViewModel.order * 1000.0 + screen.zIndex)
                     }
                 }
             }

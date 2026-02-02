@@ -42,9 +42,11 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
     init(
         navigator: VC.Navigator,
-        screen: AdaptyUIScreenInstance
+        screen: AdaptyUIScreenInstance,
+        viewportSize: CGSize
     ) {
         self.navigator = navigator
+        self.viewportSize = viewportSize
 
         screens = [screen]
     }
@@ -113,10 +115,16 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     }
 }
 
+extension VC {
+    func navigator(id: String) -> Navigator? {
+        navigators[id] ?? navigators["default"]
+    }
+}
+
 @MainActor
 package final class AdaptyUIScreensViewModel: ObservableObject {
     private let logId: String
-    private let viewConfiguration: AdaptyUIConfiguration
+    private let viewConfiguration: VC
 
     var isRightToLeft: Bool { viewConfiguration.isRightToLeft }
 
@@ -131,8 +139,11 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         self.viewConfiguration = viewConfiguration
         navigatorsViewModels = []
     }
-
+    
+    private var viewportSize: CGSize = .zero
+    
     func setViewPortSize(_ size: CGSize) {
+        viewportSize = size
         navigatorsViewModels.forEach { $0.setViewPortSize(size) }
     }
 
@@ -143,17 +154,18 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         inAnimation: (CGSize) -> ScreenTransitionAnimation,
         outAnimation: (CGSize) -> ScreenTransitionAnimation
     ) {
-        guard let navigatorConfig = viewConfiguration.navigators[navigatorId] else {
+        guard let navigatorConfig = viewConfiguration.navigator(id: navigatorId) else {
             return // TODO: x error?
         }
 
         let screen = AdaptyUIScreenInstance(instance: screen)
 
-        guard let navigatorVM = navigatorsViewModels.first(where: { $0.id == navigatorId }) else {
+        guard let navigatorVM = navigatorsViewModels.first(where: { $0.id == navigatorConfig.id }) else {
             navigatorsViewModels.append(
                 AdaptyUINavigatorViewModel(
                     navigator: navigatorConfig,
-                    screen: screen
+                    screen: screen,
+                    viewportSize: viewportSize
                 )
             )
 
