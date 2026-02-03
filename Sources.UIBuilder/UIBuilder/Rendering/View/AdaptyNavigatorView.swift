@@ -70,6 +70,11 @@ struct AdaptyNavigatorView: View {
                 }
             }
         )
+        .staticBackground(
+            navigatorViewModel.navigator.background,
+            defaultValue: VC.Asset.defaultNavigatorBackground
+        )
+        .zIndex(navigatorViewModel.order * 1000.0)
         .onAppear {
             navigatorViewModel.reportOnAppear(
                 ScreenTransitionAnimation.inAnimationBuilder(
@@ -81,3 +86,20 @@ struct AdaptyNavigatorView: View {
         }
     }
 }
+
+
+// TODO: x zIndex exeperiments
+
+//#Preview {
+//    ZStack {
+//        Rectangle()
+//            .fill(Color.red)
+//            .frame(width: 100, height: 100, alignment: .center)
+//            .offset(x: -25, y: -25)
+//
+//        Rectangle()
+//            .fill(Color.blue)
+//            .frame(width: 100, height: 100, alignment: .center)
+//            .offset(x: 25, y: 25)
+//    }
+//}

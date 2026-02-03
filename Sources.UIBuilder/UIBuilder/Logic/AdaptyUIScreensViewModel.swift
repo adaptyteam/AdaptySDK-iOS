@@ -139,9 +139,9 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         self.viewConfiguration = viewConfiguration
         navigatorsViewModels = []
     }
-    
+
     private var viewportSize: CGSize = .zero
-    
+
     func setViewPortSize(_ size: CGSize) {
         viewportSize = size
         navigatorsViewModels.forEach { $0.setViewPortSize(size) }
@@ -166,6 +166,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
                     navigator: navigatorConfig,
                     screen: screen,
                     viewportSize: viewportSize
+                    // TODO: x add in_animation and play onAppear
                 )
             )
 

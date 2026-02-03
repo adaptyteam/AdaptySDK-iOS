@@ -34,11 +34,11 @@ struct AdaptyUIStackView<ScreenHolderContent: View>: View {
                     AdaptyUIElementView(
                         stack.content[idx],
                         screenHolderBuilder: {
-                            if idx == 0 {
+//                            if idx == 0 {
                                 screenHolderBuilder() // TODO: x check
-                            } else {
-                                EmptyView()
-                            }
+//                            } else {
+//                                EmptyView()
+//                            }
                         }
                     )
                 }
