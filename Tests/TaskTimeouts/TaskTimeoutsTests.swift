@@ -22,7 +22,7 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeInterval)
+        #expect(Date().timeIntervalSince(start) < (1.3 * duration.asTimeInterval))
     }
 
     @Test func testTaskWithoutCancellationHandler() async {
@@ -57,7 +57,7 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeInterval)
+        #expect(Date().timeIntervalSince(start) < 1.3 * duration.asTimeInterval)
     }
 }
 

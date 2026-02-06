@@ -9,10 +9,10 @@ import Foundation
 
 package extension VC {
     struct EdgeInsets: Sendable, Hashable {
-        package let leading: VC.Unit
-        package let top: VC.Unit
-        package let trailing: VC.Unit
-        package let bottom: VC.Unit
+        package let leading: Unit
+        package let top: Unit
+        package let trailing: Unit
+        package let bottom: Unit
     }
 }
 
@@ -33,7 +33,7 @@ extension VC.EdgeInsets {
             && bottom.isZero
     }
 
-    var isSameRadius: Bool {
+    var isSame: Bool {
         (bottom == top)
             && (leading == trailing)
             && (top == trailing)

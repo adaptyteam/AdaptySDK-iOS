@@ -15,7 +15,7 @@ package extension Schema.EdgeInsets {
     static let zero = Self(same: .zero)
 }
 
-extension Schema.EdgeInsets: Codable {
+extension Schema.EdgeInsets: Decodable {
     enum CodingKeys: String, CodingKey {
         case top
         case leading
@@ -44,21 +44,5 @@ extension Schema.EdgeInsets: Codable {
                 bottom: container.decodeIfPresent(Schema.Unit.self, forKey: .bottom) ?? .zero
             )
         }
-    }
-
-    package func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        if case let .point(value) = leading, value == 0 {} else
-        { try container.encode(leading, forKey: .leading) }
-
-        if case let .point(value) = top, value == 0 {} else
-        { try container.encode(leading, forKey: .top) }
-
-        if case let .point(value) = trailing, value == 0 {} else
-        { try container.encode(leading, forKey: .trailing) }
-
-        if case let .point(value) = bottom, value == 0 {} else
-        { try container.encode(leading, forKey: .bottom) }
     }
 }
