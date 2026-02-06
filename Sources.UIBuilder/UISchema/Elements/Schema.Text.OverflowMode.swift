@@ -17,7 +17,7 @@ extension Schema.Text.OverflowMode: RawRepresentable {
         switch value {
         case Key.scale: self = .scale
         case Key.unknown: self = .unknown
-        default: return nil
+        default: self = .unknown
         }
     }
 
@@ -29,9 +29,4 @@ extension Schema.Text.OverflowMode: RawRepresentable {
     }
 }
 
-extension Schema.Text.OverflowMode: Codable {
-    package init(from decoder: Decoder) throws {
-        let value = try decoder.singleValueContainer().decode(String.self)
-        self = .init(rawValue: value) ?? .unknown
-    }
-}
+extension Schema.Text.OverflowMode: Codable {}
