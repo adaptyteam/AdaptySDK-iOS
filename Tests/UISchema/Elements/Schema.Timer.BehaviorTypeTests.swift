@@ -1,5 +1,5 @@
 //
-//  Schema.Stack.KindTests.swift
+//  Schema.Timer.BehaviorTypeTests.swift
 //  AdaptyTests
 //
 //  Created by Aleksei Valiano on2026-02-05.
@@ -9,26 +9,28 @@
 import Foundation
 import Testing
 
-private extension SchemaTests.StackTests {
-    @Suite("Schema.Stack.Kind Tests")
-    struct KindTests {
-        typealias Value = Schema.Stack.Kind
+private extension SchemaTests.TimerTests {
+    @Suite("Schema.Timer.BehaviorType Tests")
+    struct BehaviorTypeTests {
+        typealias Value = Schema.Timer.BehaviorType
 
         // MARK: - Test Data
 
         static let allCases: [(value: Value, rawValue: String)] = [
-            (.vertical, "v_stack"),
-            (.horizontal, "h_stack"),
-            (.z, "z_stack"),
+            (.everyAppear, "start_at_every_appear"),
+            (.firstAppear, "start_at_first_appear"),
+            (.firstAppearPersisted, "start_at_first_appear_persisted"),
+            (.endAtLocalTime, "end_at_local_time"),
+            (.endAtUTC, "end_at_utc_time"),
+            (.custom, "custom"),
         ]
 
         static let jsonCases = rawValueToJson(allCases)
 
         static let invalidValues: [String] = [
             "invalid",
-            "vstack",
-            "stack",
-            "V_STACK",
+            "start",
+            "END_AT_UTC_TIME",
             "",
         ]
 
@@ -64,6 +66,22 @@ private extension SchemaTests.StackTests {
             #expect(throws: (any Error).self, "JSON should be invalid: \(invalid)") {
                 try invalid.decode(Value.self)
             }
+        }
+
+        // MARK: - Encoding
+
+        @Test("encode produces correct JSON value", arguments: jsonCases)
+        func encode(value: Value, json: Json) throws {
+            let encoded = try Json.encode(value)
+            #expect(encoded == json)
+        }
+
+        // MARK: - Roundtrip
+
+        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
+        func roundtrip(value: Value) throws {
+            let decoded = try Json.encode(value).decode(Value.self)
+            #expect(decoded == value)
         }
     }
 }

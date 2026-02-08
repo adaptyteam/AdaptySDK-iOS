@@ -9,19 +9,21 @@
 import Foundation
 import Testing
 
-private extension AdaptyUISchemaTests {
+private extension SchemaTests {
     @Suite("Schema.ShapeType Tests")
-    struct SchemaShapeTypeTests {
+    struct ShapeTypeTests {
         typealias Value = Schema.ShapeType
 
         // MARK: - Test Data
 
-        static let allCases: [(value: Value, jsonValue: String)] = [
+        static let allCases: [(value: Value, rawValue: String)] = [
             (.circle, "circle"),
-            (.rectangle(cornerRadius: Schema.CornerRadius.zero), "rect"),
+            (.rectangle(cornerRadius: Schema.CornerRadius(same: 0)), "rect"),
             (.curveUp, "curve_up"),
             (.curveDown, "curve_down"),
         ]
+
+        static let jsonCases = rawValueToJson(allCases)
 
         static let invalidValues: [String] = [
             "invalid",
@@ -29,47 +31,38 @@ private extension AdaptyUISchemaTests {
             "Circle",
             "",
         ]
-    }
-}
 
-// MARK: - Codable Tests
+        static let invalidJsons = rawValueToJson(invalidValues)
 
-private extension AdaptyUISchemaTests.SchemaShapeTypeTests {
-    // MARK: - Decoding
+        // MARK: - Decoding
 
-    @Test("decode valid value from JSON", arguments: allCases)
-    func decodeValid(value: Value, jsonValue: String) throws {
-        let json = #"["\#(jsonValue)"]"#.data(using: .utf8)!
-        let result = try JSONDecoder().decode([Value].self, from: json)
-        #expect(result.count == 1)
-        #expect(result[0] == value)
-    }
-
-    @Test("decode invalid value from JSON throws error", arguments: invalidValues)
-    func decodeInvalid(invalid: String) {
-        let json = #"["\#(invalid)"]"#.data(using: .utf8)!
-        #expect(throws: (any Error).self) {
-            try JSONDecoder().decode([Value].self, from: json)
+        @Test("decode valid value from JSON", arguments: jsonCases)
+        func decodeValid(value: Value, json: Json) throws {
+            let decoded = try json.decode(Value.self)
+            #expect(decoded == value)
         }
-    }
 
-    // MARK: - Encoding
+        @Test("decode invalid value from JSON throws error", arguments: invalidJsons)
+        func decodeInvalid(invalid: Json) {
+            #expect(throws: (any Error).self, "JSON should be invalid: \(invalid)") {
+                try invalid.decode(Value.self)
+            }
+        }
 
-    @Test("encode produces correct JSON value", arguments: allCases)
-    func encode(value: Value, jsonValue: String) throws {
-        let data = try JSONEncoder().encode([value])
-        let json = try JSONDecoder().decode([String].self, from: data)
-        #expect(json.count == 1)
-        #expect(json[0] == jsonValue)
-    }
+        // MARK: - Encoding
 
-    // MARK: - Roundtrip
+        @Test("encode produces correct JSON value", arguments: jsonCases)
+        func encode(value: Value, json: Json) throws {
+            let encoded = try Json.encode(value)
+            #expect(encoded == json)
+        }
 
-    @Test("encode → decode roundtrip", arguments: allCases)
-    func roundtrip(value: Value, jsonValue: String) throws {
-        let data = try JSONEncoder().encode([value])
-        let decoded = try JSONDecoder().decode([Value].self, from: data)
-        #expect(decoded.count == 1)
-        #expect(decoded[0] == value)
+        // MARK: - Roundtrip
+
+        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
+        func roundtrip(value: Value) throws {
+            let decoded = try Json.encode(value).decode(Value.self)
+            #expect(decoded == value)
+        }
     }
 }

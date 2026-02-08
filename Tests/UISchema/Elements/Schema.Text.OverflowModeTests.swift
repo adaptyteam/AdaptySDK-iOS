@@ -9,9 +9,9 @@
 import Foundation
 import Testing
 
-private extension AdaptyUISchemaTests {
+private extension SchemaTests.TextTests {
     @Suite("Schema.Text.OverflowMode Tests")
-    struct SchemaTextOverflowModeTests {
+    struct OverflowModeTests {
         typealias Value = Schema.Text.OverflowMode
 
         // MARK: - Test Data
@@ -21,73 +21,63 @@ private extension AdaptyUISchemaTests {
             (.unknown, "unknown"),
         ]
 
+        static let jsonCases = rawValueToJson(allCases)
+
         static let invalidValues: [String] = [
             "invalid",
             "SCALE",
             "",
         ]
-    }
-}
 
-// MARK: - RawRepresentable Tests
+        static let invalidJsons = rawValueToJson(invalidValues)
 
-private extension AdaptyUISchemaTests.SchemaTextOverflowModeTests {
-    @Test("init with valid raw value returns correct value", arguments: allCases)
-    func initWithValidRawValue(value: Value, rawValue: String) {
-        #expect(Value(rawValue: rawValue) == value)
-    }
+        // MARK: - RawRepresentable Tests
 
-    @Test("rawValue returns correct string", arguments: allCases)
-    func rawValue(value: Value, rawValue: String) {
-        #expect(value.rawValue == rawValue)
-    }
+        @Test("init with valid raw value returns correct value", arguments: allCases)
+        func initWithValidRawValue(value: Value, rawValue: String) {
+            #expect(Value(rawValue: rawValue) == value)
+        }
 
-    // Special: invalid raw values fall back to .unknown instead of nil
-    @Test("init with invalid raw value returns .unknown", arguments: invalidValues)
-    func initWithInvalidRawValue(invalid: String) {
-        #expect(Value(rawValue: invalid) == .unknown)
-    }
-}
+        @Test("rawValue returns correct string", arguments: allCases)
+        func rawValue(value: Value, rawValue: String) {
+            #expect(value.rawValue == rawValue)
+        }
 
-// MARK: - Codable Tests
+        // Special: invalid raw values fall back to .unknown instead of nil
+        @Test("init with invalid raw value returns .unknown", arguments: invalidValues)
+        func initWithInvalidRawValue(invalid: String) {
+            #expect(Value(rawValue: invalid) == .unknown)
+        }
 
-private extension AdaptyUISchemaTests.SchemaTextOverflowModeTests {
-    // MARK: - Decoding
+        // MARK: - Decoding
 
-    @Test("decode valid value from JSON", arguments: allCases)
-    func decodeValid(value: Value, jsonValue: String) throws {
-        let json = #"["\#(jsonValue)"]"#.data(using: .utf8)!
-        let result = try JSONDecoder().decode([Value].self, from: json)
-        #expect(result.count == 1)
-        #expect(result[0] == value)
-    }
+        @Test("decode valid value from JSON", arguments: jsonCases)
+        func decodeValid(value: Value, json: Json) throws {
+            let decoded = try json.decode(Value.self)
+            #expect(decoded == value)
+        }
 
-    // Special: invalid values decode to .unknown instead of throwing
-    @Test("decode unknown value from JSON returns .unknown", arguments: invalidValues)
-    func decodeUnknown(invalid: String) throws {
-        let json = #"["\#(invalid)"]"#.data(using: .utf8)!
-        let result = try JSONDecoder().decode([Value].self, from: json)
-        #expect(result.count == 1)
-        #expect(result[0] == .unknown)
-    }
+        // Special: invalid values decode to .unknown instead of throwing
+        @Test("decode unknown value from JSON returns .unknown", arguments: invalidJsons)
+        func decodeUnknown(invalid: Json) throws {
+            let decoded = try invalid.decode(Value.self)
+            #expect(decoded == .unknown)
+        }
 
-    // MARK: - Encoding
+        // MARK: - Encoding
 
-    @Test("encode produces correct JSON value", arguments: allCases)
-    func encode(value: Value, jsonValue: String) throws {
-        let data = try JSONEncoder().encode([value])
-        let json = try JSONDecoder().decode([String].self, from: data)
-        #expect(json.count == 1)
-        #expect(json[0] == jsonValue)
-    }
+        @Test("encode produces correct JSON value", arguments: jsonCases)
+        func encode(value: Value, json: Json) throws {
+            let encoded = try Json.encode(value)
+            #expect(encoded == json)
+        }
 
-    // MARK: - Roundtrip
+        // MARK: - Roundtrip
 
-    @Test("encode → decode roundtrip", arguments: allCases)
-    func roundtrip(value: Value, jsonValue: String) throws {
-        let data = try JSONEncoder().encode([value])
-        let decoded = try JSONDecoder().decode([Value].self, from: data)
-        #expect(decoded.count == 1)
-        #expect(decoded[0] == value)
+        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
+        func roundtrip(value: Value) throws {
+            let decoded = try Json.encode(value).decode(Value.self)
+            #expect(decoded == value)
+        }
     }
 }

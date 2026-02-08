@@ -10,5 +10,5 @@ import Testing
 
 @testable import AdaptyUIBuilder
 
-@Suite("AdaptyUIConfiguration Tests")
+@Suite("AdaptyUIConfiguration Tests", .tags(.logic))
 struct AdaptyUIConfigurationTests {}

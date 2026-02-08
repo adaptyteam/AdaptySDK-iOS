@@ -1,5 +1,5 @@
 //
-//  Schema.AspectRatioTests.swift
+//  Schema.ColorTests.swift
 //  AdaptyTests
 //
 //  Created by Aleksei Valiano on2026-02-05.
@@ -10,31 +10,53 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.AspectRatio Tests")
-    struct AspectRatioTests {
-        typealias Value = Schema.AspectRatio
+    @Suite("Schema.Color Tests")
+    struct SchemaColorTests {
+        typealias Value = Schema.Color
 
         // MARK: - Test Data
 
+        /// Canonical pairs: rawValue property returns exactly this string
         static let allCases: [(value: Value, rawValue: String)] = [
-            (.fit, "fit"),
-            (.fill, "fill"),
-            (.stretch, "stretch"),
+            (Value(customId: nil, data: 0xFF0000FF), "#ff0000ff"),
+            (Value(customId: nil, data: 0x00FF00FF), "#00ff00ff"),
+            (Value(customId: nil, data: 0x0000FFFF), "#0000ffff"),
+            (Value(customId: nil, data: 0xFFFFFFFF), "#ffffffff"),
+            (Value(customId: nil, data: 0x000000FF), "#000000ff"),
+            (Value(customId: nil, data: 0x00000000), "#00000000"),
+            (Value(customId: nil, data: 0xFF00AA80), "#ff00aa80"),
+        ]
+        /// Non-canonical but valid inputs (6-digit, uppercase, mixed case)
+        static let alternativeInputsCases: [(value: Value, rawValue: String)] = [
+            // 6-digit hex → alpha defaults to 0xFF
+            (Value(customId: nil, data: 0xFF0000FF), "#FF0000"),
+            (Value(customId: nil, data: 0xFF0000FF), "#ff0000"),
+            (Value(customId: nil, data: 0xFF00AAFF), "#Ff00Aa"),
+
+            // 8-digit uppercase
+            (Value(customId: nil, data: 0xFF0000FF), "#FF0000FF"),
+            (Value(customId: nil, data: 0xFF00AA80), "#FF00AA80"),
         ]
 
         static let jsonCases = rawValueToJson(allCases)
 
+        static let alternativeInputsJsonCases = rawValueToJson(alternativeInputsCases)
+
         static let invalidValues: [String] = [
-            "invalid",
-            "FIT",
+            "FF0000",
+            "#F00",
+            "#GGGGGG",
+            "#FF0000F",
+            "#FF000",
             "",
+            "#",
         ]
 
         static let invalidJsons = rawValueToJson(invalidValues)
 
         // MARK: - RawRepresentable Tests
 
-        @Test("init with valid raw value returns correct value", arguments: allCases)
+        @Test("init with valid raw value returns correct value", arguments: allCases + alternativeInputsCases)
         func initWithValidRawValue(value: Value, rawValue: String) {
             #expect(Value(rawValue: rawValue) == value)
         }
@@ -51,14 +73,14 @@ private extension SchemaTests {
 
         // MARK: - Decoding
 
-        @Test("decode valid value from JSON", arguments: jsonCases)
+        @Test("decode valid value from JSON", arguments: jsonCases + alternativeInputsJsonCases)
         func decodeValid(value: Value, json: Json) throws {
             let decoded = try json.decode(Value.self)
             #expect(decoded == value)
         }
 
         @Test("decode invalid value from JSON throws error", arguments: invalidJsons)
-        func decodeInvalid(invalid: Json) throws {
+        func decodeInvalid(invalid: Json) {
             #expect(throws: (any Error).self, "JSON should be invalid: \(invalid)") {
                 try invalid.decode(Value.self)
             }

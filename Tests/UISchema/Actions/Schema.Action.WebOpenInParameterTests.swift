@@ -9,9 +9,9 @@
 import Foundation
 import Testing
 
-private extension AdaptyUISchemaTests {
+private extension SchemaTests.ActionTests {
     @Suite("Schema.Action.WebOpenInParameter Tests")
-    struct SchemaActionWebOpenInParameterTests {
+    struct WebOpenInParameterTests {
         typealias Value = Schema.Action.WebOpenInParameter
 
         // MARK: - Test Data
@@ -21,71 +21,62 @@ private extension AdaptyUISchemaTests {
             (.browserInApp, "browser_in_app")
         ]
 
+        static let jsonCases = rawValueToJson(allCases)
+
         static let invalidValues: [String] = [
             "invalid",
             "safari",
             ""
         ]
-    }
-}
 
-// MARK: - RawRepresentable Tests
+        static let invalidJsons = rawValueToJson(invalidValues)
 
-private extension AdaptyUISchemaTests.SchemaActionWebOpenInParameterTests {
-    @Test("init with valid raw value returns correct value", arguments: allCases)
-    func initWithValidRawValue(value: Value, rawValue: String) {
-        #expect(Value(rawValue: rawValue) == value)
-    }
+        // MARK: - RawRepresentable Tests
 
-    @Test("rawValue returns correct string", arguments: allCases)
-    func rawValue(value: Value, rawValue: String) {
-        #expect(value.rawValue == rawValue)
-    }
-
-    @Test("init with invalid raw value returns nil", arguments: invalidValues)
-    func initWithInvalidRawValue(invalid: String) {
-        #expect(Value(rawValue: invalid) == nil)
-    }
-}
-
-// MARK: - Codable Tests
-
-private extension AdaptyUISchemaTests.SchemaActionWebOpenInParameterTests {
-    // MARK: - Decoding
-
-    @Test("decode valid value from JSON", arguments: allCases)
-    func decodeValid(value: Value, jsonValue: String) throws {
-        let json = #"["\#(jsonValue)"]"#.data(using: .utf8)!
-        let result = try JSONDecoder().decode([Value].self, from: json)
-        #expect(result.count == 1)
-        #expect(result[0] == value)
-    }
-
-    @Test("decode invalid value from JSON throws error", arguments: invalidValues)
-    func decodeInvalid(invalid: String) {
-        let json = #"["\#(invalid)"]"#.data(using: .utf8)!
-        #expect(throws: (any Error).self) {
-            try JSONDecoder().decode([Value].self, from: json)
+        @Test("init with valid raw value returns correct value", arguments: allCases)
+        func initWithValidRawValue(value: Value, rawValue: String) {
+            #expect(Value(rawValue: rawValue) == value)
         }
-    }
 
-    // MARK: - Encoding
+        @Test("rawValue returns correct string", arguments: allCases)
+        func rawValue(value: Value, rawValue: String) {
+            #expect(value.rawValue == rawValue)
+        }
 
-    @Test("encode produces correct JSON value", arguments: allCases)
-    func encode(value: Value, jsonValue: String) throws {
-        let data = try JSONEncoder().encode([value])
-        let json = try JSONDecoder().decode([String].self, from: data)
-        #expect(json.count == 1)
-        #expect(json[0] == jsonValue)
-    }
+        @Test("init with invalid raw value returns nil", arguments: invalidValues)
+        func initWithInvalidRawValue(invalid: String) {
+            #expect(Value(rawValue: invalid) == nil)
+        }
 
-    // MARK: - Roundtrip
+        // MARK: - Decoding
 
-    @Test("encode → decode roundtrip", arguments: allCases)
-    func roundtrip(value: Value, jsonValue: String) throws {
-        let data = try JSONEncoder().encode([value])
-        let decoded = try JSONDecoder().decode([Value].self, from: data)
-        #expect(decoded.count == 1)
-        #expect(decoded[0] == value)
+        @Test("decode valid value from JSON", arguments: jsonCases)
+        func decodeValid(value: Value, json: Json) throws {
+            let decodable = try json.decode(Value.self)
+            #expect(decodable == value)
+        }
+
+        @Test("decode invalid value from JSON throws error", arguments: invalidJsons)
+        func decodeInvalid(invalid: Json) {
+            #expect(throws: (any Error).self, "JSON should be invalid: \(invalid)") {
+                try invalid.decode(Value.self)
+            }
+        }
+
+        // MARK: - Encoding
+
+        @Test("encode produces correct JSON value", arguments: jsonCases)
+        func encode(value: Value, json: Json) throws {
+            let encoded = try Json.encode(value)
+            #expect(encoded == json)
+        }
+
+        // MARK: - Roundtrip
+
+        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
+        func roundtrip(value: Value) throws {
+            let decoded = try Json.encode(value).decode(Value.self)
+            #expect(decoded == value)
+        }
     }
 }

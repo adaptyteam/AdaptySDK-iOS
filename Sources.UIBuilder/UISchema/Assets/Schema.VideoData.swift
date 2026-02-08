@@ -29,6 +29,9 @@ extension Schema.VideoData: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        guard try container.decode(String.self, forKey: .type) == Self.assetType else {
+            throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.type], debugDescription: "must be an video"))
+        }
         try self.init(
             customId: container.decodeIfPresent(String.self, forKey: .customId),
             url: container.decode(URL.self, forKey: .url),

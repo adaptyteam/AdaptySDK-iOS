@@ -9,154 +9,146 @@
 import Foundation
 import Testing
 
-private extension AdaptyUISchemaTests {
+private extension SchemaTests {
     @Suite("Schema.Offset Tests")
-    struct SchemaOffsetTests {
+    struct OffsetTests {
         typealias Value = Schema.Offset
 
         // MARK: - Test Data
 
-        static let decodeCases: [(value: Value, json: String)] = [
+        static let jsonCases: [(value: Value, json: Json)] = [
             // Unit format → y=value, x=.zero
             (
                 Value(x: .point(0), y: .point(10)),
-                json: "10"
+                Json(##"10"##)
             ),
             (
                 Value(x: .point(0), y: .point(0)),
-                json: "0"
+                Json(##"0"##)
             ),
             (
                 Value(x: .point(0), y: .point(5.5)),
-                json: "5.5"
+                Json(##"5.5"##)
             ),
             (
                 Value(x: .point(0), y: .point(0.5)),
-                json: #"{"point":0.5}"#
+                Json(##"{"point":0.5}"##)
             ),
             (
                 Value(x: .point(0), y: .screen(0.5)),
-                json: #"{"screen":0.5}"#
+                Json(##"{"screen":0.5}"##)
             ),
             (
                 Value(x: .point(0), y: .safeArea(.end)),
-                json: #"{"safe_area":"end"}"#
+                Json(##"{"safe_area":"end"}"##)
             ),
 
             // Array format [y, x]
             (
                 Value(x: .point(0), y: .point(0)),
-                json: "[]"
+                Json(##"[]"##)
             ),
             (
                 Value(x: .point(0), y: .point(5)),
-                json: "[5]"
+                Json(##"[5]"##)
             ),
             (
                 Value(x: .point(20), y: .point(10)),
-                json: "[10,20]"
+                Json(##"[10,20]"##)
             ),
             (
                 // >2 elements: extras ignored
                 Value(x: .point(20), y: .point(10)),
-                json: #"[10,{"point":20},30]"#
+                Json(##"[10,{"point":20},30]"##)
             ),
             (
                 // Mixed Unit types
                 Value(x: .screen(0.5), y: .point(10)),
-                json: #"[10,{"screen":0.5}]"#
+                Json(##"[10,{"screen":0.5}]"##)
             ),
 
             // Object format
             (
                 Value(x: .point(20), y: .point(10)),
-                json: #"{"y":10,"x":20}"#
+                Json(##"{"y":10,"x":20}"##)
             ),
             (
                 Value(x: .point(0), y: .point(10)),
-                json: #"{"y":10}"#
+                Json(##"{"y":10}"##)
             ),
             (
                 Value(x: .point(20), y: .point(0)),
-                json: #"{"x":20}"#
+                Json(##"{"x":20}"##)
             ),
             (
                 Value(x: .point(0), y: .point(0)),
-                json: "{}"
+                Json(##"{}"##)
             ),
             (
                 Value(x: .screen(0), y: .screen(0.5)),
-                json: #"{"x":{"screen":0},"y":{"screen":0.5}}"#
+                Json(##"{"x":{"screen":0},"y":{"screen":0.5}}"##)
             ),
             (
-                Value(x: .zero, y: .safeArea(.start)),
-                json: #"{"y":{"safe_area":"start"}}"#
+                Value(x: .point(0), y: .safeArea(.start)),
+                Json(##"{"y":{"safe_area":"start"}}"##)
             ),
         ]
 
-        static let invalidJsons: [String] = [
-            #""string""#,
-            "true",
-            #"["a","b"]"#,
+        static let invalidJsons: [Json] = [
+            Json(##""string""##),
+            Json(##"true"##),
+            Json(##"["a","b"]"##),
         ]
 
         // MARK: - Decoding Tests
 
-        @Test("decode from unit, array, and object formats", arguments: decodeCases)
-        func decode(value: Value, json: String) throws {
-            let data = "[\(json)]".data(using: .utf8)!
-            let result = try JSONDecoder().decode([Value].self, from: data)
-            #expect(result.count == 1)
-            #expect(result[0].x == value.x)
-            #expect(result[0].y == value.y)
+        @Test("decode from unit, array, and object formats", arguments: jsonCases)
+        func decode(value: Value, json: Json) throws {
+            let decoded = try json.decode(Value.self)
+            #expect(decoded == value)
         }
 
         @Test("decode invalid JSON throws error", arguments: invalidJsons)
-        func decodeInvalid(json: String) {
-            let data = "[\(json)]".data(using: .utf8)!
-            #expect(throws: (any Error).self) {
-                try JSONDecoder().decode([Value].self, from: data)
+        func decodeInvalid(invalid: Json) {
+            #expect(throws: (any Error).self, "JSON should be invalid: \(invalid)") {
+                try invalid.decode(Value.self)
             }
         }
 
         // MARK: - Encoding Tests
 
-        @Test("encode  y as single Unit value when x is zero", arguments: [
+        @Test("encode `y` as single Unit value when `x` is zero", arguments: [
             Schema.Unit.point(0),
             Schema.Unit.point(10),
             Schema.Unit.screen(0),
             Schema.Unit.screen(5),
             Schema.Unit.safeArea(.end)
         ])
-        func encodeOnlyYValue(value: Schema.Unit) throws {
-            let data = try JSONEncoder().encode([value])
-            let result = try JSONDecoder().decode([Schema.Unit].self, from: data)
-            #expect(result.count == 1)
-            #expect(result[0] == value)
+        func encodeOnlyYValue(unit: Schema.Unit) throws {
+            let value = Value(x: .point(0), y: unit)
+            let encoded = try Json.encode(value)
+            let decodedUnit = try encoded.decode(Schema.Unit.self)
+            #expect(decodedUnit == unit)
         }
 
-        @Test("encode different x and y as array [y, x]", arguments: [
-            Value(x: .point(20), y: .point(10)),
-            Value(x: .point(20), y: .screen(10)),
-            Value(x: .screen(20), y: .point(0)),
-            Value(x: .safeArea(.start), y: .point(0)),
-        ])
-        func encodeAllValues(value _: Value) throws {
-            let value = Value(x: .point(20), y: .point(10))
-            let data = try JSONEncoder().encode([value])
-            let result = try JSONDecoder().decode([[Schema.Unit]].self, from: data)
-            #expect(result.count == 1)
-            #expect(result[0] == [value.y, value.x])
+        @Test("encode all", arguments: jsonCases.map(\.value))
+        func encode(value: Value) throws {
+            let encoded = try Json.encode(value)
+            if case .point(0) = value.x {
+                let y = try encoded.decode(Schema.Unit.self)
+                #expect(y == value.y)
+            } else {
+                let array = try encoded.decode([Schema.Unit].self)
+                #expect(array == [value.y, value.x])
+            }
         }
 
         // MARK: - Roundtrip Tests
 
-        @Test("encode → decode roundtrip", arguments: Self.decodeCases.map(\.value))
+        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
         func roundtrip(value: Value) throws {
-            let data = try JSONEncoder().encode([value])
-            let decoded = try JSONDecoder().decode([Value].self, from: data)
-            #expect(decoded.count == 1)
-            #expect(decoded[0] == value)
+            let decoded = try Json.encode(value).decode(Value.self)
+            #expect(decoded == value)
         }
     }
 }

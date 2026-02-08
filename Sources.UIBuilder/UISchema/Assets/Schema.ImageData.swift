@@ -31,6 +31,9 @@ extension Schema.ImageData: Codable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
+        guard try container.decode(String.self, forKey: .type) == Self.assetType else {
+            throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.type], debugDescription: "must be an image"))
+        }
         let customId = try container.decodeIfPresent(String.self, forKey: .customId)
 
         if let base64EncodedData = try container.decodeIfPresent(String.self, forKey: .data),

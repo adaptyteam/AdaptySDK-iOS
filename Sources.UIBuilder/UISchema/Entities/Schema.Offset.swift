@@ -41,8 +41,8 @@ extension Schema.Offset: Codable {
 
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
-        if x == y {
-            try container.encode(x)
+        if case .point(0) = x {
+            try container.encode(y)
         } else {
             try container.encode([y, x])
         }
