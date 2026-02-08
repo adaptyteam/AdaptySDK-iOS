@@ -11,7 +11,7 @@ import Testing
 
 private extension SchemaTests {
     @Suite("Schema.Color Tests")
-    struct SchemaColorTests {
+    struct ColorTests {
         typealias Value = Schema.Color
 
         // MARK: - Test Data

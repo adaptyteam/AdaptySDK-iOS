@@ -70,7 +70,7 @@ extension AdaptyUISchema: Codable {
             legacyTemplateId: container.decodeIfPresent(String.self, forKey: .legacyTemplateId)
         )
 
-        assets = try (container.decodeIfPresent(AssetsContainer.self, forKey: .assets))?.value ?? [:]
+        assets = try (container.decodeIfPresent(AssetsCollection.self, forKey: .assets))?.value ?? [:]
 
         let localizationsArray = try container.decodeIfPresent([Localization].self, forKey: .localizations) ?? []
         let localizations = try [LocaleId: Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
@@ -119,7 +119,7 @@ extension AdaptyUISchema: Codable {
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(formatVersion, forKey: .formatVersion)
-        try container.encode(AssetsContainer(value: assets), forKey: .assets)
+        try container.encode(AssetsCollection(value: assets), forKey: .assets)
         try container.encode(Array(localizations.values), forKey: .localizations)
         try container.encodeIfPresent(defaultLocalization?.id, forKey: .defaultLocalId)
         try container.encode(screens, forKey: .screens)

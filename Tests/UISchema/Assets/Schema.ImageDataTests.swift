@@ -11,7 +11,7 @@ import Testing
 
 private extension SchemaTests {
     @Suite("Schema.ImageData Tests")
-    struct SchemaImageDataTests {
+    struct ImageDataTests {
         typealias Value = Schema.ImageData
 
         // MARK: - Helpers

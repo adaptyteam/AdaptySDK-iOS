@@ -9,9 +9,9 @@
 import Foundation
 import Testing
 
-private extension SchemaTests {
+private extension SchemaTests.ColorGradientTests {
     @Suite("Schema.ColorGradient.Item Tests")
-    struct SchemaColorGradientItemTests {
+    struct ItemTests {
         typealias Value = Schema.ColorGradient.Item
 
         // MARK: - Test Data

@@ -32,7 +32,7 @@ package extension AdaptyUIConfiguration {
         let dataAssets = assets.data(using: .utf8) ?? Data()
         let dataLocalization = localization.data(using: .utf8) ?? Data()
 
-        let assets = try jsonDecoder.decode(Schema.AssetsContainer.self, from: dataAssets)
+        let assets = try jsonDecoder.decode(Schema.AssetsCollection.self, from: dataAssets)
 
         let localiation = try jsonDecoder.decode(Schema.Localization.self, from: dataLocalization)
 

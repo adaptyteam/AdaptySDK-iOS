@@ -11,7 +11,7 @@ import Testing
 
 private extension SchemaTests {
     @Suite("Schema.VideoData Tests")
-    struct SchemaVideoDataTests {
+    struct VideoDataTests {
         typealias Value = Schema.VideoData
         typealias ImageData = Schema.ImageData
 

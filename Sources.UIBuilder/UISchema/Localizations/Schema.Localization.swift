@@ -40,7 +40,7 @@ extension Schema.Localization: Codable {
         id = try container.decode(LocaleId.self, forKey: .id)
         isRightToLeft = try container.decodeIfPresent(Bool.self, forKey: .isRightToLeft)
 
-        assets = try (container.decodeIfPresent(Schema.AssetsContainer.self, forKey: .assets))?.value
+        assets = try (container.decodeIfPresent(Schema.AssetsCollection.self, forKey: .assets))?.value
 
         var stringsContainer = try container.nestedUnkeyedContainer(forKey: .strings)
         var strings = [Schema.StringIdentifier: Item]()
@@ -63,7 +63,7 @@ extension Schema.Localization: Codable {
         try container.encodeIfPresent(isRightToLeft, forKey: .isRightToLeft)
 
         if let assets = assets.nonEmptyOrNil {
-            try container.encode(Schema.AssetsContainer(value: assets), forKey: .assets)
+            try container.encode(Schema.AssetsCollection(value: assets), forKey: .assets)
         }
 
         if let strings {
