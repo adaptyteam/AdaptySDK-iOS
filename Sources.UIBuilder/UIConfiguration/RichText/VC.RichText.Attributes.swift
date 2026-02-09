@@ -9,11 +9,11 @@ import Foundation
 
 package extension VC.RichText {
     struct Attributes: Sendable, Hashable {
-        package let font: VC.AssetReference? // default?
+        package let fontAssetId: VC.AssetIdentifier? // default?
         package let size: Double? // default?
-        package let txtColor: VC.AssetReference? // default?
-        package let imageTintColor: VC.AssetReference?
-        package let background: VC.AssetReference?
+        package let txtColor: VC.AssetIdentifierOrValue? // default?
+        package let imageTintColor: VC.AssetIdentifierOrValue?
+        package let background: VC.AssetIdentifierOrValue?
         package let strike: Bool? // default: false
         package let underline: Bool? // default: false
     }
@@ -21,7 +21,7 @@ package extension VC.RichText {
 
 extension VC.RichText.Attributes {
     var isEmpty: Bool {
-        font == nil
+        fontAssetId == nil
             && size == nil
             && txtColor == nil
             && imageTintColor == nil
@@ -33,11 +33,11 @@ extension VC.RichText.Attributes {
     var nonEmptyOrNil: Self? { isEmpty ? nil : self }
 
     func apply(
-        default other: Self?
+        default other: VC.RichText.Attributes?
     ) -> Self {
         guard let other else { return self }
         return .init(
-            font: font ?? other.font,
+            fontAssetId: fontAssetId ?? other.fontAssetId,
             size: size ?? other.size,
             txtColor: txtColor ?? other.txtColor,
             imageTintColor: imageTintColor ?? other.imageTintColor,
@@ -48,11 +48,5 @@ extension VC.RichText.Attributes {
     }
 }
 
-extension VC.RichText.Attributes? {
-    func apply(
-        default other: VC.RichText.Attributes?
-    ) -> VC.RichText.Attributes? {
-        guard let attributes = self else { return other }
-        return attributes.apply(default: other)
-    }
-}
+
+

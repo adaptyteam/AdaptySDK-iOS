@@ -16,16 +16,7 @@ package extension VC {
 
 package extension VC.RichText {
     static let empty: Self = .init(items: [], fallback: nil)
-    var isEmpty: Bool { items.isEmpty }
-}
-
-package extension VC.RichText {
-    func apply(defaultAttributes: VC.RichText.Attributes?) -> Self {
-        guard let defaultAttributes, !defaultAttributes.isEmpty else { return self }
-
-        return Self(
-            items: self.items.map { $0.apply(defaultAttributes: defaultAttributes) },
-            fallback: self.fallback?.map { $0.apply(defaultAttributes: defaultAttributes) }
-        )
+    var isEmpty: Bool {
+        items.isEmpty
     }
 }

@@ -10,9 +10,9 @@ import Foundation
 package extension VC.Timer {
     struct Format: Sendable, Hashable {
         package let items: [FormatItem]
-        package let textAttributes: VC.RichText.Attributes?
+        package let textAttributes: VC.Text.Attributes?
 
-        init(items: [FormatItem], textAttributes: VC.RichText.Attributes?) {
+        init(items: [FormatItem], textAttributes: VC.Text.Attributes?) {
             self.items = items.sorted(by: { $0.from > $1.from }) // TODO: move on parsing
             self.textAttributes = textAttributes
         }

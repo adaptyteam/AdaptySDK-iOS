@@ -80,17 +80,13 @@ extension AdaptyUICustomVideoAsset {
             return .init(
                 player: queuePlayer,
                 item: playerItem,
-                image: preview.flatMap {
-                    $0.resolvedImage
-                }
+                image: preview.flatMap(\.resolvedImage)
             )
         case .player(let item, let player, let preview):
             return .init(
                 player: player,
                 item: item,
-                image: preview.flatMap {
-                    $0.resolvedImage
-                }
+                image: preview.flatMap(\.resolvedImage)
             )
         }
     }
@@ -100,19 +96,19 @@ extension AdaptyUICustomAsset {
     func resolved() -> AdaptyUIResolvedAsset? {
         switch self {
         case .color(let color):
-            return .color(color.resolvedColor)
+            .color(color.resolvedColor)
         case .gradient(let gradient):
-            return .colorGradient(gradient.resolvedGradient)
+            .colorGradient(gradient.resolvedGradient)
         case .image(let image):
             if let resolvedImage = image.resolvedImage {
-                return .image(resolvedImage)
+                .image(resolvedImage)
             } else {
-                return AdaptyUIResolvedAsset?.none
+                AdaptyUIResolvedAsset?.none
             }
         case .video(let video):
-            return .video(video.resolvedVideo)
-        case .font(let font):
-            return .font(font)
+            .video(video.resolvedVideo)
+        case .font(let font): // TODO: default color of Custom fonts
+            .font(font, defaultColor: SwiftUI.Color(UIColor.adaptyDefaultTextColor))
         }
     }
 }

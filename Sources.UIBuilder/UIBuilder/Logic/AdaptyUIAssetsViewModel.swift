@@ -56,16 +56,11 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     func resolvedText(
         _ ref: VC.StringReference,
-        defaultAttributes: VC.RichText.Attributes?,
         screen: VS.ScreenInstance
     ) -> (VC.RichText, ProductInfoContainer) {
         switch ref {
         case let .stringId(stringId):
-            let text = try? _state.richText(
-                stringId,
-                defaultAttributes: defaultAttributes
-            )?.apply(defaultAttributes: defaultAttributes)
-
+            let text = try? _state.richText(stringId)
             return (text ?? .empty, .notApplicable)
         case let .variable(variable):
             if let stringId = try? _state.getValue(
@@ -73,11 +68,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                 variable: variable,
                 screenInstance: screen
             ) {
-                let text = try? _state.richText(
-                    stringId,
-                    defaultAttributes: defaultAttributes
-                )?.apply(defaultAttributes: defaultAttributes)
-
+                let text = try? _state.richText(stringId)
                 return (text ?? .empty, .notApplicable)
             } else {
                 return (.empty, .notApplicable)
@@ -88,10 +79,8 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                 let text = try? _state.richText(
                     adaptyProductId: productId,
                     byPaymentMode: nil, // TODO: x use productsInfoProvider
-                    suffix: sufix,
-                    defaultAttributes: defaultAttributes
-                )?.apply(defaultAttributes: defaultAttributes)
-
+                    suffix: sufix
+                )
                 return (text ?? .empty, .notApplicable)
             case let .variable(variable, sufix):
                 guard let productId = try? _state.getValue(
@@ -99,16 +88,15 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                     variable: variable,
                     screenInstance: screen
                 ) else {
-                    return (.empty, .notApplicable)
+                    let text = try? _state.richTextForNonSelectedProduct(suffix: sufix)
+                    return (text ?? .empty, .notApplicable)
                 }
 
                 let text = try? _state.richText(
                     adaptyProductId: productId,
                     byPaymentMode: nil, // TODO: x use productsInfoProvider
-                    suffix: sufix,
-                    defaultAttributes: defaultAttributes
-                )?.apply(defaultAttributes: defaultAttributes)
-
+                    suffix: sufix
+                )
                 return (text ?? .empty, .notApplicable)
             }
         }

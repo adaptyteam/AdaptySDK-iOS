@@ -1,21 +1,19 @@
 //
-//  Schema.RichText.Attributes.swift
+//  Schema.Text.Attributes.swift
 //  AdaptyUIBuilder
 //
-//  Created by Aleksei Valiano on 24.12.2025.
+//  Created by Aleksei Valiano on 08.02.2026.
 //
 
 import Foundation
 
-extension Schema.RichText {
-    typealias Attributes = VC.RichText.Attributes
+extension Schema.Text.Attributes? {
+    var nonEmptyOrNil: Self {
+        self?.nonEmptyOrNil
+    }
 }
 
-extension Schema.RichText.Attributes? {
-    var nonEmptyOrNil: Self { self?.nonEmptyOrNil }
-}
-
-extension Schema.RichText.Attributes: Codable {
+extension Schema.Text.Attributes: Codable {
     enum CodingKeys: String, CodingKey {
         case size
         case fontAssetId = "font"
@@ -29,11 +27,11 @@ extension Schema.RichText.Attributes: Codable {
     package init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            fontAssetId: container.decodeIfPresent(Schema.AssetIdentifier.self, forKeys: .fontAssetId),
+            fontAssetId: container.decodeIfPresent(VC.AssetIdentifier.self, forKeys: .fontAssetId),
             size: container.decodeIfPresent(Double.self, forKeys: .size),
-            txtColor: container.decodeIfPresent(Schema.AssetIdentifierOrValue.self, forKeys: .txtColor),
-            imageTintColor: container.decodeIfPresent(Schema.AssetIdentifierOrValue.self, forKeys: .imageTintColor),
-            background: container.decodeIfPresent(Schema.AssetIdentifierOrValue.self, forKeys: .background),
+            txtColor: container.decodeIfPresent(Schema.AssetReference.self, forKeys: .txtColor),
+            imageTintColor: container.decodeIfPresent(Schema.AssetReference.self, forKeys: .imageTintColor),
+            background: container.decodeIfPresent(Schema.AssetReference.self, forKeys: .background),
             strike: container.decodeIfPresent(Bool.self, forKeys: .strike),
             underline: container.decodeIfPresent(Bool.self, forKeys: .underline)
         )

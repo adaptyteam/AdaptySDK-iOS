@@ -32,5 +32,9 @@ extension Schema.Variable: Codable {
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(path.joined(separator: "."), forKey: .path)
+        try container.encodeIfPresent(setter, forKey: .setter)
+        if scope != .default {
+            try container.encode(scope, forKey: .scope)
+        }
     }
 }

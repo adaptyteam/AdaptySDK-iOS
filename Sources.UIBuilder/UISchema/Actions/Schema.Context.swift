@@ -17,13 +17,13 @@ extension Schema.Context {
 
 extension Schema.Context: RawRepresentable {
     private enum Key {
-        static let window = "window"
+        static let screen = "screen"
         static let global = "global"
     }
 
     package init?(rawValue value: String) {
         switch value {
-        case Key.window: self = .screen
+        case Key.screen: self = .screen
         case Key.global: self = .global
         default: return nil
         }
@@ -31,7 +31,7 @@ extension Schema.Context: RawRepresentable {
 
     package var rawValue: String {
         switch self {
-        case .screen: Key.window
+        case .screen: Key.screen
         case .global: Key.global
         }
     }

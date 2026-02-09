@@ -11,7 +11,7 @@ extension Schema {
     typealias Action = VC.Action
 }
 
-extension Schema.Action: Decodable {
+extension Schema.Action: Codable {
     private enum CodingKeys: String, CodingKey {
         case function = "func"
         case params
@@ -34,6 +34,18 @@ extension Schema.Action: Decodable {
             )
         } else {
             try self.init(fromLegacy: decoder)
+        }
+    }
+
+    package func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        let function = path.joined(separator: ".")
+        try container.encode(function, forKey: .function)
+        if let params, !params.isEmpty {
+            try container.encode(params, forKey: .params)
+        }
+        if scope != .default {
+            try container.encode(scope, forKey: .scope)
         }
     }
 }

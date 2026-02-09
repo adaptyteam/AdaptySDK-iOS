@@ -49,7 +49,7 @@ enum AdaptyUIResolvedAsset {
     case image(AdaptyUIResolvedImageAsset)
 
     case video(AdaptyUIResolvedVideoAsset)
-    case font(AdaptyUIResolvedFontAsset)
+    case font(AdaptyUIResolvedFontAsset, defaultColor: AdaptyUIResolvedColorAsset)
 }
 
 extension AdaptyUIResolvedAsset {
@@ -88,7 +88,7 @@ extension AdaptyUIResolvedAsset {
 
         return asset
     }
-    
+
     var asColorOrGradientAsset: AdaptyUIResolvedColorOrGradientAsset? {
         switch self {
         case let .color(v): .color(v)
@@ -106,12 +106,12 @@ extension AdaptyUIResolvedAsset {
         }
     }
 
-    var asFontAsset: AdaptyUIResolvedFontAsset? {
-        guard case let .font(asset) = self else {
+    var asFontAsset: (font: AdaptyUIResolvedFontAsset, defaultColor: AdaptyUIResolvedColorAsset)? {
+        guard case let .font(asset, defaultColor) = self else {
             return nil
         }
 
-        return asset
+        return (asset, defaultColor)
     }
 }
 

@@ -31,7 +31,6 @@ struct AdaptyUITextView: View {
     var body: some View {
         let (richText, productInfo) = assetsViewModel.resolvedText(
             text.value,
-            defaultAttributes: text.defaultTextAttributes,
             screen: screen
         )
 
@@ -39,6 +38,7 @@ struct AdaptyUITextView: View {
         case .notApplicable:
             richText
                 .convertToSwiftUIText(
+                    defaultAttributes: text.defaultTextAttributes,
                     assetsCache: assetsViewModel.cache,
                     tagResolver: customTagResolverViewModel,
                     productInfo: nil,
@@ -51,6 +51,7 @@ struct AdaptyUITextView: View {
         case .notFound:
             richText
                 .convertToSwiftUIText(
+                    defaultAttributes: text.defaultTextAttributes,
                     assetsCache: assetsViewModel.cache,
                     tagResolver: customTagResolverViewModel,
                     productInfo: nil,
@@ -65,6 +66,7 @@ struct AdaptyUITextView: View {
         case let .found(productInfoModel):
             richText
                 .convertToSwiftUIText(
+                    defaultAttributes: text.defaultTextAttributes,
                     assetsCache: assetsViewModel.cache,
                     tagResolver: customTagResolverViewModel,
                     productInfo: productInfoModel,
@@ -145,19 +147,17 @@ extension [VC.RichText.Item] {
                 ).asImageAsset
 
                 let fontResolvedAsset = assetsCache.cachedAsset(
-                    attr?.font,
-                    mode: colorScheme.toVCMode,
-                    screen: screen
+                    attr?.fontAssetId,
+                    mode: colorScheme.toVCMode
                 ).asFontAsset
 
                 let tintResolvedAsset = assetsCache.cachedAsset(
                     attr?.imageTintColor,
-                    mode: colorScheme.toVCMode,
-                    screen: screen
+                    mode: colorScheme.toVCMode
                 ).asColorAsset?.uiColor
 
                 guard let uiImage = imageResolvedAsset?.textAttachmentImage(
-                    font: fontResolvedAsset ?? .adaptyDefaultFont,
+                    font: fontResolvedAsset?.font ?? .adaptyDefaultFont,
                     tint: tintResolvedAsset
                 ) else {
                     return partialResult
@@ -176,6 +176,7 @@ extension [VC.RichText.Item] {
 @MainActor
 extension VC.RichText {
     func convertToSwiftUIText(
+        defaultAttributes: VC.Text.Attributes?,
         assetsCache: AdaptyUIAssetsCache,
         tagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
@@ -196,22 +197,29 @@ extension VC.RichText {
         } else {
             let result: Text
 
+            let defaultAttributes = assetsCache.resolveDataBinding(defaultAttributes, screen)
+
             do {
-                result = try items.convertToSwiftUITextThrowingError(
-                    assetsCache: assetsCache,
-                    tagResolver: tagResolver,
-                    productInfo: productInfo,
-                    colorScheme: colorScheme,
-                    screen: screen
-                )
+                result = try items
+                    .apply(defaultAttributes: defaultAttributes)
+                    .convertToSwiftUITextThrowingError(
+                        assetsCache: assetsCache,
+                        tagResolver: tagResolver,
+                        productInfo: productInfo,
+                        colorScheme: colorScheme,
+                        screen: screen
+                    )
             } catch {
-                if let fallback, let fallbackText = try? fallback.convertToSwiftUITextThrowingError(
-                    assetsCache: assetsCache,
-                    tagResolver: tagResolver,
-                    productInfo: productInfo,
-                    colorScheme: colorScheme,
-                    screen: screen
-                ) {
+                if let fallback, let fallbackText = try? fallback
+                    .apply(defaultAttributes: defaultAttributes)
+                    .convertToSwiftUITextThrowingError(
+                        assetsCache: assetsCache,
+                        tagResolver: tagResolver,
+                        productInfo: productInfo,
+                        colorScheme: colorScheme,
+                        screen: screen
+                    )
+                {
                     result = fallbackText
                 } else {
                     result = Text("")
@@ -292,26 +300,30 @@ extension AttributedString {
     ) -> AttributedString {
         let foregroundColorAsset = assetsCache.cachedAsset(
             attributes?.txtColor,
-            mode: colorScheme.toVCMode,
-            screen: screen
+            mode: colorScheme.toVCMode
         ).asColorAsset
 
         let fontAsset = assetsCache.cachedAsset(
-            attributes?.txtColor,
-            mode: colorScheme.toVCMode,
-            screen: screen
+            attributes?.fontAssetId,
+            mode: colorScheme.toVCMode
         ).asFontAsset
 
         var result = AttributedString(value)
 
-        result.foregroundColor = foregroundColorAsset?.uiColor ?? .adaptyDefaultTextColor
-        result.font = (fontAsset ?? .adaptyDefaultFont)
-            .withSize(attributes?.size ?? .adaptyDefaultFontSize)
+        result.foregroundColor = foregroundColorAsset?.uiColor ?? fontAsset?.defaultColor.uiColor ?? .adaptyDefaultTextColor
+
+        let baseFont = fontAsset?.font ?? .adaptyDefaultFont
+        let defaultSize = baseFont.pointSize 
+        
+        if let size = attributes?.size, CGFloat(size) != defaultSize {
+            result.font = baseFont.withSize(size)
+        } else {
+            result.font = baseFont
+        }
 
         if let backgroundColor = assetsCache.cachedAsset(
             attributes?.background,
-            mode: colorScheme.toVCMode,
-            screen: screen
+            mode: colorScheme.toVCMode
         ).asColorAsset?.uiColor {
             result.backgroundColor = backgroundColor
         }

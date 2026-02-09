@@ -14,7 +14,7 @@ extension Schema {
         let format: [Item]
         let actions: [Schema.Action]
         let horizontalAlign: HorizontalAlignment
-        let defaultTextAttributes: RichText.Attributes?
+        let defaultTextAttributes: Text.Attributes?
 
         struct Item: Sendable, Hashable {
             let from: TimeInterval
@@ -112,7 +112,7 @@ extension Schema.Timer: Decodable {
             }
 
         horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
-        let textAttributes = try Schema.RichText.Attributes(from: decoder)
+        let textAttributes = try Schema.Text.Attributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil
     }
 }

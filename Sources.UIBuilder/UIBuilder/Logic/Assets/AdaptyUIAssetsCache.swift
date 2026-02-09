@@ -41,7 +41,7 @@ extension AdaptyUICachedAsset {
         customValue?.asColorOrGradientOrImageAsset ?? stateValue?.asColorOrGradientOrImageAsset
     }
 
-    var asFontAsset: AdaptyUIResolvedFontAsset? {
+    var asFontAsset: (font: AdaptyUIResolvedFontAsset, defaultColor: AdaptyUIResolvedColorAsset)? {
         customValue?.asFontAsset ?? stateValue?.asFontAsset
     }
 
@@ -65,6 +65,22 @@ final class AdaptyUIAssetsCache {
         self.customAssetsResolver = customAssetsResolver
     }
 
+    func resolveDataBinding(
+        _ attr: VC.Text.Attributes?,
+        _ screen: VS.ScreenInstance
+    ) -> VC.RichText.Attributes? {
+        guard let attr else { return nil }
+        return .init(
+            fontAssetId: attr.fontAssetId,
+            size: attr.size,
+            txtColor: attr.txtColor?.getAssetId(state: state, screen: screen),
+            imageTintColor: attr.imageTintColor?.getAssetId(state: state, screen: screen),
+            background: attr.background?.getAssetId(state: state, screen: screen),
+            strike: attr.strike,
+            underline: attr.underline
+        ).nonEmptyOrNil
+    }
+
     func cachedAsset(
         _ ref: AdaptyUIConfiguration.AssetReference?,
         mode: VC.Mode,
@@ -77,8 +93,30 @@ final class AdaptyUIAssetsCache {
             return .empty(mode: mode)
         }
 
+        return cachedAsset(assetIdOrColor, mode: mode)
+    }
+
+    func cachedAsset(
+        _ assetIdOrColor: AdaptyUIConfiguration.AssetIdentifierOrValue?,
+        mode: VC.Mode
+    ) -> AdaptyUICachedAsset {
+        guard let assetIdOrColor else {
+            return .empty(mode: mode)
+        }
+
         guard case .assetId(let assetId) = assetIdOrColor else {
             // TODO: assetIdOrColor has color case, we dont need use cache for this asset
+            return .empty(mode: mode)
+        }
+
+        return cachedAsset(assetId, mode: mode)
+    }
+
+    func cachedAsset(
+        _ assetId: AdaptyUIConfiguration.AssetIdentifier?,
+        mode: VC.Mode
+    ) -> AdaptyUICachedAsset {
+        guard let assetId else {
             return .empty(mode: mode)
         }
 

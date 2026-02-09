@@ -22,13 +22,20 @@ package extension VC.RichText.Item {
 
         return switch self {
         case let .text(value, attributes):
-            .text(value, attributes.apply(default: defaultAttributes))
+            .text(value, attributes?.apply(default: defaultAttributes) ?? defaultAttributes)
         case let .tag(value, attributes):
-            .tag(value, attributes.apply(default: defaultAttributes))
+            .tag(value, attributes?.apply(default: defaultAttributes) ?? defaultAttributes)
         case let .image(assetId, attributes):
-            .image(assetId, attributes.apply(default: defaultAttributes))
+            .image(assetId, attributes?.apply(default: defaultAttributes) ?? defaultAttributes)
         default:
             .unknown
         }
+    }
+}
+
+extension [VC.RichText.Item] {
+    func apply(defaultAttributes: VC.RichText.Attributes?) -> Self {
+        guard let defaultAttributes, !defaultAttributes.isEmpty else { return self }
+        return self.map { $0.apply(defaultAttributes: defaultAttributes) }
     }
 }

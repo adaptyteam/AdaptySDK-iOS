@@ -29,7 +29,7 @@ extension Schema.Text: Codable {
                 try Set(container.decodeIfPresent([OverflowMode].self, forKey: .overflowMode) ?? [])
             }
 
-        let textAttributes = try Schema.RichText.Attributes(from: decoder)
+        let textAttributes = try Schema.Text.Attributes(from: decoder)
 
         try self.init(
             value: container.decode(Schema.StringReference.self, forKey: .stringId),
