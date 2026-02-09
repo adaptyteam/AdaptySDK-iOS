@@ -14,7 +14,7 @@ extension Schema {
 }
 
 extension Schema.Template {
-    static let keyPrefix: String = "$"
+    static let keyPrefix: String = "#"
 }
 
 extension Schema.Template: Encodable, DecodableWithConfiguration {

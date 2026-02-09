@@ -108,6 +108,7 @@ extension AdaptyUISchema: Codable {
         templates = try Schema.createTemplates(
             formatVersion: formatVersion,
             templatesCollection: templatesCollection,
+            navigators: navigatorCollection.values,
             screens: screensCollection.values
         )
 

@@ -64,9 +64,12 @@ package extension AdaptyUIConfiguration {
             return try jsonDecoder.decode(Schema.TemplatesCollection.self, from: data, with: configuration)
         }
 
+        let navigators = try Schema.NavigatorsCollection(data: navigators, from: jsonDecoder, configuration: configuration).values
+
         let templates = try Schema.createTemplates(
             formatVersion: formatVersion,
             templatesCollection: templatesCollection,
+            navigators: navigators,
             screens: screens
         )
 
@@ -76,12 +79,12 @@ package extension AdaptyUIConfiguration {
             scripts += [Schema.LegacyScripts.legacyOpenScreen(screenId: startScreenName)]
         }
 
-        let schema = try AdaptyUISchema(
+        let schema = AdaptyUISchema(
             formatVersion: formatVersion,
             assets: assets.value,
             localizations: [localiation.id: localiation],
             defaultLocalization: localiation,
-            navigators: Schema.NavigatorsCollection(data: navigators, from: jsonDecoder, configuration: configuration).values,
+            navigators: navigators,
             screens: screens,
             templates: templates,
             scripts: scripts

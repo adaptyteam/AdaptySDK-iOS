@@ -10,7 +10,7 @@ import Foundation
 extension Schema {
     enum Element: Sendable, Hashable {
         case legacyReference(String)
-        case template(id: String)
+        case templateInstance(Schema.TemplateInstance, Properties?)
         case scrrenHolder
         indirect case stack(Schema.Stack, Properties?)
         case text(Schema.Text, Properties?)
@@ -36,8 +36,8 @@ extension Schema.Localizer {
         switch from {
         case let .legacyReference(id):
             try legacyReference(id)
-        case let .template(id):
-            try templateInstance(id)
+        case let .templateInstance(instance, properties):
+            try templateInstance(instance, properties: properties?.value)
         case .scrrenHolder:
             .screenHolder
         case let .stack(value, properties):
@@ -109,7 +109,10 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
 
         guard let contentType = ContentType(rawValue: type) else {
             if !configuration.isLegacy, type.hasPrefix(Schema.Template.keyPrefix) {
-                self = .template(id: String(type.dropFirst()))
+                self = try .templateInstance(
+                    Schema.TemplateInstance(from: decoder, configuration: configuration),
+                    propertyOrNil()
+                )
             } else {
                 self = .unknown(type, propertyOrNil())
             }
