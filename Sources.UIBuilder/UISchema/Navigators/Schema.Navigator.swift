@@ -12,7 +12,7 @@ extension Schema {
         let id: NavigatorIdentifier
         let background: AssetReference
         let content: Element
-        let order: Int?
+        let order: Int
     }
 }
 
@@ -56,7 +56,7 @@ extension Schema.Navigator: Encodable, DecodableWithConfiguration {
             id: navigatorId,
             background: container.decodeIfPresent(Schema.AssetReference.self, forKey: .background) ?? Self.default.background,
             content: container.decodeIfPresent(Schema.Element.self, forKey: .content, configuration: configuration) ?? Self.default.content,
-            order: container.decodeIfPresent(Int.self, forKey: .order)
+            order: container.decode(Int.self, forKey: .order)
         )
     }
 }

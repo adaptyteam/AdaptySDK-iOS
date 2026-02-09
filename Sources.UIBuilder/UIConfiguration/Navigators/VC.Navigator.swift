@@ -12,6 +12,6 @@ package extension VC {
         package let id: NavigatorIdentifier
         package let background: AssetReference?
         package let content: Element
-        package let order: Int?
+        package let order: Int
     }
 }

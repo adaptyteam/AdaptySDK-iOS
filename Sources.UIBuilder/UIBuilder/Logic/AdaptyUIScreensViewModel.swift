@@ -31,7 +31,7 @@ struct AdaptyUIScreenInstance: Identifiable {
 @MainActor
 package final class AdaptyUINavigatorViewModel: ObservableObject {
     var id: VC.NavigatorIdentifier { navigator.id }
-    var order: Double { if let order = navigator.order { Double(order) } else { 0.0 } }
+    var order: Double { Double(navigator.order) }
 
     let navigator: VC.Navigator
 
