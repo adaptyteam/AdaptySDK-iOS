@@ -38,15 +38,26 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     @Published
     private(set) var screens: [AdaptyUIScreenInstance]
 
+    @Published
+    private(set) var offset: CGSize
+    @Published
+    private(set) var opacity: Double
+
     private var viewportSize: CGSize = .zero
+    private var presentAnimationBuilder: ((CGSize) -> ScreenTransitionAnimation)?
 
     init(
         navigator: VC.Navigator,
         screen: AdaptyUIScreenInstance,
+        presentAnimationBuilder: ((CGSize) -> ScreenTransitionAnimation)?,
         viewportSize: CGSize
     ) {
         self.navigator = navigator
         self.viewportSize = viewportSize
+        self.presentAnimationBuilder = presentAnimationBuilder
+
+        offset = .zero
+        opacity = 0.0
 
         screens = [screen]
     }
@@ -55,8 +66,16 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         viewportSize = size
     }
 
-    func reportOnAppear(_ animationBuilder: (CGSize) -> ScreenTransitionAnimation) {
-        // TODO: x implement
+    func reportOnAppear() {
+        if let presentAnimationBuilder {
+            presentNavigator(
+                inAnimation: presentAnimationBuilder,
+                completion: {}
+            )
+        } else {
+            offset = .zero
+            opacity = 1.0
+        }
     }
 
     func present(
@@ -105,12 +124,50 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             screens[0] = currentScreen
         }
 
+        // TODO: x fix duration
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             self?.screens.remove(at: 0)
 //            completion()
             //            guard let transitioning = self.transitioningScreenInstance else { return }
             //            self.currentScreenInstance = transitioning
             //            self.transitioningScreenInstance = nil
+        }
+    }
+
+    func presentNavigator(
+        inAnimation: (CGSize) -> ScreenTransitionAnimation,
+        completion: @escaping () -> Void
+    ) {
+        let inAnimation = inAnimation(viewportSize)
+
+        offset = inAnimation.startOffset
+        opacity = inAnimation.startOpacity
+
+        withAnimation(inAnimation.animation) {
+            offset = inAnimation.endOffset
+            opacity = inAnimation.endOpacity
+        }
+
+        // TODO: x fix duration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            completion()
+        }
+    }
+
+    func dismissNavigator(
+        outAnimation: (CGSize) -> ScreenTransitionAnimation,
+        completion: @escaping () -> Void
+    ) {
+        let outAnimation = outAnimation(viewportSize)
+
+        withAnimation(outAnimation.animation) {
+            offset = outAnimation.endOffset
+            opacity = outAnimation.endOpacity
+        }
+
+        // TODO: x fix duration
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            completion()
         }
     }
 }
@@ -150,11 +207,13 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     // TODO: x refactor
     func present(
         screen: VS.ScreenInstance,
-        in navigatorId: VC.NavigatorIdentifier,
         inAnimation: (CGSize) -> ScreenTransitionAnimation,
         outAnimation: (CGSize) -> ScreenTransitionAnimation
     ) {
-        guard let navigatorConfig = viewConfiguration.navigator(id: navigatorId) else {
+        Log.ui.verbose("#\(logId)# present screen:\(screen.id) in navigator:\(screen.navigatorId)")
+
+        guard let navigatorConfig = viewConfiguration.navigator(id: screen.navigatorId) else {
+            Log.ui.warn("#\(logId)# failed to present screen:\(screen.id) in navigator:\(screen.navigatorId) (navigator not found)")
             return // TODO: x error?
         }
 
@@ -165,6 +224,11 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
                 AdaptyUINavigatorViewModel(
                     navigator: navigatorConfig,
                     screen: screen,
+                    presentAnimationBuilder: navigatorsViewModels.isEmpty ? nil : ScreenTransitionAnimation.inAnimationBuilder(
+                        transitionType: .directional,
+                        transitionDirection: .bottomToTop,
+                        transitionStyle: .move
+                    ),
                     viewportSize: viewportSize
                     // TODO: x add in_animation and play onAppear
                 )
@@ -177,6 +241,31 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
             screen: screen,
             inAnimation: inAnimation,
             outAnimation: outAnimation
+        )
+    }
+
+    func dismiss(
+        navigatorId: String
+    ) {
+        Log.ui.verbose("#\(logId)# dismiss navigator:\(navigatorId)")
+
+        guard let index = navigatorsViewModels.firstIndex(where: { $0.id == navigatorId }) else {
+            Log.ui.error("#\(logId)# failed to dismiss navigator:\(navigatorId) (navigator not found)")
+
+            return
+        }
+
+        let navigatorVM = navigatorsViewModels[index]
+
+        navigatorVM.dismissNavigator(
+            outAnimation: ScreenTransitionAnimation.outAnimationBuilder(
+                transitionType: .directional,
+                transitionDirection: .topToBottom,
+                transitionStyle: .move
+            ),
+            completion: { [weak self] in
+                self?.navigatorsViewModels.remove(at: index)
+            }
         )
     }
 }
