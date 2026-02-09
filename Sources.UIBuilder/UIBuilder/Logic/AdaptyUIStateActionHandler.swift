@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 12/18/25.
 //
 
+#if canImport(UIKit)
+
 import Foundation
 import SwiftUI
 
@@ -99,3 +101,5 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     
     package nonisolated func closeScreen(navigatorId: String) {}
 }
+
+#endif

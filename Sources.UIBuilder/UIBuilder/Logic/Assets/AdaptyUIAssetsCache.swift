@@ -5,6 +5,8 @@
 //  Created by Alex Goncharov on 14/01/2026.
 //
 
+#if canImport(UIKit)
+
 import Foundation
 
 struct AdaptyUICachedAsset {
@@ -171,3 +173,5 @@ extension AdaptyUIConfiguration.AssetReference {
         }
     }
 }
+
+#endif

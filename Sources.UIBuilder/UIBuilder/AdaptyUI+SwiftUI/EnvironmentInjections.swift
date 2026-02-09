@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 12/30/25.
 //
 
+#if canImport(UIKit)
+
 import SwiftUI
 
 package extension View {
@@ -28,3 +30,5 @@ package extension View {
             .environmentObject(assetsViewModel)
     }
 }
+
+#endif

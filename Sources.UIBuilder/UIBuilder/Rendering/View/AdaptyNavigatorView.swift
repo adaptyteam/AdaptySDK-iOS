@@ -5,6 +5,8 @@
 //  Created by Alex Goncharov on 23/01/2026.
 //
 
+#if canImport(UIKit)
+
 import SwiftUI
 
 package extension VC {
@@ -103,3 +105,5 @@ struct AdaptyNavigatorView: View {
 //            .offset(x: 25, y: 25)
 //    }
 //}
+
+#endif

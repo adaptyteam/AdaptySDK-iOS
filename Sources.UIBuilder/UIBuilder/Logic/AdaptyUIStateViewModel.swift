@@ -5,6 +5,8 @@
 //  Created by Alexey Goncharov on 12/17/25.
 //
 
+#if canImport(UIKit)
+
 import Combine
 import Foundation
 import SwiftUI
@@ -93,3 +95,5 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         )
     }
 }
+
+#endif
