@@ -30,7 +30,7 @@ package struct AdaptyUIPaywallView_Internal: View {
                         height: proxy.size.height + proxy.safeAreaInsets.top + proxy.safeAreaInsets.bottom
                     )
                 )
-                .withSafeArea(proxy.safeAreaInsets)
+                .withSafeArea(proxy.safeAreaInsets) // TODO: x check safe area calculation rule
                 .withDebugOverlayEnabled(showDebugOverlay)
         }
         .onAppear {
