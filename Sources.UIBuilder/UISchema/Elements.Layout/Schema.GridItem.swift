@@ -45,12 +45,22 @@ extension Schema.GridItem: DecodableWithConfiguration {
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        if !configuration.isLegacy {
+
+            let type = try container.decode(String.self, forKey: .type)
+
+            guard type == Self.typeForGridItem {
+        }
+
         let length: Schema.GridItem.Length =
             if let value = try container.decodeIfPresent(Int.self, forKey: .weight) {
                 .weight(value)
             } else {
                 try .fixed(container.decode(Schema.Unit.self, forKey: .fixed))
             }
+
+
 
         try self.init(
             length: length,

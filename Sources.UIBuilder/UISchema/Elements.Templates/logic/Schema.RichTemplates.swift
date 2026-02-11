@@ -26,10 +26,7 @@ extension Schema.RichTemplates {
 }
 
 extension Schema.Localizer {
-    func templateInstance(
-        _ instance: Schema.TemplateInstance,
-        properties elementProperties: VC.Element.Properties? // TODO:  for use it in screen/navigator like basic element with property
-    ) throws -> VC.Element {
+    func templateInstance(_ instance: Schema.TemplateInstance) throws -> VC.Element {
         let id = instance.type
         guard !self.templateIds.contains(id) else {
             throw Schema.Error.elementsTreeCycle(id)

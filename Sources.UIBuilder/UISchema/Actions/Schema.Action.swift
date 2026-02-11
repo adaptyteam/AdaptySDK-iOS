@@ -82,17 +82,15 @@ extension Schema.Action {
             try self.init(path: ["SDK", "userCustomAction"], params: [
                 "userCustomId": .string(container.decode(String.self, forKey: .customId))
             ], scope: .global)
-        case "web_purchase_paywall":
-            try self.init(path: ["SDK", "webPurchasePaywall"], params: [
-                "openIn": .string(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn)
-            ], scope: .global)
         case "purchase_product":
             try self.init(path: ["SDK", "purchaseProduct"], params: [
-                "productId": .string(container.decode(String.self, forKey: .productId))
+                "productId": .string(container.decode(String.self, forKey: .productId)),
+                "paywallId": .string("legacy-paywal-id")
             ], scope: .global)
         case "web_purchase_product":
             try self.init(path: ["SDK", "webPurchaseProduct"], params: [
                 "productId": .string(container.decode(String.self, forKey: .productId)),
+                "paywallId": .string("legacy-paywal-id"),
                 "openIn": .string(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn)
             ], scope: .global)
         case "open_screen":
