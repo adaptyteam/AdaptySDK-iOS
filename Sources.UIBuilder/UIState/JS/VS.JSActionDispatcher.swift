@@ -151,10 +151,12 @@ extension VS.JSActionDispatcher: JSActionBridge {
         var screenType: VC.ScreenType?
         var contextPath: [String]?
         var navigatorId: String?
+        var transitionId: String?
 
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             instanceId = dict["instanceId"] as? String
             navigatorId = dict["navigatorId"].flatMap { $0 as? String }
+            transitionId = dict["transitionId"] as? String
             screenType = dict["type"] as? String
             if let path = dict["contextPath"] as? String {
                 contextPath = path.split(separator: ".").map(String.init)
@@ -174,21 +176,34 @@ extension VS.JSActionDispatcher: JSActionBridge {
             return
         }
 
-        handler?.openScreen(instance: .init(
-            id: instanceId,
-            navigatorId: navigatorId ?? "default",
-            configuration: configuration,
-            contextPath: contextPath ?? []
-        ))
+        guard let transitionId else {
+            Log.viewState.error("SDK.openScreen: required parameter \"transitionId\" is missing")
+            return
+        }
+
+        handler?.openScreen(
+            instance: .init(
+                id: instanceId,
+                navigatorId: navigatorId ?? "default",
+                configuration: configuration,
+                contextPath: contextPath ?? []
+            ),
+            transitionId: transitionId
+        )
     }
 
     func closeScreen(_ params: JSValue) {
         var navigatorId: String?
+        var transitionId: String?
 
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             navigatorId = dict["navigatorId"] as? String
+            transitionId = dict["transitionId"] as? String
         }
 
-        handler?.closeScreen(navigatorId: navigatorId ?? "default")
+        handler?.closeScreen(
+            navigatorId: navigatorId ?? "default",
+            transitionId: transitionId ?? "on_disappear"
+        )
     }
 }

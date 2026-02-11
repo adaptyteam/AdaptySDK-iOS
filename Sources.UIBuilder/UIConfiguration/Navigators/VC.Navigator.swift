@@ -13,5 +13,7 @@ package extension VC {
         package let background: AssetReference?
         package let content: Element
         package let order: Int
+        package let appearances: [String: AppearanceTransition]?
+        package let transitions: [String: ScreenTransition]?
     }
 }

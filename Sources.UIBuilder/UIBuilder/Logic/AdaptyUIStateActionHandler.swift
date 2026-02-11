@@ -12,6 +12,7 @@ import SwiftUI
 
 @MainActor
 package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
+
     private let productsViewModel: AdaptyUIProductsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
     private let logic: AdaptyUIBuilderLogic
@@ -80,7 +81,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
 
-    package nonisolated func openScreen(instance: VS.ScreenInstance) {
+    package nonisolated func openScreen(instance: VS.ScreenInstance, transitionId: String) {
         Task { @MainActor in
             screensViewModel.present(
                 screen: instance,
@@ -98,7 +99,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
     
-    package nonisolated func closeScreen(navigatorId: String) {
+    package nonisolated func closeScreen(navigatorId: String, transitionId: String) {
         Task { @MainActor in
             screensViewModel.dismiss(navigatorId: navigatorId)
         }

@@ -13,6 +13,8 @@ extension Schema {
         let background: AssetReference
         let content: Element
         let order: Int
+        let appearances: [String: AppearanceTransition]?
+        let transitions: [String: ScreenTransition]?
     }
 }
 
@@ -21,7 +23,9 @@ extension Schema.Navigator {
         id: "default",
         background: .color(.black),
         content: .scrrenHolder,
-        order: 0
+        order: 0,
+        appearances: nil,
+        transitions: nil
     )
 }
 
@@ -31,7 +35,9 @@ extension Schema.Localizer {
             id: from.id,
             background: from.background,
             content: element(from.content),
-            order: from.order
+            order: from.order,
+            appearances: from.appearances,
+            transitions: from.transitions
         )
     }
 }
@@ -41,6 +47,8 @@ extension Schema.Navigator: Encodable, DecodableWithConfiguration {
         case background
         case content
         case order
+        case appearances
+        case transitions
     }
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -56,7 +64,9 @@ extension Schema.Navigator: Encodable, DecodableWithConfiguration {
             id: navigatorId,
             background: container.decodeIfPresent(Schema.AssetReference.self, forKey: .background) ?? Self.default.background,
             content: container.decodeIfPresent(Schema.Element.self, forKey: .content, configuration: configuration) ?? Self.default.content,
-            order: container.decode(Int.self, forKey: .order)
+            order: container.decode(Int.self, forKey: .order),
+            appearances: container.decodeIfPresent([String: AppearanceTransition].self, forKey: .appearances),
+            transitions: container.decodeIfPresent([String: ScreenTransition].self, forKey: .transitions)
         )
     }
 }
