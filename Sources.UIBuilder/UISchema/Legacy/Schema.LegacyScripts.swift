@@ -15,7 +15,7 @@ extension Schema {
         Legacy.sections = Object.create(null);
         Legacy.selectProduct = function ({ productId, groupId }) {
               Legacy.productGroup[groupId] = productId;
-              SDK.onSelectProduct({ productId: productId });
+              SDK.onSelectProduct({ productId: productId, paywallId: "legacy-paywal-id" });
         };
         Legacy.unselectProduct = function ({ groupId }) {
               delete Legacy.productGroup[groupId]
@@ -23,12 +23,12 @@ extension Schema {
         Legacy.purchaseSelectedProduct = function ({ groupId }) {
              const productId = Legacy.productGroup[groupId];
              if (!productId) { return; }
-             SDK.purchaseProduct({ productId: productId });
+             SDK.purchaseProduct({ productId: productId, paywallId: "legacy-paywal-id" });
         };
         Legacy.webPurchaseSelectedProduct = function ({ groupId, openIn }) {
              const productId = Legacy.productGroup[groupId];
              if (!productId) { return; }
-             SDK.webPurchaseProduct({ productId: productId, openIn: openIn });
+             SDK.webPurchaseProduct({ productId: productId, paywallId: "legacy-paywal-id", openIn: openIn });
         };
         Legacy.switchSection = function ({ sectionId, index }) {
              Legacy.sections[sectionId] = index;

@@ -35,7 +35,9 @@ extension Schema.Localizer {
 }
 
 extension Schema.GridItem: DecodableWithConfiguration {
+    static let typeForGridItem = "grid_item"
     enum CodingKeys: String, CodingKey {
+        case type
         case fixed
         case weight
         case horizontalAlignment = "h_align"
@@ -45,6 +47,15 @@ extension Schema.GridItem: DecodableWithConfiguration {
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        if !configuration.isLegacy {
+            let type = try container.decode(String.self, forKey: .type)
+
+            guard type == Self.typeForGridItem else {
+                throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "worng type for GridItem: \(type)"))
+            }
+        }
+
         let length: Schema.GridItem.Length =
             if let value = try container.decodeIfPresent(Int.self, forKey: .weight) {
                 .weight(value)

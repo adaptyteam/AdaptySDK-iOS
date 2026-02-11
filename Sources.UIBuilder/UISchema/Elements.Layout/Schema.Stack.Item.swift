@@ -15,27 +15,21 @@ extension Schema.Stack {
 }
 
 extension Schema.Stack.Item: DecodableWithConfiguration {
+    static let typeForSpace = "space"
+    
     enum CodingKeys: String, CodingKey {
         case type
         case count
-    }
-
-    enum ContentType: String, Codable {
-        case space
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
 
-        guard let contentType = ContentType(rawValue: type) else {
-            self = try .element(Schema.Element(from: decoder, configuration: configuration))
-            return
-        }
-
-        switch contentType {
-        case .space:
+        if type == Self.typeForSpace {
             self = try .space(container.decodeIfPresent(Int.self, forKey: .count) ?? 1)
+        } else {
+            self = try .element(Schema.Element(from: decoder, configuration: configuration))
         }
     }
 }
