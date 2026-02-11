@@ -84,7 +84,6 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         Task { @MainActor in
             screensViewModel.present(
                 screen: instance,
-                in: "root",
                 inAnimation: ScreenTransitionAnimation.inAnimationBuilder(
                     transitionType: .directional,
                     transitionDirection: .rightToLeft,
@@ -99,7 +98,11 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
     
-    package nonisolated func closeScreen(navigatorId: String) {}
+    package nonisolated func closeScreen(navigatorId: String) {
+        Task { @MainActor in
+            screensViewModel.dismiss(navigatorId: navigatorId)
+        }
+    }
 }
 
 #endif
