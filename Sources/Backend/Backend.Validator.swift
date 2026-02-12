@@ -75,16 +75,17 @@ extension Backend {
 
     @Sendable
     func validator(_ response: HTTPDataResponse) -> Error? {
-        if let data = response.body.nonEmptyOrNil,
-           let errorCodes = try? errorCodesResponse(from: data, withConfiguration: defaultHTTPConfiguration).codes.nonEmptyOrNil
+        if let error = backendUnavailableError(response) {
+            error
+        } else if
+            let data = response.body.nonEmptyOrNil,
+            let errorCodes = try? errorCodesResponse(from: data, withConfiguration: defaultHTTPConfiguration).codes.nonEmptyOrNil
         {
             BackendError(
                 body: String(data: data, encoding: .utf8) ?? "unknown",
                 errorCodes: errorCodes,
                 requestId: response.headers.getBackendRequestId()
             )
-        } else if let error = backendUnavailableError(response) {
-            error
         } else {
             HTTPResponse.statusCodeValidator(response)
         }

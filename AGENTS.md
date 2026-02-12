@@ -2,36 +2,43 @@
 
 This file provides guidance to AI coding agents when working with code in this repository.
 
-See [CLAUDE.md](CLAUDE.md) for detailed documentation.
+## Project Overview
 
-## Quick Reference
+Adapty iOS SDK for - an open-source framework.
+Supports iOS 13+, macOS 11+, and visionOS 1+.
+The codebase uses Swift 6.0 with strict concurrency.
+Public APIs of SDK support both async/await and completion handlers.
 
-### Build & Test
+## Building SDK
+
 ```bash
-swift build              # Build the project
-swift test               # Run tests
+swift package resolve
+swift build
 ```
 
-### Version Management
+## Running Tests of SDK
+
 ```bash
-./scripts/update_version.sh <version>  # Update version everywhere
+swift test
 ```
 
-### Code Style
-- SwiftFormat configured via `.swiftformat`
-- 4-space indentation, LF line breaks
+## SDK Version Management
+For update version read scripts/README.md 
 
-## Architecture
+## Publishing to CocoaPods
 
-- **Swift 6.0** with strict concurrency
-- **@AdaptyActor** custom global actor for thread-safe SDK state
-- **Dual StoreKit**: SK1 (iOS <15) and SK2 (iOS 15+) automatic selection
+```bash
+./scripts/publish_podspecs.sh [--skip-lint] [--skip-tests] [--max-retries N]
+```
+Publishes in dependency order: Adapty → AdaptyUI → AdaptyPlugin.
 
-### Modules
-| Module | Path | Purpose |
-|--------|------|---------|
-| `Adapty` | `Sources/` | Core SDK |
-| `AdaptyLogger` | `Sources.Logger/` | Logging |
-| `AdaptyUIBuilder` | `Sources.UIBuilder/` | UI schema |
-| `AdaptyUI` | `Sources.AdaptyUI/` | Paywall UI |
-| `AdaptyPlugin` | `Sources.AdaptyPlugin/` | Cross-platform bridge |
+## Sources Structure
+| Module                 | Path                      | Purpose                                    |
+| ---------------------- | ------------------------- | ------------------------------------------ |
+| `Adapty`               | `Sources/`                | Adapty SDK                                 |
+| `AdaptyLogger`         | `Sources.Logger/`         | Library for Logging                        |
+| `AdaptyUIBuilder`      | `Sources.UIBuilder/`      | Library for build UI from JSON config.     |
+| `AdaptyUI`             | `Sources.AdaptyUI/`       | Adapty UI SDK for Onbording and Paywall UI |
+| `AdaptyPlugin`         | `Sources.AdaptyPlugin/`   | Library for cross-platform bridge          |
+| `AdaptyDeveloperTools` | `Sources.DeveloperTools/` | Library for Developer utilities  bridge    |
+| `Adapty_KidsMode`      | `Sources.KidsMode/`       | COPPA-compliant variant of Adapty SDK      |
