@@ -5,6 +5,7 @@
 //  Created by Aleksei Valiano on 23.04.2024.
 //
 
+import AdaptyLogger
 import Foundation
 
 extension AdaptyConfiguration {

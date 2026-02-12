@@ -90,3 +90,4 @@ builds/
 Examples/OnboardingsDemo-UIKit/Podfile.lock
 Examples/AdaptyRecipes-UIKit/Podfile.lock
 docs/
+settings.local.json
