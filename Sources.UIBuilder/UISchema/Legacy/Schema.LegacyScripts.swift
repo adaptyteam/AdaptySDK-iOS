@@ -9,7 +9,7 @@ import Foundation
 
 extension Schema {
     enum LegacyScripts {
-        static let actions = """
+        static let actions = ##"""
         class Legacy {}
         Legacy.productGroup = Object.create(null);
         Legacy.sections = Object.create(null);
@@ -33,14 +33,14 @@ extension Schema {
         Legacy.switchSection = function ({ sectionId, index }) {
              Legacy.sections[sectionId] = index;
         };
-        """
+        """##
 
         static func legacySelectProductScript(groupId: String = "group_A", productId: String) -> String {
-            "Legacy.productGroup[\"\(groupId)\"] = \"\(productId)\";"
+            ##"Legacy.productGroup["\##(groupId)"] = "\##(productId)";"##
         }
 
         static func legacyOpenScreen(screenId: ScreenType = "default") -> String {
-            "SDK.openScreen({ instanceId: \"\(screenId)\", type: \"\(screenId)\" })"
+            ##"SDK.openScreen({ instanceId: "\##(screenId)", type: "\##(screenId)", transitionId: "legacy-first-open" });"##
         }
     }
 }
