@@ -15,11 +15,41 @@ package extension VC {
     static let templateIdTransparent = "transparent"
 }
 
-struct AdaptyNavigatorView: View {
+struct AdaptyScreenView: View {
+    var screen: VC.Screen
+
+    @EnvironmentObject
+    private var paywallViewModel: AdaptyUIPaywallViewModel
     @EnvironmentObject
     private var navigatorViewModel: AdaptyUINavigatorViewModel
     @EnvironmentObject
-    private var paywallViewModel: AdaptyUIPaywallViewModel
+    private var screenInstance: AdaptyUIScreenInstance
+
+    @State
+    private var playIncomingTransition: [VC.Animation] = []
+
+    @State
+    private var playOutgoingTransition: [VC.Animation] = []
+
+    var body: some View {
+        templateResolverView(
+            screenInstance.configuration.templateId,
+            screen: screenInstance.configuration
+        )
+        .staticBackground(
+            screenInstance.configuration.background,
+            defaultValue: VC.Asset.defaultScreenBackground
+        )
+        .withScreenInstance(screenInstance.instance)
+        .animatablePropertiesTransition(
+            play: $playIncomingTransition
+        )
+        .animatablePropertiesTransition(
+            play: $playOutgoingTransition
+        )
+        .onReceive(screenInstance.$playIncomingTransition) { playIncomingTransition = $0 ?? [] }
+        .onReceive(screenInstance.$playOutgoingTransition) { playOutgoingTransition = $0 ?? [] }
+    }
 
     @ViewBuilder
     private func templateResolverView(
@@ -44,30 +74,26 @@ struct AdaptyNavigatorView: View {
                 }
         }
     }
+}
+
+struct AdaptyNavigatorView: View {
+    @EnvironmentObject
+    private var navigatorViewModel: AdaptyUINavigatorViewModel
 
     @ViewBuilder
-    private func screenBuilder(screenInstance: AdaptyUIScreenInstance) -> some View {
-        templateResolverView(
-            screenInstance.configuration.templateId,
-            screen: screenInstance.configuration
-        )
-        .staticBackground(
-            screenInstance.configuration.background,
-            defaultValue: VC.Asset.defaultScreenBackground
-        )
-        .withScreenInstance(screenInstance.instance)
-        .offset(screenInstance.offset)
-        .opacity(screenInstance.opacity)
-        .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
-    }
+    private func screenBuilder(screenInstance: AdaptyUIScreenInstance) -> some View {}
 
     var body: some View {
         AdaptyUIElementView(
             navigatorViewModel.navigator.content,
             screenHolderBuilder: {
                 ZStack {
-                    ForEach(navigatorViewModel.screens) { screen in
-                        screenBuilder(screenInstance: screen)
+                    ForEach(navigatorViewModel.screens, id: \.id) { screenInstance in
+                        AdaptyScreenView(
+                            screen: screenInstance.configuration
+                        )
+                        .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
+                        .environmentObject(screenInstance)
                     }
                 }
             }

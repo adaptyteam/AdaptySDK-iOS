@@ -9,169 +9,6 @@
 
 import Foundation
 
-// TODO: x move out
-extension Array {
-    var firstIfSingle: Element? {
-        guard count == 1 else { return nil }
-        return first
-    }
-}
-
-struct AdaptyUIScreenInstance: Identifiable {
-    var id: String { instance.id }
-    var configuration: VC.Screen { instance.configuration }
-
-    let instance: VS.ScreenInstance
-
-    var offset: CGSize = .zero
-    var opacity: Double = 1.0
-    var zIndex: Double = 1.0
-}
-
-@MainActor
-package final class AdaptyUINavigatorViewModel: ObservableObject {
-    var id: VC.NavigatorIdentifier { navigator.id }
-    var order: Double { Double(navigator.order) }
-
-    let navigator: VC.Navigator
-
-    @Published
-    private(set) var screens: [AdaptyUIScreenInstance]
-
-    @Published
-    private(set) var offset: CGSize
-    @Published
-    private(set) var opacity: Double
-
-    private var viewportSize: CGSize = .zero
-    private var presentAnimationBuilder: ((CGSize) -> ScreenTransitionAnimation)?
-
-    init(
-        navigator: VC.Navigator,
-        screen: AdaptyUIScreenInstance,
-        presentAnimationBuilder: ((CGSize) -> ScreenTransitionAnimation)?,
-        viewportSize: CGSize
-    ) {
-        self.navigator = navigator
-        self.viewportSize = viewportSize
-        self.presentAnimationBuilder = presentAnimationBuilder
-
-        offset = .zero
-        opacity = 0.0
-
-        screens = [screen]
-    }
-
-    func setViewPortSize(_ size: CGSize) {
-        viewportSize = size
-    }
-
-    func reportOnAppear() {
-        if let presentAnimationBuilder {
-            presentNavigator(
-                inAnimation: presentAnimationBuilder,
-                completion: {}
-            )
-        } else {
-            offset = .zero
-            opacity = 1.0
-        }
-    }
-
-    func present(
-        screen: AdaptyUIScreenInstance,
-        inAnimation inAnimationBuilder: (CGSize) -> ScreenTransitionAnimation,
-        outAnimation outAnimation: (CGSize) -> ScreenTransitionAnimation
-    ) {
-        guard var currentScreen = screens.firstIfSingle else {
-            // TODO: x throw error?
-            return // in the process of animation, TODO: x think about force replacement?
-        }
-
-        guard currentScreen.id != screen.id else {
-            return // TODO: x throw error?
-        }
-
-        let inAnimation = inAnimationBuilder(viewportSize)
-        let outAnimation = outAnimation(viewportSize)
-
-        currentScreen.offset = outAnimation.startOffset
-        currentScreen.opacity = outAnimation.startOpacity
-        currentScreen.zIndex = outAnimation.startZIndex
-
-        var newScreen = screen
-
-        newScreen.offset = inAnimation.startOffset
-        newScreen.opacity = inAnimation.startOpacity
-        newScreen.zIndex = inAnimation.startZIndex
-
-        screens[0] = currentScreen
-        screens.append(newScreen)
-
-        withAnimation(inAnimation.animation) {
-            newScreen.offset = inAnimation.endOffset
-            newScreen.opacity = inAnimation.endOpacity
-            newScreen.zIndex = inAnimation.endZIndex
-
-            screens[1] = newScreen
-        }
-
-        withAnimation(outAnimation.animation) {
-            currentScreen.offset = outAnimation.endOffset
-            currentScreen.opacity = outAnimation.endOpacity
-            currentScreen.zIndex = outAnimation.endZIndex
-
-            screens[0] = currentScreen
-        }
-
-        // TODO: x fix duration
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            self?.screens.remove(at: 0)
-//            completion()
-            //            guard let transitioning = self.transitioningScreenInstance else { return }
-            //            self.currentScreenInstance = transitioning
-            //            self.transitioningScreenInstance = nil
-        }
-    }
-
-    func presentNavigator(
-        inAnimation: (CGSize) -> ScreenTransitionAnimation,
-        completion: @escaping () -> Void
-    ) {
-        let inAnimation = inAnimation(viewportSize)
-
-        offset = inAnimation.startOffset
-        opacity = inAnimation.startOpacity
-
-        withAnimation(inAnimation.animation) {
-            offset = inAnimation.endOffset
-            opacity = inAnimation.endOpacity
-        }
-
-        // TODO: x fix duration
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            completion()
-        }
-    }
-
-    func dismissNavigator(
-        outAnimation: (CGSize) -> ScreenTransitionAnimation,
-        completion: @escaping () -> Void
-    ) {
-        let outAnimation = outAnimation(viewportSize)
-
-        withAnimation(outAnimation.animation) {
-            offset = outAnimation.endOffset
-            opacity = outAnimation.endOpacity
-        }
-
-        // TODO: x fix duration
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            completion()
-        }
-    }
-}
-
 extension VC {
     func navigator(id: String) -> Navigator? {
         navigators[id] ?? navigators["default"]
@@ -207,8 +44,9 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     // TODO: x refactor
     func present(
         screen: VS.ScreenInstance,
-        inAnimation: (CGSize) -> ScreenTransitionAnimation,
-        outAnimation: (CGSize) -> ScreenTransitionAnimation
+        transitionId: String
+//        inAnimation: (CGSize) -> ScreenTransitionAnimation,
+//        outAnimation: (CGSize) -> ScreenTransitionAnimation
     ) {
         Log.ui.verbose("#\(logId)# present screen:\(screen.id) in navigator:\(screen.navigatorId)")
 
@@ -217,7 +55,13 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
             return // TODO: x error?
         }
 
-        let screen = AdaptyUIScreenInstance(instance: screen)
+        let transition = navigatorConfig.transitions?[transitionId]
+
+        let screen = AdaptyUIScreenInstance(
+            instance: screen,
+            incomingTransition: transition?.incoming,
+            outgoingTransition: transition?.outgoing
+        )
 
         guard let navigatorVM = navigatorsViewModels.first(where: { $0.id == navigatorConfig.id }) else {
             navigatorsViewModels.append(
@@ -239,13 +83,15 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 
         navigatorVM.present(
             screen: screen,
-            inAnimation: inAnimation,
-            outAnimation: outAnimation
+            transitionId: transitionId
+//            inAnimation: inAnimation,
+//            outAnimation: outAnimation
         )
     }
 
     func dismiss(
-        navigatorId: String
+        navigatorId: String,
+        transitionId: String
     ) {
         Log.ui.verbose("#\(logId)# dismiss navigator:\(navigatorId)")
 
@@ -258,11 +104,12 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         let navigatorVM = navigatorsViewModels[index]
 
         navigatorVM.dismissNavigator(
-            outAnimation: ScreenTransitionAnimation.outAnimationBuilder(
-                transitionType: .directional,
-                transitionDirection: .topToBottom,
-                transitionStyle: .move
-            ),
+            //            outAnimation: ScreenTransitionAnimation.outAnimationBuilder(
+//                transitionType: .directional,
+//                transitionDirection: .topToBottom,
+//                transitionStyle: .move
+//            ),
+            transitionId: transitionId,
             completion: { [weak self] in
                 self?.navigatorsViewModels.remove(at: index)
             }

@@ -12,7 +12,6 @@ import SwiftUI
 
 @MainActor
 package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
-
     private let productsViewModel: AdaptyUIProductsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
     private let logic: AdaptyUIBuilderLogic
@@ -44,6 +43,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     
     package nonisolated func purchaseProduct(
         productId: String,
+        paywallId: String,
         service: VC.Action.PaymentService
     ) {
         Task { @MainActor in
@@ -69,39 +69,42 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
     
-    package nonisolated func selectProduct(productId: String) {
+    package nonisolated func selectProduct(
+        productId: String,
+        paywallId: String
+    ) {
         Task { @MainActor in
             // TODO: move animation out of here
             withAnimation(.linear(duration: 0.0)) {
                 productsViewModel.selectProduct(
                     id: productId,
-                    forGroupId: "default" // groupId
+                    forGroupId: paywallId // TODO: x check
                 )
             }
         }
     }
 
-    package nonisolated func openScreen(instance: VS.ScreenInstance, transitionId: String) {
+    package nonisolated func openScreen(
+        instance: VS.ScreenInstance,
+        transitionId: String
+    ) {
         Task { @MainActor in
             screensViewModel.present(
                 screen: instance,
-                inAnimation: ScreenTransitionAnimation.inAnimationBuilder(
-                    transitionType: .directional,
-                    transitionDirection: .rightToLeft,
-                    transitionStyle: .slide
-                ),
-                outAnimation: ScreenTransitionAnimation.outAnimationBuilder(
-                    transitionType: .directional,
-                    transitionDirection: .rightToLeft,
-                    transitionStyle: .slide
-                )
+                transitionId: transitionId
             )
         }
     }
     
-    package nonisolated func closeScreen(navigatorId: String, transitionId: String) {
+    package nonisolated func closeScreen(
+        navigatorId: String,
+        transitionId: String
+    ) {
         Task { @MainActor in
-            screensViewModel.dismiss(navigatorId: navigatorId)
+            screensViewModel.dismiss(
+                navigatorId: navigatorId,
+                transitionId: transitionId
+            )
         }
     }
 }
