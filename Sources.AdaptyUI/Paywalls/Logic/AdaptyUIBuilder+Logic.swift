@@ -110,8 +110,8 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
 
     func makePurchase(
         product: ProductResolver,
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     ) {
         guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
               case .full(let adaptyProduct) = adaptyProductWrapper
@@ -189,8 +189,8 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     }
 
     func restorePurchases(
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     ) {
         if let observerModeResolver {
             observerModeResolver.observerModeDidInitiateRestorePurchases(

@@ -32,8 +32,8 @@ extension [String: String]: AdaptyUITagResolver {
 package protocol AdaptyUIBuilderObserverModeResolver: Sendable {
     func observerMode(
         didInitiatePurchase product: ProductResolver,
-        onStartPurchase: @escaping () -> Void,
-        onFinishPurchase: @escaping () -> Void
+        onStartPurchase: @Sendable @escaping () -> Void,
+        onFinishPurchase: @Sendable @escaping () -> Void
     )
 }
 
@@ -59,15 +59,15 @@ package protocol AdaptyUIBuilderLogic {
 
     func makePurchase(
         product: ProductResolver,
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     )
 
     func openWebPaywall(for product: ProductResolver, in openIn: VC.WebOpenInParameter) async
 
     func restorePurchases(
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     )
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError)
