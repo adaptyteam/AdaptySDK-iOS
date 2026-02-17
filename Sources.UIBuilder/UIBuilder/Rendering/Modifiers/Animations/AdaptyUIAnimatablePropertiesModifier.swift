@@ -11,6 +11,7 @@ import SwiftUI
 
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private let animations: [VC.Animation]
+    private var play: Binding<[VC.Animation]>
 
     private let initialShadowFilling: VC.AssetReference?
     private let initialOffset: VC.Offset
@@ -40,7 +41,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     @State private var animationTokens = Set<AdaptyUIAnimationToken>()
 
-    init(_ properties: VC.Element.Properties) {
+    init(_ properties: VC.Element.Properties, play: Binding<[VC.Animation]>) {
         self.opacity = properties.opacity
 
         self.scaleX = 1.0
@@ -56,7 +57,28 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
         self.initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
 
-        self.animations = properties.onAppear
+        self.animations = properties.onAppear ?? []
+        self.play = play
+    }
+
+    init(play: Binding<[VC.Animation]>) {
+        self.opacity = 1.0 // properties.opacity
+
+        self.scaleX = 1.0
+        self.scaleY = 1.0
+        self.scaleAnchor = .center
+
+        self.rotation = .zero
+        self.rotationAnchor = .center
+
+        self.initialOffset = .zero // properties.offset
+
+        self.initialShadowFilling = nil // properties.decorator?.shadow?.filling
+        self.initialShadowOffset = .zero // properties.decorator?.shadow?.offset ?? .zero
+        self.initialShadowBlurRadius = .zero // properties.decorator?.shadow?.blurRadius ?? .zero
+
+        self.animations = [] // animations
+        self.play = play
     }
 
     @State private var animatedOffsetX: CGFloat?
@@ -110,14 +132,14 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             .rotationEffect(rotation, anchor: rotationAnchor)
             .scaleEffect(x: scaleX, y: scaleY, anchor: scaleAnchor)
             .opacity(opacity)
-            .onAppear { startAnimations() }
+            .onChange(of: play.wrappedValue) { startAnimations($0) }
             .onDisappear {
                 animationTokens.forEach { $0.invalidate() }
                 animationTokens.removeAll()
             }
     }
 
-    private func startAnimations() {
+    private func startAnimations(_ animations: [VC.Animation]) {
         var tokens = Set<AdaptyUIAnimationToken>()
 
         for animation in animations {
@@ -219,12 +241,31 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
 extension View {
     @ViewBuilder
-    func animatableProperties(_ properties: VC.Element.Properties?) -> some View {
+    func animatableProperties(
+        _ properties: VC.Element.Properties?,
+        play: Binding<[VC.Animation]>
+    ) -> some View {
         if let properties {
-            modifier(AdaptyUIAnimatablePropertiesModifier(properties))
+            modifier(
+                AdaptyUIAnimatablePropertiesModifier(
+                    properties,
+                    play: play
+                )
+            )
         } else {
             self
         }
+    }
+
+    @ViewBuilder
+    func animatablePropertiesTransition(
+        play: Binding<[VC.Animation]>
+    ) -> some View {
+        modifier(
+            AdaptyUIAnimatablePropertiesModifier(
+                play: play
+            )
+        )
     }
 }
 

@@ -156,6 +156,9 @@ package struct AdaptyUIElementView<ScreenHolderContent: View>: View {
         self.drawDecoratorBackground = drawDecoratorBackground
     }
 
+    @State
+    private var playOnAppearAnimations: [VC.Animation] = []
+
     package var body: some View {
         AdaptyUIElementWithoutPropertiesView(
             element,
@@ -167,9 +170,12 @@ package struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             animations: element.properties?.onAppear,
             includeBackground: drawDecoratorBackground
         )
-        .animatableProperties(element.properties)
+        .animatableProperties(element.properties, play: $playOnAppearAnimations)
         .padding(element.properties?.padding)
         .modifier(DebugOverlayModifier())
+        .onAppear {
+            playOnAppearAnimations = element.properties?.onAppear ?? []
+        }
     }
 }
 

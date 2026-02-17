@@ -130,6 +130,10 @@ struct AdaptyUIBasicContainerView: View {
         }
         .frame(height: height)
     }
+    
+    
+    @State
+    private var playOnAppearAnimations: [VC.Animation] = []
 
     @ViewBuilder
     func contentView(
@@ -163,9 +167,12 @@ struct AdaptyUIBasicContainerView: View {
             animations: properties?.onAppear,
             includeBackground: true
         )
-        .animatableProperties(properties)
+        .animatableProperties(properties, play: $playOnAppearAnimations)
         .padding(properties?.padding)
         .padding(.bottom, offsetY - bottomOverscrollHeight)
+        .onAppear {
+            playOnAppearAnimations = properties?.onAppear ?? []
+        }
     }
 
     @ViewBuilder
