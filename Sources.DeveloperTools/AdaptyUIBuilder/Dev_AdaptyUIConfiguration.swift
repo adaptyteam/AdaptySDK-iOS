@@ -59,7 +59,8 @@ public extension Dev_AdaptyUIConfiguration {
         let json = try AdaptyUISchema.createJson(
             main: main,
             templates: templates,
-            navigators: navigators, contents: contents,
+            navigators: navigators,
+            contents: contents,
             script: script,
             startScreenName: startScreenName
         )

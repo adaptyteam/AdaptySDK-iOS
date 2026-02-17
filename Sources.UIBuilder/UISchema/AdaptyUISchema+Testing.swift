@@ -86,12 +86,16 @@ public extension AdaptyUISchema {
             script += Schema.LegacyScripts.legacyOpenScreen(screenId: startScreenName)
         }
 
+        guard let encodedScript = try String(data: JSONEncoder().encode(script), encoding: .utf8) else {
+            throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Script Corrupted"))
+        }
+        
         return try ##"""
         \##(main),
         \##(templates)
-        "navigators": "{\##(navigators)}",
-        "screens": "{\##(screens)}",
-        "scipt": \##(JSONEncoder().encode(script))
+        "navigators": {\##(navigators)},
+        "screens": {\##(screens)},
+        "script": \##(encodedScript)
         }
         """##
     }

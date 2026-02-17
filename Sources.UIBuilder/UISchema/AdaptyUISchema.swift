@@ -99,7 +99,7 @@ extension AdaptyUISchema: Codable {
 
         screens = screensCollection.values
 
-        let templatesCollection = try container.decode(
+        let templatesCollection = try container.decodeIfPresent(
             TemplatesCollection.self,
             forKey: .templates,
             configuration: configuration

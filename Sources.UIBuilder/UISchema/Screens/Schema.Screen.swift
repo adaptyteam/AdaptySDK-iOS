@@ -51,7 +51,7 @@ extension Schema.Screen: Encodable, DecodableWithConfiguration {
             } else if let value = configuration.legacyTemplateId {
                 value
             } else {
-                throw DecodingError.keyNotFound(CodingKeys.templateId, .init(codingPath: decoder.codingPath, debugDescription: "Not found required key: template_id"))
+                "flat"
             }
 
         let screenId =
