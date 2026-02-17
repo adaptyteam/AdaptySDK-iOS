@@ -45,10 +45,10 @@ package final class AdaptyUIStateViewModel: ObservableObject {
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
                 
-                if let state = self?.state {
-                    print("#STATE_DEBUG# \(state.debug(filter: .withFunctionCode))")
-                }
-                
+                // TODO: x propagate state
+//                if let state = self?.state {
+//                    print("#STATE_DEBUG# \(state.debug(filter: .withFunctionCode))")
+//                }
             }
             .store(in: &cancellables)
 

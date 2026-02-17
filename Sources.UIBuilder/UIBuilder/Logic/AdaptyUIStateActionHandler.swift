@@ -91,7 +91,10 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         Task { @MainActor in
             screensViewModel.present(
                 screen: instance,
-                transitionId: transitionId
+                transitionId: transitionId,
+                completion: {
+                    // TODO: x report completion to Script
+                }
             )
         }
     }
@@ -103,7 +106,10 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         Task { @MainActor in
             screensViewModel.dismiss(
                 navigatorId: navigatorId,
-                transitionId: transitionId
+                transitionId: transitionId,
+                completion: {
+                    // TODO: x report completion to Script
+                }
             )
         }
     }

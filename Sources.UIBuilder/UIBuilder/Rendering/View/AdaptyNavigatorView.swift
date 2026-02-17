@@ -80,34 +80,41 @@ struct AdaptyNavigatorView: View {
     @EnvironmentObject
     private var navigatorViewModel: AdaptyUINavigatorViewModel
 
-    @ViewBuilder
-    private func screenBuilder(screenInstance: AdaptyUIScreenInstance) -> some View {}
+    @State private var backgroundAnimation: VC.Animation.Background?
+    @State private var contentAnimations: [VC.Animation] = []
 
     var body: some View {
-        AdaptyUIElementView(
-            navigatorViewModel.navigator.content,
-            screenHolderBuilder: {
-                ZStack {
-                    ForEach(navigatorViewModel.screens, id: \.id) { screenInstance in
-                        AdaptyScreenView(
-                            screen: screenInstance.configuration
-                        )
-                        .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
-                        .environmentObject(screenInstance)
+        ZStack {
+            Rectangle()
+                .fill(.clear)
+                .animatedBackground(
+                    play: $backgroundAnimation,
+                    initialBackground: navigatorViewModel.appearTransition?.background?.initialBackground,
+                    defaultColor: .defaultNavigatorColor
+                )
+
+            AdaptyUIElementView(
+                navigatorViewModel.navigator.content,
+                screenHolderBuilder: {
+                    ZStack {
+                        ForEach(navigatorViewModel.screens, id: \.id) { screenInstance in
+                            AdaptyScreenView(
+                                screen: screenInstance.configuration
+                            )
+                            .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
+                            .environmentObject(screenInstance)
+                        }
                     }
                 }
-            }
-        )
-        .staticBackground(
-            navigatorViewModel.navigator.background,
-            defaultValue: VC.Asset.defaultNavigatorBackground
-        )
-        .offset(navigatorViewModel.offset)
-        .opacity(navigatorViewModel.opacity)
-        .zIndex(navigatorViewModel.order * 1000.0)
-        .onAppear {
-            navigatorViewModel.reportOnAppear()
+            )
+            .animatablePropertiesTransition(
+                play: $contentAnimations,
+                initialOpacity: navigatorViewModel.appearTransition?.initialContentOpacity ?? 1.0
+            )
         }
+        .zIndex(navigatorViewModel.order * 1000.0)
+        .onReceive(navigatorViewModel.$backgroundAnimation) { backgroundAnimation = $0 }
+        .onReceive(navigatorViewModel.$contentAnimations) { contentAnimations = $0 ?? [] }
     }
 }
 

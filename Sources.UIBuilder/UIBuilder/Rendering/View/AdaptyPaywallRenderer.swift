@@ -27,12 +27,6 @@ struct AdaptyUIPaywallRendererView: View {
                     }
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
-                .onAppear {
-                    screensViewModel.setViewPortSize(geometry.size)
-                }
-                .onChange(of: geometry.size) {
-                    screensViewModel.setViewPortSize($0)
-                }
             }
             .clipped()
             .environment(

@@ -41,7 +41,10 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     @State private var animationTokens = Set<AdaptyUIAnimationToken>()
 
-    init(_ properties: VC.Element.Properties, play: Binding<[VC.Animation]>) {
+    init(
+        _ properties: VC.Element.Properties,
+        play: Binding<[VC.Animation]>
+    ) {
         self.opacity = properties.opacity
 
         self.scaleX = 1.0
@@ -61,21 +64,33 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.play = play
     }
 
-    init(play: Binding<[VC.Animation]>) {
-        self.opacity = 1.0 // properties.opacity
+    init(
+        play: Binding<[VC.Animation]>,
+        initialOpacity: Double,
+        initialScaleX: Double,
+        initialScaleY: Double,
+        initialScaleAnchor: UnitPoint,
+        initialRotation: Angle,
+        initialRotationAnchor: UnitPoint,
+        initialOffset: VC.Offset,
+        initialShadowFilling: VC.AssetReference?,
+        initialShadowOffset: VC.Offset,
+        initialShadowBlurRadius: Double,
+    ) {
+        self.opacity = initialOpacity
 
-        self.scaleX = 1.0
-        self.scaleY = 1.0
-        self.scaleAnchor = .center
+        self.scaleX = initialScaleX
+        self.scaleY = initialScaleY
+        self.scaleAnchor = initialScaleAnchor
 
-        self.rotation = .zero
-        self.rotationAnchor = .center
+        self.rotation = initialRotation
+        self.rotationAnchor = initialRotationAnchor
 
-        self.initialOffset = .zero // properties.offset
+        self.initialOffset = initialOffset
 
-        self.initialShadowFilling = nil // properties.decorator?.shadow?.filling
-        self.initialShadowOffset = .zero // properties.decorator?.shadow?.offset ?? .zero
-        self.initialShadowBlurRadius = .zero // properties.decorator?.shadow?.blurRadius ?? .zero
+        self.initialShadowFilling = initialShadowFilling
+        self.initialShadowOffset = initialShadowOffset
+        self.initialShadowBlurRadius = initialShadowBlurRadius
 
         self.animations = [] // animations
         self.play = play
@@ -259,11 +274,31 @@ extension View {
 
     @ViewBuilder
     func animatablePropertiesTransition(
-        play: Binding<[VC.Animation]>
+        play: Binding<[VC.Animation]>,
+        initialOpacity: Double = 1.0,
+        initialScaleX: Double = 1.0,
+        initialScaleY: Double = 1.0,
+        initialScaleAnchor: UnitPoint = .center,
+        initialRotation: Angle = .zero,
+        initialRotationAnchor: UnitPoint = .center,
+        initialOffset: VC.Offset = .zero,
+        initialShadowFilling: VC.AssetReference? = nil,
+        initialShadowOffset: VC.Offset = .zero,
+        initialShadowBlurRadius: Double = .zero,
     ) -> some View {
         modifier(
             AdaptyUIAnimatablePropertiesModifier(
-                play: play
+                play: play,
+                initialOpacity: initialOpacity,
+                initialScaleX: initialScaleX,
+                initialScaleY: initialScaleY,
+                initialScaleAnchor: initialScaleAnchor,
+                initialRotation: initialRotation,
+                initialRotationAnchor: initialRotationAnchor,
+                initialOffset: initialOffset,
+                initialShadowFilling: initialShadowFilling,
+                initialShadowOffset: initialShadowOffset,
+                initialShadowBlurRadius: initialShadowBlurRadius,
             )
         )
     }

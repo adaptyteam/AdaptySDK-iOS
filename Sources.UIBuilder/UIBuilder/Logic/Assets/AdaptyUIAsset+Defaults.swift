@@ -15,8 +15,15 @@ extension VC.Asset {
     static var defaultNavigatorBackground: Self {
         .solidColor(.black)
     }
+
     static var defaultScreenBackground: Self {
         .solidColor(.black)
+    }
+}
+
+extension Color {
+    static var defaultNavigatorColor: Self {
+        .black
     }
 }
 
