@@ -5,7 +5,7 @@
 //  Created by Alexey Goncharov on 1/16/25.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
+#if canImport(AVKit)
 
 import AVKit
 import SwiftUI
@@ -27,6 +27,24 @@ public enum AdaptyUICustomImageAsset: Sendable {
     case nsImage(value: NSImage)
 #endif
 }
+
+#if canImport(UIKit)
+public extension AdaptyUICustomImageAsset {
+    @_disfavoredOverload
+    static func remote(url: URL, preview: UIImage?) -> AdaptyUICustomImageAsset {
+        .remote(url: url, preview: preview.map { AdaptyPlatformImage(nativeImage: $0) })
+    }
+}
+#endif
+
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+public extension AdaptyUICustomImageAsset {
+    @_disfavoredOverload
+    static func remote(url: URL, preview: NSImage?) -> AdaptyUICustomImageAsset {
+        .remote(url: url, preview: preview.map { AdaptyPlatformImage(nativeImage: $0) })
+    }
+}
+#endif
 
 public enum AdaptyUICustomVideoAsset: Sendable {
     case file(url: URL, preview: AdaptyUICustomImageAsset?)
@@ -68,6 +86,64 @@ public protocol AdaptyUIAssetsResolver: Sendable {
 
 extension [String: AdaptyUICustomAsset]: AdaptyUIAssetsResolver {
     public func asset(for id: String) -> AdaptyUICustomAsset? { self[id] }
+}
+
+extension AdaptyUICustomAsset {
+    var platformResolvedFont: AdaptyPlatformFont? {
+        switch self {
+        case let .font(value):
+            AdaptyPlatformFont(value)
+        case let .platformFont(value):
+            value
+        default:
+            nil
+        }
+    }
+}
+
+extension AdaptyUICustomImageAsset {
+    var platformResolvedImage: AdaptyPlatformImage? {
+        switch self {
+        case let .platformImage(value):
+            value
+#if canImport(UIKit)
+        case let .uiImage(value):
+            AdaptyPlatformImage(value)
+#endif
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+        case let .nsImage(value):
+            AdaptyPlatformImage(value)
+#endif
+        default:
+            nil
+        }
+    }
+
+    var platformResolvedRemote: (url: URL, preview: AdaptyPlatformImage?)? {
+        guard case let .remote(url, preview) = self else {
+            return nil
+        }
+        return (url, preview)
+    }
+}
+
+extension AdaptyUICustomColorAsset {
+    var platformResolvedColor: AdaptyPlatformColor? {
+        switch self {
+        case let .platformColor(color):
+            color
+#if canImport(UIKit)
+        case let .uiColor(color):
+            AdaptyPlatformColor(color)
+#endif
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+        case let .nsColor(color):
+            AdaptyPlatformColor(color)
+#endif
+        default:
+            nil
+        }
+    }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)

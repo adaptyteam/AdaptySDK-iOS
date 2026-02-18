@@ -5,7 +5,6 @@
 //  Created by Alexey Goncharov on 1/16/25.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -32,20 +31,21 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
             return manager
         }
 
+        if playerStates[id] == nil {
+            playerStates[id] = .loading
+        }
+
         let manager = AdaptyUIVideoPlayerManager(
             video: video,
             loop: loop,
             assetsResolver: assetsResolver
         ) { [weak self] state in
-            DispatchQueue.main.async { [weak self] in
+            Task { @MainActor [weak self] in
                 self?.playerStates[id] = state
             }
         }
 
-        DispatchQueue.main.async { [weak self] in
-            self?.playerManagers[id] = manager
-            self?.playerStates[id] = .loading
-        }
+        playerManagers[id] = manager
 
         return manager
     }
@@ -54,5 +54,3 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
         playerManagers.removeValue(forKey: id)
     }
 }
-
-#endif

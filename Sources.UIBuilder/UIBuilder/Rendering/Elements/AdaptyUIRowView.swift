@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 23.05.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -92,5 +91,3 @@ struct AdaptyUIRowView: View {
         .frame(height: contentsSize.height)
     }
 }
-
-#endif

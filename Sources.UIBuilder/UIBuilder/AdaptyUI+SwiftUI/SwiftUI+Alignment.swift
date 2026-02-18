@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 14.06.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -75,5 +74,3 @@ extension VC.Stack {
         )
     }
 }
-
-#endif

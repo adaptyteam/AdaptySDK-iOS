@@ -5,7 +5,6 @@
 //  Created by Alexey Goncharov on 6/6/25.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -63,7 +62,13 @@ extension VC.Animation.Timeline {
         let animation = interpolator.createAnimation(duration: duration)
 
         Task { @MainActor in
-            try await Task.sleep(seconds: delay)
+            do {
+                try await Task.sleep(seconds: delay)
+            } catch {
+                token.invalidate()
+                completion(token)
+                return
+            }
 
             guard token.isActive else {
                 completion(token)
@@ -73,10 +78,16 @@ extension VC.Animation.Timeline {
             onBeforeAnimation?()
 
             if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
-                try withAnimation(animation, body, completion: { completion(token) })
+                withAnimation(animation, body, completion: { completion(token) })
             } else {
-                try withAnimation(animation, body)
-                try await Task.sleep(seconds: duration)
+                withAnimation(animation, body)
+                do {
+                    try await Task.sleep(seconds: duration)
+                } catch {
+                    token.invalidate()
+                    completion(token)
+                    return
+                }
                 completion(token)
             }
         }
@@ -118,7 +129,6 @@ enum AdaptyUIPropertyAnimator {
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        let duration = timeline.duration
         let loopDelay = timeline.loopDelay
         let pingPongDelay = timeline.pingPongDelay
 
@@ -139,10 +149,16 @@ enum AdaptyUIPropertyAnimator {
                         let loopLeftCount = (loopCount ?? .max) - 1
 
                         if loopLeftCount > 0 {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + loopDelay) {
+                            Task { @MainActor in
+                                do {
+                                    try await Task.sleep(seconds: loopDelay)
+                                } catch {
+                                    token.invalidate()
+                                    return
+                                }
                                 guard token.isActive else { return }
 
-                                animatePingPongLoop(
+                                _ = animatePingPongLoop(
                                     token: token,
                                     timeline: timeline,
                                     startDelay: 0.0,
@@ -170,8 +186,6 @@ enum AdaptyUIPropertyAnimator {
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        let duration = timeline.duration
-
         return timeline.withAsyncAnimation(
             token: token,
             delay: startDelay,
@@ -183,10 +197,16 @@ enum AdaptyUIPropertyAnimator {
                 let loopLeftCount = (loopCount ?? .max) - 1
 
                 if loopLeftCount > 0 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + timeline.loopDelay) {
+                    Task { @MainActor in
+                        do {
+                            try await Task.sleep(seconds: timeline.loopDelay)
+                        } catch {
+                            token.invalidate()
+                            return
+                        }
                         guard token.isActive else { return }
 
-                        animateBasicLoop(
+                        _ = animateBasicLoop(
                             token: token,
                             timeline: timeline,
                             startDelay: 0.0,
@@ -220,5 +240,3 @@ enum AdaptyUIPropertyAnimator {
         )
     }
 }
-
-#endif

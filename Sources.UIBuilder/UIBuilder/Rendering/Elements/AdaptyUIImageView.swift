@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 2.4.24..
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -145,5 +144,3 @@ struct AdaptyUIImageView: View {
         }
     }
 }
-
-#endif

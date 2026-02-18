@@ -5,7 +5,7 @@
 //  Created by Aleksei Valiano on 22.05.2025.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
+#if canImport(AVKit)
 
 import AVKit
 import SwiftUI
@@ -72,14 +72,11 @@ extension VC.Font {
               let asset = resolver.asset(for: customId)
         else { return resolved(withSize: size) }
 
-        switch asset {
-        case let .font(value):
-            return AdaptyPlatformFont(value).withSize(size)
-        case let .platformFont(value):
-            return value.withSize(size)
-        default:
-            return resolved(withSize: size)
+        if let font = asset.platformResolvedFont {
+            return font.withSize(size)
         }
+
+        return resolved(withSize: size)
     }
 
     private func resolved(withSize size: Double) -> Resolved {
@@ -211,39 +208,35 @@ private extension AdaptyUICustomImageAsset {
                 return nil
             }
             return .image(value)
-        case let .remote(url, preview):
-            return .remote(url, preview: preview)
-        case let .platformImage(value):
-            return .image(value)
-#if canImport(UIKit)
-        case let .uiImage(value):
-            return .image(AdaptyPlatformImage(value))
-#endif
-#if canImport(AppKit) && !targetEnvironment(macCatalyst)
-        case let .nsImage(value):
-            return .image(AdaptyPlatformImage(value))
-#endif
+        default:
+            break
         }
+
+        if let remote = platformResolvedRemote {
+            return .remote(remote.url, preview: remote.preview)
+        }
+
+        if let image = platformResolvedImage {
+            return .image(image)
+        }
+
+        return nil
     }
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 private extension AdaptyUICustomColorAsset {
     var resolved: VC.Color.Resolved {
-        switch self {
-        case let .platformColor(color):
-            SystemSpecificAbstractionManager.swiftUIColor(from: color)
-        case let .swiftUIColor(color):
-            color
-#if canImport(UIKit)
-        case let .uiColor(color):
-            SystemSpecificAbstractionManager.swiftUIColor(from: AdaptyPlatformColor(color))
-#endif
-#if canImport(AppKit) && !targetEnvironment(macCatalyst)
-        case let .nsColor(color):
-            SystemSpecificAbstractionManager.swiftUIColor(from: AdaptyPlatformColor(color))
-#endif
+        if let color = platformResolvedColor {
+            return SystemSpecificAbstractionManager.swiftUIColor(from: color)
         }
+
+        if case let .swiftUIColor(color) = self {
+            return color
+        }
+
+        assertionFailure("Unsupported color asset case.")
+        return .clear
     }
 }
 

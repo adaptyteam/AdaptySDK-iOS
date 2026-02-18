@@ -5,7 +5,6 @@
 //  Created by Alexey Goncharov on 9/23/25.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -221,5 +220,3 @@ public struct AdaptyUIPaywallView: View {
         }
     }
 }
-
-#endif

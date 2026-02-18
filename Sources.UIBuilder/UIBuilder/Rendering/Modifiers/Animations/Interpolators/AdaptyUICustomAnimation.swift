@@ -5,7 +5,6 @@
 //  Created by Alexey Goncharov on 3/21/25.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -108,5 +107,3 @@ extension Animation {
         )
     }
 }
-
-#endif

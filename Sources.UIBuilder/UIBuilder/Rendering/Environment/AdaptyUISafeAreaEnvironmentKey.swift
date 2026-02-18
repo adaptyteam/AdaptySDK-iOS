@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 16.05.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -28,5 +27,3 @@ public extension View {
         environment(\.adaptySafeAreaInsets, value)
     }
 }
-
-#endif

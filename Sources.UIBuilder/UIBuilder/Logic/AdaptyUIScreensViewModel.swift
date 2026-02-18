@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 18.06.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import Foundation
 
@@ -83,5 +82,3 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         bottomSheetsViewModels.forEach { $0.isPresented = false }
     }
 }
-
-#endif

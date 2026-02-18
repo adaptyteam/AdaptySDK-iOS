@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 27.05.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import Foundation
 
@@ -31,8 +30,6 @@ extension AdaptyUIProductsViewModel: ProductsInfoProvider {
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyUIProductsViewModel: ObservableObject {
-    private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyUIProductsViewModel.Queue")
-
     private let logId: String
     private let logic: AdaptyUIBuilderLogic
     private let paywallViewModel: AdaptyUIPaywallViewModel
@@ -185,5 +182,3 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         )
     }
 }
-
-#endif

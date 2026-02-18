@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 3.4.24..
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -83,5 +82,3 @@ extension VC.Element {
 #Preview {
     AdaptyUIUnknownElementView(value: VC.DebugElement.rectangle.rawValue)
 }
-
-#endif

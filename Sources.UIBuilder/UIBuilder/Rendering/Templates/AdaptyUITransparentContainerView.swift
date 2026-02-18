@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 03.05.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -35,7 +34,8 @@ struct AdaptyUITransparentContainerView: View {
             }
             .scrollIndicatorsHidden_compatible()
             .onAppear {
-                DispatchQueue.main.async {
+                Task { @MainActor in
+                    await Task.yield()
                     scrollProxy.scrollTo("content", anchor: .bottom)
                 }
             }
@@ -62,5 +62,3 @@ struct AdaptyUITransparentContainerView: View {
         }
     }
 }
-
-#endif

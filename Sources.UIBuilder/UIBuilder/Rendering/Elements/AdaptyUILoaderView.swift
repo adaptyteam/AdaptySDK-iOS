@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 24.06.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -28,5 +27,3 @@ struct AdaptyUILoaderView: View {
 #Preview {
     AdaptyUILoaderView()
 }
-
-#endif

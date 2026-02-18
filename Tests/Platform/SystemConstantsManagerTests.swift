@@ -7,7 +7,7 @@ import Testing
 struct PlatformSystemConstantsManagerTests {
     @Test
     @MainActor
-    func valuesAreAccessibleOnCurrentPlatform() async {
+    func valuesAreAccessibleOnCurrentPlatform() {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
             return
         }
@@ -18,10 +18,36 @@ struct PlatformSystemConstantsManagerTests {
 
         _ = SystemConstantsManager.systemBackgroundColor
 
-        let url = URL(string: "adapty-sdk-invalid-url-scheme://open")!
-        let openResult = await SystemConstantsManager.openExternalURL(url)
-        #expect(openResult == true || openResult == false)
+        let httpsURL = URL(string: "https://adapty.io")!
+        let customSchemeURL = URL(string: "adapty-sdk-invalid-url-scheme://open")!
+
+        #expect(
+            SystemConstantsManager.resolvedPresentationForCurrentPlatform(
+                .browserOutApp,
+                url: httpsURL
+            ) == .browserOutApp
+        )
+
+        let resolvedInAppHTTPS = SystemConstantsManager.resolvedPresentationForCurrentPlatform(
+            .browserInApp,
+            url: httpsURL
+        )
+
+#if os(iOS)
+        #expect(resolvedInAppHTTPS == .browserInApp)
+#else
+        #expect(resolvedInAppHTTPS == .browserOutApp)
+#endif
+
+        #expect(
+            SystemConstantsManager.resolvedPresentationForCurrentPlatform(
+                .browserInApp,
+                url: customSchemeURL
+            ) == .browserOutApp
+        )
+
     }
+
 }
 
 #endif

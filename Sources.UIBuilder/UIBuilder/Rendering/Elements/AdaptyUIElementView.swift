@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 2.4.24..
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -132,5 +131,3 @@ package struct AdaptyUIElementView: View {
             .modifier(DebugOverlayModifier())
     }
 }
-
-#endif

@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 12.06.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -53,5 +52,3 @@ extension View {
         modifier(AdaptyUIAlignmentModifier(alignment: alignment))
     }
 }
-
-#endif

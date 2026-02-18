@@ -5,7 +5,7 @@
 //  Created by Aleksey Goncharov on 25.07.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
+#if canImport(AVKit)
 
 import AVKit
 import SwiftUI
@@ -32,7 +32,7 @@ extension VC.AspectRatio {
 struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
     var player: AVPlayer
     var videoGravity: AVLayerVideoGravity
-    var onReadyForDisplay: () -> Void
+    var onReadyForDisplay: @MainActor @Sendable () -> Void
 
     @State private var playerStatusObservation: NSKeyValueObservation?
 
@@ -47,35 +47,29 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.videoGravity = videoGravity
         playerViewController.allowsPictureInPicturePlayback = false
 
-        DispatchQueue.main.async {
-    #if os(visionOS)
-            playerStatusObservation = playerViewController.player?.observe(
-                \.status,
-                options: [.old, .new],
-                changeHandler: { player, _ in
-                    DispatchQueue.main.async {
-                        if player.status == .readyToPlay {
-                            onReadyForDisplay()
-                        }
-                    }
+#if os(visionOS)
+        playerStatusObservation = playerViewController.player?.observe(
+            \.status,
+            options: [.old, .new],
+            changeHandler: { player, _ in
+                guard player.status == .readyToPlay else { return }
+                Task { @MainActor in
+                    onReadyForDisplay()
                 }
-            )
-    #else
-            playerStatusObservation = playerViewController.observe(
-                \.isReadyForDisplay,
-                options: [.old, .new, .initial, .prior],
-                changeHandler: { playerVC, _ in
-                    DispatchQueue.main.async {
-                        if playerVC.isReadyForDisplay {
-                            DispatchQueue.main.async {
-                                onReadyForDisplay()
-                            }
-                        }
-                    }
+            }
+        )
+#else
+        playerStatusObservation = playerViewController.observe(
+            \.isReadyForDisplay,
+            options: [.old, .new, .initial, .prior],
+            changeHandler: { playerVC, _ in
+                Task { @MainActor in
+                    guard playerVC.isReadyForDisplay else { return }
+                    onReadyForDisplay()
                 }
-            )
-    #endif
-        }
+            }
+        )
+#endif
 
         return playerViewController
     }
@@ -90,29 +84,118 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoPlayerView: NSViewRepresentable {
+    final class Coordinator: @unchecked Sendable {
+        private var playerCurrentItemObservation: NSKeyValueObservation?
+        private weak var observedPlayer: AVPlayer?
+
+        private var currentItemObservation: NSKeyValueObservation?
+        private weak var observedItem: AVPlayerItem?
+        private var didNotifyReady = false
+
+        func observeReadyState(
+            for player: AVPlayer,
+            onReadyForDisplay: @escaping @MainActor @Sendable () -> Void
+        ) {
+            if observedPlayer !== player {
+                playerCurrentItemObservation?.invalidate()
+                observedPlayer = player
+                didNotifyReady = false
+
+                playerCurrentItemObservation = player.observe(
+                    \.currentItem,
+                    options: [.initial, .new]
+                ) { [weak self] player, _ in
+                    self?.observeCurrentItem(
+                        player.currentItem,
+                        onReadyForDisplay: onReadyForDisplay
+                    )
+                }
+            } else {
+                observeCurrentItem(
+                    player.currentItem,
+                    onReadyForDisplay: onReadyForDisplay
+                )
+            }
+        }
+
+        private func observeCurrentItem(
+            _ item: AVPlayerItem?,
+            onReadyForDisplay: @escaping @MainActor @Sendable () -> Void
+        ) {
+            guard let item else { return }
+
+            if observedItem !== item {
+                currentItemObservation?.invalidate()
+                observedItem = item
+
+                currentItemObservation = item.observe(
+                    \.status,
+                    options: [.initial, .new]
+                ) { [weak self] item, _ in
+                    guard let self else { return }
+                    guard item.status == .readyToPlay else { return }
+                    self.notifyReady(onReadyForDisplay)
+                }
+            } else if item.status == .readyToPlay {
+                notifyReady(onReadyForDisplay)
+            }
+        }
+
+        func cleanup() {
+            playerCurrentItemObservation?.invalidate()
+            playerCurrentItemObservation = nil
+            observedPlayer = nil
+
+            currentItemObservation?.invalidate()
+            currentItemObservation = nil
+            observedItem = nil
+            didNotifyReady = false
+        }
+
+        private func notifyReady(
+            _ onReadyForDisplay: @escaping @MainActor @Sendable () -> Void
+        ) {
+            guard !didNotifyReady else { return }
+            didNotifyReady = true
+            Task { @MainActor in
+                onReadyForDisplay()
+            }
+        }
+    }
+
     var player: AVPlayer
     var videoGravity: AVLayerVideoGravity
-    var onReadyForDisplay: () -> Void
+    var onReadyForDisplay: @MainActor @Sendable () -> Void
 
-    func makeNSView(context _: Context) -> AVPlayerView {
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+
+    func makeNSView(context: Context) -> AVPlayerView {
         let playerView = AVPlayerView()
         playerView.controlsStyle = .none
         playerView.player = player
         playerView.videoGravity = videoGravity
 
-        DispatchQueue.main.async {
-            onReadyForDisplay()
-        }
+        context.coordinator.observeReadyState(
+            for: player,
+            onReadyForDisplay: onReadyForDisplay
+        )
 
         return playerView
     }
 
-    func updateNSView(_ nsView: AVPlayerView, context _: Context) {
+    func updateNSView(_ nsView: AVPlayerView, context: Context) {
         nsView.player = player
         nsView.videoGravity = videoGravity
+        context.coordinator.observeReadyState(
+            for: player,
+            onReadyForDisplay: onReadyForDisplay
+        )
     }
 
-    static func dismantleNSView(_ nsView: AVPlayerView, coordinator _: ()) {
+    static func dismantleNSView(_ nsView: AVPlayerView, coordinator: Coordinator) {
+        coordinator.cleanup()
         nsView.player?.pause()
         nsView.player = nil
     }

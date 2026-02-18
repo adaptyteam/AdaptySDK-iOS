@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 21.05.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -39,5 +38,3 @@ package final class AdaptyUIActionsViewModel: ObservableObject {
         logic.reportDidPerformAction(.custom(id: id))
     }
 }
-
-#endif

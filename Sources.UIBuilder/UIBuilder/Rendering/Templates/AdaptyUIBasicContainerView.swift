@@ -4,7 +4,6 @@
 //
 //  Created by Aleksey Goncharov on 03.05.2024.
 //
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -172,5 +171,3 @@ struct AdaptyUIBasicContainerView: View {
         }
     }
 }
-
-#endif

@@ -12,6 +12,35 @@ import UIKit
 
 struct PlatformSystemSpecificAbstractionManagerTests {
     @Test
+    func legacyCustomAssetConstructorsRemainAvailable() {
+        let url = URL(string: "https://adapty.io")!
+
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+        let preview = NSImage(size: CGSize(width: 8, height: 8))
+        _ = AdaptyUICustomImageAsset.remote(url: url, preview: nil)
+        _ = AdaptyUICustomImageAsset.remote(url: url, preview: preview)
+        _ = AdaptyUICustomImageAsset.nsImage(value: preview)
+        _ = AdaptyUICustomAsset.font(NSFont.systemFont(ofSize: 12))
+#elseif canImport(UIKit)
+        let preview = UIImage()
+        _ = AdaptyUICustomImageAsset.remote(url: url, preview: nil)
+        _ = AdaptyUICustomImageAsset.remote(url: url, preview: preview)
+        _ = AdaptyUICustomImageAsset.uiImage(value: preview)
+        _ = AdaptyUICustomAsset.font(UIFont.systemFont(ofSize: 12))
+#endif
+
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+        let platformImage = AdaptyPlatformImage(nsImage: NSImage(size: CGSize(width: 8, height: 8)))
+#elseif canImport(UIKit)
+        let platformImage = AdaptyPlatformImage(uiImage: UIImage())
+#else
+        return
+#endif
+        _ = AdaptyUICustomImageAsset.remote(url: url, preview: platformImage)
+        _ = AdaptyUICustomImageAsset.platformImage(value: platformImage)
+    }
+
+    @Test
     func colorBridgesBetweenPlatformAndSwiftUI() {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
             return

@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 13.06.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -35,5 +34,3 @@ struct CurveDownShape: InsettableShape {
         return path
     }
 }
-
-#endif

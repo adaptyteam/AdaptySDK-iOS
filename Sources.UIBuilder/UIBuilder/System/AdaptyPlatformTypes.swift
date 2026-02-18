@@ -25,6 +25,10 @@ public struct AdaptyPlatformImage: @unchecked Sendable {
     public init(_ native: AdaptyNativeImage) {
         self.native = native
     }
+
+    public init(nativeImage: AdaptyNativeImage) {
+        self.init(nativeImage)
+    }
 }
 
 public struct AdaptyPlatformColor: @unchecked Sendable {
@@ -32,6 +36,10 @@ public struct AdaptyPlatformColor: @unchecked Sendable {
 
     public init(_ native: AdaptyNativeColor) {
         self.native = native
+    }
+
+    public init(nativeColor: AdaptyNativeColor) {
+        self.init(nativeColor)
     }
 }
 
@@ -42,11 +50,11 @@ public struct AdaptyPlatformFont: @unchecked Sendable {
         self.native = native
     }
 
+    public init(nativeFont: AdaptyNativeFont) {
+        self.init(nativeFont)
+    }
+
     public func withSize(_ size: Double) -> AdaptyPlatformFont {
-#if canImport(UIKit)
         AdaptyPlatformFont(native.withSize(size))
-#else
-        AdaptyPlatformFont(native.withSize(size))
-#endif
     }
 }

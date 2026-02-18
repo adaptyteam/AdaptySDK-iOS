@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 27.06.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import Foundation
 
@@ -59,5 +58,3 @@ package final class AdaptyUIPaywallViewModel: ObservableObject {
         logShowPaywallCalled = false
     }
 }
-
-#endif

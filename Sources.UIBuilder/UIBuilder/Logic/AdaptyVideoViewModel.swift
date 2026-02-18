@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 15.08.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import AVKit
 import SwiftUI
@@ -69,7 +68,7 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
             \.status,
             options: [.old, .new, .initial, .prior],
             changeHandler: { [weak self] item, _ in
-                DispatchQueue.main.async { [weak self] in
+                Task { @MainActor [weak self] in
                     self?.playerStatusDidChange(item.status, item: item)
                 }
             }
@@ -105,5 +104,3 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         playerStatusObservation = nil
     }
 }
-
-#endif

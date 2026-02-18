@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 26.06.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -54,5 +53,3 @@ extension View {
         }
     }
 }
-
-#endif

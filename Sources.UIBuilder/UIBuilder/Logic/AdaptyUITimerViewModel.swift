@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-#if canImport(UIKit) || canImport(AppKit)
 
 @MainActor
 package struct AdaptyUIDefaultTimerResolver: AdaptyUITimerResolver {
@@ -128,5 +127,3 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         timers.removeAll()
     }
 }
-
-#endif

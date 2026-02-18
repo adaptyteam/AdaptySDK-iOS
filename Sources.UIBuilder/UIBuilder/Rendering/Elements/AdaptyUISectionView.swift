@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 30.05.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -27,5 +26,3 @@ struct AdaptyUISectionView: View {
         }
     }
 }
-
-#endif

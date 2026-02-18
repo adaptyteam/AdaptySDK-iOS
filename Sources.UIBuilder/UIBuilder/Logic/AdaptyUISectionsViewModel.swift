@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 30.05.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import Foundation
 
@@ -31,12 +30,10 @@ package final class AdaptyUISectionsViewModel: ObservableObject {
     func selectedIndex(for section: VC.Section) -> Int {
         if let stateIndex = sectionsStates[section.id] {
             return stateIndex
-        } else {
-            DispatchQueue.main.async { [weak self] in
-                self?.sectionsStates[section.id] = section.index
-            }
-            return section.index
         }
+
+        sectionsStates[section.id] = section.index
+        return section.index
     }
 
     package func resetSectionsState() {
@@ -44,5 +41,3 @@ package final class AdaptyUISectionsViewModel: ObservableObject {
         sectionsStates.removeAll()
     }
 }
-
-#endif

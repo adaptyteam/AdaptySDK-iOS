@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 03.05.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -66,5 +65,3 @@ struct AdaptyUIFlatContainerView: View {
         .coordinateSpace(name: CoordinateSpace.adaptyGlobalName)
     }
 }
-
-#endif

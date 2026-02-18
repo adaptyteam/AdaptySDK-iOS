@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 25.06.2024.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -48,5 +47,3 @@ struct FooterVerticalFillerView: View {
         .frame(height: height)
     }
 }
-
-#endif

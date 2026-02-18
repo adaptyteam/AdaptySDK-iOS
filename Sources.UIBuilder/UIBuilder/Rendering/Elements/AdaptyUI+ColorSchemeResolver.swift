@@ -5,7 +5,6 @@
 //  Created by Aleksei Valiano on 23.05.2025.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -53,5 +52,3 @@ extension VC.Mode<VC.Color> {
         usedColorScheme(colorScheme).resolve(with: resolver)
     }
 }
-
-#endif
