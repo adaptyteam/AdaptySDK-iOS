@@ -5,7 +5,7 @@
 //  Created by Aleksey Goncharov on 27.06.2024.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import Foundation
 

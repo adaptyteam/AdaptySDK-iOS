@@ -47,6 +47,7 @@ public extension AdaptyUI {
 import UIKit
 
 /// Implement this protocol to respond to different events happening inside the purchase screen.
+@available(macOS, unavailable, message: "Use AdaptyPaywallView or View.paywall(...) on macOS")
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyPaywallControllerDelegate: AnyObject {
@@ -190,6 +191,15 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     )
 }
 
+#endif
+
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+@available(macOS, unavailable, message: "Use AdaptyPaywallView or View.paywall(...) on macOS")
+public protocol AdaptyPaywallControllerDelegate: AnyObject {}
+
+@available(macOS, unavailable, message: "Use AdaptyPaywallView or View.paywall(...) on macOS")
+public final class AdaptyPaywallController {}
+#endif
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public typealias AdaptyTimerResolver = AdaptyUITimerResolver
@@ -202,8 +212,6 @@ public typealias AdaptyAssetsResolver = AdaptyUIAssetsResolver
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public typealias AdaptyCustomAsset = AdaptyUICustomAsset
-
-#endif
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public protocol AdaptyObserverModeResolver: Sendable {
@@ -238,7 +246,6 @@ public extension AdaptyUI {
 
         Log.ui.verbose("Calling AdaptyUI activate [\(stamp)] with params: \(logParams)")
 
-#if canImport(UIKit)
         let sdk: Adapty
 
         do {
@@ -262,15 +269,8 @@ public extension AdaptyUI {
         AdaptyUIBuilder.ImageUrlPrefetcher.shared.initialize()
 
         Log.ui.info("AdaptyUI activated successfully. [\(stamp)]")
-#else
-        let err = AdaptyUIError.platformNotSupported
-        Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(err).")
-        throw err
-#endif
     }
 }
-
-#if canImport(UIKit)
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
@@ -324,6 +324,8 @@ public extension AdaptyUI {
     ///   - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
     ///   - delegate: the object that implements the ``AdaptyPaywallControllerDelegate`` protocol. Use it to respond to different events happening inside the purchase screen.
     /// - Returns: an ``AdaptyPaywallController`` object, representing the requested paywall screen.
+#if canImport(UIKit)
+    @available(macOS, unavailable, message: "Use AdaptyPaywallView or View.paywall(...) on macOS")
     static func paywallController(
         with paywallConfiguration: PaywallConfiguration,
         delegate: AdaptyPaywallControllerDelegate,
@@ -341,5 +343,17 @@ public extension AdaptyUI {
             showDebugOverlay: showDebugOverlay
         )
     }
-}
+#elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+    @available(macOS, unavailable, message: "Use AdaptyPaywallView or View.paywall(...) on macOS")
+    static func paywallController(
+        with paywallConfiguration: PaywallConfiguration,
+        delegate: AdaptyPaywallControllerDelegate,
+        showDebugOverlay: Bool = false
+    ) throws -> AdaptyPaywallController {
+        _ = paywallConfiguration
+        _ = delegate
+        _ = showDebugOverlay
+        fatalError("AdaptyPaywallController is unavailable on native macOS")
+    }
 #endif
+}

@@ -5,7 +5,7 @@
 //  Created by Aleksey Goncharov on 24.06.2024.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -13,7 +13,7 @@ import SwiftUI
 extension View {
     @ViewBuilder
     func scrollIndicatorsHidden_compatible() -> some View {
-        if #available(iOS 16.0, *) {
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, visionOS 1.0, *) {
             scrollIndicators(.hidden)
         } else {
             self

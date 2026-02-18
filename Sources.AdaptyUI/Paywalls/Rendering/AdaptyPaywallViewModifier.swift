@@ -5,8 +5,6 @@
 //  Created by Aleksey Goncharov on 28.06.2024.
 //
 
-#if canImport(UIKit)
-
 import Adapty
 import AdaptyUIBuilder
 import SwiftUI
@@ -19,7 +17,7 @@ public struct AdaptyLoadingPlaceholderView: View {
     public var body: some View {
         ProgressView()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(UIColor.systemBackground))
+            .background(SystemConstantsManager.systemBackgroundColor)
     }
 }
 
@@ -127,6 +125,18 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
 
     public func body(content: Content) -> some View {
         if fullScreen {
+#if os(macOS) && !targetEnvironment(macCatalyst)
+            content
+                .sheet(
+                    isPresented: isPresented,
+                    onDismiss: {
+                        paywallConfiguration?.reportOnDisappear()
+                    },
+                    content: {
+                        paywallOrProgressView
+                    }
+                )
+#else
             content
                 .fullScreenCover(
                     isPresented: isPresented,
@@ -137,6 +147,7 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
                         paywallOrProgressView
                     }
                 )
+#endif
         } else {
             content
                 .sheet(
@@ -228,5 +239,3 @@ public extension View {
         )
     }
 }
-
-#endif

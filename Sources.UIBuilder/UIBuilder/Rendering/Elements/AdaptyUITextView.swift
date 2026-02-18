@@ -5,7 +5,7 @@
 //  Created by Aleksey Goncharov on 2.4.24..
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -123,20 +123,25 @@ extension Array where Element == VC.RichText.Item {
                     )
                 )
             case let .image(value, attr):
-                guard let uiImage = value?.resolve(with: assetsResolver, colorScheme: colorScheme).textAttachmentImage(
-                    font: attr.uiFont(assetsResolver),
-                    tint: attr.imageTintColor?.asSolidColor?.resolve(
+                let tintColor: AdaptyPlatformColor? = {
+                    guard let tint = attr.imageTintColor?.asSolidColor else { return nil }
+
+                    let resolved = tint.resolve(
                         with: assetsResolver,
                         colorScheme: colorScheme
-                    ).uiColor
+                    )
+                    return SystemSpecificAbstractionManager.platformColor(from: resolved)
+                }()
+
+                guard let image = value?.resolve(with: assetsResolver, colorScheme: colorScheme).textAttachmentImage(
+                    font: attr.platformFont(assetsResolver),
+                    tint: tintColor
                 ) else {
                     return partialResult
                 }
 
                 return partialResult + Text(
-                    Image(
-                        uiImage: uiImage
-                    )
+                    SystemSpecificAbstractionManager.swiftUIImage(from: image)
                 )
             }
         }
@@ -193,43 +198,32 @@ extension VC.RichText {
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.ImageData.Resolved {
-    private var uiImage: UIImage? {
+    private var platformImage: AdaptyPlatformImage? {
         switch self {
         case let .image(image):
             image
-        case .remote(_, preview: _): // TODO: implement this
+        case .remote(_, preview: _):
             nil
         }
     }
 
     func textAttachmentImage(
-        font: UIFont,
-        tint: UIColor?
-    ) -> UIImage? {
-        guard var image = uiImage else { return nil }
+        font: AdaptyPlatformFont,
+        tint: AdaptyPlatformColor?
+    ) -> AdaptyPlatformImage? {
+        guard var image = platformImage else { return nil }
 
-        let size = CGSize(width: image.size.width * font.capHeight / image.size.height,
-                          height: font.capHeight)
+        let capHeight = font.native.capHeight
+        let size = CGSize(width: image.native.size.width * capHeight / image.native.size.height,
+                          height: capHeight)
 
-        image = image.imageWith(newSize: size)
+        image = SystemSpecificAbstractionManager.resizedImage(image, to: size)
 
         if let tint {
-            image = image
-                .withRenderingMode(.alwaysTemplate)
-                .withTintColor(tint, renderingMode: .alwaysTemplate)
+            image = SystemSpecificAbstractionManager.tintedImage(image, with: tint)
         }
 
         return image
-    }
-}
-
-extension UIImage {
-    func imageWith(newSize: CGSize) -> UIImage {
-        let image = UIGraphicsImageRenderer(size: newSize).image { _ in
-            draw(in: CGRect(origin: .zero, size: newSize))
-        }
-
-        return image.withRenderingMode(renderingMode)
     }
 }
 
@@ -284,9 +278,11 @@ extension AttributedString {
         result.foregroundColor = attributes?.txtColor.asSolidColor?.resolve(
             with: assetsResolver,
             colorScheme: colorScheme
-        ).uiColor ?? .darkText
+        ) ?? .primary
 
-        result.font = attributes?.uiFont(assetsResolver) ?? .adaptyDefault
+        result.font = SystemSpecificAbstractionManager.swiftUIFont(
+            from: attributes?.platformFont(assetsResolver) ?? .adaptyDefault
+        )
 
         if let background = attributes?.background?.asSolidColor {
             result.backgroundColor = background.resolve(
@@ -308,14 +304,22 @@ extension AttributedString {
 }
 
 @MainActor
-extension UIFont {
-    static let adaptyDefault = UIFont.systemFont(ofSize: 15.0)
+extension AdaptyPlatformFont {
+    static let adaptyDefault: AdaptyPlatformFont = {
+#if canImport(UIKit)
+        AdaptyPlatformFont(AdaptyNativeFont.systemFont(ofSize: 15.0))
+#elseif canImport(AppKit)
+        AdaptyPlatformFont(AdaptyNativeFont.systemFont(ofSize: 15.0, weight: .regular))
+#else
+        AdaptyPlatformFont(AdaptyNativeFont.systemFont(ofSize: 15.0))
+#endif
+    }()
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension VC.RichText.TextAttributes {
-    func uiFont(_ assetsResolver: AdaptyUIAssetsResolver) -> UIFont {
+    func platformFont(_ assetsResolver: AdaptyUIAssetsResolver) -> AdaptyPlatformFont {
         font.resolve(with: assetsResolver, withSize: size)
     }
 }

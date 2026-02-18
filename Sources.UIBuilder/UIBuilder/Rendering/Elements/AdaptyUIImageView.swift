@@ -5,10 +5,9 @@
 //  Created by Aleksey Goncharov on 2.4.24..
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
-import UIKit
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
@@ -64,21 +63,22 @@ struct AdaptyUIImageView: View {
 
     @ViewBuilder
     private func rasterImage(
-        _ uiImage: UIImage?,
+        _ image: AdaptyPlatformImage?,
         aspect: VC.AspectRatio,
         tint: VC.Color.Resolved?,
         limitWidth: Bool
     ) -> some View {
-        if let uiImage {
-            if let tint = tint {
-                Image(uiImage: uiImage)
+        if let image {
+            if let tint {
+                SystemSpecificAbstractionManager
+                    .swiftUIImage(from: image)
                     .resizable()
                     .renderingMode(.template)
                     .foregroundColor(tint)
                     .aspectRatio(aspect, limitWidth: limitWidth)
-
             } else {
-                Image(uiImage: uiImage)
+                SystemSpecificAbstractionManager
+                    .swiftUIImage(from: image)
                     .resizable()
                     .aspectRatio(aspect, limitWidth: limitWidth)
             }

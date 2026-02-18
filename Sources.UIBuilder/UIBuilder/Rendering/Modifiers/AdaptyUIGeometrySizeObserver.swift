@@ -5,7 +5,7 @@
 //  Created by Aleksey Goncharov on 23.05.2024.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -47,7 +47,7 @@ extension View {
     @ViewBuilder
     func onGeometrySizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
 #if compiler(>=6.0)
-        if #available(iOS 18.0, visionOS 2.0, *) {
+        if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
             onGeometryChange(
                 for: CGSize.self,
                 of: { $0.frame(in: .local).size },

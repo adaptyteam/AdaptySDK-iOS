@@ -44,6 +44,7 @@ extension AdaptyUI.PaywallConfiguration {
 }
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@available(macOS, unavailable, message: "Use AdaptyPaywallView or View.paywall(...) on macOS")
 public final class AdaptyPaywallController: UIViewController {
     public var id: String { paywallView.id }
     

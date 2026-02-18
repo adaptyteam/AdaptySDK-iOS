@@ -5,8 +5,6 @@
 //  Created by Alexey Goncharov on 2023-01-24.
 //
 
-#if canImport(UIKit)
-
 import Adapty
 import AdaptyUIBuilder
 import Foundation
@@ -103,5 +101,3 @@ extension AdaptyProduct {
         return formatter.string(from: nsDecimalPricePerPeriod)
     }
 }
-
-#endif

@@ -5,7 +5,7 @@
 //  Created by Aleksey Goncharov on 18.06.2024.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -13,11 +13,7 @@ import SwiftUI
 @MainActor
 extension AdaptyUIBuilder {
     static var mainScreenBounds: CGRect {
-#if os(visionOS)
-        UIApplication.shared.windows.first?.bounds ?? .zero
-#else
-        UIScreen.main.bounds
-#endif
+        SystemConstantsManager.mainScreenBounds
     }
 }
 

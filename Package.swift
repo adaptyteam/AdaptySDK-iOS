@@ -89,7 +89,7 @@ let package = Package(
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),

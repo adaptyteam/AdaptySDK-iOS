@@ -5,11 +5,17 @@
 //  Created by Aleksey Goncharov on 25.07.2024.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import AVKit
-import Combine
 import SwiftUI
+
+#if canImport(UIKit)
+import UIKit
+#endif
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+import AppKit
+#endif
 
 extension VC.AspectRatio {
     var videoGravity: AVLayerVideoGravity {
@@ -21,6 +27,7 @@ extension VC.AspectRatio {
     }
 }
 
+#if canImport(UIKit)
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
     var player: AVPlayer
@@ -41,7 +48,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.allowsPictureInPicturePlayback = false
 
         DispatchQueue.main.async {
-#if os(visionOS)
+    #if os(visionOS)
             playerStatusObservation = playerViewController.player?.observe(
                 \.status,
                 options: [.old, .new],
@@ -53,7 +60,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
                     }
                 }
             )
-#else
+    #else
             playerStatusObservation = playerViewController.observe(
                 \.isReadyForDisplay,
                 options: [.old, .new, .initial, .prior],
@@ -67,7 +74,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
                     }
                 }
             )
-#endif
+    #endif
         }
 
         return playerViewController
@@ -80,6 +87,37 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         uiViewController.player = nil
     }
 }
+#elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+struct AdaptyUIVideoPlayerView: NSViewRepresentable {
+    var player: AVPlayer
+    var videoGravity: AVLayerVideoGravity
+    var onReadyForDisplay: () -> Void
+
+    func makeNSView(context _: Context) -> AVPlayerView {
+        let playerView = AVPlayerView()
+        playerView.controlsStyle = .none
+        playerView.player = player
+        playerView.videoGravity = videoGravity
+
+        DispatchQueue.main.async {
+            onReadyForDisplay()
+        }
+
+        return playerView
+    }
+
+    func updateNSView(_ nsView: AVPlayerView, context _: Context) {
+        nsView.player = player
+        nsView.videoGravity = videoGravity
+    }
+
+    static func dismantleNSView(_ nsView: AVPlayerView, coordinator _: ()) {
+        nsView.player?.pause()
+        nsView.player = nil
+    }
+}
+#endif
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoView: View {

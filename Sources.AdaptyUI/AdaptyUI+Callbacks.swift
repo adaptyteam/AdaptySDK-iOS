@@ -9,7 +9,7 @@ import Adapty
 import AdaptyUIBuilder
 import Foundation
 
-#if canImport(UIKit) && canImport(_Concurrency) && compiler(>=5.5.2)
+#if (canImport(UIKit) || canImport(AppKit)) && canImport(_Concurrency) && compiler(>=5.5.2)
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
@@ -40,6 +40,7 @@ public extension AdaptyUI {
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
+        assetsResolver: AdaptyUIAssetsResolver? = nil,
         _ completion: @escaping AdaptyResultCompletion<PaywallConfiguration>
     ) {
         withCompletion(completion) {
@@ -49,7 +50,8 @@ public extension AdaptyUI {
                 products: products,
                 observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
-                timerResolver: timerResolver
+                timerResolver: timerResolver,
+                assetsResolver: assetsResolver
             )
         }
     }

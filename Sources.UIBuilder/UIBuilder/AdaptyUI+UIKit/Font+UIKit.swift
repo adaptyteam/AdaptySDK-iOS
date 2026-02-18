@@ -58,19 +58,23 @@ extension UIFont {
 extension UIFont {
     private static let systemFontReservedName = "adapty_system"
 
-    static func create(_ font: VC.Font, withSize size: Double) -> UIFont {
+    static func create(_ font: VC.Font, withSize size: Double) -> AdaptyPlatformFont {
         if !font.alias.isEmpty, let font = UIFont(name: font.alias, size: size) {
-            return font
+            return AdaptyPlatformFont(font)
         }
 
         if font.familyName == systemFontReservedName {
-            return .systemFont(ofSize: size, weight: .fromInteger(font.weight), italic: font.italic)
+            return AdaptyPlatformFont(
+                .systemFont(ofSize: size, weight: .fromInteger(font.weight), italic: font.italic)
+            )
         }
 
-        return .customFont(ofSize: size,
-                           name: font.familyName,
-                           weight: font.weight,
-                           italic: font.italic)
+        return AdaptyPlatformFont(
+            .customFont(ofSize: size,
+                        name: font.familyName,
+                        weight: font.weight,
+                        italic: font.italic)
+        )
     }
 }
 

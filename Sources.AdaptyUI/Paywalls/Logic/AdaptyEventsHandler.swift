@@ -5,8 +5,6 @@
 //  Created by Aleksey Goncharov on 17.06.2024.
 //
 
-#if canImport(UIKit)
-
 import Adapty
 import Foundation
 
@@ -90,7 +88,7 @@ package final class AdaptyEventsHandler: ObservableObject {
             Log.ui.verbose("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null")")
         }
 
-        guard let product = product as? AdaptyPaywallProduct else {
+        guard let product else {
             Log.ui.error("#\(logId)# event_didFinishWebPaymentNavigation: WRONG INJECTION")
             return
         }
@@ -149,5 +147,3 @@ extension AdaptyUIBuilder.Action {
         }
     }
 }
-
-#endif

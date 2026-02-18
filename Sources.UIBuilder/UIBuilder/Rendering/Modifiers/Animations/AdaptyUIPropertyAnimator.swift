@@ -5,7 +5,7 @@
 //  Created by Alexey Goncharov on 6/6/25.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 

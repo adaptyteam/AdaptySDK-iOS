@@ -5,8 +5,6 @@
 //  Created by Alexey Goncharov on 2/17/25.
 //
 
-#if canImport(UIKit)
-
 import Adapty
 import AdaptyUIBuilder
 import SwiftUI
@@ -82,7 +80,9 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
             case .close:
                 presentationMode.wrappedValue.dismiss()
             case let .openURL(url):
-                UIApplication.shared.open(url, options: [:])
+                Task {
+                    _ = await SystemConstantsManager.openExternalURL(url)
+                }
             case .custom:
                 break
             }
@@ -123,5 +123,3 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         .withAlert(item: showAlertItem, builder: showAlertBuilder)
     }
 }
-
-#endif

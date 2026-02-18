@@ -5,8 +5,6 @@
 //  Created by Alexey Goncharov on 9/22/25.
 //
 
-#if canImport(UIKit)
-
 import Adapty
 import AdaptyUIBuilder
 import Foundation
@@ -69,7 +67,6 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     package func getProducts(
         determineOffers: Bool
     ) async throws -> [ProductResolver] {
-        let paywallProducts: [ProductResolver]
         let productsResult = try await getProductsInternal(
             determineOffers: determineOffers
         )
@@ -240,5 +237,3 @@ private extension VC.WebOpenInParameter {
         }
     }
 }
-
-#endif

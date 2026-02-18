@@ -64,7 +64,12 @@ struct FallbackTests {
 
         for placementId in placementIds {
             let startTime = CFAbsoluteTimeGetCurrent()
-            let content: AdaptyPlacementChosen<Content>? = fallback.getPlacement(byPlacementId: placementId, withVariationId: nil, profileId: "test_profile")
+            let content: AdaptyPlacementChosen<Content>? = fallback.getPlacement(
+                byPlacementId: placementId,
+                withVariationId: nil,
+                userId: AdaptyUserId(profileId: "test_profile", customerId: nil),
+                requestLocale: .defaultPlacementLocale
+            )
             let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
 
             #expect(content != nil)

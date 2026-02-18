@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 @MainActor
 package struct AdaptyUIDefaultTimerResolver: AdaptyUITimerResolver {

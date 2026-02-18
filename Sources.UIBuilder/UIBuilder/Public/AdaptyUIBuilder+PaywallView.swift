@@ -5,7 +5,7 @@
 //  Created by Alexey Goncharov on 9/23/25.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -74,6 +74,18 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
 
     public func body(content: Content) -> some View {
         if fullScreen {
+#if os(macOS) && !targetEnvironment(macCatalyst)
+            content
+                .sheet(
+                    isPresented: isPresented,
+                    onDismiss: {
+                        paywallConfiguration?.reportOnDisappear()
+                    },
+                    content: {
+                        paywallOrProgressView
+                    }
+                )
+#else
             content
                 .fullScreenCover(
                     isPresented: isPresented,
@@ -84,6 +96,7 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
                         paywallOrProgressView
                     }
                 )
+#endif
         } else {
             content
                 .sheet(
@@ -177,7 +190,9 @@ public struct AdaptyUIPaywallView: View {
             case .close:
                 presentationMode.wrappedValue.dismiss()
             case let .openURL(url):
-                UIApplication.shared.open(url, options: [:])
+                Task {
+                    _ = await SystemConstantsManager.openExternalURL(url)
+                }
             case .custom:
                 break
             }

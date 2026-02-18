@@ -5,7 +5,7 @@
 //  Created by Aleksey Goncharov on 24.05.2024.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) || canImport(AppKit)
 
 import SwiftUI
 
@@ -81,7 +81,7 @@ extension View {
     func clipShape(_ shape: VC.ShapeType) -> some View {
         switch shape {
         case let .rectangle(radii):
-            if #available(iOS 16.0, *) {
+            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) {
                 clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
             } else {
                 self.clipShape(UnevenRoundedRectangleFallback(cornerRadii: radii))
@@ -107,7 +107,7 @@ extension VC.ShapeType {
     ) -> some View {
         switch self {
         case let .rectangle(radii):
-            if #available(iOS 16.0, *) {
+            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
                     .fill(
                         filling,
@@ -154,7 +154,7 @@ extension VC.ShapeType {
     ) -> some View {
         switch self {
         case let .rectangle(radii):
-            if #available(iOS 16.0, *) {
+            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, visionOS 1.0, *) {
                 UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
                     .stroke(
                         filling: filling,
