@@ -8,6 +8,10 @@
         productTypes: [
             "Adapty": .framework,
             "AdaptyUI": .framework,
+        ],
+        targetSettings: [
+            "Adapty": .init().swiftVersion("6"),
+            "AdaptyUI": .init().swiftVersion("6"),
         ]
     )
 #endif
