@@ -43,7 +43,8 @@ let package = Package(
         .target(
             name: "AdaptyLogger",
             dependencies: [],
-            path: "Sources.Logger"
+            path: "Sources.Logger",
+            swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .target(
             name: "AdaptyUIBuilder",
@@ -51,13 +52,15 @@ let package = Package(
             path: "Sources.UIBuilder",
             exclude: [
                 "adaptyui.v4.4.1.schema.yaml"
-            ]
+            ],
+            swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .target(
             name: "Adapty",
             dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
             path: "Sources",
-            resources: [.copy("PrivacyInfo.xcprivacy")]
+            resources: [.copy("PrivacyInfo.xcprivacy")],
+            swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .target(
             name: "Adapty_KidsMode",
@@ -65,19 +68,22 @@ let package = Package(
             path: "Sources.KidsMode",
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
-                .define("ADAPTY_KIDS_MODE")
+                .define("ADAPTY_KIDS_MODE"),
+                .swiftLanguageMode(.v6),
             ]
         ),
         .target(
             name: "AdaptyUI",
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
             path: "Sources.AdaptyUI",
-            resources: [.copy("PrivacyInfo.xcprivacy")]
+            resources: [.copy("PrivacyInfo.xcprivacy")],
+            swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .target(
             name: "AdaptyDeveloperTools",
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
-            path: "Sources.DeveloperTools"
+            path: "Sources.DeveloperTools",
+            swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .target(
             name: "AdaptyPlugin",
@@ -85,7 +91,8 @@ let package = Package(
             path: "Sources.AdaptyPlugin",
             exclude: [
                 "cross_platform.yaml"
-            ]
+            ],
+            swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .testTarget(
             name: "AdaptyTests",
