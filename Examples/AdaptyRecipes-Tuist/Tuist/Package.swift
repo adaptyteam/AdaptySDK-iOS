@@ -10,6 +10,8 @@
             "AdaptyUI": .framework,
         ],
         targetSettings: [
+            "AdaptyLogger": .init().swiftVersion("6"),
+            "AdaptyUIBuilder": .init().swiftVersion("6"),
             "Adapty": .init().swiftVersion("6"),
             "AdaptyUI": .init().swiftVersion("6"),
         ]
