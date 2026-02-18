@@ -1,5 +1,5 @@
 //
-//  Schema.RichTemplates.swift
+//  Schema.RichTemplateSystem.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 02.12.2025.
@@ -7,17 +7,15 @@
 
 import Foundation
 
-extension Schema {
-    struct RichTemplates: Templates {
+extension AdaptyUISchema {
+    struct RichTemplateSystem: TemplateSystem {
         let templates: [String: Template]
     }
 }
 
-extension Schema.RichTemplates {
+extension AdaptyUISchema.RichTemplateSystem {
     static func create(
-        templatesCollection: Schema.TemplatesCollection?,
-        navigators: [Schema.NavigatorIdentifier: Schema.Navigator],
-        screens: [String: Schema.Screen]
+        templatesCollection: Schema.TemplatesCollection?
     ) throws -> Self {
         .init(
             templates: templatesCollection?.values ?? [:]
@@ -31,7 +29,7 @@ extension Schema.Localizer {
         guard !self.templateIds.contains(id) else {
             throw Schema.Error.elementsTreeCycle(id)
         }
-        guard let templates = source.templates as? Schema.RichTemplates else {
+        guard let templates = source.templates as? Schema.RichTemplateSystem else {
             throw Schema.Error.notFoundTemplate(id)
         }
         guard let instance = templates.templates[id] else {

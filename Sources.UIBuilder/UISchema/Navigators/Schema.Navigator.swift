@@ -15,6 +15,7 @@ extension Schema {
         let order: Int
         let appearances: [String: AppearanceTransition]?
         let transitions: [String: ScreenTransition]?
+        let defaultScreenActions: ScreenActions
     }
 }
 
@@ -25,7 +26,8 @@ extension Schema.Navigator {
         content: .scrrenHolder,
         order: 0,
         appearances: nil,
-        transitions: nil
+        transitions: nil,
+        defaultScreenActions: .empty
     )
 }
 
@@ -37,7 +39,8 @@ extension Schema.Localizer {
             content: element(from.content),
             order: from.order,
             appearances: from.appearances,
-            transitions: from.transitions
+            transitions: from.transitions,
+            defaultScreenActions: from.defaultScreenActions
         )
     }
 }
@@ -66,7 +69,8 @@ extension Schema.Navigator: Encodable, DecodableWithConfiguration {
             content: container.decodeIfPresent(Schema.Element.self, forKey: .content, configuration: configuration) ?? Self.default.content,
             order: container.decode(Int.self, forKey: .order),
             appearances: container.decodeIfPresent([String: AppearanceTransition].self, forKey: .appearances),
-            transitions: container.decodeIfPresent([String: ScreenTransition].self, forKey: .transitions)
+            transitions: container.decodeIfPresent([String: ScreenTransition].self, forKey: .transitions),
+            defaultScreenActions: decoder.singleValueContainer().decode(Schema.ScreenActions.self)
         )
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 
 extension Schema {
     struct NavigatorsCollection: Sendable, Hashable {
-        let values: [NavigatorIdentifier: Navigator]
+        let navigators: [NavigatorIdentifier: Navigator]
 
         init(values: [Schema.NavigatorIdentifier: Schema.Navigator]? = nil) {
             var values = values ?? [:]
@@ -18,7 +18,7 @@ extension Schema {
                 values[Schema.Navigator.default.id] = Schema.Navigator.default
             }
 
-            self.values = values
+            self.navigators = values
         }
     }
 }

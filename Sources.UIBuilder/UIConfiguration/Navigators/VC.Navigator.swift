@@ -15,5 +15,6 @@ package extension VC {
         package let order: Int
         package let appearances: [String: AppearanceTransition]?
         package let transitions: [String: ScreenTransition]?
+        package let defaultScreenActions: ScreenActions
     }
 }

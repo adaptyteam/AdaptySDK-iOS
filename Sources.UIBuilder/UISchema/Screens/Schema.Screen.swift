@@ -10,12 +10,11 @@ import Foundation
 extension Schema {
     struct Screen: Sendable, Hashable {
         let id: String
-        let templateId: String
-        let background: AssetReference?
+        let layoutBehaviour: LayoutBehaviour
         let cover: Box?
         let content: Element
         let footer: Element?
-        let overlay: Element?
+        let screenActions: ScreenActions
     }
 }
 
@@ -23,35 +22,31 @@ extension Schema.Localizer {
     func screen(_ from: Schema.Screen) throws -> VC.Screen {
         try .init(
             id: from.id,
-            templateId: from.templateId,
-            background: from.background,
+            layoutBehaviour: from.layoutBehaviour,
             cover: from.cover.map(box),
             content: element(from.content),
             footer: from.footer.map(element),
-            overlay: from.overlay.map(element)
+            screenActions: from.screenActions
         )
     }
 }
 
 extension Schema.Screen: Encodable, DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
-        case templateId = "template_id"
-        case background
+        case layoutBehaviour = "layout_behaviour"
         case cover
         case content
         case footer
-        case overlay
     }
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let templateId: String =
-            if container.contains(.templateId) {
-                try container.decode(String.self, forKey: .templateId)
-            } else if let value = configuration.legacyTemplateId {
+
+        let layoutBehaviour =
+            if let value = configuration.screenLayoutBehaviourFromLegacy {
                 value
             } else {
-                "flat"
+                try container.decodeIfPresent(LayoutBehaviour.self, forKey: .layoutBehaviour) ?? .default
             }
 
         let screenId =
@@ -63,12 +58,11 @@ extension Schema.Screen: Encodable, DecodableWithConfiguration {
 
         try self.init(
             id: screenId,
-            templateId: templateId,
-            background: container.decodeIfPresent(Schema.AssetReference.self, forKey: .background),
+            layoutBehaviour: layoutBehaviour,
             cover: container.decodeIfPresent(Schema.Box.self, forKey: .cover, configuration: configuration),
             content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
             footer: container.decodeIfPresent(Schema.Element.self, forKey: .footer, configuration: configuration),
-            overlay: container.decodeIfPresent(Schema.Element.self, forKey: .overlay, configuration: configuration)
+            screenActions: decoder.singleValueContainer().decode(Schema.ScreenActions.self)
         )
     }
 }

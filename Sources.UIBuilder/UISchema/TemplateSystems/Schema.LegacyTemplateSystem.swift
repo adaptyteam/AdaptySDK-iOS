@@ -1,5 +1,5 @@
 //
-//  Schema.LegacyTemplates.swift
+//  Schema.LegacyTemplateSystem.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 02.12.2025.
@@ -7,17 +7,20 @@
 
 import Foundation
 
-extension Schema {
-    struct LegacyTemplates: Templates {
+extension AdaptyUISchema {
+    struct LegacyTemplateSystem: TemplateSystem {
         let templates: [String: Element]
     }
 }
 
-extension Schema.LegacyTemplates {
-    static func create(screens: [String: Schema.Screen]) throws -> Self {
+extension AdaptyUISchema.LegacyTemplateSystem {
+    static func create(
+        screens: [String: Schema.Screen],
+        navigators: [Schema.NavigatorIdentifier: Schema.Navigator]
+    ) throws -> Self {
         try .init(
             templates: [String: Schema.Element](
-                screens.flatMap(\.value.legacyReferencedElements),
+                screens.flatMap(\.value.legacyReferencedElements) + navigators.flatMap(\.value.legacyReferencedElements),
                 uniquingKeysWith: { a, b in
                     throw Schema.Error.dublicateLegacyReference("elements: \(a), \(b)")
                 }
@@ -31,7 +34,7 @@ extension Schema.Localizer {
         guard !self.templateIds.contains(id) else {
             throw Schema.Error.elementsTreeCycle(id)
         }
-        guard let templates = source.templates as? Schema.LegacyTemplates else {
+        guard let templates = source.templates as? Schema.LegacyTemplateSystem else {
             throw Schema.Error.notFoundTemplate(id)
         }
         guard let instance = templates.templates[id] else {
@@ -50,9 +53,15 @@ extension Schema.Localizer {
     }
 }
 
+private extension Schema.Navigator {
+    var legacyReferencedElements: [(String, Schema.Element)] {
+        [content].compactMap(\.self).flatMap(\.legacyReferencedElements)
+    }
+}
+
 private extension Schema.Screen {
     var legacyReferencedElements: [(String, Schema.Element)] {
-        [content, footer, overlay].compactMap(\.self).flatMap(\.legacyReferencedElements)
+        [content, footer].compactMap(\.self).flatMap(\.legacyReferencedElements)
     }
 }
 

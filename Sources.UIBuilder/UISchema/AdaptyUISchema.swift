@@ -16,7 +16,7 @@ public struct AdaptyUISchema: Sendable {
     let defaultLocalization: Localization?
     let navigators: [NavigatorIdentifier: Navigator]
     let screens: [ScreenType: Screen]
-    let templates: any AdaptyUISchemaTemplates
+    let templates: any AdaptyUISchemaTemplateSystem
     let scripts: [String]
 }
 
@@ -31,22 +31,6 @@ public extension AdaptyUISchema {
 }
 
 extension AdaptyUISchema: Codable {
-    struct DecodingConfiguration {
-        let isLegacy: Bool
-        var insideTemplateId: String?
-        var insideScreenId: String?
-        var insideNavigatorId: String?
-        let legacyTemplateId: String?
-
-        var isNavigator: Bool {
-            insideNavigatorId != nil
-        }
-
-        var isTemplate: Bool {
-            insideTemplateId != nil
-        }
-    }
-
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
         case legacyTemplateId = "template_id"
@@ -65,10 +49,11 @@ extension AdaptyUISchema: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         formatVersion = try container.decode(Version.self, forKey: .formatVersion)
 
-        let configuration = try DecodingConfiguration(
-            isLegacy: !formatVersion.isNotLegacyVersion,
-            legacyTemplateId: container.decodeIfPresent(String.self, forKey: .legacyTemplateId)
-        )
+        var configuration = DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion)
+
+        if configuration.isLegacy {
+            configuration.legacyTemplateId = try container.decode(String.self, forKey: .legacyTemplateId)
+        }
 
         assets = try (container.decodeIfPresent(AssetsCollection.self, forKey: .assets))?.value ?? [:]
 
@@ -83,21 +68,23 @@ extension AdaptyUISchema: Codable {
             defaultLocalization = nil
         }
 
-        let navigatorCollection = try container.decodeIfPresent(
-            NavigatorsCollection.self,
-            forKey: .navigators,
-            configuration: configuration
-        ) ?? .init()
-
-        navigators = navigatorCollection.values
-
         let screensCollection = try container.decode(
             ScreensCollection.self,
             forKey: configuration.isLegacy ? .legacyScreens : .screens,
             configuration: configuration
         )
 
-        screens = screensCollection.values
+        screens = screensCollection.screens
+
+        if configuration.isLegacy {
+            navigators = screensCollection.legacyGenerayedNavigators ?? [:]
+        } else {
+            navigators = try container.decodeIfPresent(
+                NavigatorsCollection.self,
+                forKey: .navigators,
+                configuration: configuration
+            )?.navigators ?? [:]
+        }
 
         let templatesCollection = try container.decodeIfPresent(
             TemplatesCollection.self,
@@ -105,16 +92,19 @@ extension AdaptyUISchema: Codable {
             configuration: configuration
         )
 
-        templates = try Schema.createTemplates(
+        templates = try Schema.createTemplateSystem(
             formatVersion: formatVersion,
             templatesCollection: templatesCollection,
-            navigators: navigatorCollection.values,
-            screens: screensCollection.values
+            navigators: navigators,
+            screens: screens
         )
 
-        let scripts: [String] = try (container.decodeIfPresent(String.self, forKey: .script)).map { [$0] } ?? []
-
-        self.scripts = try decoder.decodingLegacy(isLegacy: configuration.isLegacy) + scripts
+        scripts =
+            if configuration.isLegacy {
+                try decoder.legacyGenerateScript()
+            } else {
+                try (container.decodeIfPresent(String.self, forKey: .script)).map { [$0] } ?? []
+            }
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -133,10 +123,10 @@ private enum LegacyCodingKeys: String, CodingKey {
 }
 
 private extension Decoder {
-    func decodingLegacy(isLegacy: Bool) throws -> [String] {
+    func legacyGenerateScript() throws -> [String] {
         let container = try container(keyedBy: LegacyCodingKeys.self)
 
-        var scripts = [Schema.LegacyScripts.actions]
+        var scripts = [String]()
 
         if container.contains(.products) {
             let container = try container.nestedContainer(keyedBy: LegacyCodingKeys.self, forKey: .products)
@@ -150,10 +140,6 @@ private extension Decoder {
             }
         }
 
-        if isLegacy {
-            scripts += [Schema.LegacyScripts.legacyOpenScreen()]
-        }
-
-        return scripts
+        return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
     }
 }

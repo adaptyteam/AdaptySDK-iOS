@@ -39,7 +39,7 @@ extension Schema {
             ##"Legacy.productGroup["\##(groupId)"] = "\##(productId)";"##
         }
 
-        static func legacyOpenScreen(screenId: ScreenType = "default") -> String {
+        static func legacyOpenDefaultScreen(screenId: ScreenType = "default") -> String {
             ##"SDK.openScreen({ instanceId: "\##(screenId)", type: "\##(screenId)", transitionId: "legacy-first-open" });"##
         }
     }
