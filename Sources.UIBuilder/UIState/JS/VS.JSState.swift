@@ -27,8 +27,11 @@ extension VS {
                 context.isInspectable = true
             }
 
-            let exceptionHandler: @convention(block) (JSContext?, JSValue?) -> Void = { _, value in
-                guard let value else { return }
+            let exceptionHandler: @convention(block) (JSContext?, JSValue?) -> Void = { context, value in
+                guard let value else {
+                    Log.js.warn("JScript exception in context: \(String(describing: context))")
+                    return
+                }
                 Log.js.warn("JScript exception: \(String(describing: value))")
             }
             context.exceptionHandler = exceptionHandler

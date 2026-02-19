@@ -10,29 +10,31 @@ import Foundation
 extension Schema {
     enum LegacyScripts {
         static let actions = ##"""
-        class Legacy {}
-        Legacy.productGroup = Object.create(null);
-        Legacy.sections = Object.create(null);
+        var Legacy = {
+           productGroup: {},
+           sections: {}
+        };
         Legacy.selectProduct = function ({ productId, groupId }) {
              Legacy.productGroup[groupId] = { productId: productId, ["_" + productId.replace(/[^a-zA-Z0-9_]/g, '_')]: true };
-             SDK.onSelectProduct({ productId: productId, paywallId: "legacy-paywal-id" });
+             SDK.onSelectProduct({ productId: productId, paywallId: "legacy-paywall-id" });
         };
         Legacy.unselectProduct = function ({ groupId }) {
              delete Legacy.productGroup[groupId]
         };
         Legacy.purchaseSelectedProduct = function ({ groupId }) {
-             const productId = Legacy.productGroup[groupId].productId;
-             if (!productId) { return; }
-             SDK.purchaseProduct({ productId: productId, paywallId: "legacy-paywal-id" });
+             const product = Legacy.productGroup[groupId];
+             if (!product) { return; }
+             SDK.purchaseProduct({ productId: product.productId, paywallId: "legacy-paywall-id" });
         };
         Legacy.webPurchaseSelectedProduct = function ({ groupId, openIn }) {
-             const productId = Legacy.productGroup[groupId].productId;
-             if (!productId) { return; }
-             SDK.webPurchaseProduct({ productId: productId, paywallId: "legacy-paywal-id", openIn: openIn });
+             const product = Legacy.productGroup[groupId];
+             if (!product) { return; }
+             SDK.webPurchaseProduct({ productId: product.productId, paywallId: "legacy-paywall-id", openIn: openIn });
         };
         Legacy.switchSection = function ({ sectionId, index }) {
              Legacy.sections[sectionId] = { index: index, ["_" + index]: true };
         };
+
         """##
 
         static func legacySelectProductScript(groupId: String = "group_A", productId: String) -> String {
