@@ -7,6 +7,7 @@
 
 import Foundation
 
+// TODO: Deprecated
 package extension VC {
     enum StateCondition: Sendable, Hashable {
         case selectedSection(id: String, index: Int32)

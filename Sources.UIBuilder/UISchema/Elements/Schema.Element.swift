@@ -152,7 +152,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         case .section:
             self = try .section(Schema.Section(from: decoder, configuration: configuration), propertyOrNil())
         case .toggle:
-            self = try .toggle(Schema.Toggle(from: decoder), propertyOrNil())
+            self = try .toggle(Schema.Toggle(from: decoder, configuration: configuration), propertyOrNil())
         case .slider:
             self = try .slider(Schema.Slider(from: decoder), propertyOrNil())
         case .timer:

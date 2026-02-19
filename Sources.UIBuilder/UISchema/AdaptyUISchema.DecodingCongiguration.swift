@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyUISchema {
+package extension AdaptyUISchema {
     struct DecodingConfiguration {
         let isLegacy: Bool
         var insideTemplateId: String?

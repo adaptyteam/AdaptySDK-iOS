@@ -12,6 +12,6 @@ package extension VC {
         package let actions: [Action]
         package let normalState: Element
         package let selectedState: Element?
-        package let selectedCondition: StateCondition?
+        package let isSelectedState: Variable?
     }
 }

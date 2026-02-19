@@ -9,9 +9,7 @@ import Foundation
 
 package extension VC {
     struct Toggle: Sendable, Hashable {
-        package let onActions: [Action]
-        package let offActions: [Action]
-        package let onCondition: StateCondition
+        package let value: Variable
         package let color: AssetReference?
     }
 }

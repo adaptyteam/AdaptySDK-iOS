@@ -9,8 +9,7 @@ import Foundation
 
 extension Schema {
     struct Section: Sendable, Hashable {
-        let id: String
-        let index: Int32
+        let index: Variable
         let content: [Schema.Element]
     }
 }
@@ -18,7 +17,6 @@ extension Schema {
 extension Schema.Localizer {
     func section(_ from: Schema.Section) throws -> VC.Section {
         try .init(
-            id: from.id,
             index: from.index,
             content: from.content.map(element)
         )
@@ -27,16 +25,26 @@ extension Schema.Localizer {
 
 extension Schema.Section: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
-        case id
+        case legacySectionId = "id"
         case index
         case content
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        guard configuration.isLegacy else {
+            try self.init(
+                index: container.decode(Schema.Variable.self, forKey: .index),
+                content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
+            )
+            return
+        }
+
+        let sectionId = try container.decode(String.self, forKey: .legacySectionId)
+        let index = try container.decodeIfPresent(Int32.self, forKey: .index) ?? 0
+        // TODO add Script: Legacy.sections.<sectionId> = index
         try self.init(
-            id: container.decode(String.self, forKey: .id),
-            index: container.decodeIfPresent(Int32.self, forKey: .index) ?? 0,
+            index: .init(path: ["Legacy","sections",sectionId], setter: nil, scope: .global),
             content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
         )
     }

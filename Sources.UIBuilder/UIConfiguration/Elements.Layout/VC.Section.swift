@@ -9,8 +9,7 @@ import Foundation
 
 package extension VC {
     struct Section: Sendable, Hashable {
-        package let id: String
-        package let index: Int32
+        package let index: Variable
         package let content: [Element]
     }
 }

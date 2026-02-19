@@ -12,7 +12,7 @@ extension Schema {
         let actions: [Schema.Action]
         let normalState: Schema.Element
         let selectedState: Schema.Element?
-        let selectedCondition: Schema.StateCondition?
+        let isSelectedState: Schema.Variable?
     }
 }
 
@@ -22,7 +22,7 @@ extension Schema.Localizer {
             actions: from.actions,
             normalState: element(from.normalState),
             selectedState: from.selectedState.map(element),
-            selectedCondition: from.selectedCondition
+            isSelectedState: from.isSelectedState
         )
     }
 }
@@ -32,16 +32,32 @@ extension Schema.Button: DecodableWithConfiguration {
         case actions = "action"
         case normalState = "normal"
         case selectedState = "selected"
-        case selectedCondition = "selected_condition"
+        case isSelectedState = "is_selected"
+        case legacySelectedCondition = "selected_condition"
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        guard configuration.isLegacy else {
+            try self.init(
+                actions: container.decodeActions(forKey: .actions),
+                normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
+                selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState, configuration: configuration),
+                isSelectedState: container.decodeIfPresent(Schema.Variable.self, forKey: .isSelectedState)
+            )
+            return
+        }
+
+        let selectedCondition = try container.decodeIfPresent(Schema.StateCondition.self, forKey: .legacySelectedCondition)
+
+        // TODO: selectedCondition
+
         try self.init(
             actions: container.decodeActions(forKey: .actions),
             normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
             selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState, configuration: configuration),
-            selectedCondition: container.decodeIfPresent(Schema.StateCondition.self, forKey: .selectedCondition)
+            isSelectedState: .init(path: ["Legacy", "unreleased"], setter: nil, scope: .global)
         )
     }
 }

@@ -11,46 +11,64 @@ extension Schema {
     typealias Toggle = VC.Toggle
 }
 
-extension Schema.Toggle: Decodable {
+extension Schema.Toggle: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
-        case sectionId = "section_id"
-        case onIndex = "on_index"
-        case offIndex = "off_index"
-
-        case onActions = "on_action"
-        case offActions = "off_action"
-        case onCondition = "on_condition"
+        case value
         case colorAssetId = "color"
+
+        case legacy1SectionId = "section_id"
+        case legacy1OnIndex = "on_index"
+        case legacy1OffIndex = "off_index"
+
+        case legacy2OnActions = "on_action"
+        case legacy2OffActions = "off_action"
+        case legacy2OnCondition = "on_condition"
     }
 
-    package init(from decoder: Decoder) throws {
+    package init(from decoder: Decoder, configuration: AdaptyUISchema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let colorAssetId = try container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)
 
-        if let sectionId = try container.decodeIfPresent(String.self, forKey: .sectionId) {
-            let onIndex = try container.decodeIfPresent(Int32.self, forKey: .onIndex) ?? 0
-            let offIndex = try container.decodeIfPresent(Int32.self, forKey: .offIndex) ?? -1
-
-            self.init(
-                onActions: [.init(path: ["Legacy", "switchSection"], params: [
-                    "sectionId": .string(sectionId),
-                    "index": .int32(onIndex)
-                ], scope: .global)],
-                offActions: [.init(path: ["Legacy", "switchSection"], params: [
-                    "sectionId": .string(sectionId),
-                    "index": .int32(offIndex)
-                ], scope: .global)],
-                onCondition: .selectedSection(id: sectionId, index: onIndex),
-                color: colorAssetId
+        guard configuration.isLegacy else {
+            try self.init(
+                value: container.decode(Schema.Variable.self, forKey: .value),
+                color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)
             )
             return
         }
 
+        if let sectionId = try container.decodeIfPresent(String.self, forKey: .legacy1SectionId) {
+            let onIndex = try container.decodeIfPresent(Int32.self, forKey: .legacy1OnIndex) ?? 0
+            let offIndex = try container.decodeIfPresent(Int32.self, forKey: .legacy1OffIndex) ?? -1
+
+            // TODO: selectedCondition
+            let onActions: [Schema.Action] = [.init(path: ["Legacy", "switchSection"], params: [
+                "sectionId": .string(sectionId),
+                "index": .int32(onIndex)
+            ], scope: .global)]
+
+            let offActions: [Schema.Action] = [.init(path: ["Legacy", "switchSection"], params: [
+                "sectionId": .string(sectionId),
+                "index": .int32(offIndex)
+            ], scope: .global)]
+
+            let onCondition: Schema.StateCondition = .selectedSection(id: sectionId, index: onIndex)
+
+            try self.init(
+                value: .init(path: ["Legacy", "unreleased"], setter: nil, scope: .global),
+                color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)
+            )
+            return
+        }
+
+        // TODO: selectedCondition
+
+        let onActions = try container.decodeIfPresentActions(forKey: .legacy2OnActions) ?? []
+        let offActions = try container.decodeIfPresentActions(forKey: .legacy2OffActions) ?? []
+        let onCondition = try container.decode(Schema.StateCondition.self, forKey: .legacy2OnCondition)
+
         try self.init(
-            onActions: try container.decodeIfPresentActions(forKey: .onActions) ?? [],
-            offActions: try container.decodeIfPresentActions(forKey: .offActions) ?? [],
-            onCondition: container.decode(Schema.StateCondition.self, forKey: .onCondition),
-            color: colorAssetId
+            value: .init(path: ["Legacy", "unreleased"], setter: nil, scope: .global),
+            color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)
         )
     }
 }
