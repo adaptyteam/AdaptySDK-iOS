@@ -36,7 +36,6 @@ package final class AdaptyUITimerViewModel: ObservableObject {
     private let stateViewModel: AdaptyUIStateViewModel
     private let paywallViewModel: AdaptyUIPaywallViewModel
     private let productsViewModel: AdaptyUIProductsViewModel
-    private let sectionsViewModel: AdaptyUISectionsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
 
     package init(
@@ -45,7 +44,6 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         stateViewModel: AdaptyUIStateViewModel,
         paywallViewModel: AdaptyUIPaywallViewModel,
         productsViewModel: AdaptyUIProductsViewModel,
-        sectionsViewModel: AdaptyUISectionsViewModel,
         screensViewModel: AdaptyUIScreensViewModel
     ) {
         self.logId = logId
@@ -53,7 +51,6 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         self.stateViewModel = stateViewModel
         self.paywallViewModel = paywallViewModel
         self.productsViewModel = productsViewModel
-        self.sectionsViewModel = sectionsViewModel
         self.screensViewModel = screensViewModel
     }
 

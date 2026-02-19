@@ -20,7 +20,6 @@ public extension AdaptyUI {
         package let actionHandler: AdaptyUIStateActionHandler
         package let paywallViewModel: AdaptyUIPaywallViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
-        package let sectionsViewModel: AdaptyUISectionsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
         package let timerViewModel: AdaptyUITimerViewModel
         package let screensViewModel: AdaptyUIScreensViewModel
@@ -51,7 +50,6 @@ public extension AdaptyUI {
             eventsHandler = AdaptyEventsHandler(logId: logId)
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
-            sectionsViewModel = AdaptyUISectionsViewModel(logId: logId)
 
             paywallViewModel = AdaptyUIPaywallViewModel(
                 logId: logId,
@@ -87,7 +85,6 @@ public extension AdaptyUI {
                 stateViewModel: stateViewModel,
                 paywallViewModel: paywallViewModel,
                 productsViewModel: productsViewModel,
-                sectionsViewModel: sectionsViewModel,
                 screensViewModel: screensViewModel
             )
             assetsViewModel = AdaptyUIAssetsViewModel(
@@ -120,7 +117,6 @@ public struct Dev_AdaptyUIRendererView: View {
     }
 
     public var body: some View {
-//        AdaptyUIElementView(viewConfiguration.screens["main"]!.content)
         AdaptyUIPaywallView_Internal(
             showDebugOverlay: false
         )
@@ -128,7 +124,6 @@ public struct Dev_AdaptyUIRendererView: View {
             stateViewModel: galleryConfiguration.stateViewModel,
             paywallViewModel: galleryConfiguration.paywallViewModel,
             productsViewModel: galleryConfiguration.productsViewModel,
-            sectionsViewModel: galleryConfiguration.sectionsViewModel,
             tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
             timerViewModel: galleryConfiguration.timerViewModel,
             screensViewModel: galleryConfiguration.screensViewModel,

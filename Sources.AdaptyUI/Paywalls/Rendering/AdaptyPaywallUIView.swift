@@ -152,7 +152,6 @@ package final class AdaptyPaywallUIView: UIView {
                 stateViewModel: configuration.stateViewModel,
                 paywallViewModel: configuration.paywallViewModel,
                 productsViewModel: configuration.productsViewModel,
-                sectionsViewModel: configuration.sectionsViewModel,
                 tagResolverViewModel: configuration.tagResolverViewModel,
                 timerViewModel: configuration.timerViewModel,
                 screensViewModel: configuration.screensViewModel,

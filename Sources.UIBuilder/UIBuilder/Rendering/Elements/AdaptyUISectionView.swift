@@ -11,7 +11,10 @@ import SwiftUI
 
 struct AdaptyUISectionView<ScreenHolderContent: View>: View {
     @EnvironmentObject
-    private var viewModel: AdaptyUISectionsViewModel
+    private var stateViewModel: AdaptyUIStateViewModel
+    
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
     private let section: VC.Section
     private let screenHolderBuilder: () -> ScreenHolderContent
@@ -25,13 +28,21 @@ struct AdaptyUISectionView<ScreenHolderContent: View>: View {
     }
 
     var body: some View {
-        let index = viewModel.selectedIndex(for: section)
-
-        if let content = section.content[safe: Int(index)] {
+        let selectedIndexVariable = section.index
+        
+        let selectedIndex = stateViewModel.getValue(
+            selectedIndexVariable,
+            defaultValue: 0.0,
+            screen: screen
+        )
+        
+        let selectedIndexInt = Int(selectedIndex)
+        
+        if let content = section.content[safe: selectedIndexInt] {
             AdaptyUIElementView(
                 content,
                 screenHolderBuilder: {
-                    if index == 0 {
+                    if selectedIndexInt == 0 {
                         screenHolderBuilder() // TODO: x check
                     } else {
                         EmptyView()
