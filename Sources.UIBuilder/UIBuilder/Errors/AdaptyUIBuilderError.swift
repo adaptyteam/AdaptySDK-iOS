@@ -8,7 +8,7 @@
 import Foundation
 
 public enum AdaptyUIBuilderError: Error {
-    case unsupportedTemplate(String)
+    case unsupportedTemplate(String) // TODO: x rename
     case wrongComponentType(String)
     case wrongAssetType(String)
 }

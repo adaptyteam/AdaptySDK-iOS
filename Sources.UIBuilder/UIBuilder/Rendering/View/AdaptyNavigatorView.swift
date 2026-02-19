@@ -33,12 +33,8 @@ struct AdaptyScreenView: View {
 
     var body: some View {
         templateResolverView(
-            screenInstance.configuration.templateId,
+            screenInstance.configuration.layoutBehaviour,
             screen: screenInstance.configuration
-        )
-        .staticBackground(
-            screenInstance.configuration.background,
-            defaultValue: VC.Asset.defaultScreenBackground
         )
         .withScreenInstance(screenInstance.instance)
         .animatablePropertiesTransition(
@@ -53,25 +49,21 @@ struct AdaptyScreenView: View {
 
     @ViewBuilder
     private func templateResolverView(
-        _ templateId: String,
+        _ layout: VC.Screen.LayoutBehaviour,
         screen: VC.Screen
     ) -> some View {
-        switch templateId {
-        case VC.templateIdBasic:
+        switch layout {
+        case .hero:
             AdaptyUIBasicContainerView(screen: screen)
-        case VC.templateIdFlat:
+        case .flat:
             AdaptyUIFlatContainerView(screen: screen)
-        case VC.templateIdTransparent:
+        case .transparent:
             AdaptyUITransparentContainerView(screen: screen)
         default:
-            // TODO: x extract
-            Rectangle()
-                .hidden()
-                .onAppear {
-                    paywallViewModel.reportDidFailRendering(
-                        with: .unsupportedTemplate(templateId)
-                    )
-                }
+            AdaptyUIElementView(
+                screen.content,
+                screenHolderBuilder: { EmptyView() } // TODO: x check
+            )
         }
     }
 }
@@ -79,6 +71,8 @@ struct AdaptyScreenView: View {
 struct AdaptyNavigatorView: View {
     @EnvironmentObject
     private var navigatorViewModel: AdaptyUINavigatorViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
 
     @State private var backgroundAnimation: VC.Animation.Background?
     @State private var contentAnimations: [VC.Animation] = []
@@ -92,6 +86,21 @@ struct AdaptyNavigatorView: View {
                     initialBackground: navigatorViewModel.appearTransition?.background?.initialBackground,
                     defaultColor: .defaultNavigatorColor
                 )
+                .onTapGesture {
+                    guard let currentScreen = navigatorViewModel.screens.last else { return }
+
+                    if let navigatorActions = navigatorViewModel.navigator.defaultScreenActions.onOutsideTap {
+                        stateViewModel.execute(
+                            actions: navigatorActions,
+                            screen: currentScreen.instance
+                        )
+                    } else if let actions = currentScreen.configuration.screenActions.onOutsideTap {
+                        stateViewModel.execute(
+                            actions: actions,
+                            screen: currentScreen.instance
+                        )
+                    }
+                }
 
             AdaptyUIElementView(
                 navigatorViewModel.navigator.content,
