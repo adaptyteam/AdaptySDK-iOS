@@ -68,16 +68,23 @@ extension AdaptyUISchema: Codable {
             defaultLocalization = nil
         }
 
+        let screenKey: CodingKeys =
+            if !container.contains(.screens), configuration.isLegacy {
+                .legacyScreens
+            } else {
+                .screens
+            }
+
         let screensCollection = try container.decode(
             ScreensCollection.self,
-            forKey: configuration.isLegacy ? .legacyScreens : .screens,
+            forKey: screenKey,
             configuration: configuration
         )
 
         screens = screensCollection.screens
 
         if configuration.isLegacy {
-            navigators = screensCollection.legacyGenerayedNavigators ?? [:]
+            navigators = screensCollection.legacyGeneratedNavigators ?? [:]
         } else {
             navigators = try container.decodeIfPresent(
                 NavigatorsCollection.self,

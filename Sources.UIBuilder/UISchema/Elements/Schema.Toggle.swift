@@ -46,21 +46,9 @@ extension Schema.Toggle: Decodable {
             return
         }
 
-        let onActions =
-            if let action = try? container.decodeIfPresent(Schema.Action.self, forKey: .onActions) {
-                [action]
-            } else {
-                try container.decodeIfPresent([Schema.Action].self, forKey: .onActions) ?? []
-            }
-        let offActions =
-            if let action = try? container.decodeIfPresent(Schema.Action.self, forKey: .offActions) {
-                [action]
-            } else {
-                try container.decodeIfPresent([Schema.Action].self, forKey: .offActions) ?? []
-            }
         try self.init(
-            onActions: onActions,
-            offActions: offActions,
+            onActions: try container.decodeIfPresentActions(forKey: .onActions) ?? [],
+            offActions: try container.decodeIfPresentActions(forKey: .offActions) ?? [],
             onCondition: container.decode(Schema.StateCondition.self, forKey: .onCondition),
             color: colorAssetId
         )

@@ -108,10 +108,10 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         let type = try container.decode(String.self, forKey: .type)
 
         guard let contentType = ContentType(rawValue: type) else {
-            if !configuration.isLegacy, type.hasPrefix(Schema.Template.keyPrefix) {
-                self = try .templateInstance(Schema.TemplateInstance(from: decoder, configuration: configuration))
-            } else {
+            if configuration.isLegacy, type.hasPrefix(Schema.Template.keyPrefix) {
                 self = .unknown(type, propertyOrNil())
+            } else {
+                self = try .templateInstance(Schema.TemplateInstance(from: decoder, configuration: configuration))
             }
             return
         }
