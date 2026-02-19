@@ -59,7 +59,7 @@ struct AdaptyUIPaywallRendererView: View {
                         .transition(.opacity)
                 }
             }
-            .ignoresSafeArea()
+            .ignoresSafeAreaIf(SystemConstantsManager.ignoresSafeAreaForInteractiveContent)
             .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
             .onAppear {
                 paywallViewModel.logShowPaywall()

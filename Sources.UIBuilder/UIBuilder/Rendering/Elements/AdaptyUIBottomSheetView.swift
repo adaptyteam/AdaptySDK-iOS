@@ -34,7 +34,7 @@ struct AdaptyUIBottomSheetView: View {
                     offset = viewModel.isPresented ? 0.0 : AdaptyUIBuilder.mainScreenBounds.height
                 }
         }
-        .ignoresSafeArea()
+        .ignoresSafeAreaIf(SystemConstantsManager.ignoresSafeAreaForInteractiveContent)
         .onChange(of: viewModel.isPresented) { newValue in
             withAnimation(newValue ? .easeOut : .linear) {
                 offset = newValue ? 0.0 : AdaptyUIBuilder.mainScreenBounds.height

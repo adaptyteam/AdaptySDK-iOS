@@ -12,6 +12,7 @@ import SwiftUI
 @MainActor
 package struct AdaptyUIPaywallView_Internal: View {
     @EnvironmentObject private var productsViewModel: AdaptyUIProductsViewModel
+    @State private var macWindowMetrics: AdaptyUIWindowMetrics?
 
     private let showDebugOverlay: Bool
 
@@ -23,14 +24,25 @@ package struct AdaptyUIPaywallView_Internal: View {
 
     package var body: some View {
         GeometryReader { proxy in
+            let resolvedSafeArea = SystemConstantsManager.resolveSafeAreaInsets(
+                geometryInsets: proxy.safeAreaInsets,
+                windowMetrics: macWindowMetrics
+            )
+            let resolvedScreenSize = SystemConstantsManager.resolveScreenSize(
+                geometrySize: proxy.size,
+                resolvedSafeArea: resolvedSafeArea,
+                windowMetrics: macWindowMetrics
+            )
+
             AdaptyUIPaywallRendererView()
-                .withScreenSize(
-                    CGSize(
-                        width: proxy.size.width + proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing,
-                        height: proxy.size.height + proxy.safeAreaInsets.top + proxy.safeAreaInsets.bottom
-                    )
+                .withScreenSize(resolvedScreenSize)
+                .withSafeArea(resolvedSafeArea)
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+                .background(
+                    MacOSWindowMetricsReader(metrics: $macWindowMetrics)
+                        .frame(width: 0, height: 0)
                 )
-                .withSafeArea(proxy.safeAreaInsets)
+#endif
                 .withDebugOverlayEnabled(showDebugOverlay)
         }
         .onAppear {

@@ -46,7 +46,7 @@ struct AdaptyUIBasicContainerView: View {
                             )
                         }
                     }
-                    .ignoresSafeArea()
+                    .ignoresSafeAreaIf(SystemConstantsManager.ignoresSafeAreaForInteractiveContent)
                     .scrollIndicatorsHidden_compatible()
                 } else {
                     Rectangle()
@@ -68,7 +68,7 @@ struct AdaptyUIBasicContainerView: View {
                 }
             }
             .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
-            .ignoresSafeArea()
+            .ignoresSafeAreaIf(SystemConstantsManager.ignoresSafeAreaForInteractiveContent)
         }
         .coordinateSpace(name: CoordinateSpace.adaptyGlobalName)
     }
@@ -131,9 +131,9 @@ struct AdaptyUIBasicContainerView: View {
         let bottomOverscrollHeight = screenSize.height
         let properties = content.properties
         let offsetY = properties?.offset.y.points(
-            screenSize: screenSize.width,
-            safeAreaStart: safeArea.leading,
-            safeAreaEnd: safeArea.trailing
+            screenSize: screenSize.height,
+            safeAreaStart: safeArea.top,
+            safeAreaEnd: safeArea.bottom
         ) ?? 0.0
 
         VStack(spacing: 0) {
@@ -141,7 +141,7 @@ struct AdaptyUIBasicContainerView: View {
 
             FooterVerticalFillerView(height: footerSize.height) { frame in
                 withAnimation {
-                    drawFooterBackground = frame.maxY > globalProxy.size.height + globalProxy.safeAreaInsets.bottom
+                    drawFooterBackground = frame.maxY > globalProxy.size.height + safeArea.bottom
                 }
             }
         }

@@ -43,6 +43,51 @@ package enum SystemConstantsManager {
 #endif
     }
 
+    package static var ignoresSafeAreaForInteractiveContent: Bool {
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+        false
+#else
+        true
+#endif
+    }
+
+    package static func resolveSafeAreaInsets(
+        geometryInsets: EdgeInsets,
+        windowMetrics: AdaptyUIWindowMetrics?
+    ) -> EdgeInsets {
+#if canImport(UIKit)
+        resolveSafeAreaInsetsiOS(geometryInsets: geometryInsets)
+#elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+        resolveSafeAreaInsetsmacOS(
+            geometryInsets: geometryInsets,
+            windowMetrics: windowMetrics
+        )
+#else
+        geometryInsets
+#endif
+    }
+
+    package static func resolveScreenSize(
+        geometrySize: CGSize,
+        resolvedSafeArea: EdgeInsets,
+        windowMetrics: AdaptyUIWindowMetrics?
+    ) -> CGSize {
+#if canImport(UIKit)
+        resolveScreenSizeiOS(
+            geometrySize: geometrySize,
+            resolvedSafeArea: resolvedSafeArea
+        )
+#elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+        resolveScreenSizemacOS(
+            geometrySize: geometrySize,
+            resolvedSafeArea: resolvedSafeArea,
+            windowMetrics: windowMetrics
+        )
+#else
+        geometrySize
+#endif
+    }
+
     @discardableResult
     package static func openExternalURL(_ url: URL) async -> Bool {
         await openExternalURL(url, presentation: .browserOutApp)
@@ -73,6 +118,46 @@ package enum SystemConstantsManager {
         return .browserOutApp
 #endif
     }
+
+    #if canImport(UIKit)
+    private static func resolveSafeAreaInsetsiOS(geometryInsets: EdgeInsets) -> EdgeInsets {
+        geometryInsets
+    }
+
+    private static func resolveScreenSizeiOS(
+        geometrySize: CGSize,
+        resolvedSafeArea: EdgeInsets
+    ) -> CGSize {
+        CGSize(
+            width: geometrySize.width + resolvedSafeArea.leading + resolvedSafeArea.trailing,
+            height: geometrySize.height + resolvedSafeArea.top + resolvedSafeArea.bottom
+        )
+    }
+    #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+    private static func resolveSafeAreaInsetsmacOS(
+        geometryInsets: EdgeInsets,
+        windowMetrics: AdaptyUIWindowMetrics?
+    ) -> EdgeInsets {
+        windowMetrics?.safeAreaInsets ?? geometryInsets
+    }
+
+    private static func resolveScreenSizemacOS(
+        geometrySize: CGSize,
+        resolvedSafeArea: EdgeInsets,
+        windowMetrics: AdaptyUIWindowMetrics?
+    ) -> CGSize {
+        if let windowSize = windowMetrics?.windowSize,
+           windowSize.width > 0,
+           windowSize.height > 0 {
+            return windowSize
+        }
+
+        return CGSize(
+            width: geometrySize.width + resolvedSafeArea.leading + resolvedSafeArea.trailing,
+            height: geometrySize.height + resolvedSafeArea.top + resolvedSafeArea.bottom
+        )
+    }
+    #endif
 
     #if canImport(UIKit)
     private static func openExternalURLiOS(

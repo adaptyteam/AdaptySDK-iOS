@@ -11,6 +11,9 @@ import SwiftUI
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUIFlatContainerView: View {
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
+
     @State
     private var footerSize: CGSize = .zero
 
@@ -44,7 +47,7 @@ struct AdaptyUIFlatContainerView: View {
 
                         FooterVerticalFillerView(height: footerSize.height) { frame in
                             withAnimation {
-                                drawFooterBackground = frame.maxY > globalProxy.size.height + globalProxy.safeAreaInsets.bottom
+                                drawFooterBackground = frame.maxY > globalProxy.size.height + safeArea.bottom
                             }
                         }
                     }
@@ -60,7 +63,7 @@ struct AdaptyUIFlatContainerView: View {
                     AdaptyUIElementView(overlay)
                 }
             }
-            .ignoresSafeArea()
+            .ignoresSafeAreaIf(SystemConstantsManager.ignoresSafeAreaForInteractiveContent)
         }
         .coordinateSpace(name: CoordinateSpace.adaptyGlobalName)
     }

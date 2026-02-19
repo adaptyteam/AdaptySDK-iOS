@@ -11,6 +11,9 @@ import SwiftUI
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUITransparentContainerView: View {
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
+
     var screen: VC.Screen
 
     @State var footerSize: CGSize = .zero
@@ -22,8 +25,8 @@ struct AdaptyUITransparentContainerView: View {
     ) -> some View {
         let additionalTopPadding = globalProxy.size.height
             - footerSize.height
-            + globalProxy.safeAreaInsets.top
-            + globalProxy.safeAreaInsets.bottom
+            + safeArea.top
+            + safeArea.bottom
 
         ScrollViewReader { scrollProxy in
             ScrollView {
@@ -58,7 +61,7 @@ struct AdaptyUITransparentContainerView: View {
                     AdaptyUIElementView(overlay)
                 }
             }
-            .ignoresSafeArea()
+            .ignoresSafeAreaIf(SystemConstantsManager.ignoresSafeAreaForInteractiveContent)
         }
     }
 }
