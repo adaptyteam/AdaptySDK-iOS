@@ -1,5 +1,5 @@
 //
-//  Schema.StateCondition.swift
+//  Schema.LegacyStateCondition.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 01.12.2025.
@@ -8,10 +8,13 @@
 import Foundation
 
 extension Schema {
-    typealias StateCondition = VC.StateCondition
+    enum LegacyStateCondition: Sendable, Hashable {
+        case selectedSection(id: String, index: Int32)
+        case selectedProduct(id: String, groupId: String)
+    }
 }
 
-extension Schema.StateCondition: Codable {
+extension Schema.LegacyStateCondition: Codable {
     enum CodingKeys: String, CodingKey {
         case type
         case productId = "product_id"

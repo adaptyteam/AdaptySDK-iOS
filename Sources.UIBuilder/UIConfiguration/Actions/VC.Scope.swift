@@ -1,5 +1,5 @@
 //
-//  VC.Context.swift
+//  VC.Scope.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 19.01.2026.

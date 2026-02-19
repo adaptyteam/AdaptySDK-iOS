@@ -49,15 +49,23 @@ extension Schema.Button: DecodableWithConfiguration {
             return
         }
 
-        let selectedCondition = try container.decodeIfPresent(Schema.StateCondition.self, forKey: .legacySelectedCondition)
-
-        // TODO: selectedCondition
+        let isSelectedState: Schema.Variable? = switch try container.decodeIfPresent(
+            Schema.LegacyStateCondition.self,
+            forKey: .legacySelectedCondition
+        ) {
+        case .selectedProduct(let productId, let groupId):
+            .init(path: ["Legacy", "productGroup", groupId, "_\(Schema.LegacyScripts.legacySafeProductId(productId))"], setter: nil, scope: .global)
+        case .selectedSection(let sectionId, let index):
+            .init(path: ["Legacy", "sections", sectionId, "_\(index)"], setter: nil, scope: .global)
+        default:
+            nil
+        }
 
         try self.init(
             actions: container.decodeActions(forKey: .actions),
             normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
             selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState, configuration: configuration),
-            isSelectedState: .init(path: ["Legacy", "unreleased"], setter: nil, scope: .global)
+            isSelectedState: isSelectedState
         )
     }
 }

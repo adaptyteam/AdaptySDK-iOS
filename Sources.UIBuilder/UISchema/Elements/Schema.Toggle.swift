@@ -51,7 +51,7 @@ extension Schema.Toggle: DecodableWithConfiguration {
                 "index": .int32(offIndex)
             ], scope: .global)]
 
-            let onCondition: Schema.StateCondition = .selectedSection(id: sectionId, index: onIndex)
+            let onCondition: Schema.LegacyStateCondition = .selectedSection(id: sectionId, index: onIndex)
 
             try self.init(
                 value: .init(path: ["Legacy", "unreleased"], setter: nil, scope: .global),
@@ -64,10 +64,19 @@ extension Schema.Toggle: DecodableWithConfiguration {
 
         let onActions = try container.decodeIfPresentActions(forKey: .legacy2OnActions) ?? []
         let offActions = try container.decodeIfPresentActions(forKey: .legacy2OffActions) ?? []
-        let onCondition = try container.decode(Schema.StateCondition.self, forKey: .legacy2OnCondition)
+
+        let value: Schema.Variable = switch try container.decode(
+            Schema.LegacyStateCondition.self,
+            forKey: .legacy2OnCondition
+        ) {
+        case .selectedProduct(let productId, let groupId):
+            .init(path: ["Legacy", "productGroup", groupId, "_\(Schema.LegacyScripts.legacySafeProductId(productId))"], setter: "", scope: .global)
+        case .selectedSection(let sectionId, let index):
+            .init(path: ["Legacy", "sections", sectionId, "_\(index)"], setter: "", scope: .global)
+        }
 
         try self.init(
-            value: .init(path: ["Legacy", "unreleased"], setter: nil, scope: .global),
+            value: value,
             color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)
         )
     }
