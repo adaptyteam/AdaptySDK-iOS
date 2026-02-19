@@ -16,15 +16,14 @@ struct AdaptyUIScreenSizeKey: EnvironmentKey {
 struct AdaptyUIScreenInstanceKey: EnvironmentKey {
     static let defaultValue: VS.ScreenInstance = .init(
         id: "fake",
-        navigatorId: "default",
+        navigatorId: "fake",
         configuration: .init(
             id: "fake",
-            templateId: "fake",
-            background: nil,
+            layoutBehaviour: .default,
             cover: nil,
             content: .unknown("fake", nil),
             footer: nil,
-            overlay: nil
+            screenActions: .empty
         ),
         contextPath: []
     )
