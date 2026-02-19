@@ -14,7 +14,6 @@ package extension View {
         stateViewModel: AdaptyUIStateViewModel,
         paywallViewModel: AdaptyUIPaywallViewModel,
         productsViewModel: AdaptyUIProductsViewModel,
-        sectionsViewModel: AdaptyUISectionsViewModel,
         tagResolverViewModel: AdaptyUITagResolverViewModel,
         timerViewModel: AdaptyUITimerViewModel,
         screensViewModel: AdaptyUIScreensViewModel,
@@ -23,7 +22,6 @@ package extension View {
         environmentObject(stateViewModel)
             .environmentObject(paywallViewModel)
             .environmentObject(productsViewModel)
-            .environmentObject(sectionsViewModel)
             .environmentObject(tagResolverViewModel)
             .environmentObject(timerViewModel)
             .environmentObject(screensViewModel)

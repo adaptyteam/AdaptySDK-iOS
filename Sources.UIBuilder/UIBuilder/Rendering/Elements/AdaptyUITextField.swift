@@ -18,7 +18,6 @@ struct AdaptyUITextField: View {
     @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
     @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
     @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
-    @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
     @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
     @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
 

@@ -15,9 +15,10 @@ struct AdaptyUIToggleView: View {
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
 
-    @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
-    @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
-    @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyUIAssetsViewModel
 
     private var toggle: VC.Toggle
 
@@ -27,20 +28,10 @@ struct AdaptyUIToggleView: View {
 
     var body: some View {
         Toggle(
-            isOn: .init(
-                get: {
-                    switch toggle.onCondition {
-                    case let .selectedSection(sectionId, sectionIndex):
-                        sectionIndex == sectionsViewModel.selectedIndex(for: sectionId)
-                    default: false
-                    }
-                },
-                set: { value in
-                    stateViewModel.execute(
-                        actions: value ? toggle.onActions : toggle.offActions,
-                        screen: screen
-                    )
-                }
+            isOn: stateViewModel.createBinding(
+                toggle.value,
+                defaultValue: false,
+                screen: screen
             )
         ) {
             EmptyView()

@@ -42,7 +42,6 @@ public extension AdaptyUIBuilder {
         let actionHandler: AdaptyUIStateActionHandler
         let paywallViewModel: AdaptyUIPaywallViewModel
         let productsViewModel: AdaptyUIProductsViewModel
-        let sectionsViewModel: AdaptyUISectionsViewModel
         let tagResolverViewModel: AdaptyUITagResolverViewModel
         let timerViewModel: AdaptyUITimerViewModel
         let screensViewModel: AdaptyUIScreensViewModel
@@ -76,7 +75,6 @@ public extension AdaptyUIBuilder {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
-            sectionsViewModel = AdaptyUISectionsViewModel(logId: logId)
             paywallViewModel = AdaptyUIPaywallViewModel(
                 logId: logId,
                 logic: logic,
@@ -111,7 +109,6 @@ public extension AdaptyUIBuilder {
                 stateViewModel: stateViewModel,
                 paywallViewModel: paywallViewModel,
                 productsViewModel: productsViewModel,
-                sectionsViewModel: sectionsViewModel,
                 screensViewModel: screensViewModel
             )
             assetsViewModel = AdaptyUIAssetsViewModel(
@@ -132,7 +129,6 @@ public extension AdaptyUIBuilder {
             logic.reportViewDidDisappear()
             paywallViewModel.resetLogShowPaywall()
             productsViewModel.resetSelectedProducts()
-            sectionsViewModel.resetSectionsState()
             timerViewModel.resetTimersState()
         }
     }

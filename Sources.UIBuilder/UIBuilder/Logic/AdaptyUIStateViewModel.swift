@@ -62,6 +62,24 @@ package final class AdaptyUIStateViewModel: ObservableObject {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
         }
     }
+    
+    func getValue<T: JSValueRepresentable & JSValueConvertable>(
+        _ variable: VC.Variable,
+        defaultValue: T,
+        screen: VS.ScreenInstance
+    ) -> T {
+        do {
+            let value = try state.getValue(
+                T.self,
+                variable: variable,
+                screenInstance: screen
+            )
+            return value ?? defaultValue
+        } catch {
+            Log.ui.error("#\(logId)# getValue error: \(error)")
+            return defaultValue
+        }
+    }
 
     func createBinding<T: JSValueRepresentable & JSValueConvertable>(
         _ variable: VC.Variable,

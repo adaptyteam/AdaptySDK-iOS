@@ -111,7 +111,6 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
             stateViewModel: paywallConfiguration.stateViewModel,
             paywallViewModel: paywallConfiguration.paywallViewModel,
             productsViewModel: paywallConfiguration.productsViewModel,
-            sectionsViewModel: paywallConfiguration.sectionsViewModel,
             tagResolverViewModel: paywallConfiguration.tagResolverViewModel,
             timerViewModel: paywallConfiguration.timerViewModel,
             screensViewModel: paywallConfiguration.screensViewModel,
