@@ -13,17 +13,17 @@ extension Double {
 
 extension VC.Asset {
     static var defaultNavigatorBackground: Self {
-        .solidColor(.black)
+        .solidColor(.transparent)
     }
 
     static var defaultScreenBackground: Self {
-        .solidColor(.black)
+        .solidColor(.transparent)
     }
 }
 
 extension Color {
     static var defaultNavigatorColor: Self {
-        .black
+        .clear
     }
 }
 
