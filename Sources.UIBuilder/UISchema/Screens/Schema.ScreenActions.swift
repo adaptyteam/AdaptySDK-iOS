@@ -27,8 +27,8 @@ extension Schema.ScreenActions: Codable {
     package init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            onOutsideTap: container.decodeIfPresent([Schema.Action].self, forKeys: .onOutsideTap),
-            onSystemBack: container.decodeIfPresent([Schema.Action].self, forKeys: .onSystemBack)
+            onOutsideTap: container.decodeIfPresentActions(forKey: .onOutsideTap),
+            onSystemBack: container.decodeIfPresentActions(forKey: .onSystemBack)
         )
     }
 

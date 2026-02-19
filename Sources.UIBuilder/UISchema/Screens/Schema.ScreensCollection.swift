@@ -10,7 +10,7 @@ import Foundation
 extension Schema {
     struct ScreensCollection: Sendable, Hashable {
         let screens: [ScreenType: Screen]
-        let legacyGenerayedNavigators: [NavigatorIdentifier: Navigator]?
+        let legacyGeneratedNavigators: [NavigatorIdentifier: Navigator]?
     }
 }
 
@@ -30,12 +30,12 @@ extension Schema.ScreensCollection: DecodableWithConfiguration {
         if configuration.isLegacy {
             try self.init(
                 screens: screens,
-                legacyGenerayedNavigators: decoder.legacyGenerateNavigators(configuration: configuration)
+                legacyGeneratedNavigators: decoder.legacyGenerateNavigators(configuration: configuration)
             )
         } else {
             self.init(
                 screens: screens,
-                legacyGenerayedNavigators: nil
+                legacyGeneratedNavigators: nil
             )
         }
     }
@@ -63,8 +63,8 @@ private extension Decoder {
             if let overlay = try legacyScreen.decodeIfPresent(Schema.Element.self, forKey: .overlay, configuration: nestedConfiguration) {
                 .stack(.init(
                     type: .z,
-                    horizontalAlignment: .left, // TODO: ???
-                    verticalAlignment: .top, // TODO: ???
+                    horizontalAlignment: .center,
+                    verticalAlignment: .bottom,
                     spacing: 0,
                     items: [
                         .element(.scrrenHolder),
@@ -82,7 +82,7 @@ private extension Decoder {
             order: Schema.Navigator.default.order,
             appearances: nil,
             transitions: nil,
-            defaultScreenActions: .empty // TODO: ???
+            defaultScreenActions: .empty
         )
 
         guard container.allKeys.count > 1 else {

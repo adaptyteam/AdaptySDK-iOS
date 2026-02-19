@@ -50,6 +50,24 @@ extension Schema.Action: Codable {
     }
 }
 
+extension KeyedDecodingContainer {
+    func decodeActions(forKey key: Key) throws -> [Schema.Action] {
+        if let action = try? decode(Schema.Action.self, forKey: key) {
+            [action]
+        } else {
+            try decode([Schema.Action].self, forKey: key)
+        }
+    }
+
+    func decodeIfPresentActions(forKey key: Key) throws -> [Schema.Action]? {
+        if let action = try? decodeIfPresent(Schema.Action.self, forKey: key) {
+            [action]
+        } else {
+            try decodeIfPresent([Schema.Action].self, forKey: key)
+        }
+    }
+}
+
 extension Schema.Action {
     private enum LegacyCodingKeys: String, CodingKey {
         case type

@@ -104,12 +104,7 @@ extension Schema.Timer: Decodable {
                 try container.decode([Item].self, forKey: .format)
             }
 
-        actions =
-            if let action = try? container.decodeIfPresent(Schema.Action.self, forKey: .actions) {
-                [action]
-            } else {
-                try container.decodeIfPresent([Schema.Action].self, forKey: .actions) ?? []
-            }
+        actions = try container.decodeIfPresentActions(forKey: .actions) ?? []
 
         horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         let textAttributes = try Schema.Text.Attributes(from: decoder)

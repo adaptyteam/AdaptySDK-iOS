@@ -37,14 +37,8 @@ extension Schema.Button: DecodableWithConfiguration {
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let actions =
-            if let action = try? container.decode(Schema.Action.self, forKey: .actions) {
-                [action]
-            } else {
-                try container.decode([Schema.Action].self, forKey: .actions)
-            }
         try self.init(
-            actions: actions,
+            actions: container.decodeActions(forKey: .actions),
             normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
             selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState, configuration: configuration),
             selectedCondition: container.decodeIfPresent(Schema.StateCondition.self, forKey: .selectedCondition)
