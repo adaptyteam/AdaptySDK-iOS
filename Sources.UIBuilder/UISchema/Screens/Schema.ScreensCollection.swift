@@ -89,19 +89,110 @@ private extension Decoder {
             return [legacyDefaultNavigator.id: legacyDefaultNavigator]
         }
 
-        let legacyBottomSheetNavigator = Schema.Navigator(
-            id: "legacy-bottom-sheet",
-            background: .color(.transparent), // TODO: ???
-            content: .scrrenHolder,
-            order: Schema.Navigator.default.order + 100,
-            appearances: nil, // TODO: ???
-            transitions: nil, // TODO: ???
-            defaultScreenActions: .empty // TODO: ???
-        )
-
+        let legacyBottomSheetNavigator = legacyBottomSheetNavigator()
         return [
             legacyDefaultNavigator.id: legacyDefaultNavigator,
             legacyBottomSheetNavigator.id: legacyBottomSheetNavigator
         ]
+    }
+
+    func legacyBottomSheetNavigator() -> Schema.Navigator {
+        let navigatorId = "legacy-bottom-sheet"
+        let navigatorBackground = Schema.AssetReference.color(.init(customId: nil, data: 0x00000066))
+        let clearBackground = Schema.AssetReference.color(.init(customId: nil, data: 0x00000000))
+
+        let onAppear = Schema.Navigator.AppearanceTransition(
+            background: .init(
+                timeline: .init(
+                    duration: 300,
+                    interpolator: .linear,
+                    startDelay: 0,
+                    loop: nil,
+                    loopDelay: 0,
+                    pingPongDelay: 0,
+                    loopCount: nil
+                ),
+                range: .init(
+                    start: clearBackground,
+                    end: navigatorBackground
+                )
+            ),
+            content: [.offset(
+                .init(
+                    duration: 350,
+                    interpolator: .easeIn,
+                    startDelay: 0,
+                    loop: nil,
+                    loopDelay: 0,
+                    pingPongDelay: 0,
+                    loopCount: nil
+                ),
+                .init(
+                    start: .init(x: .zero, y: .screen(1)),
+                    end: .zero
+                )
+            )]
+        )
+        let onDisappear = Schema.Navigator.AppearanceTransition(
+            background: .init(
+                timeline: .init(
+                    duration: 300,
+                    interpolator: .linear,
+                    startDelay: 0,
+                    loop: nil,
+                    loopDelay: 0,
+                    pingPongDelay: 0,
+                    loopCount: nil
+                ),
+                range: .init(
+                    start: navigatorBackground,
+                    end: clearBackground
+                )
+            ),
+            content: [.offset(
+                .init(
+                    duration: 350,
+                    interpolator: .linear,
+                    startDelay: 0,
+                    loop: nil,
+                    loopDelay: 0,
+                    pingPongDelay: 0,
+                    loopCount: nil
+                ),
+                .init(
+                    start: .zero,
+                    end: .init(x: .zero, y: .screen(1))
+                )
+            )]
+        )
+
+        return Schema.Navigator(
+            id: navigatorId,
+            background: navigatorBackground,
+            content: .box(.init(
+                width: .fillMax,
+                height: .fillMax,
+                horizontalAlignment: .center,
+                verticalAlignment: .bottom,
+                content: .scrrenHolder
+            ), nil),
+            order: Schema.Navigator.default.order + 100,
+            appearances: [
+                VC.Navigator.AppearanceTransition.onAppearKey: onAppear,
+                VC.Navigator.AppearanceTransition.onDisappearKey: onDisappear
+            ],
+            transitions: nil,
+            defaultScreenActions: .init(
+                onOutsideTap: [.init(
+                    path: ["SDK", "closeScreen"],
+                    params: [
+                        "navigatorId": .string(navigatorId),
+                        "transitionId": .string(VC.Navigator.AppearanceTransition.onDisappearKey)
+                    ],
+                    scope: .global
+                )],
+                onSystemBack: nil
+            )
+        )
     }
 }

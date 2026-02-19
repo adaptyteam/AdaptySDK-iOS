@@ -15,6 +15,9 @@ package extension VC.Navigator {
 }
 
 package extension VC.Navigator.AppearanceTransition {
+    static let onDisappearKey = "on_disappear"
+    static let onAppearKey = "on_appear"
+
     var isEmpty: Bool {
         background == nil && (content?.isEmpty ?? true)
     }
@@ -26,10 +29,10 @@ package extension VC.Navigator.AppearanceTransition {
 
 package extension [String: VC.Navigator.AppearanceTransition] {
     var onAppear: VC.Navigator.AppearanceTransition? {
-        self["on_appear"]
+        self[VC.Navigator.AppearanceTransition.onAppearKey]
     }
 
     var onDisappear: VC.Navigator.AppearanceTransition? {
-        self["on_disappear"]
+        self[VC.Navigator.AppearanceTransition.onDisappearKey]
     }
 }

@@ -226,7 +226,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
 
         handler?.closeScreen(
             navigatorId: navigatorId ?? "default",
-            transitionId: transitionId ?? "on_disappear"
+            transitionId: transitionId ?? VC.Navigator.AppearanceTransition.onDisappearKey
         )
     }
 }
