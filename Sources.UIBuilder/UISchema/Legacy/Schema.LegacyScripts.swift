@@ -39,6 +39,10 @@ extension Schema {
             ##"Legacy.productGroup["\##(groupId)"] = "\##(productId)";"##
         }
 
+        static func legacySelectSectionScript(sectionId: String, index: Int32) -> String {
+            ##"Legacy.sections["\##(sectionId)"] = \##(index);"##
+        }
+
         static func legacyOpenDefaultScreen(screenId: ScreenType = "default") -> String {
             ##"SDK.openScreen({ instanceId: "\##(screenId)", type: "\##(screenId)", transitionId: "legacy-first-open" });"##
         }

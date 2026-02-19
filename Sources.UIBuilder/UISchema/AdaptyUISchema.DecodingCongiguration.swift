@@ -14,6 +14,11 @@ package extension AdaptyUISchema {
         var insideScreenId: String?
         var insideNavigatorId: String?
         var legacyTemplateId: String?
+        nonisolated(unsafe) let legacyCollector: LegacyCollector = .init()
+    }
+
+    final class LegacyCollector {
+        var sections: [String: Int32] = [:]
     }
 }
 

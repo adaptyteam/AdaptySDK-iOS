@@ -42,7 +42,7 @@ extension Schema.Section: DecodableWithConfiguration {
 
         let sectionId = try container.decode(String.self, forKey: .legacySectionId)
         let index = try container.decodeIfPresent(Int32.self, forKey: .index) ?? 0
-        // TODO add Script: Legacy.sections.<sectionId> = index
+        configuration.legacyCollector.sections[sectionId] = index
         try self.init(
             index: .init(path: ["Legacy","sections",sectionId], setter: nil, scope: .global),
             content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)

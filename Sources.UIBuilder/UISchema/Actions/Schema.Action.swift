@@ -115,7 +115,8 @@ extension Schema.Action {
             try self.init(path: ["SDK", "openScreen"], params: [
                 "type": .string(container.decode(String.self, forKey: .screenType)),
                 "instanceId": .string("legacy-bottom-sheet"),
-                "navigatorId": .string("legacy-bottom-sheet")
+                "navigatorId": .string("legacy-bottom-sheet"),
+                "transitionId": .string("on_appear")
             ], scope: .global)
         case "close_screen":
             self.init(path: ["SDK", "closeScreen"], params: [
