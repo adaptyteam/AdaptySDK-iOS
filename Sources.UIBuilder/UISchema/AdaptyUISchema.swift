@@ -108,7 +108,7 @@ extension AdaptyUISchema: Codable {
 
         scripts =
             if configuration.isLegacy {
-                try decoder.legacyGenerateScript()
+                try decoder.legacyGenerateScript(collector: configuration.legacyCollector)
             } else {
                 try (container.decodeIfPresent(String.self, forKey: .script)).map { [$0] } ?? []
             }
@@ -130,7 +130,7 @@ private enum LegacyCodingKeys: String, CodingKey {
 }
 
 private extension Decoder {
-    func legacyGenerateScript() throws -> [String] {
+    func legacyGenerateScript(collector: AdaptyUISchema.LegacyCollector) throws -> [String] {
         let container = try container(keyedBy: LegacyCodingKeys.self)
 
         var scripts = [String]()
@@ -145,6 +145,10 @@ private extension Decoder {
                     Schema.LegacyScripts.legacySelectProductScript(groupId: groupId, productId: productId)
                 }
             }
+        }
+
+        for section in collector.sections {
+            scripts += [Schema.LegacyScripts.legacySelectSectionScript(sectionId: section.key, index: section.value)]
         }
 
         return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
