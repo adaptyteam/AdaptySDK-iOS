@@ -63,6 +63,42 @@ struct PlatformSystemConstantsManagerTests {
 
     @Test
     @MainActor
+    func invalidCustomSchemeReturnsFalseOnNativeMacOS() async {
+        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
+            return
+        }
+
+#if os(macOS) && !targetEnvironment(macCatalyst)
+        let invalidCustomSchemeURL = URL(string: "adapty-sdk-invalid-url-scheme://open")!
+        let result = await SystemConstantsManager.openExternalURL(
+            invalidCustomSchemeURL,
+            presentation: .browserOutApp
+        )
+
+        #expect(result == false)
+#endif
+    }
+
+    @Test
+    @MainActor
+    func invalidCustomSchemeWithInAppPresentationReturnsFalseOnNativeMacOS() async {
+        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
+            return
+        }
+
+#if os(macOS) && !targetEnvironment(macCatalyst)
+        let invalidCustomSchemeURL = URL(string: "adapty-sdk-invalid-url-scheme://open")!
+        let result = await SystemConstantsManager.openExternalURL(
+            invalidCustomSchemeURL,
+            presentation: .browserInApp
+        )
+
+        #expect(result == false)
+#endif
+    }
+
+    @Test
+    @MainActor
     func safeAreaAndScreenSizeResolversUsePlatformPolicy() {
         guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
             return

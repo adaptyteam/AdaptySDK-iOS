@@ -223,12 +223,21 @@ package enum SystemConstantsManager {
     #endif
 
     #if canImport(AppKit) && !targetEnvironment(macCatalyst)
+    private static func canOpenExternalURLmacOS(_ url: URL) -> Bool {
+        NSWorkspace.shared.urlForApplication(toOpen: url) != nil
+    }
+
     private static func openExternalURLmacOS(
         _ url: URL,
         presentation: VC.WebOpenInParameter
     ) -> Bool {
         if presentation == .browserInApp {
             Log.ui.warn("In-app browser for external URL is not available on native macOS. Falling back to external browser.")
+        }
+
+        guard canOpenExternalURLmacOS(url) else {
+            Log.ui.warn("No application can open external URL on native macOS: \(url.absoluteString)")
+            return false
         }
 
         return NSWorkspace.shared.open(url)
