@@ -130,6 +130,28 @@ struct PlatformMacOSSheetPresenterTests {
         #expect(resolved.dismissableByOutsideClick == false)
         #expect(resolved.dismissableByEsc)
     }
+
+    @Test
+    @MainActor
+    func escapeKeyConsumptionFollowsDismissPolicy() {
+        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) else {
+            return
+        }
+
+        let dismissableByEsc = AdaptyMacOSSheetDismissPolicy(
+            dismissableByOutsideClick: true,
+            dismissableByEsc: true,
+            dismissableByCustomKeyboardShortcut: nil
+        )
+        let notDismissableByEsc = AdaptyMacOSSheetDismissPolicy(
+            dismissableByOutsideClick: true,
+            dismissableByEsc: false,
+            dismissableByCustomKeyboardShortcut: nil
+        )
+
+        #expect(MacOSSheetPresenter.shouldConsumeEscapeKey(dismissPolicy: dismissableByEsc))
+        #expect(MacOSSheetPresenter.shouldConsumeEscapeKey(dismissPolicy: notDismissableByEsc) == false)
+    }
 }
 
 #endif

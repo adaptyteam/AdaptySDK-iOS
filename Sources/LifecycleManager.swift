@@ -11,6 +11,9 @@ import StoreKit
 #if canImport(UIKit)
 import UIKit
 #endif
+#if canImport(AppKit) && !targetEnvironment(macCatalyst)
+import AppKit
+#endif
 
 private let log = Log.Category(name: "LifecycleManager")
 
@@ -175,6 +178,16 @@ final class LifecycleManager {
         #if canImport(UIKit)
         Task {
             let didBecomeActiveNotification = UIApplication.didBecomeActiveNotification
+            NotificationCenter.default.addObserver(
+                forName: didBecomeActiveNotification,
+                object: nil,
+                queue: nil,
+                using: handleDidBecomeActiveNotification
+            )
+        }
+        #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+        Task {
+            let didBecomeActiveNotification = NSApplication.didBecomeActiveNotification
             NotificationCenter.default.addObserver(
                 forName: didBecomeActiveNotification,
                 object: nil,

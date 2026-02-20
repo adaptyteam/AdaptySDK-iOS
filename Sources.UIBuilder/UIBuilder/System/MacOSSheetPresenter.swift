@@ -120,6 +120,12 @@ package final class MacOSSheetPresenter {
         }
     }
 
+    package static func shouldConsumeEscapeKey(
+        dismissPolicy: AdaptyMacOSSheetDismissPolicy
+    ) -> Bool {
+        dismissPolicy.dismissableByEsc
+    }
+
     private func presentPendingIfNeeded() {
         guard let pendingPresentation else { return }
         self.pendingPresentation = nil
@@ -295,10 +301,11 @@ package final class MacOSSheetPresenter {
             guard self.activeSheetId == sheetId else { return event }
 
             if event.isEscapeKey {
-                if dismissPolicy.dismissableByEsc {
-                    self.requestDismissForCurrentSheet()
+                guard Self.shouldConsumeEscapeKey(dismissPolicy: dismissPolicy) else {
+                    return event
                 }
 
+                self.requestDismissForCurrentSheet()
                 return nil
             }
 

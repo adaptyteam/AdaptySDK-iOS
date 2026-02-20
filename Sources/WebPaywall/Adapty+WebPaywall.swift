@@ -14,6 +14,8 @@ import Foundation
     import AppKit
 #endif
 
+private let log = Log.Category(name: "WebPaywall")
+
 public extension Adapty {
     nonisolated static func openWebPaywall(
         for product: AdaptyPaywallProduct,
@@ -152,23 +154,50 @@ extension URL {
     @MainActor
     package func open(presentation: AdaptyWebPresentation) async -> Bool {
         #if os(iOS)
-            switch presentation {
-            case .externalBrowser:
-                return await UIApplication.shared.open(self, options: [:])
-            case .inAppBrowser:
-                guard let topViewController = UIApplication.shared.topPresentedController else {
-                    return await UIApplication.shared.open(self, options: [:])
-                }
-
-                let safariViewController = SFSafariViewController(url: self)
-                topViewController.present(safariViewController, animated: true)
-                return true
-            }
+        await openiOS(presentation: presentation)
         #elseif os(macOS)
-            NSWorkspace.shared.open(self)
-            return true
+        openmacOS(presentation: presentation)
+        #else
+        false
         #endif
     }
+
+    #if os(iOS)
+    @MainActor
+    private func openiOS(presentation: AdaptyWebPresentation) async -> Bool {
+        switch presentation {
+        case .externalBrowser:
+            return await UIApplication.shared.open(self, options: [:])
+        case .inAppBrowser:
+            guard let topViewController = UIApplication.shared.topPresentedController else {
+                return await UIApplication.shared.open(self, options: [:])
+            }
+
+            let safariViewController = SFSafariViewController(url: self)
+            topViewController.present(safariViewController, animated: true)
+            return true
+        }
+    }
+    #endif
+
+    #if os(macOS)
+    package func openmacOS(
+        presentation: AdaptyWebPresentation,
+        canOpenExternalURL: (URL) -> Bool = { NSWorkspace.shared.urlForApplication(toOpen: $0) != nil },
+        openExternalURL: (URL) -> Bool = { NSWorkspace.shared.open($0) }
+    ) -> Bool {
+        if presentation == .inAppBrowser {
+            log.warn("In-app browser is unavailable on native macOS. Falling back to external browser.")
+        }
+
+        guard canOpenExternalURL(self) else {
+            log.warn("No application can open web paywall URL on native macOS: \(absoluteString)")
+            return false
+        }
+
+        return openExternalURL(self)
+    }
+    #endif
 
     func appendOrOverwriteQueryParameters(
         _ parameters: [String: String]
