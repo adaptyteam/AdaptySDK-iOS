@@ -27,9 +27,15 @@ package final class AdaptyUIBottomSheetViewModel: ObservableObject {
 package final class AdaptyUIScreensViewModel: ObservableObject {
     private let logId: String
     private let viewConfiguration: AdaptyUIConfiguration
+    private var macOSSheetConfigsById = [String: AdaptyMacOSSheetConfig]()
+
     let bottomSheetsViewModels: [AdaptyUIBottomSheetViewModel]
 
     @Published var presentedScreensStack = [String]()
+
+    package var activePresentedBottomSheetId: String? {
+        presentedScreensStack.last
+    }
 
     package init(
         logId: String,
@@ -43,7 +49,10 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         }
     }
 
-    func presentScreen(id: String) {
+    func presentScreen(
+        id: String,
+        macOSSheetConfig: AdaptyMacOSSheetConfig? = nil
+    ) {
         Log.ui.verbose("#\(logId)# presentScreen \(id)")
 
         if presentedScreensStack.contains(where: { $0 == id }) {
@@ -53,15 +62,20 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 
         for bottomSheetVM in bottomSheetsViewModels {
             if bottomSheetVM.id == id {
+                macOSSheetConfigsById[id] = macOSSheetConfig ?? .default
                 bottomSheetVM.isPresented = true
                 presentedScreensStack.append(id)
+                return
             }
         }
+
+        Log.ui.warn("#\(logId)# presentScreen \(id) Bottom Sheet Not Found!")
     }
 
     func dismissScreen(id: String) {
         Log.ui.verbose("#\(logId)# dismissScreen \(id)")
         presentedScreensStack.removeAll(where: { $0 == id })
+        macOSSheetConfigsById[id] = nil
 
         for bottomSheetVM in bottomSheetsViewModels {
             if bottomSheetVM.id == id {
@@ -79,6 +93,11 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     package func resetScreensStack() {
         Log.ui.verbose("#\(logId)# resetScreensStack")
         presentedScreensStack.removeAll()
+        macOSSheetConfigsById.removeAll()
         bottomSheetsViewModels.forEach { $0.isPresented = false }
+    }
+
+    package func macOSSheetConfig(for id: String) -> AdaptyMacOSSheetConfig {
+        macOSSheetConfigsById[id] ?? .default
     }
 }

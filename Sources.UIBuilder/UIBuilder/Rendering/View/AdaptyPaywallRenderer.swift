@@ -43,16 +43,7 @@ struct AdaptyUIPaywallRendererView: View {
                 templateResolverView(template, screen: viewConfiguration.screen)
                     .staticBackground(viewConfiguration.screen.background)
 
-                Color.black
-                    .opacity(!screensViewModel.presentedScreensStack.isEmpty ? 0.4 : 0.0)
-                    .onTapGesture {
-                        screensViewModel.dismissTopScreen()
-                    }
-
-                ForEach(screensViewModel.bottomSheetsViewModels, id: \.id) { vm in
-                    AdaptyUIBottomSheetView()
-                        .environmentObject(vm)
-                }
+                AdaptyPlatformSheetPresentor()
 
                 if productsViewModel.purchaseInProgress || productsViewModel.restoreInProgress {
                     AdaptyUILoaderView()
