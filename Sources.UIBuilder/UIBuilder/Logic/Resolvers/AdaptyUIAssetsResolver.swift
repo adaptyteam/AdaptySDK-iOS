@@ -18,7 +18,11 @@ import AppKit
 
 public enum AdaptyUICustomImageAsset: Sendable {
     case file(url: URL)
-    case remote(url: URL, preview: AdaptyPlatformImage?)
+#if canImport(UIKit)
+    case remote(url: URL, preview: UIImage?)
+#elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+    case remote(url: URL, preview: NSImage?)
+#endif
     case platformImage(value: AdaptyPlatformImage)
 #if canImport(UIKit)
     case uiImage(value: UIImage)
@@ -31,8 +35,8 @@ public enum AdaptyUICustomImageAsset: Sendable {
 #if canImport(UIKit)
 public extension AdaptyUICustomImageAsset {
     @_disfavoredOverload
-    static func remote(url: URL, preview: UIImage?) -> AdaptyUICustomImageAsset {
-        .remote(url: url, preview: preview.map { AdaptyPlatformImage(nativeImage: $0) })
+    static func remote(url: URL, preview: AdaptyPlatformImage?) -> AdaptyUICustomImageAsset {
+        .remote(url: url, preview: preview?.uiImage)
     }
 }
 #endif
@@ -40,8 +44,8 @@ public extension AdaptyUICustomImageAsset {
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
 public extension AdaptyUICustomImageAsset {
     @_disfavoredOverload
-    static func remote(url: URL, preview: NSImage?) -> AdaptyUICustomImageAsset {
-        .remote(url: url, preview: preview.map { AdaptyPlatformImage(nativeImage: $0) })
+    static func remote(url: URL, preview: AdaptyPlatformImage?) -> AdaptyUICustomImageAsset {
+        .remote(url: url, preview: preview?.nsImage)
     }
 }
 #endif
@@ -120,10 +124,23 @@ extension AdaptyUICustomImageAsset {
     }
 
     var platformResolvedRemote: (url: URL, preview: AdaptyPlatformImage?)? {
-        guard case let .remote(url, preview) = self else {
+        switch self {
+#if canImport(UIKit)
+        case let .remote(url, preview):
+            return (
+                url,
+                preview.map { AdaptyPlatformImage(uiImage: $0) }
+            )
+#elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
+        case let .remote(url, preview):
+            return (
+                url,
+                preview.map { AdaptyPlatformImage(nsImage: $0) }
+            )
+#endif
+        default:
             return nil
         }
-        return (url, preview)
     }
 }
 

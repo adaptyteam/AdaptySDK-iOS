@@ -12,7 +12,7 @@ import SwiftUI
 
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package struct MacOSWindowMetricsReader: NSViewRepresentable {
-    
+
     @Binding private var metrics: AdaptyUIWindowMetrics?
 
     package init(metrics: Binding<AdaptyUIWindowMetrics?>) {
@@ -23,7 +23,7 @@ package struct MacOSWindowMetricsReader: NSViewRepresentable {
 
     package func makeNSView(context: Context) -> WindowTrackingView {
         let view = WindowTrackingView()
-        
+
         view.onWindowChanged = { [weak coordinator = context.coordinator] window in
             coordinator?.attach(window: window)
         }
@@ -178,7 +178,7 @@ private extension NSWindow {
             frameSize.height > 0,
             !layoutRect.isEmpty
         else { return EdgeInsets() }
-        
+
         return .init(
             top: max(0, frameSize.height - layoutRect.maxY),
             leading: max(0, layoutRect.minX),

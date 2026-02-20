@@ -19,6 +19,11 @@ struct PlatformSystemConstantsManagerTests {
         #expect(insets.trailing == trailing)
     }
 
+    private func invalidCustomSchemeURL() -> URL {
+        let scheme = "adapty-sdk-invalid-url-scheme-\(UUID().uuidString.lowercased())"
+        return URL(string: "\(scheme)://open")!
+    }
+
     @Test
     @MainActor
     func valuesAreAccessibleOnCurrentPlatform() {
@@ -69,7 +74,7 @@ struct PlatformSystemConstantsManagerTests {
         }
 
 #if os(macOS) && !targetEnvironment(macCatalyst)
-        let invalidCustomSchemeURL = URL(string: "adapty-sdk-invalid-url-scheme://open")!
+        let invalidCustomSchemeURL = invalidCustomSchemeURL()
         let result = await SystemConstantsManager.openExternalURL(
             invalidCustomSchemeURL,
             presentation: .browserOutApp
@@ -87,7 +92,7 @@ struct PlatformSystemConstantsManagerTests {
         }
 
 #if os(macOS) && !targetEnvironment(macCatalyst)
-        let invalidCustomSchemeURL = URL(string: "adapty-sdk-invalid-url-scheme://open")!
+        let invalidCustomSchemeURL = invalidCustomSchemeURL()
         let result = await SystemConstantsManager.openExternalURL(
             invalidCustomSchemeURL,
             presentation: .browserInApp

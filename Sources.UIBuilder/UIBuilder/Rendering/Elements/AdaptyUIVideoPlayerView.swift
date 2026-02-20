@@ -84,7 +84,8 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 #elseif canImport(AppKit) && !targetEnvironment(macCatalyst)
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoPlayerView: NSViewRepresentable {
-    final class Coordinator: @unchecked Sendable {
+    @MainActor
+    final class Coordinator {
         private var playerCurrentItemObservation: NSKeyValueObservation?
         private weak var observedPlayer: AVPlayer?
 
@@ -98,17 +99,19 @@ struct AdaptyUIVideoPlayerView: NSViewRepresentable {
         ) {
             if observedPlayer !== player {
                 playerCurrentItemObservation?.invalidate()
+                playerCurrentItemObservation = nil
                 observedPlayer = player
-                didNotifyReady = false
 
                 playerCurrentItemObservation = player.observe(
                     \.currentItem,
                     options: [.initial, .new]
                 ) { [weak self] player, _ in
-                    self?.observeCurrentItem(
-                        player.currentItem,
-                        onReadyForDisplay: onReadyForDisplay
-                    )
+                    Task { @MainActor [weak self] in
+                        self?.observeCurrentItem(
+                            player.currentItem,
+                            onReadyForDisplay: onReadyForDisplay
+                        )
+                    }
                 }
             } else {
                 observeCurrentItem(
@@ -122,21 +125,29 @@ struct AdaptyUIVideoPlayerView: NSViewRepresentable {
             _ item: AVPlayerItem?,
             onReadyForDisplay: @escaping @MainActor @Sendable () -> Void
         ) {
-            guard let item else { return }
-
             if observedItem !== item {
                 currentItemObservation?.invalidate()
+                currentItemObservation = nil
                 observedItem = item
+                didNotifyReady = false
+            }
 
+            guard let item else { return }
+
+            if currentItemObservation == nil {
                 currentItemObservation = item.observe(
                     \.status,
                     options: [.initial, .new]
                 ) { [weak self] item, _ in
-                    guard let self else { return }
-                    guard item.status == .readyToPlay else { return }
-                    self.notifyReady(onReadyForDisplay)
+                    Task { @MainActor [weak self] in
+                        guard let self else { return }
+                        guard item.status == .readyToPlay else { return }
+                        self.notifyReady(onReadyForDisplay)
+                    }
                 }
-            } else if item.status == .readyToPlay {
+            }
+
+            if item.status == .readyToPlay {
                 notifyReady(onReadyForDisplay)
             }
         }
