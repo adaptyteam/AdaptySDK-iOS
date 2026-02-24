@@ -40,6 +40,7 @@ final class AdaptyUIScreenInstance: ObservableObject {
 package final class AdaptyUINavigatorViewModel: ObservableObject {
     let navigator: VC.Navigator
     let appearTransitionId: String
+    let logId: String
 
     var id: VC.NavigatorIdentifier { navigator.id }
     var order: Double { Double(navigator.order) }
@@ -52,10 +53,12 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     private(set) var screens: [AdaptyUIScreenInstance]
 
     init(
+        logId: String,
         navigator: VC.Navigator,
         screen: AdaptyUIScreenInstance,
         appearTransitionId: String
     ) {
+        self.logId = logId
         self.navigator = navigator
         self.appearTransitionId = appearTransitionId
 
@@ -70,21 +73,29 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         transitionId: String,
         completion: (() -> Void)?
     ) {
+        Log.ui.verbose("#\(logId)# startScreenTransition screen:\(screen.id) in navigator:\(navigator.id)")
+
         guard var currentScreen = screens.firstIfSingle else {
             // TODO: x throw error?
+            Log.ui.error("#\(logId)# navigator:\(navigator.id) has animations in progress")
             return // in the process of animation, TODO: x think about force replacement?
         }
 
         guard currentScreen.id != screen.id else {
+            Log.ui.error("#\(logId)# screen:\(screen.id) is already presented in navigator:\(navigator.id)")
             return // TODO: x throw error?
         }
 
         guard let transition = navigator.transitions?[transitionId] else {
+            Log.ui.verbose("#\(logId)# screen:\(screen.id) in navigator:\(navigator.id) - no transition found")
+
             screens.removeAll()
             screens.append(screen)
             completion?()
             return
         }
+
+        Log.ui.verbose("#\(logId)# screen:\(screen.id) in navigator:\(navigator.id) - transition found")
 
         var newScreen = screen
 
@@ -96,7 +107,11 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         DispatchQueue.main.asyncAfter(
             deadline: .now() + transition.totalDuration
         ) { [weak self] in
-            self?.screens.remove(at: 0)
+            guard let self else { return }
+
+            Log.ui.verbose("#\(self.logId)# screen:\(screen.id) in navigator:\(self.navigator.id) - transition finished")
+
+            self.screens.remove(at: 0)
             completion?()
         }
     }
@@ -105,7 +120,10 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         transitionId: String,
         completion: (() -> Void)?
     ) {
+        Log.ui.verbose("#\(self.logId)# startNavigatorTransition \(transitionId) in navigator:\(self.navigator.id)")
+
         guard let transition = navigator.appearances?[transitionId] else {
+            Log.ui.verbose("#\(logId)# navigator:\(navigator.id) - no transition found")
             completion?()
             return
         }
@@ -117,6 +135,9 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             DispatchQueue.main.asyncAfter(
                 deadline: .now() + transition.totalDuration
             ) { [weak self] in
+                guard let self else { return }
+                Log.ui.verbose("#\(self.logId)# navigator:\(self.navigator.id) - transition finished")
+
                 completion()
             }
         }
@@ -151,6 +172,19 @@ extension VC.Navigator.AppearanceTransition {
             }
             .min(by: { lhs, rhs in lhs.timeline.startDelay < rhs.timeline.startDelay })
             .map { $0.range.start } ?? 1.0
+    }
+    
+    var initialContentOffset: VC.Offset {
+        content?
+            .compactMap {
+                if case let .offset(timeline, range) = $0 {
+                    return (timeline: timeline, range: range)
+                } else {
+                    return nil
+                }
+            }
+            .min(by: { lhs, rhs in lhs.timeline.startDelay < rhs.timeline.startDelay })
+            .map { $0.range.start } ?? .zero
     }
 }
 

@@ -98,7 +98,7 @@ private extension Decoder {
 
     func legacyBottomSheetNavigator() -> Schema.Navigator {
         let navigatorId = "legacy-bottom-sheet"
-        let navigatorBackground = Schema.AssetReference.color(.init(customId: nil, data: 0x00000066))
+        let navigatorBackground = Schema.AssetReference.color(.init(customId: nil, data: 0x000000C8))
         let clearBackground = Schema.AssetReference.color(.init(customId: nil, data: 0x00000000))
 
         let onAppear = Schema.Navigator.AppearanceTransition(

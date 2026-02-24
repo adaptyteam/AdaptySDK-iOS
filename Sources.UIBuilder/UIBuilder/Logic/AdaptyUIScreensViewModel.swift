@@ -57,6 +57,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         } else {
             // Create new Navigator
             let navigatorVM = AdaptyUINavigatorViewModel(
+                logId: logId,
                 navigator: navigatorConfig,
                 screen: screen,
                 appearTransitionId: transitionId

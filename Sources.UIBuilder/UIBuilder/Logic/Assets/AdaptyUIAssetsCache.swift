@@ -106,12 +106,17 @@ final class AdaptyUIAssetsCache {
             return .empty(mode: mode)
         }
 
-        guard case .assetId(let assetId) = assetIdOrColor else {
-            // TODO: assetIdOrColor has color case, we dont need use cache for this asset
-            return .empty(mode: mode)
+        switch assetIdOrColor {
+        case .assetId(let assetId):
+            return cachedAsset(assetId, mode: mode)
+        case .color(let color):
+            return .init(
+                customId: nil,
+                mode: mode,
+                stateValue: .color(color.resolvedColor),
+                customValue: nil
+            )
         }
-
-        return cachedAsset(assetId, mode: mode)
     }
 
     func cachedAsset(
@@ -162,10 +167,12 @@ extension AdaptyUIConfiguration.AssetReference {
         screen: VS.ScreenInstance
     ) -> VC.AssetIdentifierOrValue? {
         switch self {
-        case .assetId(let id): .assetId(id)
-        case .color(let color): .color(color)
+        case .assetId(let id):
+            return .assetId(id)
+        case .color(let color):
+            return .color(color)
         case .variable(let variable):
-            try? state.getValue(
+            return try? state.getValue(
                 VC.AssetIdentifierOrValue.self,
                 variable: variable,
                 screenInstance: screen

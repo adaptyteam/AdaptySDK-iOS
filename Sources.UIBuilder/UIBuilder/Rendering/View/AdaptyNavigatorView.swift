@@ -118,7 +118,8 @@ struct AdaptyNavigatorView: View {
             )
             .animatablePropertiesTransition(
                 play: $contentAnimations,
-                initialOpacity: navigatorViewModel.appearTransition?.initialContentOpacity ?? 1.0
+                initialOpacity: navigatorViewModel.appearTransition?.initialContentOpacity ?? 1.0,
+                initialOffset: navigatorViewModel.appearTransition?.initialContentOffset ?? .zero
             )
         }
         .zIndex(navigatorViewModel.order * 1000.0)
