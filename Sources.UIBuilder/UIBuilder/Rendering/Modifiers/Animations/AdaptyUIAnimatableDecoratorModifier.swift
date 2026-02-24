@@ -60,7 +60,7 @@ extension InsettableShape {
         case let .image(imageData):
             self.fillImage(imageData, tint: nil)
         case .none:
-            self
+            self.fillSolidColor(.emptyAssetColor)
         }
     }
 }

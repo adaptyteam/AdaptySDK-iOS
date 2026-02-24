@@ -22,9 +22,9 @@ extension VC.Asset {
 }
 
 extension Color {
-    static var defaultNavigatorColor: Self {
-        .clear
-    }
+    static var defaultNavigatorColor: Self { .clear }
+    
+    static var emptyAssetColor: Self { .clear }
 }
 
 #if canImport(UIKit)
