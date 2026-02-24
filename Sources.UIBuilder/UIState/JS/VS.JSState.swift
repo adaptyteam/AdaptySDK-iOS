@@ -139,8 +139,16 @@ extension VS.JSState {
     private func convertValue<T: JSValueRepresentable>(value: JSValue, convertor: AdaptyUIConfiguration.Variable.Converter) throws(VS.Error) -> T? {
         switch convertor {
         case .isEqual(let a, _):
+            guard let ctx = value.context else { return nil }
 
-            
+            let rhs = a.toJSValue(in: ctx)
+            let result = value.isEqual(to: rhs)
+            if let boolJS = JSValue(bool: result, in: ctx) {
+                return T.fromJSValue(boolJS)
+            } else {
+                return nil
+            }
+
         case .unknown(let name, let params):
             throw .notFoundConvertor(name)
         }
