@@ -49,8 +49,14 @@ extension VS.JSState {
     func evaluateScripts(
         _ scripts: [String]
     ) {
-        let script = scripts.filter { !$0.isEmpty }.joined(separator: "\n")
-        context.evaluateScript(script)
+        for script in scripts {
+            let a = context.evaluateScript(script)
+            print(a)
+            print("----")
+            print(debug(path: "", filter: .withFunctionName))
+        }
+//        let script = scripts.filter { !$0.isEmpty }.joined(separator: "\n")
+//        context.evaluateScript(script)
         objectWillChange.send()
     }
 
@@ -122,7 +128,22 @@ extension VS.JSState {
         }
 
         log.debug("get variable \(path.joined(separator: ".")) = \(result)")
-        return T.fromJSValue(result)
+
+        guard let convertor = variable.converter else {
+            return T.fromJSValue(result)
+        }
+
+        return try convertValue(value: result, convertor: convertor)
+    }
+
+    private func convertValue<T: JSValueRepresentable>(value: JSValue, convertor: AdaptyUIConfiguration.Variable.Converter) throws(VS.Error) -> T? {
+        switch convertor {
+        case .isEqual(let a, _):
+
+            
+        case .unknown(let name, let params):
+            throw .notFoundConvertor(name)
+        }
     }
 
     private func invokeMethod<T: JSValueRepresentable>(

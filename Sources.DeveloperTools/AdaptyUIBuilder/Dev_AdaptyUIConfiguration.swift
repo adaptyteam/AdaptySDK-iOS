@@ -14,40 +14,6 @@ public struct Dev_AdaptyUIConfiguration {
 }
 
 public extension Dev_AdaptyUIConfiguration {
-    @available(*, deprecated, message: "Use `create(main:templates:navigators:contents:script:startScreenName:)` instead.")
-    static func create(
-        assets: String,
-        localization: String,
-        templates: String? = nil,
-        navigators: [String: String]? = nil,
-        contents: [AdaptyUISchema.ExampleContent],
-        script: String? = nil,
-        startScreenName: String?
-    ) throws -> Self {
-        struct DefaultLocale: Decodable {
-            let id: LocaleId
-        }
-        let defaultLocale = try JSONDecoder().decode(DefaultLocale.self, from: localization.data(using: .utf8) ?? Data())
-
-        let main = ##"""
-        {
-            "format":"5.0.0",
-            "assets":\##(assets),
-            "localizations":[\##(localization)],
-            "default_localization":"\##(defaultLocale.id)"
-        }
-        """##
-
-        return try create(
-            main: main,
-            templates: templates,
-            navigators: navigators,
-            contents: contents,
-            script: script,
-            startScreenName: startScreenName
-        )
-    }
-
     static func create(
         main: String,
         templates: String? = nil,

@@ -52,6 +52,7 @@ extension Schema.Navigator: Encodable, DecodableWithConfiguration {
         case order
         case appearances
         case transitions
+        case defaultScreenActions = "default_screen_actions"
     }
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -70,7 +71,7 @@ extension Schema.Navigator: Encodable, DecodableWithConfiguration {
             order: container.decode(Int.self, forKey: .order),
             appearances: container.decodeIfPresent([String: AppearanceTransition].self, forKey: .appearances),
             transitions: container.decodeIfPresent([String: ScreenTransition].self, forKey: .transitions),
-            defaultScreenActions: decoder.singleValueContainer().decode(Schema.ScreenActions.self)
+            defaultScreenActions: container.decodeIfPresent(Schema.ScreenActions.self, forKey: .defaultScreenActions) ?? .empty
         )
     }
 }

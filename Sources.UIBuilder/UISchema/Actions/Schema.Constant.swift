@@ -1,5 +1,5 @@
 //
-//  Schema.Action.Parameter.swift
+//  Schema.Constant.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 17.12.2025.
@@ -7,7 +7,11 @@
 
 import Foundation
 
-extension Schema.Action.Parameter: Codable {
+extension Schema {
+    typealias Constant = VC.Constant
+}
+
+extension Schema.Constant: Codable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
 
@@ -23,11 +27,11 @@ extension Schema.Action.Parameter: Codable {
             self = .double(v)
         } else if let v = try? container.decode(String.self) {
             self = .string(v)
-        } else if let v = try? container.decode([String: Schema.Action.Parameter].self) {
+        } else if let v = try? container.decode([String: Schema.Constant].self) {
             self = .object(v)
         } else {
             throw DecodingError.typeMismatch(
-                Schema.Action.Parameter.self,
+                Schema.Constant.self,
                 .init(
                     codingPath: container.codingPath,
                     debugDescription: "Unsupported value type"

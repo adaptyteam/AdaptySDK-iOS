@@ -17,5 +17,7 @@ extension VS {
         case jsPathToObjectIsEmpty
         case jsObjectNotFound(String)
         case jsMethodNotFound(String)
+
+        case notFoundConvertor(String)
     }
 }

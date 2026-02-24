@@ -14,11 +14,11 @@ package extension AdaptyUISchema {
         var insideScreenId: String?
         var insideNavigatorId: String?
         var legacyTemplateId: String?
-        nonisolated(unsafe) let legacyCollector: LegacyCollector = .init()
+        nonisolated(unsafe) let collector: DecodingCollector = .init()
     }
 
-    final class LegacyCollector {
-        var sections: [String: Int32] = [:]
+    final class DecodingCollector {
+        var legacySectionsState: [String: Int32] = [:]
     }
 }
 
@@ -35,6 +35,11 @@ extension AdaptyUISchema.DecodingConfiguration {
 // # mark legacy
 
 extension AdaptyUISchema.DecodingConfiguration {
+    struct SectionSetter: Sendable, Hashable {
+        let on: Int32
+        let off: Int32
+    }
+
     var screenLayoutBehaviourFromLegacy: Schema.Screen.LayoutBehaviour? {
         guard isLegacy else {
             return nil

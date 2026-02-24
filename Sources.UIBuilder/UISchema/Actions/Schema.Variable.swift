@@ -25,7 +25,8 @@ extension Schema.Variable: Codable {
         try self.init(
             path: path.split(separator: ".").map(String.init),
             setter: container.decodeIfPresent(String.self, forKey: .setter),
-            scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default
+            scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default,
+            converter: VC.Variable.Converter(from: decoder)
         )
     }
 
@@ -33,6 +34,7 @@ extension Schema.Variable: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(path.joined(separator: "."), forKey: .path)
         try container.encodeIfPresent(setter, forKey: .setter)
+        try converter?.encode(to: encoder)
         if scope != .default {
             try container.encode(scope, forKey: .scope)
         }
