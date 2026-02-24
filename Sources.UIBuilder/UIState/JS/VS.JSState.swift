@@ -133,23 +133,31 @@ extension VS.JSState {
             return T.fromJSValue(result)
         }
 
-        return try convertValue(value: result, convertor: convertor)
+        let converted = try convert(value: result, convertor: convertor)
+        log.debug("convert to value: \(converted)")
+
+        return T.fromJSValue(converted)
     }
 
-    private func convertValue<T: JSValueRepresentable>(value: JSValue, convertor: AdaptyUIConfiguration.Variable.Converter) throws(VS.Error) -> T? {
+    private func convert(value: JSValue, convertor: AdaptyUIConfiguration.Variable.Converter) throws(VS.Error) -> JSValue {
         switch convertor {
         case .isEqual(let a, _):
-            guard let ctx = value.context else { return nil }
-
-            let rhs = a.toJSValue(in: ctx)
+            let rhs = a.toJSValue(in: context)
             let result = value.isEqual(to: rhs)
-            if let boolJS = JSValue(bool: result, in: ctx) {
-                return T.fromJSValue(boolJS)
-            } else {
-                return nil
-            }
+            return result.toJSValue(in: context)
+        case .unknown(let name, _):
+            throw .notFoundConvertor(name)
+        }
+    }
 
-        case .unknown(let name, let params):
+    private func backConvert(value: some JSValueConvertable, convertor: AdaptyUIConfiguration.Variable.Converter) throws(VS.Error) -> VC.Constant {
+        switch convertor {
+        case .isEqual(let a, let b):
+            let boolValue = value.toJSValue(in: context).toBool()
+            guard !boolValue else { return a }
+            if let b { return b }
+            return .null
+        case .unknown(let name, _):
             throw .notFoundConvertor(name)
         }
     }
@@ -181,6 +189,21 @@ extension VS.JSState {
     }
 
     func setValue(
+        variable: VC.Variable,
+        value: some JSValueConvertable,
+        screenInstance: VS.ScreenInstance
+    ) throws(VS.Error) {
+        guard let convertor = variable.converter else {
+            try setValueWithoutConverter(variable: variable, value: value, screenInstance: screenInstance)
+            return
+        }
+
+        let converted = try backConvert(value: value, convertor: convertor)
+        log.debug("convert \(value) to: \(converted)")
+        try setValueWithoutConverter(variable: variable, value: converted, screenInstance: screenInstance)
+    }
+
+    private func setValueWithoutConverter(
         variable: VC.Variable,
         value: some JSValueConvertable,
         screenInstance: VS.ScreenInstance
