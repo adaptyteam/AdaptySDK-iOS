@@ -9,17 +9,20 @@
 
 import SwiftUI
 
-struct AdaptyUIAnimatedBackgroundModifier: ViewModifier {
-    private var play: Binding<VC.Animation.Background?>
+struct AdaptyUIAnimatedBackgroundView: View {
     private var initialBackground: VC.AssetReference?
     private var defaultColor: Color
 
+    @EnvironmentObject
+    private var navigatorViewModel: AdaptyUINavigatorViewModel
+
+    @State
+    private var backgroundAnimation: VC.Animation.Background?
+
     init(
-        play: Binding<VC.Animation.Background?>,
-        initialBackground: VC.AssetReference? = nil,
+        initialBackground: VC.AssetReference?,
         defaultColor: Color
     ) {
-        self.play = play
         self.initialBackground = initialBackground
         self.defaultColor = defaultColor
     }
@@ -34,11 +37,20 @@ struct AdaptyUIAnimatedBackgroundModifier: ViewModifier {
     @State private var animatedBackgroundFilling: VC.AssetReference?
     @State private var animationTokens = Set<AdaptyUIAnimationToken>()
 
-    func body(content: Content) -> some View {
-        bodyWithBackground(content: content)
-            .onChange(of: play.wrappedValue) { animation in
-                if let animation {
-                    startAnimation(animation)
+    var body: some View {
+        bodyWithBackground()
+            .ignoresSafeArea()
+            .onReceive(navigatorViewModel.$backgroundAnimation) { anim in
+                if let anim {
+                    startAnimation(anim)
+                }
+            }
+            .onAppear {
+                if let currentAnimation = navigatorViewModel.backgroundAnimation {
+                    startAnimation(currentAnimation)
+                }
+                else {
+                    print("")
                 }
             }
             .onDisappear {
@@ -49,7 +61,6 @@ struct AdaptyUIAnimatedBackgroundModifier: ViewModifier {
 
     @ViewBuilder
     private func bodyWithBackground(
-        content: Content
     ) -> some View {
         if let animatedBackgroundFilling,
            let asset = assetsViewModel.resolvedAsset(
@@ -59,7 +70,6 @@ struct AdaptyUIAnimatedBackgroundModifier: ViewModifier {
            ).asColorOrGradientOrImageAsset
         {
             bodyWithResolvedBackground(
-                content: content,
                 asset: asset
             )
         }
@@ -71,54 +81,36 @@ struct AdaptyUIAnimatedBackgroundModifier: ViewModifier {
                 ).asColorOrGradientOrImageAsset
         {
             bodyWithResolvedBackground(
-                content: content,
                 asset: asset
             )
         }
         else {
-            content
-                .background {
-                    Rectangle()
-                        .fillSolidColor(defaultColor)
-                        .ignoresSafeArea()
-                }
+            Rectangle()
+                .fillSolidColor(defaultColor)
         }
     }
 
     @ViewBuilder
     private func bodyWithResolvedBackground(
-        content: Content,
         asset: AdaptyUIResolvedColorOrGradientOrImageAsset?
     ) -> some View {
         switch asset {
         case .color(let color):
-            content
-                .background {
-                    Rectangle()
-                        .fillSolidColor(color)
-                        .ignoresSafeArea()
-                }
+            color
         case .colorGradient(let gradient):
-            content
-                .background {
-                    Rectangle()
-                        .fillColorGradient(gradient)
-                        .ignoresSafeArea()
-                }
+            Rectangle()
+                .fillColorGradient(gradient)
         case .image(let image):
-            content
-                .background {
-                    AdaptyUIImageView(
-                        .resolvedImageAsset(
-                            asset: image,
-                            aspect: .fill,
-                            tint: nil
-                        )
-                    )
-                    .ignoresSafeArea()
-                }
+            AdaptyUIImageView(
+                .resolvedImageAsset(
+                    asset: image,
+                    aspect: .fill,
+                    tint: nil
+                )
+            )
         case .none:
-            content
+            Rectangle()
+                .fill(.clear)
         }
     }
 
@@ -129,29 +121,15 @@ struct AdaptyUIAnimatedBackgroundModifier: ViewModifier {
             animation.timeline.animate(
                 from: animation.range.start,
                 to: animation.range.end,
-                updateBlock: { self.animatedBackgroundFilling = $0 }
+                updateBlock: { value in
+                    print("#BG# animation to \(value)")
+                    self.animatedBackgroundFilling = value
+                }
                 // TODO: x add finish block and finish value
             )
         )
 
         animationTokens = tokens
-    }
-}
-
-extension View {
-    @ViewBuilder
-    func animatedBackground(
-        play: Binding<VC.Animation.Background?>,
-        initialBackground: VC.AssetReference?,
-        defaultColor: Color
-    ) -> some View {
-        modifier(
-            AdaptyUIAnimatedBackgroundModifier(
-                play: play,
-                initialBackground: initialBackground,
-                defaultColor: defaultColor
-            )
-        )
     }
 }
 

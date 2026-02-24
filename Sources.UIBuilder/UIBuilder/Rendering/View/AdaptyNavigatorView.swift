@@ -73,34 +73,30 @@ struct AdaptyNavigatorView: View {
     private var navigatorViewModel: AdaptyUINavigatorViewModel
     @EnvironmentObject
     private var stateViewModel: AdaptyUIStateViewModel
-
-    @State private var backgroundAnimation: VC.Animation.Background?
-    @State private var contentAnimations: [VC.Animation] = []
+    @State
+    private var contentAnimations: [VC.Animation] = []
 
     var body: some View {
         ZStack {
-            Rectangle()
-                .fill(.clear)
-                .animatedBackground(
-                    play: $backgroundAnimation,
-                    initialBackground: navigatorViewModel.appearTransition?.background?.initialBackground,
-                    defaultColor: .defaultNavigatorColor
-                )
-                .onTapGesture {
-                    guard let currentScreen = navigatorViewModel.screens.last else { return }
+            AdaptyUIAnimatedBackgroundView(
+                initialBackground: navigatorViewModel.appearTransition?.background?.initialBackground,
+                defaultColor: .defaultNavigatorColor
+            )
+            .onTapGesture {
+                guard let currentScreen = navigatorViewModel.screens.last else { return }
 
-                    if let navigatorActions = navigatorViewModel.navigator.defaultScreenActions.onOutsideTap {
-                        stateViewModel.execute(
-                            actions: navigatorActions,
-                            screen: currentScreen.instance
-                        )
-                    } else if let actions = currentScreen.configuration.screenActions.onOutsideTap {
-                        stateViewModel.execute(
-                            actions: actions,
-                            screen: currentScreen.instance
-                        )
-                    }
+                if let navigatorActions = navigatorViewModel.navigator.defaultScreenActions.onOutsideTap {
+                    stateViewModel.execute(
+                        actions: navigatorActions,
+                        screen: currentScreen.instance
+                    )
+                } else if let actions = currentScreen.configuration.screenActions.onOutsideTap {
+                    stateViewModel.execute(
+                        actions: actions,
+                        screen: currentScreen.instance
+                    )
                 }
+            }
 
             AdaptyUIElementView(
                 navigatorViewModel.navigator.content,
@@ -122,8 +118,8 @@ struct AdaptyNavigatorView: View {
                 initialOffset: navigatorViewModel.appearTransition?.initialContentOffset ?? .zero
             )
         }
+        .environmentObject(navigatorViewModel)
         .zIndex(navigatorViewModel.order * 1000.0)
-        .onReceive(navigatorViewModel.$backgroundAnimation) { backgroundAnimation = $0 }
         .onReceive(navigatorViewModel.$contentAnimations) { contentAnimations = $0 ?? [] }
     }
 }

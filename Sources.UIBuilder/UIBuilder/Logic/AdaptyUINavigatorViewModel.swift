@@ -120,7 +120,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         transitionId: String,
         completion: (() -> Void)?
     ) {
-        Log.ui.verbose("#\(self.logId)# startNavigatorTransition \(transitionId) in navigator:\(self.navigator.id)")
+        Log.ui.verbose("#\(logId)# startNavigatorTransition \(transitionId) in navigator:\(navigator.id)")
 
         guard let transition = navigator.appearances?[transitionId] else {
             Log.ui.verbose("#\(logId)# navigator:\(navigator.id) - no transition found")
@@ -173,7 +173,7 @@ extension VC.Navigator.AppearanceTransition {
             .min(by: { lhs, rhs in lhs.timeline.startDelay < rhs.timeline.startDelay })
             .map { $0.range.start } ?? 1.0
     }
-    
+
     var initialContentOffset: VC.Offset {
         content?
             .compactMap {
