@@ -52,7 +52,7 @@ extension String: JSValueConvertable {
     }
 }
 
-extension VC.Action.Parameter: JSValueConvertable {
+extension VC.Constant: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         switch self {
         case .null:
@@ -67,7 +67,7 @@ extension VC.Action.Parameter: JSValueConvertable {
     }
 }
 
-extension [String: VC.Action.Parameter]: JSValueConvertable {
+extension VC.Constants: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
         for (key, value) in self {

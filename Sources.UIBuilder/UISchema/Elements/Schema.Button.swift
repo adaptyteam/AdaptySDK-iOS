@@ -54,9 +54,9 @@ extension Schema.Button: DecodableWithConfiguration {
             forKey: .legacySelectedCondition
         ) {
         case .selectedProduct(let productId, let groupId):
-            .init(path: ["Legacy", "productGroup", groupId, "_\(Schema.LegacyScripts.legacySafeProductId(productId))"], setter: nil, scope: .global)
+                .init(path: ["Legacy", "productGroup", groupId], setter: nil, scope: .global, converter: .isEqual(.string(productId), false: nil))
         case .selectedSection(let sectionId, let index):
-            .init(path: ["Legacy", "sections", sectionId, "_\(index)"], setter: nil, scope: .global)
+            .init(path: ["Legacy", "sections", sectionId], setter: nil, scope: .global, converter: .isEqual(.int32(index), false: nil))
         default:
             nil
         }

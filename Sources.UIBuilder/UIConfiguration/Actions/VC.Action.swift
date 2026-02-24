@@ -10,7 +10,7 @@ import Foundation
 package extension VC {
     struct Action: Sendable, Hashable {
         let path: [String]
-        let params: [String: Parameter]?
+        let params: Constants?
         let scope: Scope
     }
 }

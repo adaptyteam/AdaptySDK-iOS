@@ -104,7 +104,7 @@ private extension Decoder {
         let onAppear = Schema.Navigator.AppearanceTransition(
             background: .init(
                 timeline: .init(
-                    duration: 300,
+                    duration: 0.3,
                     interpolator: .linear,
                     startDelay: 0,
                     loop: nil,
@@ -119,7 +119,7 @@ private extension Decoder {
             ),
             content: [.offset(
                 .init(
-                    duration: 350,
+                    duration: 0.35,
                     interpolator: .easeIn,
                     startDelay: 0,
                     loop: nil,
@@ -136,7 +136,7 @@ private extension Decoder {
         let onDisappear = Schema.Navigator.AppearanceTransition(
             background: .init(
                 timeline: .init(
-                    duration: 300,
+                    duration: 0.3,
                     interpolator: .linear,
                     startDelay: 0,
                     loop: nil,
@@ -151,7 +151,7 @@ private extension Decoder {
             ),
             content: [.offset(
                 .init(
-                    duration: 350,
+                    duration: 0.35,
                     interpolator: .linear,
                     startDelay: 0,
                     loop: nil,

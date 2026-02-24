@@ -13,41 +13,6 @@ public extension AdaptyUISchema {
         case element(name: String, value: String)
     }
 
-    @available(*, deprecated, message: "Use `createJson(main:templates:navigators:contents:script:startScreenName:)` instead.")
-    static func createJson(
-        formatVersion: String = "5.0.0",
-        assets: String,
-        localization: String,
-        templates: String?,
-        navigators: [String: String]?,
-        contents: [ExampleContent],
-        script: String?,
-        startScreenName: String?
-    ) throws -> String {
-        struct DefaultLocale: Decodable {
-            let id: LocaleId
-        }
-        let defaultLocale = try JSONDecoder().decode(DefaultLocale.self, from: localization.data(using: .utf8) ?? Data())
-
-        let main = ##"""
-        {
-            "format":"\##(formatVersion)",
-            "assets":\##(assets),
-            "localizations":[\##(localization)],
-            "default_localization":"\##(defaultLocale.id)"
-        }
-        """##
-
-        return try createJson(
-            main: main,
-            templates: templates,
-            navigators: navigators,
-            contents: contents,
-            script: script,
-            startScreenName: startScreenName
-        )
-    }
-
     static func createJson(
         main: String,
         templates: String?,
@@ -77,7 +42,7 @@ public extension AdaptyUISchema {
             case let .screen(name, value):
                 ##""\##(name)":\##(value)"##
             case let .element(name, value):
-                ##""\##(name)": { "content": \##(value)}"##
+                ##""\##(name)": {"background": "#000000FF", "content": \##(value)}"##
             }
         }.joined(separator: ",")
 

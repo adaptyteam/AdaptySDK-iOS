@@ -59,10 +59,10 @@ extension Schema.Screen: Encodable, DecodableWithConfiguration {
         try self.init(
             id: screenId,
             layoutBehaviour: layoutBehaviour,
-            cover: layoutBehaviour == .hero ? container.decode(Schema.Box.self, forKey: .cover, configuration: configuration) : nil,
+            cover: layoutBehaviour == .hero ? container.decodeIfPresent(Schema.Box.self, forKey: .cover, configuration: configuration) : nil,
             content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
             footer: layoutBehaviour != .default ? container.decodeIfPresent(Schema.Element.self, forKey: .footer, configuration: configuration) : nil,
-            screenActions: decoder.singleValueContainer().decode(Schema.ScreenActions.self)
+            screenActions: Schema.ScreenActions(from: decoder)
         )
     }
 }

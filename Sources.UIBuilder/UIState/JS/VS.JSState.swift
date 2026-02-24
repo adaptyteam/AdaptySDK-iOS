@@ -49,8 +49,14 @@ extension VS.JSState {
     func evaluateScripts(
         _ scripts: [String]
     ) {
-        let script = scripts.filter { !$0.isEmpty }.joined(separator: "\n")
-        context.evaluateScript(script)
+        for script in scripts {
+            let a = context.evaluateScript(script)
+            print(a)
+            print("----")
+            print(debug(path: "", filter: .withFunctionName))
+        }
+//        let script = scripts.filter { !$0.isEmpty }.joined(separator: "\n")
+//        context.evaluateScript(script)
         objectWillChange.send()
     }
 
@@ -122,7 +128,38 @@ extension VS.JSState {
         }
 
         log.debug("get variable \(path.joined(separator: ".")) = \(result)")
-        return T.fromJSValue(result)
+
+        guard let convertor = variable.converter else {
+            return T.fromJSValue(result)
+        }
+
+        let converted = try convert(value: result, convertor: convertor)
+        log.debug("convert to value: \(converted)")
+
+        return T.fromJSValue(converted)
+    }
+
+    private func convert(value: JSValue, convertor: AdaptyUIConfiguration.Variable.Converter) throws(VS.Error) -> JSValue {
+        switch convertor {
+        case .isEqual(let a, _):
+            let rhs = a.toJSValue(in: context)
+            let result = value.isEqual(to: rhs)
+            return result.toJSValue(in: context)
+        case .unknown(let name, _):
+            throw .notFoundConvertor(name)
+        }
+    }
+
+    private func backConvert(value: some JSValueConvertable, convertor: AdaptyUIConfiguration.Variable.Converter) throws(VS.Error) -> VC.Constant {
+        switch convertor {
+        case .isEqual(let a, let b):
+            let boolValue = value.toJSValue(in: context).toBool()
+            guard !boolValue else { return a }
+            if let b { return b }
+            return .null
+        case .unknown(let name, _):
+            throw .notFoundConvertor(name)
+        }
     }
 
     private func invokeMethod<T: JSValueRepresentable>(
@@ -152,6 +189,21 @@ extension VS.JSState {
     }
 
     func setValue(
+        variable: VC.Variable,
+        value: some JSValueConvertable,
+        screenInstance: VS.ScreenInstance
+    ) throws(VS.Error) {
+        guard let convertor = variable.converter else {
+            try setValueWithoutConverter(variable: variable, value: value, screenInstance: screenInstance)
+            return
+        }
+
+        let converted = try backConvert(value: value, convertor: convertor)
+        log.debug("convert \(value) to: \(converted)")
+        try setValueWithoutConverter(variable: variable, value: converted, screenInstance: screenInstance)
+    }
+
+    private func setValueWithoutConverter(
         variable: VC.Variable,
         value: some JSValueConvertable,
         screenInstance: VS.ScreenInstance

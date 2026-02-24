@@ -77,19 +77,19 @@ extension VC.Action {
             return
         }
 
-        var params = [String: Parameter]()
+        var params = VC.Constants()
         for item in queryItems {
             let (fullPath, suffix) = item.name.extractSuffix()
             let path = fullPath.split(separator: ".").map(String.init)
 
-            let value: Parameter =
+            let value: VC.Constant =
                 if autodetectType {
-                    (try? Parameter(key: fullPath, suffix: suffix, value: item.value))
-                        ?? Parameter(string: item.value)
+                    (try? VC.Constant(key: fullPath, suffix: suffix, value: item.value))
+                        ?? VC.Constant(string: item.value)
                 } else {
-                    try Parameter(key: fullPath, suffix: suffix, value: item.value)
+                    try VC.Constant(key: fullPath, suffix: suffix, value: item.value)
                 }
-            params.setParameter(value, for: path)
+            params.set(value: value, for: path)
         }
         self.params = params
     }
@@ -114,7 +114,7 @@ extension String {
     }
 }
 
-extension VC.Action.Parameter {
+extension VC.Constant {
     fileprivate func asQueryItems(name: String) -> [URLQueryItem] {
         switch self {
         case .null:
@@ -219,20 +219,20 @@ extension VC.Action.Parameter {
     }
 }
 
-extension [String: VC.Action.Parameter] {
-    fileprivate mutating func setParameter(_ value: VC.Action.Parameter, for path: [String]) {
+extension VC.Constants {
+    fileprivate mutating func set(value: VC.Constant, for path: [String]) {
         guard !path.isEmpty else { return }
         let key = path[0]
         if path.count == 1 {
             self[key] = value
         } else {
-            var subParams: [String: VC.Action.Parameter] =
+            var subParams: [String: VC.Constant] =
                 if case .object(let existing) = self[key] {
                     existing
                 } else {
                     [:]
                 }
-            subParams.setParameter(value, for: Array(path.dropFirst()))
+            subParams.set(value: value, for: Array(path.dropFirst()))
             self[key] = .object(subParams)
         }
     }
