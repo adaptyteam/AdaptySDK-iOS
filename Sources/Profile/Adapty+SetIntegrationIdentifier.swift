@@ -9,6 +9,12 @@ import Foundation
 
 extension Adapty {
     public nonisolated static func setIntegrationIdentifier(
+        _ identifier: AdaptyIntegrationIdentifier
+    ) async throws {
+        try await setIntegrationIdentifiers([identifier.key.rawValue: identifier.value])
+    }
+
+    public nonisolated static func setIntegrationIdentifier(
         key: String,
         value: String
     ) async throws(AdaptyError) {
