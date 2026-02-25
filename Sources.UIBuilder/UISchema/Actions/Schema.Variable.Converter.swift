@@ -1,8 +1,8 @@
 //
-//  Schema.Variable.Convertor.swift
+//  Schema.Variable.Converter.swift
 //  AdaptyUIBuilder
 //
-//  Created by Aleksei Valiano on 23.02.2026.
+//  Created by Aleksei Valiano on 24.02.2026.
 //
 
 import Foundation
@@ -17,11 +17,11 @@ extension Schema.Variable.Converter: Codable {
         case isEqual = "is_equal"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let name = try container.decode(String.self, forKey: .name)
-        let params = try container.decodeIfPresent(VC.Constant.self, forKey: .params)?.asOptional
+        let params = try container.decodeIfPresent(VC.Parameter.self, forKey: .params)?.asOptional
 
         switch Names(rawValue: name) {
         case .isEqual:
@@ -35,9 +35,9 @@ extension Schema.Variable.Converter: Codable {
                     throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.params], debugDescription: "Not found `value` key"))
                 }
 
-                self = .isEqual(value, false: object["false_value"])
+                self = .isEqual(value, falseValue: object["false_value"])
             default:
-                self = .isEqual(params, false: nil)
+                self = .isEqual(params, falseValue: nil)
             }
 
         case nil:
@@ -45,12 +45,12 @@ extension Schema.Variable.Converter: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case .isEqual(let value, let falseValue):
             try container.encode(Names.isEqual, forKey: .name)
-            let params: VC.Constant =
+            let params: VC.Parameter =
                 if let falseValue {
                     .object(["value": value, "false_value": falseValue])
                 } else {

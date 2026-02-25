@@ -15,11 +15,47 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    func row(_ from: Schema.Row) throws -> VC.Row {
-        try .init(
-            spacing: from.spacing,
-            items: from.items.map(gridItem)
-        )
+    func planRow(
+        _ value: Schema.Row,
+        _ properties: Schema.Element.Properties?,
+        in workStack: inout [WorkItem]
+    ) throws {
+        workStack.append(.buildRow(value, properties))
+        for item in value.items.reversed() {
+            workStack.append(.planElement(item.content))
+        }
+    }
+
+    func buildRow(
+        _ from: Schema.Row,
+        _ properties: Schema.Element.Properties?,
+        in resultStack: inout [VC.Element]
+    ) {
+        let count = from.items.count
+        var elements = [VC.Element]()
+        elements.reserveCapacity(count)
+        for _ in 0 ..< count {
+            elements.append(resultStack.removeLast())
+        }
+        elements.reverse()
+
+        var vcItems = [VC.GridItem]()
+        vcItems.reserveCapacity(count)
+        for (i, item) in from.items.enumerated() {
+            vcItems.append(.init(
+                length: item.length,
+                horizontalAlignment: item.horizontalAlignment,
+                verticalAlignment: item.verticalAlignment,
+                content: elements[i]
+            ))
+        }
+        resultStack.append(.row(
+            .init(
+                spacing: from.spacing,
+                items: vcItems
+            ),
+            properties?.value
+        ))
     }
 }
 

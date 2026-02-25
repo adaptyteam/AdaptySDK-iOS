@@ -11,7 +11,7 @@ import JavaScriptCore
 extension VS {
     struct ActionParameters: Sendable, Hashable {
         let screenInstance: ScreenInstance
-        let params: VC.Constants?
+        let params: [String: VC.Parameter]?
     }
 }
 

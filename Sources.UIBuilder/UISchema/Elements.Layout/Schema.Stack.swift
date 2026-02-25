@@ -28,24 +28,67 @@ extension Schema.Stack {
 }
 
 extension Schema.Localizer {
-    private func stackItem(_ from: Schema.Stack.Item) throws -> VC.Stack.Item {
-        switch from {
-        case let .space(value):
-            .space(value)
-        case let .element(value):
-            try .element(element(value))
+    func planStack(
+        _ stack: Schema.Stack,
+        _ properties: Schema.Element.Properties?,
+        in workStack: inout [WorkItem]
+    ) throws {
+        workStack.append(.buildStack(stack, properties))
+        for item in stack.items.reversed() {
+            if case let .element(el) = item {
+                workStack.append(.planElement(el))
+            }
         }
     }
 
-    func stack(_ from: Schema.Stack) throws -> VC.Stack {
-        try .init(
-            type: from.type,
-            horizontalAlignment: from.horizontalAlignment,
-            verticalAlignment: from.verticalAlignment,
-            spacing: from.spacing,
-            items: from.items.map(stackItem)
-        )
+    func buildStack(
+        _ from: Schema.Stack,
+        _ properties: Schema.Element.Properties?,
+        in resultStack: inout [VC.Element]
+    ) {
+        var elementCount = 0
+        for item in from.items {
+            if case .element = item { elementCount += 1 }
+        }
+        var elements = [VC.Element]()
+        elements.reserveCapacity(elementCount)
+        for _ in 0 ..< elementCount {
+            elements.append(resultStack.removeLast())
+        }
+        elements.reverse()
+
+        var vcItems = [VC.Stack.Item]()
+        vcItems.reserveCapacity(from.items.count)
+        var elementIndex = 0
+        for item in from.items {
+            switch item {
+            case let .space(value):
+                vcItems.append(.space(value))
+            case .element:
+                vcItems.append(.element(elements[elementIndex]))
+                elementIndex += 1
+            }
+        }
+        resultStack.append(.stack(
+            .init(
+                type: from.type,
+                horizontalAlignment: from.horizontalAlignment,
+                verticalAlignment: from.verticalAlignment,
+                spacing: from.spacing,
+                items: vcItems
+            ),
+            properties?.value
+        ))
     }
+
+//    private func old_stackItem(_ from: Schema.Stack.Item) throws -> VC.Stack.Item {
+//        switch from {
+//        case let .space(value):
+//            .space(value)
+//        case let .element(value):
+//            try .element(old_element(value))
+//        }
+//    }
 }
 
 extension Schema.Stack: DecodableWithConfiguration {
@@ -66,7 +109,7 @@ extension Schema.Stack: DecodableWithConfiguration {
             verticalAlignment: container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment)
                 ?? Self.default.verticalAlignment,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
-            items: container.decode([Item].self, forKey: .content, configuration:  configuration)
+            items: container.decode([Item].self, forKey: .content, configuration: configuration)
         )
     }
 }

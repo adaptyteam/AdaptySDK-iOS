@@ -41,7 +41,12 @@ extension Schema.Toggle: DecodableWithConfiguration {
         let offIndex = try container.decodeIfPresent(Int32.self, forKey: .legacy1OffIndex) ?? -1
 
         try self.init(
-            value: .init(path: ["Legacy", "sections", sectionId], setter: nil, scope: .global, converter: .isEqual(.int32(onIndex), false: .int32(offIndex))),
+            value: .init(
+                path: ["Legacy", "sections", sectionId],
+                setter: nil,
+                scope: .global,
+                converter: .isEqual(.int32(onIndex), falseValue: .int32(offIndex))
+            ),
             color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)
         )
     }

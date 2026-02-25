@@ -10,67 +10,119 @@ import Foundation
 extension Schema {
     enum Element: Sendable, Hashable {
         case legacyReference(String)
-        case templateInstance(Schema.TemplateInstance)
+        indirect case templateInstance(Schema.TemplateInstance)
         case scrrenHolder
         indirect case stack(Schema.Stack, Properties?)
-        case text(Schema.Text, Properties?)
-        case textField(Schema.TextField, Properties?)
-        case image(Schema.Image, Properties?)
-        case video(Schema.VideoPlayer, Properties?)
+        indirect case text(Schema.Text, Properties?)
+        indirect case textField(Schema.TextField, Properties?)
+        indirect case image(Schema.Image, Properties?)
+        indirect case video(Schema.VideoPlayer, Properties?)
         indirect case button(Schema.Button, Properties?)
         indirect case box(Schema.Box, Properties?)
         indirect case row(Schema.Row, Properties?)
         indirect case column(Schema.Column, Properties?)
         indirect case section(Schema.Section, Properties?)
-        case toggle(Schema.Toggle, Properties?)
-        case slider(Schema.Slider, Properties?)
-        case timer(Schema.Timer, Properties?)
+        indirect case toggle(Schema.Toggle, Properties?)
+        indirect case slider(Schema.Slider, Properties?)
+        indirect case timer(Schema.Timer, Properties?)
         indirect case pager(Schema.Pager, Properties?)
 
-        case unknown(String, Properties?)
+        indirect case unknown(String, Properties?)
     }
 }
 
 extension Schema.Localizer {
-    func element(_ from: Schema.Element) throws -> VC.Element {
+    enum WorkItem {
+        case planElement(Schema.Element)
+        case leaveTemplate(String)
+        case buildStack(Schema.Stack, Schema.Element.Properties?)
+        case buildBox(Schema.Box, Schema.Element.Properties?)
+        case buildButton(Schema.Button, Schema.Element.Properties?)
+        case buildRow(Schema.Row, Schema.Element.Properties?)
+        case buildColumn(Schema.Column, Schema.Element.Properties?)
+        case buildSection(Schema.Section, Schema.Element.Properties?)
+        case buildPager(Schema.Pager, Schema.Element.Properties?)
+    }
+
+    func element(_ root: Schema.Element) throws -> VC.Element {
+        var workStack: [WorkItem] = [.planElement(root)]
+        var resultStack: [VC.Element] = []
+
+        while let work = workStack.popLast() {
+            switch work {
+            case let .planElement(value):
+                let result = try planElement(value, in: &workStack)
+                if let result {
+                    resultStack.append(result)
+                }
+            case let .leaveTemplate(id):
+                templateIds.remove(id)
+            case let .buildButton(value, properties):
+                buildButton(value, properties, in: &resultStack)
+            case let .buildStack(value, properties):
+                buildStack(value, properties, in: &resultStack)
+            case let .buildBox(value, properties):
+                buildBox(value, properties, in: &resultStack)
+            case let .buildRow(value, properties):
+                buildRow(value, properties, in: &resultStack)
+            case let .buildColumn(value, properties):
+                buildColumn(value, properties, in: &resultStack)
+            case let .buildSection(value, properties):
+                buildSection(value, properties, in: &resultStack)
+            case let .buildPager(value, properties):
+                buildPager(value, properties, in: &resultStack)
+            }
+        }
+
+        guard let result = resultStack.last else {
+            throw Schema.Error.unsupportedElement("empty element tree")
+        }
+        return result
+    }
+
+    private func planElement(
+        _ from: Schema.Element,
+        in workStack: inout [WorkItem]
+    ) throws -> VC.Element? {
         switch from {
         case let .legacyReference(id):
-            try legacyReference(id)
-        case let .templateInstance(instance):
-            try templateInstance(instance)
+            try planLegacyReference(id, in: &workStack)
+        case let .templateInstance(value):
+            try planTemplateInstance(value, in: &workStack)
         case .scrrenHolder:
-            .screenHolder
+            return .screenHolder
         case let .stack(value, properties):
-            try .stack(stack(value), properties?.value)
+            try planStack(value, properties, in: &workStack)
         case let .text(value, properties):
-            .text(value, properties?.value)
+            return .text(value, properties?.value)
         case let .textField(value, properties):
-            .textField(value, properties?.value)
+            return .textField(value, properties?.value)
         case let .image(value, properties):
-            .image(value, properties?.value)
+            return .image(value, properties?.value)
         case let .video(value, properties):
-            .video(value, properties?.value)
+            return .video(value, properties?.value)
         case let .button(value, properties):
-            try .button(button(value), properties?.value)
+            try planButton(value, properties, in: &workStack)
         case let .box(value, properties):
-            try .box(box(value), properties?.value)
+            try planBox(value, properties, in: &workStack)
         case let .row(value, properties):
-            try .row(row(value), properties?.value)
+            try planRow(value, properties, in: &workStack)
         case let .column(value, properties):
-            try .column(column(value), properties?.value)
+            try planColumn(value, properties, in: &workStack)
         case let .section(value, properties):
-            try .section(section(value), properties?.value)
+            try planSection(value, properties, in: &workStack)
         case let .toggle(value, properties):
-            .toggle(value, properties?.value)
+            return .toggle(value, properties?.value)
         case let .slider(value, properties):
-            .slider(value, properties?.value)
+            return .slider(value, properties?.value)
         case let .timer(value, properties):
-            .timer(timer(value), properties?.value)
+            return .timer(convertTimer(value), properties?.value)
         case let .pager(value, properties):
-            try .pager(pager(value), properties?.value)
+            try planPager(value, properties, in: &workStack)
         case let .unknown(value, properties):
-            .unknown(value, properties?.value)
+            return .unknown(value, properties?.value)
         }
+        return nil
     }
 }
 

@@ -28,7 +28,7 @@ extension VC.Timer.StartBehavior {
 }
 
 extension Schema.Localizer {
-    func timer(_ from: Schema.Timer) -> VC.Timer {
+    func convertTimer(_ from: Schema.Timer) -> VC.Timer {
         .init(
             id: from.id,
             state: from.state,

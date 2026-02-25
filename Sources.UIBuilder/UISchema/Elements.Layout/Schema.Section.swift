@@ -15,11 +15,36 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    func section(_ from: Schema.Section) throws -> VC.Section {
-        try .init(
-            index: from.index,
-            content: from.content.map(element)
-        )
+    func planSection(
+        _ value: Schema.Section,
+        _ properties: Schema.Element.Properties?,
+        in workStack: inout [WorkItem]
+    ) throws {
+        workStack.append(.buildSection(value, properties))
+        for item in value.content.reversed() {
+            workStack.append(.planElement(item))
+        }
+    }
+
+    func buildSection(
+        _ from: Schema.Section,
+        _ properties: Schema.Element.Properties?,
+        in resultStack: inout [VC.Element]
+    ) {
+        let count = from.content.count
+        var elements = [VC.Element]()
+        elements.reserveCapacity(count)
+        for _ in 0 ..< count {
+            elements.append(resultStack.removeLast())
+        }
+        elements.reverse()
+        resultStack.append(.section(
+            .init(
+                index: from.index,
+                content: elements
+            ),
+            properties?.value
+        ))
     }
 }
 
@@ -43,8 +68,14 @@ extension Schema.Section: DecodableWithConfiguration {
         let sectionId = try container.decode(String.self, forKey: .legacySectionId)
         let index = try container.decodeIfPresent(Int32.self, forKey: .index) ?? 0
         configuration.collector.legacySectionsState[sectionId] = index
+
         try self.init(
-            index: .init(path: ["Legacy", "sections", sectionId], setter: nil, scope: .global, converter: nil),
+            index: .init(
+                path: ["Legacy", "sections", sectionId, "index"],
+                setter: nil,
+                scope: .global,
+                converter: nil
+            ),
             content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
         )
     }

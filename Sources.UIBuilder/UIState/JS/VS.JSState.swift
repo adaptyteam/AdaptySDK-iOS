@@ -49,14 +49,15 @@ extension VS.JSState {
     func evaluateScripts(
         _ scripts: [String]
     ) {
-        for script in scripts {
-            let a = context.evaluateScript(script)
-            print(a)
-            print("----")
-            print(debug(path: "", filter: .withFunctionName))
-        }
-//        let script = scripts.filter { !$0.isEmpty }.joined(separator: "\n")
-//        context.evaluateScript(script)
+//        for script in scripts {
+//            let a = context.evaluateScript(script)
+//            print(a)
+//            print("----")
+//            print(debug(path: "", filter: .withFunctionName))
+//        }
+
+        let script = scripts.filter { !$0.isEmpty }.joined(separator: "\n")
+        context.evaluateScript(script)
         objectWillChange.send()
     }
 
@@ -139,7 +140,7 @@ extension VS.JSState {
         return T.fromJSValue(converted)
     }
 
-    private func convert(value: JSValue, convertor: AdaptyUIConfiguration.Variable.Converter) throws(VS.Error) -> JSValue {
+    private func convert(value: JSValue, convertor: VC.Variable.Converter) throws(VS.Error) -> JSValue {
         switch convertor {
         case .isEqual(let a, _):
             let rhs = a.toJSValue(in: context)
@@ -150,7 +151,7 @@ extension VS.JSState {
         }
     }
 
-    private func backConvert(value: some JSValueConvertable, convertor: AdaptyUIConfiguration.Variable.Converter) throws(VS.Error) -> VC.Constant {
+    private func backConvert(value: some JSValueConvertable, convertor: VC.Variable.Converter) throws(VS.Error) -> VC.Parameter {
         switch convertor {
         case .isEqual(let a, let b):
             let boolValue = value.toJSValue(in: context).toBool()

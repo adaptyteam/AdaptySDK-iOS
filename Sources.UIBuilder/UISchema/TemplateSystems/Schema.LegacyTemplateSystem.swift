@@ -30,8 +30,11 @@ extension AdaptyUISchema.LegacyTemplateSystem {
 }
 
 extension Schema.Localizer {
-    func legacyReference(_ id: String) throws -> VC.Element {
-        guard !self.templateIds.contains(id) else {
+    func planLegacyReference(
+        _ id: String,
+        in workStack: inout [WorkItem]
+    ) throws {
+        guard !templateIds.contains(id) else {
             throw Schema.Error.elementsTreeCycle(id)
         }
         guard let templates = source.templates as? Schema.LegacyTemplateSystem else {
@@ -41,15 +44,8 @@ extension Schema.Localizer {
             throw Schema.Error.notFoundTemplate(id)
         }
         templateIds.insert(id)
-        let result: VC.Element
-        do {
-            result = try element(instance)
-            templateIds.remove(id)
-        } catch {
-            templateIds.remove(id)
-            throw error
-        }
-        return result
+        workStack.append(.leaveTemplate(id))
+        workStack.append(.planElement(instance))
     }
 }
 

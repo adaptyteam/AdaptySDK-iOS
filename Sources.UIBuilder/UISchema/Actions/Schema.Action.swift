@@ -29,7 +29,7 @@ extension Schema.Action: Codable {
             }
             try self.init(
                 path: path,
-                params: container.decodeIfPresent(VC.Constants.self, forKey: .params),
+                params: container.decodeIfPresent([String: Schema.Parameter].self, forKey: .params),
                 scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default
             )
         } else {

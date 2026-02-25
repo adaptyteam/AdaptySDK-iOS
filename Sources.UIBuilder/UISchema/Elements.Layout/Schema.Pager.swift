@@ -34,17 +34,42 @@ extension Schema.Pager {
 }
 
 extension Schema.Localizer {
-    func pager(_ from: Schema.Pager) throws -> VC.Pager {
-        try .init(
-            pageWidth: from.pageWidth,
-            pageHeight: from.pageHeight,
-            pagePadding: from.pagePadding,
-            spacing: from.spacing,
-            content: from.content.map(element),
-            pageControl: from.pageControl,
-            animation: from.animation,
-            interactionBehavior: from.interactionBehavior
-        )
+    func planPager(
+        _ value: Schema.Pager,
+        _ properties: Schema.Element.Properties?,
+        in workStack: inout [WorkItem]
+    ) throws {
+        workStack.append(.buildPager(value, properties))
+        for item in value.content.reversed() {
+            workStack.append(.planElement(item))
+        }
+    }
+
+    func buildPager(
+        _ from: Schema.Pager,
+        _ properties: Schema.Element.Properties?,
+        in resultStack: inout [VC.Element]
+    ) {
+        let count = from.content.count
+        var elements = [VC.Element]()
+        elements.reserveCapacity(count)
+        for _ in 0 ..< count {
+            elements.append(resultStack.removeLast())
+        }
+        elements.reverse()
+        resultStack.append(.pager(
+            .init(
+                pageWidth: from.pageWidth,
+                pageHeight: from.pageHeight,
+                pagePadding: from.pagePadding,
+                spacing: from.spacing,
+                content: elements,
+                pageControl: from.pageControl,
+                animation: from.animation,
+                interactionBehavior: from.interactionBehavior
+            ),
+            properties?.value
+        ))
     }
 }
 

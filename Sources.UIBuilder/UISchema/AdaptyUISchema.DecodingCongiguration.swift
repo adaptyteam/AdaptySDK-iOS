@@ -35,11 +35,6 @@ extension AdaptyUISchema.DecodingConfiguration {
 // # mark legacy
 
 extension AdaptyUISchema.DecodingConfiguration {
-    struct SectionSetter: Sendable, Hashable {
-        let on: Int32
-        let off: Int32
-    }
-
     var screenLayoutBehaviourFromLegacy: Schema.Screen.LayoutBehaviour? {
         guard isLegacy else {
             return nil

@@ -1,5 +1,5 @@
 //
-//  VC.Constant.swift
+//  VC.Parameter.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 17.12.2025.
@@ -8,9 +8,7 @@
 import Foundation
 
 extension VC {
-    typealias Constants = [String: Constant]
-
-    enum Constant: Sendable, Hashable {
+    enum Parameter: Sendable, Hashable {
         case null
         case string(String)
         case bool(Bool)
@@ -21,7 +19,7 @@ extension VC {
     }
 }
 
-extension VC.Constant {
+extension VC.Parameter {
     var asOptional: Self? {
         guard case .null = self else { return nil }
         return self

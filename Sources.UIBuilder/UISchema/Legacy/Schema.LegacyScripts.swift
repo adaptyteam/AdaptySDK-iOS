@@ -15,19 +15,21 @@ extension Schema {
            sections: {}
         };
         Legacy.selectProduct = function ({ productId, groupId }) {
-             Legacy.productGroup[groupId] = productId;
-             SDK.onSelectProduct({ productId: productId, paywallId: "legacy-paywall-id" });
+              Legacy.productGroup[groupId] = productId;
+              SDK.onSelectProduct({ productId: productId, paywallId: "legacy-paywal-id" });
         };
         Legacy.unselectProduct = function ({ groupId }) {
-             delete Legacy.productGroup[groupId]
+              delete Legacy.productGroup[groupId]
         };
         Legacy.purchaseSelectedProduct = function ({ groupId }) {
              const productId = Legacy.productGroup[groupId];
-             SDK.purchaseProduct({ productId: productId, paywallId: "legacy-paywall-id" });
+             if (!productId) { return; }
+             SDK.purchaseProduct({ productId: productId, paywallId: "legacy-paywal-id" });
         };
         Legacy.webPurchaseSelectedProduct = function ({ groupId, openIn }) {
              const productId = Legacy.productGroup[groupId];
-             SDK.webPurchaseProduct({ productId: productId, paywallId: "legacy-paywall-id", openIn: openIn });
+             if (!productId) { return; }
+             SDK.webPurchaseProduct({ productId: productId, paywallId: "legacy-paywal-id", openIn: openIn });
         };
         Legacy.switchSection = function ({ sectionId, index }) {
              Legacy.sections[sectionId] = index;

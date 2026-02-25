@@ -17,13 +17,34 @@ extension Schema {
 }
 
 extension Schema.Localizer {
-    func button(_ from: Schema.Button) throws -> VC.Button {
-        try .init(
-            actions: from.actions,
-            normalState: element(from.normalState),
-            selectedState: from.selectedState.map(element),
-            isSelectedState: from.isSelectedState
-        )
+    func planButton(
+        _ value: Schema.Button,
+        _ properties: Schema.Element.Properties?,
+        in workStack: inout [WorkItem]
+    ) throws {
+        workStack.append(.buildButton(value, properties))
+        if let sel = value.selectedState {
+            workStack.append(.planElement(sel))
+        }
+        workStack.append(.planElement(value.normalState))
+    }
+
+    func buildButton(
+        _ from: Schema.Button,
+        _ properties: Schema.Element.Properties?,
+        in resultStack: inout [VC.Element]
+    ) {
+        let selectedState: VC.Element? = from.selectedState != nil ? resultStack.removeLast() : nil
+        let normalState = resultStack.removeLast()
+        resultStack.append(.button(
+            .init(
+                actions: from.actions,
+                normalState: normalState,
+                selectedState: selectedState,
+                isSelectedState: from.isSelectedState
+            ),
+            properties?.value
+        ))
     }
 }
 
@@ -54,9 +75,19 @@ extension Schema.Button: DecodableWithConfiguration {
             forKey: .legacySelectedCondition
         ) {
         case .selectedProduct(let productId, let groupId):
-                .init(path: ["Legacy", "productGroup", groupId], setter: nil, scope: .global, converter: .isEqual(.string(productId), false: nil))
+            .init(
+                path: ["Legacy", "productGroup", groupId],
+                setter: nil,
+                scope: .global,
+                converter: .isEqual(.string(productId), falseValue: nil)
+            )
         case .selectedSection(let sectionId, let index):
-            .init(path: ["Legacy", "sections", sectionId], setter: nil, scope: .global, converter: .isEqual(.int32(index), false: nil))
+            .init(
+                path: ["Legacy", "sections", sectionId],
+                setter: nil,
+                scope: .global,
+                converter: .isEqual(.int32(index), falseValue: nil)
+            )
         default:
             nil
         }

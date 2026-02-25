@@ -25,6 +25,7 @@ extension Schema.Box {
 }
 
 extension Schema.Localizer {
+
     func box(_ from: Schema.Box) throws -> VC.Box {
         try .init(
             width: from.width,
@@ -33,6 +34,35 @@ extension Schema.Localizer {
             verticalAlignment: from.verticalAlignment,
             content: from.content.map(element)
         )
+    }
+
+    func planBox(
+        _ value: Schema.Box,
+        _ properties: Schema.Element.Properties?,
+        in workStack: inout [WorkItem]
+    ) throws {
+        workStack.append(.buildBox(value, properties))
+        if let content = value.content {
+            workStack.append(.planElement(content))
+        }
+    }
+
+    func buildBox(
+        _ from: Schema.Box,
+        _ properties: Schema.Element.Properties?,
+        in resultStack: inout [VC.Element]
+    ) {
+        let content: VC.Element? = from.content != nil ? resultStack.removeLast() : nil
+        resultStack.append(.box(
+            .init(
+                width: from.width,
+                height: from.height,
+                horizontalAlignment: from.horizontalAlignment,
+                verticalAlignment: from.verticalAlignment,
+                content: content
+            ),
+            properties?.value
+        ))
     }
 }
 

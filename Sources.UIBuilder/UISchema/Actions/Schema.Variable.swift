@@ -16,6 +16,7 @@ extension Schema.Variable: Codable {
         case path = "var"
         case setter
         case scope
+        case converter
     }
 
     package init(from decoder: Decoder) throws {
@@ -26,7 +27,7 @@ extension Schema.Variable: Codable {
             path: path.split(separator: ".").map(String.init),
             setter: container.decodeIfPresent(String.self, forKey: .setter),
             scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default,
-            converter: VC.Variable.Converter(from: decoder)
+            converter: container.contains(.converter) ? VC.Variable.Converter(from: decoder) : nil
         )
     }
 

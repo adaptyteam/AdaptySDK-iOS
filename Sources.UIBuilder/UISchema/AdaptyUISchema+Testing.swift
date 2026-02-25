@@ -42,7 +42,7 @@ public extension AdaptyUISchema {
             case let .screen(name, value):
                 ##""\##(name)":\##(value)"##
             case let .element(name, value):
-                ##""\##(name)": {"background": "#000000FF", "content": \##(value)}"##
+                ##""\##(name)": { "background": "#000000FF", "content": \##(value)}"##
             }
         }.joined(separator: ",")
 

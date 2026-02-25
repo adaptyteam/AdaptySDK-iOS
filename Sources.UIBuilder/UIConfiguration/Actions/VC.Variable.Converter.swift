@@ -1,18 +1,15 @@
 //
 //  VC.Variable.Converter.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
-//  Created by Aleksei Valiano on 23.02.2026.
+//  Created by Aleksei Valiano on 24.02.2026.
 //
 
 import Foundation
 
 extension VC.Variable {
-
-
     enum Converter: Sendable, Hashable {
-        case isEqual(VC.Constant, `false`:VC.Constant? )
-
-        case unknown(String, VC.Constant?)
+        case isEqual(VC.Parameter, falseValue: VC.Parameter?)
+        case unknown(String, VC.Parameter?)
     }
 }

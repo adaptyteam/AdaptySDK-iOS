@@ -24,9 +24,12 @@ extension AdaptyUISchema.RichTemplateSystem {
 }
 
 extension Schema.Localizer {
-    func templateInstance(_ instance: Schema.TemplateInstance) throws -> VC.Element {
+    func planTemplateInstance(
+        _ instance: Schema.TemplateInstance,
+        in workStack: inout [WorkItem]
+    ) throws {
         let id = instance.type
-        guard !self.templateIds.contains(id) else {
+        guard !templateIds.contains(id) else {
             throw Schema.Error.elementsTreeCycle(id)
         }
         guard let templates = source.templates as? Schema.RichTemplateSystem else {
@@ -36,14 +39,7 @@ extension Schema.Localizer {
             throw Schema.Error.notFoundTemplate(id)
         }
         templateIds.insert(id)
-        let result: VC.Element
-        do {
-            result = try element(instance.content)
-            templateIds.remove(id)
-        } catch {
-            templateIds.remove(id)
-            throw error
-        }
-        return result
+        workStack.append(.leaveTemplate(id))
+        workStack.append(.planElement(instance.content))
     }
 }
