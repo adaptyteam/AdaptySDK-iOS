@@ -14,37 +14,29 @@ extension Schema {
     }
 }
 
-extension Schema.Localizer {
+extension Schema.ConfigurationBuilder {
+    @inlinable
     func planSection(
         _ value: Schema.Section,
-        _ properties: Schema.Element.Properties?,
-        in workStack: inout [WorkItem]
-    ) throws {
-        workStack.append(.buildSection(value, properties))
+        _ properties: VC.Element.Properties?,
+        in taskStack: inout [Task]
+    ) {
+        taskStack.append(.buildSection(value, properties))
         for item in value.content.reversed() {
-            workStack.append(.planElement(item))
+            taskStack.append(.planElement(item))
         }
     }
 
+    @inlinable
     func buildSection(
         _ from: Schema.Section,
-        _ properties: Schema.Element.Properties?,
-        in resultStack: inout [VC.Element]
-    ) {
-        let count = from.content.count
-        var elements = [VC.Element]()
-        elements.reserveCapacity(count)
-        for _ in 0 ..< count {
-            elements.append(resultStack.removeLast())
-        }
-        elements.reverse()
-        resultStack.append(.section(
-            .init(
-                index: from.index,
-                content: elements
-            ),
-            properties?.value
-        ))
+        _ elementStack: inout [VC.Element]
+    ) throws(Schema.Error) -> VC.Section {
+        let content = try elementStack.popLastElements(from.content.count)
+        return .init(
+            index: from.index,
+            content: content
+        )
     }
 }
 

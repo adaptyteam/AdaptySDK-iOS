@@ -31,68 +31,21 @@ extension Schema {
     }
 }
 
-extension Schema.Localizer {
-    enum WorkItem {
-        case planElement(Schema.Element)
-        case leaveTemplate(String)
-        case buildStack(Schema.Stack, Schema.Element.Properties?)
-        case buildBox(Schema.Box, Schema.Element.Properties?)
-        case buildButton(Schema.Button, Schema.Element.Properties?)
-        case buildRow(Schema.Row, Schema.Element.Properties?)
-        case buildColumn(Schema.Column, Schema.Element.Properties?)
-        case buildSection(Schema.Section, Schema.Element.Properties?)
-        case buildPager(Schema.Pager, Schema.Element.Properties?)
-    }
-
-    func element(_ root: Schema.Element) throws -> VC.Element {
-        var workStack: [WorkItem] = [.planElement(root)]
-        var resultStack: [VC.Element] = []
-
-        while let work = workStack.popLast() {
-            switch work {
-            case let .planElement(value):
-                let result = try planElement(value, in: &workStack)
-                if let result {
-                    resultStack.append(result)
-                }
-            case let .leaveTemplate(id):
-                templateIds.remove(id)
-            case let .buildButton(value, properties):
-                buildButton(value, properties, in: &resultStack)
-            case let .buildStack(value, properties):
-                buildStack(value, properties, in: &resultStack)
-            case let .buildBox(value, properties):
-                buildBox(value, properties, in: &resultStack)
-            case let .buildRow(value, properties):
-                buildRow(value, properties, in: &resultStack)
-            case let .buildColumn(value, properties):
-                buildColumn(value, properties, in: &resultStack)
-            case let .buildSection(value, properties):
-                buildSection(value, properties, in: &resultStack)
-            case let .buildPager(value, properties):
-                buildPager(value, properties, in: &resultStack)
-            }
-        }
-
-        guard let result = resultStack.last else {
-            throw Schema.Error.unsupportedElement("empty element tree")
-        }
-        return result
-    }
-
-    private func planElement(
+extension Schema.ConfigurationBuilder {
+    @inlinable
+    func planElement(
         _ from: Schema.Element,
-        in workStack: inout [WorkItem]
-    ) throws -> VC.Element? {
+        in taskStack: inout [Task]
+    ) throws(Schema.Error) -> VC.Element? {
         switch from {
         case let .legacyReference(id):
-            try planLegacyReference(id, in: &workStack)
+            try planLegacyReference(id, in: &taskStack)
         case let .templateInstance(value):
-            try planTemplateInstance(value, in: &workStack)
+            try planTemplateInstance(value, in: &taskStack)
         case .scrrenHolder:
             return .screenHolder
         case let .stack(value, properties):
-            try planStack(value, properties, in: &workStack)
+            planStack(value, properties?.value, in: &taskStack)
         case let .text(value, properties):
             return .text(value, properties?.value)
         case let .textField(value, properties):
@@ -102,15 +55,15 @@ extension Schema.Localizer {
         case let .video(value, properties):
             return .video(value, properties?.value)
         case let .button(value, properties):
-            try planButton(value, properties, in: &workStack)
+            planButton(value, properties?.value, in: &taskStack)
         case let .box(value, properties):
-            try planBox(value, properties, in: &workStack)
+            planBox(value, properties?.value, in: &taskStack)
         case let .row(value, properties):
-            try planRow(value, properties, in: &workStack)
+            planRow(value, properties?.value, in: &taskStack)
         case let .column(value, properties):
-            try planColumn(value, properties, in: &workStack)
+            planColumn(value, properties?.value, in: &taskStack)
         case let .section(value, properties):
-            try planSection(value, properties, in: &workStack)
+            planSection(value, properties?.value, in: &taskStack)
         case let .toggle(value, properties):
             return .toggle(value, properties?.value)
         case let .slider(value, properties):
@@ -118,7 +71,7 @@ extension Schema.Localizer {
         case let .timer(value, properties):
             return .timer(convertTimer(value), properties?.value)
         case let .pager(value, properties):
-            try planPager(value, properties, in: &workStack)
+            planPager(value, properties?.value, in: &taskStack)
         case let .unknown(value, properties):
             return .unknown(value, properties?.value)
         }

@@ -10,6 +10,6 @@ import Foundation
 package extension VC {
     struct ScreenActions: Sendable, Hashable {
         package let onOutsideTap: [Action]?
-        package let onSystemBack: [Action]?
+        package let onDeviceBack: [Action]?
     }
 }

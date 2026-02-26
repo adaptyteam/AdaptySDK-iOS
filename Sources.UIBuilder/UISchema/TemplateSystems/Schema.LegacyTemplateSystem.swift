@@ -29,11 +29,12 @@ extension AdaptyUISchema.LegacyTemplateSystem {
     }
 }
 
-extension Schema.Localizer {
+extension Schema.ConfigurationBuilder {
+    @inlinable
     func planLegacyReference(
         _ id: String,
-        in workStack: inout [WorkItem]
-    ) throws {
+        in taskStack: inout [Task]
+    ) throws(Schema.Error) {
         guard !templateIds.contains(id) else {
             throw Schema.Error.elementsTreeCycle(id)
         }
@@ -44,8 +45,8 @@ extension Schema.Localizer {
             throw Schema.Error.notFoundTemplate(id)
         }
         templateIds.insert(id)
-        workStack.append(.leaveTemplate(id))
-        workStack.append(.planElement(instance))
+        taskStack.append(.leaveTemplate(id))
+        taskStack.append(.planElement(instance))
     }
 }
 

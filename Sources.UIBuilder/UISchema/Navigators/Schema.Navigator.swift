@@ -31,12 +31,23 @@ extension Schema.Navigator {
     )
 }
 
-extension Schema.Localizer {
-    func navigator(_ from: Schema.Navigator) throws -> VC.Navigator {
-        try .init(
+extension Schema.ConfigurationBuilder {
+    @inlinable
+    func convertNavigator(_ from: Schema.Navigator) throws(Schema.Error) -> VC.Navigator {
+        var taskStack: [Task] = [.planElement(from.content)]
+        var elementStack = try startTasks(&taskStack)
+        return try buildNavigator(from, &elementStack)
+    }
+
+    private func buildNavigator(
+        _ from: Schema.Navigator,
+        _ elementStack: inout [VC.Element]
+    ) throws(Schema.Error) -> VC.Navigator {
+        let content = try elementStack.popLastElement()
+        return .init(
             id: from.id,
             background: from.background,
-            content: element(from.content),
+            content: content,
             order: from.order,
             appearances: from.appearances,
             transitions: from.transitions,

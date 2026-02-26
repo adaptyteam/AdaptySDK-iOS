@@ -7,6 +7,7 @@
 
 import Foundation
 
+@usableFromInline
 typealias Schema = AdaptyUISchema
 
 public struct AdaptyUISchema: Sendable {

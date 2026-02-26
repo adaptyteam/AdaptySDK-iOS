@@ -24,45 +24,32 @@ extension Schema.Box {
     )
 }
 
-extension Schema.Localizer {
+extension Schema.ConfigurationBuilder {
+    @inlinable
+    func planBox(
+        _ value: Schema.Box,
+        _ properties: VC.Element.Properties?,
+        in taskStack: inout [Task]
+    ) {
+        taskStack.append(.buildBox(value, properties))
+        if let content = value.content {
+            taskStack.append(.planElement(content))
+        }
+    }
 
-    func box(_ from: Schema.Box) throws -> VC.Box {
-        try .init(
+    @inlinable
+    func buildBox(
+        _ from: Schema.Box,
+        _ elementStack: inout [VC.Element]
+    ) throws(Schema.Error) -> VC.Box {
+        let content = try elementStack.popLastElement(from.content != nil)
+        return .init(
             width: from.width,
             height: from.height,
             horizontalAlignment: from.horizontalAlignment,
             verticalAlignment: from.verticalAlignment,
-            content: from.content.map(element)
+            content: content
         )
-    }
-
-    func planBox(
-        _ value: Schema.Box,
-        _ properties: Schema.Element.Properties?,
-        in workStack: inout [WorkItem]
-    ) throws {
-        workStack.append(.buildBox(value, properties))
-        if let content = value.content {
-            workStack.append(.planElement(content))
-        }
-    }
-
-    func buildBox(
-        _ from: Schema.Box,
-        _ properties: Schema.Element.Properties?,
-        in resultStack: inout [VC.Element]
-    ) {
-        let content: VC.Element? = from.content != nil ? resultStack.removeLast() : nil
-        resultStack.append(.box(
-            .init(
-                width: from.width,
-                height: from.height,
-                horizontalAlignment: from.horizontalAlignment,
-                verticalAlignment: from.verticalAlignment,
-                content: content
-            ),
-            properties?.value
-        ))
     }
 }
 

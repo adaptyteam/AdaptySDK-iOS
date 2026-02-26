@@ -27,68 +27,58 @@ extension Schema.Stack {
     )
 }
 
-extension Schema.Localizer {
+extension Schema.ConfigurationBuilder {
+    @inlinable
     func planStack(
         _ stack: Schema.Stack,
-        _ properties: Schema.Element.Properties?,
-        in workStack: inout [WorkItem]
-    ) throws {
-        workStack.append(.buildStack(stack, properties))
+        _ properties: VC.Element.Properties?,
+        in taskStack: inout [Task]
+    ) {
+        taskStack.append(.buildStack(stack, properties))
         for item in stack.items.reversed() {
             if case let .element(el) = item {
-                workStack.append(.planElement(el))
+                taskStack.append(.planElement(el))
             }
         }
     }
 
+    @inlinable
     func buildStack(
         _ from: Schema.Stack,
-        _ properties: Schema.Element.Properties?,
-        in resultStack: inout [VC.Element]
-    ) {
-        var elementCount = 0
-        for item in from.items {
-            if case .element = item { elementCount += 1 }
+        _ elementStack: inout [VC.Element]
+    ) throws(Schema.Error) -> VC.Stack {
+        let elementCount = from.items.count { item in
+            if case .element = item { true } else { false }
         }
-        var elements = [VC.Element]()
-        elements.reserveCapacity(elementCount)
-        for _ in 0 ..< elementCount {
-            elements.append(resultStack.removeLast())
-        }
-        elements.reverse()
+        let elements = try elementStack.popLastElements(elementCount)
+        return .init(
+            type: from.type,
+            horizontalAlignment: from.horizontalAlignment,
+            verticalAlignment: from.verticalAlignment,
+            spacing: from.spacing,
+            items: buildStackItems(from.items, elements)
+        )
+    }
 
-        var vcItems = [VC.Stack.Item]()
-        vcItems.reserveCapacity(from.items.count)
+    @inlinable
+    func buildStackItems(
+        _ items: [Schema.Stack.Item],
+        _ elements: [VC.Element]
+    ) -> [VC.Stack.Item] {
+        var stackItems = [VC.Stack.Item]()
+        stackItems.reserveCapacity(elements.count)
         var elementIndex = 0
-        for item in from.items {
+        for item in items {
             switch item {
             case let .space(value):
-                vcItems.append(.space(value))
+                stackItems.append(.space(value))
             case .element:
-                vcItems.append(.element(elements[elementIndex]))
+                stackItems.append(.element(elements[elementIndex]))
                 elementIndex += 1
             }
         }
-        resultStack.append(.stack(
-            .init(
-                type: from.type,
-                horizontalAlignment: from.horizontalAlignment,
-                verticalAlignment: from.verticalAlignment,
-                spacing: from.spacing,
-                items: vcItems
-            ),
-            properties?.value
-        ))
+        return stackItems
     }
-
-//    private func old_stackItem(_ from: Schema.Stack.Item) throws -> VC.Stack.Item {
-//        switch from {
-//        case let .space(value):
-//            .space(value)
-//        case let .element(value):
-//            try .element(old_element(value))
-//        }
-//    }
 }
 
 extension Schema.Stack: DecodableWithConfiguration {

@@ -18,14 +18,37 @@ extension Schema {
     }
 }
 
-extension Schema.Localizer {
-    func screen(_ from: Schema.Screen) throws -> VC.Screen {
-        try .init(
+extension Schema.ConfigurationBuilder {
+    @inlinable
+    func convertScreen(_ from: Schema.Screen) throws(Schema.Error) -> VC.Screen {
+        var taskStack: [Task] = []
+        if let boxContent = from.cover?.content {
+            taskStack.append(.planElement(boxContent))
+        }
+        taskStack.append(.planElement(from.content))
+        if let footer = from.footer {
+            taskStack.append(.planElement(footer))
+        }
+        var elementStack = try startTasks(&taskStack)
+        return try buildScreen(from, &elementStack)
+    }
+
+    private func buildScreen(
+        _ from: Schema.Screen,
+        _ elementStack: inout [VC.Element]
+    ) throws(Schema.Error) -> VC.Screen {
+        var cover: VC.Box?
+        if let box = from.cover {
+            cover = try buildBox(box, &elementStack)
+        }
+        let content = try elementStack.popLastElement()
+        let footer = try elementStack.popLastElement(from.footer != nil)
+        return .init(
             id: from.id,
             layoutBehaviour: from.layoutBehaviour,
-            cover: from.cover.map(box),
-            content: element(from.content),
-            footer: from.footer.map(element),
+            cover: cover,
+            content: content,
+            footer: footer,
             screenActions: from.screenActions
         )
     }

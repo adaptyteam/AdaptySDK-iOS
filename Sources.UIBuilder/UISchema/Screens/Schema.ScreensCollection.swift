@@ -191,7 +191,7 @@ private extension Decoder {
                     ],
                     scope: .global
                 )],
-                onSystemBack: nil
+                onDeviceBack: nil
             )
         )
     }

@@ -1,5 +1,5 @@
 //
-//  AdaptyUISchema.Localizer.swift
+//  Schema.ConfigurationBuilder.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 20.01.2023
@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension AdaptyUISchema {
-    final class Localizer: @unchecked Sendable {
+extension Schema {
+    final class ConfigurationBuilder: @unchecked Sendable {
         let id = UUID()
         let configuarationId: String
         let localeId: LocaleId
@@ -42,8 +42,8 @@ extension AdaptyUISchema {
     }
 }
 
-extension AdaptyUISchema.Localizer: Hashable {
-    static func == (lhs: Schema.Localizer, rhs: Schema.Localizer) -> Bool {
+extension Schema.ConfigurationBuilder: Hashable {
+    static func == (lhs: Schema.ConfigurationBuilder, rhs: Schema.ConfigurationBuilder) -> Bool {
         lhs.id == rhs.id
     }
 
@@ -52,8 +52,9 @@ extension AdaptyUISchema.Localizer: Hashable {
     }
 }
 
-extension AdaptyUISchema.Localizer {
+extension Schema.ConfigurationBuilder {
     func localize() throws -> AdaptyUIConfiguration {
+        
         templateIds.removeAll()
         return try .init(
             id: configuarationId,
@@ -61,9 +62,10 @@ extension AdaptyUISchema.Localizer {
             isRightToLeft: isRightToLeft,
             assets: assets,
             strings: strings,
-            navigators: source.navigators.mapValues(navigator),
-            screens: source.screens.mapValues(screen),
+            navigators: source.navigators.mapValues(convertNavigator),
+            screens: source.screens.mapValues(convertScreen),
             scripts: source.scripts
         )
     }
 }
+

@@ -6,9 +6,8 @@
 //
 
 package extension Schema {
+    @usableFromInline
     enum Error: Swift.Error {
-
-
         case unsupportedElement(String)
         case elementsTreeCycle(String)
 

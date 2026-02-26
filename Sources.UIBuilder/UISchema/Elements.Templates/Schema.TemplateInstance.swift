@@ -26,11 +26,12 @@ extension Schema.TemplateInstance: Encodable, DecodableWithConfiguration {
             throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "Wrong type format for template instance \(type)"))
         }
 
-        try self.init(
-            type: String(type.dropFirst())//,
+        self.init(
+            type: String(type.dropFirst()) // ,
 //            childs: Self.decodeChilds(container: container, configuration: configuration)
         )
     }
+
 //
 //    private static func decodeChilds(
 //        container: KeyedDecodingContainer<CodingKeys>,

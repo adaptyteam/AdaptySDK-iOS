@@ -14,48 +14,29 @@ extension Schema {
     }
 }
 
-extension Schema.Localizer {
+extension Schema.ConfigurationBuilder {
+    @inlinable
     func planColumn(
         _ value: Schema.Column,
-        _ properties: Schema.Element.Properties?,
-        in workStack: inout [WorkItem]
-    ) throws {
-        workStack.append(.buildColumn(value, properties))
+        _ properties: VC.Element.Properties?,
+        in taskStack: inout [Task]
+    ) {
+        taskStack.append(.buildColumn(value, properties))
         for item in value.items.reversed() {
-            workStack.append(.planElement(item.content))
+            taskStack.append(.planElement(item.content))
         }
     }
 
+    @inlinable
     func buildColumn(
         _ from: Schema.Column,
-        _ properties: Schema.Element.Properties?,
-        in resultStack: inout [VC.Element]
-    ) {
-        let count = from.items.count
-        var elements = [VC.Element]()
-        elements.reserveCapacity(count)
-        for _ in 0 ..< count {
-            elements.append(resultStack.removeLast())
-        }
-        elements.reverse()
-
-        var vcItems = [VC.GridItem]()
-        vcItems.reserveCapacity(count)
-        for (i, item) in from.items.enumerated() {
-            vcItems.append(.init(
-                length: item.length,
-                horizontalAlignment: item.horizontalAlignment,
-                verticalAlignment: item.verticalAlignment,
-                content: elements[i]
-            ))
-        }
-        resultStack.append(.column(
-            .init(
-                spacing: from.spacing,
-                items: vcItems
-            ),
-            properties?.value
-        ))
+        _ elementStack: inout [VC.Element]
+    ) throws(Schema.Error) -> VC.Column {
+        let elements = try elementStack.popLastElements(from.items.count)
+        return .init(
+            spacing: from.spacing,
+            items: convertGridItems(from.items, elements)
+        )
     }
 }
 

@@ -16,35 +16,33 @@ extension Schema {
     }
 }
 
-extension Schema.Localizer {
+extension Schema.ConfigurationBuilder {
+    @inlinable
     func planButton(
         _ value: Schema.Button,
-        _ properties: Schema.Element.Properties?,
-        in workStack: inout [WorkItem]
-    ) throws {
-        workStack.append(.buildButton(value, properties))
+        _ properties: VC.Element.Properties?,
+        in taskStack: inout [Task]
+    ) {
+        taskStack.append(.buildButton(value, properties))
         if let sel = value.selectedState {
-            workStack.append(.planElement(sel))
+            taskStack.append(.planElement(sel))
         }
-        workStack.append(.planElement(value.normalState))
+        taskStack.append(.planElement(value.normalState))
     }
 
+    @inlinable
     func buildButton(
         _ from: Schema.Button,
-        _ properties: Schema.Element.Properties?,
-        in resultStack: inout [VC.Element]
-    ) {
-        let selectedState: VC.Element? = from.selectedState != nil ? resultStack.removeLast() : nil
-        let normalState = resultStack.removeLast()
-        resultStack.append(.button(
-            .init(
-                actions: from.actions,
-                normalState: normalState,
-                selectedState: selectedState,
-                isSelectedState: from.isSelectedState
-            ),
-            properties?.value
-        ))
+        _ elementStack: inout [VC.Element]
+    ) throws(Schema.Error) -> VC.Button {
+        let selectedState = try elementStack.popLastElement(from.selectedState != nil)
+        let normalState = try elementStack.popLastElement()
+        return .init(
+            actions: from.actions,
+            normalState: normalState,
+            selectedState: selectedState,
+            isSelectedState: from.isSelectedState
+        )
     }
 }
 

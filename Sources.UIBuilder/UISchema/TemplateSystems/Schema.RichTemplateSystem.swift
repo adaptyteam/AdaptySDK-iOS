@@ -23,11 +23,12 @@ extension AdaptyUISchema.RichTemplateSystem {
     }
 }
 
-extension Schema.Localizer {
+extension Schema.ConfigurationBuilder {
+    @inlinable
     func planTemplateInstance(
         _ instance: Schema.TemplateInstance,
-        in workStack: inout [WorkItem]
-    ) throws {
+        in taskStack: inout [Task]
+    ) throws(Schema.Error) {
         let id = instance.type
         guard !templateIds.contains(id) else {
             throw Schema.Error.elementsTreeCycle(id)
@@ -39,7 +40,7 @@ extension Schema.Localizer {
             throw Schema.Error.notFoundTemplate(id)
         }
         templateIds.insert(id)
-        workStack.append(.leaveTemplate(id))
-        workStack.append(.planElement(instance.content))
+        taskStack.append(.leaveTemplate(id))
+        taskStack.append(.planElement(instance.content))
     }
 }

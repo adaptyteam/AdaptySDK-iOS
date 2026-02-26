@@ -23,19 +23,25 @@ extension Schema.GridItem {
     )
 }
 
-// TODO: Refactoring
-extension Schema.Localizer {
-//    func old_gridItem(_ from: Schema.GridItem) throws -> VC.GridItem {
-//        try .init(
-//            length: from.length,
-//            horizontalAlignment: from.horizontalAlignment,
-//            verticalAlignment: from.verticalAlignment,
-//            content: old_element(from.content)
-//        )
-//    }
+extension Schema.ConfigurationBuilder {
+    @inlinable
+    func convertGridItems(
+        _ items: [Schema.GridItem],
+        _ elements: [VC.Element]
+    ) -> [VC.GridItem] {
+        var gridItems = [VC.GridItem]()
+        gridItems.reserveCapacity(elements.count)
+        for (i, item) in items.enumerated() {
+            gridItems.append(.init(
+                length: item.length,
+                horizontalAlignment: item.horizontalAlignment,
+                verticalAlignment: item.verticalAlignment,
+                content: elements[i]
+            ))
+        }
+        return gridItems
+    }
 }
-
-// end refactoring
 
 extension Schema.GridItem: DecodableWithConfiguration {
     static let typeForGridItem = "grid_item"

@@ -27,7 +27,8 @@ extension VC.Timer.StartBehavior {
     static let `default` = Self.firstAppear
 }
 
-extension Schema.Localizer {
+extension Schema.ConfigurationBuilder {
+    @inlinable
     func convertTimer(_ from: Schema.Timer) -> VC.Timer {
         .init(
             id: from.id,
