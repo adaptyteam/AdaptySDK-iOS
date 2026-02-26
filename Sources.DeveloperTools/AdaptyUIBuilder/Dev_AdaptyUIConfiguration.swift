@@ -11,6 +11,7 @@ import Foundation
 public struct Dev_AdaptyUIConfiguration {
     typealias Wrapped = AdaptyUIConfiguration
     let wrapped: Wrapped
+    public let json: String
 }
 
 public extension Dev_AdaptyUIConfiguration {
@@ -39,6 +40,9 @@ public extension Dev_AdaptyUIConfiguration {
     ) throws -> Self {
         let schema = try AdaptyUISchema(from: json)
         let configuration = try schema.extractUIConfiguration()
-        return .init(wrapped: configuration)
+        return .init(
+            wrapped: configuration,
+            json: json
+        )
     }
 }
