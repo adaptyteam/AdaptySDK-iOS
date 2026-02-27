@@ -436,7 +436,7 @@ $requests:
         properties:
           paywall: { $ref: "#/$defs/AdaptyPaywall" }
 
-  CreateWebPurchaseUrl.Response: #response
+  CreateWebPaywallUrl.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -1494,7 +1494,7 @@ $defs:
 
   AdaptyUI.DialogConfiguration: #request
     type: object
-    required: [default_action]
+    required: [default_action_title]
     properties:
       title: { type: string }
       content: { type: string }
