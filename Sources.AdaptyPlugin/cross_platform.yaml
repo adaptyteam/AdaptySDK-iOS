@@ -1468,10 +1468,6 @@ $defs:
     type: object
     additionalProperties: { $ref: "#/$defs/Date", nullable: false }
 
-  AdaptyUI.AndroidPersonalizedOffers: #request
-    type: object
-    additionalProperties: { type: boolean, nullable: false }
-
   AdaptyUI.ProductPurchaseParameters:  #request
     type: object
     propertyNames: { description: "key is adapty_product_id" }
