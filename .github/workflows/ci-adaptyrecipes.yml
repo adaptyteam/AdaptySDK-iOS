@@ -1,0 +1,491 @@
+name: CI AdaptyRecipes
+
+on:
+  push:
+    branches:
+      - master
+      - 'release/*'
+    tags-ignore:
+      - '**'
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  workflow_dispatch:
+    inputs:
+      run_demo_builds:
+        description: Run demo app xcodebuild matrix
+        type: boolean
+        required: true
+        default: true
+      run_sdk_tests:
+        description: Run SDK swift test
+        type: boolean
+        required: true
+        default: true
+      matrix_override_json:
+        description: Optional matrix override (JSON array or object with include[])
+        type: string
+        required: false
+        default: ''
+      ignored_errors_override_json:
+        description: 'Optional ignored errors override (JSON array of rules: string or {message,file?,line?})'
+        type: string
+        required: false
+        default: ''
+      ignored_test_errors_override_json:
+        description: 'Optional ignored test errors override (JSON array of rules: string or {message,file?,line?})'
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare_config:
+    name: Prepare CI config
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run_builds: ${{ steps.prepare.outputs.run_builds }}
+      run_tests: ${{ steps.prepare.outputs.run_tests }}
+      matrix_json: ${{ steps.prepare.outputs.matrix_json }}
+      ignored_errors_json: ${{ steps.prepare.outputs.ignored_errors_json }}
+      ignored_test_errors_json: ${{ steps.prepare.outputs.ignored_test_errors_json }}
+      sdk_runner: ${{ steps.prepare.outputs.sdk_runner }}
+      sdk_xcode: ${{ steps.prepare.outputs.sdk_xcode }}
+    steps:
+      - name: Checkout push ref
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Checkout non-push ref
+        if: ${{ github.event_name != 'push' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Prepare effective config
+        id: prepare
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_RUN_DEMO_BUILDS: ${{ github.event.inputs.run_demo_builds }}
+          INPUT_RUN_SDK_TESTS: ${{ github.event.inputs.run_sdk_tests }}
+          INPUT_MATRIX_OVERRIDE_JSON: ${{ github.event.inputs.matrix_override_json }}
+          INPUT_IGNORED_ERRORS_OVERRIDE_JSON: ${{ github.event.inputs.ignored_errors_override_json }}
+          INPUT_IGNORED_TEST_ERRORS_OVERRIDE_JSON: ${{ github.event.inputs.ignored_test_errors_override_json }}
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          const fail = (message) => {
+            console.error(message);
+            process.exit(1);
+          };
+
+          const parseJson = (raw, label) => {
+            try {
+              return JSON.parse(raw);
+            } catch (error) {
+              fail(`Invalid ${label}: ${error.message}`);
+            }
+          };
+
+          const parseBool = (raw, defaultValue, label) => {
+            const normalized = (raw ?? "").toString().trim().toLowerCase();
+            if (normalized === "") return defaultValue;
+            if (normalized === "true") return true;
+            if (normalized === "false") return false;
+            fail(`${label} must be 'true' or 'false'. Got: ${raw}`);
+          };
+
+          const validateMatrix = (matrix, label) => {
+            if (!Array.isArray(matrix) || matrix.length === 0) {
+              fail(`${label} must be a non-empty JSON array.`);
+            }
+
+            const seenRunnerXcode = new Set();
+
+            return matrix.map((entry, index) => {
+              if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+                fail(`${label}[${index}] must be an object.`);
+              }
+
+              const { runner, xcode, informational } = entry;
+
+              if (typeof runner !== "string" || runner.trim() === "") {
+                fail(`${label}[${index}].runner must be a non-empty string.`);
+              }
+              if (typeof xcode !== "string" || xcode.trim() === "") {
+                fail(`${label}[${index}].xcode must be a non-empty string.`);
+              }
+              if (typeof informational !== "boolean") {
+                fail(`${label}[${index}].informational must be a boolean.`);
+              }
+
+              const normalizedRunner = runner.trim();
+              const normalizedXcode = xcode.trim();
+              const uniqueKey = `${normalizedRunner}::${normalizedXcode}`;
+              if (seenRunnerXcode.has(uniqueKey)) {
+                fail(`${label} contains duplicate runner+xcode pair '${normalizedRunner}' + '${normalizedXcode}'.`);
+              }
+              seenRunnerXcode.add(uniqueKey);
+
+              return {
+                runner: normalizedRunner,
+                xcode: normalizedXcode,
+                informational,
+              };
+            });
+          };
+
+          const validateIgnoredErrors = (list, label) => {
+            if (!Array.isArray(list)) {
+              fail(`${label} must be a JSON array.`);
+            }
+
+            return list.map((entry, index) => {
+              if (typeof entry === "string") {
+                if (entry.trim() === "") {
+                  fail(`${label}[${index}] must be a non-empty string.`);
+                }
+                return entry.trim();
+              }
+
+              if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+                fail(`${label}[${index}] must be a string or object.`);
+              }
+
+              const allowedKeys = new Set(["message", "file", "line"]);
+              for (const key of Object.keys(entry)) {
+                if (!allowedKeys.has(key)) {
+                  fail(`${label}[${index}] contains unsupported key '${key}'.`);
+                }
+              }
+
+              if (typeof entry.message !== "string" || entry.message.trim() === "") {
+                fail(`${label}[${index}].message must be a non-empty string.`);
+              }
+
+              const normalized = {
+                message: entry.message.trim(),
+              };
+
+              if (entry.file !== undefined) {
+                if (typeof entry.file !== "string" || entry.file.trim() === "") {
+                  fail(`${label}[${index}].file must be a non-empty string when provided.`);
+                }
+                normalized.file = entry.file.trim();
+              }
+
+              if (entry.line !== undefined) {
+                if (!Number.isInteger(entry.line) || entry.line <= 0) {
+                  fail(`${label}[${index}].line must be a positive integer when provided.`);
+                }
+                if (normalized.file === undefined) {
+                  fail(`${label}[${index}].line requires .file to be provided.`);
+                }
+                normalized.line = entry.line;
+              }
+
+              return normalized;
+            });
+          };
+
+          const validateSdkTests = (config) => {
+            if (!config || typeof config !== "object" || Array.isArray(config)) {
+              fail("sdk_tests must be an object.");
+            }
+
+            const runner = config.runner;
+            const xcode = config.xcode;
+
+            if (typeof runner !== "string" || runner.trim() === "") {
+              fail("sdk_tests.runner must be a non-empty string.");
+            }
+            if (typeof xcode !== "string" || xcode.trim() === "") {
+              fail("sdk_tests.xcode must be a non-empty string.");
+            }
+
+            return {
+              runner: runner.trim(),
+              xcode: xcode.trim(),
+            };
+          };
+
+          const configPath = ".github/ci/demo-build-config.json";
+          let configRaw;
+          try {
+            configRaw = fs.readFileSync(configPath, "utf8");
+          } catch (error) {
+            fail(`Unable to read ${configPath}: ${error.message}`);
+          }
+
+          const config = parseJson(configRaw, configPath);
+          if (config.schema_version !== 1) {
+            fail(`Unsupported schema_version '${config.schema_version}' in ${configPath}. Expected 1.`);
+          }
+
+          const eventName = process.env.EVENT_NAME;
+          let runBuilds;
+          let runTests;
+
+          if (eventName === "pull_request") {
+            runBuilds = true;
+            runTests = true;
+          } else if (eventName === "push") {
+            runBuilds = true;
+            runTests = false;
+          } else if (eventName === "workflow_dispatch") {
+            runBuilds = parseBool(process.env.INPUT_RUN_DEMO_BUILDS, true, "run_demo_builds");
+            runTests = parseBool(process.env.INPUT_RUN_SDK_TESTS, true, "run_sdk_tests");
+          } else {
+            fail(`Unsupported event '${eventName}'.`);
+          }
+
+          if (eventName === "workflow_dispatch" && !runBuilds && !runTests) {
+            fail("workflow_dispatch requires at least one of run_demo_builds or run_sdk_tests to be true.");
+          }
+
+          const defaultMatrix = runBuilds
+            ? validateMatrix(config.build_matrix, "build_matrix")
+            : [];
+          const defaultIgnoredErrors = runBuilds
+            ? validateIgnoredErrors(config.ignored_error_messages, "ignored_error_messages")
+            : [];
+          const defaultIgnoredTestErrors = runTests
+            ? validateIgnoredErrors(config.ignored_test_error_messages, "ignored_test_error_messages")
+            : [];
+          const sdkTests = runTests
+            ? validateSdkTests(config.sdk_tests)
+            : { runner: "", xcode: "" };
+
+          let effectiveMatrix = defaultMatrix;
+          let effectiveIgnoredErrors = defaultIgnoredErrors;
+          let effectiveIgnoredTestErrors = defaultIgnoredTestErrors;
+
+          if (eventName === "workflow_dispatch") {
+            if (runBuilds) {
+              const matrixOverrideRaw = (process.env.INPUT_MATRIX_OVERRIDE_JSON || "").trim();
+              if (matrixOverrideRaw !== "") {
+                let parsed = parseJson(matrixOverrideRaw, "matrix_override_json");
+                if (!Array.isArray(parsed)) {
+                  if (parsed && typeof parsed === "object" && Array.isArray(parsed.include)) {
+                    parsed = parsed.include;
+                  } else {
+                    fail("matrix_override_json must be a JSON array or an object with include[] array.");
+                  }
+                }
+                effectiveMatrix = validateMatrix(parsed, "matrix_override_json");
+              }
+
+              const ignoredOverrideRaw = (process.env.INPUT_IGNORED_ERRORS_OVERRIDE_JSON || "").trim();
+              if (ignoredOverrideRaw !== "") {
+                const parsed = parseJson(ignoredOverrideRaw, "ignored_errors_override_json");
+                effectiveIgnoredErrors = validateIgnoredErrors(parsed, "ignored_errors_override_json");
+              }
+            }
+
+            if (runTests) {
+              const ignoredTestOverrideRaw = (process.env.INPUT_IGNORED_TEST_ERRORS_OVERRIDE_JSON || "").trim();
+              if (ignoredTestOverrideRaw !== "") {
+                const parsed = parseJson(ignoredTestOverrideRaw, "ignored_test_errors_override_json");
+                effectiveIgnoredTestErrors = validateIgnoredErrors(parsed, "ignored_test_errors_override_json");
+              }
+            }
+          }
+
+          const githubOutput = process.env.GITHUB_OUTPUT;
+          if (!githubOutput) fail("GITHUB_OUTPUT is not set.");
+
+          const setOutput = (name, value) => {
+            fs.appendFileSync(githubOutput, `${name}=${value}\n`);
+          };
+
+          setOutput("run_builds", String(runBuilds));
+          setOutput("run_tests", String(runTests));
+          setOutput("matrix_json", JSON.stringify({ include: effectiveMatrix }));
+          setOutput("ignored_errors_json", JSON.stringify(effectiveIgnoredErrors));
+          setOutput("ignored_test_errors_json", JSON.stringify(effectiveIgnoredTestErrors));
+          setOutput("sdk_runner", sdkTests.runner);
+          setOutput("sdk_xcode", sdkTests.xcode);
+          NODE
+
+  build_demo_matrix:
+    name: Demo build (Xcode ${{ matrix.xcode }})
+    needs: prepare_config
+    if: ${{ needs.prepare_config.outputs.run_builds == 'true' }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    continue-on-error: ${{ matrix.informational }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare_config.outputs.matrix_json) }}
+    steps:
+      - name: Checkout push ref
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Checkout non-push ref
+        if: ${{ github.event_name != 'push' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Select Xcode
+        id: setup_xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        continue-on-error: true
+        with:
+          xcode-version: ${{ matrix.xcode }}
+
+      - name: Handle unavailable Xcode for informational matrix entry
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational }}
+        shell: bash
+        run: |
+          echo "::warning::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}. Skipping informational build."
+
+      - name: Fail when required Xcode version is unavailable
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational == false }}
+        shell: bash
+        run: |
+          echo "::error::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}."
+          exit 1
+
+      - name: Print toolchain versions
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Build demo app
+        id: build
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          set +e
+          set -o pipefail
+
+          xcodebuild \
+            -project Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI.xcodeproj \
+            -scheme AdaptyRecipes-SwiftUI \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee xcodebuild.log
+
+          exit_code=${PIPESTATUS[0]}
+          set -e
+
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+          echo "xcodebuild_exit_code=$exit_code"
+
+      - name: Validate build failure against ignored errors
+        if: ${{ steps.build.outcome == 'success' && steps.build.outputs.exit_code != '0' }}
+        env:
+          IGNORED_ERRORS_JSON: ${{ needs.prepare_config.outputs.ignored_errors_json }}
+        shell: bash
+        run: |
+          bash scripts/ci/validate_demo_build.sh \
+            --log xcodebuild.log \
+            --ignored-json "$IGNORED_ERRORS_JSON"
+
+      - name: Upload demo build log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-build-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}
+          path: xcodebuild.log
+          if-no-files-found: ignore
+
+  sdk_tests:
+    name: SDK tests
+    needs: prepare_config
+    if: ${{ needs.prepare_config.outputs.run_tests == 'true' }}
+    runs-on: ${{ needs.prepare_config.outputs.sdk_runner }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout push ref
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Checkout non-push ref
+        if: ${{ github.event_name != 'push' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Select Xcode
+        id: setup_xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        continue-on-error: true
+        with:
+          xcode-version: ${{ needs.prepare_config.outputs.sdk_xcode }}
+
+      - name: Fail when SDK test Xcode version is unavailable
+        if: ${{ steps.setup_xcode.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo "::error::Xcode ${{ needs.prepare_config.outputs.sdk_xcode }} is unavailable on ${{ needs.prepare_config.outputs.sdk_runner }}."
+          exit 1
+
+      - name: Print toolchain versions
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Resolve dependencies
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: swift package resolve
+
+      - name: Run SDK tests
+        id: tests
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          set +e
+          set -o pipefail
+
+          swift test 2>&1 | tee swift-test.log
+
+          exit_code=${PIPESTATUS[0]}
+          set -e
+
+          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
+          echo "swift_test_exit_code=$exit_code"
+
+      - name: Validate test failure against ignored errors
+        if: ${{ steps.tests.outcome == 'success' && steps.tests.outputs.exit_code != '0' }}
+        env:
+          IGNORED_TEST_ERRORS_JSON: ${{ needs.prepare_config.outputs.ignored_test_errors_json }}
+        shell: bash
+        run: |
+          bash scripts/ci/validate_demo_build.sh \
+            --log swift-test.log \
+            --ignored-json "$IGNORED_TEST_ERRORS_JSON"
+
+      - name: Upload swift test log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-tests-log
+          path: swift-test.log
+          if-no-files-found: ignore

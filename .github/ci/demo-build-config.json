@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "build_matrix": [
+    {
+      "runner": "macos-15",
+      "xcode": "26.2",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "26.1",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "16.4",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "16.1",
+      "informational": false
+    }
+  ],
+  "ignored_error_messages": [
+    {
+      "message": "Change this constant with your own API key, then remove this line.",
+      "file": "Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI/Application/AppConstants.swift",
+      "line": 13
+    },
+    {
+      "message": "Change this constant with the desired placement ID, then remove this line.",
+      "file": "Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI/Application/AppConstants.swift",
+      "line": 16
+    }
+  ],
+  "ignored_test_error_messages": [
+    {
+      "message": "extra argument 'profileId' in call",
+      "file": "Tests/Placements/FallbackTests.swift",
+      "line": 67
+    },
+    {
+      "message": "missing arguments for parameters 'userId', 'requestLocale' in call",
+      "file": "Tests/Placements/FallbackTests.swift",
+      "line": 67
+    }
+  ],
+  "sdk_tests": {
+    "runner": "macos-15",
+    "xcode": "26.2"
+  }
+}
