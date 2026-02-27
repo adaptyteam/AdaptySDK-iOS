@@ -86,12 +86,15 @@ extension AdaptyUISchema: Codable {
 
         if configuration.isLegacy {
             navigators = screensCollection.legacyGeneratedNavigators ?? [:]
+        } else if let navigatorCollection = try container.decodeIfPresent(
+            NavigatorsCollection.self,
+            forKey: .navigators,
+            configuration: configuration
+        ) {
+            navigators = navigatorCollection.navigators
         } else {
-            navigators = try container.decodeIfPresent(
-                NavigatorsCollection.self,
-                forKey: .navigators,
-                configuration: configuration
-            )?.navigators ?? [:]
+            let navigatorCollection = NavigatorsCollection()
+            navigators = navigatorCollection.navigators
         }
 
         let templatesCollection = try container.decodeIfPresent(

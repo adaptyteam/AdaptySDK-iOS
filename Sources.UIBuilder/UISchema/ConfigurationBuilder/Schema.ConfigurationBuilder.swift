@@ -54,7 +54,7 @@ extension Schema.ConfigurationBuilder: Hashable {
 
 extension Schema.ConfigurationBuilder {
     func localize() throws -> AdaptyUIConfiguration {
-        
+
         templateIds.removeAll()
         return try .init(
             id: configuarationId,

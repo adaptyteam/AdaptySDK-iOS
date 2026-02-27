@@ -39,23 +39,3 @@ extension Schema.NavigatorsCollection: DecodableWithConfiguration {
         self.init(values: values)
     }
 }
-
-extension Schema.NavigatorsCollection {
-    init(data: [String: String]?, from decoder: JSONDecoder, configuration: Schema.DecodingConfiguration) throws {
-        guard let data, !data.isEmpty else {
-            self.init()
-            return
-        }
-
-        let array = try data.compactMapValues {
-            $0.data(using: .utf8)
-        }.map { id, data in
-            var nestedConfiguration = configuration
-            nestedConfiguration.insideNavigatorId = id
-            let navigator = try decoder.decode(Schema.Navigator.self, from: data, with: nestedConfiguration)
-            return (id, navigator)
-        }
-
-        self.init(values: Dictionary(array) { first, _ in first })
-    }
-}

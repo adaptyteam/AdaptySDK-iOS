@@ -13,6 +13,10 @@ public extension AdaptyUISchema {
         case element(name: String, value: String)
     }
 
+    private struct MainObject: Decodable {
+        let format: Schema.Version
+    }
+
     static func createJson(
         main: String,
         templates: String?,
@@ -21,47 +25,57 @@ public extension AdaptyUISchema {
         script: String?,
         startScreenName: String?
     ) throws -> String {
-        let main = main.trimmingCharacters(in: .whitespacesAndNewlines).dropLast(1)
+        let isNotLegacy = try JSONDecoder()
+            .decode(MainObject.self, from: main.data(using: .utf8) ?? Data())
+            .format
+            .isNotLegacyVersion
 
-        let templates =
-            if let templates {
-                ##""templates": \##(templates),"##
-            } else {
-                ""
-            }
+        var result: [String] = []
+        result.append(
+            String(main.trimmingCharacters(in: .whitespacesAndNewlines).dropLast(1))
+        )
 
-        let navigators =
-            if let navigators {
-                navigators.map { ##""\##($0.key)":\##($0.value)"## }.joined(separator: ",")
-            } else {
-                ""
-            }
+        if isNotLegacy, let templates {
+            result.append(##""templates": \##(templates)"##)
+        }
+
+        if isNotLegacy, let navigators {
+            let navigators = navigators.map { ##""\##($0.key)":\##($0.value)"## }.joined(separator: ",\n")
+            result.append(##""navigators": {\##(navigators)}"##)
+        }
 
         let screens: String = contents.map { content in
             switch content {
             case let .screen(name, value):
                 ##""\##(name)":\##(value)"##
             case let .element(name, value):
-                ##""\##(name)": { "background": "#000000FF", "content": \##(value)}"##
+                if isNotLegacy {
+                    ##""\##(name)": { "content": \##(value)}"##
+                } else {
+                    ##""\##(name)": { "background": "#000000FF", "content": \##(value)}"##
+                }
             }
-        }.joined(separator: ",")
+        }.joined(separator: ",\n")
 
-        var script = script ?? ""
-        if let startScreenName {
-            script += Schema.LegacyScripts.legacyOpenDefaultScreen(screenId: startScreenName)
+        if isNotLegacy {
+            result.append(##""screens": {\##(screens)}"##)
+        } else {
+            result.append(##""styles": {\##(screens)}"##)
         }
 
-        guard let encodedScript = try String(data: JSONEncoder().encode(script), encoding: .utf8) else {
-            throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Script Corrupted"))
+        if isNotLegacy {
+            var script = script ?? ""
+            if let startScreenName {
+                script += Schema.LegacyScripts.legacyOpenDefaultScreen(screenId: startScreenName)
+            }
+
+            guard let encodedScript = try String(data: JSONEncoder().encode(script), encoding: .utf8) else {
+                throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Script Corrupted"))
+            }
+
+            result.append(##""script": \##(encodedScript)"##)
         }
 
-        return ##"""
-        \##(main),
-        \##(templates)
-        "navigators": {\##(navigators)},
-        "screens": {\##(screens)},
-        "script": \##(encodedScript)
-        }
-        """##
+        return result.joined(separator: ",\n") + "\n}"
     }
 }
