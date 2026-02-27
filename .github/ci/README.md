@@ -4,7 +4,7 @@ This folder contains the source-of-truth config for the reusable CI workflow:
 
 - Workflow: `.github/workflows/ci-adaptyrecipes.yml`
 - Config: `.github/ci/demo-build-config.json`
-- Demo log validator: `scripts/ci/validate_demo_build.sh`
+- Build/test log validator: `scripts/ci/validate_demo_build.sh`
 
 ## What Runs Automatically
 
@@ -16,7 +16,7 @@ This folder contains the source-of-truth config for the reusable CI workflow:
 
 - Demo matrix jobs try to select configured Xcode with `setup-xcode`
 - If Xcode is unavailable:
-  - `informational: true` entry is marked as skipped with warning
+  - `informational: true` entry finishes successfully with warning and no build/test step execution
   - `informational: false` entry fails the job
 - SDK tests job fails when configured SDK-test Xcode is unavailable
 
@@ -43,6 +43,7 @@ Inputs:
 
 At least one of `run_demo_builds` / `run_sdk_tests` must be `true`.
 `matrix_override_json` is a workflow input field in GitHub Actions UI (not a file).
+`matrix_override_json` cannot be an empty array (`[]`); it must contain at least one matrix entry.
 Matrix entries must be unique by `runner + xcode` pair.
 Manual overrides are applied only to enabled jobs:
 - build overrides are applied only when `run_demo_builds=true`
