@@ -266,9 +266,7 @@ jobs:
           const defaultIgnoredTestErrors = runTests
             ? validateIgnoredErrors(config.ignored_test_error_messages, "ignored_test_error_messages")
             : [];
-          const sdkTests = runTests
-            ? validateSdkTests(config.sdk_tests)
-            : { runner: "", xcode: "" };
+          const sdkTests = validateSdkTests(config.sdk_tests);
 
           let effectiveMatrix = defaultMatrix;
           let effectiveIgnoredErrors = defaultIgnoredErrors;

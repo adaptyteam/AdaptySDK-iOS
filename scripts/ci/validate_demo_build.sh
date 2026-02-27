@@ -20,11 +20,19 @@ ignored_json=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --log)
-      log_path="${2:-}"
+      if [[ $# -lt 2 ]]; then
+        echo "Error: --log requires an argument" >&2
+        exit 1
+      fi
+      log_path="$2"
       shift 2
       ;;
     --ignored-json)
-      ignored_json="${2:-}"
+      if [[ $# -lt 2 ]]; then
+        echo "Error: --ignored-json requires an argument" >&2
+        exit 1
+      fi
+      ignored_json="$2"
       shift 2
       ;;
     -h|--help)
@@ -228,7 +236,7 @@ if (unexpected.length > 0) {
   process.exit(1);
 }
 
-console.log("Command failed only with ignored errors:");
+console.log("::warning::Command failed but only contained known/ignored errors.");
 for (const entry of relevantErrors) {
   console.log(`- ${formatError(entry)}`);
 }
