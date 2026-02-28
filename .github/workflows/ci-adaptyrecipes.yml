@@ -30,11 +30,6 @@ on:
         type: string
         required: false
         default: ''
-      ignored_errors_override_json:
-        description: 'Optional ignored errors override (JSON array of rules: string or {message,file?,line?})'
-        type: string
-        required: false
-        default: ''
       ignored_test_errors_override_json:
         description: 'Optional ignored test errors override (JSON array of rules: string or {message,file?,line?})'
         type: string
@@ -57,20 +52,20 @@ jobs:
       run_builds: ${{ steps.prepare.outputs.run_builds }}
       run_tests: ${{ steps.prepare.outputs.run_tests }}
       matrix_json: ${{ steps.prepare.outputs.matrix_json }}
-      ignored_errors_json: ${{ steps.prepare.outputs.ignored_errors_json }}
+      sdk_tests_matrix_json: ${{ steps.prepare.outputs.sdk_tests_matrix_json }}
       ignored_test_errors_json: ${{ steps.prepare.outputs.ignored_test_errors_json }}
       sdk_runner: ${{ steps.prepare.outputs.sdk_runner }}
       sdk_xcode: ${{ steps.prepare.outputs.sdk_xcode }}
     steps:
       - name: Checkout push ref
         if: ${{ github.event_name == 'push' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ github.sha }}
 
       - name: Checkout non-push ref
         if: ${{ github.event_name != 'push' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ github.ref }}
 
@@ -81,7 +76,6 @@ jobs:
           INPUT_RUN_DEMO_BUILDS: ${{ github.event.inputs.run_demo_builds }}
           INPUT_RUN_SDK_TESTS: ${{ github.event.inputs.run_sdk_tests }}
           INPUT_MATRIX_OVERRIDE_JSON: ${{ github.event.inputs.matrix_override_json }}
-          INPUT_IGNORED_ERRORS_OVERRIDE_JSON: ${{ github.event.inputs.ignored_errors_override_json }}
           INPUT_IGNORED_TEST_ERRORS_OVERRIDE_JSON: ${{ github.event.inputs.ignored_test_errors_override_json }}
         shell: bash
         run: |
@@ -202,6 +196,15 @@ jobs:
             });
           };
 
+          const validateDemoIgnoredErrors = (list, label) => {
+            if (!Array.isArray(list)) {
+              fail(`${label} must be a JSON array.`);
+            }
+            if (list.length !== 0) {
+              fail(`${label} must be [] because demo builds no longer support ignored build errors.`);
+            }
+          };
+
           const validateSdkTests = (config) => {
             if (!config || typeof config !== "object" || Array.isArray(config)) {
               fail("sdk_tests must be an object.");
@@ -236,6 +239,8 @@ jobs:
             fail(`Unsupported schema_version '${config.schema_version}' in ${configPath}. Expected 1.`);
           }
 
+          validateDemoIgnoredErrors(config.ignored_error_messages, "ignored_error_messages");
+
           const eventName = process.env.EVENT_NAME;
           let runBuilds;
           let runTests;
@@ -260,8 +265,8 @@ jobs:
           const defaultMatrix = runBuilds
             ? validateMatrix(config.build_matrix, "build_matrix")
             : [];
-          const defaultIgnoredErrors = runBuilds
-            ? validateIgnoredErrors(config.ignored_error_messages, "ignored_error_messages")
+          const defaultSdkTestsMatrix = runTests
+            ? validateMatrix(config.sdk_tests_matrix, "sdk_tests_matrix")
             : [];
           const defaultIgnoredTestErrors = runTests
             ? validateIgnoredErrors(config.ignored_test_error_messages, "ignored_test_error_messages")
@@ -269,7 +274,7 @@ jobs:
           const sdkTests = validateSdkTests(config.sdk_tests);
 
           let effectiveMatrix = defaultMatrix;
-          let effectiveIgnoredErrors = defaultIgnoredErrors;
+          let effectiveSdkTestsMatrix = defaultSdkTestsMatrix;
           let effectiveIgnoredTestErrors = defaultIgnoredTestErrors;
 
           if (eventName === "workflow_dispatch") {
@@ -285,12 +290,6 @@ jobs:
                   }
                 }
                 effectiveMatrix = validateMatrix(parsed, "matrix_override_json");
-              }
-
-              const ignoredOverrideRaw = (process.env.INPUT_IGNORED_ERRORS_OVERRIDE_JSON || "").trim();
-              if (ignoredOverrideRaw !== "") {
-                const parsed = parseJson(ignoredOverrideRaw, "ignored_errors_override_json");
-                effectiveIgnoredErrors = validateIgnoredErrors(parsed, "ignored_errors_override_json");
               }
             }
 
@@ -313,7 +312,7 @@ jobs:
           setOutput("run_builds", String(runBuilds));
           setOutput("run_tests", String(runTests));
           setOutput("matrix_json", JSON.stringify({ include: effectiveMatrix }));
-          setOutput("ignored_errors_json", JSON.stringify(effectiveIgnoredErrors));
+          setOutput("sdk_tests_matrix_json", JSON.stringify({ include: effectiveSdkTestsMatrix }));
           setOutput("ignored_test_errors_json", JSON.stringify(effectiveIgnoredTestErrors));
           setOutput("sdk_runner", sdkTests.runner);
           setOutput("sdk_xcode", sdkTests.xcode);
@@ -324,7 +323,7 @@ jobs:
     needs: prepare_config
     if: ${{ needs.prepare_config.outputs.run_builds == 'true' }}
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     continue-on-error: ${{ matrix.informational }}
     strategy:
       fail-fast: false
@@ -332,19 +331,19 @@ jobs:
     steps:
       - name: Checkout push ref
         if: ${{ github.event_name == 'push' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ github.sha }}
 
       - name: Checkout non-push ref
         if: ${{ github.event_name != 'push' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ github.ref }}
 
       - name: Select Xcode
         id: setup_xcode
-        uses: maxim-lobanov/setup-xcode@v1
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
         continue-on-error: true
         with:
           xcode-version: ${{ matrix.xcode }}
@@ -369,14 +368,89 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Build demo app
-        id: build
+      - name: Resolve package dependencies
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: swift package resolve
+
+      - name: Build SDK library targets (SwiftPM)
         if: ${{ steps.setup_xcode.outcome == 'success' }}
         shell: bash
         run: |
-          set +e
-          set -o pipefail
+          set -euo pipefail
+          targets=()
+          while IFS= read -r target; do
+            if [[ -n "${target}" ]]; then
+              targets+=("${target}")
+            fi
+          done < <(
+            swift package dump-package | ruby -rjson -e '
+              package = JSON.parse(STDIN.read)
+              library_products = package.fetch("products").select do |product|
+                product.is_a?(Hash) && product.dig("type", "library")
+              end
 
+              if library_products.empty?
+                abort("No SwiftPM library products found in Package.swift.")
+              end
+
+              library_targets = library_products.flat_map do |product|
+                targets = product["targets"]
+                targets.is_a?(Array) ? targets : []
+              end
+
+              if library_targets.empty?
+                abort("No SwiftPM library targets found in Package.swift products.")
+              end
+
+              library_targets.uniq.each do |target|
+                puts target
+              end
+            '
+          )
+
+          if [[ "${#targets[@]}" -eq 0 ]]; then
+            echo "No SwiftPM library targets found in Package.swift."
+            exit 1
+          fi
+
+          : > swift-build-products.log
+
+          for target in "${targets[@]}"; do
+            echo "=== Building SwiftPM target: ${target} ===" | tee -a swift-build-products.log
+            swift build --target "$target" 2>&1 | tee -a swift-build-products.log
+          done
+
+      - name: Build SDK package for iOS (xcodebuild)
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          echo "=== Building iOS package scheme: Adapty-Package ===" | tee -a swift-build-products.log
+          xcodebuild \
+            -scheme Adapty-Package \
+            -configuration Debug \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee -a swift-build-products.log
+
+      - name: Prepare demo constants for CI
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          app_constants="Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI/Application/AppConstants.swift"
+
+          sed -i '' 's/#error("Change this constant with your own API key, then remove this line.")/\/\/ CI override: removed compile-time guard for demo build/' "$app_constants"
+          sed -i '' 's/static let adaptyApiKey = "YOUR_API_KEY"/static let adaptyApiKey = "ci_dummy_api_key"/' "$app_constants"
+          sed -i '' 's/#error("Change this constant with the desired placement ID, then remove this line.")/\/\/ CI override: removed compile-time guard for demo build/' "$app_constants"
+          sed -i '' 's/static let placementId = "YOUR_PLACEMENT_ID"/static let placementId = "ci_dummy_placement_id"/' "$app_constants"
+
+      - name: Build demo app
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
           xcodebuild \
             -project Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI.xcodeproj \
             -scheme AdaptyRecipes-SwiftUI \
@@ -385,61 +459,229 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             build 2>&1 | tee xcodebuild.log
 
-          exit_code=${PIPESTATUS[0]}
-          set -e
-
-          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
-          echo "xcodebuild_exit_code=$exit_code"
-
-      - name: Validate build failure against ignored errors
-        if: ${{ steps.build.outcome == 'success' && steps.build.outputs.exit_code != '0' }}
-        env:
-          IGNORED_ERRORS_JSON: ${{ needs.prepare_config.outputs.ignored_errors_json }}
-        shell: bash
-        run: |
-          bash scripts/ci/validate_demo_build.sh \
-            --log xcodebuild.log \
-            --ignored-json "$IGNORED_ERRORS_JSON"
-
       - name: Upload demo build log
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: demo-build-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}
           path: xcodebuild.log
           if-no-files-found: ignore
 
-  sdk_tests:
-    name: SDK tests
+      - name: Upload swift build products log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: swift-build-products-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}
+          path: swift-build-products.log
+          if-no-files-found: ignore
+
+  macos_sdk_build:
+    name: SDK macOS build
     needs: prepare_config
-    if: ${{ needs.prepare_config.outputs.run_tests == 'true' }}
+    if: ${{ needs.prepare_config.outputs.run_builds == 'true' }}
     runs-on: ${{ needs.prepare_config.outputs.sdk_runner }}
     timeout-minutes: 20
     steps:
       - name: Checkout push ref
         if: ${{ github.event_name == 'push' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ github.sha }}
 
       - name: Checkout non-push ref
         if: ${{ github.event_name != 'push' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           ref: ${{ github.ref }}
 
       - name: Select Xcode
         id: setup_xcode
-        uses: maxim-lobanov/setup-xcode@v1
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
         continue-on-error: true
         with:
           xcode-version: ${{ needs.prepare_config.outputs.sdk_xcode }}
 
-      - name: Fail when SDK test Xcode version is unavailable
+      - name: Fail when macOS build Xcode version is unavailable
         if: ${{ steps.setup_xcode.outcome == 'failure' }}
         shell: bash
         run: |
           echo "::error::Xcode ${{ needs.prepare_config.outputs.sdk_xcode }} is unavailable on ${{ needs.prepare_config.outputs.sdk_runner }}."
+          exit 1
+
+      - name: Print toolchain versions
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Resolve dependencies
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: swift package resolve
+
+      - name: Build SDK library targets for macOS 11 (SwiftPM)
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          targets=()
+          while IFS= read -r target; do
+            if [[ -n "${target}" ]]; then
+              targets+=("${target}")
+            fi
+          done < <(
+            swift package dump-package | ruby -rjson -e '
+              package = JSON.parse(STDIN.read)
+              library_products = package.fetch("products").select do |product|
+                product.is_a?(Hash) && product.dig("type", "library")
+              end
+
+              if library_products.empty?
+                abort("No SwiftPM library products found in Package.swift.")
+              end
+
+              library_targets = library_products.flat_map do |product|
+                targets = product["targets"]
+                targets.is_a?(Array) ? targets : []
+              end
+
+              if library_targets.empty?
+                abort("No SwiftPM library targets found in Package.swift products.")
+              end
+
+              library_targets.uniq.each do |target|
+                puts target
+              end
+            '
+          )
+
+          if [[ "${#targets[@]}" -eq 0 ]]; then
+            echo "No SwiftPM library targets found in Package.swift."
+            exit 1
+          fi
+
+          : > swift-build-macos.log
+
+          for target in "${targets[@]}"; do
+            echo "=== Building macOS target: ${target} ===" | tee -a swift-build-macos.log
+            swift build --triple arm64-apple-macosx11.0 --target "$target" 2>&1 | tee -a swift-build-macos.log
+          done
+
+      - name: Upload macOS swift build log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: swift-build-macos-log-xcode-${{ needs.prepare_config.outputs.sdk_xcode }}
+          path: swift-build-macos.log
+          if-no-files-found: ignore
+
+  cocoapods_lint:
+    name: CocoaPods lint
+    needs: prepare_config
+    if: ${{ needs.prepare_config.outputs.run_builds == 'true' }}
+    runs-on: ${{ needs.prepare_config.outputs.sdk_runner }}
+    timeout-minutes: 25
+    steps:
+      - name: Checkout push ref
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Checkout non-push ref
+        if: ${{ github.event_name != 'push' }}
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Select Xcode
+        id: setup_xcode
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+        continue-on-error: true
+        with:
+          xcode-version: ${{ needs.prepare_config.outputs.sdk_xcode }}
+
+      - name: Fail when CocoaPods lint Xcode version is unavailable
+        if: ${{ steps.setup_xcode.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo "::error::Xcode ${{ needs.prepare_config.outputs.sdk_xcode }} is unavailable on ${{ needs.prepare_config.outputs.sdk_runner }}."
+          exit 1
+
+      - name: Print toolchain versions
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+          pod --version
+
+      - name: Run pod lib lint (published podspecs)
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          : > pod-lib-lint.log
+
+          pod lib lint \
+            Adapty.podspec \
+            AdaptyUI.podspec \
+            AdaptyPlugin.podspec \
+            --allow-warnings \
+            --skip-tests \
+            --include-podspecs=Adapty.podspec,AdaptyUI.podspec,AdaptyPlugin.podspec,AdaptyLogger.podspec,AdaptyUIBuilder.podspec \
+            2>&1 | tee -a pod-lib-lint.log
+
+      - name: Upload pod lib lint log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pod-lib-lint-log-xcode-${{ needs.prepare_config.outputs.sdk_xcode }}
+          path: pod-lib-lint.log
+          if-no-files-found: ignore
+
+  sdk_tests:
+    name: SDK tests (Xcode ${{ matrix.xcode }})
+    needs: prepare_config
+    if: ${{ needs.prepare_config.outputs.run_tests == 'true' }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    continue-on-error: ${{ matrix.informational }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare_config.outputs.sdk_tests_matrix_json) }}
+    steps:
+      - name: Checkout push ref
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Checkout non-push ref
+        if: ${{ github.event_name != 'push' }}
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Select Xcode
+        id: setup_xcode
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+        continue-on-error: true
+        with:
+          xcode-version: ${{ matrix.xcode }}
+
+      - name: Handle unavailable Xcode for informational test matrix entry
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational }}
+        shell: bash
+        run: |
+          echo "::warning::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}. Skipping informational test run."
+
+      - name: Fail when required SDK test Xcode version is unavailable
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational == false }}
+        shell: bash
+        run: |
+          echo "::error::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}."
           exit 1
 
       - name: Print toolchain versions
@@ -482,8 +724,8 @@ jobs:
 
       - name: Upload swift test log
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: sdk-tests-log
+          name: sdk-tests-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}
           path: swift-test.log
           if-no-files-found: ignore

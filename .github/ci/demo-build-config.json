@@ -18,22 +18,11 @@
     },
     {
       "runner": "macos-15",
-      "xcode": "16.1",
+      "xcode": "16.0",
       "informational": false
     }
   ],
-  "ignored_error_messages": [
-    {
-      "message": "Change this constant with your own API key, then remove this line.",
-      "file": "Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI/Application/AppConstants.swift",
-      "line": 13
-    },
-    {
-      "message": "Change this constant with the desired placement ID, then remove this line.",
-      "file": "Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI/Application/AppConstants.swift",
-      "line": 16
-    }
-  ],
+  "ignored_error_messages": [],
   "ignored_test_error_messages": [
     {
       "message": "extra argument 'profileId' in call",
@@ -49,5 +38,17 @@
   "sdk_tests": {
     "runner": "macos-15",
     "xcode": "26.2"
-  }
+  },
+  "sdk_tests_matrix": [
+    {
+      "runner": "macos-15",
+      "xcode": "26.2",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "16.0",
+      "informational": false
+    }
+  ]
 }
