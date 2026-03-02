@@ -13,14 +13,14 @@ import Foundation
 package final class AdaptyUIEventsHandler {
     let logId: String
 
-    var didAppear: (() -> Void)?
-    var didDisappear: (() -> Void)?
+    package var didAppear: (() -> Void)?
+    package var didDisappear: (() -> Void)?
 
-    var didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
-    var didSelectProduct: ((ProductResolver) -> Void)?
-    var didStartPurchase: ((ProductResolver) -> Void)?
-    var didStartRestore: (() -> Void)?
-    var didFailRendering: ((AdaptyUIBuilderError) -> Void)?
+    package var didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
+    package var didSelectProduct: ((ProductResolver) -> Void)?
+    package var didStartPurchase: ((ProductResolver) -> Void)?
+    package var didStartRestore: (() -> Void)?
+    package var didFailRendering: ((AdaptyUIBuilderError) -> Void)?
 
     package init(logId: String) {
         self.logId = logId
@@ -31,37 +31,37 @@ package final class AdaptyUIEventsHandler {
         self.didFailRendering = nil
     }
 
-    func event_viewDidAppear() {
+    package func event_viewDidAppear() {
         Log.app.verbose("#\(logId)# event_didAppear")
         didAppear?()
     }
 
-    func event_viewDidDisappear() {
+    package func event_viewDidDisappear() {
         Log.app.verbose("#\(logId)# event_didDisappear")
         didDisappear?()
     }
 
-    func event_didPerformAction(_ action: AdaptyUIBuilder.Action) {
+    package func event_didPerformAction(_ action: AdaptyUIBuilder.Action) {
         Log.app.verbose("#\(logId)# event_didPerformAction: \(action)")
         didPerformAction?(action)
     }
 
-    func event_didSelectProduct(_ product: ProductResolver, automatic: Bool) {
+    package func event_didSelectProduct(_ product: ProductResolver, automatic: Bool) {
         Log.app.verbose("#\(logId)# event_didSelectProduct: \(product.adaptyProductId) automatic: \(automatic)")
         didSelectProduct?(product)
     }
 
-    func event_didStartPurchase(product: ProductResolver) {
+    package func event_didStartPurchase(product: ProductResolver) {
         Log.app.verbose("#\(logId)# event_didStartPurchase")
         didStartPurchase?(product)
     }
 
-    func event_didStartRestore() {
+    package func event_didStartRestore() {
         Log.app.verbose("#\(logId)# event_didStartRestore")
         didStartRestore?()
     }
 
-    func event_didFailRendering(with error: AdaptyUIBuilderError) {
+    package func event_didFailRendering(with error: AdaptyUIBuilderError) {
         Log.app.error("#\(logId)# event_didFailRendering: \(error)")
         didFailRendering?(error)
     }

@@ -11,11 +11,24 @@ import AdaptyUIBuilder
 import Foundation
 
 struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
+    let logId: String
+    let events: AdaptyUIEventsHandler
+    
+    init(
+        logId: String,
+        events: AdaptyUIEventsHandler
+    ) {
+        self.logId = logId
+        self.events = events
+    }
+    
     func reportViewDidAppear() {}
 
     func reportViewDidDisappear() {}
 
-    func reportDidPerformAction(_ action: AdaptyUIBuilder.Action) {}
+    func reportDidPerformAction(_ action: AdaptyUIBuilder.Action) {
+        events.event_didPerformAction(action)
+    }
 
     func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {}
 
