@@ -227,9 +227,11 @@ extension VS.JSState {
             }
         }
 
+//        let before = self.debug(path: "", filter: .withoutFunction)
         let parent = try findObject(path: path.dropLast(), createIfNeeded: true)
 
-        parent.setObject(value, forKeyedSubscript: name as NSString)
+        parent.setValue(value.toJSValue(in: context), forProperty: name as NSString)
+//        let after = self.debug(path: "", filter: .withoutFunction)
         log.debug("set variable \(path.joined(separator: ".")) = \(value)")
         objectWillChange.send()
     }
