@@ -63,7 +63,7 @@ extension Schema.Section: DecodableWithConfiguration {
 
         try self.init(
             index: .init(
-                path: ["Legacy", "sections", sectionId, "index"],
+                path: ["Legacy", "sections", sectionId],
                 setter: nil,
                 scope: .global,
                 converter: nil
