@@ -32,7 +32,7 @@ extension Schema.Variable.Converter: Codable {
 
             switch params {
             case .object(let object):
-                guard let value = object["value"]?.asOptional else {
+                guard let value = object["value"], value != .null else {
                     throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.params], debugDescription: "Not found `value` key"))
                 }
 
