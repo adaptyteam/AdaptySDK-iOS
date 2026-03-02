@@ -103,7 +103,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         case slider
         case timer
         case `if`
-        case legacyReference
+        case legacyReference = "reference"
         case pager
         case screenHolder = "screen_holder"
     }
