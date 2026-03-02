@@ -44,12 +44,12 @@ private extension SchemaTests {
             ),
             // Variable reference — dotted path
             (
-                .variable(Variable(path: ["some", "path"], setter: nil, scope: .screen)),
+                .variable(Variable(path: ["some", "path"], setter: nil, scope: .screen, converter: nil)),
                 Json(##"{"var":"some.path"}"##)
             ),
             // Variable reference — single segment
             (
-                .variable(Variable(path: ["color"], setter: nil, scope: .screen)),
+                .variable(Variable(path: ["color"], setter: nil, scope: .screen, converter: nil)),
                 Json(##"{"var":"color"}"##)
             ),
         ]

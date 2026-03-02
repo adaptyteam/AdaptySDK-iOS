@@ -21,7 +21,8 @@ extension Schema.Variable.Converter: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let name = try container.decode(String.self, forKey: .name)
-        let params = try container.decodeIfPresent(VC.Parameter.self, forKey: .params)?.asOptional
+        var params = try container.decodeIfPresent(VC.Parameter.self, forKey: .params)
+        if case .null = params  { params = nil }
 
         switch Names(rawValue: name) {
         case .isEqual:

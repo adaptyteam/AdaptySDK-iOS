@@ -9,7 +9,7 @@
 import Foundation
 import Testing
 
-private extension SchemaTests {
+extension SchemaTests {
     @Suite("Schema.Variable Tests")
     struct VariableTests {
         typealias Value = Schema.Variable
@@ -19,22 +19,22 @@ private extension SchemaTests {
         static let jsonCases: [(value: Value, json: Json)] = [
             // Minimal — single path segment, defaults
             (
-                Value(path: ["name"], setter: nil, scope: .screen),
+                Value(path: ["name"], setter: nil, scope: .screen, converter: nil),
                 Json(##"{"var":"name"}"##)
             ),
             // Dotted path
             (
-                Value(path: ["user", "name"], setter: nil, scope: .screen),
+                Value(path: ["user", "name"], setter: nil, scope: .screen, converter: nil),
                 Json(##"{"var":"user.name"}"##)
             ),
             // Deep dotted path
             (
-                Value(path: ["a", "b", "c", "d"], setter: nil, scope: .screen),
+                Value(path: ["a", "b", "c", "d"], setter: nil, scope: .screen, converter: nil),
                 Json(##"{"var":"a.b.c.d"}"##)
             ),
             // With setter
             (
-                Value(path: ["count"], setter: "setCount", scope: .screen),
+                Value(path: ["count"], setter: "setCount", scope: .screen, converter: nil),
                 Json(##"""
                 {
                     "var": "count",
@@ -42,9 +42,20 @@ private extension SchemaTests {
                 }
                 """##)
             ),
+            // With converter
+            (
+                Value(path: ["section"], setter: nil, scope: .screen, converter: .isEqual(.int32(5), falseValue: nil)),
+                Json(##"""
+                {
+                    "var": "section",
+                    "converter": "is_equal",
+                    "converter_params": 5
+                }
+                """##)
+            ),
             // With scope global
             (
-                Value(path: ["theme"], setter: nil, scope: .global),
+                Value(path: ["theme"], setter: nil, scope: .global, converter: nil),
                 Json(##"""
                 {
                     "var": "theme",
@@ -54,7 +65,7 @@ private extension SchemaTests {
             ),
             // With scope screen (explicit)
             (
-                Value(path: ["visible"], setter: nil, scope: .screen),
+                Value(path: ["visible"], setter: nil, scope: .screen, converter: nil),
                 Json(##"""
                 {
                     "var": "visible",
@@ -64,12 +75,14 @@ private extension SchemaTests {
             ),
             // Full — all fields
             (
-                Value(path: ["data", "count"], setter: "setCount", scope: .global),
+                Value(path: ["data", "count"], setter: "setCount", scope: .global, converter: .unknown("to_string", .bool(true))),
                 Json(##"""
                 {
                     "var": "data.count",
                     "setter": "setCount",
-                    "scope": "global"
+                    "scope": "global",
+                    "converter": "to_string",
+                    "converter_params": true
                 }
                 """##)
             ),

@@ -1,5 +1,5 @@
 //
-//  Schema.Action.ParameterTests.swift
+//  Schema.ParameterTests.swift
 //  AdaptyTests
 //
 //  Created by Aleksei Valiano on2026-02-05.
@@ -9,10 +9,10 @@
 import Foundation
 import Testing
 
-private extension SchemaTests.ActionTests {
-    @Suite("Schema.Action.Parameter Tests")
+private extension SchemaTests {
+    @Suite("Schema.Parameter Tests")
     struct ParameterTests {
-        typealias Value = Schema.Action.Parameter
+        typealias Value = Schema.Parameter
 
         // MARK: - Test Data
 
@@ -124,7 +124,7 @@ private extension SchemaTests.ActionTests {
 
         // MARK: - Encoding Tests
 
-        private func reqursiveExpect(_ value: Value, _ deserilized: Any) throws {
+        func reqursiveExpect(_ value: Value, _ deserilized: Any) throws {
             switch value {
             case .null:
                 #expect(deserilized is NSNull)

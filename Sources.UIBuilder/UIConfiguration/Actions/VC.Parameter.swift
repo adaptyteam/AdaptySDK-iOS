@@ -18,10 +18,3 @@ extension VC {
         case object([String: Self])
     }
 }
-
-extension VC.Parameter {
-    var asOptional: Self? {
-        guard case .null = self else { return nil }
-        return self
-    }
-}

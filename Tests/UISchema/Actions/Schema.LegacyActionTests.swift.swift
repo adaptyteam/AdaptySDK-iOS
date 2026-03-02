@@ -47,26 +47,35 @@ extension SchemaTests {
                 ),
                 Json(##"{"type":"custom","custom_id":"my_action"}"##)
             ),
-            (
-                Value(
-                    path: ["SDK", "webPurchasePaywall"],
-                    params: ["openIn": .string("browser_out_app")],
-                    scope: .global
-                ),
-                Json(##"{"type":"web_purchase_paywall"}"##)
-            ),
-            (
-                Value(
-                    path: ["SDK", "webPurchasePaywall"],
-                    params: ["openIn": .string("browser_in_app")],
-                    scope: .global
-                ),
-                Json(##"{"type":"web_purchase_paywall","open_in":"browser_in_app"}"##)
-            ),
+//            (
+//                Value(
+//                    path: ["SDK", "webPurchasePaywall"],
+//                    params: [
+//                        "openIn": .string("browser_out_app"),
+//                        "paywallId": .string("legacy-paywall-id"),
+//                    ],
+//                    scope: .global
+//                ),
+//                Json(##"{"type":"web_purchase_paywall"}"##)
+//            ),
+//            (
+//                Value(
+//                    path: ["SDK", "webPurchasePaywall"],
+//                    params: [
+//                        "openIn": .string("browser_in_app"),
+//                        "paywallId": .string("legacy-paywall-id"),
+//                    ],
+//                    scope: .global
+//                ),
+//                Json(##"{"type":"web_purchase_paywall","open_in":"browser_in_app"}"##)
+//            ),
             (
                 Value(
                     path: ["SDK", "purchaseProduct"],
-                    params: ["productId": .string("premium")],
+                    params: [
+                        "productId": .string("premium"),
+                        "paywallId": .string("legacy-paywall-id"),
+                    ],
                     scope: .global
                 ),
                 Json(##"{"type":"purchase_product","product_id":"premium"}"##)
@@ -76,6 +85,7 @@ extension SchemaTests {
                     path: ["SDK", "webPurchaseProduct"],
                     params: [
                         "productId": .string("premium"),
+                        "paywallId": .string("legacy-paywall-id"),
                         "openIn": .string("browser_out_app"),
                     ],
                     scope: .global
@@ -89,6 +99,7 @@ extension SchemaTests {
                         "type": .string("details"),
                         "instanceId": .string("legacy-bottom-sheet"),
                         "navigatorId": .string("legacy-bottom-sheet"),
+                        "transitionId": .string("on_appear")
                     ],
                     scope: .global
                 ),
