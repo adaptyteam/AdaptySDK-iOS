@@ -13,7 +13,7 @@ import SwiftUI
 public extension AdaptyUI {
     @MainActor
     final class Dev_GalleryPreviewConfiguration {
-        package let eventsHandler: AdaptyEventsHandler
+        package let eventsHandler: AdaptyUIEventsHandler
 
         package let presentationViewModel: AdaptyUIPresentationViewModel
         package let stateViewModel: AdaptyUIStateViewModel
@@ -25,7 +25,7 @@ public extension AdaptyUI {
         package let screensViewModel: AdaptyUIScreensViewModel
         package let assetsViewModel: AdaptyUIAssetsViewModel
 
-        private let logic = Dev_AdaptyUILogic()
+        private let logic: AdaptyUIBuilderLogic
 
         fileprivate let logId: String
         fileprivate let observerModeResolver: AdaptyObserverModeResolver?
@@ -47,7 +47,11 @@ public extension AdaptyUI {
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
 
-            eventsHandler = AdaptyEventsHandler(logId: logId)
+            eventsHandler = AdaptyUIEventsHandler(logId: logId)
+            logic = Dev_AdaptyUILogic(
+                logId: logId,
+                events: eventsHandler
+            )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
 
@@ -101,9 +105,12 @@ public struct Dev_AdaptyUIRendererView: View {
     let viewConfiguration: AdaptyUIConfiguration
     let galleryConfiguration: AdaptyUI.Dev_GalleryPreviewConfiguration
 
+    private let didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
+
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
-        assetsResolver: AdaptyUIAssetsResolver?
+        assetsResolver: AdaptyUIAssetsResolver?,
+        didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
     ) {
         self.viewConfiguration = viewConfiguration.wrapped
         galleryConfiguration = .init(
@@ -114,10 +121,14 @@ public struct Dev_AdaptyUIRendererView: View {
             timerResolver: nil,
             assetsResolver: assetsResolver
         )
+        
+        self.didPerformAction = didPerformAction
     }
 
     public var body: some View {
-        AdaptyUIPaywallView_Internal(
+        galleryConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { _ in }
+
+        return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false
         )
         .environmentObjects(
