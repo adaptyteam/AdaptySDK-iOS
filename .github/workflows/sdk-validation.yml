@@ -374,6 +374,17 @@ jobs:
             }
           }
 
+          if (runBuildSdkTargets || runBuildTestApp) {
+            const hasPrimaryXcodeInBuildMatrix = effectiveBuildMatrix.some(
+              (entry) => entry.xcode === sdkTests.xcode
+            );
+            if (!hasPrimaryXcodeInBuildMatrix) {
+              fail(
+                `build_matrix must include primary sdk_tests.xcode '${sdkTests.xcode}' when build_sdk_targets or build_test_app is enabled.`
+              );
+            }
+          }
+
           const githubOutput = process.env.GITHUB_OUTPUT;
           if (!githubOutput) fail("GITHUB_OUTPUT is not set.");
 
@@ -490,7 +501,7 @@ jobs:
           done
 
       - name: Build SDK package for iOS (xcodebuild)
-        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        if: ${{ steps.setup_xcode.outcome == 'success' && matrix.xcode == needs.prepare_config.outputs.sdk_xcode }}
         shell: bash
         run: |
           set -euo pipefail
@@ -514,7 +525,7 @@ jobs:
   build_test_app_matrix:
     name: Test app build (Xcode ${{ matrix.xcode }})
     needs: prepare_config
-    if: ${{ needs.prepare_config.outputs.run_build_test_app == 'true' }}
+    if: ${{ needs.prepare_config.outputs.run_build_test_app == 'true' && matrix.xcode == needs.prepare_config.outputs.sdk_xcode }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     continue-on-error: ${{ matrix.informational }}

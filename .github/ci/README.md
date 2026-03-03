@@ -9,8 +9,9 @@ This folder contains the source-of-truth config for the CI workflow:
 ## What Runs Automatically
 
 - `pull_request` (`opened`, `reopened`, `synchronize`, `ready_for_review`): default PR pipeline
-  - SDK build matrix (`swift build` for all library targets + iOS package build)
-  - test app build matrix (`AdaptyRecipes-SwiftUI`)
+  - SDK target build matrix (`swift build` for all library targets)
+  - iOS package build (`Adapty-Package`) on primary Xcode (`sdk_tests.xcode`)
+  - test app build (`AdaptyRecipes-SwiftUI`) on primary Xcode (`sdk_tests.xcode`)
   - one-Xcode macOS SDK build
   - SDK tests matrix (`swift test`)
 - `workflow_dispatch`: manual run with per-step toggles and optional JSON overrides
@@ -23,12 +24,12 @@ Note: there is no automatic `push` trigger for this workflow.
 `schema_version: 2` config keys:
 
 - `build_sdk_targets` (`bool`): default enable SDK matrix build + macOS SDK build
-- `build_test_app` (`bool`): default enable test app matrix build
+- `build_test_app` (`bool`): default enable test app build on primary Xcode (`sdk_tests.xcode`)
 - `run_tests` (`bool`): default enable `swift test` matrix
 - `lint_pods` (`bool`): default disable CocoaPods lint job (can be enabled in manual runs)
 - `build_errors_whitelist` (`list`): allowlist for test app build failures only
 - `test_errors_whitelist` (`list`): allowlist for `swift test` failures
-- `build_matrix` (`list`): Xcode matrix for SDK/test-app jobs
+- `build_matrix` (`list`): Xcode matrix for SDK jobs (and for selecting primary-Xcode entry used by iOS package/test app builds)
 - `sdk_tests` (`object`): runner/Xcode for one-Xcode jobs (`macOS build`, `pod lib lint`)
 - `sdk_tests_matrix` (`list`): Xcode matrix for `swift test`
 
@@ -58,6 +59,7 @@ Boolean defaults are duplicated in two places by design:
 - If matrix entry is `informational: true` and Xcode is unavailable, that entry is skipped with warning.
 - If matrix entry is `informational: false` and Xcode is unavailable, that entry fails.
 - One-Xcode jobs (`SDK macOS build`, `CocoaPods lint` when enabled) fail when configured Xcode is unavailable.
+- iOS-specific steps (iOS package build + test app build) run only on primary Xcode (`sdk_tests.xcode`).
 - Test app build does not patch placeholders with `sed`; CI writes a dedicated `AppConstants.swift` with dummy values before `xcodebuild`.
 
 ## Manual Run Inputs (`workflow_dispatch`)
@@ -81,6 +83,7 @@ Validation rules:
 - At least one toggle must be `true`.
 - Matrix override JSON must contain at least one matrix entry.
 - Matrix entries must be unique by `runner + xcode`.
+- If `build_sdk_targets=true` or `build_test_app=true`, build matrix must include primary Xcode (`sdk_tests.xcode`).
 - Empty whitelist input means "use values from `ci-run-config.json`".
 
 ## Manual Run Guide for QA
@@ -94,7 +97,7 @@ Validation rules:
 5. In `Use workflow from`, select the branch.
 6. Configure boolean toggles:
    - `build_sdk_targets`: run SDK matrix + iOS package + macOS SDK build.
-   - `build_test_app`: run test app matrix build.
+   - `build_test_app`: run test app build on primary Xcode (`sdk_tests.xcode`).
    - `run_tests`: run `swift test` matrix.
    - `lint_pods`: run `pod lib lint`.
 7. (Optional) Fill JSON override fields:
