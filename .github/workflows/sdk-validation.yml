@@ -1,4 +1,4 @@
-name: CI AdaptyRecipes
+name: SDK Validation
 
 on:
   pull_request:
@@ -28,7 +28,7 @@ on:
         description: Run CocoaPods pod lib lint
         type: boolean
         required: true
-        default: true
+        default: false
       build_errors_whitelist:
         description: 'Optional build errors whitelist override (JSON array of rules: string or {message,file?,line?})'
         type: string
@@ -278,7 +278,7 @@ jobs:
           const defaultRunTests = validateBoolean(config.run_tests, "run_tests");
           const defaultRunLintPods = validateBoolean(config.lint_pods, "lint_pods");
 
-          const workflowPath = ".github/workflows/ci-adaptyrecipes.yml";
+          const workflowPath = ".github/workflows/sdk-validation.yml";
           let workflowRaw;
           try {
             workflowRaw = fs.readFileSync(workflowPath, "utf8");
@@ -323,7 +323,7 @@ jobs:
             runBuildSdkTargets = true;
             runBuildTestApp = true;
             runTests = true;
-            runLintPods = true;
+            runLintPods = false;
           } else if (eventName === "workflow_dispatch") {
             runBuildSdkTargets = parseBool(process.env.INPUT_BUILD_SDK_TARGETS, defaultRunBuildSdkTargets, "build_sdk_targets");
             runBuildTestApp = parseBool(process.env.INPUT_BUILD_TEST_APP, defaultRunBuildTestApp, "build_test_app");

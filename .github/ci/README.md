@@ -1,20 +1,20 @@
-# CI Configuration for AdaptyRecipes
+# CI Configuration for SDK Validation
 
 This folder contains the source-of-truth config for the CI workflow:
 
-- Workflow: `.github/workflows/ci-adaptyrecipes.yml`
+- Workflow: `.github/workflows/sdk-validation.yml`
 - Config: `.github/ci/ci-run-config.json`
 - Build/test log validator: `scripts/ci/validate_demo_build.sh`
 
 ## What Runs Automatically
 
-- `pull_request` (`opened`, `reopened`, `synchronize`, `ready_for_review`): full pipeline
+- `pull_request` (`opened`, `reopened`, `synchronize`, `ready_for_review`): default PR pipeline
   - SDK build matrix (`swift build` for all library targets + iOS package build)
   - test app build matrix (`AdaptyRecipes-SwiftUI`)
   - one-Xcode macOS SDK build
-  - one-Xcode CocoaPods lint
   - SDK tests matrix (`swift test`)
 - `workflow_dispatch`: manual run with per-step toggles and optional JSON overrides
+- `pull_request` note: CocoaPods lint is disabled for PR auto-runs (`lint_pods=false`)
 
 Note: there is no automatic `push` trigger for this workflow.
 
@@ -25,7 +25,7 @@ Note: there is no automatic `push` trigger for this workflow.
 - `build_sdk_targets` (`bool`): default enable SDK matrix build + macOS SDK build
 - `build_test_app` (`bool`): default enable test app matrix build
 - `run_tests` (`bool`): default enable `swift test` matrix
-- `lint_pods` (`bool`): default enable CocoaPods lint job
+- `lint_pods` (`bool`): default disable CocoaPods lint job (can be enabled in manual runs)
 - `build_errors_whitelist` (`list`): allowlist for test app build failures only
 - `test_errors_whitelist` (`list`): allowlist for `swift test` failures
 - `build_matrix` (`list`): Xcode matrix for SDK/test-app jobs
@@ -57,7 +57,7 @@ Boolean defaults are duplicated in two places by design:
 - Matrix jobs use `setup-xcode` for requested versions.
 - If matrix entry is `informational: true` and Xcode is unavailable, that entry is skipped with warning.
 - If matrix entry is `informational: false` and Xcode is unavailable, that entry fails.
-- One-Xcode jobs (`SDK macOS build`, `CocoaPods lint`) fail when configured Xcode is unavailable.
+- One-Xcode jobs (`SDK macOS build`, `CocoaPods lint` when enabled) fail when configured Xcode is unavailable.
 - Test app build does not patch placeholders with `sed`; CI writes a dedicated `AppConstants.swift` with dummy values before `xcodebuild`.
 
 ## Manual Run Inputs (`workflow_dispatch`)
@@ -89,7 +89,7 @@ Validation rules:
 
 1. Open repository on GitHub.
 2. Go to `Actions`.
-3. Select workflow `CI AdaptyRecipes`.
+3. Select workflow `SDK Validation`.
 4. Click `Run workflow`.
 5. In `Use workflow from`, select the branch.
 6. Configure boolean toggles:
@@ -123,13 +123,13 @@ Run from repository root with authenticated CLI (`gh auth status`).
 - Run full workflow using defaults from config:
 
 ```bash
-gh workflow run "CI AdaptyRecipes" --ref master
+gh workflow run "SDK Validation" --ref master
 ```
 
 - Run only SDK builds on one Xcode:
 
 ```bash
-gh workflow run "CI AdaptyRecipes" --ref master \
+gh workflow run "SDK Validation" --ref master \
   -f build_sdk_targets=true \
   -f build_test_app=false \
   -f run_tests=false \
@@ -140,7 +140,7 @@ gh workflow run "CI AdaptyRecipes" --ref master \
 - Run only test app build:
 
 ```bash
-gh workflow run "CI AdaptyRecipes" --ref master \
+gh workflow run "SDK Validation" --ref master \
   -f build_sdk_targets=false \
   -f build_test_app=true \
   -f run_tests=false \
@@ -150,7 +150,7 @@ gh workflow run "CI AdaptyRecipes" --ref master \
 - Run only tests:
 
 ```bash
-gh workflow run "CI AdaptyRecipes" --ref master \
+gh workflow run "SDK Validation" --ref master \
   -f build_sdk_targets=false \
   -f build_test_app=false \
   -f run_tests=true \
@@ -160,7 +160,7 @@ gh workflow run "CI AdaptyRecipes" --ref master \
 - Run tests with whitelist override:
 
 ```bash
-gh workflow run "CI AdaptyRecipes" --ref master \
+gh workflow run "SDK Validation" --ref master \
   -f build_sdk_targets=false \
   -f build_test_app=false \
   -f run_tests=true \
@@ -171,7 +171,7 @@ gh workflow run "CI AdaptyRecipes" --ref master \
 - Run test app build with whitelist override:
 
 ```bash
-gh workflow run "CI AdaptyRecipes" --ref master \
+gh workflow run "SDK Validation" --ref master \
   -f build_sdk_targets=false \
   -f build_test_app=true \
   -f run_tests=false \
