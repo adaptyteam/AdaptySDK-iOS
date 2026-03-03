@@ -1,5 +1,5 @@
 {
-  "schema_version": 3,
+  "schema_version": 2,
   "build_sdk_targets": true,
   "build_test_app": true,
   "run_tests": true,
