@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "build_sdk_targets": true,
+  "build_test_app": true,
+  "run_tests": true,
+  "lint_pods": true,
+  "build_errors_whitelist": [],
+  "test_errors_whitelist": [
+    {
+      "message": "extra argument 'profileId' in call",
+      "file": "Tests/Placements/FallbackTests.swift",
+      "line": 67
+    },
+    {
+      "message": "missing arguments for parameters 'userId', 'requestLocale' in call",
+      "file": "Tests/Placements/FallbackTests.swift",
+      "line": 67
+    }
+  ],
+  "build_matrix": [
+    {
+      "runner": "macos-15",
+      "xcode": "26.2",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "16.1",
+      "informational": false
+    }
+  ],
+  "sdk_tests": {
+    "runner": "macos-15",
+    "xcode": "26.2"
+  },
+  "sdk_tests_matrix": [
+    {
+      "runner": "macos-15",
+      "xcode": "26.2",
+      "informational": false
+    }
+  ]
+}

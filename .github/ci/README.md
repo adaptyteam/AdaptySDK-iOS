@@ -1,187 +1,186 @@
 # CI Configuration for AdaptyRecipes
 
-This folder contains the source-of-truth config for the reusable CI workflow:
+This folder contains the source-of-truth config for the CI workflow:
 
 - Workflow: `.github/workflows/ci-adaptyrecipes.yml`
-- Config: `.github/ci/demo-build-config.json`
+- Config: `.github/ci/ci-run-config.json`
 - Build/test log validator: `scripts/ci/validate_demo_build.sh`
 
 ## What Runs Automatically
 
-- `push` (`master`, `release/*`): matrix job with SDK `swift build` (all library targets derived from `Package.swift` library products) + demo `xcodebuild`, plus one-Xcode macOS SDK `swift build` and one-Xcode `pod lib lint`
-- `pull_request` (`opened`, `reopened`, `synchronize`, `ready_for_review`): matrix job with SDK `swift build` (all library targets derived from `Package.swift` library products) + demo `xcodebuild`, one-Xcode macOS SDK `swift build`, one-Xcode `pod lib lint`, plus SDK `swift test` matrix
-- `workflow_dispatch`: manual selection of builds/tests, with optional JSON overrides
+- `pull_request` (`opened`, `reopened`, `synchronize`, `ready_for_review`): full pipeline
+  - SDK build matrix (`swift build` for all library targets + iOS package build)
+  - test app build matrix (`AdaptyRecipes-SwiftUI`)
+  - one-Xcode macOS SDK build
+  - one-Xcode CocoaPods lint
+  - SDK tests matrix (`swift test`)
+- `workflow_dispatch`: manual run with per-step toggles and optional JSON overrides
+
+Note: there is no automatic `push` trigger for this workflow.
+
+## Config File (`ci-run-config.json`)
+
+`schema_version: 2` config keys:
+
+- `build_sdk_targets` (`bool`): default enable SDK matrix build + macOS SDK build
+- `build_test_app` (`bool`): default enable test app matrix build
+- `run_tests` (`bool`): default enable `swift test` matrix
+- `lint_pods` (`bool`): default enable CocoaPods lint job
+- `build_errors_whitelist` (`list`): allowlist for test app build failures only
+- `test_errors_whitelist` (`list`): allowlist for `swift test` failures
+- `build_matrix` (`list`): Xcode matrix for SDK/test-app jobs
+- `sdk_tests` (`object`): runner/Xcode for one-Xcode jobs (`macOS build`, `pod lib lint`)
+- `sdk_tests_matrix` (`list`): Xcode matrix for `swift test`
+
+Whitelist rule format:
+
+- string message
+- object `{ "message": string, "file"?: string, "line"?: number }`
+
+Matching rules:
+
+- `message` exact match
+- `file` exact path or suffix path match
+- `line` exact match (allowed only with `file`)
+
+## Input Defaults Sync Rule
+
+Boolean defaults are duplicated in two places by design:
+
+- `workflow_dispatch` input defaults (GitHub UI)
+- `.github/ci/ci-run-config.json` boolean values
+
+`prepare_config` validates these defaults are identical and fails CI if they diverge.
 
 ## Xcode Selection Behavior
 
-- Demo matrix jobs try to select configured Xcode with `setup-xcode`
-- If Xcode is unavailable:
-  - `informational: true` entry finishes successfully with warning and no build/test step execution
-  - `informational: false` entry fails the job
-- One-Xcode macOS SDK build uses `sdk_tests.runner` + `sdk_tests.xcode` and fails when Xcode is unavailable
-- macOS SDK build compiles all SDK library targets with `swift build --triple arm64-apple-macosx11.0`
-- One-Xcode CocoaPods lint uses `sdk_tests.runner` + `sdk_tests.xcode` and fails when Xcode is unavailable
-- CocoaPods lint checks published podspecs (`Adapty`, `AdaptyUI`, `AdaptyPlugin`) with `--allow-warnings --skip-tests`, resolving local ancillary podspecs via `--include-podspecs`
-- SDK tests run on `sdk_tests_matrix` entries:
-  - required entries (`informational: false`) fail on unavailable Xcode or test failures
-  - informational entries (`informational: true`) warn and skip when Xcode is unavailable
-  - default matrix includes `26.2` (required) and `16.0` (required)
+- Matrix jobs use `setup-xcode` for requested versions.
+- If matrix entry is `informational: true` and Xcode is unavailable, that entry is skipped with warning.
+- If matrix entry is `informational: false` and Xcode is unavailable, that entry fails.
+- One-Xcode jobs (`SDK macOS build`, `CocoaPods lint`) fail when configured Xcode is unavailable.
+- Test app build does not patch placeholders with `sed`; CI writes a dedicated `AppConstants.swift` with dummy values before `xcodebuild`.
 
-## Edit Xcode Matrix via Config File
+## Manual Run Inputs (`workflow_dispatch`)
 
-Update `.github/ci/demo-build-config.json`:
+Boolean toggles (GitHub UI pickers):
 
-- `build_matrix` controls matrix runs that compile all SDK library targets derived from `Package.swift` library products and then build the demo app
-- `sdk_tests` controls Xcode/runner for one-Xcode macOS SDK build and one-Xcode `pod lib lint`
-- `sdk_tests_matrix` controls multi-Xcode `swift test` runs
-- `ignored_error_messages` is unused for demo builds, must stay `[]`, and is validated in `prepare_config`
-- `ignored_test_error_messages` is an allowlist for accepted `swift test` failures
+- `build_sdk_targets`
+- `build_test_app`
+- `run_tests`
+- `lint_pods`
 
-## Manual Overrides (`workflow_dispatch`)
+Text JSON overrides:
 
-You can override config values for a single run without committing changes.
+- `build_errors_whitelist`: optional whitelist override for test app build
+- `test_errors_whitelist`: optional whitelist override for `swift test`
+- `build_matrix_override_json`: optional build matrix override (array or `{ "include": [...] }`)
+- `sdk_tests_matrix_override_json`: optional test matrix override (array or `{ "include": [...] }`)
 
-Inputs:
+Validation rules:
 
-- `run_demo_builds`: `true` or `false`
-- `run_sdk_tests`: `true` or `false`
-- `matrix_override_json`: optional JSON
-- `ignored_test_errors_override_json`: optional JSON
-
-At least one of `run_demo_builds` / `run_sdk_tests` must be `true`.
-`matrix_override_json` is a workflow input field in GitHub Actions UI (not a file).
-`matrix_override_json` cannot be an empty array (`[]`); it must contain at least one matrix entry.
-Matrix entries must be unique by `runner + xcode` pair.
-Manual overrides are applied only to enabled jobs:
-- build overrides are applied only when `run_demo_builds=true`
-- test ignored-errors override is applied only when `run_sdk_tests=true`
-
-### Matrix Override Examples
-
-Use a JSON array:
-
-```json
-[
-  { "runner": "macos-15", "xcode": "26.2", "informational": false }
-]
-```
-
-Or object with `include`:
-
-```json
-{
-  "include": [
-    { "runner": "macos-15", "xcode": "26.2", "informational": false },
-    { "runner": "macos-15", "xcode": "16.0", "informational": false }
-  ]
-}
-```
-
-### Ignored Test Errors Override Example
-
-```json
-[
-  {
-    "message": "extra argument 'profileId' in call",
-    "file": "Tests/Placements/FallbackTests.swift",
-    "line": 67
-  },
-  {
-    "message": "missing arguments for parameters 'userId', 'requestLocale' in call",
-    "file": "Tests/Placements/FallbackTests.swift",
-    "line": 67
-  }
-]
-```
+- At least one toggle must be `true`.
+- Matrix override JSON must contain at least one matrix entry.
+- Matrix entries must be unique by `runner + xcode`.
+- Empty whitelist input means "use values from `ci-run-config.json`".
 
 ## Manual Run Guide for QA
 
-This section is for manual CI runs when validating a branch before merge/release.
-
 ### Run via GitHub UI (step-by-step)
 
-1. Open GitHub repository page.
+1. Open repository on GitHub.
 2. Go to `Actions`.
 3. Select workflow `CI AdaptyRecipes`.
 4. Click `Run workflow`.
-5. In `Use workflow from`, pick the target branch (for example `master` or your release branch).
-6. Fill inputs:
-   - `run_demo_builds`: run matrix SDK/demo builds (`true` for regular full validation, `false` to skip builds).
-   - `run_sdk_tests`: run `swift test` matrix (`true` to run tests, `false` to skip tests).
-   - `matrix_override_json`: optional custom build matrix JSON (use when you need only one Xcode build run).
-     Example:
-     ```json
-     [{"runner":"macos-15","xcode":"26.2","informational":false}]
-     ```
-   - `ignored_test_errors_override_json`: optional override for allowed `swift test` failures.
-     Example:
-     ```json
-     [{"message":"extra argument 'profileId' in call","file":"Tests/Placements/FallbackTests.swift","line":67}]
-     ```
-7. Click `Run workflow`.
-8. Wait for jobs to appear:
-   - build matrix jobs: `Demo build (Xcode ...)`
-   - macOS compile job: `SDK macOS build`
-   - CocoaPods job: `CocoaPods lint`
-   - test matrix jobs: `SDK tests (Xcode ...)`
-9. Open run artifacts:
-   - `demo-build-log-...`
+5. In `Use workflow from`, select the branch.
+6. Configure boolean toggles:
+   - `build_sdk_targets`: run SDK matrix + iOS package + macOS SDK build.
+   - `build_test_app`: run test app matrix build.
+   - `run_tests`: run `swift test` matrix.
+   - `lint_pods`: run `pod lib lint`.
+7. (Optional) Fill JSON override fields:
+   - `build_errors_whitelist`
+   - `test_errors_whitelist`
+   - `build_matrix_override_json`
+   - `sdk_tests_matrix_override_json`
+8. Click `Run workflow`.
+9. Wait for jobs:
+   - `SDK build (Xcode ...)`
+   - `Test app build (Xcode ...)`
+   - `SDK macOS build`
+   - `CocoaPods lint`
+   - `SDK tests (Xcode ...)`
+10. Open artifacts/logs:
    - `swift-build-products-log-...`
+   - `demo-build-log-...`
    - `swift-build-macos-log-...`
    - `pod-lib-lint-log-...`
    - `sdk-tests-log-...`
 
 ### Run via GitHub CLI (`gh`)
 
-Run from repository root with authenticated GitHub CLI (`gh auth status`).
+Run from repository root with authenticated CLI (`gh auth status`).
 
-- Run full default workflow:
-  ```bash
-  gh workflow run "CI AdaptyRecipes" --ref master
-  ```
+- Run full workflow using defaults from config:
 
-- Run builds only on one Xcode:
-  ```bash
-  gh workflow run "CI AdaptyRecipes" --ref master \
-    -f run_demo_builds=true \
-    -f run_sdk_tests=false \
-    -f matrix_override_json='[{"runner":"macos-15","xcode":"26.2","informational":false}]'
-  ```
+```bash
+gh workflow run "CI AdaptyRecipes" --ref master
+```
 
-- Run tests only:
-  ```bash
-  gh workflow run "CI AdaptyRecipes" --ref master \
-    -f run_demo_builds=false \
-    -f run_sdk_tests=true
-  ```
+- Run only SDK builds on one Xcode:
 
-- Run tests with overridden ignored test errors:
-  ```bash
-  gh workflow run "CI AdaptyRecipes" --ref master \
-    -f run_demo_builds=false \
-    -f run_sdk_tests=true \
-    -f ignored_test_errors_override_json='[{"message":"extra argument '\''profileId'\'' in call","file":"Tests/Placements/FallbackTests.swift","line":67}]'
-  ```
+```bash
+gh workflow run "CI AdaptyRecipes" --ref master \
+  -f build_sdk_targets=true \
+  -f build_test_app=false \
+  -f run_tests=false \
+  -f lint_pods=false \
+  -f build_matrix_override_json='[{"runner":"macos-15","xcode":"26.2","informational":false}]'
+```
 
-Note: `ignored_test_errors_override_json` affects only `swift test` validation. Demo builds do not use ignored errors.
+- Run only test app build:
 
-## Rule for Ignored Test Errors
+```bash
+gh workflow run "CI AdaptyRecipes" --ref master \
+  -f build_sdk_targets=false \
+  -f build_test_app=true \
+  -f run_tests=false \
+  -f lint_pods=false
+```
 
-Demo build jobs do not use ignored errors. In CI, `AppConstants.swift` is patched with dummy values before `xcodebuild`, and demo build must succeed without allowlisted failures.
+- Run only tests:
 
-Each ignored rule can be:
+```bash
+gh workflow run "CI AdaptyRecipes" --ref master \
+  -f build_sdk_targets=false \
+  -f build_test_app=false \
+  -f run_tests=true \
+  -f lint_pods=false
+```
 
-- exact message string
-- object with `message` and optional `file`, `line`
+- Run tests with whitelist override:
 
-Matching rules:
+```bash
+gh workflow run "CI AdaptyRecipes" --ref master \
+  -f build_sdk_targets=false \
+  -f build_test_app=false \
+  -f run_tests=true \
+  -f lint_pods=false \
+  -f test_errors_whitelist='[{"message":"Some known test error"}]'
+```
 
-- `message` is matched exactly
-- `file` matches exact path or suffix path
-- `line` matches exact line number
-- `line` is allowed only together with `file`
-- secondary compiler summary lines (for example `emit-module/compile/frontend command failed ...`) are ignored when file/line diagnostics are present in the same log
+- Run test app build with whitelist override:
 
-An empty array `[]` is allowed and means "ignore nothing".
+```bash
+gh workflow run "CI AdaptyRecipes" --ref master \
+  -f build_sdk_targets=false \
+  -f build_test_app=true \
+  -f run_tests=false \
+  -f lint_pods=false \
+  -f build_errors_whitelist='[{"message":"Some known build error"}]'
+```
 
-Regex and partial-message matching are not used.
+## Whitelist Scope
+
+- `build_errors_whitelist` is applied only to test app build (`xcodebuild` in `Test app build` matrix job).
+- SDK build steps (`swift build` targets, iOS package build, macOS SDK build) are strict and never use build whitelist.
+- `test_errors_whitelist` is applied only to `swift test` logs.
