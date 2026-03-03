@@ -68,6 +68,7 @@ jobs:
       run_tests: ${{ steps.prepare.outputs.run_tests }}
       run_lint_pods: ${{ steps.prepare.outputs.run_lint_pods }}
       build_matrix_json: ${{ steps.prepare.outputs.build_matrix_json }}
+      test_app_matrix_json: ${{ steps.prepare.outputs.test_app_matrix_json }}
       sdk_tests_matrix_json: ${{ steps.prepare.outputs.sdk_tests_matrix_json }}
       build_errors_whitelist_json: ${{ steps.prepare.outputs.build_errors_whitelist_json }}
       test_errors_whitelist_json: ${{ steps.prepare.outputs.test_errors_whitelist_json }}
@@ -338,6 +339,7 @@ jobs:
           }
 
           let effectiveBuildMatrix = runBuildSdkTargets || runBuildTestApp ? defaultBuildMatrix : [];
+          let effectiveTestAppMatrix = [];
           let effectiveSdkTestsMatrix = runTests ? defaultSdkTestsMatrix : [];
           let effectiveBuildWhitelist = runBuildTestApp ? defaultBuildWhitelist : [];
           let effectiveTestWhitelist = runTests ? defaultTestWhitelist : [];
@@ -385,6 +387,12 @@ jobs:
             }
           }
 
+          if (runBuildTestApp) {
+            effectiveTestAppMatrix = effectiveBuildMatrix.filter(
+              (entry) => entry.xcode === sdkTests.xcode
+            );
+          }
+
           const githubOutput = process.env.GITHUB_OUTPUT;
           if (!githubOutput) fail("GITHUB_OUTPUT is not set.");
 
@@ -397,6 +405,7 @@ jobs:
           setOutput("run_tests", String(runTests));
           setOutput("run_lint_pods", String(runLintPods));
           setOutput("build_matrix_json", JSON.stringify({ include: effectiveBuildMatrix }));
+          setOutput("test_app_matrix_json", JSON.stringify({ include: effectiveTestAppMatrix }));
           setOutput("sdk_tests_matrix_json", JSON.stringify({ include: effectiveSdkTestsMatrix }));
           setOutput("build_errors_whitelist_json", JSON.stringify(effectiveBuildWhitelist));
           setOutput("test_errors_whitelist_json", JSON.stringify(effectiveTestWhitelist));
@@ -525,13 +534,13 @@ jobs:
   build_test_app_matrix:
     name: Test app build (Xcode ${{ matrix.xcode }})
     needs: prepare_config
-    if: ${{ needs.prepare_config.outputs.run_build_test_app == 'true' && matrix.xcode == needs.prepare_config.outputs.sdk_xcode }}
+    if: ${{ needs.prepare_config.outputs.run_build_test_app == 'true' }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
     continue-on-error: ${{ matrix.informational }}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.prepare_config.outputs.build_matrix_json) }}
+      matrix: ${{ fromJSON(needs.prepare_config.outputs.test_app_matrix_json) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
