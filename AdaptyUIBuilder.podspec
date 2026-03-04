@@ -20,6 +20,12 @@ Pod::Spec.new do |s|
   s.swift_version = '6.0'
   
   s.source_files = 'Sources.UIBuilder/**/*.swift'
+  s.exclude_files = [
+    'Sources.UIBuilder/UIBuilder/Cache/KingFisher/Extensions/PHLivePhotoView+Kingfisher.swift',
+    'Sources.UIBuilder/UIBuilder/Cache/KingFisher/General/ImageSource/LivePhotoSource.swift',
+    'Sources.UIBuilder/UIBuilder/Cache/KingFisher/General/KingfisherManager+LivePhoto.swift',
+    'Sources.UIBuilder/UIBuilder/Cache/KingFisher/Networking/ImageDownloader+LivePhoto.swift',
+  ]
   
   s.frameworks = 'SwiftUI'
   s.ios.framework = 'UIKit'
