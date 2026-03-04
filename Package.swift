@@ -50,7 +50,11 @@ let package = Package(
             dependencies: ["AdaptyLogger"],
             path: "Sources.UIBuilder",
             exclude: [
-                "adaptyui.v4.4.1.schema.yaml"
+                "adaptyui.v4.4.1.schema.yaml",
+                "UIBuilder/Cache/KingFisher/Extensions/PHLivePhotoView+Kingfisher.swift",
+                "UIBuilder/Cache/KingFisher/General/ImageSource/LivePhotoSource.swift",
+                "UIBuilder/Cache/KingFisher/General/KingfisherManager+LivePhoto.swift",
+                "UIBuilder/Cache/KingFisher/Networking/ImageDownloader+LivePhoto.swift",
             ]
         ),
         .target(

@@ -316,17 +316,22 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
         if let block = progressBlock {
             options.onDataReceived = (options.onDataReceived ?? []) + [ImageLoadingProgressSideEffect(block)]
         }
+        let resolvedOptions = options
 
         let task = KingfisherManager.shared.retrieveImage(
             with: source,
-            options: options,
+            options: resolvedOptions,
             downloadTaskUpdated: { task in
-                Task { @MainActor in mutatingSelf.imageTask = task }
+                Task { @MainActor in
+                    var mutatingSelf = self
+                    mutatingSelf.imageTask = task
+                }
             },
             progressiveImageSetter: { self.base.image = $0 },
             referenceTaskIdentifierChecker: { issuedIdentifier == self.taskIdentifier },
             completionHandler: { result in
                 CallbackQueueMain.currentOrAsync {
+                    var mutatingSelf = self
                     maybeIndicator?.stopAnimatingView()
                     guard issuedIdentifier == self.taskIdentifier else {
                         let reason: KingfisherError.ImageSettingErrorReason
@@ -346,19 +351,19 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
 
                     switch result {
                     case .success(let value):
-                        guard self.needsTransition(options: options, cacheType: value.cacheType) else {
+                        guard self.needsTransition(options: resolvedOptions, cacheType: value.cacheType) else {
                             mutatingSelf.placeholder = nil
                             self.base.image = value.image
                             completionHandler?(result)
                             return
                         }
 
-                        self.makeTransition(image: value.image, transition: options.transition) {
+                        self.makeTransition(image: value.image, transition: resolvedOptions.transition) {
                             completionHandler?(result)
                         }
 
                     case .failure:
-                        if let image = options.onFailureImage {
+                        if let image = resolvedOptions.onFailureImage {
                             mutatingSelf.placeholder = nil
                             self.base.image = image
                         }
