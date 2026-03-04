@@ -73,7 +73,7 @@ public extension AdaptyUISchema {
                 throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Script Corrupted"))
             }
 
-            result.append(##""script": \##(encodedScript)"##)
+            result.append(##""scripts":[{ "type": "js", "content": \##(encodedScript) }]"##)
         }
 
         return result.joined(separator: ",\n") + "\n}"

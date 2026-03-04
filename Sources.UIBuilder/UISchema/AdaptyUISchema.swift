@@ -43,7 +43,7 @@ extension AdaptyUISchema: Codable {
         case legacyScreens = "styles"
         case screens
         case navigators
-        case script
+        case scripts
     }
 
     public init(from decoder: Decoder) throws {
@@ -114,7 +114,7 @@ extension AdaptyUISchema: Codable {
             if configuration.isLegacy {
                 try decoder.legacyGenerateScript(collector: configuration.collector)
             } else {
-                try (container.decodeIfPresent(String.self, forKey: .script)).map { [$0] } ?? []
+                try decoder.decodeScript(configuration: configuration)
             }
     }
 
@@ -125,6 +125,43 @@ extension AdaptyUISchema: Codable {
         try container.encode(Array(localizations.values), forKey: .localizations)
         try container.encodeIfPresent(defaultLocalization?.id, forKey: .defaultLocalId)
         try container.encode(screens, forKey: .screens)
+        try container.encode(screens, forKey: .templates)
+        try container.encode(screens, forKey: .navigators)
+
+        if scripts.isNotEmpty {
+            var container = container.nestedUnkeyedContainer(forKey: .scripts)
+            var script = container.nestedContainer(keyedBy: ScriptCodingKeys.self)
+            try script.encode("js", forKey: .type)
+            try script.encode(scripts.joined(), forKey: .content)
+        }
+    }
+}
+
+private enum ScriptCodingKeys: String, CodingKey {
+    case scripts
+    case type
+    case content
+    case format
+}
+
+private extension Decoder {
+    func decodeScript(configuration: AdaptyUISchema.DecodingConfiguration) throws -> [String] {
+        let container = try container(keyedBy: ScriptCodingKeys.self)
+        guard container.contains(.scripts) else {
+            return []
+        }
+        var scripts = try container.nestedUnkeyedContainer(forKey: .scripts)
+
+        while !scripts.isAtEnd {
+            let script = try scripts.nestedContainer(keyedBy: ScriptCodingKeys.self)
+            if script.contains(.type) {
+                guard try script.decode(String.self, forKey: .type) == "js" else { continue }
+            }
+            let content = try script.decode(String.self, forKey: .content)
+            return [content]
+        }
+
+        return []
     }
 }
 
