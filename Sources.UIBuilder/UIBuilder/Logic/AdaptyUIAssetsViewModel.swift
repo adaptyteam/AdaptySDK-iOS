@@ -59,7 +59,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) -> (VC.RichText, ProductInfoContainer) {
         switch ref {
-        case let .stringId(stringId):
+        case let .stringId(stringId, tagValues): // TODO: need use tagValues
             let text = try? _state.richText(stringId)
             return (text ?? .empty, .notApplicable)
         case let .variable(variable):

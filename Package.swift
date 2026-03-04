@@ -9,7 +9,7 @@ let package = Package(
         .macOS(.v12),
         //        .tvOS(.v15),
         //        .watchOS(.v8),
-        .visionOS(.v1),
+        .visionOS(.v1)
     ],
     products: [
         .library(
@@ -39,7 +39,7 @@ let package = Package(
         .library(
             name: "AdaptyPlugin",
             targets: ["AdaptyPlugin"]
-        ),
+        )
     ],
     targets: [
         .target(
@@ -95,8 +95,8 @@ let package = Package(
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),
-                .process("Placements/fallback_large.json"),
+                .process("Placements/fallback_large.json")
             ]
-        ),
+        )
     ]
 )

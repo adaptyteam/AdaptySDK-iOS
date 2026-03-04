@@ -13,13 +13,27 @@ extension Schema {
 
 extension Schema.StringReference: Codable {
     enum CodingKeys: String, CodingKey {
+        case stringId = "string_id"
         case variable = "var"
-        case type
+        case product
     }
 
     package init(from decoder: Decoder) throws {
         guard let container = try? decoder.container(keyedBy: CodingKeys.self) else {
-            self = try .stringId(decoder.singleValueContainer().decode(String.self))
+            self = try .stringId(decoder.singleValueContainer().decode(String.self), nil)
+            return
+        }
+
+        guard !container.contains(.stringId) else {
+            let id = try container.decode(String.self, forKey: .stringId)
+            var tags = try decoder.singleValueContainer().decode([String: TagValue].self)
+            tags.removeValue(forKey: CodingKeys.stringId.rawValue)
+            if tags.isEmpty {
+                self = .stringId(id, nil)
+            } else {
+                tags.reserveCapacity(tags.count)
+                self = .stringId(id, tags)
+            }
             return
         }
 
@@ -28,20 +42,26 @@ extension Schema.StringReference: Codable {
             return
         }
 
-        guard !container.contains(.type) else {
+        guard !container.contains(.product) else {
             self = try .product(Product(from: decoder))
             return
         }
 
-        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "unknown value"))
+        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "value must be string_id or variable "))
     }
 
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
 
         switch self {
-        case let .stringId(string):
-            try container.encode(string)
+        case let .stringId(string, tags):
+            guard let tags, !tags.isEmpty else {
+                try container.encode(string)
+                return
+            }
+            try container.encode(tags)
+            var objContainer = encoder.container(keyedBy: CodingKeys.self)
+            try objContainer.encode(string, forKey: .stringId)
         case let .product(product):
             try container.encode(product)
         case let .variable(variable):

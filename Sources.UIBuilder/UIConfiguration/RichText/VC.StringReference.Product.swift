@@ -14,10 +14,6 @@ package extension VC.StringReference {
     }
 }
 
-
-
-
-
 extension VC.StringReference.Product {
     static func calculate(suffix: String?) -> String {
         if let suffix {
