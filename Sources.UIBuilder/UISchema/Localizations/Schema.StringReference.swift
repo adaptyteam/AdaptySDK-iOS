@@ -16,6 +16,7 @@ extension Schema.StringReference: Codable {
         case stringId = "string_id"
         case variable = "var"
         case product
+        case legacyProduct = "type"
     }
 
     package init(from decoder: Decoder) throws {
@@ -42,7 +43,7 @@ extension Schema.StringReference: Codable {
             return
         }
 
-        guard !container.contains(.product) else {
+        guard !container.contains(.product), !container.contains(.legacyProduct) else {
             self = try .product(Product(from: decoder))
             return
         }
