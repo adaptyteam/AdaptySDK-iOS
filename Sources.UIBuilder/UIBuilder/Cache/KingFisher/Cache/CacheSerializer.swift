@@ -34,7 +34,7 @@ import UIKit
 
 /// A `CacheSerializer` is used to convert some data to an image object after retrieving it from disk storage,
 /// and vice versa, to convert an image to a data object for storing it to the disk storage.
-protocol CacheSerializer: Sendable {
+public protocol CacheSerializer: Sendable {
     
     /// Retrieves the serialized data from a provided image and optional original data for caching to disk.
     ///
@@ -64,7 +64,7 @@ protocol CacheSerializer: Sendable {
     var originalDataUsed: Bool { get }
 }
 
-extension CacheSerializer {
+public extension CacheSerializer {
     var originalDataUsed: Bool { false }
 }
 
@@ -73,18 +73,25 @@ extension CacheSerializer {
 /// It can serialize and deserialize images in PNG, JPEG, and GIF formats. For images other than these formats, a 
 /// normalized ``KingfisherWrapper/pngRepresentation()`` will be used.
 ///
-/// When converting an `image` to the date, it will only be converted to the corresponding data type when `original`
+/// When converting an `image` to the data, it will only be converted to the corresponding data type when `original`
 /// contains valid PNG, JPEG, and GIF format data. If the `original` is provided but not valid, or if `original` is
 /// `nil`, the input `image` will be encoded as PNG data.
-struct DefaultCacheSerializer: CacheSerializer {
+///
+/// If `original` is `nil` but the input `image` contains embedded GIF data (for example, a cached animated image
+/// created from GIF data), the serializer will prefer the embedded GIF data and store it as GIF instead of falling
+/// back to PNG.
+///
+/// > Tip: If you create a new image instance from an animated image in a custom processor, use
+/// > ``KingfisherWrapper/copyKingfisherState(to:)`` to propagate the embedded animated data to the new image.
+public struct DefaultCacheSerializer: CacheSerializer {
     
     /// The default general cache serializer utilized throughout Kingfisher's caching mechanism.
-    static let `default` = DefaultCacheSerializer()
+    public static let `default` = DefaultCacheSerializer()
 
     /// The compression quality used when converting an image to lossy format data (such as JPEG).
     ///
     /// Default is 1.0.
-    var compressionQuality: CGFloat = 1.0
+    public var compressionQuality: CGFloat = 1.0
 
     /// Determines whether the original data should be prioritized during image serialization.
     ///
@@ -92,31 +99,34 @@ struct DefaultCacheSerializer: CacheSerializer {
     /// In the event of a `nil` data, the serialization process will revert to generating data from the image.
     ///
     /// > This value is used as ``CacheSerializer/originalDataUsed-d2v9``.
-    var preferCacheOriginalData: Bool = false
+    public var preferCacheOriginalData: Bool = false
 
-    var originalDataUsed: Bool { preferCacheOriginalData }
+    public var originalDataUsed: Bool { preferCacheOriginalData }
     
     /// Creates a cache serializer that serializes and deserializes images in PNG, JPEG, and GIF formats.
     ///
     /// > Prefer to use the ``DefaultCacheSerializer/default`` value unless you need to specify your own properties.
-    init() { }
+    public init() { }
 
-    func data(with image: KFCrossPlatformImage, original: Data?) -> Data? {
+    public func data(with image: KFCrossPlatformImage, original: Data?) -> Data? {
+        let format: ImageFormat = {
+            if let original = original { return original.kf.imageFormat }
+
+            if let animatedData = image.kf.gifRepresentation(), animatedData.kf.imageFormat == .GIF {
+                return .GIF
+            }
+            return .unknown
+        }()
+
         if preferCacheOriginalData {
-            return original ??
-                image.kf.data(
-                    format: original?.kf.imageFormat ?? .unknown,
-                    compressionQuality: compressionQuality
-                )
-        } else {
-            return image.kf.data(
-                format: original?.kf.imageFormat ?? .unknown,
-                compressionQuality: compressionQuality
-            )
+            if let original = original { return original }
+            if format == .GIF { return image.kf.gifRepresentation() }
         }
+
+        return image.kf.data(format: format, compressionQuality: compressionQuality)
     }
     
-    func image(with data: Data, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
+    public func image(with data: Data, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
         return KingfisherWrapper.image(data: data, options: options.imageCreatingOptions)
     }
 }

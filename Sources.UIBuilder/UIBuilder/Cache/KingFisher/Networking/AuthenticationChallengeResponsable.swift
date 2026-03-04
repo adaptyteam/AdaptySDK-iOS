@@ -27,10 +27,10 @@
 import Foundation
 
 @available(*, deprecated, message: "Typo. Use `AuthenticationChallengeResponsible` instead", renamed: "AuthenticationChallengeResponsible")
-typealias AuthenticationChallengeResponsable = AuthenticationChallengeResponsible
+public typealias AuthenticationChallengeResponsable = AuthenticationChallengeResponsible
 
 /// Protocol indicates that an authentication challenge could be handled.
-protocol AuthenticationChallengeResponsible: AnyObject {
+public protocol AuthenticationChallengeResponsible: AnyObject {
 
     /// Called when a session level authentication challenge is received.
     ///
@@ -73,7 +73,7 @@ protocol AuthenticationChallengeResponsible: AnyObject {
 
 extension AuthenticationChallengeResponsible {
 
-    func downloader(
+    public func downloader(
         _ downloader: ImageDownloader,
         didReceive challenge: URLAuthenticationChallenge
     ) async -> (URLSession.AuthChallengeDisposition, URLCredential?)
@@ -88,7 +88,7 @@ extension AuthenticationChallengeResponsible {
         return (.performDefaultHandling, nil)
     }
     
-    func downloader(
+    public func downloader(
         _ downloader: ImageDownloader,
         task: URLSessionTask,
         didReceive challenge: URLAuthenticationChallenge

@@ -36,7 +36,7 @@ import UIKit
 
 /// Represents a placeholder type that could be set during loading as well as when loading is finished without
 /// getting an image.
-protocol Placeholder {
+public protocol Placeholder {
     
     /// Called when the placeholder needs to be added to a given image view.
     /// 
@@ -57,19 +57,19 @@ protocol Placeholder {
 
 @MainActor
 extension KFCrossPlatformImage: Placeholder {
-    func add(to imageView: KFCrossPlatformImageView) {
+    public func add(to imageView: KFCrossPlatformImageView) {
         imageView.image = self
     }
     
-    func remove(from imageView: KFCrossPlatformImageView) {
+    public func remove(from imageView: KFCrossPlatformImageView) {
         imageView.image = nil
     }
     
-    func add(to base: any KingfisherHasImageComponent) {
+    public func add(to base: any KingfisherHasImageComponent) {
         base.image = self
     }
     
-    func remove(from base: any KingfisherHasImageComponent) {
+    public func remove(from base: any KingfisherHasImageComponent) {
         base.image = nil
     }
 }
@@ -82,7 +82,7 @@ extension KFCrossPlatformImage: Placeholder {
 @MainActor
 extension Placeholder where Self: KFCrossPlatformView {
     
-    func add(to imageView: KFCrossPlatformImageView) {
+    public func add(to imageView: KFCrossPlatformImageView) {
         imageView.addSubview(self)
         translatesAutoresizingMaskIntoConstraints = false
 
@@ -92,7 +92,7 @@ extension Placeholder where Self: KFCrossPlatformView {
         widthAnchor.constraint(equalTo: imageView.widthAnchor).isActive = true
     }
 
-    func remove(from imageView: KFCrossPlatformImageView) {
+    public func remove(from imageView: KFCrossPlatformImageView) {
         removeFromSuperview()
     }
 }

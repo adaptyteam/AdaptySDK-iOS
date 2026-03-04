@@ -34,7 +34,7 @@ import UIKit
 /// transition. Apple's `UIViewAnimationOptions` are used under the hood.
 ///
 /// For custom transitions, you should specify your own transition options, animations, and completion handler as well.
-enum ImageTransition: Sendable {
+public enum ImageTransition: Sendable {
     /// No animation transition.
     case none
     /// Fade effect to the loaded image over a specified duration.
@@ -56,7 +56,7 @@ enum ImageTransition: Sendable {
     ///    - completion: A block called when the transition animation finishes.
     case custom(duration: TimeInterval,
                  options: UIView.AnimationOptions,
-              animations: (@Sendable (UIImageView, UIImage) -> Void)?,
+              animations: (@Sendable @MainActor (UIImageView, UIImage) -> Void)?,
               completion: (@Sendable (Bool) -> Void)?)
     
     var duration: TimeInterval {
@@ -104,7 +104,7 @@ enum ImageTransition: Sendable {
 }
 #else
 // Just a placeholder for compiling on macOS.
-enum ImageTransition: Sendable {
+public enum ImageTransition: Sendable {
     case none
     /// This is a placeholder on macOS now. It is for SwiftUI (KFImage) to identify the fade option only.
     case fade(TimeInterval)

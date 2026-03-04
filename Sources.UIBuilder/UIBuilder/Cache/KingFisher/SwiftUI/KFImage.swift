@@ -61,13 +61,18 @@ import Combine
 /// Here only very few are listed as demonstration. To check other available modifiers, see ``KFOptionSetter`` and its
 /// extension methods.
 ///
+/// - Important: `KFImage` loads disk cached images synchronously by default (`.loadDiskFileSynchronously()` is enabled).
+/// This prevents image flickering during SwiftUI view updates but may impact performance when loading large images from disk.
+/// You can disable this behavior by calling `.loadDiskFileSynchronously(false)` if you prefer better loading performance
+/// over visual consistency.
+///
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-struct KFImage: KFImageProtocol {
+public struct KFImage: KFImageProtocol {
     
     /// Represent the wrapping context of the image view.
     ///
     /// Inside ``KFImage`` it is using the `SwiftUI.Image` to render the image.
-    var context: Context<Image>
+    public var context: Context<Image>
     
     /// Initializes the ``KFImage`` with a context.
     ///
@@ -75,15 +80,15 @@ struct KFImage: KFImageProtocol {
     ///  ``KFImage/init(source:)`` or ``KFImage/init(_:)`` initializers or other relevant methods in ``KF`` Builder
     ///  type.
     /// - Parameter context: The context value that the image view should wrap.
-    init(context: Context<Image>) {
+    public init(context: Context<Image>) {
         self.context = context
     }
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension Image: KFImageHoldingView {
-    typealias RenderingView = Image
-    static func created(from image: KFCrossPlatformImage?, context: KFImage.Context<Self>) -> Image {
+    public typealias RenderingView = Image
+    public static func created(from image: KFCrossPlatformImage?, context: KFImage.Context<Self>) -> Image {
         Image(crossPlatformImage: image)
     }
 }
@@ -92,22 +97,22 @@ extension Image: KFImageHoldingView {
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension KFImage {
 
-    func resizable(
+    public func resizable(
         capInsets: EdgeInsets = EdgeInsets(),
         resizingMode: Image.ResizingMode = .stretch) -> KFImage
     {
         configure { $0.resizable(capInsets: capInsets, resizingMode: resizingMode) }
     }
 
-    func renderingMode(_ renderingMode: Image.TemplateRenderingMode?) -> KFImage {
+    public func renderingMode(_ renderingMode: Image.TemplateRenderingMode?) -> KFImage {
         configure { $0.renderingMode(renderingMode) }
     }
 
-    func interpolation(_ interpolation: Image.Interpolation) -> KFImage {
+    public func interpolation(_ interpolation: Image.Interpolation) -> KFImage {
         configure { $0.interpolation(interpolation) }
     }
 
-    func antialiased(_ isAntialiased: Bool) -> KFImage {
+    public func antialiased(_ isAntialiased: Bool) -> KFImage {
         configure { $0.antialiased(isAntialiased) }
     }
     
@@ -123,7 +128,7 @@ extension KFImage {
     ///
     /// - Returns: The `Self` value with changes applied.
     @available(*, deprecated, message: "This is not necessary anymore since `@StateObject` is used. It does nothing now and please just remove it.")
-    func loadImmediately(_ start: Bool = true) -> KFImage {
+    public func loadImmediately(_ start: Bool = true) -> KFImage {
         return self
     }
 }

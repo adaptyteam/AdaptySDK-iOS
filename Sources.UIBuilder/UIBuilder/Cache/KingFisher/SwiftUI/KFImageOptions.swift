@@ -37,7 +37,7 @@ extension KFImageProtocol {
     /// - Parameters:
     ///   - source: The ``Source`` object that defines data information from the network or a data provider.
     /// - Returns: A Kingfisher-compatible image view for future configuration or embedding into another `SwiftUI.View`.
-    static func source(
+    public static func source(
         _ source: Source?
     ) -> Self
     {
@@ -49,7 +49,7 @@ extension KFImageProtocol {
     /// - Parameters:
     ///   - resource: The ``Resource`` object that defines data information such as a key or URL.
     /// - Returns: A Kingfisher-compatible image view for future configuration or embedding into another `SwiftUI.View`.
-    static func resource(
+    public static func resource(
         _ resource: (any Resource)?
     ) -> Self
     {
@@ -63,7 +63,7 @@ extension KFImageProtocol {
     ///   - cacheKey: The key used to store the downloaded image in the cache. If `nil`, the `absoluteString` of `url`
     ///   is used as the cache key.
     /// - Returns: A Kingfisher-compatible image view for future configuration or embedding into another `SwiftUI.View`.
-    static func url(
+    public static func url(
         _ url: URL?, cacheKey: String? = nil
     ) -> Self
     {
@@ -76,7 +76,7 @@ extension KFImageProtocol {
     ///   - provider: The ``ImageDataProvider`` object that contains information about the data.
     /// - Returns: A Kingfisher-compatible image view for future configuration or embedding into another `SwiftUI.View`.
 
-    static func dataProvider(
+    public static func dataProvider(
         _ provider: (any ImageDataProvider)?
     ) -> Self
     {
@@ -89,7 +89,7 @@ extension KFImageProtocol {
     ///   - data: The data object from which the image should be created.
     ///   - cacheKey: The key used to store the downloaded image in the cache.
     /// - Returns: A Kingfisher-compatible image view for future configuration or embedding into another `SwiftUI.View`.
-    static func data(
+    public static func data(
         _ data: Data?, cacheKey: String
     ) -> Self
     {
@@ -108,7 +108,7 @@ extension KFImageProtocol {
     ///
     /// - Parameter content: A view that represents the placeholder.
     /// - Returns: A Kingfisher-compatible image view that includes the provided `content` as its placeholder.
-    func placeholder<P: View>(@ViewBuilder _ content: @escaping (Progress) -> P) -> Self {
+    public func placeholder<P: View>(@ViewBuilder _ content: @escaping (Progress) -> P) -> Self {
         context.placeholder = { progress in
             return AnyView(content(progress))
         }
@@ -119,15 +119,56 @@ extension KFImageProtocol {
     ///
     /// - Parameter content: A view that represents the placeholder.
     /// - Returns: A Kingfisher-compatible image view that includes the provided `content` as its placeholder.
-    func placeholder<P: View>(@ViewBuilder _ content: @escaping () -> P) -> Self {
+    public func placeholder<P: View>(@ViewBuilder _ content: @escaping () -> P) -> Self {
         placeholder { _ in content() }
+    }
+
+    /// Sets a failure `View` that is displayed when the image fails to load.
+    ///
+    /// Use this modifier to provide a custom view when image loading fails. This offers more flexibility than the
+    /// deprecated `onFailureImage` API by allowing any SwiftUI view as the failure placeholder.
+    ///
+    /// Example:
+    /// ```swift
+    /// KFImage(url)
+    ///     .onFailureView {
+    ///         VStack {
+    ///             Image(systemName: "exclamationmark.triangle")
+    ///                 .foregroundColor(.red)
+    ///             Text("Failed to load image")
+    ///                 .font(.caption)
+    ///             Button("Retry") {
+    ///                 // Retry logic
+    ///             }
+    ///         }
+    ///     }
+    /// ```
+    ///
+    /// - Note: If both deprecated `onFailureImage` and `onFailureView` are set, `onFailureView` takes precedence.
+    /// 
+    /// - Parameter content: A view builder that creates the failure view.
+    /// - Returns: A Kingfisher-compatible image view that displays the provided `content` when image loading fails.
+    public func onFailureView<F: View>(@ViewBuilder _ content: @escaping () -> F) -> Self {
+        context.failureView = { AnyView(content()) }
+        return self
+    }
+
+    /// Sets an image to display when the loading fails.
+    ///
+    /// - Deprecated: Use ``onFailureView(_:)`` instead, which lets you return any SwiftUI `View` and guarantees
+    ///   consistent behavior across SwiftUI platforms. The image-based fallback modifier is maintained purely for
+    ///   backward compatibility and will be removed in a future major release.
+    @available(*, deprecated, message: "Use `onFailureView(_:)` to customize SwiftUI failure placeholders instead.")
+    public func onFailureImage(_ image: KFCrossPlatformImage?) -> Self {
+        options.onFailureImage = .some(image)
+        return self
     }
 
     /// Enables canceling the download task associated with `self` when the view disappears.
     ///
     /// - Parameter flag: A boolean value indicating whether to cancel the task.
     /// - Returns: A Kingfisher-compatible image view that cancels the download task when it disappears.
-    func cancelOnDisappear(_ flag: Bool) -> Self {
+    public func cancelOnDisappear(_ flag: Bool) -> Self {
         context.cancelOnDisappear = flag
         return self
     }
@@ -135,7 +176,7 @@ extension KFImageProtocol {
     /// Sets reduce priority  of the download task to low,  bound to `self` when the view disappearing.
     /// - Parameter flag: Whether reduce the priority task or not.
     /// - Returns: A `KFImage` view that reduces downloading task priority when disappears.
-    func reducePriorityOnDisappear(_ flag: Bool) -> Self {
+    public func reducePriorityOnDisappear(_ flag: Bool) -> Self {
         context.reducePriorityOnDisappear = flag
         return self
     }
@@ -150,7 +191,7 @@ extension KFImageProtocol {
     /// will not occur when the image is retrieved from either memory or disk cache by default. If you need the
     /// transition to occur even when the image is retrieved from the cache, also call
     /// ``KFOptionSetter/forceRefresh(_:)`` on the returned view.
-    func fade(duration: TimeInterval) -> Self {
+    public func fade(duration: TimeInterval) -> Self {
         context.options.transition = .fade(duration)
         return self
     }
@@ -173,8 +214,65 @@ extension KFImageProtocol {
     /// > Use it at your own risk.
     /// >
     /// > Please refer to [#1988](https://github.com/onevcat/Kingfisher/issues/1988) for more information.
-    func startLoadingBeforeViewAppear(_ flag: Bool = true) -> Self {
+    public func startLoadingBeforeViewAppear(_ flag: Bool = true) -> Self {
         context.startLoadingBeforeViewAppear = flag
+        return self
+    }
+    
+    /// Sets a SwiftUI transition for the image loading.
+    ///
+    /// - Parameters:
+    ///   - transition: The SwiftUI transition to apply when the image appears.
+    ///   - animation: The animation to use with the transition. Defaults to `.default`.
+    /// - Returns: A Kingfisher-compatible image view with the applied transition.
+    ///
+    /// This is the recommended way to apply transitions in SwiftUI applications. Unlike the UIKit-based
+    /// ``KingfisherOptionsInfoItem/transition(_:)`` option, this method uses native SwiftUI transitions,
+    /// providing better integration with the SwiftUI animation system and access to all SwiftUI transition types.
+    ///
+    /// Available transitions include `.slide`, `.scale`, `.opacity`, `.move`, `.offset`, and custom transitions.
+    /// The transition will be applied when the image is loaded from the network, following the same
+    /// rules as the fade transition regarding cache behavior and `forceTransition`.
+    /// 
+    /// When both `loadTransition` and `fade` are set, `loadTransition` takes precedence.
+    ///
+    /// Example:
+    /// ```swift
+    /// KFImage(url)
+    ///     .loadTransition(.slide, animation: .easeInOut(duration: 0.5))
+    /// ```
+    ///
+    /// - Note: For UIKit/AppKit applications, use ``KingfisherOptionsInfoItem/transition(_:)`` instead.
+    public func loadTransition(_ transition: AnyTransition, animation: Animation? = .default) -> Self {
+        context.swiftUITransition = transition
+        context.swiftUIAnimation = animation
+        return self
+    }
+    
+    /// Sets a SwiftUI transition for the image loading (iOS 17.0+).
+    ///
+    /// - Parameters:
+    ///   - transition: The SwiftUI transition conforming to the Transition protocol.
+    ///   - animation: The animation to use with the transition. Defaults to `.default`.
+    /// - Returns: A Kingfisher-compatible image view with the applied transition.
+    ///
+    /// This method provides access to newer SwiftUI transitions available in iOS 17.0+,
+    /// such as `BlurReplaceTransition`, `PushTransition`, and other transitions conforming to the `Transition` protocol.
+    /// This is the recommended approach for SwiftUI applications on iOS 17.0+.
+    /// 
+    /// When both `loadTransition` and `fade` are set, `loadTransition` takes precedence.
+    ///
+    /// Example:
+    /// ```swift
+    /// KFImage(url)
+    ///     .loadTransition(.blurReplace(.downUp), animation: .bouncy)
+    /// ```
+    ///
+    /// - Note: For UIKit/AppKit applications, use ``KingfisherOptionsInfoItem/transition(_:)`` instead.
+    @available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
+    public func loadTransition<T: Transition>(_ transition: T, animation: Animation? = .default) -> Self {
+        context.swiftUITransition = AnyTransition(transition)
+        context.swiftUIAnimation = animation
         return self
     }
 }

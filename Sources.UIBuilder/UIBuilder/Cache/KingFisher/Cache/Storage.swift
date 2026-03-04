@@ -33,7 +33,7 @@ struct TimeConstants {
 }
 
 /// Represents the expiration strategy utilized in storage.
-enum StorageExpiration: Sendable {
+public enum StorageExpiration: Sendable {
     
     /// The item never expires.
     case never
@@ -89,7 +89,7 @@ enum StorageExpiration: Sendable {
 }
 
 /// Represents the expiration extension strategy used in storage after access.
-enum ExpirationExtending: Sendable {
+public enum ExpirationExtending: Sendable {
     /// The item expires after the original time, without extension after access.
     case none
     /// The item expiration extends to the original cache time after each access.
@@ -99,12 +99,12 @@ enum ExpirationExtending: Sendable {
 }
 
 /// Represents types for which the memory cost can be calculated.
-protocol CacheCostCalculable {
+public protocol CacheCostCalculable {
     var cacheCost: Int { get }
 }
 
 /// Represents types that can be converted to and from data.
-protocol DataTransformable {
+public protocol DataTransformable {
     
     /// Converts the current value to a `Data` representation.
     /// - Returns: The data object which can represent the value of the conforming type.

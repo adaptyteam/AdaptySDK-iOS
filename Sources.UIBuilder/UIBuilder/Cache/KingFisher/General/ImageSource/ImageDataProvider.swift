@@ -25,12 +25,13 @@
 //  THE SOFTWARE.
 
 import Foundation
+import ImageIO
 
 /// Represents a data provider to provide image data to Kingfisher when setting with
 /// ``Source/provider(_:)`` source. Compared to ``Source/network(_:)`` member, it gives a chance
 /// to load some image data in your own way, as long as you can provide the data
 /// representation for the image.
-protocol ImageDataProvider: Sendable {
+public protocol ImageDataProvider: Sendable {
     
     /// The key used in cache.
     var cacheKey: String { get }
@@ -53,6 +54,14 @@ protocol ImageDataProvider: Sendable {
 }
 
 extension ImageDataProvider {
+    func data() async throws -> Data {
+        try await withCheckedThrowingContinuation { continuation in
+            data(handler: { continuation.resume(with: $0) })
+        }
+    }
+}
+
+public extension ImageDataProvider {
     var contentURL: URL? { return nil }
     func convertToSource() -> Source {
         .provider(self)
@@ -63,12 +72,12 @@ extension ImageDataProvider {
 /// Uses this type for adding a disk image to Kingfisher. Compared to loading it
 /// directly, you can get benefit of using Kingfisher's extension methods, as well
 /// as applying ``ImageProcessor``s and storing the image to ``ImageCache`` of Kingfisher.
-struct LocalFileImageDataProvider: ImageDataProvider {
+public struct LocalFileImageDataProvider: ImageDataProvider {
 
-    // MARK: Properties
+    // MARK: Public Properties
 
     /// The file URL from which the image be loaded.
-    let fileURL: URL
+    public let fileURL: URL
     private let loadingQueue: ExecutionQueue
 
     // MARK: Initializers
@@ -81,7 +90,7 @@ struct LocalFileImageDataProvider: ImageDataProvider {
     ///               the `absoluteString` of ``LocalFileImageDataProvider/fileURL`` is used.
     ///   - loadingQueue: The queue where the file loading should happen. By default, the dispatch queue of
     ///                   `.global(qos: .userInitiated)` will be used.
-    init(
+    public init(
         fileURL: URL,
         cacheKey: String? = nil,
         loadingQueue: ExecutionQueue = .dispatch(DispatchQueue.global(qos: .userInitiated))
@@ -94,15 +103,15 @@ struct LocalFileImageDataProvider: ImageDataProvider {
     // MARK: Protocol Conforming
 
     /// The key used in cache.
-    var cacheKey: String
+    public var cacheKey: String
 
-    func data(handler: @escaping @Sendable (Result<Data, any Error>) -> Void) {
+    public func data(handler: @escaping @Sendable (Result<Data, any Error>) -> Void) {
         loadingQueue.execute {
             handler(Result(catching: { try Data(contentsOf: fileURL) }))
         }
     }
     
-    var data: Data {
+    public var data: Data {
         get async throws {
             try await withCheckedThrowingContinuation { continuation in
                 loadingQueue.execute {
@@ -118,17 +127,17 @@ struct LocalFileImageDataProvider: ImageDataProvider {
     }
 
     /// The URL of the local file on the disk.
-    var contentURL: URL? {
+    public var contentURL: URL? {
         return fileURL
     }
 }
 
 /// Represents an image data provider for loading image from a given Base64 encoded string.
-struct Base64ImageDataProvider: ImageDataProvider {
+public struct Base64ImageDataProvider: ImageDataProvider {
 
-    // MARK: Properties
+    // MARK: Public Properties
     /// The encoded Base64 string for the image.
-    let base64String: String
+    public let base64String: String
 
     // MARK: Initializers
 
@@ -137,7 +146,7 @@ struct Base64ImageDataProvider: ImageDataProvider {
     /// - Parameters:
     ///   - base64String: The Base64 encoded string for an image.
     ///   - cacheKey: The key is used for caching the image data. You need a different key for any different image.
-    init(base64String: String, cacheKey: String) {
+    public init(base64String: String, cacheKey: String) {
         self.base64String = base64String
         self.cacheKey = cacheKey
     }
@@ -145,21 +154,21 @@ struct Base64ImageDataProvider: ImageDataProvider {
     // MARK: Protocol Conforming
 
     /// The key used in cache.
-    var cacheKey: String
+    public var cacheKey: String
 
-    func data(handler: (Result<Data, any Error>) -> Void) {
+    public func data(handler: (Result<Data, any Error>) -> Void) {
         let data = Data(base64Encoded: base64String)!
         handler(.success(data))
     }
 }
 
 /// Represents an image data provider for a raw data object.
-struct RawImageDataProvider: ImageDataProvider {
+public struct RawImageDataProvider: ImageDataProvider {
 
-    // MARK: Properties
+    // MARK: Public Properties
 
     /// The raw data object to provide to Kingfisher image loader.
-    let data: Data
+    public let data: Data
 
     // MARK: Initializers
 
@@ -168,7 +177,7 @@ struct RawImageDataProvider: ImageDataProvider {
     /// - Parameters:
     ///   - data: The raw data represents an image.
     ///   - cacheKey: The key is used for caching the image data. You need a different key for any different image.
-    init(data: Data, cacheKey: String) {
+    public init(data: Data, cacheKey: String) {
         self.data = data
         self.cacheKey = cacheKey
     }
@@ -176,9 +185,90 @@ struct RawImageDataProvider: ImageDataProvider {
     // MARK: Protocol Conforming
     
     /// The key used in cache.
-    var cacheKey: String
+    public var cacheKey: String
 
-    func data(handler: @escaping (Result<Data, any Error>) -> Void) {
+    public func data(handler: @escaping (Result<Data, any Error>) -> Void) {
         handler(.success(data))
+    }
+}
+
+/// A data provider that creates a thumbnail from a URL using Core Graphics.
+public struct ThumbnailImageDataProvider: ImageDataProvider {
+    
+    public enum ThumbnailImageDataProviderError: Error {
+        case invalidImageSource
+        case invalidThumbnail
+        case writeDataError
+        case finalizeDataError
+    }
+    
+    /// The URL from which to load the image
+    public let url: URL
+    
+    /// The maximum size of the thumbnail in pixels
+    public var maxPixelSize: CGFloat
+    
+    /// Whether to always create a thumbnail even if the image is smaller than maxPixelSize
+    public var alwaysCreateThumbnail: Bool
+    
+    /// The cache key for this provider
+    public var cacheKey: String
+    
+    /// Creates a new thumbnail data provider
+    /// - Parameters:
+    ///   - url: The URL from which to load the image
+    ///   - maxPixelSize: The maximum size of the thumbnail in pixels
+    ///   - alwaysCreateThumbnail: Whether to always create a thumbnail even if the image is smaller than maxPixelSize
+    public init(
+        url: URL,
+        maxPixelSize: CGFloat,
+        alwaysCreateThumbnail: Bool = true,
+        cacheKey: String? = nil
+    ) {
+        self.url = url
+        self.maxPixelSize = maxPixelSize
+        self.alwaysCreateThumbnail = alwaysCreateThumbnail
+        self.cacheKey = cacheKey ?? "\(url.absoluteString)_thumb_\(maxPixelSize)_\(alwaysCreateThumbnail)"
+    }
+    
+    public func data(handler: @escaping @Sendable (Result<Data, any Error>) -> Void) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                guard let url = URL(string: url.absoluteString) else {
+                    throw KingfisherError.imageSettingError(reason: .emptySource)
+                        
+                }
+                
+                guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil) else {
+                    throw ThumbnailImageDataProviderError.invalidImageSource
+                }
+                
+                let options = [
+                    kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
+                    kCGImageSourceCreateThumbnailFromImageAlways: alwaysCreateThumbnail,
+                    kCGImageSourceCreateThumbnailWithTransform: true
+                ]
+                
+                guard let thumbnailRef = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary) else {
+                    throw ThumbnailImageDataProviderError.invalidThumbnail
+                }
+                
+                let data = NSMutableData()
+                guard let destination = CGImageDestinationCreateWithData(
+                    data, CGImageSourceGetType(imageSource)!, 1, nil
+                ) else {
+                    throw ThumbnailImageDataProviderError.writeDataError
+                }
+                
+                CGImageDestinationAddImage(destination, thumbnailRef, nil)
+                if CGImageDestinationFinalize(destination) {
+                    handler(.success(data as Data))
+                } else {
+                    throw ThumbnailImageDataProviderError.finalizeDataError
+                }
+            } catch {
+                handler(.failure(error))
+            }
+        }
     }
 }

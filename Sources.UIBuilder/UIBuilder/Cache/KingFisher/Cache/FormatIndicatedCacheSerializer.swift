@@ -59,13 +59,13 @@ import UIKit
 /// // Otherwise, the corner part would be filled by a white color (since JPEG does not contain an alpha channel).
 /// imageView.kf.setImage(with: url, options: optionsInfo)
 /// ```
-struct FormatIndicatedCacheSerializer: CacheSerializer {
+public struct FormatIndicatedCacheSerializer: CacheSerializer {
     
     /// A ``FormatIndicatedCacheSerializer`` instance that converts images to and from the PNG format. 
     ///
     /// If the image cannot be represented in the PNG format, it will fallback to its actual format determined by the
     /// `original` data in ``CacheSerializer/data(with:original:)``.
-    static let png = FormatIndicatedCacheSerializer(imageFormat: .PNG, jpegCompressionQuality: nil)
+    public static let png = FormatIndicatedCacheSerializer(imageFormat: .PNG, jpegCompressionQuality: nil)
     
     /// A `FormatIndicatedCacheSerializer` which converts image from and to JPEG format. If the image cannot be
     /// represented by JPEG format, it will fallback to its real format which is determined by `original` data.
@@ -80,7 +80,7 @@ struct FormatIndicatedCacheSerializer: CacheSerializer {
     ///
     /// > The compression quality is 1.0 when using this serializer. To set a customized compression quality,
     /// use ``FormatIndicatedCacheSerializer/jpeg(compressionQuality:)``.
-    static let jpeg = FormatIndicatedCacheSerializer(imageFormat: .JPEG, jpegCompressionQuality: 1.0)
+    public static let jpeg = FormatIndicatedCacheSerializer(imageFormat: .JPEG, jpegCompressionQuality: 1.0)
 
     /// A ``FormatIndicatedCacheSerializer`` instance that converts images to and from the JPEG format.
     ///
@@ -88,7 +88,7 @@ struct FormatIndicatedCacheSerializer: CacheSerializer {
     ///
     /// If the image cannot be represented in the JPEG format, it will fallback to its actual format determined by the
     /// `original` data in ``CacheSerializer/data(with:original:)``.
-    static func jpeg(compressionQuality: CGFloat) -> FormatIndicatedCacheSerializer {
+    public static func jpeg(compressionQuality: CGFloat) -> FormatIndicatedCacheSerializer {
         return FormatIndicatedCacheSerializer(imageFormat: .JPEG, jpegCompressionQuality: compressionQuality)
     }
     
@@ -96,7 +96,7 @@ struct FormatIndicatedCacheSerializer: CacheSerializer {
     ///
     /// If the image cannot be represented in the GIF format, it will fallback to its actual format determined by the
     /// `original` data in ``CacheSerializer/data(with:original:)``.
-    static let gif = FormatIndicatedCacheSerializer(imageFormat: .GIF, jpegCompressionQuality: nil)
+    public static let gif = FormatIndicatedCacheSerializer(imageFormat: .GIF, jpegCompressionQuality: nil)
     
     // The specified image format.
     private let imageFormat: ImageFormat
@@ -104,7 +104,7 @@ struct FormatIndicatedCacheSerializer: CacheSerializer {
     // The compression quality used for lossy image formats (like JPEG).
     private let jpegCompressionQuality: CGFloat?
     
-    func data(with image: KFCrossPlatformImage, original: Data?) -> Data? {
+    public func data(with image: KFCrossPlatformImage, original: Data?) -> Data? {
         
         func imageData(withFormat imageFormat: ImageFormat) -> Data? {
             return autoreleasepool { () -> Data? in
@@ -132,7 +132,7 @@ struct FormatIndicatedCacheSerializer: CacheSerializer {
         return original ?? image.kf.normalized.kf.pngRepresentation()
     }
     
-    func image(with data: Data, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
+    public func image(with data: Data, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
         return KingfisherWrapper.image(data: data, options: options.imageCreatingOptions)
     }
 }

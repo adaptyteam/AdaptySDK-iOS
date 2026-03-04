@@ -42,19 +42,19 @@ struct SendableBox<T>: @unchecked Sendable {
 private let ciContext = SendableBox(value: CIContext(options: nil))
 
 /// Represents the type of transformer method, which will be used to provide a ``Filter``.
-typealias Transformer = (CIImage) -> CIImage?
+public typealias Transformer = (CIImage) -> CIImage?
 
 /// Represents an ``ImageProcessor`` based on a ``Filter``, for images of `CIImage`.
 ///
 /// You can use any ``Filter``, or in other words, a ``Transformer`` to convert a `CIImage` to another, to create a
 /// ``ImageProcessor`` type easily.
-protocol CIImageProcessor: ImageProcessor {
+public protocol CIImageProcessor: ImageProcessor {
     var filter: Filter { get }
 }
 
 extension CIImageProcessor {
     
-    func process(item: ImageProcessItem, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
+    public func process(item: ImageProcessItem, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
         switch item {
         case .image(let image):
             return image.kf.apply(filter)
@@ -67,19 +67,19 @@ extension CIImageProcessor {
 /// A wrapper struct for a `Transformer` of CIImage filters. 
 ///
 /// A ``Filter`` value can be used to create an ``ImageProcessor`` for `CIImage`s.
-struct Filter {
+public struct Filter {
     
     let transform: Transformer
     
     /// Creates a ``Filter`` from a given ``Transformer``.
     ///
     /// - Parameter transform: The value defines how a `CIImage` can be converted to another one.
-    init(transform: @escaping Transformer) {
+    public init(transform: @escaping Transformer) {
         self.transform = transform
     }
     
     /// Tint filter that applies a tint color to images.
-    static let tint: @Sendable (KFCrossPlatformColor) -> Filter = {
+    public static let tint: @Sendable (KFCrossPlatformColor) -> Filter = {
         color in
         Filter {
             input in
@@ -101,11 +101,11 @@ struct Filter {
     ///
     /// It contains necessary variables which can be applied as a filter to `CIImage.applyingFilter` feature as
     /// "CIColorControls".
-    struct ColorElement {
-        let brightness: CGFloat
-        let contrast: CGFloat
-        let saturation: CGFloat
-        let inputEV: CGFloat
+    public struct ColorElement {
+        public let brightness: CGFloat
+        public let contrast: CGFloat
+        public let saturation: CGFloat
+        public let inputEV: CGFloat
         
         /// Creates a ``ColorElement`` value with given parameters.
         /// - Parameters:
@@ -113,7 +113,7 @@ struct Filter {
         ///   - contrast: The contrast change applied to the image.
         ///   - saturation: The saturation change applied to the image.
         ///   - inputEV: The EV (F-stops brighter or darker) change applied to the image.
-        init(brightness: CGFloat, contrast: CGFloat, saturation: CGFloat, inputEV: CGFloat) {
+        public init(brightness: CGFloat, contrast: CGFloat, saturation: CGFloat, inputEV: CGFloat) {
             self.brightness = brightness
             self.contrast = contrast
             self.saturation = saturation
@@ -122,7 +122,7 @@ struct Filter {
     }
     
     /// Color control filter that applies color control changes to images.
-    static let colorControl: @Sendable (ColorElement) -> Filter = { arg -> Filter in
+    public static let colorControl: @Sendable (ColorElement) -> Filter = { arg -> Filter in
         return Filter { input in
             let paramsColor = [kCIInputBrightnessKey: arg.brightness,
                                  kCIInputContrastKey: arg.contrast,
@@ -144,7 +144,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > Important: Only CG-based images are supported. If an error occurs during transformation,
     /// ``KingfisherWrapper/base`` will be returned.
-    func apply(_ filter: Filter) -> KFCrossPlatformImage {
+    public func apply(_ filter: Filter) -> KFCrossPlatformImage {
         
         guard let cgImage = cgImage else {
             assertionFailure("[Kingfisher] Tint image only works for CG-based image.")

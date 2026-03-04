@@ -35,7 +35,7 @@ import UIKit
 ///
 /// This delegate protocol provides a set of methods related to the stages and rules of the image downloader. You use
 /// the provided methods to inspect the downloader working phases or respond to some events to make decisions.
-protocol ImageDownloaderDelegate: AnyObject {
+public protocol ImageDownloaderDelegate: AnyObject {
 
     /// Called when the ``ImageDownloader`` object is about to start downloading an image from a specified URL.
     ///
@@ -57,30 +57,20 @@ protocol ImageDownloaderDelegate: AnyObject {
         didFinishDownloadingImageForURL url: URL,
         with response: URLResponse?,
         error: (any Error)?)
-
+    
     /// Called when the ``ImageDownloader`` object successfully downloads image data with a specified task.
     ///
-    /// This is your last chance to verify or modify the downloaded data before Kingfisher attempts to perform 
+    /// This is your last chance to verify or modify the downloaded data before Kingfisher attempts to perform
     /// additional processing on the image data.
     ///
     /// - Parameters:
     ///   - downloader: The ``ImageDownloader`` object used for the downloading operation.
     ///   - data: The original downloaded data.
-    ///   - dataTask: The data task containing request and response information for the download.
-    ///
+    ///   - task: The data task containing request and response information for the download.
     /// - Returns: The data that Kingfisher should use to create an image. You need to provide valid data that is in
     /// one of the supported image file formats. Kingfisher will process this data and attempt to convert it into an
     /// image object.
-    ///
-    ///
-    /// This method can be used to preprocess raw image data before the creation of the `Image` instance (e.g.,
-    /// decrypting or verification). If `nil` is returned, the processing is interrupted and a
-    /// ``KingfisherError/ResponseErrorReason/dataModifyingFailed(task:)`` error will be raised. You can use this fact
-    /// to stop the image processing flow if you find that the data is corrupted or malformed.
-    ///
-    /// > If this method is implemented, the `URL` version of 
-    /// ``ImageDownloaderDelegate/imageDownloader(_:didDownload:for:)-5btcl`` will not be called anymore.
-    func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, with dataTask: SessionDataTask) -> Data?
+    func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, with task: SessionDataTask) -> Data?
   
     /// Called when the ``ImageDownloader`` object successfully downloads image data from a specified URL.
     ///
@@ -157,39 +147,39 @@ protocol ImageDownloaderDelegate: AnyObject {
 
 // Default implementation for `ImageDownloaderDelegate`.
 extension ImageDownloaderDelegate {
-    func imageDownloader(
+    public func imageDownloader(
         _ downloader: ImageDownloader,
         willDownloadImageForURL url: URL,
         with request: URLRequest?) {}
 
-    func imageDownloader(
+    public func imageDownloader(
         _ downloader: ImageDownloader,
         didFinishDownloadingImageForURL url: URL,
         with response: URLResponse?,
         error: (any Error)?) {}
 
-    func imageDownloader(
+    public func imageDownloader(
         _ downloader: ImageDownloader,
         didDownload image: KFCrossPlatformImage,
         for url: URL,
         with response: URLResponse?) {}
 
-    func isValidStatusCode(_ code: Int, for downloader: ImageDownloader) -> Bool {
+    public func isValidStatusCode(_ code: Int, for downloader: ImageDownloader) -> Bool {
         return (200..<400).contains(code)
     }
   
-    func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, with task: SessionDataTask) -> Data? {
+    public func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, with task: SessionDataTask) -> Data? {
         guard let url = task.originalURL else {
             return data
         }
         return imageDownloader(downloader, didDownload: data, for: url)
     }
   
-    func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, for url: URL) -> Data? {
+    public func imageDownloader(_ downloader: ImageDownloader, didDownload data: Data, for url: URL) -> Data? {
         return data
     }
 
-    func imageDownloader(
+    public func imageDownloader(
         _ downloader: ImageDownloader,
         didReceive response: URLResponse
     ) async -> URLSession.ResponseDisposition {

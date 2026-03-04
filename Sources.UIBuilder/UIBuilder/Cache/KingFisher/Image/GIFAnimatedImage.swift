@@ -28,20 +28,20 @@ import Foundation
 import ImageIO
 
 /// Represents a set of image creation options used in Kingfisher.
-struct ImageCreatingOptions {
+public struct ImageCreatingOptions: Equatable {
 
     /// The target scale of the image that needs to be created.
-    var scale: CGFloat
+    public var scale: CGFloat
 
     /// The expected animation duration if an animated image is being created.
-    var duration: TimeInterval
+    public var duration: TimeInterval
 
     /// For an animated image, indicates whether or not all frames should be loaded before displaying.
-    var preloadAll: Bool
+    public var preloadAll: Bool
 
     /// For an animated image, indicates whether only the first image should be
     /// loaded as a static image. It is useful for previewing an animated image.
-    var onlyFirstFrame: Bool
+    public var onlyFirstFrame: Bool
     
     /// Creates an `ImageCreatingOptions` object.
     ///
@@ -55,7 +55,7 @@ struct ImageCreatingOptions {
     ///     - onlyFirstFrame: For an animated image, whether only the first image should be
     ///                       loaded as a static image. It is useful for previewing an animated image.
     ///                       Default is `false`.
-    init(
+    public init(
         scale: CGFloat = 1.0,
         duration: TimeInterval = 0.0,
         preloadAll: Bool = false,
@@ -71,7 +71,7 @@ struct ImageCreatingOptions {
 
 /// Represents the decoding for a GIF image. This class extracts frames from an ``ImageFrameSource``, and then
 /// holds the images for later use.
-class GIFAnimatedImage {
+public class GIFAnimatedImage {
     let images: [KFCrossPlatformImage]
     let duration: TimeInterval
     
@@ -104,7 +104,7 @@ class GIFAnimatedImage {
     }
     
     /// Calculates the frame duration for a GIF frame out of the `kCGImagePropertyGIFDictionary` dictionary.
-    static func getFrameDuration(from gifInfo: [String: Any]?) -> TimeInterval {
+    public static func getFrameDuration(from gifInfo: [String: Any]?) -> TimeInterval {
         let defaultFrameDuration = 0.1
         guard let gifInfo = gifInfo else { return defaultFrameDuration }
         
@@ -122,7 +122,7 @@ class GIFAnimatedImage {
     ///   - imageSource: The image source where the animated image information should be extracted from.
     ///   - index: The index of the target frame in the image.
     /// - Returns: The time duration of the frame at given index in the image.
-    static func getFrameDuration(from imageSource: CGImageSource, at index: Int) -> TimeInterval {
+    public static func getFrameDuration(from imageSource: CGImageSource, at index: Int) -> TimeInterval {
         guard let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, index, nil)
             as? [String: Any] else { return 0.0 }
 
@@ -132,7 +132,7 @@ class GIFAnimatedImage {
 }
 
 /// Represents a frame source for an animated image.
-protocol ImageFrameSource {
+public protocol ImageFrameSource {
     
     /// Source data associated with this frame source.
     var data: Data? { get }
@@ -148,13 +148,24 @@ protocol ImageFrameSource {
     
     /// Retrieves the duration at a specific index. If the index is invalid, implementors should return `0.0`.
     func duration(at index: Int) -> TimeInterval
+    
+    /// Creates a copy of the current `ImageFrameSource` instance.
+    ///
+    /// - Returns: A new instance of the same type as `self` with identical properties.
+    ///            If not overridden by conforming types, this default implementation
+    ///            simply returns `self`, which may not create an actual copy if the type is a reference type.
+    func copy() -> Self
 }
 
-extension ImageFrameSource {
+public extension ImageFrameSource {
     
     /// Retrieves the frame at a specific index. If the index is invalid, implementors should return `nil`.
     func frame(at index: Int) -> CGImage? {
         return frame(at: index, maxSize: nil)
+    }
+    
+    func copy() -> Self {
+        return self
     }
 }
 
@@ -182,6 +193,13 @@ struct CGImageFrameSource: ImageFrameSource {
 
     func duration(at index: Int) -> TimeInterval {
         return GIFAnimatedImage.getFrameDuration(from: imageSource, at: index)
+    }
+    
+    func copy() -> Self {
+        guard let data = data, let source = CGImageSourceCreateWithData(data as CFData, options as CFDictionary?) else {
+            return self
+        }
+        return CGImageFrameSource(data: data, imageSource: source, options: options)
     }
 }
 

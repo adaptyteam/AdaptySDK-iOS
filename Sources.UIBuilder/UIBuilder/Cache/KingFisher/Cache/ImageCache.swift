@@ -41,15 +41,15 @@ extension Notification.Name {
     /// of the removed files.
     /// 
     /// > Invoking the `clearDiskCache` method manually will not trigger this notification.
-    static let KingfisherDidCleanDiskCache =
+    public static let KingfisherDidCleanDiskCache =
         Notification.Name("com.onevcat.Kingfisher.KingfisherDidCleanDiskCache")
 }
 
 /// Key for array of cleaned hashes in `userInfo` of `KingfisherDidCleanDiskCache` notification.
-let KingfisherDiskCacheCleanedHashKey = "com.onevcat.Kingfisher.cleanedHash"
+public let KingfisherDiskCacheCleanedHashKey = "com.onevcat.Kingfisher.cleanedHash"
 
 /// The type of cache for a cached image.
-enum CacheType: Sendable {
+public enum CacheType: Sendable {
     /// The image is not yet cached when retrieving it.
     ///
     /// This indicates that the image was recently downloaded or generated rather than being retrieved from either
@@ -63,7 +63,7 @@ enum CacheType: Sendable {
     case disk
     
     /// Indicates whether the cache type represents the image is already cached or not.
-    var cached: Bool {
+    public var cached: Bool {
         switch self {
         case .memory, .disk: return true
         case .none: return false
@@ -72,18 +72,18 @@ enum CacheType: Sendable {
 }
 
 /// Represents the result of the caching operation.
-struct CacheStoreResult: Sendable {
+public struct CacheStoreResult: Sendable {
     
     /// The caching result for memory cache.
     ///
     /// Caching an image to memory will never fail.
-    let memoryCacheResult: Result<(), Never>
+    public let memoryCacheResult: Result<(), Never>
     
     /// The caching result for disk cache.
     ///
     /// If an error occurs during the caching operation, you can retrieve it from the `.failure` case of this value.
     /// Usually, the error contains a ``KingfisherError/CacheErrorReason``.
-    let diskCacheResult: Result<(), KingfisherError>
+    public let diskCacheResult: Result<(), KingfisherError>
 }
 
 extension KFCrossPlatformImage: CacheCostCalculable {
@@ -92,24 +92,24 @@ extension KFCrossPlatformImage: CacheCostCalculable {
     /// It is an estimated size represented as a bitmap, measured in bytes of all pixels. A larger cost indicates that
     /// when cached in memory, it occupies more memory space. This cost contributes to the
     /// ``MemoryStorage/Config/countLimit``.
-    var cacheCost: Int { return kf.cost }
+    public var cacheCost: Int { return kf.cost }
 }
 
 extension Data: DataTransformable {
-    func toData() throws -> Data {
+    public func toData() throws -> Data {
         self
     }
 
-    static func fromData(_ data: Data) throws -> Data {
+    public static func fromData(_ data: Data) throws -> Data {
         data
     }
 
-    static let empty = Data()
+    public static let empty = Data()
 }
 
 
 /// Represents the result of the operation to retrieve an image from the cache.
-enum ImageCacheResult: Sendable {
+public enum ImageCacheResult: Sendable {
     
     /// The image can be retrieved from the disk cache.
     case disk(KFCrossPlatformImage)
@@ -124,7 +124,7 @@ enum ImageCacheResult: Sendable {
     ///
     /// It returns the associated `Image` value for ``ImageCacheResult/disk(_:)`` and ``ImageCacheResult/memory(_:)``
     /// case. For ``ImageCacheResult/none`` case, returns `nil`.
-    var image: KFCrossPlatformImage? {
+    public var image: KFCrossPlatformImage? {
         switch self {
         case .disk(let image): return image
         case .memory(let image): return image
@@ -133,7 +133,7 @@ enum ImageCacheResult: Sendable {
     }
     
     /// Returns the corresponding ``CacheType`` value based on the result type of `self`.
-    var cacheType: CacheType {
+    public var cacheType: CacheType {
         switch self {
         case .disk: return .disk
         case .memory: return .memory
@@ -151,7 +151,7 @@ enum ImageCacheResult: Sendable {
 /// > While a default image cache object will be used if you prefer the extension methods of Kingfisher, you can create
 /// your own cache object and configure its storages according to your needs. This class also provides an interface for
 /// configuring the memory and disk storage.
-final class ImageCache: @unchecked Sendable {
+open class ImageCache: @unchecked Sendable {
 
     // MARK: Singleton
     /// The default ``ImageCache`` object.
@@ -160,27 +160,27 @@ final class ImageCache: @unchecked Sendable {
     ///
     /// > Warning: The `name` of this default cache is reserved as "default", and you should not use this name for any
     /// of your custom caches. Otherwise, different caches might become mixed up and corrupted.
-    static let `default` = ImageCache(name: "default")
+    public static let `default` = ImageCache(name: "default")
 
-    // MARK: Properties
+    // MARK: Public Properties
     /// The ``MemoryStorage/Backend`` object for the memory cache used in this cache.
     ///
     /// This storage stores loaded images in memory with a reasonable expire duration and a maximum memory usage.
     ///
     /// > To modify the configuration of a storage, just set the storage ``MemoryStorage/Config`` and its properties.
-    let memoryStorage: MemoryStorage.Backend<KFCrossPlatformImage>
+    public let memoryStorage: MemoryStorage.Backend<KFCrossPlatformImage>
     
     /// The ``DiskStorage/Backend`` object for the disk cache used in this cache.
     ///
     /// This storage stores loaded images on disk with a reasonable expire duration and a maximum disk usage.
     ///
     /// > To modify the configuration of a storage, just set the storage ``DiskStorage/Config`` and its properties.
-    let diskStorage: DiskStorage.Backend<Data>
+    public let diskStorage: DiskStorage.Backend<Data>
     
     private let ioQueue: DispatchQueue
     
     /// A closure that specifies the disk cache path based on a given path and the cache name.
-    typealias DiskCachePathClosure = @Sendable (URL, String) -> URL
+    public typealias DiskCachePathClosure = @Sendable (URL, String) -> URL
 
     // MARK: Initializers
 
@@ -189,7 +189,7 @@ final class ImageCache: @unchecked Sendable {
     /// - Parameters:
     ///   - memoryStorage: The ``MemoryStorage/Backend`` object to be used in the image memory cache.
     ///   - diskStorage: The ``DiskStorage/Backend`` object to be used in the image disk cache.
-    init(
+    public init(
         memoryStorage: MemoryStorage.Backend<KFCrossPlatformImage>,
         diskStorage: DiskStorage.Backend<Data>)
     {
@@ -230,7 +230,7 @@ final class ImageCache: @unchecked Sendable {
     /// > Warning: The `name` "default" is reserved to be used as the name of ``ImageCache/default`` in Kingfisher,
     /// and you should not use this name for any of your custom caches. Otherwise, different caches might become mixed
     /// up and corrupted.
-    convenience init(name: String) {
+    public convenience init(name: String) {
         self.init(noThrowName: name, cacheDirectoryURL: nil, diskCachePathClosure: nil)
     }
 
@@ -252,7 +252,7 @@ final class ImageCache: @unchecked Sendable {
     /// > Warning: The `name` "default" is reserved to be used as the name of ``ImageCache/default`` in Kingfisher,
     /// and you should not use this name for any of your custom caches. Otherwise, different caches might become mixed
     /// up and corrupted.
-    convenience init(
+    public convenience init(
         name: String,
         cacheDirectoryURL: URL?,
         diskCachePathClosure: DiskCachePathClosure? = nil
@@ -335,7 +335,7 @@ final class ImageCache: @unchecked Sendable {
     ///   - toDisk: Whether this image should be cached to disk or not. If `false`, the image is only cached in memory.
     ///   Otherwise, it is cached in both memory storage and disk storage. The default is `true`.
     ///   - completionHandler: A closure which is invoked when the cache operation finishes.
-    func store(
+    open func store(
         _ image: KFCrossPlatformImage,
         original: Data? = nil,
         forKey key: String,
@@ -365,6 +365,7 @@ final class ImageCache: @unchecked Sendable {
                 self.syncStoreToDisk(
                     data,
                     forKey: key,
+                    forcedExtension: options.forcedExtension,
                     processorIdentifier: identifier,
                     callbackQueue: callbackQueue,
                     expiration: options.diskCacheExpiration,
@@ -395,6 +396,8 @@ final class ImageCache: @unchecked Sendable {
     ///   - key: The key used for caching the image.
     ///   - identifier: The identifier of the processor being used for caching. If you are using a processor for the 
     ///   image, pass the identifier of the processor to this parameter.
+    ///   - forcedExtension: The expected extension of the file. If `nil`, the file extension will be determined by the
+    ///   disk storage configuration instead.
     ///   - serializer: The ``CacheSerializer`` used to convert the `image` and `original` to the data that will be
     ///   stored to disk. By default, the ``DefaultCacheSerializer/default`` will be used.
     ///   - toDisk: Whether this image should be cached to disk or not. If `false`, the image is only cached in memory.
@@ -405,11 +408,12 @@ final class ImageCache: @unchecked Sendable {
     ///   the `completionHandler` will be called from an internal file IO queue. To change this behavior, specify
     ///   another ``CallbackQueue`` value.
     ///   - completionHandler: A closure that is invoked when the cache operation finishes.
-    func store(
+    open func store(
         _ image: KFCrossPlatformImage,
         original: Data? = nil,
         forKey key: String,
         processorIdentifier identifier: String = "",
+        forcedExtension: String? = nil,
         cacheSerializer serializer: any CacheSerializer = DefaultCacheSerializer.default,
         toDisk: Bool = true,
         callbackQueue: CallbackQueue = .untouch,
@@ -426,16 +430,40 @@ final class ImageCache: @unchecked Sendable {
         let options = KingfisherParsedOptionsInfo([
             .processor(TempProcessor(identifier: identifier)),
             .cacheSerializer(serializer),
-            .callbackQueue(callbackQueue)
+            .callbackQueue(callbackQueue),
+            .forcedCacheFileExtension(forcedExtension)
         ])
-        store(image, original: original, forKey: key, options: options,
-              toDisk: toDisk, completionHandler: completionHandler)
+        store(
+            image,
+            original: original,
+            forKey: key,
+            options: options,
+            toDisk: toDisk,
+            completionHandler: completionHandler
+        )
     }
     
-    func storeToDisk(
+    /// Store some data to the disk.
+    /// 
+    /// - Parameters:
+    ///   - data: The data to be stored.
+    ///   - key: The key used for caching the data.
+    ///   - identifier: The identifier of the processor being used for caching. If you are using a processor for the
+    ///   image, pass the identifier of the processor to this parameter.
+    ///   - forcedExtension: The expected extension of the file. If `nil`, the file extension will be determined by the
+    ///   disk storage configuration instead.
+    ///   - expiration: The expiration policy used by this storage action.
+    ///   - callbackQueue: The callback queue on which the `completionHandler` is invoked. The default is
+    ///   ``CallbackQueue/untouch``. Under this default ``CallbackQueue/untouch`` queue, if `toDisk` is `false`, it
+    ///   means the `completionHandler` will be invoked from the caller queue of this method; if `toDisk` is `true`,
+    ///   the `completionHandler` will be called from an internal file IO queue. To change this behavior, specify
+    ///   another ``CallbackQueue`` value.
+    ///   - completionHandler: A closure that is invoked when the cache operation finishes.
+    open func storeToDisk(
         _ data: Data,
         forKey key: String,
         processorIdentifier identifier: String = "",
+        forcedExtension: String? = nil,
         expiration: StorageExpiration? = nil,
         callbackQueue: CallbackQueue = .untouch,
         completionHandler: (@Sendable (CacheStoreResult) -> Void)? = nil)
@@ -444,16 +472,19 @@ final class ImageCache: @unchecked Sendable {
             self.syncStoreToDisk(
                 data,
                 forKey: key,
+                forcedExtension: forcedExtension,
                 processorIdentifier: identifier,
                 callbackQueue: callbackQueue,
                 expiration: expiration,
-                completionHandler: completionHandler)
+                completionHandler: completionHandler
+            )
         }
     }
     
     private func syncStoreToDisk(
         _ data: Data,
         forKey key: String,
+        forcedExtension: String?,
         processorIdentifier identifier: String = "",
         callbackQueue: CallbackQueue = .untouch,
         expiration: StorageExpiration? = nil,
@@ -463,7 +494,13 @@ final class ImageCache: @unchecked Sendable {
         let computedKey = key.computedKey(with: identifier)
         let result: CacheStoreResult
         do {
-            try self.diskStorage.store(value: data, forKey: computedKey, expiration: expiration, writeOptions: writeOptions)
+            try self.diskStorage.store(
+                value: data,
+                forKey: computedKey,
+                expiration: expiration,
+                writeOptions: writeOptions,
+                forcedExtension: forcedExtension
+            )
             result = CacheStoreResult(memoryCacheResult: .success(()), diskCacheResult: .success(()))
         } catch {
             let diskError: KingfisherError
@@ -491,6 +528,8 @@ final class ImageCache: @unchecked Sendable {
     ///   - key: The key used for caching the image.
     ///   - identifier: The identifier of the processor being used for caching. If you are using a processor for the 
     ///   image, pass the identifier of the processor to this parameter.
+    ///   - forcedExtension: The expected extension of the file. If `nil`, the file extension will be determined by the
+    ///   disk storage configuration instead.
     ///   - fromMemory: Whether this image should be removed from memory storage or not. If `false`, the image won't be 
     ///   removed from the memory storage. The default is `true`.
     ///   - fromDisk: Whether this image should be removed from the disk storage or not. If `false`, the image won't be
@@ -498,9 +537,10 @@ final class ImageCache: @unchecked Sendable {
     ///   - callbackQueue: The callback queue on which the `completionHandler` is invoked. The default is
     ///   ``CallbackQueue/untouch``.
     ///   - completionHandler: A closure that is invoked when the cache removal operation finishes.
-    func removeImage(
+    open func removeImage(
         forKey key: String,
         processorIdentifier identifier: String = "",
+        forcedExtension: String? = nil,
         fromMemory: Bool = true,
         fromDisk: Bool = true,
         callbackQueue: CallbackQueue = .untouch,
@@ -510,6 +550,7 @@ final class ImageCache: @unchecked Sendable {
         removeImage(
             forKey: key,
             processorIdentifier: identifier,
+            forcedExtension: forcedExtension,
             fromMemory: fromMemory,
             fromDisk: fromDisk,
             callbackQueue: callbackQueue,
@@ -517,12 +558,14 @@ final class ImageCache: @unchecked Sendable {
         )
     }
     
-    func removeImage(forKey key: String,
-                          processorIdentifier identifier: String = "",
-                          fromMemory: Bool = true,
-                          fromDisk: Bool = true,
-                          callbackQueue: CallbackQueue = .untouch,
-                          completionHandler: (@Sendable ((any Error)?) -> Void)? = nil)
+    func removeImage(
+        forKey key: String,
+        processorIdentifier identifier: String = "",
+        forcedExtension: String?,
+        fromMemory: Bool = true,
+        fromDisk: Bool = true,
+        callbackQueue: CallbackQueue = .untouch,
+        completionHandler: (@Sendable ((any Error)?) -> Void)? = nil)
     {
         let computedKey = key.computedKey(with: identifier)
 
@@ -539,7 +582,7 @@ final class ImageCache: @unchecked Sendable {
         if fromDisk {
             ioQueue.async{
                 do {
-                    try self.diskStorage.remove(forKey: computedKey)
+                    try self.diskStorage.remove(forKey: computedKey, forcedExtension: forcedExtension)
                     callHandler(nil)
                 } catch {
                     callHandler(error)
@@ -562,7 +605,7 @@ final class ImageCache: @unchecked Sendable {
     ///   - completionHandler: A closure that is invoked when the image retrieval operation finishes. If the image 
     ///   retrieval operation finishes without any problems, an ``ImageCacheResult`` value will be sent to this closure
     ///   as a result. Otherwise, a ``KingfisherError`` result with detailed failure reason will be sent.
-    func retrieveImage(
+    open func retrieveImage(
         forKey key: String,
         options: KingfisherParsedOptionsInfo,
         callbackQueue: CallbackQueue = .mainCurrentOrAsync,
@@ -624,9 +667,9 @@ final class ImageCache: @unchecked Sendable {
     ///   as a result. Otherwise, a ``KingfisherError`` result with detailed failure reason will be sent.
     ///
     /// > This method is marked as `open` for compatibility purposes only. Do not override this method. Instead,
-    /// override the version ``ImageCache/retrieveImage(forKey:options:callbackQueue:completionHandler:)-1m1bb`` that 
+    /// override the version ``ImageCache/retrieveImageInDiskCache(forKey:options:callbackQueue:completionHandler:)``
     /// accepts a ``KingfisherParsedOptionsInfo`` value.
-    func retrieveImage(
+    open func retrieveImage(
         forKey key: String,
         options: KingfisherOptionsInfo? = nil,
         callbackQueue: CallbackQueue = .mainCurrentOrAsync,
@@ -647,7 +690,7 @@ final class ImageCache: @unchecked Sendable {
     ///   - options: The ``KingfisherParsedOptionsInfo`` options setting used to fetch the image.
     /// - Returns: The image stored in the memory cache if it exists and is valid. If the image does not exist or has
     ///  already expired, `nil` is returned.
-    func retrieveImageInMemoryCache(
+    open func retrieveImageInMemoryCache(
         forKey key: String,
         options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage?
     {
@@ -669,7 +712,7 @@ final class ImageCache: @unchecked Sendable {
     /// > This method is marked as `open` for compatibility purposes only. Do not override this method. Instead,
     /// override the version ``ImageCache/retrieveImageInMemoryCache(forKey:options:)-2xj0`` that accepts a
     ///  ``KingfisherParsedOptionsInfo`` value.
-    func retrieveImageInMemoryCache(
+    open func retrieveImageInMemoryCache(
         forKey key: String,
         options: KingfisherOptionsInfo? = nil) -> KFCrossPlatformImage?
     {
@@ -687,7 +730,11 @@ final class ImageCache: @unchecked Sendable {
         loadingQueue.execute {
             do {
                 var image: KFCrossPlatformImage? = nil
-                if let data = try self.diskStorage.value(forKey: computedKey, extendingExpiration: options.diskCacheAccessExtendingExpiration) {
+                if let data = try self.diskStorage.value(
+                    forKey: computedKey,
+                    forcedExtension: options.forcedExtension,
+                    extendingExpiration: options.diskCacheAccessExtendingExpiration
+                ) {
                     image = options.cacheSerializer.image(with: data, options: options)
                 }
                 if options.backgroundDecode {
@@ -710,7 +757,7 @@ final class ImageCache: @unchecked Sendable {
     ///   - callbackQueue: The callback queue on which the `completionHandler` is invoked.
     ///   The default is ``CallbackQueue/untouch``.
     ///   - completionHandler: A closure that is invoked when the operation is finished.
-    func retrieveImageInDiskCache(
+    open func retrieveImageInDiskCache(
         forKey key: String,
         options: KingfisherOptionsInfo? = nil,
         callbackQueue: CallbackQueue = .untouch,
@@ -730,13 +777,13 @@ final class ImageCache: @unchecked Sendable {
     ///
     /// - Parameter handler: A closure that is invoked when the cache clearing operation finishes.
     ///                      This `handler` will be called from the main queue.
-    func clearCache(completion handler: (@Sendable () -> Void)? = nil) {
+    public func clearCache(completion handler: (@Sendable () -> Void)? = nil) {
         clearMemoryCache()
         clearDiskCache(completion: handler)
     }
     
     /// Clears the memory storage of this cache.
-    @objc func clearMemoryCache() {
+    @objc public func clearMemoryCache() {
         memoryStorage.removeAll()
     }
     
@@ -746,7 +793,7 @@ final class ImageCache: @unchecked Sendable {
     ///
     /// - Parameter handler: A closure that is invoked when the cache clearing operation finishes.
     ///                      This `handler` will be called from the main queue.
-    func clearDiskCache(completion handler: (@Sendable () -> Void)? = nil) {
+    open func clearDiskCache(completion handler: (@Sendable () -> Void)? = nil) {
         ioQueue.async {
             do {
                 try self.diskStorage.removeAll()
@@ -760,13 +807,13 @@ final class ImageCache: @unchecked Sendable {
     /// Clears the expired images from the memory and disk storage.
     ///
     /// This is an asynchronous operation. When the cache clearing operation finishes, the `handler` will be invoked.
-    func cleanExpiredCache(completion handler: (@Sendable () -> Void)? = nil) {
+    open func cleanExpiredCache(completion handler: (@Sendable () -> Void)? = nil) {
         cleanExpiredMemoryCache()
         cleanExpiredDiskCache(completion: handler)
     }
 
     /// Clears the expired images from the memory storage.
-    func cleanExpiredMemoryCache() {
+    open func cleanExpiredMemoryCache() {
         memoryStorage.removeExpired()
     }
     
@@ -783,7 +830,7 @@ final class ImageCache: @unchecked Sendable {
     ///
     /// - Parameter handler: A closure which is invoked when the cache clearing operation finishes.
     ///                      This `handler` will be called from the main queue.
-    func cleanExpiredDiskCache(completion handler: (@Sendable () -> Void)? = nil) {
+    open func cleanExpiredDiskCache(completion handler: (@Sendable () -> Void)? = nil) {
         ioQueue.async {
             do {
                 var removed: [URL] = []
@@ -818,34 +865,49 @@ final class ImageCache: @unchecked Sendable {
     /// In most cases, you should not call this method explicitly. It will be called automatically when a
     ///  `UIApplicationDidEnterBackgroundNotification` is received.
     @MainActor
-    @objc func backgroundCleanExpiredDiskCache() {
+    @objc public func backgroundCleanExpiredDiskCache() {
         // if 'sharedApplication()' is unavailable, then return
         guard let sharedApplication = KingfisherWrapper<UIApplication>.shared else { return }
-        
-        let taskActor = ActorBox<UIBackgroundTaskIdentifier?>(nil)
-        
-        let createdTask = sharedApplication.beginBackgroundTask(withName: "Kingfisher:backgroundCleanExpiredDiskCache") {
-            Task {
-                guard let bgTask = await taskActor.value, bgTask != .invalid else { return }
-                sharedApplication.endBackgroundTask(bgTask)
-                await taskActor.setValue(.invalid)
+
+        actor BackgroundTaskState {
+            private var value: UIBackgroundTaskIdentifier? = nil
+
+            func setValue(_ newValue: UIBackgroundTaskIdentifier) {
+                value = newValue
+            }
+
+            func takeValidValueAndInvalidate() -> UIBackgroundTaskIdentifier? {
+                guard let task = value, task != .invalid else { return nil }
+                value = .invalid
+                return task
             }
         }
-        
-        cleanExpiredDiskCache {
-            Task {
-                guard let bgTask = await taskActor.value, bgTask != .invalid else { return }
+
+        let taskState = BackgroundTaskState()
+
+        let endBackgroundTaskIfNeeded: @Sendable () -> Void = {
+            Task { @MainActor in
+                guard let bgTask = await taskState.takeValidValueAndInvalidate() else { return }
+                guard let sharedApplication = KingfisherWrapper<UIApplication>.shared else { return }
                 #if compiler(>=6)
                 sharedApplication.endBackgroundTask(bgTask)
                 #else
                 await sharedApplication.endBackgroundTask(bgTask)
                 #endif
-                await taskActor.setValue(.invalid)
             }
         }
-        
-        Task {
-            await taskActor.setValue(createdTask)
+
+        let createdTask = sharedApplication.beginBackgroundTask(
+            withName: "Kingfisher:backgroundCleanExpiredDiskCache",
+            expirationHandler: endBackgroundTaskIfNeeded
+        )
+
+        Task { await taskState.setValue(createdTask) }
+
+        cleanExpiredDiskCache {
+            Task { @MainActor in
+                endBackgroundTaskIfNeeded()
+            }
         }
     }
 #endif
@@ -861,16 +923,96 @@ final class ImageCache: @unchecked Sendable {
     ///   - key: The key used for caching the image.
     ///   - identifier: The processor identifier used for this image. The default value is the
     ///    ``DefaultImageProcessor/identifier`` of the ``DefaultImageProcessor/default`` image processor.
+    ///   - forcedExtension: The expected extension of the file. If `nil`, the file extension will be determined by the
+    ///   disk storage configuration instead.
+    /// 
     /// - Returns: A ``CacheType`` instance that indicates the cache status. ``CacheType/none`` indicates that the
     /// image is not in the cache or that it has already expired.
-    func imageCachedType(
+    open func imageCachedType(
         forKey key: String,
-        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier) -> CacheType
+        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier,
+        forcedExtension: String? = nil
+    ) -> CacheType
     {
         let computedKey = key.computedKey(with: identifier)
         if memoryStorage.isCached(forKey: computedKey) { return .memory }
-        if diskStorage.isCached(forKey: computedKey) { return .disk }
+        if diskStorage.isCached(forKey: computedKey, forcedExtension: forcedExtension) { return .disk }
         return .none
+    }
+
+    /// Checks cache type for a given key and processor identifier combination asynchronously.
+    ///
+    /// This method is an opt-in alternative to ``imageCachedType(forKey:processorIdentifier:forcedExtension:)``.
+    /// It performs any disk existence/meta check on the cache's I/O queue to avoid blocking the calling thread.
+    ///
+    /// - Parameters:
+    ///   - key: The key used for caching the image.
+    ///   - identifier: The processor identifier used for this image. The default value is the
+    ///     ``DefaultImageProcessor/identifier`` of the ``DefaultImageProcessor/default`` image processor.
+    ///   - forcedExtension: The expected extension of the file. If `nil`, the file extension will be determined by the
+    ///     disk storage configuration instead.
+    ///   - callbackQueue: The callback queue on which the `completionHandler` is invoked. Default is `.mainCurrentOrAsync`.
+    ///   - completionHandler: Called with the resolved ``CacheType``.
+    public func imageCachedTypeAsync(
+        forKey key: String,
+        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier,
+        forcedExtension: String? = nil,
+        callbackQueue: CallbackQueue = .mainCurrentOrAsync,
+        completionHandler: @escaping @Sendable (CacheType) -> Void
+    ) {
+        let computedKey = key.computedKey(with: identifier)
+
+        // Memory cache check remains synchronous (no I/O).
+        if memoryStorage.isCached(forKey: computedKey) {
+            callbackQueue.execute {
+                completionHandler(.memory)
+            }
+            return
+        }
+
+        // Disk cache check on the I/O queue.
+        ioQueue.async { [weak self] in
+            guard let self else {
+                callbackQueue.execute {
+                    completionHandler(.none)
+                }
+                return
+            }
+
+            let cached = self.diskStorage.isCached(forKey: computedKey, forcedExtension: forcedExtension)
+            let result: CacheType = cached ? .disk : .none
+            callbackQueue.execute {
+                completionHandler(result)
+            }
+        }
+    }
+
+    /// Checks cache type for a given key and processor identifier combination asynchronously.
+    ///
+    /// This is an `async`/`await` convenience wrapper of
+    /// ``imageCachedTypeAsync(forKey:processorIdentifier:forcedExtension:callbackQueue:completionHandler:)``.
+    ///
+    /// - Parameters:
+    ///   - key: The key used for caching the image.
+    ///   - identifier: The processor identifier used for this image.
+    ///   - forcedExtension: The expected extension of the file.
+    ///
+    /// - Returns: A ``CacheType`` instance that indicates the cache status.
+    public func imageCachedTypeAsync(
+        forKey key: String,
+        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier,
+        forcedExtension: String? = nil
+    ) async -> CacheType {
+        await withCheckedContinuation { continuation in
+            imageCachedTypeAsync(
+                forKey: key,
+                processorIdentifier: identifier,
+                forcedExtension: forcedExtension,
+                callbackQueue: .untouch
+            ) { cacheType in
+                continuation.resume(returning: cacheType)
+            }
+        }
     }
     
     /// Returns whether the file exists in the cache for a given `key` and `identifier` combination.
@@ -879,16 +1021,21 @@ final class ImageCache: @unchecked Sendable {
     ///   - key: The key used for caching the image.
     ///   - identifier: The processor identifier used for this image. The default value is the
     ///    ``DefaultImageProcessor/identifier`` of the ``DefaultImageProcessor/default`` image processor.
+    ///   - forcedExtension: The expected extension of the file. If `nil`, the file extension will be determined by the
+    ///   disk storage configuration instead.
+    ///
     /// - Returns: A `Bool` value indicating whether a cache matches the given `key` and `identifier` combination.
     ///
     /// > The return value does not contain information about the kind of storage the cache matches from.
     /// > To obtain information about the cache type according to ``CacheType``, use
-    ///  ``ImageCache/imageCachedType(forKey:processorIdentifier:)`` instead.
-    func isCached(
+    ///  ``ImageCache/imageCachedType(forKey:processorIdentifier:forcedExtension:)`` instead.
+    public func isCached(
         forKey key: String,
-        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier) -> Bool
+        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier,
+        forcedExtension: String? = nil
+    ) -> Bool
     {
-        return imageCachedType(forKey: key, processorIdentifier: identifier).cached
+        return imageCachedType(forKey: key, processorIdentifier: identifier, forcedExtension: forcedExtension).cached
     }
     
     /// Retrieves the hash used as the cache file name for the key.
@@ -897,17 +1044,22 @@ final class ImageCache: @unchecked Sendable {
     ///   - key: The key used for caching the image.
     ///   - identifier: The processor identifier used for this image. The default value is the
     ///    ``DefaultImageProcessor/identifier`` of the ``DefaultImageProcessor/default`` image processor.
+    ///   - forcedExtension: The expected extension of the file. If `nil`, the file extension will be determined by the
+    ///   disk storage configuration instead.
+    /// 
     /// - Returns: The hash used as the cache file name.
     ///
     /// > By default, for a given combination of `key` and `identifier`, the ``ImageCache`` instance uses the value
     /// returned by this method as the cache file name. You can use this value to check and match the cache file if 
     /// needed.
-    func hash(
+    open func hash(
         forKey key: String,
-        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier) -> String
+        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier,
+        forcedExtension: String? = nil
+    ) -> String
     {
         let computedKey = key.computedKey(with: identifier)
-        return diskStorage.cacheFileName(forKey: computedKey)
+        return diskStorage.cacheFileName(forKey: computedKey, forcedExtension: forcedExtension)
     }
     
     /// Calculates the size taken by the disk storage.
@@ -915,7 +1067,7 @@ final class ImageCache: @unchecked Sendable {
     /// It represents the total file size of all cached files in the ``ImageCache/diskStorage`` on disk in bytes.
     ///
     /// - Parameter handler: Called when the size calculation is complete. This closure is invoked from the main queue.
-    func calculateDiskStorageSize(
+    open func calculateDiskStorageSize(
         completion handler: @escaping (@Sendable (Result<UInt, KingfisherError>) -> Void)
     ) {
         ioQueue.async {
@@ -939,19 +1091,45 @@ final class ImageCache: @unchecked Sendable {
     ///   - key: The key used for caching the image.
     ///   - identifier: The processor identifier used for this image. The default value is the
     ///    ``DefaultImageProcessor/identifier`` of the ``DefaultImageProcessor/default`` image processor.
+    ///   - forcedExtension: The expected extension of the file. If `nil`, the file extension will be determined by the
+    ///   disk storage configuration instead.
+    /// 
     /// - Returns: The disk path of the cached image under the given `key` and `identifier`.
     ///
     /// > This method does not guarantee that there is an image already cached in the returned path. It simply provides
     /// > the path where the image should be if it exists in the disk storage.
     /// >
-    /// > You could use the ``ImageCache/isCached(forKey:processorIdentifier:)`` method to check whether the image is
+    /// > You could use the ``ImageCache/isCached(forKey:processorIdentifier:forcedExtension:)`` method to check whether the image is
     /// cached under that key on disk if necessary.
-    func cachePath(
+    open func cachePath(
         forKey key: String,
-        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier) -> String
+        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier,
+        forcedExtension: String? = nil
+    ) -> String
     {
         let computedKey = key.computedKey(with: identifier)
-        return diskStorage.cacheFileURL(forKey: computedKey).path
+        return diskStorage.cacheFileURL(forKey: computedKey, forcedExtension: forcedExtension).path
+    }
+    
+    /// Returns the file URL if a disk cache file is existing for the target key, identifier and forcedExtension
+    /// combination. Otherwise, if the requested cache value is not on the disk as a file, `nil`.
+    ///
+    /// - Parameters:
+    ///   - key: The key used for caching the item.
+    ///   - identifier: The processor identifier used for this image. It involves into calculating the final cache key.
+    ///   - forcedExtension: The expected extension of the file.
+    /// - Returns: The file URL if a disk cache file is existing for the combination. Otherwise, `nil`.
+    open func cacheFileURLIfOnDisk(
+        forKey key: String,
+        processorIdentifier identifier: String = DefaultImageProcessor.default.identifier,
+        forcedExtension: String? = nil
+    ) -> URL?
+    {
+        let computedKey = key.computedKey(with: identifier)
+        return diskStorage.isCached(
+            forKey: computedKey,
+            forcedExtension: forcedExtension
+        ) ? diskStorage.cacheFileURL(forKey: computedKey, forcedExtension: forcedExtension) : nil
     }
     
     // MARK: - Concurrency
@@ -969,7 +1147,7 @@ final class ImageCache: @unchecked Sendable {
     ///   - options: The options which contains configurations for caching the image.
     ///   - toDisk: Whether this image should be cached to disk or not. If `false`, the image is only cached in memory.
     ///   Otherwise, it is cached in both memory storage and disk storage. The default is `true`.
-    func store(
+    open func store(
         _ image: KFCrossPlatformImage,
         original: Data? = nil,
         forKey key: String,
@@ -995,15 +1173,17 @@ final class ImageCache: @unchecked Sendable {
     ///   - key: The key used for caching the image.
     ///   - identifier: The identifier of the processor being used for caching. If you are using a processor for the
     ///   image, pass the identifier of the processor to this parameter.
+    ///   - forcedExtension: The file extension, if exists.
     ///   - serializer: The ``CacheSerializer`` used to convert the `image` and `original` to the data that will be
     ///   stored to disk. By default, the ``DefaultCacheSerializer/default`` will be used.
     ///   - toDisk: Whether this image should be cached to disk or not. If `false`, the image is only cached in memory.
     ///   Otherwise, it is cached in both memory storage and disk storage. The default is `true`.
-    func store(
+    open func store(
         _ image: KFCrossPlatformImage,
         original: Data? = nil,
         forKey key: String,
         processorIdentifier identifier: String = "",
+        forcedExtension: String? = nil,
         cacheSerializer serializer: any CacheSerializer = DefaultCacheSerializer.default,
         toDisk: Bool = true
     ) async throws {
@@ -1013,6 +1193,7 @@ final class ImageCache: @unchecked Sendable {
                 original: original,
                 forKey: key,
                 processorIdentifier: identifier,
+                forcedExtension: forcedExtension,
                 cacheSerializer: serializer,
                 toDisk: toDisk) {
                     // Only `diskCacheResult` can fail
@@ -1021,10 +1202,11 @@ final class ImageCache: @unchecked Sendable {
         }
     }
     
-    func storeToDisk(
+    open func storeToDisk(
         _ data: Data,
         forKey key: String,
         processorIdentifier identifier: String = "",
+        forcedExtension: String? = nil,
         expiration: StorageExpiration? = nil
     ) async throws
     {
@@ -1033,6 +1215,7 @@ final class ImageCache: @unchecked Sendable {
                 data,
                 forKey: key,
                 processorIdentifier: identifier,
+                forcedExtension: forcedExtension,
                 expiration: expiration) {
                     // Only `diskCacheResult` can fail
                     continuation.resume(with: $0.diskCacheResult)
@@ -1046,13 +1229,15 @@ final class ImageCache: @unchecked Sendable {
     ///   - key: The key used for caching the image.
     ///   - identifier: The identifier of the processor being used for caching. If you are using a processor for the
     ///   image, pass the identifier of the processor to this parameter.
+    ///   - forcedExtension: The file extension, if exists.
     ///   - fromMemory: Whether this image should be removed from memory storage or not. If `false`, the image won't be
     ///   removed from the memory storage. The default is `true`.
     ///   - fromDisk: Whether this image should be removed from the disk storage or not. If `false`, the image won't be
     ///    removed from the disk storage. The default is `true`.
-    func removeImage(
+    open func removeImage(
         forKey key: String,
         processorIdentifier identifier: String = "",
+        forcedExtension: String? = nil,
         fromMemory: Bool = true,
         fromDisk: Bool = true
     ) async throws {
@@ -1060,6 +1245,7 @@ final class ImageCache: @unchecked Sendable {
             removeImage(
                 forKey: key,
                 processorIdentifier: identifier,
+                forcedExtension: forcedExtension,
                 fromMemory: fromMemory,
                 fromDisk: fromDisk,
                 completionHandler: { error in
@@ -1082,7 +1268,7 @@ final class ImageCache: @unchecked Sendable {
     /// If the image retrieving operation finishes without problem, an ``ImageCacheResult`` value.
     ///
     /// - Throws: An error of type ``KingfisherError``, if any error happens inside Kingfisher framework.
-    func retrieveImage(
+    open func retrieveImage(
         forKey key: String,
         options: KingfisherParsedOptionsInfo
     ) async throws -> ImageCacheResult {
@@ -1102,9 +1288,9 @@ final class ImageCache: @unchecked Sendable {
     /// - Throws: An error of type ``KingfisherError``, if any error happens inside Kingfisher framework.
     ///
     /// > This method is marked as `open` for compatibility purposes only. Do not override this method. Instead,
-    /// override the version ``ImageCache/retrieveImage(forKey:options:callbackQueue:completionHandler:)-1m1bb`` that
+    /// override the version ``ImageCache/retrieveImage(forKey:options:callbackQueue:completionHandler:)-1jjo3`` that
     /// accepts a ``KingfisherParsedOptionsInfo`` value.
-    func retrieveImage(
+    open func retrieveImage(
         forKey key: String,
         options: KingfisherOptionsInfo? = nil
     ) async throws -> ImageCacheResult {
@@ -1126,7 +1312,7 @@ final class ImageCache: @unchecked Sendable {
     ///
     /// - Throws: An error of type ``KingfisherError``, if any error happens inside Kingfisher framework.
     ///  ``KingfisherParsedOptionsInfo`` value.
-    func retrieveImageInDiskCache(
+    open func retrieveImageInDiskCache(
         forKey key: String,
         options: KingfisherOptionsInfo? = nil
     ) async throws -> KFCrossPlatformImage? {
@@ -1140,7 +1326,7 @@ final class ImageCache: @unchecked Sendable {
     /// Clears the memory and disk storage of this cache.
     ///
     /// This is an asynchronous operation. When the cache clearing operation finishes, the whole method returns.
-    func clearCache() async {
+    open func clearCache() async {
         await withCheckedContinuation { continuation in
             clearCache { continuation.resume() }
         }
@@ -1149,7 +1335,7 @@ final class ImageCache: @unchecked Sendable {
     /// Clears the disk storage of this cache.
     ///
     /// This is an asynchronous operation. When the cache clearing operation finishes, the whole method returns.
-    func clearDiskCache() async {
+    open func clearDiskCache() async {
         await withCheckedContinuation { continuation in
             clearDiskCache { continuation.resume() }
         }
@@ -1158,7 +1344,7 @@ final class ImageCache: @unchecked Sendable {
     /// Clears the expired images from the memory and disk storage.
     ///
     /// This is an asynchronous operation. When the cache clearing operation finishes, the whole method returns.
-    func cleanExpiredCache() async {
+    open func cleanExpiredCache() async {
         await withCheckedContinuation { continuation in
             cleanExpiredCache { continuation.resume() }
         }
@@ -1167,7 +1353,7 @@ final class ImageCache: @unchecked Sendable {
     /// Clears the expired images from disk storage.
     ///
     /// This is an asynchronous operation. When the cache clearing operation finishes, the whole method returns.
-    func cleanExpiredDiskCache() async {
+    open func cleanExpiredDiskCache() async {
         await withCheckedContinuation { continuation in
             cleanExpiredDiskCache { continuation.resume() }
         }
@@ -1176,7 +1362,7 @@ final class ImageCache: @unchecked Sendable {
     /// Calculates the size taken by the disk storage.
     ///
     /// It represents the total file size of all cached files in the ``ImageCache/diskStorage`` on disk in bytes.
-    var diskStorageSize: UInt {
+    open var diskStorageSize: UInt {
         get async throws {
             try await withCheckedThrowingContinuation { continuation in
                 calculateDiskStorageSize { continuation.resume(with: $0) }
@@ -1193,10 +1379,11 @@ final class ImageCache: @unchecked Sendable {
 // MARK: - For App Extensions
 extension UIApplication: KingfisherCompatible { }
 extension KingfisherWrapper where Base: UIApplication {
-    static var shared: UIApplication? {
+    public static var shared: UIApplication? {
         let selector = NSSelectorFromString("sharedApplication")
         guard Base.responds(to: selector) else { return nil }
-        return Base.perform(selector).takeUnretainedValue() as? UIApplication
+        guard let unmanaged = Base.perform(selector) else { return nil }
+        return unmanaged.takeUnretainedValue() as? UIApplication
     }
 }
 #endif

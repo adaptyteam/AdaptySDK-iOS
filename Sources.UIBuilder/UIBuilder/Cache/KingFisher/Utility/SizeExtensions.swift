@@ -35,7 +35,7 @@ extension KingfisherWrapper where Base == CGSize {
     ///   - size: The target size to resize to.
     ///   - contentMode: The content mode of the target size when resizing.
     /// - Returns: The resized size under the given ``ContentMode``.
-    func resize(to size: CGSize, for contentMode: ContentMode) -> CGSize {
+    public func resize(to size: CGSize, for contentMode: ContentMode) -> CGSize {
         switch contentMode {
         case .aspectFit:
             return constrained(size)
@@ -50,7 +50,7 @@ extension KingfisherWrapper where Base == CGSize {
     ///
     /// - Parameter size: The size in which the `base` should fit.
     /// - Returns: The size that fits the `base` within the input `size`, while keeping the `base` aspect.
-    func constrained(_ size: CGSize) -> CGSize {
+    public func constrained(_ size: CGSize) -> CGSize {
         let aspectWidth = round(aspectRatio * size.height)
         let aspectHeight = round(size.width / aspectRatio)
         
@@ -63,7 +63,7 @@ extension KingfisherWrapper where Base == CGSize {
     ///
     /// - Parameter size: The size that the `base` should fill.
     /// - Returns: The size filled by the input `size`, while keeping the `base` aspect.
-    func filling(_ size: CGSize) -> CGSize {
+    public func filling(_ size: CGSize) -> CGSize {
         let aspectWidth = round(aspectRatio * size.height)
         let aspectHeight = round(size.width / aspectRatio)
         
@@ -79,7 +79,7 @@ extension KingfisherWrapper where Base == CGSize {
     ///   - size: The size to which the `base` should be constrained.
     ///   - anchor: The anchor point where the size constraint is applied.
     /// - Returns: A `CGRect` that results from the constraint operation.
-    func constrainedRect(for size: CGSize, anchor: CGPoint) -> CGRect {
+    public func constrainedRect(for size: CGSize, anchor: CGPoint) -> CGRect {
         
         let unifiedAnchor = CGPoint(x: anchor.x.clamped(to: 0.0...1.0),
                                     y: anchor.y.clamped(to: 0.0...1.0))

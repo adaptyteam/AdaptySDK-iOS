@@ -52,6 +52,7 @@ extension KFImage {
         private(set) var animating = false
 
         var loadedImage: KFCrossPlatformImage? = nil { willSet { objectWillChange.send() } }
+        var failureView: (() -> AnyView)? = nil { willSet { objectWillChange.send() } }
         var progress: Progress = .init()
 
         func markLoading() {
@@ -65,11 +66,13 @@ extension KFImage {
             }
         }
 
-        func start<HoldingView: KFImageHoldingView>(context: Context<HoldingView>) {
+        func start<HoldingView: KFImageHoldingView>(context: Context<HoldingView>) where HoldingView: Sendable {
             guard let source = context.source else {
                 CallbackQueueMain.currentOrAsync {
                     context.onFailureDelegate.call(KingfisherError.imageSettingError(reason: .emptySource))
-                    if let image = context.options.onFailureImage {
+                    if let view = context.failureView {
+                        self.failureView = view
+                    } else if let image = context.options.onFailureImage {
                         self.loadedImage = image
                     }
                     self.loading = false
@@ -89,6 +92,12 @@ extension KFImage {
                         self.updateProgress(downloaded: size, total: total)
                         context.onProgressDelegate.call((size, total))
                     },
+                    progressiveImageSetter: { image in
+                        CallbackQueueMain.currentOrAsync {
+                            self.markLoaded(sendChangeEvent: true)
+                            self.loadedImage = image
+                        }
+                    },
                     completionHandler: { [weak self] result in
 
                         guard let self else { return }
@@ -101,7 +110,15 @@ extension KFImage {
                         switch result {
                         case .success(let value):
                             CallbackQueueMain.currentOrAsync {
-                                if let fadeDuration = context.fadeTransitionDuration(cacheType: value.cacheType) {
+                                if context.swiftUITransition != nil,
+                                   context.shouldApplyFade(cacheType: value.cacheType) {
+                                    // Apply SwiftUI loadTransition with custom animation (higher priority than fade)
+                                    self.animating = true
+                                    let animation = context.swiftUIAnimation ?? .default
+                                    withAnimation(animation) {
+                                        self.markLoaded(sendChangeEvent: true)
+                                    }
+                                } else if let fadeDuration = context.fadeTransitionDuration(cacheType: value.cacheType) {
                                     self.animating = true
                                     let animation = Animation.linear(duration: fadeDuration)
                                     withAnimation(animation) {
@@ -120,7 +137,9 @@ extension KFImage {
                             }
                         case .failure(let error):
                             CallbackQueueMain.currentOrAsync {
-                                if let image = context.options.onFailureImage {
+                                if let view = context.failureView {
+                                    self.failureView = view
+                                } else if let image = context.options.onFailureImage {
                                     self.loadedImage = image
                                 }
                                 self.markLoaded(sendChangeEvent: false)

@@ -36,13 +36,13 @@ import Foundation
 /// - `provider`: The target image should be provided in a data format. Normally, it can be an image
 ///             from local storage or in any other encoding format (like Base64).
 ///
-enum Source: Sendable {
+public enum Source: Sendable {
 
     /// Represents the source task identifier when setting an image to a view with extension methods.
-    enum Identifier {
+    public enum Identifier {
 
         /// The underlying value type of source identifier.
-        typealias Value = UInt
+        public typealias Value = UInt
         
         @MainActor static private(set) var current: Value = 0
         
@@ -66,7 +66,7 @@ enum Source: Sendable {
     // MARK: Getting Properties
 
     /// The cache key defined for this source value.
-    var cacheKey: String {
+    public var cacheKey: String {
         switch self {
         case .network(let resource): return resource.cacheKey
         case .provider(let provider): return provider.cacheKey
@@ -77,7 +77,7 @@ enum Source: Sendable {
     ///
     /// For a ``Source/network(_:)`` source, it is the ``Resource/downloadURL`` of associated ``Resource`` instance.
     /// For a ``Source/provider(_:)`` value, it is always `nil`.
-    var url: URL? {
+    public var url: URL? {
         switch self {
         case .network(let resource): return resource.downloadURL
         case .provider(let provider): return provider.contentURL
@@ -86,7 +86,7 @@ enum Source: Sendable {
 }
 
 extension Source: Hashable {
-    static func == (lhs: Source, rhs: Source) -> Bool {
+    public static func == (lhs: Source, rhs: Source) -> Bool {
         switch (lhs, rhs) {
         case (.network(let r1), .network(let r2)):
             return r1.cacheKey == r2.cacheKey && r1.downloadURL == r2.downloadURL
@@ -99,7 +99,7 @@ extension Source: Hashable {
         }
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         switch self {
         case .network(let r):
             hasher.combine(r.cacheKey)

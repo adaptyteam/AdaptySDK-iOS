@@ -27,7 +27,7 @@
 import Foundation
 
 /// Represents the image format.
-enum ImageFormat: Sendable {
+public enum ImageFormat: Sendable {
     /// The format cannot be recognized or not supported yet.
     case unknown
     /// PNG image format.
@@ -47,7 +47,7 @@ enum ImageFormat: Sendable {
     /// JPEG marker of each sequence of segments.
     ///
     /// See also [here](https://www.digicamsoft.com/itu/itu-t81-36.html).
-    enum JPEGMarker {
+    public enum JPEGMarker {
         case SOF0           //baseline
         case SOF2           //progressive
         case DHT            //Huffman Table
@@ -82,7 +82,7 @@ extension Data: KingfisherCompatibleValue {}
 // MARK: - Misc Helpers
 extension KingfisherWrapper where Base == Data {
     /// Gets the image format corresponding to the data.
-    var imageFormat: ImageFormat {
+    public var imageFormat: ImageFormat {
         guard base.count > 8 else { return .unknown }
         
         var buffer = [UInt8](repeating: 0, count: 8)
@@ -107,7 +107,7 @@ extension KingfisherWrapper where Base == Data {
         return .unknown
     }
     
-    func contains(jpeg marker: ImageFormat.JPEGMarker) -> Bool {
+    public func contains(jpeg marker: ImageFormat.JPEGMarker) -> Bool {
         guard imageFormat == .JPEG else {
             return false
         }

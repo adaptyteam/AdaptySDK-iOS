@@ -28,14 +28,14 @@
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
 import AppKit
-typealias IndicatorView = NSView
+public typealias IndicatorView = NSView
 #else
 import UIKit
-typealias IndicatorView = UIView
+public typealias IndicatorView = UIView
 #endif
 
 /// Represents the activity indicator type that should be added to an image view when an image is being downloaded.
-enum IndicatorType {
+public enum IndicatorType {
     
     /// No indicator.
     case none
@@ -54,7 +54,7 @@ enum IndicatorType {
 
 /// An indicator type which can be used to show that the download task is in progress.
 @MainActor 
-protocol Indicator: Sendable {
+public protocol Indicator: Sendable {
     
     /// Called when the indicator should start animating.
     func startAnimatingView()
@@ -77,7 +77,7 @@ protocol Indicator: Sendable {
 }
 
 /// The idicator size strategy used when sizing the indicator in the image view.
-enum IndicatorSizeStrategy {
+public enum IndicatorSizeStrategy {
     /// Uses the intrinsic size of the indicator.
     case intrinsicSize
     /// Match the size of the super view of the indicator.
@@ -91,7 +91,7 @@ extension Indicator {
     /// Default implementation of ``Indicator/centerOffset-7jxdw`` of the ``Indicator``.
     ///
     /// The default value is `.zero`, which means that there is no offset for the indicator view.
-    var centerOffset: CGPoint {
+    public var centerOffset: CGPoint {
         .zero
     }
 
@@ -101,7 +101,7 @@ extension Indicator {
     /// width as the image view.
     /// - Parameter imageView: The image view which holds the indicator.
     /// - Returns: The desired ``IndicatorSizeStrategy``
-    func sizeStrategy(in imageView: KFCrossPlatformImageView) -> IndicatorSizeStrategy {
+    public func sizeStrategy(in imageView: KFCrossPlatformImageView) -> IndicatorSizeStrategy {
         .full
     }
 }
@@ -152,7 +152,7 @@ final class ActivityIndicator: Indicator {
     init() {
         #if os(macOS)
             activityIndicatorView = NSProgressIndicator(frame: CGRect(x: 0, y: 0, width: 16, height: 16))
-            activityIndicatorView.controlSize = .small
+            activityIndicatorView.controlSize = .regular
             activityIndicatorView.style = .spinning
         #else
             let indicatorStyle: UIActivityIndicatorView.Style

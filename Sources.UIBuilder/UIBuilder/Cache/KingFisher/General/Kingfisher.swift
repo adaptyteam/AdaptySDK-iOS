@@ -29,11 +29,11 @@ import ImageIO
 
 #if os(macOS)
 import AppKit
-typealias KFCrossPlatformImage       = NSImage
-typealias KFCrossPlatformView        = NSView
-typealias KFCrossPlatformColor       = NSColor
-typealias KFCrossPlatformImageView   = NSImageView
-typealias KFCrossPlatformButton      = NSButton
+public typealias KFCrossPlatformImage       = NSImage
+public typealias KFCrossPlatformView        = NSView
+public typealias KFCrossPlatformColor       = NSColor
+public typealias KFCrossPlatformImageView   = NSImageView
+public typealias KFCrossPlatformButton      = NSButton
 
 // `NSImage` is not yet Sendable. We have to assume it sendable to resolve warnings in Kingfisher.
 #if compiler(>=6)
@@ -43,12 +43,12 @@ extension KFCrossPlatformImage: @unchecked Sendable { }
 #endif // compiler(>=6)
 #else // os(macOS)
 import UIKit
-typealias KFCrossPlatformImage       = UIImage
-typealias KFCrossPlatformColor       = UIColor
+public typealias KFCrossPlatformImage       = UIImage
+public typealias KFCrossPlatformColor       = UIColor
 #if !os(watchOS)
-typealias KFCrossPlatformImageView   = UIImageView
-typealias KFCrossPlatformView        = UIView
-typealias KFCrossPlatformButton      = UIButton
+public typealias KFCrossPlatformImageView   = UIImageView
+public typealias KFCrossPlatformView        = UIView
+public typealias KFCrossPlatformButton      = UIButton
 #if canImport(TVUIKit)
 import TVUIKit
 #endif // canImport(TVUIKit)
@@ -62,9 +62,9 @@ import WatchKit
 
 /// Wrapper for Kingfisher compatible types. This type provides an extension point for
 /// convenience methods in Kingfisher.
-struct KingfisherWrapper<Base>: @unchecked Sendable {
-    let base: Base
-    init(_ base: Base) {
+public struct KingfisherWrapper<Base>: @unchecked Sendable {
+    public let base: Base
+    public init(_ base: Base) {
         self.base = base
     }
 }
@@ -83,15 +83,15 @@ struct KingfisherWrapper<Base>: @unchecked Sendable {
 /// ```
 ///
 /// For more about basic usage of Kingfisher, check the <doc:CommonTasks> documentation.
-protocol KingfisherCompatible: AnyObject { }
+public protocol KingfisherCompatible: AnyObject { }
 
 /// Represents a value type that is compatible with Kingfisher. You can use ``kf`` property to get a
 /// value in the namespace of Kingfisher.
-protocol KingfisherCompatibleValue {}
+public protocol KingfisherCompatibleValue {}
 
 extension KingfisherCompatible {
     /// Gets a namespace holder for Kingfisher compatible types.
-    var kf: KingfisherWrapper<Self> {
+    public var kf: KingfisherWrapper<Self> {
         get { return KingfisherWrapper(self) }
         set { }
     }
@@ -99,7 +99,7 @@ extension KingfisherCompatible {
 
 extension KingfisherCompatibleValue {
     /// Gets a namespace holder for Kingfisher compatible types.
-    var kf: KingfisherWrapper<Self> {
+    public var kf: KingfisherWrapper<Self> {
         get { return KingfisherWrapper(self) }
         set { }
     }
@@ -113,6 +113,12 @@ extension NSTextAttachment          : KingfisherCompatible { }
 #else
 extension WKInterfaceImage          : KingfisherCompatible { }
 #endif
+
+#if canImport(PhotosUI) && !os(watchOS)
+import PhotosUI
+extension PHLivePhotoView           : KingfisherCompatible { }
+#endif
+
 
 #if os(tvOS) && canImport(TVUIKit)
 @available(tvOS 12.0, *)

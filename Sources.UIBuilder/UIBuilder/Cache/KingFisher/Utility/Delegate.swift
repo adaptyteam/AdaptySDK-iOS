@@ -68,8 +68,8 @@ import Foundation
 ///     }
 /// }
 ///
-class Delegate<Input, Output>: @unchecked Sendable {
-    init() {}
+public class Delegate<Input, Output>: @unchecked Sendable {
+    public init() {}
 
     private let propertyQueue = DispatchQueue(label: "com.onevcat.Kingfisher.DelegateQueue")
     
@@ -85,59 +85,59 @@ class Delegate<Input, Output>: @unchecked Sendable {
         set { propertyQueue.sync { _asyncBlock = newValue } }
     }
     
-    func delegate<T: AnyObject>(on target: T, block: ((T, Input) -> Output)?) {
+    public func delegate<T: AnyObject>(on target: T, block: ((T, Input) -> Output)?) {
         self.block = { [weak target] input in
             guard let target = target else { return nil }
             return block?(target, input)
         }
     }
     
-    func delegate<T: AnyObject>(on target: T, block: ((T, Input) async -> Output)?) {
+    public func delegate<T: AnyObject>(on target: T, block: ((T, Input) async -> Output)?) {
         self.asyncBlock = { [weak target] input in
             guard let target = target else { return nil }
             return await block?(target, input)
         }
     }
 
-    func call(_ input: Input) -> Output? {
+    public func call(_ input: Input) -> Output? {
         return block?(input)
     }
 
-    func callAsFunction(_ input: Input) -> Output? {
+    public func callAsFunction(_ input: Input) -> Output? {
         return call(input)
     }
     
-    func callAsync(_ input: Input) async -> Output? {
+    public func callAsync(_ input: Input) async -> Output? {
         return await asyncBlock?(input)
     }
     
-    var isSet: Bool {
+    public var isSet: Bool {
         block != nil || asyncBlock != nil
     }
 }
 
 extension Delegate where Input == Void {
-    func call() -> Output? {
+    public func call() -> Output? {
         return call(())
     }
 
-    func callAsFunction() -> Output? {
+    public func callAsFunction() -> Output? {
         return call()
     }
 }
 
 extension Delegate where Input == Void, Output: OptionalProtocol {
-    func call() -> Output {
+    public func call() -> Output {
         return call(())
     }
 
-    func callAsFunction() -> Output {
+    public func callAsFunction() -> Output {
         return call()
     }
 }
 
 extension Delegate where Output: OptionalProtocol {
-    func call(_ input: Input) -> Output {
+    public func call(_ input: Input) -> Output {
         if let result = block?(input) {
             return result
         } else {
@@ -145,16 +145,16 @@ extension Delegate where Output: OptionalProtocol {
         }
     }
 
-    func callAsFunction(_ input: Input) -> Output {
+    public func callAsFunction(_ input: Input) -> Output {
         return call(input)
     }
 }
 
-protocol OptionalProtocol {
+public protocol OptionalProtocol {
     static var _createNil: Self { get }
 }
 extension Optional : OptionalProtocol {
-    static var _createNil: Optional<Wrapped> {
+    public static var _createNil: Optional<Wrapped> {
          return nil
     }
 }

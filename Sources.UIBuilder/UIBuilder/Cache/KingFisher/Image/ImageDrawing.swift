@@ -49,7 +49,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image, the `base` image itself is returned.
-    func image(withBlendMode blendMode: CGBlendMode,
+    public func image(withBlendMode blendMode: CGBlendMode,
                       alpha: CGFloat = 1.0,
                       backgroundColor: KFCrossPlatformColor? = nil) -> KFCrossPlatformImage
     {
@@ -84,7 +84,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image, the `base` image itself is returned.
-    func image(withCompositingOperation compositingOperation: NSCompositingOperation,
+    public func image(withCompositingOperation compositingOperation: NSCompositingOperation,
                       alpha: CGFloat = 1.0,
                       backgroundColor: KFCrossPlatformColor? = nil) -> KFCrossPlatformImage
     {
@@ -118,7 +118,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image, the `base` image itself is returned.
-    func image(
+    public func image(
         withRadius radius: Radius,
         fit size: CGSize,
         roundingCorners corners: RectCorner = .all,
@@ -175,7 +175,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image, the `base` image itself is returned.
-    func image(
+    public func image(
         withRoundRadius radius: CGFloat,
         fit size: CGSize,
         roundingCorners corners: RectCorner = .all,
@@ -232,7 +232,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     /// > Tip: This method resizes the `base` image to a specified size by drawing it into that size. If you require a
     /// smaller thumbnail of the image, consider using ``downsampledImage(data:to:scale:)`` instead, as it offers
     /// improved efficiency.
-    func resize(to size: CGSize) -> KFCrossPlatformImage {
+    public func resize(to size: CGSize) -> KFCrossPlatformImage {
         guard let _ = cgImage else {
             assertionFailure("[Kingfisher] Resize only works for CG-based image.")
             return base
@@ -262,7 +262,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     /// > Tip: This method resizes the `base` image to a specified size by drawing it into that size. If you require a
     /// smaller thumbnail of the image, consider using ``downsampledImage(data:to:scale:)`` instead, as it offers
     /// improved efficiency.
-    func resize(to targetSize: CGSize, for contentMode: ContentMode) -> KFCrossPlatformImage {
+    public func resize(to targetSize: CGSize, for contentMode: ContentMode) -> KFCrossPlatformImage {
         let newSize = size.kf.resize(to: targetSize, for: contentMode)
         return resize(to: newSize)
     }
@@ -278,7 +278,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image, the `base` image itself is returned.
-    func crop(to size: CGSize, anchorOn anchor: CGPoint) -> KFCrossPlatformImage {
+    public func crop(to size: CGSize, anchorOn anchor: CGPoint) -> KFCrossPlatformImage {
         guard let cgImage = cgImage else {
             assertionFailure("[Kingfisher] Crop only works for CG-based image.")
             return base
@@ -302,7 +302,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image, the `base` image itself is returned.
-    func blurred(withRadius radius: CGFloat) -> KFCrossPlatformImage {
+    public func blurred(withRadius radius: CGFloat) -> KFCrossPlatformImage {
         guard let cgImage = cgImage else {
             assertionFailure("[Kingfisher] Blur only works for CG-based image.")
             return base
@@ -384,7 +384,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
         return blurredImage
     }
     
-    func addingBorder(_ border: Border) -> KFCrossPlatformImage
+    public func addingBorder(_ border: Border) -> KFCrossPlatformImage
     {
         guard let _ = cgImage else {
             assertionFailure("[Kingfisher] Blend mode image only works for CG-based image.")
@@ -430,7 +430,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image, the `base` image itself is returned.
-    func overlaying(with color: KFCrossPlatformColor, fraction: CGFloat) -> KFCrossPlatformImage {
+    public func overlaying(with color: KFCrossPlatformColor, fraction: CGFloat) -> KFCrossPlatformImage {
         
         guard let _ = cgImage else {
             assertionFailure("[Kingfisher] Overlaying only works for CG-based image.")
@@ -466,7 +466,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     /// - Returns: An image with a color tint applied.
     ///
     /// > Important: This method does not work on watchOS, where the original image is returned.
-    func tinted(with color: KFCrossPlatformColor) -> KFCrossPlatformImage {
+    public func tinted(with color: KFCrossPlatformColor) -> KFCrossPlatformImage {
 #if os(watchOS)
         return base
 #else
@@ -486,7 +486,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     /// - Returns: An image with color control adjustments applied.
     ///
     /// > Important: This method does not work on watchOS, where the original image is returned.
-    func adjusted(brightness: CGFloat, contrast: CGFloat, saturation: CGFloat, inputEV: CGFloat) -> KFCrossPlatformImage {
+    public func adjusted(brightness: CGFloat, contrast: CGFloat, saturation: CGFloat, inputEV: CGFloat) -> KFCrossPlatformImage {
 #if os(watchOS)
         return base
 #else
@@ -508,7 +508,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image, the `base` image itself is returned.
-    func scaled(to scale: CGFloat) -> KFCrossPlatformImage {
+    public func scaled(to scale: CGFloat) -> KFCrossPlatformImage {
         guard scale != self.scale else {
             return base
         }
@@ -533,7 +533,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image or animated image, the `base` image itself is returned.
-    var decoded: KFCrossPlatformImage { return decoded(scale: scale) }
+    public var decoded: KFCrossPlatformImage { return decoded(scale: scale) }
     
     /// Returns the decoded image of the `base` image at a given `scale`.
     ///
@@ -545,7 +545,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image or animated image, the `base` image itself is returned.
-    func decoded(scale: CGFloat) -> KFCrossPlatformImage {
+    public func decoded(scale: CGFloat) -> KFCrossPlatformImage {
 
         // Prevent animated image (GIF) losing it's images
         #if os(iOS) || os(visionOS)
@@ -588,7 +588,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     ///
     /// > This method is only applicable to CG-based images. The current image scale is preserved.
     /// > For any non-CG-based image or animated image, the `base` image itself is returned.
-    func decoded(on context: CGContext) -> KFCrossPlatformImage {
+    public func decoded(on context: CGContext) -> KFCrossPlatformImage {
         // Prevent animated image (GIF) losing it's images
         if frameSource != nil { return base }
 

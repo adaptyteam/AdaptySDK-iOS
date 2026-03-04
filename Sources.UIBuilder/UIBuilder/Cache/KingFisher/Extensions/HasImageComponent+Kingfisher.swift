@@ -24,7 +24,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-protocol KingfisherImageSettable: KingfisherCompatible {
+public protocol KingfisherImageSettable: KingfisherCompatible {
     @MainActor func setImage(
         _ image: KFCrossPlatformImage?,
         options: KingfisherParsedOptionsInfo
@@ -32,18 +32,18 @@ protocol KingfisherImageSettable: KingfisherCompatible {
     @MainActor func getImage() -> KFCrossPlatformImage?
 }
 
-protocol KingfisherHasImageComponent: KingfisherImageSettable {
+public protocol KingfisherHasImageComponent: KingfisherImageSettable {
     @MainActor var image: KFCrossPlatformImage? { set get }
 }
 
 extension KingfisherHasImageComponent {
     @MainActor 
-    func setImage(_ image: KFCrossPlatformImage?, options: KingfisherParsedOptionsInfo) {
+    public func setImage(_ image: KFCrossPlatformImage?, options: KingfisherParsedOptionsInfo) {
         self.image = image
     }
     
     @MainActor
-    func getImage() -> KFCrossPlatformImage? {
+    public func getImage() -> KFCrossPlatformImage? {
         image
     }
 }
@@ -75,7 +75,7 @@ extension UIBarItem: KingfisherHasImageComponent {}
 #if canImport(WatchKit)
 import WatchKit
 extension WKInterfaceImage: KingfisherHasImageComponent {
-    @MainActor var image: KFCrossPlatformImage? {
+    @MainActor public var image: KFCrossPlatformImage? {
         get { nil }
         set { setImage(newValue) }
     }
@@ -140,7 +140,7 @@ extension KingfisherWrapper where Base: KingfisherImageSettable {
     ///
     /// > Both `progressBlock` and `completionHandler` will also be executed in the main thread.
     @discardableResult
-    func setImage(
+    public func setImage(
         with source: Source?,
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
@@ -193,7 +193,7 @@ extension KingfisherWrapper where Base: KingfisherImageSettable {
     ///
     /// > Both `progressBlock` and `completionHandler` will also be executed in the main thread.
     @discardableResult
-    func setImage(
+    public func setImage(
         with source: Source?,
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
@@ -234,7 +234,7 @@ extension KingfisherWrapper where Base: KingfisherImageSettable {
     ///
     /// > Both `progressBlock` and `completionHandler` will also be executed in the main thread.
     @discardableResult
-    func setImage(
+    public func setImage(
         with resource: (any Resource)?,
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
@@ -274,7 +274,7 @@ extension KingfisherWrapper where Base: KingfisherImageSettable {
     ///
     /// > Both `progressBlock` and `completionHandler` will also be executed in the main thread.
     @discardableResult
-    func setImage(
+    public func setImage(
         with resource: (any Resource)?,
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
@@ -306,7 +306,7 @@ extension KingfisherWrapper where Base: KingfisherImageSettable {
     ///
     /// > Both `progressBlock` and `completionHandler` will also be executed in the main thread.
     @discardableResult
-    func setImage(
+    public func setImage(
         with provider: (any ImageDataProvider)?,
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
@@ -337,7 +337,7 @@ extension KingfisherWrapper where Base: KingfisherImageSettable {
     ///
     /// > Both `progressBlock` and `completionHandler` will also be executed in the main thread.
     @discardableResult
-    func setImage(
+    public func setImage(
         with provider: (any ImageDataProvider)?,
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
@@ -474,7 +474,7 @@ extension KingfisherWrapper {
 extension KingfisherWrapper where Base: KingfisherImageSettable {
 
     // MARK: Properties
-    private(set) var taskIdentifier: Source.Identifier.Value? {
+    public private(set) var taskIdentifier: Source.Identifier.Value? {
         get {
             let box: Box<Source.Identifier.Value>? = getAssociatedObject(base, &taskIdentifierKey)
             return box?.value
@@ -493,7 +493,7 @@ extension KingfisherWrapper where Base: KingfisherImageSettable {
     /// Cancels the image download task of the image view if it is running.
     ///
     /// Nothing will happen if the downloading has already finished.
-    func cancelDownloadTask() {
+    public func cancelDownloadTask() {
         imageTask?.cancel()
     }
 }

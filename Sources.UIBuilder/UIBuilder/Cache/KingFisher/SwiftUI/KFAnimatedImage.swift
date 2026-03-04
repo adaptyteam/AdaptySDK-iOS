@@ -28,11 +28,20 @@
 import SwiftUI
 import Combine
 
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-struct KFAnimatedImage: KFImageProtocol {
-    typealias HoldingView = KFAnimatedImageViewRepresenter
-    var context: Context<HoldingView>
-    init(context: KFImage.Context<HoldingView>) {
+/// Represents an animated image view in SwiftUI that manages its content using Kingfisher.
+///
+/// Similar to ``KFImage``, this view provides support for animated image formats like GIF.
+///
+/// - Important: Like ``KFImage``, `KFAnimatedImage` loads disk cached images synchronously by default 
+/// (`.loadDiskFileSynchronously()` is enabled). This prevents image flickering during SwiftUI view updates 
+/// but may impact performance when loading large animated images from disk. You can disable this behavior 
+/// by calling `.loadDiskFileSynchronously(false)` if you prefer better loading performance over visual consistency.
+///
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, *)
+public struct KFAnimatedImage: KFImageProtocol {
+    public typealias HoldingView = KFAnimatedImageViewRepresenter
+    public var context: Context<HoldingView>
+    public init(context: KFImage.Context<HoldingView>) {
         self.context = context
     }
     
@@ -41,10 +50,25 @@ struct KFAnimatedImage: KFImageProtocol {
     ///
     /// - Parameter block: The block applies to the animated image view.
     /// - Returns: A `KFAnimatedImage` view that being configured by the `block`.
-    func configure(_ block: @escaping (HoldingView.RenderingView) -> Void) -> Self {
+    public func configure(_ block: @escaping (HoldingView.RenderingView) -> Void) -> Self {
         context.renderConfigurations.append(block)
         return self
     }
+
+#if os(iOS)
+    /// Whether the animated frame buffer should be purged when the app enters background.
+    ///
+    /// This is an opt-in behavior to reduce memory footprint when your app is in background. When enabled,
+    /// the internal `AnimatedImageView` stops animating and purges preloaded frames on
+    /// `UIApplication.didEnterBackgroundNotification`. If the view was animating before entering background, it will
+    /// prepare frames and resume animation on `UIApplication.willEnterForegroundNotification`.
+    ///
+    /// - Parameter purge: Whether to enable the frame purging behavior. Default is `true`.
+    /// - Returns: A `KFAnimatedImage` view that configures the behavior.
+    public func purgeFramesOnBackground(_ purge: Bool = true) -> Self {
+        configure { $0.purgeFramesOnBackground = purge }
+    }
+#endif
 }
 
 #if os(macOS)
@@ -57,9 +81,9 @@ typealias KFCrossPlatformViewRepresentable = UIViewRepresentable
 
 /// A wrapped `UIViewRepresentable` of `AnimatedImageView`
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-struct KFAnimatedImageViewRepresenter: KFCrossPlatformViewRepresentable, KFImageHoldingView {
-    typealias RenderingView = AnimatedImageView
-    static func created(from image: KFCrossPlatformImage?, context: KFImage.Context<Self>) -> KFAnimatedImageViewRepresenter {
+public struct KFAnimatedImageViewRepresenter: KFCrossPlatformViewRepresentable, KFImageHoldingView, Sendable {
+    public typealias RenderingView = AnimatedImageView
+    public static func created(from image: KFCrossPlatformImage?, context: KFImage.Context<Self>) -> KFAnimatedImageViewRepresenter {
         KFAnimatedImageViewRepresenter(image: image, context: context)
     }
     
@@ -67,19 +91,19 @@ struct KFAnimatedImageViewRepresenter: KFCrossPlatformViewRepresentable, KFImage
     let context: KFImage.Context<KFAnimatedImageViewRepresenter>
     
     #if os(macOS)
-    func makeNSView(context: Context) -> AnimatedImageView {
+    public func makeNSView(context: Context) -> AnimatedImageView {
         return makeImageView()
     }
     
-    func updateNSView(_ nsView: AnimatedImageView, context: Context) {
+    public func updateNSView(_ nsView: AnimatedImageView, context: Context) {
         updateImageView(nsView)
     }
     #else
-    func makeUIView(context: Context) -> AnimatedImageView {
+    public func makeUIView(context: Context) -> AnimatedImageView {
         return makeImageView()
     }
     
-    func updateUIView(_ uiView: AnimatedImageView, context: Context) {
+    public func updateUIView(_ uiView: AnimatedImageView, context: Context) {
         updateImageView(uiView)
     }
     #endif

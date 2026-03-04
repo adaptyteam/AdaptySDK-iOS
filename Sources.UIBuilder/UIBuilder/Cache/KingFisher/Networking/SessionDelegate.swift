@@ -29,7 +29,8 @@ import Foundation
 /// Represents the delegate object of the downloader session.
 ///
 /// It also behaves like a task manager for downloading.
-final class SessionDelegate: NSObject, @unchecked Sendable {
+@objc(KFSessionDelegate) // Fix for ObjC header name conflicting. https://github.com/onevcat/Kingfisher/issues/1530
+open class SessionDelegate: NSObject, @unchecked Sendable {
 
     typealias SessionChallengeFunc = (
         URLSession,
@@ -149,7 +150,7 @@ final class SessionDelegate: NSObject, @unchecked Sendable {
 
 extension SessionDelegate: URLSessionDataDelegate {
 
-    func urlSession(
+    open func urlSession(
         _ session: URLSession,
         dataTask: URLSessionDataTask,
         didReceive response: URLResponse
@@ -179,7 +180,7 @@ extension SessionDelegate: URLSessionDataDelegate {
         return disposition
     }
 
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         guard let task = self.task(for: dataTask) else {
             return
         }
@@ -193,7 +194,7 @@ extension SessionDelegate: URLSessionDataDelegate {
         }
     }
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
         guard let sessionTask = self.task(for: task) else { return }
 
         if let url = sessionTask.originalURL {
@@ -221,7 +222,7 @@ extension SessionDelegate: URLSessionDataDelegate {
         onCompleted(task: task, result: result)
     }
 
-    func urlSession(
+    open func urlSession(
         _ session: URLSession,
         didReceive challenge: URLAuthenticationChallenge
     ) async -> (URLSession.AuthChallengeDisposition, URLCredential?)
@@ -229,7 +230,7 @@ extension SessionDelegate: URLSessionDataDelegate {
         await onReceiveSessionChallenge.callAsync((session, challenge)) ?? (.performDefaultHandling, nil)
     }
     
-    func urlSession(
+    open func urlSession(
         _ session: URLSession,
         task: URLSessionTask,
         didReceive challenge: URLAuthenticationChallenge
@@ -239,7 +240,7 @@ extension SessionDelegate: URLSessionDataDelegate {
     }
     
     
-    func urlSession(
+    open func urlSession(
         _ session: URLSession,
         task: URLSessionTask,
         willPerformHTTPRedirection response: HTTPURLResponse,
@@ -257,12 +258,22 @@ extension SessionDelegate: URLSessionDataDelegate {
             newRequest: request
         )
     }
+    
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+        guard let sessionTask = self.task(for: task) else { return }
+        
+        // Collect network metrics for the completed task
+        if let networkMetrics = NetworkMetrics(from: metrics) {
+            sessionTask.didCollectMetrics(networkMetrics)
+        }
+    }
 
     private func onCompleted(task: URLSessionTask, result: Result<(Data, URLResponse?), KingfisherError>) {
         guard let sessionTask = self.task(for: task) else {
             return
         }
-        sessionTask.onTaskDone.call((result, sessionTask.callbacks))
+        let callbacks = sessionTask.removeAllCallbacks()
+        sessionTask.onTaskDone.call((result, callbacks))
         remove(sessionTask)
     }
 }

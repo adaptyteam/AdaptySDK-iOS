@@ -30,7 +30,7 @@ import Combine
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension KFImage {
-    class Context<HoldingView: KFImageHoldingView>: @unchecked Sendable {
+    public class Context<HoldingView: KFImageHoldingView>: @unchecked Sendable where HoldingView: Sendable {
         
         private let propertyQueue = DispatchQueue(label: "com.onevcat.Kingfisher.KFImageContextPropertyQueue")
         
@@ -78,11 +78,30 @@ extension KFImage {
             get { propertyQueue.sync { _placeholder } }
             set { propertyQueue.sync { _placeholder = newValue } }
         }
-        
+
+        var _failureView: (() -> AnyView)? = nil
+        var failureView: (() -> AnyView)? {
+            get { propertyQueue.sync { _failureView } }
+            set { propertyQueue.sync { _failureView = newValue } }
+        }
+
         var _startLoadingBeforeViewAppear: Bool = false
         var startLoadingBeforeViewAppear: Bool {
             get { propertyQueue.sync { _startLoadingBeforeViewAppear } }
             set { propertyQueue.sync { _startLoadingBeforeViewAppear = newValue } }
+        }
+        
+        // SwiftUI transition support
+        var _swiftUITransition: AnyTransition? = nil
+        var swiftUITransition: AnyTransition? {
+            get { propertyQueue.sync { _swiftUITransition } }
+            set { propertyQueue.sync { _swiftUITransition = newValue } }
+        }
+        
+        var _swiftUIAnimation: Animation? = nil
+        var swiftUIAnimation: Animation? {
+            get { propertyQueue.sync { _swiftUIAnimation } }
+            set { propertyQueue.sync { _swiftUIAnimation = newValue } }
         }
 
         let onFailureDelegate = Delegate<KingfisherError, Void>()
@@ -120,21 +139,21 @@ extension ImageTransition {
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension KFImage.Context: Hashable {
-    static func == (lhs: KFImage.Context<HoldingView>, rhs: KFImage.Context<HoldingView>) -> Bool {
+    public static func == (lhs: KFImage.Context<HoldingView>, rhs: KFImage.Context<HoldingView>) -> Bool {
         lhs.source == rhs.source &&
         lhs.options.processor.identifier == rhs.options.processor.identifier
     }
 
-    func hash(into hasher: inout Hasher) {
+    public func hash(into hasher: inout Hasher) {
         hasher.combine(source)
         hasher.combine(options.processor.identifier)
     }
 }
 
 #if !os(watchOS)
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, macOS 11.0, tvOS 14.0, *)
 extension KFAnimatedImage {
-    typealias Context = KFImage.Context
+    public typealias Context = KFImage.Context
     typealias ImageBinder = KFImage.ImageBinder
 }
 #endif

@@ -80,7 +80,7 @@ extension KingfisherWrapper where Base: NSTextAttachment {
     /// label.attributedText = attributedText
     /// ```
     @discardableResult
-    func setImage(
+    public func setImage(
         with source: Source?,
         attributedView: @autoclosure @escaping @Sendable () -> KFCrossPlatformView,
         placeholder: KFCrossPlatformImage? = nil,
@@ -143,7 +143,7 @@ extension KingfisherWrapper where Base: NSTextAttachment {
     /// label.attributedText = attributedText
     /// ```
     @discardableResult
-    func setImage(
+    public func setImage(
         with resource: (any Resource)?,
         attributedView: @autoclosure @escaping @Sendable () -> KFCrossPlatformView,
         placeholder: KFCrossPlatformImage? = nil,
@@ -243,7 +243,7 @@ extension KingfisherWrapper where Base: NSTextAttachment {
     /// Cancel the image download task bound to the text attachment if it is running.
     ///
     /// Nothing will happen if the downloading has already finished.
-    func cancelDownloadTask() {
+    public func cancelDownloadTask() {
         imageTask?.cancel()
     }
 }
@@ -255,7 +255,7 @@ extension KingfisherWrapper where Base: NSTextAttachment {
 @MainActor
 extension KingfisherWrapper where Base: NSTextAttachment {
 
-    private(set) var taskIdentifier: Source.Identifier.Value? {
+    public private(set) var taskIdentifier: Source.Identifier.Value? {
         get {
             let box: Box<Source.Identifier.Value>? = getAssociatedObject(base, &taskIdentifierKey)
             return box?.value

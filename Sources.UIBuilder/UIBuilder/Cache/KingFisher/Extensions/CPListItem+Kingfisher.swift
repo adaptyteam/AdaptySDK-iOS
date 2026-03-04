@@ -52,7 +52,7 @@ extension KingfisherWrapper where Base: CPListItem {
     /// Both `progressBlock` and `completionHandler` will be also executed in the main thread.
     ///
     @discardableResult
-    func setImage(
+    public func setImage(
         with source: Source?,
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
@@ -87,7 +87,7 @@ extension KingfisherWrapper where Base: CPListItem {
     /// Both `progressBlock` and `completionHandler` will be also executed in the main thread.
     ///
     @discardableResult
-    func setImage(
+    public func setImage(
         with resource: (any Resource)?,
         placeholder: KFCrossPlatformImage? = nil,
         options: KingfisherOptionsInfo? = nil,
@@ -149,7 +149,7 @@ extension KingfisherWrapper where Base: CPListItem {
     
     /// Cancel the image download task bounded to the image view if it is running.
     /// Nothing will happen if the downloading has already finished.
-    func cancelDownloadTask() {
+    public func cancelDownloadTask() {
         imageTask?.cancel()
     }
 }
@@ -161,7 +161,7 @@ extension KingfisherWrapper where Base: CPListItem {
 @MainActor
 extension KingfisherWrapper where Base: CPListItem {
 
-    private(set) var taskIdentifier: Source.Identifier.Value? {
+    public private(set) var taskIdentifier: Source.Identifier.Value? {
         get {
             let box: Box<Source.Identifier.Value>? = getAssociatedObject(base, &taskIdentifierKey)
             return box?.value

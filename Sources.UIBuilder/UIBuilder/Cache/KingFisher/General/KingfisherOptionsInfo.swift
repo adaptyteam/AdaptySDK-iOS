@@ -33,14 +33,14 @@ import UIKit
 
 /// `KingfisherOptionsInfo` is a typealias for `[KingfisherOptionsInfoItem]`.
 /// You can utilize the enum of option items with values to control certain behaviors of Kingfisher.
-typealias KingfisherOptionsInfo = [KingfisherOptionsInfoItem]
+public typealias KingfisherOptionsInfo = [KingfisherOptionsInfoItem]
 
 extension Array where Element == KingfisherOptionsInfoItem {
     static let empty: KingfisherOptionsInfo = []
 }
 
 /// Represents the available option items that can be used in ``KingfisherOptionsInfo``.
-enum KingfisherOptionsInfoItem: Sendable {
+public enum KingfisherOptionsInfoItem: Sendable {
     
     /// Kingfisher will utilize the associated ``ImageCache`` object when performing related operations, such as
     /// attempting to retrieve cached images and storing downloaded images in it.
@@ -72,6 +72,9 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// By default, the transition does not occur when the image is retrieved from either memory or disk cache. To
     /// force the transition even when the image is retrieved from the cache, also set
     /// ``KingfisherOptionsInfoItem/forceTransition``.
+    ///
+    /// - Important: This option is designed for UIKit/AppKit transitions. For SwiftUI applications, use the
+    /// ``KFImageProtocol/loadTransition(_:animation:)`` method instead, which provides native SwiftUI transition support.
     case transition(ImageTransition)
     
     /// The associated `Float` value to be set as the priority of the image download task.
@@ -283,9 +286,22 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// Determines the queue on which image processing should occur.
     ///
     /// By default, Kingfisher uses an internal pre-defined serial queue to process images. Use this option to modify
-    /// this behavior. For instance, you can specify ``CallbackQueue/mainCurrentOrAsync`` to process the image on the
-    /// main queue, preventing potential flickering (but with the risk of blocking the UI, especially if the processor
-    /// is time-consuming).
+    /// this behavior.
+    ///
+    /// For instance, you can specify ``CallbackQueue/mainCurrentOrAsync`` to process the image on the main queue,
+    /// preventing potential flickering (but with the risk of blocking the UI, especially if the processor is
+    /// time-consuming).
+    ///
+    /// If you need more control over scheduling (such as limiting concurrency, changing priority, or using a LIFO
+    /// strategy), you can provide an operation queue by using ``CallbackQueue/operationQueue(_:)``.
+    ///
+    /// ```swift
+    /// let queue = OperationQueue()
+    /// // Configure `queue` as needed.
+    /// options = [.processingQueue(.operationQueue(queue))]
+    /// ```
+    ///
+    /// - Note: The execution order depends on the provided queue.
     case processingQueue(CallbackQueue)
     
     /// Enables progressive image loading.
@@ -347,6 +363,8 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// If not set or if the associated optional ``Source`` value is `nil`, the device's Low Data Mode will be ignored,
     /// and the original source will be loaded following the system default behavior.
     case lowDataMode(Source?)
+    
+    case forcedCacheFileExtension(String?)
 }
 
 // MARK: - KingfisherParsedOptionsInfo
@@ -359,48 +377,49 @@ enum KingfisherOptionsInfoItem: Sendable {
 /// Each property in this type corresponds to a case member in ``KingfisherOptionsInfoItem``. When a
 ///  ``KingfisherOptionsInfo`` is sent to Kingfisher-related methods, it will be parsed and converted to a
 ///  ``KingfisherParsedOptionsInfo`` first before passing through the internal methods.
-struct KingfisherParsedOptionsInfo: Sendable {
+public struct KingfisherParsedOptionsInfo: Sendable {
 
-    var targetCache: ImageCache? = nil
-    var originalCache: ImageCache? = nil
-    var downloader: ImageDownloader? = nil
-    var transition: ImageTransition = .none
-    var downloadPriority: Float = URLSessionTask.defaultPriority
-    var forceRefresh = false
-    var fromMemoryCacheOrRefresh = false
-    var forceTransition = false
-    var cacheMemoryOnly = false
-    var waitForCache = false
-    var onlyFromCache = false
-    var backgroundDecode = false
-    var preloadAllAnimationData = false
-    var callbackQueue: CallbackQueue = .mainCurrentOrAsync
-    var scaleFactor: CGFloat = 1.0
-    var requestModifier: (any AsyncImageDownloadRequestModifier)? = nil
-    var redirectHandler: (any ImageDownloadRedirectHandler)? = nil
-    var processor: any ImageProcessor = DefaultImageProcessor.default
-    var imageModifier: (any ImageModifier)? = nil
-    var cacheSerializer: any CacheSerializer = DefaultCacheSerializer.default
-    var keepCurrentImageWhileLoading = false
-    var onlyLoadFirstFrame = false
-    var cacheOriginalImage = false
-    var onFailureImage: Optional<KFCrossPlatformImage?> = .none
-    var alsoPrefetchToMemory = false
-    var loadDiskFileSynchronously = false
-    var diskStoreWriteOptions: Data.WritingOptions = []
-    var memoryCacheExpiration: StorageExpiration? = nil
-    var memoryCacheAccessExtendingExpiration: ExpirationExtending = .cacheTime
-    var diskCacheExpiration: StorageExpiration? = nil
-    var diskCacheAccessExtendingExpiration: ExpirationExtending = .cacheTime
-    var processingQueue: CallbackQueue? = nil
-    var progressiveJPEG: ImageProgressive? = nil
-    var alternativeSources: [Source]? = nil
-    var retryStrategy: (any RetryStrategy)? = nil
-    var lowDataModeSource: Source? = nil
+    public var targetCache: ImageCache? = nil
+    public var originalCache: ImageCache? = nil
+    public var downloader: ImageDownloader? = nil
+    public var transition: ImageTransition = .none
+    public var downloadPriority: Float = URLSessionTask.defaultPriority
+    public var forceRefresh = false
+    public var fromMemoryCacheOrRefresh = false
+    public var forceTransition = false
+    public var cacheMemoryOnly = false
+    public var waitForCache = false
+    public var onlyFromCache = false
+    public var backgroundDecode = false
+    public var preloadAllAnimationData = false
+    public var callbackQueue: CallbackQueue = .mainCurrentOrAsync
+    public var scaleFactor: CGFloat = 1.0
+    public var requestModifier: (any AsyncImageDownloadRequestModifier)? = nil
+    public var redirectHandler: (any ImageDownloadRedirectHandler)? = nil
+    public var processor: any ImageProcessor = DefaultImageProcessor.default
+    public var imageModifier: (any ImageModifier)? = nil
+    public var cacheSerializer: any CacheSerializer = DefaultCacheSerializer.default
+    public var keepCurrentImageWhileLoading = false
+    public var onlyLoadFirstFrame = false
+    public var cacheOriginalImage = false
+    public var onFailureImage: Optional<KFCrossPlatformImage?> = .none
+    public var alsoPrefetchToMemory = false
+    public var loadDiskFileSynchronously = false
+    public var diskStoreWriteOptions: Data.WritingOptions = []
+    public var memoryCacheExpiration: StorageExpiration? = nil
+    public var memoryCacheAccessExtendingExpiration: ExpirationExtending = .cacheTime
+    public var diskCacheExpiration: StorageExpiration? = nil
+    public var diskCacheAccessExtendingExpiration: ExpirationExtending = .cacheTime
+    public var processingQueue: CallbackQueue? = nil
+    public var progressiveJPEG: ImageProgressive? = nil
+    public var alternativeSources: [Source]? = nil
+    public var retryStrategy: (any RetryStrategy)? = nil
+    public var lowDataModeSource: Source? = nil
+    public var forcedExtension: String? = nil
 
     var onDataReceived: [any DataReceivingSideEffect]? = nil
     
-    init(_ info: KingfisherOptionsInfo?) {
+    public init(_ info: KingfisherOptionsInfo?) {
         guard let info = info else { return }
         for option in info {
             switch option {
@@ -440,6 +459,7 @@ struct KingfisherParsedOptionsInfo: Sendable {
             case .alternativeSources(let sources): alternativeSources = sources
             case .retryStrategy(let strategy): retryStrategy = strategy
             case .lowDataMode(let source): lowDataModeSource = source
+            case .forcedCacheFileExtension(let ext): forcedExtension = ext
             }
         }
 

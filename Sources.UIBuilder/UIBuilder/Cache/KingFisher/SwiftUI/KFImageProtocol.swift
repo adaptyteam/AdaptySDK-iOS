@@ -31,13 +31,13 @@ import Combine
 
 /// Represents a view that is compatible with Kingfisher in SwiftUI.
 ///
-/// As a framework user, you do not need to know the details of this protocol. As the types, ``KFImage`` and
+/// As a framework user, you do not need to know the details of this protocol. As the public types, ``KFImage`` and
 /// ``KFAnimatedImage`` conform this type and should be used in your app to represent an image view with network and
 /// cache support in SwiftUI.
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @MainActor
-protocol KFImageProtocol: View, KFOptionSetter {
-    associatedtype HoldingView: KFImageHoldingView
+public protocol KFImageProtocol: View, KFOptionSetter {
+    associatedtype HoldingView: KFImageHoldingView & Sendable
     var context: KFImage.Context<HoldingView> { get set }
     init(context: KFImage.Context<HoldingView>)
 }
@@ -45,7 +45,7 @@ protocol KFImageProtocol: View, KFOptionSetter {
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension KFImageProtocol {
     @MainActor
-    var body: some View {
+    public var body: some View {
         ZStack {
             KFImageRenderer<HoldingView>(
                 context: context
@@ -57,7 +57,7 @@ extension KFImageProtocol {
     ///
     /// - Parameters:
     ///   - source: The `Source` of the image that specifies where to load the target image.
-    init(source: Source?) {
+    public init(source: Source?) {
         let context = KFImage.Context<HoldingView>(source: source)
         self.init(context: context)
     }
@@ -66,7 +66,7 @@ extension KFImageProtocol {
     ///
     /// - Parameters:
     ///   - url: The `URL` defining the location from which to load the target image.
-    init(_ url: URL?) {
+    public init(_ url: URL?) {
         self.init(source: url?.convertToSource())
     }
     
@@ -83,7 +83,7 @@ extension KFImageProtocol {
     ///
     /// > If you want to configure the input image (which is usually an `Image` value) and use a non-`Image` value as
     /// > the configured result, use ``KFImageProtocol/contentConfigure(_:)`` instead.
-    func configure(_ block: @escaping (HoldingView) -> HoldingView) -> Self {
+    public func configure(_ block: @escaping (HoldingView) -> HoldingView) -> Self {
         context.configurations.append(block)
         return self
     }
@@ -97,7 +97,7 @@ extension KFImageProtocol {
     /// - Parameter block: The block applies to the loaded image. The block should return a `View` that is configured.
     /// - Returns: A ``KFImage`` or ``KFAnimatedImage`` view that configures the internal `Image` with the provided
     /// `block`.
-    func contentConfigure<V: View>(_ block: @escaping (HoldingView) -> V) -> Self {
+    public func contentConfigure<V: View>(_ block: @escaping (HoldingView) -> V) -> Self {
         context.contentConfiguration = { AnyView(block($0)) }
         return self
     }
@@ -105,23 +105,23 @@ extension KFImageProtocol {
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @MainActor
-protocol KFImageHoldingView: View {
+public protocol KFImageHoldingView: View {
     associatedtype RenderingView
     static func created(from image: KFCrossPlatformImage?, context: KFImage.Context<Self>) -> Self
 }
 
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension KFImageProtocol {
-    var options: KingfisherParsedOptionsInfo {
+    public var options: KingfisherParsedOptionsInfo {
         get { context.options }
         nonmutating set { context.options = newValue }
     }
 
-    var onFailureDelegate: Delegate<KingfisherError, Void> { context.onFailureDelegate }
-    var onSuccessDelegate: Delegate<RetrieveImageResult, Void> { context.onSuccessDelegate }
-    var onProgressDelegate: Delegate<(Int64, Int64), Void> { context.onProgressDelegate }
+    public var onFailureDelegate: Delegate<KingfisherError, Void> { context.onFailureDelegate }
+    public var onSuccessDelegate: Delegate<RetrieveImageResult, Void> { context.onSuccessDelegate }
+    public var onProgressDelegate: Delegate<(Int64, Int64), Void> { context.onProgressDelegate }
 
-    var delegateObserver: AnyObject { context }
+    public var delegateObserver: AnyObject { context }
 }
 
 

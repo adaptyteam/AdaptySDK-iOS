@@ -30,28 +30,33 @@ import Foundation
 ///
 /// Essentially, a ``SessionDataTask`` wraps a `URLSessionDataTask` and manages the download data.
 /// It uses a ``SessionDataTask/CancelToken`` to track the task and manage its cancellation.
-class SessionDataTask: @unchecked Sendable {
+public class SessionDataTask: @unchecked Sendable {
 
     /// Represents the type of token used for canceling a task.
-    typealias CancelToken = Int
+    public typealias CancelToken = Int
 
     struct TaskCallback {
         let onCompleted: Delegate<Result<ImageLoadingResult, KingfisherError>, Void>?
         let options: KingfisherParsedOptionsInfo
     }
 
+    private var _mutableData: Data
     /// The downloaded raw data of the current task.
-    private(set) var mutableData: Data
+    public var mutableData: Data {
+        lock.lock()
+        defer { lock.unlock() }
+        return _mutableData
+    }
 
     // This is a copy of `task.originalRequest?.url`. It is for obtaining race-safe behavior for a pitfall on iOS 13.
     // Ref: https://github.com/onevcat/Kingfisher/issues/1511
-    let originalURL: URL?
+    public let originalURL: URL?
 
     /// The underlying download task. 
     ///
     /// It is only for debugging purposes when you encounter an error. You should not modify the content of this task
     /// or start it yourself.
-    let task: URLSessionDataTask
+    public let task: URLSessionDataTask
     
     private var callbacksStore = [CancelToken: TaskCallback]()
 
@@ -63,6 +68,14 @@ class SessionDataTask: @unchecked Sendable {
 
     private var currentToken = 0
     private let lock = NSLock()
+    
+    private var _metrics: NetworkMetrics?
+    /// The network metrics collected during the download task.
+    public var metrics: NetworkMetrics? {
+        lock.lock()
+        defer { lock.unlock() }
+        return _metrics
+    }
 
     let onTaskDone = Delegate<(Result<(Data, URLResponse?), KingfisherError>, [TaskCallback]), Void>()
     let onCallbackCancelled = Delegate<(CancelToken, TaskCallback), Void>()
@@ -80,7 +93,7 @@ class SessionDataTask: @unchecked Sendable {
     init(task: URLSessionDataTask) {
         self.task = task
         self.originalURL = task.originalRequest?.url
-        mutableData = Data()
+        _mutableData = Data()
     }
 
     func addCallback(_ callback: TaskCallback) -> CancelToken {
@@ -101,10 +114,13 @@ class SessionDataTask: @unchecked Sendable {
         return nil
     }
     
-    func removeAllCallbacks() -> Void {
+    @discardableResult
+    func removeAllCallbacks() -> [TaskCallback] {
         lock.lock()
         defer { lock.unlock() }
+        let callbacks = callbacksStore.values
         callbacksStore.removeAll()
+        return Array(callbacks)
     }
 
     func resume() {
@@ -127,6 +143,14 @@ class SessionDataTask: @unchecked Sendable {
     }
 
     func didReceiveData(_ data: Data) {
-        mutableData.append(data)
+        lock.lock()
+        defer { lock.unlock() }
+        _mutableData.append(data)
+    }
+    
+    func didCollectMetrics(_ metrics: NetworkMetrics) {
+        lock.lock()
+        defer { lock.unlock() }
+        _metrics = metrics
     }
 }

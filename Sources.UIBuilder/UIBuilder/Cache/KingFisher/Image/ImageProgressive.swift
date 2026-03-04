@@ -36,10 +36,10 @@ private let sharedProcessingQueue: CallbackQueue =
     .dispatch(DispatchQueue(label: "com.onevcat.Kingfisher.ImageDownloader.Process"))
 
 /// Represents a progressive loading for images which supports this feature.
-struct ImageProgressive: Sendable {
+public struct ImageProgressive: Sendable {
     
     /// The updating strategy when an intermediate progressive image is generated and about to be set to the hosting view.
-    enum UpdatingStrategy {
+    public enum UpdatingStrategy {
         
         /// Use the progressive image as it is.
         ///
@@ -59,33 +59,33 @@ struct ImageProgressive: Sendable {
     /// A default `ImageProgressive` could be used across. It blurs the progressive loading with the fastest
     /// scan enabled and scan interval as 0.
     @available(*, deprecated, message: "Getting a default `ImageProgressive` is deprecated due to its syntax semantic is not clear. Use `ImageProgressive.init` instead.", renamed: "init()")
-    static let `default` = ImageProgressive(
+    public static let `default` = ImageProgressive(
         isBlur: true,
         isFastestScan: true,
         scanInterval: 0
     )
     
     /// Indicates whether to enable blur effect processing.
-    var isBlur: Bool
+    public var isBlur: Bool
     
     /// Indicates whether to enable the fastest scan.
-    var isFastestScan: Bool
+    public var isFastestScan: Bool
     
     /// The minimum time interval for each scan.
-    var scanInterval: TimeInterval
+    public var scanInterval: TimeInterval
     
     /// Called when an intermediate image is prepared and about to be set to the image view. 
     ///
     /// If implemented, you should return an ``UpdatingStrategy`` value from this delegate. This value will be used to
     /// update the hosting view, if any. Otherwise, if there is no hosting view (i.e., the image retrieval is not
     /// happening from a view extension method), the returned ``UpdatingStrategy`` is ignored.
-    let onImageUpdated = Delegate<KFCrossPlatformImage, UpdatingStrategy>()
+    public let onImageUpdated = Delegate<KFCrossPlatformImage, UpdatingStrategy>()
     
     /// Creates an `ImageProgressive` value with default settings. 
     ///
     /// It enables progressive loading with the fastest scan enabled and a scan interval of 0, resulting in a blurred 
     /// effect.
-    init() {
+    public init() {
         self.init(isBlur: true, isFastestScan: true, scanInterval: 0)
     }
     
@@ -95,7 +95,7 @@ struct ImageProgressive: Sendable {
     ///     - isBlur: Indicates whether to enable blur effect processing.
     ///     - isFastestScan: Indicates whether to enable the fastest scan.
     ///     - scanInterval: The minimum time interval for each scan.
-    init(
+    public init(
         isBlur: Bool,
         isFastestScan: Bool,
         scanInterval: TimeInterval

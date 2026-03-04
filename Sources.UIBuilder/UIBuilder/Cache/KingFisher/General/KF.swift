@@ -47,13 +47,13 @@ import TVUIKit
 /// A helper type to create image setting tasks in a builder pattern.
 ///
 /// Use methods in this type to create a ``KF/Builder`` instance and configure image tasks there.
-enum KF {
+public enum KF {
 
     /// Creates a builder for a given ``Source``.
     /// - Parameter source: The ``Source`` object defines data information from network or a data provider.
     /// - Returns: A ``Builder`` for future configuration. After configuring the builder, call its 
     /// `Builder/set(to:)` to start the image loading.
-    static func source(_ source: Source?) -> KF.Builder {
+    public static func source(_ source: Source?) -> KF.Builder {
         Builder(source: source)
     }
 
@@ -61,7 +61,7 @@ enum KF {
     /// - Parameter resource: The ``Resource`` object defines data information like key or URL.
     /// - Returns: A ``Builder`` for future configuration. After configuring the builder, call its
     /// `Builder/set(to:)` to start the image loading.
-    static func resource(_ resource: (any Resource)?) -> KF.Builder {
+    public static func resource(_ resource: (any Resource)?) -> KF.Builder {
         source(resource?.convertToSource())
     }
 
@@ -72,7 +72,7 @@ enum KF {
     ///               If `nil`, the `absoluteString` of `url` is used as the cache key.
     /// - Returns: A ``Builder`` for future configuration. After configuring the builder, call its
     /// `Builder/set(to:)` to start the image loading.
-    static func url(_ url: URL?, cacheKey: String? = nil) -> KF.Builder {
+    public static func url(_ url: URL?, cacheKey: String? = nil) -> KF.Builder {
         source(url?.convertToSource(overrideCacheKey: cacheKey))
     }
 
@@ -80,7 +80,7 @@ enum KF {
     /// - Parameter provider: The ``ImageDataProvider`` object contains information about the data.
     /// - Returns: A ``Builder`` for future configuration. After configuring the builder, call its
     /// `Builder/set(to:)` to start the image loading.
-    static func dataProvider(_ provider: (any ImageDataProvider)?) -> KF.Builder {
+    public static func dataProvider(_ provider: (any ImageDataProvider)?) -> KF.Builder {
         source(provider?.convertToSource())
     }
 
@@ -90,7 +90,7 @@ enum KF {
     ///   - cacheKey: The key used to store the downloaded image in cache.
     /// - Returns: A ``Builder`` for future configuration. After configuring the builder, call its
     /// `Builder/set(to:)` to start the image loading.
-    static func data(_ data: Data?, cacheKey: String) -> KF.Builder {
+    public static func data(_ data: Data?, cacheKey: String) -> KF.Builder {
         if let data = data {
             return dataProvider(RawImageDataProvider(data: data, cacheKey: cacheKey))
         } else {
@@ -103,7 +103,7 @@ enum KF {
 extension KF {
 
     /// A builder class to configure an image retrieving task and set it to a holder view or component.
-    class Builder: @unchecked Sendable {
+    public class Builder: @unchecked Sendable {
         
         private let propertyQueue = DispatchQueue(label: "com.onevcat.Kingfisher.KF.Builder.propertyQueue")
         
@@ -124,14 +124,14 @@ extension KF {
         #endif
 
         private var _options = KingfisherParsedOptionsInfo(KingfisherManager.shared.defaultOptions)
-        var options: KingfisherParsedOptionsInfo {
+        public var options: KingfisherParsedOptionsInfo {
             get { propertyQueue.sync { _options } }
             set { propertyQueue.sync { _options = newValue } }
         }
 
-        let onFailureDelegate = Delegate<KingfisherError, Void>()
-        let onSuccessDelegate = Delegate<RetrieveImageResult, Void>()
-        let onProgressDelegate = Delegate<(Int64, Int64), Void>()
+        public let onFailureDelegate = Delegate<KingfisherError, Void>()
+        public let onSuccessDelegate = Delegate<RetrieveImageResult, Void>()
+        public let onProgressDelegate = Delegate<(Int64, Int64), Void>()
 
         init(source: Source?) {
             self.source = source
@@ -163,7 +163,7 @@ extension KF.Builder {
     /// - Returns: A task represents the image downloading, if initialized.
     ///            This value is `nil` if the image is being loaded from cache.
     @discardableResult
-    func set(to imageView: KFCrossPlatformImageView) -> DownloadTask? {
+    public func set(to imageView: KFCrossPlatformImageView) -> DownloadTask? {
         imageView.kf.setImage(
             with: source,
             placeholder: placeholder,
@@ -180,7 +180,7 @@ extension KF.Builder {
     /// - Returns: A task represents the image downloading, if initialized.
     ///            This value is `nil` if the image is being loaded from cache.
     @discardableResult
-    func set(
+    public func set(
         to attachment: NSTextAttachment,
         attributedView: @autoclosure @escaping @Sendable () -> KFCrossPlatformView) -> DownloadTask? {
         let placeholderImage = placeholder as? KFCrossPlatformImage ?? nil
@@ -203,7 +203,7 @@ extension KF.Builder {
     /// - Returns: A task represents the image downloading, if initialized.
     ///            This value is `nil` if the image is being loaded from cache.
     @discardableResult
-    func set(to button: UIButton, for state: UIControl.State) -> DownloadTask? {
+    public func set(to button: UIButton, for state: UIControl.State) -> DownloadTask? {
         let placeholderImage = placeholder as? KFCrossPlatformImage ?? nil
         return button.kf.setImage(
             with: source,
@@ -222,7 +222,7 @@ extension KF.Builder {
     /// - Returns: A task represents the image downloading, if initialized.
     ///            This value is `nil` if the image is being loaded from cache.
     @discardableResult
-    func setBackground(to button: UIButton, for state: UIControl.State) -> DownloadTask? {
+    public func setBackground(to button: UIButton, for state: UIControl.State) -> DownloadTask? {
         let placeholderImage = placeholder as? KFCrossPlatformImage ?? nil
         return button.kf.setBackgroundImage(
             with: source,
@@ -244,7 +244,7 @@ extension KF.Builder {
     ///            This value is `nil` if the image is being loaded from cache.
     @available(iOS 14.0, *)
     @discardableResult
-    func set(to listItem: CPListItem) -> DownloadTask? {
+    public func set(to listItem: CPListItem) -> DownloadTask? {
         let placeholderImage = placeholder as? KFCrossPlatformImage ?? nil
         return listItem.kf.setImage(
             with: source,
@@ -264,7 +264,7 @@ extension KF.Builder {
     /// - Returns: A task represents the image downloading, if initialized.
     ///            This value is `nil` if the image is being loaded from cache.
     @discardableResult
-    func set(to button: NSButton) -> DownloadTask? {
+    public func set(to button: NSButton) -> DownloadTask? {
         let placeholderImage = placeholder as? KFCrossPlatformImage ?? nil
         return button.kf.setImage(
             with: source,
@@ -280,7 +280,7 @@ extension KF.Builder {
     /// - Returns: A task represents the image downloading, if initialized.
     ///            This value is `nil` if the image is being loaded from cache.
     @discardableResult
-    func setAlternative(to button: NSButton) -> DownloadTask? {
+    public func setAlternative(to button: NSButton) -> DownloadTask? {
         let placeholderImage = placeholder as? KFCrossPlatformImage ?? nil
         return button.kf.setAlternateImage(
             with: source,
@@ -299,7 +299,7 @@ extension KF.Builder {
     /// - Returns: A task represents the image downloading, if initialized.
     ///            This value is `nil` if the image is being loaded from cache.
     @discardableResult
-    func set(to interfaceImage: WKInterfaceImage) -> DownloadTask? {
+    public func set(to interfaceImage: WKInterfaceImage) -> DownloadTask? {
         return interfaceImage.kf.setImage(
             with: source,
             placeholder: placeholder,
@@ -317,7 +317,7 @@ extension KF.Builder {
     ///            This value is `nil` if the image is being loaded from cache.
     @available(tvOS 12.0, *)
     @discardableResult
-    func set(to monogramView: TVMonogramView) -> DownloadTask? {
+    public func set(to monogramView: TVMonogramView) -> DownloadTask? {
         let placeholderImage = placeholder as? KFCrossPlatformImage ?? nil
         return monogramView.kf.setImage(
             with: source,
@@ -337,16 +337,17 @@ extension KF.Builder {
     /// Sets a placeholder which is used while retrieving the image.
     /// - Parameter placeholder: A placeholder to show while retrieving the image from its source.
     /// - Returns: A ``KF/Builder`` with changes applied.
-    func placeholder(_ placeholder: (any Placeholder)?) -> Self {
+    public func placeholder(_ placeholder: (any Placeholder)?) -> Self {
         self.placeholder = placeholder
         return self
     }
     #endif
 
     /// Sets a placeholder image which is used while retrieving the image.
-    /// - Parameter placeholder: An image to show while retrieving the image from its source.
+    /// - Parameters:
+    ///   - image: An image to show while retrieving the image from its source.
     /// - Returns: A ``KF/Builder`` with changes applied.
-    func placeholder(_ image: KFCrossPlatformImage?) -> Self {
+    public func placeholder(_ image: KFCrossPlatformImage?) -> Self {
         self.placeholder = image
         return self
     }
@@ -364,7 +365,7 @@ extension KF.Builder {
     /// The transition will not happen when the image is retrieved from either memory or disk cache by default.
     /// If you need to do the transition even when the image being retrieved from cache, also call
     /// ``KFOptionSetter/forceRefresh(_:)`` on the returned ``KF/Builder``.
-    func transition(_ transition: ImageTransition) -> Self {
+    public func transition(_ transition: ImageTransition) -> Self {
         options.transition = transition
         return self
     }
@@ -377,7 +378,7 @@ extension KF.Builder {
     /// The transition will not happen when the image is retrieved from either memory or disk cache by default.
     /// If you need to do the transition even when the image being retrieved from cache, also call
     /// ``KFOptionSetter/forceRefresh(_:)`` on the returned ``KF/Builder``.
-    func fade(duration: TimeInterval) -> Self {
+    public func fade(duration: TimeInterval) -> Self {
         options.transition = .fade(duration)
         return self
     }
@@ -390,7 +391,7 @@ extension KF.Builder {
     /// By setting this option, the placeholder image parameter of image view extension method
     /// will be ignored and the current image will be kept while loading or downloading the new image.
     ///
-    func keepCurrentImageWhileLoading(_ enabled: Bool = true) -> Self {
+    public func keepCurrentImageWhileLoading(_ enabled: Bool = true) -> Self {
         options.keepCurrentImageWhileLoading = enabled
         return self
     }
@@ -404,17 +405,8 @@ extension KF.Builder {
     ///
     /// This option will be ignored if the target image is not animated image data.
     ///
-    func onlyLoadFirstFrame(_ enabled: Bool = true) -> Self {
+    public func onlyLoadFirstFrame(_ enabled: Bool = true) -> Self {
         options.onlyLoadFirstFrame = enabled
-        return self
-    }
-
-    /// Enables progressive image loading with a specified `ImageProgressive` setting to process the
-    /// progressive JPEG data and display it in a progressive way.
-    /// - Parameter progressive: The progressive settings which is used while loading.
-    /// - Returns: A ``KF/Builder`` with changes applied.
-    func progressiveJPEG(_ progressive: ImageProgressive? = .init()) -> Self {
-        options.progressiveJPEG = progressive
         return self
     }
 }
@@ -430,7 +422,7 @@ extension KF.Builder {
     ///
     /// - Returns: The `Self` value with changes applied.
     @available(*, deprecated, message: "This is not necessary anymore since `@StateObject` is used. It does nothing now and please just remove it.")
-    func loadImmediately(_ start: Bool = true) -> Self {
+    public func loadImmediately(_ start: Bool = true) -> Self {
         return self
     }
 }
@@ -440,19 +432,19 @@ extension KF {
 
     /// Represents the detail information when a task redirect happens. It is wrapping necessary information for a
     /// ``ImageDownloadRedirectHandler``. See that protocol for more information.
-    struct RedirectPayload {
+    public struct RedirectPayload {
 
         /// The related session data task when the redirect happens. It is
         /// the current ``SessionDataTask`` which triggers this redirect.
-        let task: SessionDataTask
+        public let task: SessionDataTask
 
         /// The response received during redirection.
-        let response: HTTPURLResponse
+        public let response: HTTPURLResponse
 
         /// The request for redirection which can be modified.
-        let newRequest: URLRequest
+        public let newRequest: URLRequest
 
         /// A closure for being called with modified request.
-        let completionHandler: (URLRequest?) -> Void
+        public let completionHandler: (URLRequest?) -> Void
     }
 }
