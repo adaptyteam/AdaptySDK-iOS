@@ -14,11 +14,14 @@ package struct AdaptyUIPaywallView_Internal: View {
     @EnvironmentObject private var productsViewModel: AdaptyUIProductsViewModel
 
     private let showDebugOverlay: Bool
+    private let displayMissingTags: Bool
 
     package init(
-        showDebugOverlay: Bool
+        showDebugOverlay: Bool,
+        displayMissingTags: Bool
     ) {
         self.showDebugOverlay = showDebugOverlay
+        self.displayMissingTags = displayMissingTags
     }
 
     package var body: some View {
@@ -32,6 +35,7 @@ package struct AdaptyUIPaywallView_Internal: View {
                 )
                 .withSafeArea(proxy.safeAreaInsets) // TODO: x check safe area calculation rule
                 .withDebugOverlayEnabled(showDebugOverlay)
+                .withDisplayMissingTags(displayMissingTags)
         }
         .onAppear {
             productsViewModel.loadProductsIfNeeded()

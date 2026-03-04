@@ -57,11 +57,19 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
     func resolvedText(
         _ ref: VC.StringReference,
         screen: VS.ScreenInstance
-    ) -> (VC.RichText, ProductInfoContainer) {
+    ) -> (
+        richText: VC.RichText,
+        tagValues: [String : AdaptyUIConfiguration.StringReference.TagValue]?,
+        productInfo: ProductInfoContainer
+    ) {
         switch ref {
-        case let .stringId(stringId, tagValues): // TODO: need use tagValues
+        case let .stringId(stringId, tagValues): // TODO: x need use tagValues
             let text = try? _state.richText(stringId)
-            return (text ?? .empty, .notApplicable)
+            return (
+                richText: text ?? .empty,
+                tagValues: tagValues,
+                productInfo: .notApplicable
+            )
         case let .variable(variable):
             if let stringId = try? _state.getValue(
                 String.self,
@@ -69,9 +77,17 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                 screenInstance: screen
             ) {
                 let text = try? _state.richText(stringId)
-                return (text ?? .empty, .notApplicable)
+                return (
+                    richText: text ?? .empty,
+                    tagValues: nil,
+                    productInfo: .notApplicable
+                )
             } else {
-                return (.empty, .notApplicable)
+                return (
+                    richText: .empty,
+                    tagValues: nil,
+                    productInfo: .notApplicable
+                )
             }
         case let .product(product):
             switch product {
@@ -81,7 +97,11 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                     byPaymentMode: nil, // TODO: x use productsInfoProvider
                     suffix: sufix
                 )
-                return (text ?? .empty, .notApplicable)
+                return (
+                    richText: text ?? .empty,
+                    tagValues: nil,
+                    productInfo: .notApplicable
+                )
             case let .variable(variable, sufix):
                 guard let productId = try? _state.getValue(
                     String.self,
@@ -89,7 +109,11 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                     screenInstance: screen
                 ) else {
                     let text = try? _state.richTextForNonSelectedProduct(suffix: sufix)
-                    return (text ?? .empty, .notApplicable)
+                    return (
+                        richText: text ?? .empty,
+                        tagValues: nil,
+                        productInfo: .notApplicable
+                    )
                 }
 
                 let text = try? _state.richText(
@@ -97,7 +121,11 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                     byPaymentMode: nil, // TODO: x use productsInfoProvider
                     suffix: sufix
                 )
-                return (text ?? .empty, .notApplicable)
+                return (
+                    richText: text ?? .empty,
+                    tagValues: nil,
+                    productInfo: .notApplicable
+                )
             }
         }
     }

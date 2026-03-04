@@ -105,7 +105,8 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         paywallConfiguration.eventsHandler.didFinishWebPaymentNavigation = didFinishWebPaymentNavigation ?? { _, _ in }
 
         return AdaptyUIPaywallView_Internal(
-            showDebugOverlay: false
+            showDebugOverlay: false,
+            displayMissingTags: false
         )
         .environmentObjects(
             stateViewModel: paywallConfiguration.stateViewModel,

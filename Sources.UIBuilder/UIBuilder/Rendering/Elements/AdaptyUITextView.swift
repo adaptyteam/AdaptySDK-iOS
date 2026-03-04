@@ -13,6 +13,8 @@ struct AdaptyUITextView: View {
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
     @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
+    @EnvironmentObject
     private var productsViewModel: AdaptyUIProductsViewModel
     @EnvironmentObject
     private var customTagResolverViewModel: AdaptyUITagResolverViewModel
@@ -23,13 +25,15 @@ struct AdaptyUITextView: View {
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
+    @Environment(\.adaptyDisplayMissingTags)
+    private var displayMissingTags: Bool
 
     init(_ text: VC.Text) {
         self.text = text
     }
 
     var body: some View {
-        let (richText, productInfo) = assetsViewModel.resolvedText(
+        let (richText, tagValues, productInfo) = assetsViewModel.resolvedText(
             text.value,
             screen: screen
         )
@@ -40,10 +44,13 @@ struct AdaptyUITextView: View {
                 .convertToSwiftUIText(
                     defaultAttributes: text.defaultTextAttributes,
                     assetsCache: assetsViewModel.cache,
-                    tagResolver: customTagResolverViewModel,
+                    stateViewModel: stateViewModel,
+                    tagValues: tagValues,
+                    customTagResolver: customTagResolverViewModel,
                     productInfo: nil,
                     colorScheme: colorScheme,
-                    screen: screen
+                    screen: screen,
+                    displayMissingTags: displayMissingTags
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -53,11 +60,14 @@ struct AdaptyUITextView: View {
                 .convertToSwiftUIText(
                     defaultAttributes: text.defaultTextAttributes,
                     assetsCache: assetsViewModel.cache,
-                    tagResolver: customTagResolverViewModel,
+                    stateViewModel: stateViewModel,
+                    tagValues: tagValues,
+                    customTagResolver: customTagResolverViewModel,
                     productInfo: nil,
                     colorScheme: colorScheme,
                     screen: screen,
-                    placeholder: true
+                    placeholder: true,
+                    displayMissingTags: displayMissingTags
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -68,10 +78,13 @@ struct AdaptyUITextView: View {
                 .convertToSwiftUIText(
                     defaultAttributes: text.defaultTextAttributes,
                     assetsCache: assetsViewModel.cache,
-                    tagResolver: customTagResolverViewModel,
+                    stateViewModel: stateViewModel,
+                    tagValues: tagValues,
+                    customTagResolver: customTagResolverViewModel,
                     productInfo: productInfoModel,
                     colorScheme: colorScheme,
-                    screen: screen
+                    screen: screen,
+                    displayMissingTags: displayMissingTags
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -90,10 +103,13 @@ extension AdaptyUIBuilder {
 extension [VC.RichText.Item] {
     func convertToSwiftUITextThrowingError(
         assetsCache: AdaptyUIAssetsCache,
-        tagResolver: AdaptyUITagResolver,
+        stateViewModel: AdaptyUIStateViewModel,
+        tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
+        customTagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
-        screen: VS.ScreenInstance
+        screen: VS.ScreenInstance,
+        displayMissingTags: Bool
     ) throws -> Text {
         try reduce(Text("")) {
             partialResult,
@@ -107,15 +123,25 @@ extension [VC.RichText.Item] {
                         value: value,
                         attributes: attr,
                         assetsCache: assetsCache,
-                        colorScheme: colorScheme,
-                        screen: screen
+                        colorScheme: colorScheme
                     )
                 )
             case let .tag(value, attr):
                 let tagReplacementResult: String
 
-                if let customTagResult = tagResolver.replacement(for: value) {
+                if let customTagResult = customTagResolver.replacement(for: value) {
                     tagReplacementResult = customTagResult
+                } else if let tagValue = tagValues?[value] {
+                    tagReplacementResult = switch tagValue {
+                    case let .value(value):
+                        value
+                    case let .variable(variable):
+                        stateViewModel.getValue(
+                            variable,
+                            defaultValue: displayMissingTags ? "<var:\(variable.path.joined(separator: "."))}>" : "",
+                            screen: screen
+                        )
+                    }
                 } else if let productTag = TextProductTag(rawValue: value),
                           let productTagResult = productInfo?.value(byTag: productTag)
                 {
@@ -127,7 +153,11 @@ extension [VC.RichText.Item] {
                     }
 
                 } else {
-                    throw AdaptyUIBuilder.RichTextError.tagReplacementNotFound
+                    if displayMissingTags {
+                        tagReplacementResult = "<tag:\(value)>"
+                    } else {
+                        throw AdaptyUIBuilder.RichTextError.tagReplacementNotFound
+                    }
                 }
 
                 return partialResult + Text(
@@ -135,8 +165,7 @@ extension [VC.RichText.Item] {
                         value: tagReplacementResult,
                         attributes: attr,
                         assetsCache: assetsCache,
-                        colorScheme: colorScheme,
-                        screen: screen
+                        colorScheme: colorScheme
                     )
                 )
             case let .image(value, attr):
@@ -178,11 +207,14 @@ extension VC.RichText {
     func convertToSwiftUIText(
         defaultAttributes: VC.Text.Attributes?,
         assetsCache: AdaptyUIAssetsCache,
-        tagResolver: AdaptyUITagResolver,
+        stateViewModel: AdaptyUIStateViewModel,
+        tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
+        customTagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
         screen: VS.ScreenInstance,
-        placeholder: Bool = false
+        placeholder: Bool = false,
+        displayMissingTags: Bool = false
     ) -> Text {
         if placeholder {
             let reducedString = items.reduce("") { partialResult, item in
@@ -204,20 +236,26 @@ extension VC.RichText {
                     .apply(defaultAttributes: defaultAttributes)
                     .convertToSwiftUITextThrowingError(
                         assetsCache: assetsCache,
-                        tagResolver: tagResolver,
+                        stateViewModel: stateViewModel,
+                        tagValues: tagValues,
+                        customTagResolver: customTagResolver,
                         productInfo: productInfo,
                         colorScheme: colorScheme,
-                        screen: screen
+                        screen: screen,
+                        displayMissingTags: displayMissingTags
                     )
             } catch {
                 if let fallback, let fallbackText = try? fallback
                     .apply(defaultAttributes: defaultAttributes)
                     .convertToSwiftUITextThrowingError(
                         assetsCache: assetsCache,
-                        tagResolver: tagResolver,
+                        stateViewModel: stateViewModel,
+                        tagValues: tagValues,
+                        customTagResolver: customTagResolver,
                         productInfo: productInfo,
                         colorScheme: colorScheme,
-                        screen: screen
+                        screen: screen,
+                        displayMissingTags: displayMissingTags
                     )
                 {
                     result = fallbackText
@@ -295,8 +333,7 @@ extension AttributedString {
         value: String,
         attributes: VC.RichText.Attributes?,
         assetsCache: AdaptyUIAssetsCache,
-        colorScheme: ColorScheme,
-        screen: VS.ScreenInstance
+        colorScheme: ColorScheme
     ) -> AttributedString {
         let foregroundColorAsset = assetsCache.cachedAsset(
             attributes?.txtColor,
@@ -313,8 +350,8 @@ extension AttributedString {
         result.foregroundColor = foregroundColorAsset?.uiColor ?? fontAsset?.defaultColor.uiColor ?? .adaptyDefaultTextColor
 
         let baseFont = fontAsset?.font ?? .adaptyDefaultFont
-        let defaultSize = baseFont.pointSize 
-        
+        let defaultSize = baseFont.pointSize
+
         if let size = attributes?.size, CGFloat(size) != defaultSize {
             result.font = baseFont.withSize(size)
         } else {
