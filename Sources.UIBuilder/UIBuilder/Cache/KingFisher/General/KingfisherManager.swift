@@ -339,7 +339,7 @@ public class KingfisherManager: @unchecked Sendable {
             retryContext: RetryContext?,
             downloadTaskUpdated: DownloadTaskUpdatedBlock?
         ) {
-            let newTask = self.retrieveImage(with: source, context: retrievingContext) { result in
+            let newTask = retrieveImage(with: source, context: retrievingContext) { result in
                 handler(currentSource: source, retryContext: retryContext, result: result)
             }
             downloadTaskUpdated?(newTask)
@@ -510,7 +510,7 @@ public class KingfisherManager: @unchecked Sendable {
                 metrics: value.metrics
             )
             // Add image to cache.
-            let targetCache = options.targetCache ?? self.cache
+            let targetCache = options.targetCache ?? cache
             targetCache.store(
                 value.image,
                 original: value.originalData,
@@ -680,9 +680,9 @@ public class KingfisherManager: @unchecked Sendable {
                             checkResultImageAndCallback(image)
                         }
                     }
-                } onFailure: { error in
+                } onFailure: { _ in
                     options.callbackQueue.execute {
-                        completionHandler(.failure(error))
+                        completionHandler(.failure(KingfisherError.cacheError(reason: .imageNotExisting(key: key))))
                     }
                 }
             }
@@ -761,11 +761,13 @@ public class KingfisherManager: @unchecked Sendable {
                             }
                         }
                     },
-                    onFailure: { error in
+                    onFailure: { _ in
                         // This should not happen actually, since we already confirmed `originalImageCached` is `true`.
                         // Just in case...
-                        if let completionHandler = completionHandler {
-                            options.callbackQueue.execute { completionHandler(.failure(error)) }
+                        options.callbackQueue.execute {
+                            completionHandler?(
+                                .failure(KingfisherError.cacheError(reason: .imageNotExisting(key: key)))
+                            )
                         }
                     }
                 )
