@@ -117,29 +117,21 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Resolve package dependencies
-        if: ${{ steps.setup_xcode.outcome == 'success' }}
-        shell: bash
-        run: swift package resolve
-
       - name: Build SDK library targets (SwiftPM)
         if: ${{ steps.setup_xcode.outcome == 'success' }}
         shell: bash
-        run: bash scripts/ci/sdk_validation/build-spm-library-targets.sh --log swift-build-products.log --scratch-path .build-sdk-validation-${{ matrix.runner }}-${{ matrix.xcode }}
-
-      - name: Build SDK package for iOS (xcodebuild)
-        if: ${{ steps.setup_xcode.outcome == 'success' && matrix.runner == needs.prepare_config.outputs.sdk_runner && matrix.xcode == needs.prepare_config.outputs.sdk_xcode }}
-        shell: bash
         run: |
-          set -euo pipefail
+          args=(
+            --log swift-build-products.log
+            --scratch-path ".build-sdk-validation-${{ matrix.runner }}-${{ matrix.xcode }}"
+            --resolve-package
+          )
 
-          echo "=== Building iOS package scheme: Adapty-Package ===" | tee -a swift-build-products.log
-          xcodebuild \
-            -scheme Adapty-Package \
-            -configuration Debug \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGNING_ALLOWED=NO \
-            build 2>&1 | tee -a swift-build-products.log
+          if [[ "${{ matrix.runner }}" == "${{ needs.prepare_config.outputs.sdk_runner }}" && "${{ matrix.xcode }}" == "${{ needs.prepare_config.outputs.sdk_xcode }}" ]]; then
+            args+=(--package-scheme Adapty-Package --package-destination "generic/platform=iOS")
+          fi
+
+          bash scripts/ci/sdk_validation/build-spm-library-targets.sh "${args[@]}"
 
       - name: Upload swift build products log
         if: ${{ always() }}
@@ -201,29 +193,7 @@ jobs:
         id: build_test_app
         if: ${{ steps.setup_xcode.outcome == 'success' }}
         shell: bash
-        run: |
-          set +e
-          set -o pipefail
-
-          xcodebuild \
-            -project Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI.xcodeproj \
-            -scheme AdaptyRecipes-SwiftUI \
-            -configuration Debug \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGNING_ALLOWED=NO \
-            build 2>&1 | tee xcodebuild.log
-          pipeline_statuses=("${PIPESTATUS[@]}")
-          exit_code="${pipeline_statuses[0]:-1}"
-          tee_exit_code="${pipeline_statuses[1]:-1}"
-          set -e
-
-          if [[ "$tee_exit_code" -ne 0 ]]; then
-            echo "::error::Failed to write xcodebuild.log. See step output for details."
-            exit 1
-          fi
-
-          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
-          echo "xcodebuild_exit_code=$exit_code"
+        run: bash scripts/ci/sdk_validation/build-demo-app.sh --log xcodebuild.log
 
       - name: Fail on demo build failure
         if: ${{ steps.build_test_app.outcome == 'success' && steps.build_test_app.outputs.exit_code != '0' }}
@@ -273,15 +243,10 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Resolve dependencies
-        if: ${{ steps.setup_xcode.outcome == 'success' }}
-        shell: bash
-        run: swift package resolve
-
       - name: Build SDK library targets for macOS 11 (SwiftPM)
         if: ${{ steps.setup_xcode.outcome == 'success' }}
         shell: bash
-        run: bash scripts/ci/sdk_validation/build-spm-library-targets.sh --log swift-build-macos.log --triple arm64-apple-macosx11.0 --scratch-path .build-sdk-validation-macos-${{ needs.prepare_config.outputs.sdk_runner }}-${{ needs.prepare_config.outputs.sdk_xcode }}
+        run: bash scripts/ci/sdk_validation/build-spm-library-targets.sh --log swift-build-macos.log --resolve-package --triple arm64-apple-macosx11.0 --scratch-path .build-sdk-validation-macos-${{ needs.prepare_config.outputs.sdk_runner }}-${{ needs.prepare_config.outputs.sdk_xcode }}
 
       - name: Upload macOS swift build log
         if: ${{ always() }}
@@ -328,18 +293,7 @@ jobs:
       - name: Run pod lib lint (published podspecs)
         if: ${{ steps.setup_xcode.outcome == 'success' }}
         shell: bash
-        run: |
-          set -euo pipefail
-          : > pod-lib-lint.log
-
-          pod lib lint \
-            Adapty.podspec \
-            AdaptyUI.podspec \
-            AdaptyPlugin.podspec \
-            --allow-warnings \
-            --skip-tests \
-            --include-podspecs=Adapty.podspec,AdaptyUI.podspec,AdaptyPlugin.podspec,AdaptyLogger.podspec,AdaptyUIBuilder.podspec \
-            2>&1 | tee -a pod-lib-lint.log
+        run: bash scripts/ci/sdk_validation/run-pod-lib-lint.sh --log pod-lib-lint.log
 
       - name: Upload pod lib lint log
         if: ${{ always() }}
@@ -392,32 +346,11 @@ jobs:
           xcodebuild -version
           swift --version
 
-      - name: Resolve dependencies
-        if: ${{ steps.setup_xcode.outcome == 'success' }}
-        shell: bash
-        run: swift package resolve
-
       - name: Run SDK tests
         id: tests
         if: ${{ steps.setup_xcode.outcome == 'success' }}
         shell: bash
-        run: |
-          set +e
-          set -o pipefail
-
-          swift test 2>&1 | tee swift-test.log
-          pipeline_statuses=("${PIPESTATUS[@]}")
-          exit_code="${pipeline_statuses[0]:-1}"
-          tee_exit_code="${pipeline_statuses[1]:-1}"
-          set -e
-
-          if [[ "$tee_exit_code" -ne 0 ]]; then
-            echo "::error::Failed to write swift-test.log. See step output for details."
-            exit 1
-          fi
-
-          echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
-          echo "swift_test_exit_code=$exit_code"
+        run: bash scripts/ci/sdk_validation/run-sdk-tests.sh --log swift-test.log
 
       - name: Fail on SDK test failure
         if: ${{ steps.tests.outcome == 'success' && steps.tests.outputs.exit_code != '0' }}

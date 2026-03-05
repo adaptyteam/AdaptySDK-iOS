@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require("node:fs");
-const { execFileSync } = require("node:child_process");
+const { spawnSync } = require("node:child_process");
 
 const fail = (message) => {
     console.error(message);
@@ -15,15 +15,22 @@ const readDumpPackage = () => {
         return fs.readFileSync(0, "utf8");
     }
 
-    try {
-        return execFileSync("swift", ["package", "dump-package"], {
-            encoding: "utf8",
-            maxBuffer: 10 * 1024 * 1024,
-        });
-    } catch (error) {
-        const stderr = error?.stderr?.toString().trim();
-        fail(stderr || error.message);
+    const result = spawnSync("swift", ["package", "dump-package"], {
+        encoding: "utf8",
+        maxBuffer: 10 * 1024 * 1024,
+        stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    if (result.error) {
+        fail(result.error.message);
     }
+
+    if (result.status !== 0) {
+        const stderr = result.stderr?.toString().trim();
+        fail(stderr || `swift package dump-package failed with exit code ${result.status}.`);
+    }
+
+    return result.stdout;
 };
 
 const raw = readDumpPackage().trim();

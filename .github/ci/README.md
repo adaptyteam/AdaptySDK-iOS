@@ -6,7 +6,9 @@ Main files:
 
 - Workflow: `.github/workflows/sdk-validation.yml`
 - Config: `.github/ci/ci-run-config.json`
-- Helpers: `scripts/ci/sdk_validation/`
+- Config preparation: `scripts/ci/sdk_validation/prepare-config.js`
+- Shared shell logging: `scripts/ci/sdk_validation/lib/logging.sh`
+- Build/test helpers: `scripts/ci/sdk_validation/`
 
 The workflow is manual-only (`workflow_dispatch`). There are no automatic triggers for pull requests or pushes.
 
@@ -19,7 +21,12 @@ There is one workflow, `SDK Validation`, with four user-facing validation flows 
 - `run_tests`
 - `lint_pods`
 
-Internally, the workflow also has a technical `Prepare CI config` job that validates inputs and computes effective matrices before the validation jobs start.
+Internally, the workflow also has one technical job, `Prepare CI config`, that:
+
+- validates workflow input defaults against `.github/ci/ci-run-config.json`
+- parses boolean and JSON overrides
+- validates matrix structure
+- derives the effective matrices used by downstream jobs
 
 Default manual profile:
 
@@ -28,15 +35,30 @@ Default manual profile:
 - `run_tests = true`
 - `lint_pods = false`
 
+Concurrency behavior:
+
+- manual runs are grouped by `workflow + ref`
+- starting a new `SDK Validation` run on the same branch cancels the previous in-progress run on that branch
+
 ## Validation Flows
 
 ### `build_sdk_targets`
 
 What it does:
 
-- runs SwiftPM SDK library target builds across `build_matrix`
-- builds the iOS package scheme `Adapty-Package` on the primary `sdk_tests` entry (`runner + xcode`)
-- runs a separate one-Xcode macOS SDK build on `sdk_tests.runner` + `sdk_tests.xcode`
+- runs `build_sdk_matrix` across `build_matrix`
+- for each matrix entry:
+  - resolves SwiftPM dependencies inside the configured scratch path
+  - discovers library products from `Package.swift`
+  - builds each SwiftPM library target
+- on the primary `sdk_tests.runner + sdk_tests.xcode` entry, also builds the iOS package scheme `Adapty-Package`
+- runs a separate `macos_sdk_build` job on `sdk_tests.runner + sdk_tests.xcode`
+
+Scripts involved:
+
+- `scripts/ci/sdk_validation/build-spm-library-targets.sh`
+- `scripts/ci/sdk_validation/list-library-targets.js`
+- `scripts/ci/sdk_validation/lib/logging.sh`
 
 Inputs that affect it:
 
@@ -45,16 +67,29 @@ Inputs that affect it:
 
 Behavior:
 
-- strict failure
-- `build_matrix` must include the primary `sdk_tests` entry (`runner + xcode`)
+- default config is blocking
+- `build_matrix` entries may use `informational: true`; those entries run with `continue-on-error`
+- the primary `sdk_tests.runner + sdk_tests.xcode` entry must exist in `build_matrix`
+- the primary build entry must have `informational: false`
+
+Artifacts:
+
+- `swift-build-products-log-<runner>-xcode-<xcode>`
+- `swift-build-macos-log-xcode-<xcode>`
 
 ### `build_test_app`
 
 What it does:
 
-- builds `AdaptyRecipes-SwiftUI`
-- runs only on the primary `sdk_tests` entry (`runner + xcode`), even if `build_matrix` contains more entries
-- writes a CI-specific `AppConstants.swift` before `xcodebuild`
+- builds `Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI.xcodeproj`
+- writes CI-specific demo constants before the build
+- uploads `xcodebuild.log` even when `xcodebuild` returns non-zero
+
+Scripts involved:
+
+- `scripts/ci/sdk_validation/write-demo-constants.sh`
+- `scripts/ci/sdk_validation/build-demo-app.sh`
+- `scripts/ci/sdk_validation/lib/logging.sh`
 
 Inputs that affect it:
 
@@ -63,14 +98,29 @@ Inputs that affect it:
 
 Behavior:
 
-- uses the single primary `sdk_tests` entry filtered from `build_matrix`
-- strict failure
+- runs only on the single primary entry derived from `build_matrix`
+- the helper writes `exit_code` to `GITHUB_OUTPUT`
+- the workflow uploads the log first, then fails in a separate step if `exit_code != 0`
+- effectively blocking, because the derived primary entry must have `informational: false`
+
+Artifact:
+
+- `demo-build-log-<runner>-xcode-<xcode>`
 
 ### `run_tests`
 
 What it does:
 
-- runs `swift test` using `sdk_tests_matrix`
+- runs `sdk_tests` across `sdk_tests_matrix`
+- for each matrix entry:
+  - resolves SwiftPM dependencies
+  - runs `swift test`
+- uploads `swift-test.log` even when `swift test` returns non-zero
+
+Scripts involved:
+
+- `scripts/ci/sdk_validation/run-sdk-tests.sh`
+- `scripts/ci/sdk_validation/lib/logging.sh`
 
 Inputs that affect it:
 
@@ -79,14 +129,30 @@ Inputs that affect it:
 
 Behavior:
 
-- strict failure
-- no whitelist support
+- default config is blocking, because the default matrix contains one primary entry with `informational: false`
+- override entries may use `informational: true`; those entries run with `continue-on-error`
+- `sdk_tests_matrix_override_json` does not have to include the primary `sdk_tests` entry
+- there is no whitelist mechanism
+- the helper writes `exit_code` to `GITHUB_OUTPUT`
+- the workflow uploads the log first, then fails in a separate step if `exit_code != 0`
+
+Artifact:
+
+- `sdk-tests-log-<runner>-xcode-<xcode>`
 
 ### `lint_pods`
 
 What it does:
 
-- runs `pod lib lint` for published podspecs
+- runs `pod lib lint` for:
+  - `Adapty.podspec`
+  - `AdaptyUI.podspec`
+  - `AdaptyPlugin.podspec`
+
+Scripts involved:
+
+- `scripts/ci/sdk_validation/run-pod-lib-lint.sh`
+- `scripts/ci/sdk_validation/lib/logging.sh`
 
 Inputs that affect it:
 
@@ -94,43 +160,89 @@ Inputs that affect it:
 
 Behavior:
 
-- strict failure
-- no whitelist support
-- runs on `sdk_tests.runner` + `sdk_tests.xcode`
+- blocking
+- runs only on `sdk_tests.runner + sdk_tests.xcode`
+- there is no whitelist mechanism
+
+Artifact:
+
+- `pod-lib-lint-log-xcode-<xcode>`
+
+## Logging Model
+
+All artifact-producing shell helpers use the same logging contract from `scripts/ci/sdk_validation/lib/logging.sh`.
+
+After log initialization:
+
+- stdout and stderr are mirrored to both live Actions output and the log file
+- early failures are written into the artifact log
+- helpers must not use extra `tee -a` logging on top of the shared logger
+
+Current artifact-owning helpers:
+
+- `build-spm-library-targets.sh`
+- `build-demo-app.sh`
+- `run-sdk-tests.sh`
+- `run-pod-lib-lint.sh`
+
+Special cases:
+
+- `build-demo-app.sh` and `run-sdk-tests.sh` intentionally do not fail their step on command non-zero
+- instead, they store `exit_code` in `GITHUB_OUTPUT`, so the workflow can upload the log artifact before failing
 
 ## Manual Run Inputs
 
 ### Boolean flags
 
-- `build_sdk_targets`: enable the SDK build flow
-- `build_test_app`: enable the test app build flow
-- `run_tests`: enable the `swift test` flow
-- `lint_pods`: enable the CocoaPods lint flow
+- `build_sdk_targets`: enable SDK builds
+- `build_test_app`: enable demo app build
+- `run_tests`: enable `swift test`
+- `lint_pods`: enable CocoaPods lint
 
 At least one of these flags must be `true`.
 
 ### JSON overrides
 
-- `build_matrix_override_json`: optional override for SDK build flow and primary entry selection for the test app
-- `sdk_tests_matrix_override_json`: optional override for the `swift test` matrix; entries may use `informational: true` to make a test run non-blocking
+- `build_matrix_override_json`: override for SDK build matrix and primary build entry selection
+- `sdk_tests_matrix_override_json`: override for `swift test` matrix
+
+Accepted formats:
+
+- JSON array of matrix entries
+- JSON object with `include: [...]`
+
+Matrix entry shape:
+
+```json
+{
+  "runner": "macos-15",
+  "xcode": "26.2",
+  "informational": false
+}
+```
+
+Rules:
+
+- `runner + xcode` pairs must be unique
+- `informational: true` means the matrix entry is advisory and uses `continue-on-error`
+- if `build_sdk_targets=true` or `build_test_app=true`, `build_matrix` must include the primary `sdk_tests` entry with `informational: false`
+- `sdk_tests_matrix_override_json` may omit the primary `sdk_tests` entry entirely for custom test-only runs
 
 ## Validation Rules
 
-- Boolean defaults in `workflow_dispatch` must stay in sync with `.github/ci/ci-run-config.json`.
-- `Prepare CI config` fails if all four boolean flags are `false`.
-- Matrix override JSON must be a non-empty array or an object with `include[]`.
-- Matrix entries must be unique by `runner + xcode`.
-- If `build_sdk_targets=true` or `build_test_app=true`, `build_matrix` must include the primary `sdk_tests` entry (`runner + xcode`).
-- `sdk_tests_matrix_override_json` does not require the primary `sdk_tests` entry; it can be used for custom test-only runs.
+- `Prepare CI config` fails if all four boolean flags are `false`
+- workflow input defaults in `workflow_dispatch` must stay in sync with `.github/ci/ci-run-config.json`
+- matrix override JSON must be a non-empty array or an object with `include[]`
+- matrix entries must be unique by `runner + xcode`
+- `build_test_app` always derives a single-entry matrix from the primary build entry
 
 ## Xcode Selection Behavior
 
-- Matrix jobs use `setup-xcode` for requested versions.
-- If a matrix entry is `informational: true` and Xcode is unavailable, that entry is skipped with a warning.
-- If a matrix entry is `informational: false` and Xcode is unavailable, that entry fails.
-- For matrix jobs, `informational: true` also means the entry uses `continue-on-error` and does not block the whole workflow if the build/test command fails.
-- One-Xcode jobs (`SDK macOS build`, `CocoaPods lint`) fail if the configured Xcode is unavailable.
-- iOS-specific steps (`Adapty-Package` and `AdaptyRecipes-SwiftUI`) run only on the primary `sdk_tests` entry (`runner + xcode`).
+- matrix jobs use `setup-xcode` for the requested version
+- if a matrix entry is `informational: true` and Xcode is unavailable, that entry is skipped with a warning
+- if a matrix entry is `informational: false` and Xcode is unavailable, that entry fails
+- `SDK macOS build` and `CocoaPods lint` are single-Xcode jobs and fail if the configured Xcode is unavailable
+- iOS-specific steps (`Adapty-Package` and `AdaptyRecipes-SwiftUI`) run only on the primary `sdk_tests.runner + sdk_tests.xcode`
 
 ## Manual Run Guide
 
@@ -142,14 +254,6 @@ At least one of these flags must be `true`.
 4. Choose the branch in `Use workflow from`.
 5. Leave the default profile or override flags/JSON inputs.
 6. Click `Run workflow`.
-
-Artifacts:
-
-- `swift-build-products-log-...`
-- `demo-build-log-...`
-- `swift-build-macos-log-...`
-- `pod-lib-lint-log-...`
-- `sdk-tests-log-...`
 
 ### GitHub CLI (`gh`)
 
@@ -170,7 +274,7 @@ gh workflow run "SDK Validation" --ref master \
   -f build_matrix_override_json='[{"runner":"macos-15","xcode":"26.2","informational":false}]'
 ```
 
-Run only test app build:
+Run only demo app build:
 
 ```bash
 gh workflow run "SDK Validation" --ref master \
@@ -189,3 +293,11 @@ gh workflow run "SDK Validation" --ref master \
   -f run_tests=true \
   -f lint_pods=false
 ```
+
+Artifacts produced by the workflow:
+
+- `swift-build-products-log-...`
+- `demo-build-log-...`
+- `swift-build-macos-log-...`
+- `pod-lib-lint-log-...`
+- `sdk-tests-log-...`
