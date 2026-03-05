@@ -11,7 +11,7 @@ import Foundation
 import SwiftUI
 
 @MainActor
-final class AdaptyUIScreenInstance: ObservableObject {
+final class AdaptyUIScreenViewModel: ObservableObject {
     var id: String { instance.id }
     var configuration: VC.Screen { instance.configuration }
 
@@ -50,12 +50,16 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     }
 
     @Published
-    private(set) var screens: [AdaptyUIScreenInstance]
+    private(set) var screens: [AdaptyUIScreenViewModel]
+    
+    var currentScreenInstanceIfSingle: VS.ScreenInstance? {
+        screens.firstIfSingle?.instance
+    }
 
     init(
         logId: String,
         navigator: VC.Navigator,
-        screen: AdaptyUIScreenInstance,
+        screen: AdaptyUIScreenViewModel,
         appearTransitionId: String
     ) {
         self.logId = logId
@@ -69,7 +73,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     @Published var contentAnimations: [VC.Animation]? = nil
 
     func startScreenTransition(
-        _ screen: AdaptyUIScreenInstance,
+        _ screen: AdaptyUIScreenViewModel,
         transitionId: String,
         completion: (() -> Void)?
     ) {

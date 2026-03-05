@@ -54,6 +54,22 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
         state.startOnce()
     }
+    
+    func handle(url: URL, screen: VS.ScreenInstance?) -> Bool {
+        do {
+            let action = try VC.Action(url: url)
+            
+            if let screen {
+                execute(actions: [action], screen: screen)
+            } else {
+                Log.ui.warn("#\(logId)# cant handle action url because there is no current screen!")
+            }
+            return true
+        } catch {
+            Log.ui.error("#\(logId)# handle action url error: \(error)")
+            return false
+        }
+    }
 
     func execute(actions: [VC.Action], screen: VS.ScreenInstance) {
         do {

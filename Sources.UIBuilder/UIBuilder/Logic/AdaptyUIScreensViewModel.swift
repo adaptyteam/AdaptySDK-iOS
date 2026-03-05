@@ -46,7 +46,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
             return // TODO: x error?
         }
 
-        let screen = AdaptyUIScreenInstance(instance: screen)
+        let screen = AdaptyUIScreenViewModel(instance: screen)
 
         if let navigatorVM = navigatorsViewModels.first(where: { $0.id == navigatorConfig.id }) {
             navigatorVM.startScreenTransition(
