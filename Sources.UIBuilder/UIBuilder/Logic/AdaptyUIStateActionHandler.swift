@@ -15,7 +15,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     private let productsViewModel: AdaptyUIProductsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
     private let logic: AdaptyUIBuilderLogic
-    
+
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
         screensViewModel: AdaptyUIScreensViewModel,
@@ -25,7 +25,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         self.screensViewModel = screensViewModel
         self.logic = logic
     }
-    
+
     package nonisolated func openUrl(
         url: URL,
         openIn: VC.Action.WebOpenInParameter
@@ -34,13 +34,21 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             logic.reportDidPerformAction(.openURL(url: url))
         }
     }
-    
+
+    package nonisolated func openUrl(
+        stringId: String,
+        openIn: VC.Action.WebOpenInParameter
+    ) {
+        // TODO: use stringId to get url
+        // stringId -> VC.RichText ,  richText.asString
+    }
+
     package nonisolated func userCustomAction(id: String) {
         Task { @MainActor in
             logic.reportDidPerformAction(.custom(id: id))
         }
     }
-    
+
     package nonisolated func purchaseProduct(
         productId: String,
         paywallId: String,
@@ -50,25 +58,25 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             productsViewModel.purchaseProduct(id: productId, service: service)
         }
     }
-    
+
     package nonisolated func openWebPaywall(
         openIn: VC.Action.WebOpenInParameter
     ) {
         // TODO: Deperecated
     }
-    
+
     package nonisolated func restorePurchases() {
         Task { @MainActor in
             productsViewModel.restorePurchases()
         }
     }
-    
+
     package nonisolated func closeAll() {
         Task { @MainActor in
             logic.reportDidPerformAction(.close)
         }
     }
-    
+
     package nonisolated func selectProduct(
         productId: String,
         paywallId: String
@@ -98,7 +106,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             )
         }
     }
-    
+
     package nonisolated func closeScreen(
         navigatorId: String,
         transitionId: String

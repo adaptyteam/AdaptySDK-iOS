@@ -17,11 +17,12 @@ extension Schema.RichText.Item: Codable {
         case tag
         case image
         case attributes
+        case action
     }
 
     package init(from decoder: Decoder) throws {
         if let value = try? (try? decoder.singleValueContainer())?.decode(String.self) {
-            self = .text(value, nil)
+            self = .text(value, nil, nil)
             return
         }
 
@@ -30,17 +31,20 @@ extension Schema.RichText.Item: Codable {
             if container.contains(.text) {
                 try .text(
                     container.decode(String.self, forKey: .text),
-                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes)
+                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes),
+                    container.decodeIfPresent(Schema.Action.self, forKey: .action)
                 )
             } else if container.contains(.tag) {
                 try .tag(
                     container.decode(String.self, forKey: .tag),
-                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes)
+                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes),
+                    container.decodeIfPresent(Schema.Action.self, forKey: .action)
                 )
             } else if container.contains(.image) {
                 try .image(
                     container.decode(Schema.AssetReference.self, forKey: .image),
-                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes)
+                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes),
+                    container.decodeIfPresent(Schema.Action.self, forKey: .action)
                 )
             } else {
                 .unknown
@@ -49,26 +53,37 @@ extension Schema.RichText.Item: Codable {
 
     package func encode(to encoder: any Encoder) throws {
         switch self {
-        case let .text(text, attributes):
-            guard let attributes = attributes.nonEmptyOrNil else {
+        case let .text(text, attributes, action):
+            if attributes?.isEmpty ?? true, action == nil {
                 var container = encoder.singleValueContainer()
                 try container.encode(text)
                 return
             }
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(text, forKey: .text)
-            try container.encode(attributes, forKey: .attributes)
-        case let .tag(tag, attributes):
+            if let attributes = attributes.nonEmptyOrNil {
+                try container.encode(attributes, forKey: .attributes)
+            }
+            if let action {
+                try container.encode(action, forKey: .action)
+            }
+        case let .tag(tag, attributes, action):
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(tag, forKey: .tag)
             if let attributes = attributes.nonEmptyOrNil {
                 try container.encode(attributes, forKey: .attributes)
             }
-        case let .image(image, attributes):
+            if let action {
+                try container.encode(action, forKey: .action)
+            }
+        case let .image(image, attributes, action):
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(image, forKey: .image)
             if let attributes = attributes.nonEmptyOrNil {
                 try container.encode(attributes, forKey: .attributes)
+            }
+            if let action {
+                try container.encode(action, forKey: .action)
             }
         case .unknown:
             break

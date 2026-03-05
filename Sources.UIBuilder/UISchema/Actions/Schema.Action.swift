@@ -90,7 +90,7 @@ extension Schema.Action {
         switch try container.decode(String.self, forKey: .type) {
         case "open_url":
             try self.init(path: ["SDK", "openUrl"], params: [
-                "url": .string(container.decode(String.self, forKey: .url))
+                "stringId": .string(container.decode(String.self, forKey: .url))
             ], scope: .global)
         case "restore":
             self.init(path: ["SDK", "restorePurchases"], params: nil, scope: .global)
