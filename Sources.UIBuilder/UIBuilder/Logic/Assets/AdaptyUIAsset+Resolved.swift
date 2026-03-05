@@ -74,13 +74,8 @@ import AVKit
 
 extension VC.VideoData {
     var resolvedVideo: AdaptyUIResolvedVideoAsset {
-        let item = AVPlayerItem(url: url)
-        let player = AVQueuePlayer(items: [item])
-        player.isMuted = true
-
-        return AdaptyUIResolvedVideoAsset(
-            player: player,
-            item: item,
+        AdaptyUIResolvedVideoAsset(
+            asset: AVAsset(url: url),
             image: image.resolvedImage
         )
     }

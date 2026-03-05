@@ -40,32 +40,31 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     @Published var playerState: PlayerState = .invalid
     @Published var player: AVQueuePlayer?
 
-    private let onStateUpdated: (PlayerState) -> Void
-
     private var playerLooper: AVPlayerLooper?
     private var playerStatusObservation: NSKeyValueObservation?
 
     init(
-        video: AdaptyUIResolvedVideoAsset,
-        loop: Bool,
-        onStateUpdated: @escaping (PlayerState) -> Void
+        asset: AVAsset,
+        loop: Bool
     ) {
-        player = video.player
+        let newItem = AVPlayerItem(asset: asset)
+        let newPlayer = AVQueuePlayer(items: [newItem])
+        newPlayer.isMuted = true
+
+        player = newPlayer
 
         if loop {
             playerLooper = AVPlayerLooper(
-                player: video.player,
-                templateItem: video.item
+                player: newPlayer,
+                templateItem: newItem
             )
         } else {
             playerLooper = nil
         }
 
-        self.onStateUpdated = onStateUpdated
-
         super.init()
 
-        playerStatusObservation = video.item.observe(
+        playerStatusObservation = newItem.observe(
             \.status,
             options: [.old, .new, .initial, .prior],
             changeHandler: { [weak self] item, _ in
@@ -99,8 +98,6 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         @unknown default:
             break
         }
-
-        onStateUpdated(playerState)
     }
 
     deinit {

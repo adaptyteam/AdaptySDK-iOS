@@ -132,37 +132,25 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     // MARK: - Video Player Logic
 
-    @Published var playerStates = [String: AdaptyUIVideoPlayerManager.PlayerState]()
-    @Published var playerManagers = [String: AdaptyUIVideoPlayerManager]()
+    private var playerManagers = [VC.AssetReference: AdaptyUIVideoPlayerManager]()
 
     func getOrCreatePlayerManager(
         for video: AdaptyUIResolvedVideoAsset,
-        loop: Bool,
-        id: String
+        assetRef: VC.AssetReference,
+        loop: Bool
     ) -> AdaptyUIVideoPlayerManager {
-        if let manager = playerManagers[id] {
+        if let manager = playerManagers[assetRef] {
             return manager
         }
 
         let manager = AdaptyUIVideoPlayerManager(
-            video: video,
+            asset: video.asset,
             loop: loop
-        ) { [weak self] state in
-            DispatchQueue.main.async { [weak self] in
-                self?.playerStates[id] = state
-            }
-        }
+        )
 
-        DispatchQueue.main.async { [weak self] in
-            self?.playerManagers[id] = manager
-            self?.playerStates[id] = .loading
-        }
+        playerManagers[assetRef] = manager
 
         return manager
-    }
-
-    func dismissPlayerManager(id: String) {
-        playerManagers.removeValue(forKey: id)
     }
 }
 
