@@ -139,9 +139,14 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
 
-    @EnvironmentObject var viewModel: AdaptyUITimerViewModel
-    @EnvironmentObject var customTagResolverViewModel: AdaptyUITagResolverViewModel
-    @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var viewModel: AdaptyUITimerViewModel
+    @EnvironmentObject
+    private var customTagResolverViewModel: AdaptyUITagResolverViewModel
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
@@ -172,7 +177,9 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
                 .convertToSwiftUIText(
                     defaultAttributes: timer.format.textAttributes,
                     assetsCache: assetsViewModel.cache,
-                    tagResolver: self,
+                    stateViewModel: stateViewModel,
+                    tagValues: nil, // TODO: x check
+                    customTagResolver: self,
                     productInfo: nil,
                     colorScheme: colorScheme,
                     screen: screen

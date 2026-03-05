@@ -187,7 +187,8 @@ public struct AdaptyUIPaywallView: View {
         paywallConfiguration.eventsHandler.didFailRendering = didFailRendering
 
         return AdaptyUIPaywallView_Internal(
-            showDebugOverlay: false
+            showDebugOverlay: false,
+            displayMissingTags: false,
         )
         .environmentObjects(
             stateViewModel: paywallConfiguration.stateViewModel,

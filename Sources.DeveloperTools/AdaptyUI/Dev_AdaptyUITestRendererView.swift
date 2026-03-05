@@ -129,7 +129,8 @@ public struct Dev_AdaptyUIRendererView: View {
         galleryConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { _ in }
 
         return AdaptyUIPaywallView_Internal(
-            showDebugOverlay: false
+            showDebugOverlay: false,
+            displayMissingTags: true
         )
         .environmentObjects(
             stateViewModel: galleryConfiguration.stateViewModel,

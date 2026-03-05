@@ -146,7 +146,8 @@ package final class AdaptyPaywallUIView: UIView {
 
         parentVC.addSubSwiftUIView(
             AdaptyUIPaywallView_Internal(
-                showDebugOverlay: showDebugOverlay
+                showDebugOverlay: showDebugOverlay,
+                displayMissingTags: false
             )
             .environmentObjects(
                 stateViewModel: configuration.stateViewModel,
