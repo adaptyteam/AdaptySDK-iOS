@@ -123,7 +123,7 @@ extension VC.RichText {
         var result = 1
 
         for item in items {
-            if case let .tag(tagValue, _) = item,
+            if case let .tag(tagValue, _, _) = item,
                let timerTag = VC.TimerTag.createFromString(tagValue)
             {
                 result = max(timerTag.updatesPerSecond, result)

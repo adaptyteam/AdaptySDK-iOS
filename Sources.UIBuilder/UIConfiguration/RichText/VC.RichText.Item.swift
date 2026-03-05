@@ -9,9 +9,9 @@ import Foundation
 
 package extension VC.RichText {
     enum Item: Sendable, Hashable {
-        case text(String, Attributes?)
-        case tag(String, Attributes?)
-        case image(VC.AssetReference, Attributes?)
+        case text(String, Attributes?, VC.Action?)
+        case tag(String, Attributes?, VC.Action?)
+        case image(VC.AssetReference, Attributes?, VC.Action?)
         case unknown
     }
 }
@@ -21,12 +21,12 @@ package extension VC.RichText.Item {
         guard let defaultAttributes, !defaultAttributes.isEmpty else { return self }
 
         return switch self {
-        case let .text(value, attributes):
-            .text(value, attributes?.apply(default: defaultAttributes) ?? defaultAttributes)
-        case let .tag(value, attributes):
-            .tag(value, attributes?.apply(default: defaultAttributes) ?? defaultAttributes)
-        case let .image(assetId, attributes):
-            .image(assetId, attributes?.apply(default: defaultAttributes) ?? defaultAttributes)
+        case let .text(value, attributes, action):
+            .text(value, attributes?.apply(default: defaultAttributes) ?? defaultAttributes, action)
+        case let .tag(value, attributes, action):
+            .tag(value, attributes?.apply(default: defaultAttributes) ?? defaultAttributes, action)
+        case let .image(assetId, attributes, action):
+            .image(assetId, attributes?.apply(default: defaultAttributes) ?? defaultAttributes, action)
         default:
             .unknown
         }

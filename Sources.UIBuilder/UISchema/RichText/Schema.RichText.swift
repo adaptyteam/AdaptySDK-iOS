@@ -16,12 +16,6 @@ extension Schema {
 
 extension Schema.RichText {
     var isEmpty: Bool { items.isEmpty }
-
-    var asString: String? {
-        items.first.flatMap {
-            if case let .text(value, attributes) = $0, attributes == nil { value } else { nil }
-        }
-    }
 }
 
 extension Schema.RichText: Codable {

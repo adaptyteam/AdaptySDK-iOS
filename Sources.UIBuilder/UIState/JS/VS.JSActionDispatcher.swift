@@ -65,19 +65,27 @@ extension VS.JSActionDispatcher: JSActionBridge {
     }
 
     func openUrl(_ params: JSValue) {
+        var stringId: String?
         var url: URL?
         var openIn = VC.Action.WebOpenInParameter.browserOutApp
 
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+            stringId = dict["stringId"] as? String
             url = (dict["url"] as? String).flatMap(URL.init)
             openIn = (dict["openIn"] as? String).flatMap(VC.Action.WebOpenInParameter.init) ?? openIn
         }
 
-        guard let url else {
-            Log.viewState.error("SDK.openUrl: required parameter \"url\" is missing or not is URL")
+        if let url {
+            handler?.openUrl(url: url, openIn: openIn)
             return
         }
-        handler?.openUrl(url: url, openIn: openIn)
+
+        if let stringId {
+            handler?.openUrl(stringId: stringId, openIn: openIn)
+            return
+        }
+
+        Log.viewState.error(#"SDK.openUrl: required parameter "url" or "stringId" is missing or not is URL"#)
     }
 
     func userCustomAction(_ params: JSValue) {

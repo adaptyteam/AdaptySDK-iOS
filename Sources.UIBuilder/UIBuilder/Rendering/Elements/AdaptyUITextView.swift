@@ -97,11 +97,11 @@ extension [VC.RichText.Item] {
     ) throws -> Text {
         try reduce(Text("")) {
             partialResult,
-                item in
+            item in
             switch item {
             case .unknown:
                 return partialResult
-            case let .text(value, attr):
+            case let .text(value, attr, _):
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: value,
@@ -111,7 +111,7 @@ extension [VC.RichText.Item] {
                         screen: screen
                     )
                 )
-            case let .tag(value, attr):
+            case let .tag(value, attr, _):
                 let tagReplacementResult: String
 
                 if let customTagResult = tagResolver.replacement(for: value) {
@@ -139,7 +139,7 @@ extension [VC.RichText.Item] {
                         screen: screen
                     )
                 )
-            case let .image(value, attr):
+            case let .image(value, attr, _):
                 let imageResolvedAsset = assetsCache.cachedAsset(
                     value,
                     mode: colorScheme.toVCMode,
@@ -187,7 +187,7 @@ extension VC.RichText {
         if placeholder {
             let reducedString = items.reduce("") { partialResult, item in
                 switch item {
-                case let .text(value, _), let .tag(value, _):
+                case let .text(value, _, _), let .tag(value, _, _):
                     partialResult + value
                 default:
                     partialResult
@@ -313,8 +313,8 @@ extension AttributedString {
         result.foregroundColor = foregroundColorAsset?.uiColor ?? fontAsset?.defaultColor.uiColor ?? .adaptyDefaultTextColor
 
         let baseFont = fontAsset?.font ?? .adaptyDefaultFont
-        let defaultSize = baseFont.pointSize 
-        
+        let defaultSize = baseFont.pointSize
+
         if let size = attributes?.size, CGFloat(size) != defaultSize {
             result.font = baseFont.withSize(size)
         } else {
