@@ -1,12 +1,6 @@
 name: SDK Validation
 
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
   workflow_dispatch:
     inputs:
       build_sdk_targets:
@@ -29,16 +23,6 @@ on:
         type: boolean
         required: true
         default: false
-      build_errors_whitelist:
-        description: 'Optional build errors whitelist override (JSON array of rules: string or {message,file?,line?})'
-        type: string
-        required: false
-        default: ''
-      test_errors_whitelist:
-        description: 'Optional test errors whitelist override (JSON array of rules: string or {message,file?,line?})'
-        type: string
-        required: false
-        default: ''
       build_matrix_override_json:
         description: Optional build matrix override (JSON array or object with include[])
         type: string
@@ -70,8 +54,6 @@ jobs:
       build_matrix_json: ${{ steps.prepare.outputs.build_matrix_json }}
       test_app_matrix_json: ${{ steps.prepare.outputs.test_app_matrix_json }}
       sdk_tests_matrix_json: ${{ steps.prepare.outputs.sdk_tests_matrix_json }}
-      build_errors_whitelist_json: ${{ steps.prepare.outputs.build_errors_whitelist_json }}
-      test_errors_whitelist_json: ${{ steps.prepare.outputs.test_errors_whitelist_json }}
       sdk_runner: ${{ steps.prepare.outputs.sdk_runner }}
       sdk_xcode: ${{ steps.prepare.outputs.sdk_xcode }}
     steps:
@@ -83,335 +65,14 @@ jobs:
       - name: Prepare effective config
         id: prepare
         env:
-          EVENT_NAME: ${{ github.event_name }}
           INPUT_BUILD_SDK_TARGETS: ${{ github.event.inputs.build_sdk_targets }}
           INPUT_BUILD_TEST_APP: ${{ github.event.inputs.build_test_app }}
           INPUT_RUN_TESTS: ${{ github.event.inputs.run_tests }}
           INPUT_LINT_PODS: ${{ github.event.inputs.lint_pods }}
-          INPUT_BUILD_ERRORS_WHITELIST: ${{ github.event.inputs.build_errors_whitelist }}
-          INPUT_TEST_ERRORS_WHITELIST: ${{ github.event.inputs.test_errors_whitelist }}
           INPUT_BUILD_MATRIX_OVERRIDE_JSON: ${{ github.event.inputs.build_matrix_override_json }}
           INPUT_SDK_TESTS_MATRIX_OVERRIDE_JSON: ${{ github.event.inputs.sdk_tests_matrix_override_json }}
         shell: bash
-        run: |
-          node <<'NODE'
-          const fs = require("node:fs");
-
-          const fail = (message) => {
-            console.error(message);
-            process.exit(1);
-          };
-
-          const parseJson = (raw, label) => {
-            try {
-              return JSON.parse(raw);
-            } catch (error) {
-              fail(`Invalid ${label}: ${error.message}`);
-            }
-          };
-
-          const parseBool = (raw, defaultValue, label) => {
-            const normalized = (raw ?? "").toString().trim().toLowerCase();
-            if (normalized === "") return defaultValue;
-            if (normalized === "true") return true;
-            if (normalized === "false") return false;
-            fail(`${label} must be 'true' or 'false'. Got: ${raw}`);
-          };
-
-          const validateBoolean = (value, label) => {
-            if (typeof value !== "boolean") {
-              fail(`${label} must be a boolean.`);
-            }
-            return value;
-          };
-
-          const validateMatrix = (matrix, label) => {
-            if (!Array.isArray(matrix) || matrix.length === 0) {
-              fail(`${label} must be a non-empty JSON array.`);
-            }
-
-            const seenRunnerXcode = new Set();
-
-            return matrix.map((entry, index) => {
-              if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
-                fail(`${label}[${index}] must be an object.`);
-              }
-
-              const { runner, xcode, informational } = entry;
-
-              if (typeof runner !== "string" || runner.trim() === "") {
-                fail(`${label}[${index}].runner must be a non-empty string.`);
-              }
-              if (typeof xcode !== "string" || xcode.trim() === "") {
-                fail(`${label}[${index}].xcode must be a non-empty string.`);
-              }
-              if (typeof informational !== "boolean") {
-                fail(`${label}[${index}].informational must be a boolean.`);
-              }
-
-              const normalizedRunner = runner.trim();
-              const normalizedXcode = xcode.trim();
-              const uniqueKey = `${normalizedRunner}::${normalizedXcode}`;
-              if (seenRunnerXcode.has(uniqueKey)) {
-                fail(`${label} contains duplicate runner+xcode pair '${normalizedRunner}' + '${normalizedXcode}'.`);
-              }
-              seenRunnerXcode.add(uniqueKey);
-
-              return {
-                runner: normalizedRunner,
-                xcode: normalizedXcode,
-                informational,
-              };
-            });
-          };
-
-          const validateWhitelists = (list, label) => {
-            if (!Array.isArray(list)) {
-              fail(`${label} must be a JSON array.`);
-            }
-
-            return list.map((entry, index) => {
-              if (typeof entry === "string") {
-                if (entry.trim() === "") {
-                  fail(`${label}[${index}] must be a non-empty string.`);
-                }
-                return entry.trim();
-              }
-
-              if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
-                fail(`${label}[${index}] must be a string or object.`);
-              }
-
-              const allowedKeys = new Set(["message", "file", "line"]);
-              for (const key of Object.keys(entry)) {
-                if (!allowedKeys.has(key)) {
-                  fail(`${label}[${index}] contains unsupported key '${key}'.`);
-                }
-              }
-
-              if (typeof entry.message !== "string" || entry.message.trim() === "") {
-                fail(`${label}[${index}].message must be a non-empty string.`);
-              }
-
-              const normalized = {
-                message: entry.message.trim(),
-              };
-
-              if (entry.file !== undefined) {
-                if (typeof entry.file !== "string" || entry.file.trim() === "") {
-                  fail(`${label}[${index}].file must be a non-empty string when provided.`);
-                }
-                normalized.file = entry.file.trim();
-              }
-
-              if (entry.line !== undefined) {
-                if (!Number.isInteger(entry.line) || entry.line <= 0) {
-                  fail(`${label}[${index}].line must be a positive integer when provided.`);
-                }
-                if (normalized.file === undefined) {
-                  fail(`${label}[${index}].line requires .file to be provided.`);
-                }
-                normalized.line = entry.line;
-              }
-
-              return normalized;
-            });
-          };
-
-          const validateSdkTests = (config) => {
-            if (!config || typeof config !== "object" || Array.isArray(config)) {
-              fail("sdk_tests must be an object.");
-            }
-
-            const runner = config.runner;
-            const xcode = config.xcode;
-
-            if (typeof runner !== "string" || runner.trim() === "") {
-              fail("sdk_tests.runner must be a non-empty string.");
-            }
-            if (typeof xcode !== "string" || xcode.trim() === "") {
-              fail("sdk_tests.xcode must be a non-empty string.");
-            }
-
-            return {
-              runner: runner.trim(),
-              xcode: xcode.trim(),
-            };
-          };
-
-          const parseMatrixOverride = (raw, label) => {
-            let parsed = parseJson(raw, label);
-            if (!Array.isArray(parsed)) {
-              if (parsed && typeof parsed === "object" && Array.isArray(parsed.include)) {
-                parsed = parsed.include;
-              } else {
-                fail(`${label} must be a JSON array or an object with include[] array.`);
-              }
-            }
-            return validateMatrix(parsed, label);
-          };
-
-          const readWorkflowBooleanInputDefault = (workflowText, inputName) => {
-            const escaped = inputName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-            const pattern = new RegExp(`\\n\\s{6}${escaped}:\\s*\\r?\\n(?:\\s{8}.*\\r?\\n)*?\\s{8}default:\\s*(true|false)\\s*(?:\\r?\\n|$)`, "m");
-            const match = workflowText.match(pattern);
-            if (!match) {
-              fail(`Unable to locate workflow_dispatch default for input '${inputName}'.`);
-            }
-            return match[1] === "true";
-          };
-
-          const configPath = ".github/ci/ci-run-config.json";
-          let configRaw;
-          try {
-            configRaw = fs.readFileSync(configPath, "utf8");
-          } catch (error) {
-            fail(`Unable to read ${configPath}: ${error.message}`);
-          }
-
-          const config = parseJson(configRaw, configPath);
-          if (config.schema_version !== 2) {
-            fail(`Unsupported schema_version '${config.schema_version}' in ${configPath}. Expected 2.`);
-          }
-
-          const defaultRunBuildSdkTargets = validateBoolean(config.build_sdk_targets, "build_sdk_targets");
-          const defaultRunBuildTestApp = validateBoolean(config.build_test_app, "build_test_app");
-          const defaultRunTests = validateBoolean(config.run_tests, "run_tests");
-          const defaultRunLintPods = validateBoolean(config.lint_pods, "lint_pods");
-
-          const workflowPath = ".github/workflows/sdk-validation.yml";
-          let workflowRaw;
-          try {
-            workflowRaw = fs.readFileSync(workflowPath, "utf8");
-          } catch (error) {
-            fail(`Unable to read ${workflowPath}: ${error.message}`);
-          }
-
-          const workflowDefaults = {
-            build_sdk_targets: readWorkflowBooleanInputDefault(workflowRaw, "build_sdk_targets"),
-            build_test_app: readWorkflowBooleanInputDefault(workflowRaw, "build_test_app"),
-            run_tests: readWorkflowBooleanInputDefault(workflowRaw, "run_tests"),
-            lint_pods: readWorkflowBooleanInputDefault(workflowRaw, "lint_pods"),
-          };
-
-          if (workflowDefaults.build_sdk_targets !== defaultRunBuildSdkTargets) {
-            fail("Workflow input default for build_sdk_targets is out of sync with ci-run-config.json.");
-          }
-          if (workflowDefaults.build_test_app !== defaultRunBuildTestApp) {
-            fail("Workflow input default for build_test_app is out of sync with ci-run-config.json.");
-          }
-          if (workflowDefaults.run_tests !== defaultRunTests) {
-            fail("Workflow input default for run_tests is out of sync with ci-run-config.json.");
-          }
-          if (workflowDefaults.lint_pods !== defaultRunLintPods) {
-            fail("Workflow input default for lint_pods is out of sync with ci-run-config.json.");
-          }
-
-          const defaultBuildMatrix = validateMatrix(config.build_matrix, "build_matrix");
-          const defaultSdkTestsMatrix = validateMatrix(config.sdk_tests_matrix, "sdk_tests_matrix");
-          const defaultBuildWhitelist = validateWhitelists(config.build_errors_whitelist, "build_errors_whitelist");
-          const defaultTestWhitelist = validateWhitelists(config.test_errors_whitelist, "test_errors_whitelist");
-          const sdkTests = validateSdkTests(config.sdk_tests);
-
-          const eventName = process.env.EVENT_NAME;
-
-          let runBuildSdkTargets;
-          let runBuildTestApp;
-          let runTests;
-          let runLintPods;
-
-          if (eventName === "pull_request") {
-            runBuildSdkTargets = true;
-            runBuildTestApp = true;
-            runTests = true;
-            runLintPods = false;
-          } else if (eventName === "workflow_dispatch") {
-            runBuildSdkTargets = parseBool(process.env.INPUT_BUILD_SDK_TARGETS, defaultRunBuildSdkTargets, "build_sdk_targets");
-            runBuildTestApp = parseBool(process.env.INPUT_BUILD_TEST_APP, defaultRunBuildTestApp, "build_test_app");
-            runTests = parseBool(process.env.INPUT_RUN_TESTS, defaultRunTests, "run_tests");
-            runLintPods = parseBool(process.env.INPUT_LINT_PODS, defaultRunLintPods, "lint_pods");
-          } else {
-            fail(`Unsupported event '${eventName}'.`);
-          }
-
-          if (eventName === "workflow_dispatch" && !runBuildSdkTargets && !runBuildTestApp && !runTests && !runLintPods) {
-            fail("workflow_dispatch requires at least one enabled action (build_sdk_targets, build_test_app, run_tests, lint_pods).");
-          }
-
-          let effectiveBuildMatrix = runBuildSdkTargets || runBuildTestApp ? defaultBuildMatrix : [];
-          let effectiveTestAppMatrix = [];
-          let effectiveSdkTestsMatrix = runTests ? defaultSdkTestsMatrix : [];
-          let effectiveBuildWhitelist = runBuildTestApp ? defaultBuildWhitelist : [];
-          let effectiveTestWhitelist = runTests ? defaultTestWhitelist : [];
-
-          if (eventName === "workflow_dispatch") {
-            if (runBuildSdkTargets || runBuildTestApp) {
-              const buildMatrixOverrideRaw = (process.env.INPUT_BUILD_MATRIX_OVERRIDE_JSON || "").trim();
-              if (buildMatrixOverrideRaw !== "") {
-                effectiveBuildMatrix = parseMatrixOverride(buildMatrixOverrideRaw, "build_matrix_override_json");
-              }
-            }
-
-            if (runTests) {
-              const sdkTestsMatrixOverrideRaw = (process.env.INPUT_SDK_TESTS_MATRIX_OVERRIDE_JSON || "").trim();
-              if (sdkTestsMatrixOverrideRaw !== "") {
-                effectiveSdkTestsMatrix = parseMatrixOverride(sdkTestsMatrixOverrideRaw, "sdk_tests_matrix_override_json");
-              }
-            }
-
-            if (runBuildTestApp) {
-              const buildWhitelistOverrideRaw = (process.env.INPUT_BUILD_ERRORS_WHITELIST || "").trim();
-              if (buildWhitelistOverrideRaw !== "") {
-                const parsed = parseJson(buildWhitelistOverrideRaw, "build_errors_whitelist");
-                effectiveBuildWhitelist = validateWhitelists(parsed, "build_errors_whitelist");
-              }
-            }
-
-            if (runTests) {
-              const testWhitelistOverrideRaw = (process.env.INPUT_TEST_ERRORS_WHITELIST || "").trim();
-              if (testWhitelistOverrideRaw !== "") {
-                const parsed = parseJson(testWhitelistOverrideRaw, "test_errors_whitelist");
-                effectiveTestWhitelist = validateWhitelists(parsed, "test_errors_whitelist");
-              }
-            }
-          }
-
-          if (runBuildSdkTargets || runBuildTestApp) {
-            const hasPrimaryXcodeInBuildMatrix = effectiveBuildMatrix.some(
-              (entry) => entry.xcode === sdkTests.xcode
-            );
-            if (!hasPrimaryXcodeInBuildMatrix) {
-              fail(
-                `build_matrix must include primary sdk_tests.xcode '${sdkTests.xcode}' when build_sdk_targets or build_test_app is enabled.`
-              );
-            }
-          }
-
-          if (runBuildTestApp) {
-            effectiveTestAppMatrix = effectiveBuildMatrix.filter(
-              (entry) => entry.xcode === sdkTests.xcode
-            );
-          }
-
-          const githubOutput = process.env.GITHUB_OUTPUT;
-          if (!githubOutput) fail("GITHUB_OUTPUT is not set.");
-
-          const setOutput = (name, value) => {
-            fs.appendFileSync(githubOutput, `${name}=${value}\n`);
-          };
-
-          setOutput("run_build_sdk_targets", String(runBuildSdkTargets));
-          setOutput("run_build_test_app", String(runBuildTestApp));
-          setOutput("run_tests", String(runTests));
-          setOutput("run_lint_pods", String(runLintPods));
-          setOutput("build_matrix_json", JSON.stringify({ include: effectiveBuildMatrix }));
-          setOutput("test_app_matrix_json", JSON.stringify({ include: effectiveTestAppMatrix }));
-          setOutput("sdk_tests_matrix_json", JSON.stringify({ include: effectiveSdkTestsMatrix }));
-          setOutput("build_errors_whitelist_json", JSON.stringify(effectiveBuildWhitelist));
-          setOutput("test_errors_whitelist_json", JSON.stringify(effectiveTestWhitelist));
-          setOutput("sdk_runner", sdkTests.runner);
-          setOutput("sdk_xcode", sdkTests.xcode);
-          NODE
+        run: node scripts/ci/sdk_validation/prepare-config.js
 
   build_sdk_matrix:
     name: SDK build (Xcode ${{ matrix.xcode }})
@@ -464,53 +125,10 @@ jobs:
       - name: Build SDK library targets (SwiftPM)
         if: ${{ steps.setup_xcode.outcome == 'success' }}
         shell: bash
-        run: |
-          set -euo pipefail
-          targets=()
-          while IFS= read -r target; do
-            if [[ -n "${target}" ]]; then
-              targets+=("${target}")
-            fi
-          done < <(
-            swift package dump-package | ruby -rjson -e '
-              package = JSON.parse(STDIN.read)
-              library_products = package.fetch("products").select do |product|
-                product.is_a?(Hash) && product.dig("type", "library")
-              end
-
-              if library_products.empty?
-                abort("No SwiftPM library products found in Package.swift.")
-              end
-
-              library_targets = library_products.flat_map do |product|
-                targets = product["targets"]
-                targets.is_a?(Array) ? targets : []
-              end
-
-              if library_targets.empty?
-                abort("No SwiftPM library targets found in Package.swift products.")
-              end
-
-              library_targets.uniq.each do |target|
-                puts target
-              end
-            '
-          )
-
-          if [[ "${#targets[@]}" -eq 0 ]]; then
-            echo "No SwiftPM library targets found in Package.swift."
-            exit 1
-          fi
-
-          : > swift-build-products.log
-
-          for target in "${targets[@]}"; do
-            echo "=== Building SwiftPM target: ${target} ===" | tee -a swift-build-products.log
-            swift build --target "$target" 2>&1 | tee -a swift-build-products.log
-          done
+        run: bash scripts/ci/sdk_validation/build-spm-library-targets.sh --log swift-build-products.log --scratch-path .build-sdk-validation-${{ matrix.runner }}-${{ matrix.xcode }}
 
       - name: Build SDK package for iOS (xcodebuild)
-        if: ${{ steps.setup_xcode.outcome == 'success' && matrix.xcode == needs.prepare_config.outputs.sdk_xcode }}
+        if: ${{ steps.setup_xcode.outcome == 'success' && matrix.runner == needs.prepare_config.outputs.sdk_runner && matrix.xcode == needs.prepare_config.outputs.sdk_xcode }}
         shell: bash
         run: |
           set -euo pipefail
@@ -577,24 +195,7 @@ jobs:
       - name: Prepare demo constants for CI
         if: ${{ steps.setup_xcode.outcome == 'success' }}
         shell: bash
-        run: |
-          app_constants="Examples/AdaptyRecipes-SwiftUI/AdaptyRecipes-SwiftUI/Application/AppConstants.swift"
-          cat > "$app_constants" <<'SWIFT'
-          //
-          //  AppConstants.swift
-          //  AdaptyRecipes-SwiftUI
-          //
-          //  Auto-generated in CI for build validation.
-          //
-
-          import Foundation
-
-          enum AppConstants {
-              static let accessLevelId = "premium"
-              static let adaptyApiKey = "ci_dummy_api_key"
-              static let placementId = "ci_dummy_placement_id"
-          }
-          SWIFT
+        run: bash scripts/ci/sdk_validation/write-demo-constants.sh
 
       - name: Build demo app
         id: build_test_app
@@ -611,22 +212,25 @@ jobs:
             -destination 'generic/platform=iOS' \
             CODE_SIGNING_ALLOWED=NO \
             build 2>&1 | tee xcodebuild.log
-
-          exit_code=${PIPESTATUS[0]}
+          pipeline_statuses=("${PIPESTATUS[@]}")
+          exit_code="${pipeline_statuses[0]:-1}"
+          tee_exit_code="${pipeline_statuses[1]:-1}"
           set -e
+
+          if [[ "$tee_exit_code" -ne 0 ]]; then
+            echo "::error::Failed to write xcodebuild.log. See step output for details."
+            exit 1
+          fi
 
           echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
           echo "xcodebuild_exit_code=$exit_code"
 
-      - name: Validate demo build failure against whitelist
+      - name: Fail on demo build failure
         if: ${{ steps.build_test_app.outcome == 'success' && steps.build_test_app.outputs.exit_code != '0' }}
-        env:
-          BUILD_ERRORS_WHITELIST_JSON: ${{ needs.prepare_config.outputs.build_errors_whitelist_json }}
         shell: bash
         run: |
-          bash scripts/ci/validate_demo_build.sh \
-            --log xcodebuild.log \
-            --ignored-json "$BUILD_ERRORS_WHITELIST_JSON"
+          echo "::error::Test app build failed. See artifact 'demo-build-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}'."
+          exit 1
 
       - name: Upload demo build log
         if: ${{ always() }}
@@ -677,50 +281,7 @@ jobs:
       - name: Build SDK library targets for macOS 11 (SwiftPM)
         if: ${{ steps.setup_xcode.outcome == 'success' }}
         shell: bash
-        run: |
-          set -euo pipefail
-          targets=()
-          while IFS= read -r target; do
-            if [[ -n "${target}" ]]; then
-              targets+=("${target}")
-            fi
-          done < <(
-            swift package dump-package | ruby -rjson -e '
-              package = JSON.parse(STDIN.read)
-              library_products = package.fetch("products").select do |product|
-                product.is_a?(Hash) && product.dig("type", "library")
-              end
-
-              if library_products.empty?
-                abort("No SwiftPM library products found in Package.swift.")
-              end
-
-              library_targets = library_products.flat_map do |product|
-                targets = product["targets"]
-                targets.is_a?(Array) ? targets : []
-              end
-
-              if library_targets.empty?
-                abort("No SwiftPM library targets found in Package.swift products.")
-              end
-
-              library_targets.uniq.each do |target|
-                puts target
-              end
-            '
-          )
-
-          if [[ "${#targets[@]}" -eq 0 ]]; then
-            echo "No SwiftPM library targets found in Package.swift."
-            exit 1
-          fi
-
-          : > swift-build-macos.log
-
-          for target in "${targets[@]}"; do
-            echo "=== Building macOS target: ${target} ===" | tee -a swift-build-macos.log
-            swift build --triple arm64-apple-macosx11.0 --target "$target" 2>&1 | tee -a swift-build-macos.log
-          done
+        run: bash scripts/ci/sdk_validation/build-spm-library-targets.sh --log swift-build-macos.log --triple arm64-apple-macosx11.0 --scratch-path .build-sdk-validation-macos-${{ needs.prepare_config.outputs.sdk_runner }}-${{ needs.prepare_config.outputs.sdk_xcode }}
 
       - name: Upload macOS swift build log
         if: ${{ always() }}
@@ -845,22 +406,25 @@ jobs:
           set -o pipefail
 
           swift test 2>&1 | tee swift-test.log
-
-          exit_code=${PIPESTATUS[0]}
+          pipeline_statuses=("${PIPESTATUS[@]}")
+          exit_code="${pipeline_statuses[0]:-1}"
+          tee_exit_code="${pipeline_statuses[1]:-1}"
           set -e
+
+          if [[ "$tee_exit_code" -ne 0 ]]; then
+            echo "::error::Failed to write swift-test.log. See step output for details."
+            exit 1
+          fi
 
           echo "exit_code=$exit_code" >> "$GITHUB_OUTPUT"
           echo "swift_test_exit_code=$exit_code"
 
-      - name: Validate test failure against whitelist
+      - name: Fail on SDK test failure
         if: ${{ steps.tests.outcome == 'success' && steps.tests.outputs.exit_code != '0' }}
-        env:
-          TEST_ERRORS_WHITELIST_JSON: ${{ needs.prepare_config.outputs.test_errors_whitelist_json }}
         shell: bash
         run: |
-          bash scripts/ci/validate_demo_build.sh \
-            --log swift-test.log \
-            --ignored-json "$TEST_ERRORS_WHITELIST_JSON"
+          echo "::error::swift test failed. See artifact 'sdk-tests-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}'."
+          exit 1
 
       - name: Upload swift test log
         if: ${{ always() }}
