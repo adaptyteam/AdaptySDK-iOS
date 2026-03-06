@@ -20,7 +20,7 @@ public enum AdaptyUICustomImageAsset: Sendable {
 public enum AdaptyUICustomVideoAsset: Sendable {
     case file(url: URL, preview: AdaptyUICustomImageAsset?)
     case remote(url: URL, preview: AdaptyUICustomImageAsset?)
-    case player(item: AVPlayerItem, player: AVQueuePlayer, preview: AdaptyUICustomImageAsset?)
+    case player(item: AVPlayerItem, player: AVPlayer, preview: AdaptyUICustomImageAsset?)
 }
 
 public enum AdaptyUICustomColorAsset: Sendable {

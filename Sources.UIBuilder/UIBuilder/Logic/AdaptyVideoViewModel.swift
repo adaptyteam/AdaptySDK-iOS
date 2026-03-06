@@ -38,35 +38,38 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     }
 
     @Published var playerState: PlayerState = .invalid
-    @Published var player: AVQueuePlayer?
+    @Published var player: AVPlayer?
 
-    private var playerLooper: AVPlayerLooper?
     private var playerStatusObservation: NSKeyValueObservation?
+    private nonisolated(unsafe) var loopObserver: (any NSObjectProtocol)?
 
     init(
         asset: AVAsset,
         loop: Bool
     ) {
         let newItem = AVPlayerItem(asset: asset)
-        let newPlayer = AVQueuePlayer(items: [newItem])
+        let newPlayer = AVPlayer(playerItem: newItem)
         newPlayer.isMuted = true
 
         player = newPlayer
 
-        if loop {
-            playerLooper = AVPlayerLooper(
-                player: newPlayer,
-                templateItem: newItem
-            )
-        } else {
-            playerLooper = nil
-        }
-
         super.init()
+
+        if loop {
+            newPlayer.actionAtItemEnd = .none
+            loopObserver = NotificationCenter.default.addObserver(
+                forName: .AVPlayerItemDidPlayToEndTime,
+                object: newItem,
+                queue: .main
+            ) { [weak self] _ in
+                self?.player?.seek(to: .zero)
+                self?.player?.play()
+            }
+        }
 
         playerStatusObservation = newItem.observe(
             \.status,
-            options: [.old, .new, .initial, .prior],
+            options: [.new, .initial],
             changeHandler: { [weak self] item, _ in
                 DispatchQueue.main.async { [weak self] in
                     self?.playerStatusDidChange(item.status, item: item)
@@ -103,6 +106,9 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     deinit {
         playerStatusObservation?.invalidate()
         playerStatusObservation = nil
+        if let loopObserver {
+            NotificationCenter.default.removeObserver(loopObserver)
+        }
     }
 }
 

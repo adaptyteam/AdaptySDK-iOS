@@ -38,6 +38,8 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.player = player
         playerViewController.videoGravity = videoGravity
         playerViewController.allowsPictureInPicturePlayback = false
+        player.seek(to: .zero)
+        player.play()
 
         DispatchQueue.main.async {
 #if os(visionOS)
@@ -55,7 +57,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 #else
             playerStatusObservation = playerViewController.observe(
                 \.isReadyForDisplay,
-                options: [.old, .new, .initial, .prior],
+                options: [.new, .initial],
                 changeHandler: { playerVC, _ in
                     DispatchQueue.main.async {
                         if playerVC.isReadyForDisplay {
