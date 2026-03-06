@@ -1,6 +1,6 @@
 # CI Configuration for SDK Validation
 
-This folder contains the source-of-truth config for the manual `SDK Validation` workflow.
+This folder contains the source-of-truth config for the `SDK Validation` workflow.
 
 Main files:
 
@@ -10,7 +10,10 @@ Main files:
 - Shared shell logging: `scripts/ci/sdk_validation/lib/logging.sh`
 - Build/test helpers: `scripts/ci/sdk_validation/`
 
-The workflow is manual-only (`workflow_dispatch`). There are no automatic triggers for pull requests or pushes.
+The workflow supports both:
+
+- automatic runs on `pull_request`
+- manual runs via `workflow_dispatch`
 
 ## Workflow Shape
 
@@ -28,7 +31,7 @@ Internally, the workflow also has one technical job, `Prepare CI config`, that:
 - validates matrix structure
 - derives the effective matrices used by downstream jobs
 
-Default manual profile:
+Default validation profile from `.github/ci/ci-run-config.json`:
 
 - `build_sdk_targets = true`
 - `build_test_app = true`
@@ -37,7 +40,7 @@ Default manual profile:
 
 Concurrency behavior:
 
-- manual runs are grouped by `workflow + ref`
+- runs are grouped by `workflow + ref`
 - starting a new `SDK Validation` run on the same branch cancels the previous in-progress run on that branch
 
 ## Validation Flows
@@ -189,6 +192,30 @@ Special cases:
 
 - `build-demo-app.sh` and `run-sdk-tests.sh` intentionally do not fail their step on command non-zero
 - instead, they store `exit_code` in `GITHUB_OUTPUT`, so the workflow can upload the log artifact before failing
+
+## Trigger Modes
+
+### `pull_request`
+
+Automatic runs happen on:
+
+- `opened`
+- `reopened`
+- `synchronize`
+- `ready_for_review`
+
+For `pull_request`, the workflow does not use manual inputs. It derives the effective profile directly from `.github/ci/ci-run-config.json`.
+
+With the current config this means:
+
+- `build_sdk_targets = true`
+- `build_test_app = true`
+- `run_tests = true`
+- `lint_pods = false`
+
+### `workflow_dispatch`
+
+Manual runs use the workflow inputs shown in the GitHub UI. If an input is left empty, `Prepare CI config` falls back to `.github/ci/ci-run-config.json`.
 
 ## Manual Run Inputs
 

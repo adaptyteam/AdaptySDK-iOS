@@ -1,6 +1,12 @@
 name: SDK Validation
 
 on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
   workflow_dispatch:
     inputs:
       build_sdk_targets:
@@ -65,6 +71,7 @@ jobs:
       - name: Prepare effective config
         id: prepare
         env:
+          EVENT_NAME: ${{ github.event_name }}
           INPUT_BUILD_SDK_TARGETS: ${{ github.event.inputs.build_sdk_targets }}
           INPUT_BUILD_TEST_APP: ${{ github.event.inputs.build_test_app }}
           INPUT_RUN_TESTS: ${{ github.event.inputs.run_tests }}

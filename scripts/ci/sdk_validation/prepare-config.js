@@ -16,10 +16,15 @@ const {
 const main = () => {
     const configPath = ".github/ci/ci-run-config.json";
     const workflowPath = ".github/workflows/sdk-validation.yml";
+    const eventName = (process.env.EVENT_NAME || "workflow_dispatch").trim();
 
     const config = parseJson(readRequiredFile(configPath), configPath);
     if (config.schema_version !== 2) {
         throw new Error(`Unsupported schema_version '${config.schema_version}' in ${configPath}. Expected 2.`);
+    }
+
+    if (eventName !== "workflow_dispatch" && eventName !== "pull_request") {
+        throw new Error(`Unsupported event '${eventName}'. Expected workflow_dispatch or pull_request.`);
     }
 
     const defaultRunBuildSdkTargets = validateBoolean(config.build_sdk_targets, "build_sdk_targets");
@@ -51,13 +56,16 @@ const main = () => {
     const defaultSdkTestsMatrix = validateMatrix(config.sdk_tests_matrix, "sdk_tests_matrix");
     const sdkTests = validateSdkTests(config.sdk_tests);
 
-    const runBuildSdkTargets = parseBool(process.env.INPUT_BUILD_SDK_TARGETS, defaultRunBuildSdkTargets, "build_sdk_targets");
-    const runBuildTestApp = parseBool(process.env.INPUT_BUILD_TEST_APP, defaultRunBuildTestApp, "build_test_app");
-    const runTests = parseBool(process.env.INPUT_RUN_TESTS, defaultRunTests, "run_tests");
-    const runLintPods = parseBool(process.env.INPUT_LINT_PODS, defaultRunLintPods, "lint_pods");
+    const parseEffectiveBool = (raw, defaultValue, label) =>
+        eventName === "pull_request" ? defaultValue : parseBool(raw, defaultValue, label);
+
+    const runBuildSdkTargets = parseEffectiveBool(process.env.INPUT_BUILD_SDK_TARGETS, defaultRunBuildSdkTargets, "build_sdk_targets");
+    const runBuildTestApp = parseEffectiveBool(process.env.INPUT_BUILD_TEST_APP, defaultRunBuildTestApp, "build_test_app");
+    const runTests = parseEffectiveBool(process.env.INPUT_RUN_TESTS, defaultRunTests, "run_tests");
+    const runLintPods = parseEffectiveBool(process.env.INPUT_LINT_PODS, defaultRunLintPods, "lint_pods");
 
     if (!runBuildSdkTargets && !runBuildTestApp && !runTests && !runLintPods) {
-        throw new Error("workflow_dispatch requires at least one enabled action (build_sdk_targets, build_test_app, run_tests, lint_pods).");
+        throw new Error(`SDK Validation requires at least one enabled action (event: ${eventName}).`);
     }
 
     let effectiveBuildMatrix = runBuildSdkTargets || runBuildTestApp ? defaultBuildMatrix : [];
