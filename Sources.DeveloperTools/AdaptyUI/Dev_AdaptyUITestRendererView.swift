@@ -76,12 +76,16 @@ public extension AdaptyUI {
                 screensViewModel: screensViewModel,
                 logic: logic
             )
+            let stateHolder = AdaptyUIStateHolder(
+                logId: logId,
+                actionHandler: actionHandler,
+                viewConfiguration: viewConfiguration,
+                isInspectable: true
+            )
             stateViewModel = AdaptyUIStateViewModel(
                 logId: logId,
                 logic: logic,
-                actionHandler: actionHandler,
-                viewConfiguration: viewConfiguration,
-                isInspectable: false
+                stateHolder: stateHolder
             )
             timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
@@ -92,11 +96,13 @@ public extension AdaptyUI {
                 screensViewModel: screensViewModel
             )
             assetsViewModel = AdaptyUIAssetsViewModel(
+                logId: logId,
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
-                stateViewModel: stateViewModel
+                stateHolder: stateHolder
             )
 
-            stateViewModel.start()
+            stateHolder.start()
+            productsViewModel.loadProductsIfNeeded()
         }
     }
 }

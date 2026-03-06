@@ -7,14 +7,55 @@
 
 #if canImport(UIKit)
 
+import Combine
 import Foundation
 import SwiftUI
+
+@MainActor
+package final class AdaptyUIStateHolder {
+    let state: AdaptyUIState
+
+    private let logId: String
+    private var cancellables = Set<AnyCancellable>()
+
+    package init(
+        logId: String,
+        actionHandler: AdaptyUIActionHandler,
+        viewConfiguration: VC,
+        isInspectable: Bool
+    ) {
+        self.logId = logId
+        self.state = AdaptyUIState(
+            name: "AdaptyJSState_[\(logId)]",
+            configuration: viewConfiguration,
+            actionHandler: actionHandler,
+            isInspectable: isInspectable
+        )
+        
+        actionHandler.registerState(state)
+    }
+
+    package func start() {
+//        state.objectWillChange
+//            .sink { [weak self] _ in
+        // TODO: x propagate state
+//                if let state = self?.state {
+//                    print("#STATE_DEBUG# \(state.debug(filter: .withFunctionCode))")
+//                }
+//            }
+//            .store(in: &cancellables)
+
+        state.startOnce()
+    }
+}
 
 @MainActor
 package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     private let productsViewModel: AdaptyUIProductsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
+
     private let logic: AdaptyUIBuilderLogic
+    private weak var state: AdaptyUIState?
 
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
@@ -25,27 +66,47 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         self.screensViewModel = screensViewModel
         self.logic = logic
     }
+    
+    package nonisolated func registerState(_ state: AdaptyUIState) {
+        Task { @MainActor [weak self] in
+            self?.state = state
+        }
+    }
 
     package nonisolated func openUrl(
         url: URL,
         openIn: VC.Action.WebOpenInParameter
     ) {
-        Task { @MainActor in
-            logic.reportDidPerformAction(.openURL(url: url))
+        Task { @MainActor [weak self] in
+            self?.logic.reportDidPerformAction(.openURL(url: url))
         }
+    }
+
+    private func resolvedText(stringId: String) -> VC.RichText? {
+        try? state?.richText(stringId)
     }
 
     package nonisolated func openUrl(
         stringId: String,
         openIn: VC.Action.WebOpenInParameter
     ) {
-        // TODO: use stringId to get url
-        // stringId -> VC.RichText ,  richText.asString
+        Task { @MainActor [weak self] in
+            guard
+                let text = self?.resolvedText(stringId: stringId),
+                let str = text.asString,
+                let url = URL(string: str)
+            else {
+                // TODO: x warn
+                return
+            }
+
+            self?.logic.reportDidPerformAction(.openURL(url: url))
+        }
     }
 
     package nonisolated func userCustomAction(id: String) {
-        Task { @MainActor in
-            logic.reportDidPerformAction(.custom(id: id))
+        Task { @MainActor [weak self] in
+            self?.logic.reportDidPerformAction(.custom(id: id))
         }
     }
 
@@ -54,8 +115,11 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         paywallId: String,
         service: VC.Action.PaymentService
     ) {
-        Task { @MainActor in
-            productsViewModel.purchaseProduct(id: productId, service: service)
+        Task { @MainActor [weak self] in
+            self?.productsViewModel.purchaseProduct(
+                id: productId,
+                service: service
+            )
         }
     }
 
@@ -66,14 +130,14 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     }
 
     package nonisolated func restorePurchases() {
-        Task { @MainActor in
-            productsViewModel.restorePurchases()
+        Task { @MainActor [weak self] in
+            self?.productsViewModel.restorePurchases()
         }
     }
 
     package nonisolated func closeAll() {
-        Task { @MainActor in
-            logic.reportDidPerformAction(.close)
+        Task { @MainActor [weak self] in
+            self?.logic.reportDidPerformAction(.close)
         }
     }
 
@@ -81,10 +145,10 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         productId: String,
         paywallId: String
     ) {
-        Task { @MainActor in
+        Task { @MainActor [weak self] in
             // TODO: move animation out of here
             withAnimation(.linear(duration: 0.0)) {
-                productsViewModel.selectProduct(
+                self?.productsViewModel.selectProduct(
                     id: productId,
                     forGroupId: paywallId // TODO: x check
                 )
@@ -96,8 +160,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         instance: VS.ScreenInstance,
         transitionId: String
     ) {
-        Task { @MainActor in
-            screensViewModel.present(
+        Task { @MainActor [weak self] in
+            self?.screensViewModel.present(
                 screen: instance,
                 transitionId: transitionId,
                 completion: {
@@ -111,8 +175,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         navigatorId: String,
         transitionId: String
     ) {
-        Task { @MainActor in
-            screensViewModel.dismiss(
+        Task { @MainActor [weak self] in
+            self?.screensViewModel.dismiss(
                 navigatorId: navigatorId,
                 transitionId: transitionId,
                 completion: {

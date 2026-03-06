@@ -18,4 +18,6 @@ package protocol AdaptyUIActionHandler: AnyObject {
 
     func openScreen(instance: VS.ScreenInstance, transitionId: String)
     func closeScreen(navigatorId: String, transitionId: String)
+    
+    func registerState(_ state: AdaptyUIState)
 }

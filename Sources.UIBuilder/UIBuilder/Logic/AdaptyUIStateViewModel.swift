@@ -14,10 +14,9 @@ import SwiftUI
 @MainActor
 package final class AdaptyUIStateViewModel: ObservableObject {
     let logId: String
-    let isInspectable: Bool
-    let state: AdaptyUIState
+    let stateHolder: AdaptyUIStateHolder
 
-    package var viewConfiguration: VC { state.configuration }
+    package var viewConfiguration: VC { stateHolder.state.configuration }
     package let logic: any AdaptyUIBuilderLogic
 
     private var cancellables = Set<AnyCancellable>()
@@ -25,40 +24,23 @@ package final class AdaptyUIStateViewModel: ObservableObject {
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,
-        actionHandler: AdaptyUIActionHandler,
-        viewConfiguration: VC,
-        isInspectable: Bool
+        stateHolder: AdaptyUIStateHolder
     ) {
         self.logId = logId
-        self.isInspectable = isInspectable
         self.logic = logic
-        self.state = AdaptyUIState(
-            name: "AdaptyJSState_[\(logId)]",
-            configuration: viewConfiguration,
-            actionHandler: actionHandler,
-            isInspectable: true // isInspectable // TODO: fix
-        )
-    }
+        self.stateHolder = stateHolder
 
-    package func start() {
-        state.objectWillChange
+        stateHolder.state.objectWillChange
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
-                
-                // TODO: x propagate state
-//                if let state = self?.state {
-//                    print("#STATE_DEBUG# \(state.debug(filter: .withFunctionCode))")
-//                }
             }
             .store(in: &cancellables)
-
-        state.startOnce()
     }
-    
+
     func handle(url: URL, screen: VS.ScreenInstance?) -> Bool {
         do {
             let action = try VC.Action(url: url)
-            
+
             if let screen {
                 execute(actions: [action], screen: screen)
             } else {
@@ -73,19 +55,19 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     func execute(actions: [VC.Action], screen: VS.ScreenInstance) {
         do {
-            try state.execute(actions: actions, screenInstance: screen)
+            try stateHolder.state.execute(actions: actions, screenInstance: screen)
         } catch {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
         }
     }
-    
+
     func getValue<T: JSValueRepresentable & JSValueConvertable>(
         _ variable: VC.Variable,
         defaultValue: T,
         screen: VS.ScreenInstance
     ) -> T {
         do {
-            let value = try state.getValue(
+            let value = try stateHolder.state.getValue(
                 T.self,
                 variable: variable,
                 screenInstance: screen
@@ -107,7 +89,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
                 guard let self else { return defaultValue }
 
                 do {
-                    let value = try state.getValue(
+                    let value = try stateHolder.state.getValue(
                         T.self,
                         variable: variable,
                         screenInstance: screen
@@ -122,7 +104,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
                 guard let self else { return }
 
                 do {
-                    try state.setValue(
+                    try stateHolder.state.setValue(
                         variable: variable,
                         value: value,
                         screenInstance: screen

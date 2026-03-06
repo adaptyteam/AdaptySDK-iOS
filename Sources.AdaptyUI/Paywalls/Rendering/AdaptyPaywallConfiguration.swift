@@ -62,6 +62,8 @@ public extension AdaptyUI {
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
+            
+
 
             eventsHandler = AdaptyEventsHandler(logId: logId)
             logic = AdaptyUILogic(
@@ -93,12 +95,16 @@ public extension AdaptyUI {
                 screensViewModel: screensViewModel,
                 logic: logic
             )
-            stateViewModel = AdaptyUIStateViewModel(
+            let stateHolder = AdaptyUIStateHolder(
                 logId: logId,
-                logic: logic,
                 actionHandler: actionHandler,
                 viewConfiguration: viewConfiguration,
                 isInspectable: false
+            )
+            stateViewModel = AdaptyUIStateViewModel(
+                logId: logId,
+                logic: logic,
+                stateHolder: stateHolder
             )
             timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
@@ -109,11 +115,12 @@ public extension AdaptyUI {
                 screensViewModel: screensViewModel
             )
             assetsViewModel = AdaptyUIAssetsViewModel(
+                logId: logId,
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
-                stateViewModel: stateViewModel
+                stateHolder: stateHolder
             )
 
-            stateViewModel.start()
+            stateHolder.start()
             productsViewModel.loadProductsIfNeeded()
         }
 
