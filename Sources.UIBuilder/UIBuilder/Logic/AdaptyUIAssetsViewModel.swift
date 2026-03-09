@@ -58,7 +58,8 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     func resolvedText(
         _ ref: VC.StringReference,
-        screen: VS.ScreenInstance
+        screen: VS.ScreenInstance,
+        productsInfoProvider: ProductsInfoProvider?
     ) -> (
         richText: VC.RichText,
         tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
@@ -94,15 +95,16 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
         case let .product(product):
             switch product {
             case let .id(productId, sufix):
+                let productResolver = productsInfoProvider?.productInfo(by: productId)
                 let text = try? stateHolder.state.richText(
                     adaptyProductId: productId,
-                    byPaymentMode: nil, // TODO: x use productsInfoProvider
+                    byPaymentMode: productResolver?.paymentMode,
                     suffix: sufix
                 )
                 return (
                     richText: text ?? .empty,
                     tagValues: nil,
-                    productInfo: .notApplicable
+                    productInfo: productResolver.map { .found($0) } ?? .notFound
                 )
             case let .variable(variable, sufix):
                 guard let productId = try? stateHolder.state.getValue(
@@ -118,15 +120,16 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                     )
                 }
 
+                let productResolver = productsInfoProvider?.productInfo(by: productId)
                 let text = try? stateHolder.state.richText(
                     adaptyProductId: productId,
-                    byPaymentMode: nil, // TODO: x use productsInfoProvider
+                    byPaymentMode: productResolver?.paymentMode,
                     suffix: sufix
                 )
                 return (
                     richText: text ?? .empty,
                     tagValues: nil,
-                    productInfo: .notApplicable
+                    productInfo: productResolver.map { .found($0) } ?? .notFound
                 )
             }
         }

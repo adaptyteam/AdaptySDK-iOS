@@ -41,13 +41,12 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     package func getProducts(
         determineOffers: Bool
     ) async throws -> [ProductResolver] {
-        []
-    }
-
-    private func getProductsInternal(
-        determineOffers: Bool
-    ) async throws -> ([ProductResolver], [String]) {
-        ([], [])
+        [
+            Dev_MockProduct(id: "premium-free_trial-0-usd"),
+            Dev_MockProduct(id: "premium-pay_as_you_go-1.99-usd"),
+            Dev_MockProduct(id: "premium-pay_up_front-9.99-usd"),
+            Dev_MockProduct(id: "basic-default-4.99-usd"),
+        ]
     }
 
     func makePurchase(

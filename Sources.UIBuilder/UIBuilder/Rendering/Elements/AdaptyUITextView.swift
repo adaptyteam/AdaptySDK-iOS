@@ -35,7 +35,8 @@ struct AdaptyUITextView: View {
     var body: some View {
         let (richText, tagValues, productInfo) = assetsViewModel.resolvedText(
             text.value,
-            screen: screen
+            screen: screen,
+            productsInfoProvider: productsViewModel
         )
 
         switch productInfo {
