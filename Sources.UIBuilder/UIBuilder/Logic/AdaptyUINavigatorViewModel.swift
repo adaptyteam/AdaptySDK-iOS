@@ -45,6 +45,10 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     var id: VC.NavigatorIdentifier { navigator.id }
     var order: Double { Double(navigator.order) }
 
+    var initialBackground: VC.AssetReference? {
+        appearTransition?.background?.initialBackground ?? navigator.background
+    }
+    
     var appearTransition: VC.Navigator.AppearanceTransition? {
         navigator.appearances?[appearTransitionId]
     }

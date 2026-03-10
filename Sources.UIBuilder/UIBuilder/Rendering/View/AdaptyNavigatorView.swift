@@ -79,7 +79,7 @@ struct AdaptyNavigatorView: View {
     var body: some View {
         ZStack {
             AdaptyUIAnimatedBackgroundView(
-                initialBackground: navigatorViewModel.appearTransition?.background?.initialBackground,
+                initialBackground: navigatorViewModel.initialBackground,
                 defaultColor: .defaultNavigatorColor
             )
             .onTapGesture {
