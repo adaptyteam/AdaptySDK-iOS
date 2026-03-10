@@ -15,25 +15,29 @@ package struct AdaptyUIPaywallView_Internal: View {
 
     private let showDebugOverlay: Bool
     private let displayMissingTags: Bool
+    private let safeAreaOverride: EdgeInsets?
 
     package init(
         showDebugOverlay: Bool,
-        displayMissingTags: Bool
+        displayMissingTags: Bool,
+        safeAreaOverride: EdgeInsets? = nil
     ) {
         self.showDebugOverlay = showDebugOverlay
         self.displayMissingTags = displayMissingTags
+        self.safeAreaOverride = safeAreaOverride
     }
 
     package var body: some View {
         GeometryReader { proxy in
+            let safeArea = safeAreaOverride ?? proxy.safeAreaInsets
             AdaptyUIPaywallRendererView()
                 .withScreenSize(
                     CGSize(
-                        width: proxy.size.width + proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing,
-                        height: proxy.size.height + proxy.safeAreaInsets.top + proxy.safeAreaInsets.bottom
+                        width: proxy.size.width + safeArea.leading + safeArea.trailing,
+                        height: proxy.size.height + safeArea.top + safeArea.bottom
                     )
                 )
-                .withSafeArea(proxy.safeAreaInsets) // TODO: x check safe area calculation rule
+                .withSafeArea(safeArea)
                 .withDebugOverlayEnabled(showDebugOverlay)
                 .withDisplayMissingTags(displayMissingTags)
         }

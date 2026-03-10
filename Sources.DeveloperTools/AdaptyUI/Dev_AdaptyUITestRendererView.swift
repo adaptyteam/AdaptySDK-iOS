@@ -119,9 +119,12 @@ public struct Dev_AdaptyUIRendererView: View {
     private let didStartRestore: (() -> Void)?
     private let didFailRendering: ((AdaptyUIBuilderError) -> Void)?
 
+    private let safeAreaOverride: EdgeInsets?
+
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
         assetsResolver: AdaptyUIAssetsResolver?,
+        safeAreaOverride: EdgeInsets? = nil,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUIBuilder.Action) -> Void)? = nil,
@@ -130,6 +133,7 @@ public struct Dev_AdaptyUIRendererView: View {
         didStartRestore: (() -> Void)? = nil,
         didFailRendering: ((AdaptyUIBuilderError) -> Void)? = nil
     ) {
+        self.safeAreaOverride = safeAreaOverride
         self.viewConfiguration = viewConfiguration.wrapped
         galleryConfiguration = .init(
             logId: "test",
@@ -164,7 +168,8 @@ public struct Dev_AdaptyUIRendererView: View {
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false,
-            displayMissingTags: true
+            displayMissingTags: true,
+            safeAreaOverride: safeAreaOverride
         )
         .environmentObjects(
             stateViewModel: galleryConfiguration.stateViewModel,
