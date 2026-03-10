@@ -22,21 +22,28 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         self.events = events
     }
     
-    func reportViewDidAppear() {}
+    func reportViewDidAppear() {
+        events.event_viewDidAppear()
+    }
 
-    func reportViewDidDisappear() {}
+    func reportViewDidDisappear() {
+        events.event_viewDidDisappear()
+    }
 
     func reportDidPerformAction(_ action: AdaptyUIBuilder.Action) {
         events.event_didPerformAction(action)
     }
 
-    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {}
+    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {
+        events.event_didSelectProduct(product, automatic: automatic)
+    }
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool { false }
 
     package func logShowPaywall(
         viewConfiguration: AdaptyUIConfiguration
-    ) async {}
+    ) async {
+    }
 
     package func getProducts(
         determineOffers: Bool
@@ -53,19 +60,34 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         product: ProductResolver,
         onStart: @MainActor @escaping () -> Void,
         onFinish: @MainActor @escaping () -> Void
-    ) {}
+    ) {
+        onStart()
+        events.event_didStartPurchase(product: product)
+
+        Task { @MainActor in
+            try await Task.sleep(nanoseconds: 3 * 1_000_000_000)
+            
+            onFinish()
+        }
+    }
 
     func openWebPaywall(
         for product: ProductResolver,
         in openIn: VC.Action.WebOpenInParameter
-    ) async {}
+    ) async {
+        
+    }
 
     func restorePurchases(
         onStart: @MainActor @escaping () -> Void,
         onFinish: @MainActor @escaping () -> Void
-    ) {}
+    ) {
+        events.event_didStartRestore()
+    }
 
-    func reportDidFailRendering(with error: AdaptyUIBuilderError) {}
+    func reportDidFailRendering(with error: AdaptyUIBuilderError) {
+        events.event_didFailRendering(with: error)
+    }
 }
 
 #endif
