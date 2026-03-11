@@ -25,9 +25,7 @@ extension Schema.Point: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        if let value = try? container.decode(Double.self) {
-            self.init(x: value, y: value)
-        } else if let values = try? container.decode([Double].self) {
+        if let values = try? container.decode([Double].self) {
             switch values.count {
             case 0: self.init(x: 0.0, y: 0.0)
             case 1: self.init(x: values[0], y: values[0])
@@ -44,10 +42,6 @@ extension Schema.Point: Codable {
 
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
-        if x == y {
-            try container.encode(x)
-        } else {
-            try container.encode([y, x])
-        }
+        try container.encode([y, x])
     }
 }

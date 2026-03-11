@@ -12,6 +12,5 @@ package extension VC {
         case top
         case center
         case bottom
-        case justified
     }
 }

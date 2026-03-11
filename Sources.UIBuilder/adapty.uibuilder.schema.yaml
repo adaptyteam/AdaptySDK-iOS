@@ -1,32 +1,53 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/ui/4_8_0/schema"
+$id: "https://adapty.io/ui/5_0_0/schema"
 title: "AdaptyUI Configuration"
 type: object
-required: [format, screens, script]
+required: [format, screens, scripts]
 properties:
   format:
     type: string
     const: "5.0.0-SNAPSHOT"
   assets:
     title: "Default assets"
-    $ref: "#/$defs/Assets"
+    $ref: "#/Assets"
   localizations:
-    $ref: "#/$defs/Localizations"
+    title: "Localizations"
+    type: array
+    items: { $ref: "#/Localization" }
+    uniqueItems: true
+    minItems: 1
   default_localization:
     title: "Default localizations locale identifier"
-    $ref: "#/$defs/Localizations.Identifier"
-  templates: # from v4.8.0
-    $ref: "#/$defs/UI.TemplatesCollection"
-  screens: # from v4.8.0
-    $ref: "#/$defs/UI"
-  script: # from v4.8.0
+    $ref: "#/Localization/Identifier"
+  templates:
+    title: "Templates"
     type: object
-    required: [content]
+    additionalProperties: { $ref: "#/Template" }
+  navigators:
+    title: "Navigators"
+    type: object
     properties:
-      content: { type: string }
+      default: 
+        $ref: "#/Navigator"
+        default: {
+          "background": "#000000FF",
+          "content": { "type": "screen_holder" },
+          "order": 0
+        }
+    additionalProperties: { $ref: "#/Navigator" }
+  screens:
+    title: "Screens"
+    type: object
+    additionalProperties: { $ref: "#/Screen" }
+  scripts:
+    type: array
+    items: { $ref: "#/Script" }
+    uniqueItems: true
+additionalProperties: false
 
-$defs:
-  ###### Common Types ######
+###### Entities ######
+
+Entities:
 
   VerticalAlignment:
     type: string
@@ -34,7 +55,6 @@ $defs:
       - top
       - center
       - bottom
-      - justified
 
   HorizontalAlignment:
     type: string
@@ -47,6 +67,7 @@ $defs:
       - justified
 
   AspectRatio:
+    title: "Aspect ratio"
     type: string
     enum:
       - fit
@@ -55,7 +76,7 @@ $defs:
 
   CornerRadius:
     title: "Corner radius"
-    anyOf:
+    oneOf:
       - type: number
         description: "Same radius for all corners"
       - type: array
@@ -64,31 +85,41 @@ $defs:
       - type: object
         properties:
           top_leading:
-            { type: number, default: 0, title: "Top leading corner radius" }
+            title: "Top leading corner radius"
+            type: number
+            default: 0
           top_trailing:
-            { type: number, default: 0, title: "Top trailing corner radius" }
+            title: "Top trailing corner radius"
+            type: number
+            default: 0
           bottom_trailing:
-            { type: number, default: 0, title: "Bottom trailing corner radius" }
+            title: "Bottom trailing corner radius"
+            type: number
+            default: 0
           bottom_leading:
-            { type: number, default: 0, title: "Bottom leading corner radius" }
+            title: "Bottom leading corner radius"
+            type: number
+            default: 0
+        additionalProperties: false
 
   EdgeInsets:
     title: "Edge Insets"
-    anyOf:
-      - $ref: "#/$defs/Unit"
+    oneOf:
+      - $ref: "#/Entities/Unit"
       - type: array
-        items: { $ref: "#/$defs/Unit" }
-        description: "[], default 0;  [allEdges]; [verticalEdges,horizontalEdges]; [left,top,right,bottom], default 0"
+        items: { $ref: "#/Entities/Unit" }
+        description: "[], default 0;  [allEdges]; [verticalEdges,horizontalEdges]; [leading,top,trailing,bottom], default 0"
       - type: object
         properties:
-          top: { $ref: "#/$defs/Unit", default: 0 }
-          leading: { $ref: "#/$defs/Unit", default: 0 }
-          bottom: { $ref: "#/$defs/Unit", default: 0 }
-          trailing: { $ref: "#/$defs/Unit", default: 0 }
+          top: { $ref: "#/Entities/Unit", default: 0 }
+          leading: { $ref: "#/Entities/Unit", default: 0 }
+          bottom: { $ref: "#/Entities/Unit", default: 0 }
+          trailing: { $ref: "#/Entities/Unit", default: 0 }
+        additionalProperties: false
 
   Point:
     title: Point
-    anyOf:
+    oneOf:
       - type: array
         items: { type: number }
         description: "[y,x], default 0"
@@ -96,22 +127,24 @@ $defs:
         properties:
           y: { type: number, default: 0 }
           x: { type: number, default: 0 }
+        additionalProperties: false
 
   Offset:
     title: Offset
-    anyOf:
-      - { $ref: "#/$defs/Unit", description: "y value, x:0" } # from v4.4.0
+    oneOf:
+      - { $ref: "#/Entities/Unit", description: "y value, x:0" }
       - type: array
-        items: { $ref: "#/$defs/Unit" } # from v4.4.0
+        items: { $ref: "#/Entities/Unit" }
         description: "[] => y:0,x:0, [y] => x:0, [y,x]"
       - type: object
         properties:
-          y: { $ref: "#/$defs/Unit", default: 0 } # from v4.4.0
-          x: { $ref: "#/$defs/Unit", default: 0 } # from v4.4.0
+          y: { $ref: "#/Entities/Unit", default: 0 }
+          x: { $ref: "#/Entities/Unit", default: 0 }
+        additionalProperties: false
 
   Unit:
     title: Unit
-    anyOf:
+    oneOf:
       - type: number
         description: "Value in points"
       - type: object
@@ -127,39 +160,54 @@ $defs:
       - type: object
         required: [safe_area]
         properties:
-          safe_area: { type: string, enum: [start, end] }
+          safe_area: { enum: [start, end] }
         additionalProperties: false
       - type: object
         required: [value]
         properties:
           value: { type: number }
-          unit: { type: string, enum: [point, screen], default: point }
+          unit: { enum: [point, screen], default: point }
+        additionalProperties: false
 
-  Animation: # from v4.4.0
-    type: object
-    allOf:
-      - properties:
-          interpolator:
-            { $ref: "#/$defs/Animation.Interpolator", default: ease_in_out }
-          start_delay:
-            { type: integer, default: 0, description: "milliseconds" }
-          duration: { type: integer, default: 300, description: "milliseconds" }
-          loop: { enum: [normal, ping_pong] }
-          loop_delay: { type: integer, default: 0, description: "milliseconds" }
-          ping_pong_delay:
-            { type: integer, default: 0, description: "milliseconds" }
-          loop_count: { type: integer }
-      - oneOf:
-          - { $ref: "#/$defs/Animation.Opacity" }
-          - { $ref: "#/$defs/Animation.Offset" }
-          - { $ref: "#/$defs/Animation.Rotation" }
-          - { $ref: "#/$defs/Animation.Scale" }
-          - { $ref: "#/$defs/Animation.Box" }
-          - { $ref: "#/$defs/Animation.Background" }
-          - { $ref: "#/$defs/Animation.Border" }
-          - { $ref: "#/$defs/Animation.Shadow" }
+###### Animations ######
 
-  Animation.Interpolator:
+Animation:
+  type: object
+  allOf:
+    - properties:
+        interpolator:
+          $ref: "#/Animation/Interpolator"
+          default: ease_in_out
+        start_delay:
+          type: integer
+          default: 0
+          description: milliseconds
+        duration: 
+          type: integer
+          default: 300
+          description: milliseconds
+        loop: { enum: [normal, ping_pong] }
+        loop_delay: 
+          type: integer
+          default: 0
+          description: milliseconds
+        ping_pong_delay:
+          type: integer
+          default: 0
+          description: milliseconds
+        loop_count: { type: integer }
+    - oneOf:
+        - $ref: "#/Animation/Opacity" 
+        - $ref: "#/Animation/Offset" 
+        - $ref: "#/Animation/Rotation"
+        - $ref: "#/Animation/Scale"
+        - $ref: "#/Animation/Box"
+        - $ref: "#/Animation/Background"
+        - $ref: "#/Animation/Border"
+        - $ref: "#/Animation/Shadow"
+  additionalProperties: false
+
+  Interpolator:
     oneOf:
       - type: string
         enum:
@@ -167,18 +215,20 @@ $defs:
           - ease_in
           - ease_out
           - linear
-          - ease_in_elastic # from v4.4.0
-          - ease_out_elastic # from v4.4.0
-          - ease_in_out_elastic # from v4.4.0
-          - ease_in_bounce # from v4.4.0
-          - ease_out_bounce # from v4.4.0
-          - ease_in_out_bounce # from v4.4.0
-      - type: array # from v4.4.0
+          - ease_in_elastic
+          - ease_out_elastic
+          - ease_in_out_elastic
+          - ease_in_bounce
+          - ease_out_bounce
+          - ease_in_out_bounce
+      - type: array
         items: { type: number }
-        description: "[ x1, y1, x2, y2] 4 numbers used for 2 point Cubic-Bezier curve"
+        description: "[x1, y1, x2, y2] 4 numbers used for 2 point Cubic-Bezier curve"
+        minItems: 4
+        maxItems: 4
     default: ease_in_out
 
-  Animation.Opacity:
+  Opacity:
     type: object
     required: [type]
     properties:
@@ -189,9 +239,11 @@ $defs:
         properties:
           start: { type: number }
           end: { type: number }
-        default: { “start”: 0, “end”: 1 }
+        default: { "start": 0, "end": 1 }
+        additionalProperties: false
+    additionalProperties: false
 
-  Animation.Offset:
+  Offset:
     type: object
     required: [type, offset]
     properties:
@@ -200,10 +252,12 @@ $defs:
         type: object
         required: [start, end]
         properties:
-          start: { $ref: "#/$defs/Offset" }
-          end: { $ref: "#/$defs/Offset" }
+          start: { $ref: "#/Entities/Offset" }
+          end: { $ref: "#/Entities/Offset" }
+        additionalProperties: false
+    additionalProperties: false
 
-  Animation.Rotation:
+  Rotation:
     type: object
     required: [type, angle]
     properties:
@@ -214,9 +268,11 @@ $defs:
         properties:
           start: { type: number, description: "degrees" }
           end: { type: number, description: "degrees" }
-      anchor: { default: [0.5, 0.5] }
+        additionalProperties: false
+      anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
+    additionalProperties: false
 
-  Animation.Scale:
+  Scale:
     type: object
     required: [type, scale]
     properties:
@@ -225,11 +281,13 @@ $defs:
         type: object
         required: [start, end]
         properties:
-          start: { $ref: "#/$defs/Point" }
-          end: { $ref: "#/$defs/Point" }
-      anchor: { default: [0.5, 0.5] }
+          start: { $ref: "#/Entities/Point" }
+          end: { $ref: "#/Entities/Point" }
+        additionalProperties: false
+      anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
+    additionalProperties: false
 
-  Animation.Box:
+  Box:
     type: object
     required: [type]
     properties:
@@ -241,18 +299,21 @@ $defs:
             type: object
             required: [start, end]
             properties:
-              start: { $ref: "#/$defs/Unit" }
-              end: { $ref: "#/$defs/Unit" }
+              start: { $ref: "#/Entities/Unit" }
+              end: { $ref: "#/Entities/Unit" }
+            additionalProperties: false
       - required: [height]
         properties:
           height:
             type: object
             required: [start, end]
             properties:
-              start: { $ref: "#/$defs/Unit" }
-              end: { $ref: "#/$defs/Unit" }
+              start: { $ref: "#/Entities/Unit" }
+              end: { $ref: "#/Entities/Unit" }
+            additionalProperties: false
+    additionalProperties: false
 
-  Animation.Background:
+  Background:
     type: object
     required: [type, color]
     properties:
@@ -261,12 +322,12 @@ $defs:
         type: object
         required: [start, end]
         properties:
-          start:
-            { type: string, description: "color[-gradient] asset identifier" }
-          end:
-            { type: string, description: "color[-gradient] asset identifier" }
+          start: { $ref: "#/AssetIdOrColor/Binding"}
+          end: { $ref: "#/AssetIdOrColor/Binding"}
+        additionalProperties: false
+    additionalProperties: false
 
-  Animation.Border:
+  Border:
     type: object
     required: [type]
     properties:
@@ -278,16 +339,9 @@ $defs:
             type: object
             required: [start, end]
             properties:
-              start:
-                {
-                  type: string,
-                  description: "color[-gradient] asset identifier",
-                }
-              end:
-                {
-                  type: string,
-                  description: "color[-gradient] asset identifier",
-                }
+              start: { $ref: "#/AssetIdOrColor/Binding" }
+              end: { $ref: "#/AssetIdOrColor/Binding" }
+            additionalProperties: false
       - required: [thickness]
         properties:
           thickness:
@@ -296,8 +350,10 @@ $defs:
             properties:
               start: { type: number }
               end: { type: number }
+            additionalProperties: false
+    additionalProperties: false
 
-  Animation.Shadow:
+  Shadow:
     type: object
     required: [type]
     properties:
@@ -309,16 +365,9 @@ $defs:
             type: object
             required: [start, end]
             properties:
-              start:
-                {
-                  type: string,
-                  description: "color[-gradient] asset identifier",
-                }
-              end:
-                {
-                  type: string,
-                  description: "color[-gradient] asset identifier",
-                }
+              start: { $ref: "#/AssetIdOrColor/Binding" }
+              end: { $ref: "#/AssetIdOrColor/Binding" }
+            additionalProperties: false
       - required: [blur_radius]
         properties:
           blur_radius:
@@ -327,405 +376,435 @@ $defs:
             properties:
               start: { type: number }
               end: { type: number }
+            additionalProperties: false
       - required: [offset]
         properties:
           offset:
             type: object
             required: [start, end]
             properties:
-              start: { $ref: "#/$defs/Offset" }
-              end: { $ref: "#/$defs/Offset" }
-
-  Transition:
-    type: object
-    required: [type]
-    anyOf:
-      - $ref: "#/$defs/Transition.Fade"
-
-  Transition.Fade:
-    type: object
-    required: [type]
-    properties:
-      type: { const: fade }
-      start_delay: { type: number, default: 0 }
-      duration: { type: number, default: 300 }
-      interpolator:
-        { $ref: "#/$defs/Animation.Interpolator", default: ease_in_out }
+              start: { $ref: "#/Entities/Offset" }
+              end: { $ref: "#/Entities/Offset" }
+            additionalProperties: false
+    additionalProperties: false
 
   Transition.Slide:
     type: object
     required: [type]
     properties:
       type: { const: slide }
-      start_delay: { type: number, default: 0 }
-      duration: { type: number, default: 300 }
+      start_delay: { type: integer, default: 0 }
+      duration: { type: integer, default: 300 }
       interpolator:
-        { $ref: "#/$defs/Animation.Interpolator", default: ease_in_out }
+        { $ref: "#/Animation/Interpolator", default: ease_in_out }
+    additionalProperties: false
 
-  ###### UI Components ######
- 
-  UI:
-    title: "Screen by key"
+###### Navigators ######
+
+Navigator:
+  type: object
+  required: [background, order]
+  properties:
+    background: { $ref: "#/AssetIdOrColor/Binding" }
+    content:
+      $ref: "#/UI/Element"
+      default: { $ref: "#/Screen/Holder" }
+    order: { type: integer }
+    default_screen_actions:
+      type: object
+      properties:
+        on_outside_tap: { $ref: "#/Script/ActionOrArray" }
+        on_device_back: { $ref: "#/Script/ActionOrArray" }
+      additionalProperties: false
+    appearances:
+      type: object
+      properties:
+        on_appear: { $ref: "#/Navigator/Appearance" }
+        on_disappear: { $ref: "#/Navigator/Appearance" }
+      additionalProperties: { $ref: "#/Navigator/Appearance" }
+    transitions:
+      type: object
+      properties:
+        forward: { $ref: "#/Navigator/ScreenTransition" }
+        backward: { $ref: "#/Navigator/ScreenTransition" }
+      additionalProperties: { $ref: "#/Navigator/ScreenTransition" }
+    
+  Appearance:
     type: object
-    required: [default]
     properties:
-      default: { $ref: "#/$defs/UI.Screen" }
-    additionalProperties: { $ref: "#/$defs/UI.SimpleScreen" }
+      background: { $ref: "#/Animation/Background" }
+      content:
+        type: array
+        items: { $ref: "#/Animation" }
+        uniqueItems: true
+        minItems: 1
+    additionalProperties: false
 
-
-  UI.SimpleScreen:
+  ScreenTransition:
     type: object
-    required: [content]
+    required: [is_incoming_on_top]
     properties:
-      content: { $ref: "#/$defs/UI.Element" }
+      outgoing:
+        type: array
+        items: { $ref: "#/Animation" }
+        uniqueItems: true
+        minItems: 1
+      incoming:
+        type: array
+        items: { $ref: "#/Animation" }
+        uniqueItems: true
+        minItems: 1
+      is_incoming_on_top: { type: boolean }
+    additionalProperties: false
 
-  UI.Screen:
-    type: object
-    required: [background, content]
-    properties:
-      background:
-        {
-          type: string,
-          title: "Background image|color[-gradient] asset identifier",
-        }
-      cover: { $ref: "#/$defs/UI.Box" }
-      content: { $ref: "#/$defs/UI.Element" }
-      footer: { $ref: "#/$defs/UI.Element" }
-      overlay: { $ref: "#/$defs/UI.Element" }
+###### Screens ######
 
-  UI.TemplatesCollection: # from v4.8.0
-    title: "Templates by key"
-    type: object
-    patternProperties:
-      '^\$':
-        type: object
-        required: [content]
-        properties:
-          content: { $ref: "#/$defs/UI.Element" }
+Screen:
+  type: object
+  required: [content]
+  properties:
+    cover: { $ref: "#/UI/Box" }
+    content: { $ref: "#/UI/Element" }
+    footer: { $ref: "#/UI/Element" }
+    layout_behaviour:
+      type: string
+      enum: [default, flat, hero, transparent]
+      default: default
+    on_outside_tap: { $ref: "#/Script/ActionOrArray" }
+    on_device_back: { $ref: "#/Script/ActionOrArray" }
+  additionalProperties: false
 
-  UI.Template: # from v4.8.0
+  Holder:
+    title: "Placeholder for screen content inside navigator"
     type: object
     required: [type]
     properties:
-      type: { type: string, pattern: '^\$' }
+      type: { const: "screen_holder" }
+    additionalProperties: false
 
-  UI.Box:
+###### Templates ######
+
+Template:
+  type: object
+  required: [content]
+  properties:
+    content: { $ref: "#/UI/Element" }
+  additionalProperties: false
+
+  Child:
+    title: "Template child placeholder"
+    type: object
+    required: [type, name]
+    properties:
+      type: { const: "child" }
+      name: { type: string }
+    additionalProperties: false
+
+  Reference:
+    title: "Template reference"
     type: object
     required: [type]
     properties:
-      type: { type: string, const: box }
-      height: { $ref: "#/$defs/UI.Box.Length" }
-      width: { $ref: "#/$defs/UI.Box.Length" }
-      h_align: { $ref: "#/$defs/HorizontalAlignment", default: center }
-      v_align: { $ref: "#/$defs/VerticalAlignment", default: center }
-      content: { $ref: "#/$defs/UI.Element" }
+      type: { type: string, pattern: '^#' }
+    additionalProperties: false
 
-  UI.Box.Length:
-    anyOf:
-      - $ref: "#/$defs/Unit"
-        description: "Fixed length"
-      - type: object
-        required: [fill_max]
-        additionalProperties: false
-        properties:
-          fill_max: { type: boolean, const: true }
-      - type: object
-        required: [min]
-        additionalProperties: false
-        properties:
-          min: { $ref: "#/$defs/Unit" }
-          max: { $ref: "#/$defs/Unit" } # from v4.2.0
-      - type: object
-        required: [shrink]
-        additionalProperties: false
-        properties:
-          shrink: { $ref: "#/$defs/Unit" }
-          max: { $ref: "#/$defs/Unit" } # from v4.2.0
+###### UI Components ######
 
-  UI.Element:
+UI:
+
+  Element:
     type: object
     required: [type]
     oneOf:
-      - { $ref: "#/$defs/UI.Template" }
-      - { $ref: "#/$defs/UI.If.Them.Else" }
+      - $ref: "#/Template/Reference"
+      - $ref: "#/Template/Child"
+        description: Allowed use only in Template
+      - $ref: "#/Screen/Holder"
+        description: Allowed use only in Navigator
+      - $ref: "#/UI/If.Then.Else"
       - allOf:
           - oneOf:
-              - { $ref: "#/$defs/UI.Image" }
-              - { $ref: "#/$defs/UI.Video" } # from v4.1.0
-              - { $ref: "#/$defs/UI.Text" }
-              - { $ref: "#/$defs/UI.Toggle" }
-              - { $ref: "#/$defs/UI.Button" }
-              - { $ref: "#/$defs/UI.Stack" }
-              - { $ref: "#/$defs/UI.Box" }
-              - { $ref: "#/$defs/UI.Section" }
-              - { $ref: "#/$defs/UI.Row" }
-              - { $ref: "#/$defs/UI.Column" }
-              - { $ref: "#/$defs/UI.Timer" }
-              - { $ref: "#/$defs/UI.Pager" }
+              - $ref: "#/UI/Image"
+              - $ref: "#/UI/Video"
+              - $ref: "#/UI/Text"
+              - $ref: "#/UI/TextField"
+              - $ref: "#/UI/Toggle"
+              - $ref: "#/UI/Slider"
+              - $ref: "#/UI/Button"
+              - $ref: "#/UI/Stack"
+              - $ref: "#/UI/Box"
+              - $ref: "#/UI/Section"
+              - $ref: "#/UI/Row"
+              - $ref: "#/UI/Column"
+              - $ref: "#/UI/Timer"
+              - $ref: "#/UI/Pager"
           - properties:
-              decorator: { $ref: "#/$defs/UI.Element.Decorator" }
-              padding: { $ref: "#/$defs/EdgeInsets", default: 0 }
-              offset: { $ref: "#/$defs/Offset", default: 0 }
-              opacity: { type: number, default: 1.0 } # from v4.4.0
-              on_appear: # from v4.4.0
+              decorator: { $ref: "#/UI/Element/Decorator" }
+              padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
+              offset: { $ref: "#/Entities/Offset", default: 0 }
+              opacity: { type: number, default: 1.0 }
+              on_appear:
                 type: array
-                items: { $ref: "#/$defs/Animation" }
-              visibility: { type: boolean, default: true } # deprecated from v4.4.0
-              transition_in: { $ref: "#/$defs/Transition" } # deprecated from v4.4.0
+                items: { $ref: "#/Animation" }
+                uniqueItems: true
+                minItems: 1
+        additionalProperties: false
 
-  UI.Element.Decorator:
-    title: "Decorator for any element"
-    type: object
-    properties:
-      background:
-        {
-          type: string,
-          title: "Background image or color[-gradient] asset identifier",
-        }
-      type: { $ref: "#/$defs/UI.Element.Decorator.ShapeType", default: rect }
-      border:
-        { type: string, title: "Border color[-gradient] asset identifier" }
-      shadow: { $ref: "#/$defs/UI.Element.Decorator.Shadow" } # from v4.4.0
-    dependentSchemas:
-      border:
+    Decorator:
+      title: "Decorator for any element"
+      type: object
+      properties:
+        background: { $ref: "#/AssetIdOrColor/Binding" }
+        type: { $ref: "#/UI/Element/Decorator/ShapeType", default: rect }
+        border: { $ref: "#/AssetIdOrColor/Binding" }
+        shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
+      dependentSchemas:
+        border:
+          properties:
+            thickness: { type: number, default: 1 }
+      if:
         properties:
-          thickness: { type: number, default: 1 }
-    if:
-      properties:
-        type: { const: rect }
-    then:
-      properties:
-        rect_corner_radius: { $ref: "#/$defs/CornerRadius", default: 0 }
+          type: { const: rect }
+      then:
+        properties:
+          rect_corner_radius: { $ref: "#/Entities/CornerRadius", default: 0 }
+      additionalProperties: false
 
-  UI.Element.Decorator.ShapeType:
-    title: "Shape type"
-    type: string
-    enum:
-      - circle
-      - rect
-      - curve_up
-      - curve_down
+      ShapeType:
+        title: "Shape type"
+        type: string
+        enum:
+          - circle
+          - rect
+          - curve_up
+          - curve_down
 
-  UI.Element.Decorator.Shadow: # from v4.4.0
-    title: "Shadow"
+      Shadow:
+        title: "Shadow"
+        type: object
+        required: [color]
+        properties:
+          color: { $ref: "#/AssetIdOrColor/Binding" }
+          blur_radius:
+            type: number
+            default: 0
+            description: "A measure of how much to blur the shadow. Larger values result in more blur."
+          offset: { $ref: "#/Entities/Offset", default: [0, 0] }
+        additionalProperties: false
+
+  If.Then.Else:
     type: object
-    required: [color]
+    required: [type, then, else]
     properties:
-      color: { type: string, title: "Border color asset identifier" }
-      blur_radius:
-        {
-          type: number,
-          default: 0,
-          description: "A measure of how much to blur the shadow. Larger values result in more blur.",
-        }
-      offset: { $ref: "#/$defs/Offset", default: [0, 0] }
+      type: { const: if }
+      platform: { enum: [ios, android] }
+      os_version:
+        type: string
+        pattern: "^[0-9]+\\.[0-9]+$"
+        description: "Minimum OS version (inclusive)"
+      version:
+        { type: string, pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
+      to_version:
+        { type: string, pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
+      then: { $ref: "#/UI/Element" }
+      else: { $ref: "#/UI/Element" }
+    additionalProperties: false
 
-  UI.Image:
+
+  Box:
+    type: object
+    required: [type]
+    properties:
+      type: { const: box }
+      height: { $ref: "#/UI/Box/Length" }
+      width: { $ref: "#/UI/Box/Length" }
+      h_align: 
+        $ref: "#/Entities/HorizontalAlignment"
+        default: center
+      v_align: 
+        $ref: "#/Entities/VerticalAlignment"
+        default: center 
+      content: { $ref: "#/UI/Element" }
+
+    Length:
+      oneOf:
+        - title: Fixed length
+          $ref: "#/Entities/Unit"
+        - title: Fill max
+          type: object
+          required: [fill_max]
+          properties:
+            fill_max: { type: boolean, const: true }
+          additionalProperties: false
+        - title: Set min, and optional max
+          type: object
+          required: [min]
+          properties:
+            min: { $ref: "#/Entities/Unit" }
+            max: { $ref: "#/Entities/Unit" }
+          additionalProperties: false
+        - title: Set shrink, and optional max
+          type: object
+          required: [shrink]
+          properties:
+            shrink: { $ref: "#/Entities/Unit" }
+            max: { $ref: "#/Entities/Unit" }
+          additionalProperties: false
+
+  Image:
     type: object
     required: [type, asset_id]
     properties:
       type: { const: "image" }
-      asset_id: { type: string, title: "Image asset identifier" }
+      asset_id: { $ref: "#/AssetId/Binding" }
       aspect:
-        { $ref: "#/$defs/AspectRatio", default: fit, title: "Aspect ratio" }
-      tint:
-        { type: string, title: "Image tint color[-gradient] asset identifier" }
+        $ref: "#/Entities/AspectRatio"
+        default: fit
+      tint: { $ref: "#/AssetIdOrColor/Binding" }
 
-  UI.Video: # from v4.1.0
+  Video:
     type: object
     required: [type, asset_id]
     properties:
       type: { const: "video" }
-      asset_id: { type: string, title: "Video asset identifier" }
+      asset_id: { $ref: "#/AssetId/Binding" }
       aspect:
-        { $ref: "#/$defs/AspectRatio", default: fit, title: "Aspect ratio" }
+        $ref: "#/Entities/AspectRatio"
+        default: fit
       loop: { type: boolean, default: true }
 
-  UI.Text:
+  Text:
     type: object
     allOf:
       - required: [type, string_id]
         properties:
           type: { const: "text" }
-          string_id: { $ref: "#/$defs/Localizations.String.Id" }
-          align: { $ref: "#/$defs/HorizontalAlignment", default: left }
+          string_id: { $ref: "#/Localization/StringId/Binding" }
+          align: { $ref: "#/Entities/HorizontalAlignment", default: leading }
           max_rows: { type: integer, minimum: 1 }
           on_overflow:
             anyOf:
-              - $ref: "#/$defs/UI.Text.OverflowMode"
+              - $ref: "#/UI/Text/OverflowMode"
               - type: array
-                items: { $ref: "#/$defs/UI.Text.OverflowMode" }
+                items: { $ref: "#/UI/Text/OverflowMode" }
                 uniqueItems: true
-      - $ref: "#/$defs/RichText.Attributes"
+                minItems: 1
+      - $ref: "#/UI/Text/Attributes"
 
-  UI.Text.OverflowMode:
-    type: string
-    enum:
-      - scale
+    OverflowMode:
+      type: string
+      enum:
+        - scale
 
-  UI.Toggle:
+    Attributes:
+      title: Attributes for RichText
+      type: object
+      properties:
+        font: 
+          title: "Font Asset identifier"
+          $ref: "#/AssetId/Binding"
+        size: 
+          title: "Font size"
+          type: number
+        strike: 
+          type: boolean
+        underline:
+          type: boolean 
+        color: 
+          title: "Text color[-gradient] Asset identifier" 
+          $ref: "#/AssetIdOrColor/Binding"
+        background:
+          title: Background color of text
+          $ref: "#/AssetIdOrColor/Binding"
+        tint:
+          title: Tint color of image
+          $ref: "#/AssetIdOrColor/Binding"
+      additionalProperties: false
+
+
+  TextField:
     type: object
-    required: [type]
+    allOf:
+      - required: [type, value]
+        properties:
+          type: { const: "text_field" }
+          value: { $ref: "#/Script/DataBinding" }
+          align: { $ref: "#/Entities/HorizontalAlignment", default: leading }
+          max_rows: { type: integer, minimum: 1 }
+          on_overflow:
+            anyOf:
+              - $ref: "#/UI/Text/OverflowMode"
+              - type: array
+                items: { $ref: "#/UI/Text/OverflowMode" }
+                uniqueItems: true
+                minItems: 1
+      - $ref: "#/UI/Text/Attributes"
+
+  Toggle:
+    type: object
+    required: [type, value]
     properties:
       type: { const: toggle }
-      color: { type: string, title: "Text color[-gradient] Asset identifier" }
-    oneOf:
-      - required: [section_id]
-        properties:
-          section_id: { type: string }
-          on_index: { type: integer, default: 0 }
-          off_index: { type: integer, default: -1 }
-      - required: [on_condition]
-        properties:
-          on_condition: { $ref: "#/$defs/UI.Condition" }
-          on_action:
-            oneOf:
-              - $ref: "#/$defs/UI.Action"
-              - type: array
-                items: { $ref: "#/$defs/UI.Action" }
-          off_action:
-            oneOf:
-              - $ref: "#/$defs/UI.Action"
-              - type: array
-                items: { $ref: "#/$defs/UI.Action" }
+      color: { $ref: "#/AssetIdOrColor/Binding" }
+      value: { $ref: "#/Script/DataBinding" }
 
-  UI.Button:
+  Slider:
+    type: object
+    required: [type, value, min, max]
+    properties:
+      type: { const: slider }
+      value: { $ref: "#/Script/DataBinding", title: "Two-way data binding to number" }
+      min: { type: number }
+      max: { type: number }
+      step: { type: number }
+
+  Button:
     type: object
     required: [type, action, normal]
     properties:
       type: { const: button }
-      action:
-        oneOf:
-          - $ref: "#/$defs/UI.Action"
-          - type: array
-            items: { $ref: "#/$defs/UI.Action" }
-      normal: { $ref: "#/$defs/UI.Element" }
-      selected: { $ref: "#/$defs/UI.Element" }
-      selected_condition: { $ref: "#/$defs/UI.Condition" }
+      action: { $ref: "#/Script/ActionOrArray" }
+      normal: { $ref: "#/UI/Element" }
+      selected: { $ref: "#/UI/Element" }
+      is_selected: { $ref: "#/Script/DataBinding", title: "One-way data binding to boolean"}
 
-  UI.Condition:
-    type: object
-    oneOf:
-      - required: [type, section_id, index]
-        properties:
-          type: { const: selected_section }
-          section_id: { type: string }
-          index: { type: integer }
-      - required: [type, product_id]
-        properties:
-          type: { const: selected_product }
-          product_id: { type: string }
-          group_id: { type: string, default: group_A }
-
-  UI.Action:
-    type: object
-    required: [type]
-    anyOf:
-      - required: [type, url]
-        properties:
-          type: { const: open_url }
-          url: { type: string }
-      - required: [type, custom_id]
-        properties:
-          type: { const: custom }
-          custom_id: { title: "Custom action identifier", type: string }
-      - required: [type]
-        properties:
-          type: { const: web_purchase_paywall }
-          open_in: {
-              enum: [browser_out_app, browser_in_app],
-              default: browser_out_app,
-            } # from v4.4.1
-      - required: [type, product_id]
-        properties:
-          type: { const: purchase_product }
-          product_id: { title: "Adapty product identifier", type: string }
-      - required: [type, product_id]
-        properties:
-          type: { const: web_purchase_product }
-          product_id: { title: "Adapty product identifier", type: string }
-          open_in: {
-              enum: [browser_out_app, browser_in_app],
-              default: browser_out_app,
-            } # from v4.4.1
-      - required: [type, product_id]
-        properties:
-          type: { const: select_product }
-          product_id: { title: "Adapty product identifier", type: string }
-          group_id: { default: "group_A", type: string }
-      - required: [type]
-        properties:
-          type: { const: unselect_product }
-          group_id: { default: "group_A", type: string }
-      - required: [type]
-        properties:
-          type: { const: purchase_selected_product }
-          group_id: { default: "group_A", type: string }
-      - required: [type]
-        properties:
-          type: { const: web_purchase_selected_product }
-          group_id: { default: "group_A", type: string }
-          open_in: {
-              enum: [browser_out_app, browser_in_app],
-              default: browser_out_app,
-            } # from v4.4.1
-      - required: [type, screen_id]
-        properties:
-          type: { const: open_screen }
-          screen_id: { title: "Screen identifier", type: string }
-      - required: [type, section_id, index]
-        properties:
-          type: { const: switch }
-          section_id: { title: "Section identifier", type: string }
-          index: { type: integer }
-      - required: [type]
-        properties:
-          type: { type: string, enum: [restore, close, close_screen] }
-
-  UI.Stack:
-    title: "Stack of elements"
+  Stack:
     type: object
     required: [type, content]
     properties:
-      type:
-        type: string
-        enum:
-          - v_stack
-          - h_stack
-          - z_stack
-      h_align: { $ref: "#/$defs/HorizontalAlignment", default: center }
-      v_align: { $ref: "#/$defs/VerticalAlignment", default: center }
+      type: { enum: [ v_stack, h_stack, z_stack] }
+      h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
+      v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
       spacing: { type: number, default: 0 }
       content:
         title: "Child elements"
         type: array
         minItems: 1
         items:
-          anyOf:
-            - $ref: "#/$defs/UI.Stack.Space"
-            - $ref: "#/$defs/UI.Element"
+          oneOf:
+            - $ref: "#/UI/Stack/Space"
+            - $ref: "#/UI/Element"
 
-  UI.Stack.Space:
-    title: "Space in stack"
-    type: object
-    properties:
-      type: { const: space }
-      count: { type: integer, default: 1, minimum: 1 }
+    Space:
+      title: "Space in stack"
+      type: object
+      properties:
+        type: { const: space }
+        count: { type: integer, default: 1, minimum: 1 }
+      additionalProperties: false
 
-  UI.Section:
+  Section:
     type: object
-    required: [type, id, content]
+    required: [type, index, content]
     properties:
       type: { const: section }
-      id: { type: string }
-      index: { type: integer, default: 0 }
+      index: { $ref: "#/Script/DataBinding", title: "One-way data binding to integer"}
       content:
         type: array
         minItems: 1
-        items: { $ref: "#/$defs/UI.Element" }
+        items: { $ref: "#/UI/Element" }
 
-  UI.Row:
-    title: "Row of items"
+  Row:
     type: object
     required: [type, items]
     properties:
@@ -734,37 +813,38 @@ $defs:
       items:
         type: array
         minItems: 1
-        items: { $ref: "#/$defs/UI.GridItem" }
+        items: { $ref: "#/UI/GridItem" }
 
-  UI.Column:
-    title: "Column of items"
+  Column:
     type: object
     required: [type, items]
     properties:
-      type: { const: row }
+      type: { const: column }
       spacing: { type: number, default: 0 }
       items:
         type: array
         minItems: 1
-        items: { $ref: "#/$defs/UI.GridItem" }
+        items: { $ref: "#/UI/GridItem" }
 
-  UI.GridItem:
+  GridItem:
     type: object
-    required: [content]
+    required: [type, content]
     allOf:
       - oneOf:
           - required: [fixed]
             properties:
-              fixed: { $ref: "#/$defs/Unit" }
+              fixed: { $ref: "#/Entities/Unit" }
           - required: [weight]
             properties:
-              fixed: { type: integer }
+              weight: { type: integer }
       - properties:
-          h_align: { $ref: "#/$defs/HorizontalAlignment", default: center }
-          v_align: { $ref: "#/$defs/VerticalAlignment", default: center }
-          content: { $ref: "#/$defs/UI.Element" }
+          type: { const: grid_item }
+          h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
+          v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
+          content: { $ref: "#/UI/Element" }
+    additionalProperties: false
 
-  UI.Timer:
+  Timer:
     type: object
     allOf:
       - required: [type, id, format]
@@ -782,12 +862,8 @@ $defs:
                   properties:
                     from: { type: number }
                     string_id: { type: string }
-          align: { $ref: "#/$defs/HorizontalAlignment", default: left }
-          action:
-            oneOf:
-              - $ref: "#/$defs/UI.Action"
-              - type: array
-                items: { $ref: "#/$defs/UI.Action" }
+          align: { $ref: "#/Entities/HorizontalAlignment", default: leading }
+          action: { $ref: "#/Script/ActionOrArray" }
       - oneOf:
           - required: [end_time, behaviour]
             properties:
@@ -803,235 +879,262 @@ $defs:
             properties:
               duration: { type: number, description: seconds }
               behaviour:
-                type: string
                 enum:
                   - start_at_every_appear
                   - start_at_first_appear
                   - start_at_first_appear_persisted
                   - custom
-      - ref: "#/$defs/RichText.Attributes"
+                default: start_at_first_appear
+      - $ref: "#/UI/Text/Attributes"
 
-  UI.Pager:
+  Pager:
     type: object
-    required: [type, items]
+    required: [type, content]
     properties:
       type: { const: pager }
-      page_width: { $ref: "#/$defs/UI.Pager.Length", default: { parent: 1 } }
-      page_height: { $ref: "#/$defs/UI.Pager.Length", default: { parent: 1 } }
+      page_width: 
+        $ref: "#/UI/Pager/Length"
+        default: { parent: 1 }
+      page_height: 
+        $ref: "#/UI/Pager/Length"
+        default: { parent: 1 } 
+      page_padding: { $ref: "#/Entities/EdgeInsets" }
       spacing: { type: number, default: 0 }
       content:
         type: array
         minItems: 1
-        items: { $ref: "#/$defs/UI.Element" }
+        items: { $ref: "#/UI/Element" }
       page_control:
         type: object
         properties:
-          layout: { type: string, enum: [overlaid, stacked] }
-          v_align: { $ref: "#/$defs/VerticalAlignment", default: bottom }
-          padding: { $ref: "#/$defs/EdgeInsets", default: 6 }
+          layout: { enum: [overlaid, stacked] }
+          v_align: { $ref: "#/Entities/VerticalAlignment", default: bottom }
+          padding: { $ref: "#/Entities/EdgeInsets", default: 6 }
           dot_size: { type: number, default: 6 }
           spacing: { type: number, default: 6 }
-          color:
-            { type: string, title: "Text color[-gradient] Asset identifier" }
-          selected_color:
-            { type: string, title: "Text color[-gradient] Asset identifier" }
+          color:  { $ref: "#/AssetIdOrColor/Binding" }
+          selected_color: { $ref: "#/AssetIdOrColor/Binding" }
+        additionalProperties: false
       animation:
         type: object
         properties:
           start_delay: { type: number, default: 0 }
           page_transition:
-            { $ref: "#/$defs/Transition.Slide", default: { type: slide } }
-          repeat_transition: { $ref: "#/$defs/Transition.Slide" }
+            $ref: "#/Animation/Transition.Slide"
+            default: { type: slide } 
+          repeat_transition: { $ref: "#/Animation/Transition.Slide" }
           after_interaction_delay: { type: number, default: 3000 }
+        additionalProperties: false
       interaction:
         type: string
         enum:
           - none
           - cancel_animation
           - pause_animation
+        default: pause_animation
 
-  UI.Pager.Length:
-    anyOf:
-      - $ref: "#/$defs/Unit"
-        description: "Fixed length"
-      - type: object
-        required: [parent]
-        additionalProperties: false
-        properties:
-          parent: { type: number }
+    Length:
+      oneOf:
+        - $ref: "#/Entities/Unit"
+          description: "Fixed length"
+        - type: object
+          required: [parent]
+          additionalProperties: false
+          properties:
+            parent: { type: number }
 
-  UI.If.Them.Else:
-    type: object
-    required: [type, then, else]
-    properties:
-      type: { const: if }
-      platform: { type: string, enum: [ios, android] }
-      version:
-        { type: string, pattern: "^[0-9]+(.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
-      to_version: # from v4.4.2
-        { type: string, pattern: "^[0-9]+(.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
-      then: { $ref: "#/$defs/UI.Element" }
-      else: { $ref: "#/$defs/UI.Element" }
+###### Rich Text ######
 
-  ###### Rich Text ######
+RichText:
+  oneOf:
+    - $ref: "#/RichText/Item"
+    - type: array
+      items: { $ref: "#/RichText/Item" }
+      minItems: 1
 
-  RichText:
-    anyOf:
-      - $ref: "#/$defs/RichText.Item"
-      - type: array
-        items: { $ref: "#/$defs/RichText.Item" }
+  Item:
+    oneOf:
+      - $ref: "#/RichText/Text"
+      - $ref: "#/RichText/Tag"
+      - $ref: "#/RichText/Image"
 
-  RichText.Item:
-    anyOf:
-      - $ref: "#/$defs/RichText.Text"
-      - $ref: "#/$defs/RichText.Tag"
-      - $ref: "#/$defs/RichText.Image"
-
-  RichText.Text:
-    anyOf:
+  Text:
+    title: Text item in RichText
+    oneOf:
       - type: string
         title: Text
       - type: object
         required: [text]
         properties:
           text: { title: Text, type: string }
-          attributes: { $ref: "#/$defs/RichText.Attributes" }
+          attributes: { $ref: "#/RichText/Attributes" }
+          action: { $ref: "#/Script/Action" }
         additionalProperties: false
 
-  RichText.Attributes:
-    type: object
-    properties:
-      font: { type: string, title: "Font Asset identifier" }
-      size: { type: number, title: "Font size" }
-      strike: { type: boolean }
-      underline: { type: boolean }
-      color: { type: string, title: "Text color[-gradient] Asset identifier" }
-      background:
-        { type: string, title: "Background color[-gradient] Asset identifier" }
-      tint:
-        { type: string, title: "Image tint color[-gradient] Asset identifier" }
-
-  RichText.Tag:
+  Tag:
+    title: Tag item in RichText
     type: object
     required: [tag]
     properties:
       tag: { type: string, title: "Tag value" }
-      attributes: { $ref: "#/$defs/RichText.Attributes" }
+      attributes: { $ref: "#/RichText/Attributes" }
+      action: { $ref: "#/Script/Action" }
     additionalProperties: false
 
-  RichText.Image:
+  Image:
+    title: Image item in RichText
     type: object
     required: [image]
     properties:
       image: { type: string, title: "Image asset identifier" }
-      attributes: { $ref: "#/$defs/RichText.Attributes" }
+      attributes: { $ref: "#/RichText/Attributes" }
     additionalProperties: false
 
-  ###### Localizations ######
+  Attributes:
+    title: Attributes for RichText
+    type: object
+    properties:
+      font: 
+        title: "Font Asset identifier"
+        $ref: "#/AssetId"
+      size: 
+        title: "Font size"
+        type: number
+      strike: 
+        type: boolean
+      underline:
+        type: boolean 
+      color: 
+        title: "Text color[-gradient] Asset identifier" 
+        $ref: "#/AssetIdOrColor"
+      background:
+        title: Background color of text
+        $ref: "#/AssetIdOrColor"
+      tint:
+        title: Tint color of image
+        $ref: "#/AssetIdOrColor"
+    additionalProperties: false
 
-  Localizations:
-    title: "All localizations"
-    type: array
-    items:
-      title: "Localization by locale identifier"
-      type: object
-      required: [id]
-      properties:
-        id: { $ref: "#/$defs/Localizations.Identifier" }
-        is_right_to_left: { type: boolean, default: false }
-        strings: { $ref: "#/$defs/Localizations.Strings" }
-        assets: { $ref: "#/$defs/Assets" }
+###### Localization ######
 
-  Localizations.Identifier:
+Localization:
+  title: Localization by locale identifier
+  type: object
+  required: [id]
+  properties:
+    id: { $ref: "#/Localization/Identifier" }
+    is_right_to_left: { type: boolean, default: false }
+    assets: { $ref: "#/Assets" }
+    strings:
+      type: array
+      items: { $ref: "#/Localization/String" }
+      uniqueItems: true
+      minItems: 1
+  additionalProperties: false
+
+  Identifier:
     type: string
     pattern: "^[a-z]{2,4}([_-][A-Z][a-z]{3})?([_-]([A-Z]{2,3}|[0-9]{3}))?$"
     examples:
       - en-Latn-US
       - ru-Cyrl-RU
 
-  Localizations.Strings:
-    type: array
-    items:
+  String:
+    type: object
+    required: [id, value]
+    properties:
+      id:
+        title: Localized string identifier
+        type: string
+      value: { $ref: "#/RichText" }
+      fallback: { $ref: "#/RichText" }
+    additionalProperties: false
+
+  StringId:
+    Binding:
+      oneOf:
+        - title: Localization string id
+          type: string
+        - title: Localization string id with values tags
+          $ref: "#/Localization/StringIdWithTagValues/Binding"
+        - title: One way binding to localization string id
+          $ref: "#/Script/DataBinding"
+        - title: Product string id
+          $ref: "#/Localization/ProductStringId/Binding"
+
+  StringIdWithTagValues:
+    Binding:
       type: object
-      required: [id, value]
+      required: [string_id]
       properties:
-        id: { type: string, title: "Localized string identifier" }
-        value: { $ref: "#/$defs/RichText" }
-        fallback: { $ref: "#/$defs/RichText" }
+        string_id: { type: string }
+      additionalProperties:
+        oneOf:
+          - title: String value
+            type: string
+          - title: One way binding to string value
+            $ref: "#/Script/DataBinding"
 
-  Localizations.String.Id:
-    title: "Localization string identifier"
-    anyOf:
-      - type: string
-      - type: object
-        properties:
-          type: { const: product }
-          id: { type: string, title: "Adapty product identifier" }
-          group_id: { type: string, default: "group_A" }
-          suffix: { type: string }
+  ProductStringId:
+    Binding:
+      type: object
+      required: [product]
+      properties:
+        product:
+          oneOf:
+            - title: Adapty product id
+              type: string
+            - title: One way binding to Adapty product id
+              $ref: "#/Script/DataBinding"
+        suffix: { type: string }
+      additionalProperties: false
 
-  ###### Assets ######
+###### Assets ######
 
-  Assets:
-    type: array
-    items:
-      anyOf:
-        - $ref: "#/$defs/Assets.Color"
-        - $ref: "#/$defs/Assets.ColorGradient"
-        - $ref: "#/$defs/Assets.Font"
-        - $ref: "#/$defs/Assets.Image"
-        - $ref: "#/$defs/Assets.Video" # from v4.1.0
+Assets:
+  type: array
+  items: { $ref: "#/Assets/Asset" }
+  uniqueItems: true
+  minItems: 1
 
-  Assets.Font:
+  Asset:
+    title: Asset
     type: object
-    required: [id, type, value]
+    required: [id, type]
     properties:
-      id: { type: string, title: "Asset identifier" }
-      custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
-      type: { const: font }
-      value:
-        title: "font alias for ios only"
-        anyOf:
-          - type: string
-          - type: array
-            items: { type: string }
-            minItems: 1
-      resources:
-        title: "resource name for android only"
-        type: array
-        items: { type: string }
-      family_name:
-        anyOf:
-          - { type: string, default: adapty_system }
-          - type: array
-            items: { type: string }
-            minItems: 1
-      weight: { type: integer, minimum: 0, default: 400 }
-      italic: { type: boolean, default: false }
-      size: { type: number, default: 15 }
-      color: { $ref: "#/$defs/Assets.Color.Hex", default: "#000000FF" }
+      id:
+        title: Asset identifier
+        type: string
+      custom_id:
+        title: User asset identifier
+        type: string
+    oneOf:
+      - $ref: "#/Assets/Color"
+      - $ref: "#/Assets/ColorGradient"
+      - $ref: "#/Assets/Font"
+      - $ref: "#/Assets/Image"
+      - $ref: "#/Assets/Video"
+    additionalProperties: false
 
-  Assets.Color:
-    title: "Color asset"
+  Color:
+    title: Color asset
     type: object
-    required: [id, type, value]
+    required: [type, value]
     properties:
-      id: { type: string, title: "Asset identifier" }
-      custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
       type: { const: color }
-      value: { $ref: "#/$defs/Assets.Color.Hex" }
+      value: { $ref: "#/Assets/Color/HexString" }
+    additionalProperties: false
 
-  Assets.Color.Hex:
-    type: string
-    pattern: "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"
+    HexString:
+      title: "Color #RRGGBBAA"
+      type: string
+      pattern: "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"
 
-  Assets.ColorGradient:
-    title: "Color gradient asset"
+  ColorGradient:
+    title: Color gradient asset
     type: object
-    required: [id, type, values, points]
+    required: [type, values, points]
     properties:
-      id: { type: string, title: "Asset identifier" }
-      custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
       type:
         type: string
         enum:
@@ -1044,8 +1147,9 @@ $defs:
           type: object
           required: [color, p]
           properties:
-            color: { $ref: "#/$defs/Assets.Color.Hex" }
+            color: { $ref: "#/Assets/Color/HexString" }
             p: { type: number }
+        minItems: 1
       points:
         type: object
         required: [x0, y0, x1, y1]
@@ -1054,37 +1158,161 @@ $defs:
           y0: { type: number }
           x1: { type: number }
           y1: { type: number }
+    additionalProperties: false
 
-  Assets.Image:
-    title: "Image asset"
+  Font:
+    title: Font asset
+    type: object
+    required: [type, value]
+    properties:
+      type: { const: font }
+      value:
+        title: font alias for ios only
+        oneOf:
+          - type: string
+          - type: array
+            items: { type: string }
+            minItems: 1
+            uniqueItems: true
+      resources:
+        title: Resource name for android only
+        type: array
+        items: { type: string }
+        uniqueItems: true
+        minItems: 1
+      family_name:
+        oneOf:
+          - type: string
+            default: adapty_system
+          - type: array
+            items: { type: string }
+            minItems: 1
+            uniqueItems: true
+      weight: { type: integer, minimum: 0, default: 400 }
+      italic: { type: boolean, default: false }
+      size: { type: number, default: 15 }
+      color: { $ref: "#/Assets/Color/HexString", default: "#000000FF" }
+    additionalProperties: false
+
+  Image:
+    title: Image asset
     type: object
     allOf:
-      - required: [id, type]
+      - required: [type]
         properties:
-          id: { type: string, title: "Asset identifier" }
-          custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
           type: { const: image }
-      - { $ref: "#/$defs/Data.Image" }
+      - $ref: "#/Assets/Image/Data"
+    additionalProperties: false
 
-  Assets.Video: # from v4.1.0
-    title: "Video asset"
+    Data:
+      type: object
+      oneOf:
+        - title: Base64 encoded image
+          required: [value]
+          properties:
+            value: { type: string, contentEncoding: base64 }
+        - title: URL to image
+          required: [url, preview_value]
+          properties:
+            url: { type: string }
+            preview_value: { type: string, contentEncoding: base64 }
+
+  Video:
+    title: Video asset
     type: object
-    required: [id, type, url, image]
+    required: [type, url, image]
     properties:
-      id: { type: string, title: "Asset identifier" }
-      custom_id: { type: string, title: "User asset identifier" } # from v4.2.0
       type: { const: video }
       url: { type: string }
-      image: { $ref: "#/$defs/Data.Image" }
+      image: { $ref: "#/Assets/Image/Data" }
+    additionalProperties: false
 
-  Data.Image:
-    title: "Image data"
+AssetId:
+  title: Asset identifier
+  type: string
+
+  Binding:
+     oneOf:
+      - $ref: "#/AssetId"
+      - title: One way binding to asset identifier
+        $ref: "#/Script/DataBinding"
+
+AssetIdOrColor:
+  oneOf:
+    - $ref: "#/AssetId"
+    - $ref: "#/Assets/Color/HexString"
+
+  Binding:
+    oneOf:
+      - $ref: "#/AssetId"
+      - $ref: "#/Assets/Color/HexString"
+      - title: One way binding to asset identifier or color hex string
+        $ref: "#/Script/DataBinding"
+
+
+###### Scripts, Actions & Data Binding ######
+
+Script:
+  title: "Script code block"
+  type: object
+  required: [content]
+  properties:
+    type: { type: string, default: "js" }
+    content: { type: string }
+  additionalProperties: false
+
+  Action:
+    title: "Action calling a Script method"
     type: object
-    anyOf:
-      - required: [value]
-        properties:
-          value: { type: string, contentEncoding: base64 }
-      - required: [url, preview_value]
-        properties:
-          url: { type: string }
-          preview_value: { type: string, contentEncoding: base64 }
+    required: [func]
+    properties:
+      func:
+        type: string
+        description: "Path to Script method (dot-separated)"
+      params:
+        type: object
+        default: {}
+        description: "Parameters passed to the method"
+      scope:
+        type: string
+        enum: [global, screen]
+        default: screen
+    additionalProperties: false
+
+  ActionOrArray:
+    title: "Single action or array of actions"
+    oneOf:
+      - $ref: "#/Script/Action"
+      - type: array
+        items: { $ref: "#/Script/Action" }
+        uniqueItems: true
+        minItems: 1
+
+  DataBinding:
+    title: "Binding to a Script variable"
+    type: object
+    required: [var]
+    properties:
+      var:
+        type: string
+        description: "Path to Script property (dot-separated)"
+      setter:
+        type: string
+        description: "Alternative setter method name for two-way binding"
+      scope:
+        type: string
+        enum: [global, screen]
+        default: screen
+      converter: { enum: [is_equal] }
+      converter_params: 
+        oneOf:
+          - type: string
+          - type: boolean
+          - type: number
+          - type: object
+            additionalProperties:
+              oneOf:
+              - type: string
+              - type: boolean
+              - type: number
+    additionalProperties: false

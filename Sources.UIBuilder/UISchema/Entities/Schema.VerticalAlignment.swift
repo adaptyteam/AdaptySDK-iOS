@@ -16,7 +16,7 @@ extension Schema.VerticalAlignment: RawRepresentable {
         static let top = "top"
         static let center = "center"
         static let bottom = "bottom"
-        static let justified = "justified"
+        static let legacyJustified = "justified"
     }
 
     package init?(rawValue value: String) {
@@ -24,7 +24,7 @@ extension Schema.VerticalAlignment: RawRepresentable {
         case Key.top: self = .top
         case Key.center: self = .center
         case Key.bottom: self = .bottom
-        case Key.justified: self = .justified
+        case Key.legacyJustified: self = .center
         default: return nil
         }
     }
@@ -34,7 +34,6 @@ extension Schema.VerticalAlignment: RawRepresentable {
         case .top: Key.top
         case .center: Key.center
         case .bottom: Key.bottom
-        case .justified: Key.justified
         }
     }
 }
