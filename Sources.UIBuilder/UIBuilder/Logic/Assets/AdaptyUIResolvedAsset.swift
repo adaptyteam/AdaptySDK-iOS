@@ -27,8 +27,7 @@ enum AdaptyUIResolvedImageAsset {
 import AVKit
 
 struct AdaptyUIResolvedVideoAsset {
-    let player: AVQueuePlayer
-    let item: AVPlayerItem
+    let asset: AVAsset
     let image: AdaptyUIResolvedImageAsset?
 }
 

@@ -23,7 +23,7 @@ struct AdaptyScreenView: View {
     @EnvironmentObject
     private var navigatorViewModel: AdaptyUINavigatorViewModel
     @EnvironmentObject
-    private var screenInstance: AdaptyUIScreenInstance
+    private var screenInstance: AdaptyUIScreenViewModel
 
     @State
     private var playIncomingTransition: [VC.Animation] = []
@@ -79,7 +79,7 @@ struct AdaptyNavigatorView: View {
     var body: some View {
         ZStack {
             AdaptyUIAnimatedBackgroundView(
-                initialBackground: navigatorViewModel.appearTransition?.background?.initialBackground,
+                initialBackground: navigatorViewModel.initialBackground,
                 defaultColor: .defaultNavigatorColor
             )
             .onTapGesture {
@@ -106,6 +106,12 @@ struct AdaptyNavigatorView: View {
                             AdaptyScreenView(
                                 screen: screenInstance.configuration
                             )
+                            .overrideOpenUrl { url in
+                                stateViewModel.handle(
+                                    url: url,
+                                    screen: screenInstance.instance
+                                ) ? .handled : .discarded
+                            }
                             .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
                             .environmentObject(screenInstance)
                         }
@@ -117,6 +123,12 @@ struct AdaptyNavigatorView: View {
                 initialOpacity: navigatorViewModel.appearTransition?.initialContentOpacity ?? 1.0,
                 initialOffset: navigatorViewModel.appearTransition?.initialContentOffset ?? .zero
             )
+            .overrideOpenUrl { url in
+                stateViewModel.handle(
+                    url: url,
+                    screen: navigatorViewModel.currentScreenInstanceIfSingle
+                ) ? .handled : .discarded
+            }
         }
         .environmentObject(navigatorViewModel)
         .zIndex(navigatorViewModel.order * 1000.0)
@@ -124,20 +136,13 @@ struct AdaptyNavigatorView: View {
     }
 }
 
-// TODO: x zIndex exeperiments
-
-// #Preview {
-//    ZStack {
-//        Rectangle()
-//            .fill(Color.red)
-//            .frame(width: 100, height: 100, alignment: .center)
-//            .offset(x: -25, y: -25)
-//
-//        Rectangle()
-//            .fill(Color.blue)
-//            .frame(width: 100, height: 100, alignment: .center)
-//            .offset(x: 25, y: 25)
-//    }
-// }
+extension View {
+    func overrideOpenUrl(_ handler: @escaping (URL) -> OpenURLAction.Result) -> some View {
+        environment(
+            \.openURL,
+            OpenURLAction(handler: handler)
+        )
+    }
+}
 
 #endif

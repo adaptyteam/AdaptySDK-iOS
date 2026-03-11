@@ -76,12 +76,16 @@ public extension AdaptyUI {
                 screensViewModel: screensViewModel,
                 logic: logic
             )
+            let stateHolder = AdaptyUIStateHolder(
+                logId: logId,
+                actionHandler: actionHandler,
+                viewConfiguration: viewConfiguration,
+                isInspectable: true
+            )
             stateViewModel = AdaptyUIStateViewModel(
                 logId: logId,
                 logic: logic,
-                actionHandler: actionHandler,
-                viewConfiguration: viewConfiguration,
-                isInspectable: false
+                stateHolder: stateHolder
             )
             timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
@@ -92,11 +96,13 @@ public extension AdaptyUI {
                 screensViewModel: screensViewModel
             )
             assetsViewModel = AdaptyUIAssetsViewModel(
+                logId: logId,
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
-                stateViewModel: stateViewModel
+                stateHolder: stateHolder
             )
 
-            stateViewModel.start()
+            stateHolder.start()
+            productsViewModel.loadProductsIfNeeded()
         }
     }
 }
@@ -105,13 +111,29 @@ public struct Dev_AdaptyUIRendererView: View {
     let viewConfiguration: AdaptyUIConfiguration
     let galleryConfiguration: AdaptyUI.Dev_GalleryPreviewConfiguration
 
+    private let didAppear: (() -> Void)?
+    private let didDisappear: (() -> Void)?
     private let didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
+    private let didSelectProduct: ((String) -> Void)?
+    private let didStartPurchase: ((String) -> Void)?
+    private let didStartRestore: (() -> Void)?
+    private let didFailRendering: ((AdaptyUIBuilderError) -> Void)?
+
+    private let safeAreaOverride: EdgeInsets?
 
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
         assetsResolver: AdaptyUIAssetsResolver?,
-        didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
+        safeAreaOverride: EdgeInsets? = nil,
+        didAppear: (() -> Void)? = nil,
+        didDisappear: (() -> Void)? = nil,
+        didPerformAction: ((AdaptyUIBuilder.Action) -> Void)? = nil,
+        didSelectProduct: ((String) -> Void)? = nil,
+        didStartPurchase: ((String) -> Void)? = nil,
+        didStartRestore: (() -> Void)? = nil,
+        didFailRendering: ((AdaptyUIBuilderError) -> Void)? = nil
     ) {
+        self.safeAreaOverride = safeAreaOverride
         self.viewConfiguration = viewConfiguration.wrapped
         galleryConfiguration = .init(
             logId: "test",
@@ -121,16 +143,33 @@ public struct Dev_AdaptyUIRendererView: View {
             timerResolver: nil,
             assetsResolver: assetsResolver
         )
-        
+
+        self.didAppear = didAppear
+        self.didDisappear = didDisappear
         self.didPerformAction = didPerformAction
+        self.didSelectProduct = didSelectProduct
+        self.didStartPurchase = didStartPurchase
+        self.didStartRestore = didStartRestore
+        self.didFailRendering = didFailRendering
     }
 
     public var body: some View {
+        galleryConfiguration.eventsHandler.didAppear = didAppear
+        galleryConfiguration.eventsHandler.didDisappear = didDisappear
         galleryConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { _ in }
+        galleryConfiguration.eventsHandler.didSelectProduct = didSelectProduct.map { callback in
+            { product in callback(product.adaptyProductId) }
+        }
+        galleryConfiguration.eventsHandler.didStartPurchase = didStartPurchase.map { callback in
+            { product in callback(product.adaptyProductId) }
+        }
+        galleryConfiguration.eventsHandler.didStartRestore = didStartRestore
+        galleryConfiguration.eventsHandler.didFailRendering = didFailRendering
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false,
-            displayMissingTags: true
+            displayMissingTags: true,
+            safeAreaOverride: safeAreaOverride
         )
         .environmentObjects(
             stateViewModel: galleryConfiguration.stateViewModel,

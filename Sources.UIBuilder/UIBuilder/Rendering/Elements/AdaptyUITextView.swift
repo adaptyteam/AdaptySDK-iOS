@@ -35,7 +35,8 @@ struct AdaptyUITextView: View {
     var body: some View {
         let (richText, tagValues, productInfo) = assetsViewModel.resolvedText(
             text.value,
-            screen: screen
+            screen: screen,
+            productsInfoProvider: productsViewModel
         )
 
         switch productInfo {
@@ -113,20 +114,21 @@ extension [VC.RichText.Item] {
     ) throws -> Text {
         try reduce(Text("")) {
             partialResult,
-            item in
+                item in
             switch item {
             case .unknown:
                 return partialResult
-            case let .text(value, attr, _):
+            case let .text(value, attr, action):
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: value,
+                        link: action?.asURL,
                         attributes: attr,
                         assetsCache: assetsCache,
                         colorScheme: colorScheme
                     )
                 )
-            case let .tag(value, attr, _):
+            case let .tag(value, attr, action):
                 let tagReplacementResult: String
 
                 if let customTagResult = customTagResolver.replacement(for: value) {
@@ -163,12 +165,13 @@ extension [VC.RichText.Item] {
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: tagReplacementResult,
+                        link: action?.asURL,
                         attributes: attr,
                         assetsCache: assetsCache,
                         colorScheme: colorScheme
                     )
                 )
-            case let .image(value, attr, _):
+            case let .image(value, attr, _): // TODO: x check action
                 let imageResolvedAsset = assetsCache.cachedAsset(
                     value,
                     mode: colorScheme.toVCMode,
@@ -331,6 +334,7 @@ extension UIImage {
 extension AttributedString {
     static func createFrom(
         value: String,
+        link: URL?,
         attributes: VC.RichText.Attributes?,
         assetsCache: AdaptyUIAssetsCache,
         colorScheme: ColorScheme
@@ -372,6 +376,8 @@ extension AttributedString {
         if attributes?.underline ?? false {
             result.underlineStyle = .single
         }
+
+        result.link = link
 
         return result
     }

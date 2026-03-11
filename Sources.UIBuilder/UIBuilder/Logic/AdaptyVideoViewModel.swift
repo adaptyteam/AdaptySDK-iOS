@@ -38,36 +38,38 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     }
 
     @Published var playerState: PlayerState = .invalid
-    @Published var player: AVQueuePlayer?
+    @Published var player: AVPlayer?
 
-    private let onStateUpdated: (PlayerState) -> Void
-
-    private var playerLooper: AVPlayerLooper?
     private var playerStatusObservation: NSKeyValueObservation?
+    private nonisolated(unsafe) var loopObserver: (any NSObjectProtocol)?
 
     init(
-        video: AdaptyUIResolvedVideoAsset,
-        loop: Bool,
-        onStateUpdated: @escaping (PlayerState) -> Void
+        asset: AVAsset,
+        loop: Bool
     ) {
-        player = video.player
+        let newItem = AVPlayerItem(asset: asset)
+        let newPlayer = AVPlayer(playerItem: newItem)
+        newPlayer.isMuted = true
 
-        if loop {
-            playerLooper = AVPlayerLooper(
-                player: video.player,
-                templateItem: video.item
-            )
-        } else {
-            playerLooper = nil
-        }
-
-        self.onStateUpdated = onStateUpdated
+        player = newPlayer
 
         super.init()
 
-        playerStatusObservation = video.item.observe(
+        if loop {
+            newPlayer.actionAtItemEnd = .none
+            loopObserver = NotificationCenter.default.addObserver(
+                forName: .AVPlayerItemDidPlayToEndTime,
+                object: newItem,
+                queue: .main
+            ) { [weak self] _ in
+                self?.player?.seek(to: .zero)
+                self?.player?.play()
+            }
+        }
+
+        playerStatusObservation = newItem.observe(
             \.status,
-            options: [.old, .new, .initial, .prior],
+            options: [.new, .initial],
             changeHandler: { [weak self] item, _ in
                 DispatchQueue.main.async { [weak self] in
                     self?.playerStatusDidChange(item.status, item: item)
@@ -99,13 +101,14 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         @unknown default:
             break
         }
-
-        onStateUpdated(playerState)
     }
 
     deinit {
         playerStatusObservation?.invalidate()
         playerStatusObservation = nil
+        if let loopObserver {
+            NotificationCenter.default.removeObserver(loopObserver)
+        }
     }
 }
 

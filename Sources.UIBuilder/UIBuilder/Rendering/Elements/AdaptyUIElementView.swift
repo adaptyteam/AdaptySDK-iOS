@@ -50,9 +50,6 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     private let element: VC.Element
     private let screenHolderBuilder: () -> ScreenHolderContent
 
-    @Environment(\.colorScheme)
-    private var colorScheme: ColorScheme
-
     init(
         _ element: VC.Element,
         screenHolderBuilder: @escaping () -> ScreenHolderContent
@@ -90,7 +87,7 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
         case let .image(image, _):
             AdaptyUIImageView(.unresolvedAsset(image))
         case let .video(video, _):
-            AdaptyUIVideoView(video: video, colorScheme: colorScheme)
+            AdaptyUIVideoView(video: video)
         case let .button(button, _):
             AdaptyUIButtonView(button)
         case let .row(row, _):

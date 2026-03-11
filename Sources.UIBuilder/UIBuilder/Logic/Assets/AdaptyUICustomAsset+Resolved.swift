@@ -74,18 +74,13 @@ extension AdaptyUICustomVideoAsset {
         switch self {
         case .file(let url, let preview),
              .remote(let url, let preview):
-            let playerItem = AVPlayerItem(url: url)
-            let queuePlayer = AVQueuePlayer(items: [playerItem])
-            queuePlayer.isMuted = true
             return .init(
-                player: queuePlayer,
-                item: playerItem,
+                asset: AVAsset(url: url),
                 image: preview.flatMap(\.resolvedImage)
             )
-        case .player(let item, let player, let preview):
+        case .player(let item, _, let preview):
             return .init(
-                player: player,
-                item: item,
+                asset: item.asset,
                 image: preview.flatMap(\.resolvedImage)
             )
         }

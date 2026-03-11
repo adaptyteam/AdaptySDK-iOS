@@ -13,23 +13,27 @@ import UIKit
 
 @MainActor
 package class AdaptyUIAssetsViewModel: ObservableObject {
+    let logId: String
     let assetsResolver: AdaptyUIAssetsResolver
     let cache: AdaptyUIAssetsCache
+    let stateHolder: AdaptyUIStateHolder
 
     private var cancellables = Set<AnyCancellable>()
 
     package init(
+        logId: String,
         assetsResolver: AdaptyUIAssetsResolver,
-        stateViewModel: AdaptyUIStateViewModel
+        stateHolder: AdaptyUIStateHolder
     ) {
+        self.logId = logId
         self.assetsResolver = assetsResolver
+        self.stateHolder = stateHolder
         cache = AdaptyUIAssetsCache(
-            state: stateViewModel.state,
+            state: stateHolder.state,
             customAssetsResolver: assetsResolver
         )
-        _state = stateViewModel.state
 
-        stateViewModel.state.objectWillChange
+        stateHolder.state.objectWillChange
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
             }
@@ -46,8 +50,6 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     // MARK: - Strings Assets Logic
 
-    private let _state: VS // TODO: x remove
-
     enum ProductInfoContainer {
         case notApplicable
         case notFound
@@ -56,27 +58,28 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     func resolvedText(
         _ ref: VC.StringReference,
-        screen: VS.ScreenInstance
+        screen: VS.ScreenInstance,
+        productsInfoProvider: ProductsInfoProvider?
     ) -> (
         richText: VC.RichText,
-        tagValues: [String : AdaptyUIConfiguration.StringReference.TagValue]?,
+        tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
         productInfo: ProductInfoContainer
     ) {
         switch ref {
         case let .stringId(stringId, tagValues): // TODO: x need use tagValues
-            let text = try? _state.richText(stringId)
+            let text = try? stateHolder.state.richText(stringId)
             return (
                 richText: text ?? .empty,
                 tagValues: tagValues,
                 productInfo: .notApplicable
             )
         case let .variable(variable):
-            if let stringId = try? _state.getValue(
+            if let stringId = try? stateHolder.state.getValue(
                 String.self,
                 variable: variable,
                 screenInstance: screen
             ) {
-                let text = try? _state.richText(stringId)
+                let text = try? stateHolder.state.richText(stringId)
                 return (
                     richText: text ?? .empty,
                     tagValues: nil,
@@ -92,23 +95,24 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
         case let .product(product):
             switch product {
             case let .id(productId, sufix):
-                let text = try? _state.richText(
+                let productResolver = productsInfoProvider?.productInfo(by: productId)
+                let text = try? stateHolder.state.richText(
                     adaptyProductId: productId,
-                    byPaymentMode: nil, // TODO: x use productsInfoProvider
+                    byPaymentMode: productResolver?.paymentMode,
                     suffix: sufix
                 )
                 return (
                     richText: text ?? .empty,
                     tagValues: nil,
-                    productInfo: .notApplicable
+                    productInfo: productResolver.map { .found($0) } ?? .notFound
                 )
             case let .variable(variable, sufix):
-                guard let productId = try? _state.getValue(
+                guard let productId = try? stateHolder.state.getValue(
                     String.self,
                     variable: variable,
                     screenInstance: screen
                 ) else {
-                    let text = try? _state.richTextForNonSelectedProduct(suffix: sufix)
+                    let text = try? stateHolder.state.richTextForNonSelectedProduct(suffix: sufix)
                     return (
                         richText: text ?? .empty,
                         tagValues: nil,
@@ -116,15 +120,16 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                     )
                 }
 
-                let text = try? _state.richText(
+                let productResolver = productsInfoProvider?.productInfo(by: productId)
+                let text = try? stateHolder.state.richText(
                     adaptyProductId: productId,
-                    byPaymentMode: nil, // TODO: x use productsInfoProvider
+                    byPaymentMode: productResolver?.paymentMode,
                     suffix: sufix
                 )
                 return (
                     richText: text ?? .empty,
                     tagValues: nil,
-                    productInfo: .notApplicable
+                    productInfo: productResolver.map { .found($0) } ?? .notFound
                 )
             }
         }
@@ -132,37 +137,25 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     // MARK: - Video Player Logic
 
-    @Published var playerStates = [String: AdaptyUIVideoPlayerManager.PlayerState]()
-    @Published var playerManagers = [String: AdaptyUIVideoPlayerManager]()
+    private var playerManagers = [VC.AssetReference: AdaptyUIVideoPlayerManager]()
 
     func getOrCreatePlayerManager(
         for video: AdaptyUIResolvedVideoAsset,
-        loop: Bool,
-        id: String
+        assetRef: VC.AssetReference,
+        loop: Bool
     ) -> AdaptyUIVideoPlayerManager {
-        if let manager = playerManagers[id] {
+        if let manager = playerManagers[assetRef] {
             return manager
         }
 
         let manager = AdaptyUIVideoPlayerManager(
-            video: video,
+            asset: video.asset,
             loop: loop
-        ) { [weak self] state in
-            DispatchQueue.main.async { [weak self] in
-                self?.playerStates[id] = state
-            }
-        }
+        )
 
-        DispatchQueue.main.async { [weak self] in
-            self?.playerManagers[id] = manager
-            self?.playerStates[id] = .loading
-        }
+        playerManagers[assetRef] = manager
 
         return manager
-    }
-
-    func dismissPlayerManager(id: String) {
-        playerManagers.removeValue(forKey: id)
     }
 }
 
