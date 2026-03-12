@@ -90,36 +90,20 @@ private extension SchemaTests {
             // Missing url
             Json(##"""
             {
-                "type": "video",
                 "image": { "type": "image", "value": "SGVsbG8=" }
             }
             """##),
             // Missing image
             Json(##"""
             {
-                "type": "video",
                 "url": "https://example.com/video.mp4"
-            }
-            """##),
-            // Missing type
-            Json(##"""
-            {
-                "url": "https://example.com/video.mp4",
-                "image": { "type": "image", "value": "SGVsbG8=" }
             }
             """##),
             // Empty object
             Json(##"{}"##),
-            // Only type field
-            Json(##"""
-            {
-                "type": "video"
-            }
-            """##),
             // Invalid image (empty object)
             Json(##"""
             {
-                "type": "video",
                 "url": "https://example.com/video.mp4",
                 "image": {}
             }

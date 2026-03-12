@@ -37,17 +37,17 @@ private extension SchemaTests.RichTextTests {
         static let jsonCases: [(value: Value, json: Json)] = [
             // Text — plain string
             (
-                .text("Hello", nil),
+                .text("Hello", nil, nil),
                 Json(##""Hello""##)
             ),
             // Text — empty string
             (
-                .text("", nil),
+                .text("", nil, nil),
                 Json(##""""##)
             ),
             // Text — with attributes
             (
-                .text("styled", attrsWithColor),
+                .text("styled", attrsWithColor, nil),
                 Json(##"""
                 {
                     "text": "styled",
@@ -59,7 +59,7 @@ private extension SchemaTests.RichTextTests {
             ),
             // Tag — without attributes
             (
-                .tag("price", nil),
+                .tag("price", nil, nil),
                 Json(##"""
                 {
                     "tag": "price"
@@ -68,7 +68,7 @@ private extension SchemaTests.RichTextTests {
             ),
             // Tag — with attributes
             (
-                .tag("product_name", attrsWithSize),
+                .tag("product_name", attrsWithSize, nil),
                 Json(##"""
                 {
                     "tag": "product_name",
@@ -105,7 +105,7 @@ private extension SchemaTests.RichTextTests {
         static let textObjectJsonCases: [(value: Value, json: Json)] = [
             // Text as object without attributes
             (
-                .text("Hello", nil),
+                .text("Hello", nil, nil),
                 Json(##"""
                 {
                     "text": "Hello"
@@ -176,7 +176,7 @@ private extension SchemaTests.RichTextTests {
         func encode(value: Value) throws {
             let encoded = try Json.encode(value)
             switch value {
-            case let .text(text, attributes):
+            case let .text(text, attributes, action):
                 if attributes != nil {
                     let obj = try #require(encoded.deserilized as? [String: Any])
                     #expect(obj["text"] as? String == text)
@@ -185,7 +185,7 @@ private extension SchemaTests.RichTextTests {
                     let str = try #require(encoded.deserilized as? String)
                     #expect(str == text)
                 }
-            case let .tag(tag, attributes):
+            case let .tag(tag, attributes, action):
                 let obj = try #require(encoded.deserilized as? [String: Any])
                 #expect(obj["tag"] as? String == tag)
                 if attributes != nil {

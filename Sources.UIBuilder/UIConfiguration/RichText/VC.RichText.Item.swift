@@ -11,7 +11,7 @@ package extension VC.RichText {
     enum Item: Sendable, Hashable {
         case text(String, Attributes?, VC.Action?)
         case tag(String, Attributes?, VC.Action?)
-        case image(VC.AssetReference, Attributes?, VC.Action?)
+        case image(VC.AssetReference, Attributes?)
         case unknown
     }
 }
@@ -25,8 +25,8 @@ package extension VC.RichText.Item {
             .text(value, attributes?.apply(default: defaultAttributes) ?? defaultAttributes, action)
         case let .tag(value, attributes, action):
             .tag(value, attributes?.apply(default: defaultAttributes) ?? defaultAttributes, action)
-        case let .image(assetId, attributes, action):
-            .image(assetId, attributes?.apply(default: defaultAttributes) ?? defaultAttributes, action)
+        case let .image(assetId, attributes):
+            .image(assetId, attributes?.apply(default: defaultAttributes) ?? defaultAttributes)
         default:
             .unknown
         }

@@ -94,43 +94,26 @@ private extension SchemaTests {
         ]
 
         static let invalidJsons: [Json] = [
-            // Missing type
-            Json(##"""
-            {
-                "value": "SGVsbG8="
-            }
-            """##),
-            // Wrong type
-            Json(##"""
-            {
-                "type": "wrong_image",
-                "url": "https://example.com/image.png"
-            }
-            """##),
             // Missing both value and url
             Json(##"""
             {
-                "type": "image"
             }
             """##),
             // Empty value and no url
             Json(##"""
             {
-                "type": "image",
                 "value": ""
             }
             """##),
             // Invalid base64 in value
             Json(##"""
             {
-                "type": "image",
                 "value": "@@@"
             }
             """##),
             // Invalid base64 in preview_value
             Json(##"""
             {
-                "type": "image",
                 "url": "https://example.com/image.png",
                 "preview_value": "@@@"
             }

@@ -43,8 +43,7 @@ extension Schema.RichText.Item: Codable {
             } else if container.contains(.image) {
                 try .image(
                     container.decode(Schema.AssetReference.self, forKey: .image),
-                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes),
-                    container.decodeIfPresent(Schema.Action.self, forKey: .action)
+                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes)
                 )
             } else {
                 .unknown
@@ -76,14 +75,11 @@ extension Schema.RichText.Item: Codable {
             if let action {
                 try container.encode(action, forKey: .action)
             }
-        case let .image(image, attributes, action):
+        case let .image(image, attributes):
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(image, forKey: .image)
             if let attributes = attributes.nonEmptyOrNil {
                 try container.encode(attributes, forKey: .attributes)
-            }
-            if let action {
-                try container.encode(action, forKey: .action)
             }
         case .unknown:
             break

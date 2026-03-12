@@ -543,12 +543,30 @@ UI:
               padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
               offset: { $ref: "#/Entities/Offset", default: 0 }
               opacity: { type: number, default: 1.0 }
+              overlay:
+                type: array
+                items: { $ref: "#/UI/Element/Overlay" }
+                uniqueItems: true
+                minItems: 1
               on_appear:
                 type: array
                 items: { $ref: "#/Animation" }
                 uniqueItems: true
                 minItems: 1
         additionalProperties: false
+
+    Overlay:
+      type: object
+      required: [content]
+      properties:
+        h_align: 
+          $ref: "#/Entities/HorizontalAlignment"
+          default: center
+        v_align: 
+          $ref: "#/Entities/VerticalAlignment"
+          default: center 
+        content: { $ref: "#/UI/Element" }
+
 
     Decorator:
       title: "Decorator for any element"
@@ -676,25 +694,27 @@ UI:
   Text:
     type: object
     allOf:
+      - $ref: "#/UI/Text/Attributes"
       - required: [type, string_id]
         properties:
           type: { const: "text" }
           string_id: { $ref: "#/Localization/StringId/Binding" }
           align: { $ref: "#/Entities/HorizontalAlignment", default: leading }
           max_rows: { type: integer, minimum: 1 }
-          on_overflow:
-            anyOf:
-              - $ref: "#/UI/Text/OverflowMode"
-              - type: array
-                items: { $ref: "#/UI/Text/OverflowMode" }
-                uniqueItems: true
-                minItems: 1
-      - $ref: "#/UI/Text/Attributes"
+          on_overflow: { $ref: "#/UI/Text/OverflowMode" }
 
     OverflowMode:
-      type: string
-      enum:
-        - scale
+      anyOf:
+        - $ref: "#/UI/Text/OverflowMode/Value"
+        - type: array
+          items: { $ref: "#/UI/Text/OverflowMode/Value" }
+          uniqueItems: true
+          minItems: 1
+
+      Value:
+        type: string
+        enum:
+          - scale
 
     Attributes:
       title: Attributes for RichText
@@ -725,20 +745,94 @@ UI:
   TextField:
     type: object
     allOf:
+      - $ref: "#/UI/Text/Attributes"
       - required: [type, value]
         properties:
           type: { const: "text_field" }
           value: { $ref: "#/Script/DataBinding" }
+          placeholder: 
+            type: object
+            allOf:
+              - $ref: "#/UI/Text/Attributes"
+              - required: [string_id]
+                properties:
+                  string_id: { $ref: "#/Localization/StringId/Binding" }
+                  on_overflow: { $ref: "#/UI/Text/OverflowMode" }
+            additionalProperties: false
+          secure_entry: { type: boolean , default: false }
           align: { $ref: "#/Entities/HorizontalAlignment", default: leading }
+          input_constraints: 
+            type: object
+            properties:
+              regex: { type: string }
+              max_length: { type: integer }
+            additionalProperties: false
+          validation: { $ref: "#/Script/DataBinding" }
+          invalid_attributes: { $ref: "#/UI/Text/Attributes" }   
+          keyboard_options: 
+            type: object
+            properties:
+              keyboard: 
+                enum:
+                  - default
+                  - email
+                  - number
+                  - decimal
+                  - phone
+                  - url
+                  - ascii
+              content_type:
+                enum:
+                  - email
+                  - phone
+                  - username
+                  - password
+                  - new_password
+                  - name
+                  - given_name
+                  - family_name
+                  - middle_name
+                  - name_prefix
+                  - name_suffix
+                  - one_time_code
+                  - postal_code
+                  - street_address
+                  - city
+                  - state
+                  - country
+                  - credit_card_number
+                  - credit_card_security_code
+                  - credit_card_expiration
+                  - credit_card_expiration_month
+                  - credit_card_expiration_year
+                  - birthdate
+                  - birthdate_day
+                  - birthdate_month
+                  - birthdate_year
+                  - flight_number
+              auto_capitalization:
+                enum:
+                  - never
+                  - sentences
+                  - words
+                  - characters
+              submit_button:
+                enum:
+                  - done
+                  - go 
+                  - search
+                  - send
+                  - next
+                  - return
+            additionalProperties: false
+
+  TextEditor:
+    type: object
+    allOf: 
+      - $ref: "#/UI/TextField"
+      - properties:
+          min_rows: { type: integer, minimum: 1 }
           max_rows: { type: integer, minimum: 1 }
-          on_overflow:
-            anyOf:
-              - $ref: "#/UI/Text/OverflowMode"
-              - type: array
-                items: { $ref: "#/UI/Text/OverflowMode" }
-                uniqueItems: true
-                minItems: 1
-      - $ref: "#/UI/Text/Attributes"
 
   Toggle:
     type: object

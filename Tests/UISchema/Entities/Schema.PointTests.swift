@@ -10,27 +10,12 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.Point Tests")
     struct PointTests {
         typealias Value = Schema.Point
 
         // MARK: - Test Data
 
         static let jsonCases: [(value: Value, json: Json)] = [
-            // Number format → same x and y
-            (
-                Value(x: 0.5, y: 0.5),
-                Json(##"0.5"##)
-            ),
-            (
-                Value(x: 0, y: 0),
-                Json(##"0"##)
-            ),
-            (
-                Value(x: 1, y: 1),
-                Json(##"1"##)
-            ),
-
             // Array format [y, x]
             (
                 Value(x: 0, y: 0),
@@ -74,6 +59,7 @@ private extension SchemaTests {
         ]
 
         static let invalidJsons: [Json] = [
+            Json(##"10"##),
             Json(##""string""##),
             Json(##"true"##),
             Json(##"["a","b"]"##),
@@ -99,13 +85,8 @@ private extension SchemaTests {
         @Test("encode ", arguments: jsonCases.map(\.value))
         func encodeSameValues(value: Value) throws {
             let encoded = try Json.encode(value)
-            if value.x == value.y {
-                let v = try encoded.decode(Double.self)
-                #expect(v == value.x)
-            } else {
-                let array = try encoded.decode([Double].self)
-                #expect(array == [value.y, value.x])
-            }
+            let array = try encoded.decode([Double].self)
+            #expect(array == [value.y, value.x])
         }
 
         // MARK: - Roundtrip Tests

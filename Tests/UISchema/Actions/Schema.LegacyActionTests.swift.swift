@@ -20,7 +20,7 @@ extension SchemaTests {
             (
                 Value(
                     path: ["SDK", "openUrl"],
-                    params: ["url": .string("example_com")],
+                    params: ["stringId": .string("example_com")],
                     scope: .global
                 ),
                 Json(##"{"type":"open_url","url":"example_com"}"##)

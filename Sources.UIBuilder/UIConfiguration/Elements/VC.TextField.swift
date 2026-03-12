@@ -7,14 +7,23 @@
 
 import Foundation
 
-import Foundation
 
 package extension VC {
-    struct TextField: Sendable, Hashable {
+    struct TextField: Hashable {
         package let value: Variable
+        let placeholder: Placeholder?
+        let secureEntry: Bool
         package let horizontalAlign: HorizontalAlignment
-        package let maxRows: Int?
-        package let overflowMode: Set<Text.OverflowMode>
-        package let defaultTextAttributes: RichText.Attributes?
+        let inputConstraints: InputConstraints?
+        let validation: Variable?
+        package let defaultTextAttributes: Text.Attributes?
+        let invalidTextAttributes: Text.Attributes?
+        let keyboardOptions: KeyboardOptions?
+//         let maxRows: Int?
     }
 }
+
+
+
+
+

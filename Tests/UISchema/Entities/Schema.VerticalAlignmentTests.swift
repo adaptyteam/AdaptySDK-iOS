@@ -20,7 +20,6 @@ private extension SchemaTests {
             (.top, "top"),
             (.center, "center"),
             (.bottom, "bottom"),
-            (.justified, "justified"),
         ]
 
         static let jsonCases = rawValueToJson(allCases)
