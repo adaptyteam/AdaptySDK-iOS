@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests.AnimationTests {
-    @Suite("Schema.Animation.Interpolator Tests")
     struct InterpolatorTests {
         typealias Value = Schema.Animation.Interpolator
 

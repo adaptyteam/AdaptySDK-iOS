@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.HorizontalAlignment Tests")
     struct HorizontalAlignmentTests {
         typealias Value = Schema.HorizontalAlignment
 

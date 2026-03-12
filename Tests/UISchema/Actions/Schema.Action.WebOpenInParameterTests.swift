@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests.ActionTests {
-    @Suite("Schema.Action.WebOpenInParameter Tests")
     struct WebOpenInParameterTests {
         typealias Value = Schema.Action.WebOpenInParameter
 
@@ -18,7 +17,7 @@ private extension SchemaTests.ActionTests {
 
         static let allCases: [(value: Value, rawValue: String)] = [
             (.browserOutApp, "browser_out_app"),
-            (.browserInApp, "browser_in_app")
+            (.browserInApp, "browser_in_app"),
         ]
 
         static let jsonCases = rawValueToJson(allCases)
@@ -26,7 +25,7 @@ private extension SchemaTests.ActionTests {
         static let invalidValues: [String] = [
             "invalid",
             "safari",
-            ""
+            "",
         ]
 
         static let invalidJsons = rawValueToJson(invalidValues)

@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.AspectRatio Tests")
     struct AspectRatioTests {
         typealias Value = Schema.AspectRatio
 

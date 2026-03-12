@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension AdaptyUIConfigurationTests {
-    @Suite("VC.Point Tests")
     struct VCPointTests {
         typealias Value = VC.Point
     }
@@ -23,7 +22,7 @@ private extension AdaptyUIConfigurationTests.VCPointTests {
         (x: 0, y: 0),
         (x: 1, y: 2),
     ])
-    func create(x: Double, y: Double) throws {
+    func create(x: Double, y: Double) {
         let value = Value(
             x: x,
             y: y
@@ -32,11 +31,11 @@ private extension AdaptyUIConfigurationTests.VCPointTests {
         #expect(value.x == x)
         #expect(value.y == y)
     }
-    
+
     // MARK: - isZero
 
     @Test("Test isZero property")
-    func isZero() throws {
+    func isZero() {
         let value = Value(x: 0, y: 0)
         #expect(value.isZero)
     }
@@ -44,9 +43,9 @@ private extension AdaptyUIConfigurationTests.VCPointTests {
     @Test("Negative test isZero  property", arguments: [
         Value(x: 10, y: 10),
         Value(x: 0, y: 10),
-        Value(x: 10, y: 0)
+        Value(x: 10, y: 0),
     ])
-    func isNotZero(value: Value) throws {
+    func isNotZero(value: Value) {
         #expect(!value.isZero)
     }
 }

@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 extension SchemaTests {
-    @Suite("Schema.Action Legacy format Tests")
     struct LegacyActionTests {
         typealias Value = Schema.Action
 
@@ -99,7 +98,7 @@ extension SchemaTests {
                         "type": .string("details"),
                         "instanceId": .string("legacy-bottom-sheet"),
                         "navigatorId": .string("legacy-bottom-sheet"),
-                        "transitionId": .string("on_appear")
+                        "transitionId": .string("on_appear"),
                     ],
                     scope: .global
                 ),

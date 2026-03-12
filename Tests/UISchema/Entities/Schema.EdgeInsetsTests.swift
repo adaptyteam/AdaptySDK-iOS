@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.EdgeInsets Tests")
     struct EdgeInsetsTests {
         typealias Value = Schema.EdgeInsets
 

@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension AdaptyUIConfigurationTests {
-    @Suite("VC.Offset Tests")
     struct VCOffsetTests {
         typealias Value = VC.Offset
     }
@@ -24,11 +23,11 @@ private extension AdaptyUIConfigurationTests.VCOffsetTests {
         (x: .screen(0), y: .screen(0)),
         (x: .point(1), y: .point(2)),
         (x: .screen(0), y: .point(10)),
-        (x: .safeArea(.end), y: .point(0))
+        (x: .safeArea(.end), y: .point(0)),
     ]
 
     @Test("Test base init", arguments: createArguments)
-    func create(x: VC.Unit, y: VC.Unit) throws {
+    func create(x: VC.Unit, y: VC.Unit) {
         let value = Value(
             x: x,
             y: y
@@ -42,9 +41,9 @@ private extension AdaptyUIConfigurationTests.VCOffsetTests {
 
     @Test("Test isZero property", arguments: [
         Value(x: .point(0), y: .point(0)),
-        Value(x: .screen(0), y: .screen(0))
+        Value(x: .screen(0), y: .screen(0)),
     ])
-    func isZero(value: Value) throws {
+    func isZero(value: Value) {
         #expect(value.isZero)
     }
 
@@ -52,9 +51,9 @@ private extension AdaptyUIConfigurationTests.VCOffsetTests {
         Value(x: .point(0), y: .safeArea(.end)),
         Value(x: .screen(0), y: .point(10)),
         Value(x: .point(10), y: .screen(0.5)),
-        Value(x: .point(0), y: .screen(0.2))
+        Value(x: .point(0), y: .screen(0.2)),
     ])
-    func isNotZero(value: Value) throws {
+    func isNotZero(value: Value) {
         #expect(!value.isZero)
     }
 }

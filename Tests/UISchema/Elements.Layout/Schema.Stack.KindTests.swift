@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests.StackTests {
-    @Suite("Schema.Stack.Kind Tests")
     struct KindTests {
         typealias Value = Schema.Stack.Kind
 

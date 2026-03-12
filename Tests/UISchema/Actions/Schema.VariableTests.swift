@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 extension SchemaTests {
-    @Suite("Schema.Variable Tests")
     struct VariableTests {
         typealias Value = Schema.Variable
 

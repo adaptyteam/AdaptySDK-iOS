@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests.TextTests {
-    @Suite("Schema.Text.OverflowMode Tests")
     struct OverflowModeTests {
         typealias Value = Schema.Text.OverflowMode
 

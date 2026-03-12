@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.Unit Tests")
     struct UnitTests {
         typealias Value = Schema.Unit
 
@@ -124,13 +123,13 @@ private extension SchemaTests {
         func encode(value: Value) throws {
             let encoded = try Json.encode(value)
             switch value {
-            case .point(let point):
+            case let .point(point):
                 let v = try encoded.decode(Double.self)
                 #expect(v == point)
-            case .screen(let screen):
+            case let .screen(screen):
                 let o = try encoded.decode([String: Double].self)
                 #expect(o == ["screen": screen])
-            case .safeArea(let safeArea):
+            case let .safeArea(safeArea):
                 let o = try encoded.decode([String: Value.SafeArea].self)
                 #expect(o == ["safe_area": safeArea])
             }

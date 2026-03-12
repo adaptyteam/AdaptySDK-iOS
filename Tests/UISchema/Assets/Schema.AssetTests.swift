@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.Asset Tests")
     struct AssetTests {
         typealias Value = Schema.Asset
 
@@ -161,19 +160,19 @@ private extension SchemaTests {
             let encoded = try Json.encode(value)
             let obj = try #require(encoded.deserilized as? [String: Any])
             switch value {
-            case .solidColor(let color):
+            case let .solidColor(color):
                 #expect(obj["type"] as? String == "color")
                 #expect(obj["custom_id"] as? String == color.customId)
                 #expect(obj["value"] as? String == color.rawValue)
-            case .colorGradient(let gradient):
+            case let .colorGradient(gradient):
                 #expect(obj["type"] as? String == gradient.kind.rawValue)
                 #expect(obj["custom_id"] as? String == gradient.customId)
             case .font:
                 #expect(obj["type"] as? String == "font")
-            case .image(let image):
+            case let .image(image):
                 #expect(obj["type"] as? String == "image")
                 #expect(obj["custom_id"] as? String == image.customId)
-            case .video(let video):
+            case let .video(video):
                 #expect(obj["type"] as? String == "video")
                 #expect(obj["custom_id"] as? String == video.customId)
             case .unknown:

@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension AdaptyUIConfigurationTests {
-    @Suite("VC.CornerRadius Tests")
     struct VCCornerRadiusTests {
         typealias Value = VC.CornerRadius
     }
@@ -24,7 +23,7 @@ private extension AdaptyUIConfigurationTests.VCCornerRadiusTests {
         (topLeading: 1, topTrailing: 1, bottomTrailing: 1, bottomLeading: 1),
         (topLeading: 1, topTrailing: 2, bottomTrailing: 3, bottomLeading: 4),
     ])
-    func create(topLeading: Double, topTrailing: Double, bottomTrailing: Double, bottomLeading: Double) throws {
+    func create(topLeading: Double, topTrailing: Double, bottomTrailing: Double, bottomLeading: Double) {
         let value = Value(
             topLeading: topLeading,
             topTrailing: topTrailing,
@@ -39,7 +38,7 @@ private extension AdaptyUIConfigurationTests.VCCornerRadiusTests {
     }
 
     @Test("Test same value", arguments: [0, -1, 5, 5.5])
-    func createSameRadius(radius: Double) throws {
+    func createSameRadius(radius: Double) {
         let value = Value(same: radius)
         #expect(value.topLeading == radius)
         #expect(value.topTrailing == radius)
@@ -50,7 +49,7 @@ private extension AdaptyUIConfigurationTests.VCCornerRadiusTests {
     // MARK: - zero
 
     @Test("Test zero value")
-    func zero() throws {
+    func zero() {
         let value = Value.zero
         #expect(value.topLeading == 0)
         #expect(value.topTrailing == 0)
@@ -65,7 +64,7 @@ private extension AdaptyUIConfigurationTests.VCCornerRadiusTests {
         Value(same: 0),
         Value(topLeading: 0, topTrailing: 0, bottomTrailing: 0, bottomLeading: 0),
     ])
-    func isZero(value: Value) throws {
+    func isZero(value: Value) {
         #expect(value.isZero)
     }
 
@@ -76,7 +75,7 @@ private extension AdaptyUIConfigurationTests.VCCornerRadiusTests {
         Value(topLeading: 0, topTrailing: 0, bottomTrailing: 1, bottomLeading: 0),
         Value(topLeading: 0, topTrailing: 0, bottomTrailing: 0, bottomLeading: 1),
     ])
-    func isNotZero(value: Value) throws {
+    func isNotZero(value: Value) {
         #expect(!value.isZero)
     }
 
@@ -87,7 +86,7 @@ private extension AdaptyUIConfigurationTests.VCCornerRadiusTests {
         Value(same: 15),
         Value(topLeading: 10, topTrailing: 10, bottomTrailing: 10, bottomLeading: 10),
     ])
-    func isSameRadius(value: Value) throws {
+    func isSameRadius(value: Value) {
         #expect(value.isSameRadius)
     }
 
@@ -97,7 +96,7 @@ private extension AdaptyUIConfigurationTests.VCCornerRadiusTests {
         Value(topLeading: 10, topTrailing: 10, bottomTrailing: 0, bottomLeading: 10),
         Value(topLeading: 10, topTrailing: 10, bottomTrailing: 10, bottomLeading: 0),
     ])
-    func isNotSameRadius(value: Value) throws {
+    func isNotSameRadius(value: Value) {
         #expect(!value.isSameRadius)
     }
 }

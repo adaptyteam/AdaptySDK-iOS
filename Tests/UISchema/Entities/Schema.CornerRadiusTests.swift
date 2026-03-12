@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.CornerRadius Tests")
     struct CornerRadiusTests {
         typealias Value = Schema.CornerRadius
 
@@ -101,13 +100,13 @@ private extension SchemaTests {
             (
                 Value(same: 0),
                 Json(##"{}"##)
-            )
+            ),
         ]
 
         static let invalidJsons: [Json] = [
             Json(##""string""##),
             Json(##"true"##),
-            Json(##"["a","b"]"##)
+            Json(##"["a","b"]"##),
         ]
 
         // MARK: - Decoding Tests

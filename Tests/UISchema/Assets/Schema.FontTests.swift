@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.Font Tests")
     struct FontTests {
         typealias Value = Schema.Font
 

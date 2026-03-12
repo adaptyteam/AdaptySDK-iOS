@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests.VariableTests {
-    @Suite("Schema.Variable.Converter format Tests")
     struct ConverterTests {
         typealias Value = Schema.Variable.Converter
 
@@ -81,7 +80,7 @@ private extension SchemaTests.VariableTests {
             let encoded = try Json.encode(value)
             let obj = try #require(encoded.deserilized as? [String: Any])
             switch value {
-            case .isEqual(let value, falseValue: let falseValue):
+            case let .isEqual(value, falseValue: falseValue):
                 #expect(obj["converter"] as? String == "is_equal")
                 if let falseValue {
                     let params = try #require(obj["converter_params"] as? [String: Any])
@@ -91,7 +90,7 @@ private extension SchemaTests.VariableTests {
                     #expect(obj["converter_params"] != nil)
                 }
 
-            case .unknown(let name, let param):
+            case let .unknown(name, param):
                 #expect(obj["converter"] as? String == name)
                 if let param {
                     #expect(obj["converter_params"] != nil)

@@ -5,10 +5,9 @@
 //  Created by Aleksei Valiano on 01.03.2026.
 //
 
+@testable import AdaptyUIBuilder
 import Foundation
 import Testing
 
-@testable import AdaptyUIBuilder
-
-@Suite("AdaptyUISchema Tests", .tags(.codable))
+@Suite(.tags(.codable))
 struct SchemaTests {}

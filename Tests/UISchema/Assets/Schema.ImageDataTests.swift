@@ -10,15 +10,14 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.ImageData Tests")
     struct ImageDataTests {
         typealias Value = Schema.ImageData
 
         // MARK: - Helpers
 
-        // base64 "SGVsbG8="
+        /// base64 "SGVsbG8="
         static let SGVsbG8_ = Data("Hello".utf8)
-        // base64 "UHJldmlldw=="
+        /// base64 "UHJldmlldw=="
         static let UHJldmlldw__ = Data("Preview".utf8)
 
         static let https_example_com_image_png = URL(string: "https://example.com/image.png")!

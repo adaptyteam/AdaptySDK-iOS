@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.VideoData Tests")
     struct VideoDataTests {
         typealias Value = Schema.VideoData
         typealias ImageData = Schema.ImageData

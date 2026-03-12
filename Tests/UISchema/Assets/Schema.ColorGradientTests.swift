@@ -9,8 +9,7 @@
 import Foundation
 import Testing
 
- extension SchemaTests {
-    @Suite("Schema.ColorGradient Tests")
+extension SchemaTests {
     struct ColorGradientTests {
         typealias Value = Schema.ColorGradient
 

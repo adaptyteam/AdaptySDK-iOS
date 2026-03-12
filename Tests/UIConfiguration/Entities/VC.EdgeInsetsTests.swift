@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension AdaptyUIConfigurationTests {
-    @Suite("VC.EdgeInsets Tests")
     struct VCEdgeInsetsTests {
         typealias Value = VC.EdgeInsets
     }
@@ -28,7 +27,7 @@ private extension AdaptyUIConfigurationTests.VCEdgeInsetsTests {
     ]
 
     @Test("Test base init", arguments: createArguments)
-    func create(leading: VC.Unit, top: VC.Unit, trailing: VC.Unit, bottom: VC.Unit) throws {
+    func create(leading: VC.Unit, top: VC.Unit, trailing: VC.Unit, bottom: VC.Unit) {
         let value = Value(
             leading: leading,
             top: top,
@@ -52,7 +51,7 @@ private extension AdaptyUIConfigurationTests.VCEdgeInsetsTests {
     ]
 
     @Test("Test same value", arguments: createSameArguments)
-    func createSame(v: VC.Unit) throws {
+    func createSame(v: VC.Unit) {
         let value = Value(same: v)
         #expect(value.leading == v)
         #expect(value.top == v)
@@ -68,7 +67,7 @@ private extension AdaptyUIConfigurationTests.VCEdgeInsetsTests {
         Value(leading: .point(0), top: .point(0), trailing: .point(0), bottom: .point(0)),
         Value(leading: .screen(0), top: .screen(0), trailing: .screen(0), bottom: .screen(0)),
     ])
-    func isZero(value: Value) throws {
+    func isZero(value: Value) {
         #expect(value.isZero)
     }
 
@@ -80,7 +79,7 @@ private extension AdaptyUIConfigurationTests.VCEdgeInsetsTests {
         Value(leading: .point(1), top: .point(0), trailing: .point(0), bottom: .point(0)),
         Value(leading: .screen(0), top: .screen(0), trailing: .screen(0), bottom: .screen(1)),
     ])
-    func isNotZero(value: Value) throws {
+    func isNotZero(value: Value) {
         #expect(!value.isZero)
     }
 
@@ -98,7 +97,7 @@ private extension AdaptyUIConfigurationTests.VCEdgeInsetsTests {
         Value(leading: .screen(0.2), top: .screen(0.2), trailing: .screen(0.2), bottom: .screen(0.2)),
         Value(leading: .safeArea(.start), top: .safeArea(.start), trailing: .safeArea(.start), bottom: .safeArea(.start)),
     ])
-    func isSameRadius(value: Value) throws {
+    func isSameRadius(value: Value) {
         #expect(value.isSame)
     }
 
@@ -109,7 +108,7 @@ private extension AdaptyUIConfigurationTests.VCEdgeInsetsTests {
         Value(leading: .screen(0), top: .screen(0.2), trailing: .screen(0.2), bottom: .screen(0.2)),
         Value(leading: .safeArea(.end), top: .safeArea(.start), trailing: .safeArea(.start), bottom: .safeArea(.start)),
     ])
-    func isNotSameRadius(value: Value) throws {
+    func isNotSameRadius(value: Value) {
         #expect(!value.isSame)
     }
 }

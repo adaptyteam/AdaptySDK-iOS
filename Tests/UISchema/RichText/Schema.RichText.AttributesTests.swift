@@ -5,12 +5,10 @@
 //  Created by Aleksei Valiano on2026-02-05.
 //
 
+@testable import AdaptyUIBuilder
 import Testing
 
-@testable import AdaptyUIBuilder
-
 private extension SchemaTests.RichTextTests {
-    @Suite("Schema.RichText.Attributes Tests")
     struct AttributesTests {
         typealias Value = Schema.RichText.Attributes
 

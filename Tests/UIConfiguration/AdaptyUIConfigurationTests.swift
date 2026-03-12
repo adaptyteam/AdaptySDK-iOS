@@ -5,10 +5,9 @@
 //  Created by Aleksei Valiano on 06.02.2026.
 //
 
+@testable import AdaptyUIBuilder
 import Foundation
 import Testing
 
-@testable import AdaptyUIBuilder
-
-@Suite("AdaptyUIConfiguration Tests", .tags(.logic))
+@Suite(.tags(.logic))
 struct AdaptyUIConfigurationTests {}

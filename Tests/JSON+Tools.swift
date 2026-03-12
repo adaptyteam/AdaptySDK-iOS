@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Json: Sendable, Hashable, CustomStringConvertible, CustomDebugStringConvertible {
+struct Json: Hashable, CustomStringConvertible, CustomDebugStringConvertible {
     let data: Data
 
     private init(data: Data) {
@@ -35,33 +35,33 @@ struct Json: Sendable, Hashable, CustomStringConvertible, CustomDebugStringConve
         } catch {
             preconditionFailure(
                 "Invalid JSON:\n\n \(String(describing: value))\n\nfile: \(file), line: \(line)\n" +
-                #####"""
-                
-                Use json in Json(##"..."##) or Json(##""" ... """##)
-                
-                Examples:
-                  [1,2]    -> Json(##"[1,2]"##)
-                  {}       -> Json(##"{}"##)
-                  null     -> Json(##"null"##)
-                  55       -> Json(##"55"##)
-                  55.125   -> Json(##"55.125"##)
-                  ""       -> Json(##""""##)
-                  "string" -> Json(##""string""##)
-                  true     -> Json(##"true"##)
-                  false    -> Json(##"false"##)
-                
-                Multiline example: Json(##"""
-                  {
-                    "array": [ 1, 2, 3, 4],
-                    "name": "Aleksei",
-                    "pi": 3.1415,
-                    "result": true
-                  }
-                """##)
-                
-                
-                """##### +
-                "error: \(error)",
+                    #####"""
+
+                    Use json in Json(##"..."##) or Json(##""" ... """##)
+
+                    Examples:
+                      [1,2]    -> Json(##"[1,2]"##)
+                      {}       -> Json(##"{}"##)
+                      null     -> Json(##"null"##)
+                      55       -> Json(##"55"##)
+                      55.125   -> Json(##"55.125"##)
+                      ""       -> Json(##""""##)
+                      "string" -> Json(##""string""##)
+                      true     -> Json(##"true"##)
+                      false    -> Json(##"false"##)
+
+                    Multiline example: Json(##"""
+                      {
+                        "array": [ 1, 2, 3, 4],
+                        "name": "Aleksei",
+                        "pi": 3.1415,
+                        "result": true
+                      }
+                    """##)
+
+
+                    """##### +
+                    "error: \(error)",
                 file: file,
                 line: line
             )

@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.Parameter Tests")
     struct ParameterTests {
         typealias Value = Schema.Parameter
 
@@ -128,17 +127,17 @@ private extension SchemaTests {
             switch value {
             case .null:
                 #expect(deserilized is NSNull)
-            case .bool(let v):
+            case let .bool(v):
                 #expect(deserilized as? Bool == v)
-            case .int32(let v):
+            case let .int32(v):
                 #expect(deserilized as? Int == Int(v))
-            case .uint32(let v):
+            case let .uint32(v):
                 #expect(deserilized as? UInt == UInt(v))
-            case .double(let v):
+            case let .double(v):
                 #expect(deserilized as? Double == v)
-            case .string(let v):
+            case let .string(v):
                 #expect(deserilized as? String == v)
-            case .object(let object):
+            case let .object(object):
                 let dic = try #require(deserilized as? [String: Any])
                 for item in object {
                     print(item.key)
@@ -149,7 +148,7 @@ private extension SchemaTests {
         }
 
         @Test("encode produces correct value", arguments: jsonCases)
-        func encode(value: Value, json: Json) throws {
+        func encode(value: Value, json _: Json) throws {
             let encoded = try Json.encode(value)
             let deserilized = try encoded.deserilized
             try reqursiveExpect(value, deserilized)

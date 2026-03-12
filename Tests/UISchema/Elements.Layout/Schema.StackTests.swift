@@ -1,15 +1,13 @@
 //
-//  Schema.TextTests.swift.swift
+//  Schema.StackTests.swift
 //  AdaptyTests
 //
 //  Created by Aleksei Valiano on 01.03.2026.
 //
 
+@testable import AdaptyUIBuilder
 import Testing
 
-@testable import AdaptyUIBuilder
-
 extension SchemaTests {
-    @Suite("Schema.Text Parsing Tests")
-    struct TextTests {}
+    struct StackTests {}
 }

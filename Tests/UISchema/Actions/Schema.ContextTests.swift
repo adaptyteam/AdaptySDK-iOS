@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.Context Tests")
     struct ContextTests {
         typealias Value = Schema.Context
 

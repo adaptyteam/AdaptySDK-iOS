@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.ShapeType Tests")
     struct ShapeTypeTests {
         typealias Value = Schema.ShapeType
 

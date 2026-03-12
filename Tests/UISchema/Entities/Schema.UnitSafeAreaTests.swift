@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.Unit.SafeArea Tests")
     struct UnitSafeAreaTests {
         typealias Value = Schema.Unit.SafeArea
 

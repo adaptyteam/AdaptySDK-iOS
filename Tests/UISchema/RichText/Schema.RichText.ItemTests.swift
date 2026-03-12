@@ -5,12 +5,10 @@
 //  Created by Aleksei Valiano on2026-02-05.
 //
 
+@testable import AdaptyUIBuilder
 import Testing
 
-@testable import AdaptyUIBuilder
-
 private extension SchemaTests.RichTextTests {
-    @Suite("Schema.RichText.Item Tests")
     struct ItemTests {
         typealias Value = Schema.RichText.Item
         typealias Attributes = Schema.RichText.Attributes
@@ -101,7 +99,7 @@ private extension SchemaTests.RichTextTests {
             ),
         ]
 
-        // Text as object — decodes correctly, encodes back as plain string
+        /// Text as object — decodes correctly, encodes back as plain string
         static let textObjectJsonCases: [(value: Value, json: Json)] = [
             // Text as object without attributes
             (
@@ -114,7 +112,7 @@ private extension SchemaTests.RichTextTests {
             ),
         ]
 
-        // Unknown — decoded from object without known keys
+        /// Unknown — decoded from object without known keys
         static let unknownJsonCases: [(value: Value, json: Json)] = [
             // Empty object
             (.unknown, Json(##"{}"##)),

@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests.PagerTests {
-    @Suite("Schema.Pager.InteractionBehavior Tests")
     struct InteractionBehaviorTests {
         typealias Value = Schema.Pager.InteractionBehavior
 

@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    @Suite("Schema.AssetReference Tests")
     struct AssetReferenceTests {
         typealias Value = Schema.AssetReference
         typealias Variable = Schema.Variable
@@ -86,13 +85,13 @@ private extension SchemaTests {
         func encode(value: Value) throws {
             let encoded = try Json.encode(value)
             switch value {
-            case .assetId(let id):
+            case let .assetId(id):
                 let str = try #require(encoded.deserilized as? String)
                 #expect(str == id)
-            case .color(let color):
+            case let .color(color):
                 let str = try #require(encoded.deserilized as? String)
                 #expect(str == color.rawValue)
-            case .variable(let variable):
+            case let .variable(variable):
                 let obj = try #require(encoded.deserilized as? [String: Any])
                 #expect(obj["var"] as? String == variable.path.joined(separator: "."))
             }

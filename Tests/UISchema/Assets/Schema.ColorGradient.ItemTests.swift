@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests.ColorGradientTests {
-    @Suite("Schema.ColorGradient.Item Tests")
     struct ItemTests {
         typealias Value = Schema.ColorGradient.Item
 
@@ -42,14 +41,14 @@ private extension SchemaTests.ColorGradientTests {
             (
                 Value(color: .init(customId: nil, data: 0x000000FF), p: 1.5),
                 Json(##"{"color":"#000000","p":1.5}"##)
-            )
+            ),
         ]
 
         static let invalidJsons: [Json] = [
             Json(##"{"p":0}"##),
             Json(##"{"color":"#FF0000"}"##),
             Json(##"{}"##),
-            Json(##"{"color":"invalid","p":0}"##)
+            Json(##"{"color":"invalid","p":0}"##),
         ]
 
         // MARK: - Decoding Tests

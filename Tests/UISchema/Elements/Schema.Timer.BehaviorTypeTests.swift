@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests.TimerTests {
-    @Suite("Schema.Timer.BehaviorType Tests")
     struct BehaviorTypeTests {
         typealias Value = Schema.Timer.BehaviorType
 

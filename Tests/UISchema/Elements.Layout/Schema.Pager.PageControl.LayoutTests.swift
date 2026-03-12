@@ -10,7 +10,6 @@ import Foundation
 import Testing
 
 private extension SchemaTests.PagerTests.PageControlTests {
-    @Suite("Schema.Pager.PageControl.Layout Tests")
     struct LayoutTests {
         typealias Value = Schema.Pager.PageControl.Layout
 
