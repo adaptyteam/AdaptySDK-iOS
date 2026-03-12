@@ -9,7 +9,7 @@ import Foundation
 
 package extension VC.Text {
     struct Attributes: Sendable, Hashable {
-        package let fontAssetId: VC.AssetIdentifier? // default?
+        package let fontAssetId: VC.AssetReference? // default?
         package let size: Double? // default?
         package let txtColor: VC.AssetReference? // default?
         package let imageTintColor: VC.AssetReference?

@@ -171,7 +171,7 @@ extension [VC.RichText.Item] {
                         colorScheme: colorScheme
                     )
                 )
-            case let .image(value, attr, _): // TODO: x check action
+            case let .image(value, attr): 
                 let imageResolvedAsset = assetsCache.cachedAsset(
                     value,
                     mode: colorScheme.toVCMode,

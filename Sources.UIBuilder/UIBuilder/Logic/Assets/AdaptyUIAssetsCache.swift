@@ -73,7 +73,7 @@ final class AdaptyUIAssetsCache {
     ) -> VC.RichText.Attributes? {
         guard let attr else { return nil }
         return .init(
-            fontAssetId: attr.fontAssetId,
+            fontAssetId: attr.fontAssetId?.getAssetIdentifier(state: state, screen: screen),
             size: attr.size,
             txtColor: attr.txtColor?.getAssetId(state: state, screen: screen),
             imageTintColor: attr.imageTintColor?.getAssetId(state: state, screen: screen),
@@ -162,17 +162,35 @@ final class AdaptyUIAssetsCache {
 
 @MainActor
 extension AdaptyUIConfiguration.AssetReference {
+    func getAssetIdentifier(
+        state: AdaptyUIState,
+        screen: VS.ScreenInstance
+    ) -> VC.AssetIdentifier? {
+        switch self {
+        case .assetId(let id):
+            id
+        case .color:
+            nil
+        case .variable(let variable):
+            try? state.getValue(
+                VC.AssetIdentifier.self,
+                variable: variable,
+                screenInstance: screen
+            )
+        }
+    }
+
     func getAssetId(
         state: AdaptyUIState,
         screen: VS.ScreenInstance
     ) -> VC.AssetIdentifierOrValue? {
         switch self {
         case .assetId(let id):
-            return .assetId(id)
+            .assetId(id)
         case .color(let color):
-            return .color(color)
+            .color(color)
         case .variable(let variable):
-            return try? state.getValue(
+            try? state.getValue(
                 VC.AssetIdentifierOrValue.self,
                 variable: variable,
                 screenInstance: screen

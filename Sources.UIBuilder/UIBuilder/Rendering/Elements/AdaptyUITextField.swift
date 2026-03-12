@@ -40,7 +40,7 @@ struct AdaptyUITextField: View {
         )
         .multilineTextAlignment(textField.horizontalAlign)
         .lineLimit(textField.maxRows)
-        .minimumScaleFactor(textField.overflowMode.contains(.scale) ? 0.1 : 1.0)
+//        .minimumScaleFactor(textField.overflowMode.contains(.scale) ? 0.1 : 1.0)
     }
 }
 

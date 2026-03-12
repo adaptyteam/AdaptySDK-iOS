@@ -15,7 +15,6 @@ extension VC.VerticalAlignment {
         case .top: .top
         case .center: .center
         case .bottom: .bottom
-        case .justified: .center
         }
     }
 }

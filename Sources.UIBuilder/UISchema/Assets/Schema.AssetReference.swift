@@ -11,6 +11,18 @@ extension Schema {
     typealias AssetReference = VC.AssetReference
 }
 
+extension Schema.AssetReference {
+    @inlinable
+    var isColor: Bool {
+        switch self {
+        case .color:
+            true
+        default:
+            false
+        }
+    }
+}
+
 extension Schema.AssetReference: Codable {
     package init(from decoder: Decoder) throws {
         guard let value = try? decoder.singleValueContainer().decode(String.self) else {

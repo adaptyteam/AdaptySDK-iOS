@@ -26,8 +26,9 @@ extension Schema.Text.Attributes: Codable {
 
     package init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let fontAssetId = try container.decodeIfPresent(VC.AssetReference.self, forKeys: .fontAssetId)
         try self.init(
-            fontAssetId: container.decodeIfPresent(VC.AssetIdentifier.self, forKeys: .fontAssetId),
+            fontAssetId: fontAssetId?.isColor ?? true ? nil : fontAssetId,
             size: container.decodeIfPresent(Double.self, forKeys: .size),
             txtColor: container.decodeIfPresent(Schema.AssetReference.self, forKeys: .txtColor),
             imageTintColor: container.decodeIfPresent(Schema.AssetReference.self, forKeys: .imageTintColor),

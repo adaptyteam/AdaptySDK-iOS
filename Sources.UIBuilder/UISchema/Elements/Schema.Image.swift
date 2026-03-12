@@ -20,8 +20,16 @@ extension Schema.Image: Decodable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let asset = try container.decode(Schema.AssetReference.self, forKey: .assetId)
+        if asset.isColor {
+            throw DecodingError.dataCorruptedError(
+                forKey: .assetId,
+                in: container,
+                debugDescription: "Image asset_id should not be a color"
+            )
+        }
         try self.init(
-            asset: container.decode(Schema.AssetReference.self, forKey: .assetId),
+            asset: asset,
             aspect: container.decodeIfPresent(Schema.AspectRatio.self, forKey: .aspect) ?? Schema.AspectRatio.default,
             tint: container.decodeIfPresent(Schema.AssetReference.self, forKey: .tintAssetId)
         )

@@ -21,8 +21,7 @@ extension VC.Action {
             return components.url
         }
 
-        components.queryItems =
-            params
+        components.queryItems = params
             .sorted(by: { $0.key < $1.key })
             .flatMap { $0.value.asQueryItems(name: $0.key) }
 
@@ -38,7 +37,8 @@ extension VC.Action {
                 .init(
                     codingPath: [],
                     debugDescription: "wrong url: \(url)"
-                ))
+                )
+            )
         }
 
         guard components.scheme == Self.scheme else {
@@ -46,18 +46,20 @@ extension VC.Action {
                 .init(
                     codingPath: [],
                     debugDescription: "wrong schema of url: \(url) use: \(Self.scheme)"
-                ))
+                )
+            )
         }
 
         guard let rawValue = components.host?.split(separator: ".").first.map(String.init),
-            let scope = VC.Scope(rawValue: rawValue)
+              let scope = VC.Scope(rawValue: rawValue)
         else {
             throw DecodingError.dataCorrupted(
                 .init(
                     codingPath: [],
                     debugDescription:
-                        "wrong host, unknown scope of action: \(components.host ?? "nil")"
-                ))
+                    "wrong host, unknown scope of action: \(components.host ?? "nil")"
+                )
+            )
         }
 
         self.scope = scope
@@ -67,7 +69,8 @@ extension VC.Action {
             throw DecodingError.dataCorrupted(
                 .init(
                     codingPath: [], debugDescription: "wrong function name in path of url: \(url)"
-                ))
+                )
+            )
         }
 
         self.path = path
@@ -103,8 +106,8 @@ private enum Suffix: String, CaseIterable {
     case double = "_d"
 }
 
-extension String {
-    fileprivate func extractSuffix() -> (String, Suffix?) {
+private extension String {
+    func extractSuffix() -> (String, Suffix?) {
         for suffix in Suffix.allCases {
             let raw = suffix.rawValue
             guard hasSuffix(raw) else { continue }
@@ -114,8 +117,8 @@ extension String {
     }
 }
 
-extension VC.Parameter {
-    fileprivate func asQueryItems(name: String) -> [URLQueryItem] {
+private extension VC.Parameter {
+    func asQueryItems(name: String) -> [URLQueryItem] {
         switch self {
         case .null:
             [URLQueryItem(name: name, value: nil)]
@@ -136,7 +139,7 @@ extension VC.Parameter {
         }
     }
 
-    fileprivate init(
+    init(
         key: String,
         suffix: Suffix?,
         value: String?
@@ -150,7 +153,8 @@ extension VC.Parameter {
             throw DecodingError.dataCorrupted(
                 .init(
                     codingPath: [], debugDescription: "key: \(key) without suffix specified"
-                ))
+                )
+            )
         }
 
         switch suffix {
@@ -162,8 +166,9 @@ extension VC.Parameter {
                     .init(
                         codingPath: [],
                         debugDescription:
-                            "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
-                    ))
+                        "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
+                    )
+                )
             }
             self = .bool(v)
         case .int32:
@@ -172,8 +177,9 @@ extension VC.Parameter {
                     .init(
                         codingPath: [],
                         debugDescription:
-                            "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
-                    ))
+                        "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
+                    )
+                )
             }
             self = .int32(v)
         case .uint32:
@@ -182,8 +188,9 @@ extension VC.Parameter {
                     .init(
                         codingPath: [],
                         debugDescription:
-                            "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
-                    ))
+                        "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
+                    )
+                )
             }
             self = .uint32(v)
         case .double:
@@ -192,14 +199,15 @@ extension VC.Parameter {
                     .init(
                         codingPath: [],
                         debugDescription:
-                            "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
-                    ))
+                        "value is wrong type for key: \(key)\(suffix.rawValue) = \(value) "
+                    )
+                )
             }
             self = .double(v)
         }
     }
 
-    fileprivate init(string: String?) {
+    init(string: String?) {
         guard let string else {
             self = .null
             return
@@ -219,8 +227,8 @@ extension VC.Parameter {
     }
 }
 
-extension [String: VC.Parameter] {
-    fileprivate mutating func setParameter(_ value: VC.Parameter, for path: [String]) {
+private extension [String: VC.Parameter] {
+    mutating func setParameter(_ value: VC.Parameter, for path: [String]) {
         guard !path.isEmpty else { return }
         let key = path[0]
         if path.count == 1 {

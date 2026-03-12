@@ -13,17 +13,17 @@ extension Schema {
         indirect case templateInstance(Schema.TemplateInstance)
         case scrrenHolder
         indirect case stack(Schema.Stack, Properties?)
-        indirect case text(Schema.Text, Properties?)
-        indirect case textField(Schema.TextField, Properties?)
-        indirect case image(Schema.Image, Properties?)
-        indirect case video(Schema.VideoPlayer, Properties?)
+        indirect case text(Schema.Text, Properties?) // VC
+        indirect case textField(Schema.TextField, Properties?) // VC
+        indirect case image(Schema.Image, Properties?) // VC
+        indirect case video(Schema.VideoPlayer, Properties?) // VC
         indirect case button(Schema.Button, Properties?)
         indirect case box(Schema.Box, Properties?)
         indirect case row(Schema.Row, Properties?)
         indirect case column(Schema.Column, Properties?)
         indirect case section(Schema.Section, Properties?)
-        indirect case toggle(Schema.Toggle, Properties?)
-        indirect case slider(Schema.Slider, Properties?)
+        indirect case toggle(Schema.Toggle, Properties?) // VC
+        indirect case slider(Schema.Slider, Properties?) // VC
         indirect case timer(Schema.Timer, Properties?)
         indirect case pager(Schema.Pager, Properties?)
 
