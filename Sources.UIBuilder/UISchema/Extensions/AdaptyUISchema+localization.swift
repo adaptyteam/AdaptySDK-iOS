@@ -25,12 +25,12 @@ private extension Schema.Localization {
     func addDefault(localization: Self?) -> Self {
         guard let localization else { return self }
 
-        var strings = self.strings ?? [:]
+        var strings = strings ?? [:]
         if let other = localization.strings {
             strings = strings.merging(other, uniquingKeysWith: { current, _ in current })
         }
 
-        var assets = self.assets ?? [:]
+        var assets = assets ?? [:]
         if let other = localization.assets {
             assets = assets.merging(other, uniquingKeysWith: { current, _ in current })
         }

@@ -15,8 +15,19 @@ package extension VC {
 }
 
 package extension VC.Color {
-    var red: Double { Double((data & 0xFF000000) >> 24) / 255 }
-    var green: Double { Double((data & 0x00FF0000) >> 16) / 255 }
-    var blue: Double { Double((data & 0x0000FF00) >> 8) / 255 }
-    var alpha: Double { Double(data & 0x000000FF) / 255 }
+    var red: Double {
+        Double((data & 0xFF000000) >> 24) / 255
+    }
+
+    var green: Double {
+        Double((data & 0x00FF0000) >> 16) / 255
+    }
+
+    var blue: Double {
+        Double((data & 0x0000FF00) >> 8) / 255
+    }
+
+    var alpha: Double {
+        Double(data & 0x000000FF) / 255
+    }
 }

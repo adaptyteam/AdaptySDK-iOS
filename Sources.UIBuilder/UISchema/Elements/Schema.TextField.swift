@@ -38,13 +38,13 @@ extension Schema.TextField: Codable {
         let constraints = try container.decodeIfPresent(Schema.TextField.InputConstraints.self, forKey: .inputConstraints)
         inputConstraints = constraints?.nonEmptyOrNil
 
-        validation = try container.decode(Schema.Variable.self, forKey: .validation)
+        validation = try container.decodeIfPresent(Schema.Variable.self, forKey: .validation)
 
         let textAttributes = try Schema.Text.Attributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil
 
         if validation == nil {
-            self.invalidTextAttributes = nil
+            invalidTextAttributes = nil
         } else {
             let invalidTextAttributes = try container.decodeIfPresent(Schema.Text.Attributes.self, forKey: .invalidTextAttributes)
             self.invalidTextAttributes = invalidTextAttributes?.nonEmptyOrNil

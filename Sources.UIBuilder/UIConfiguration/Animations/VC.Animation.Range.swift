@@ -8,7 +8,7 @@
 import Foundation
 
 package extension VC.Animation {
-    struct Range<T>: Sendable, Hashable where T: Sendable, T: Hashable {
+    struct Range<T: Sendable & Hashable>: Sendable, Hashable {
         package let start: T
         package let end: T
     }

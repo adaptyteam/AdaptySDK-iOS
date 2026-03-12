@@ -21,11 +21,11 @@ extension VC {
 extension VC.Asset {
     var customId: String? {
         switch self {
-        case .solidColor(let v): v.customId
-        case .colorGradient(let v): v.customId
-        case .image(let v): v.customId
-        case .video(let v): v.customId
-        case .font(let v): v.customId
+        case let .solidColor(v): v.customId
+        case let .colorGradient(v): v.customId
+        case let .image(v): v.customId
+        case let .video(v): v.customId
+        case let .font(v): v.customId
         case .unknown: nil
         }
     }

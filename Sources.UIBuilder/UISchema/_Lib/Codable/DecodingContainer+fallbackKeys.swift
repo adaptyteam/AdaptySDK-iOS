@@ -16,15 +16,15 @@ extension KeyedDecodingContainer {
         }
     }
 
-    func decode<T>(_ type: T.Type, forKeys key: Key, _ fallback: Key...) throws -> T where T: Decodable {
+    func decode<T: Decodable>(_ type: T.Type, forKeys key: Key, _ fallback: Key...) throws -> T {
         try decode(type, forKey: findKey(key, fallback))
     }
 
-    func decodeIfPresent<T>(_ type: T.Type, forKeys key: Key, _ fallback: Key...) throws -> T? where T: Decodable {
+    func decodeIfPresent<T: Decodable>(_ type: T.Type, forKeys key: Key, _ fallback: Key...) throws -> T? {
         try decodeIfPresent(type, forKey: findKey(key, fallback))
     }
 
-    func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKeys key: Key, _ fallback: Key...) throws -> KeyedDecodingContainer<NestedKey> where NestedKey: CodingKey {
+    func nestedContainer<NestedKey: CodingKey>(keyedBy type: NestedKey.Type, forKeys key: Key, _ fallback: Key...) throws -> KeyedDecodingContainer<NestedKey> {
         try nestedContainer(keyedBy: type, forKey: findKey(key, fallback))
     }
 
@@ -32,19 +32,19 @@ extension KeyedDecodingContainer {
         try nestedUnkeyedContainer(forKey: findKey(key, fallback))
     }
 
-    func decode<T, C>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: C.Type) throws -> T where T: DecodableWithConfiguration, C: DecodingConfigurationProviding, T.DecodingConfiguration == C.DecodingConfiguration {
+    func decode<T: DecodableWithConfiguration, C: DecodingConfigurationProviding>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: C.Type) throws -> T where T.DecodingConfiguration == C.DecodingConfiguration {
         try decode(type, forKey: findKey(key, fallback), configuration: configuration)
     }
 
-    func decodeIfPresent<T, C>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: C.Type) throws -> T? where T: DecodableWithConfiguration, C: DecodingConfigurationProviding, T.DecodingConfiguration == C.DecodingConfiguration {
+    func decodeIfPresent<T: DecodableWithConfiguration, C: DecodingConfigurationProviding>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: C.Type) throws -> T? where T.DecodingConfiguration == C.DecodingConfiguration {
         try decodeIfPresent(type, forKey: findKey(key, fallback), configuration: configuration)
     }
 
-    func decode<T>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: T.DecodingConfiguration) throws -> T where T: DecodableWithConfiguration {
+    func decode<T: DecodableWithConfiguration>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: T.DecodingConfiguration) throws -> T {
         try decode(type, forKey: findKey(key, fallback), configuration: configuration)
     }
 
-    func decodeIfPresent<T>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: T.DecodingConfiguration) throws -> T? where T: DecodableWithConfiguration {
+    func decodeIfPresent<T: DecodableWithConfiguration>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: T.DecodingConfiguration) throws -> T? {
         try decodeIfPresent(type, forKey: findKey(key, fallback), configuration: configuration)
     }
 }

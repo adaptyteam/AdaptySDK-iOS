@@ -1,5 +1,5 @@
 //
-//  VC.Action+JSValueConvertable.swift
+//  JSValueConvertable.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 17.12.2025.
@@ -14,7 +14,7 @@ protocol JSValueConvertable: Sendable, Hashable {
 
 extension Optional: JSValueConvertable where Wrapped: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
-        if case .some(let value) = self {
+        if case let .some(value) = self {
             value.toJSValue(in: context)
         } else {
             .init(nullIn: context)
@@ -57,12 +57,12 @@ extension VC.Parameter: JSValueConvertable {
         switch self {
         case .null:
             .init(nullIn: context)
-        case .string(let v): v.toJSValue(in: context)
-        case .bool(let v): v.toJSValue(in: context)
-        case .int32(let v): v.toJSValue(in: context)
-        case .uint32(let v): v.toJSValue(in: context)
-        case .double(let v): v.toJSValue(in: context)
-        case .object(let v): v.toJSValue(in: context)
+        case let .string(v): v.toJSValue(in: context)
+        case let .bool(v): v.toJSValue(in: context)
+        case let .int32(v): v.toJSValue(in: context)
+        case let .uint32(v): v.toJSValue(in: context)
+        case let .double(v): v.toJSValue(in: context)
+        case let .object(v): v.toJSValue(in: context)
         }
     }
 }

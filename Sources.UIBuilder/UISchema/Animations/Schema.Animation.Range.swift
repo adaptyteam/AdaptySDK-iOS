@@ -1,5 +1,5 @@
 //
-//  Schema.Animation.BoxParameters.swift
+//  Schema.Animation.Range.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 25.11.2025.

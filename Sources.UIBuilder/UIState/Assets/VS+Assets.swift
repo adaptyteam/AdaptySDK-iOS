@@ -14,7 +14,7 @@ extension VS {
         }
         return value
     }
-    
+
     private func assetOrNil(_ assetId: VC.AssetIdentifier, for mode: VC.Mode) -> VC.Asset? {
         if let suffix = mode.suffix, let value = configuration.assets[assetId + suffix] {
             return value

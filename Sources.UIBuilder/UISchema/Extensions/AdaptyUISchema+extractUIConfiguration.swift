@@ -10,7 +10,7 @@ import Foundation
 package extension AdaptyUISchema {
     func extractUIConfiguration(id: String? = nil, withLocaleId localeId: LocaleId? = nil) throws -> AdaptyUIConfiguration {
         let id = id ?? UUID().uuidString
-        let localeId = localeId ?? self.defaultLocalization?.id ?? AdaptyUISchema.defaultLocaleId
+        let localeId = localeId ?? defaultLocalization?.id ?? AdaptyUISchema.defaultLocaleId
         return try ConfigurationBuilder(id: id, source: self, withLocaleId: localeId).localize()
     }
 }

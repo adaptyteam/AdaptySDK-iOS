@@ -12,7 +12,9 @@ extension Schema.RichText {
 }
 
 extension Schema.RichText.Attributes? {
-    var nonEmptyOrNil: Self { self?.nonEmptyOrNil }
+    var nonEmptyOrNil: Self {
+        self?.nonEmptyOrNil
+    }
 }
 
 extension Schema.RichText.Attributes: Codable {

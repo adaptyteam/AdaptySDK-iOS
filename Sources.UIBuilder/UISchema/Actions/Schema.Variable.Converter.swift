@@ -22,7 +22,7 @@ extension Schema.Variable.Converter: Codable {
 
         let name = try container.decode(String.self, forKey: .name)
         var params = try container.decodeIfPresent(VC.Parameter.self, forKey: .params)
-        if case .null = params  { params = nil }
+        if case .null = params { params = nil }
 
         switch Names(rawValue: name) {
         case .isEqual:
@@ -31,7 +31,7 @@ extension Schema.Variable.Converter: Codable {
             }
 
             switch params {
-            case .object(let object):
+            case let .object(object):
                 guard let value = object["value"], value != .null else {
                     throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.params], debugDescription: "Not found `value` key"))
                 }
@@ -49,7 +49,7 @@ extension Schema.Variable.Converter: Codable {
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
-        case .isEqual(let value, let falseValue):
+        case let .isEqual(value, falseValue):
             try container.encode(Names.isEqual, forKey: .name)
             let params: VC.Parameter =
                 if let falseValue {
@@ -58,7 +58,7 @@ extension Schema.Variable.Converter: Codable {
                     value
                 }
             try container.encode(params, forKey: .params)
-        case .unknown(let name, let params):
+        case let .unknown(name, params):
             try container.encode(name, forKey: .name)
             try container.encodeIfPresent(params, forKey: .params)
         }

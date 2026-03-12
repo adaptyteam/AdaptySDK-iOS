@@ -30,7 +30,9 @@ extension VC.RichText.Attributes {
             && (underline ?? false) == false
     }
 
-    var nonEmptyOrNil: Self? { isEmpty ? nil : self }
+    var nonEmptyOrNil: Self? {
+        isEmpty ? nil : self
+    }
 
     func apply(
         default other: VC.RichText.Attributes?
@@ -47,6 +49,3 @@ extension VC.RichText.Attributes {
         )
     }
 }
-
-
-

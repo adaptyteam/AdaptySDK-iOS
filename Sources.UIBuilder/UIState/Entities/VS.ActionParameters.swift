@@ -9,7 +9,7 @@ import Foundation
 import JavaScriptCore
 
 extension VS {
-    struct ActionParameters: Sendable, Hashable {
+    struct ActionParameters: Hashable {
         let screenInstance: ScreenInstance
         let params: [String: VC.Parameter]?
     }

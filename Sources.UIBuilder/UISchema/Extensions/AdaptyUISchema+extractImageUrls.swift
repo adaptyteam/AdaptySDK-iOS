@@ -1,5 +1,5 @@
 //
-//  AdaptyUISchema+ImageUrls.swift
+//  AdaptyUISchema+extractImageUrls.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 06.03.2024

@@ -14,5 +14,3 @@ package extension VC {
         case stretch
     }
 }
-
-

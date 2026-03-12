@@ -16,5 +16,3 @@ package extension VC {
         package let content: Element?
     }
 }
-
-

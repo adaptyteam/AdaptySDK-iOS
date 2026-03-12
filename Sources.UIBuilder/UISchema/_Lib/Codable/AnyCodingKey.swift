@@ -11,11 +11,11 @@ struct AnyCodingKey: CodingKey {
 
     init(stringValue: String) {
         self.stringValue = stringValue
-        self.intValue = nil
+        intValue = nil
     }
 
     init?(intValue: Int) {
-        self.stringValue = String(intValue)
+        stringValue = String(intValue)
         self.intValue = intValue
     }
 }

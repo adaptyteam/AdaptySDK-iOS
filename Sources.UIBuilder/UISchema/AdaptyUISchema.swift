@@ -145,7 +145,7 @@ private enum ScriptCodingKeys: String, CodingKey {
 }
 
 private extension Decoder {
-    func decodeScript(configuration: AdaptyUISchema.DecodingConfiguration) throws -> [String] {
+    func decodeScript(configuration _: AdaptyUISchema.DecodingConfiguration) throws -> [String] {
         let container = try container(keyedBy: ScriptCodingKeys.self)
         guard container.contains(.scripts) else {
             return []

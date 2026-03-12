@@ -1,5 +1,5 @@
 //
-//  VS.Debug.swift
+//  VS.DebugFilter.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 29.01.2026.

@@ -1,5 +1,5 @@
 //
-//  VCS.ScreenInstance.swift
+//  VS.ScreenInstance.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 26.01.2026.
@@ -9,7 +9,7 @@ import Foundation
 import JavaScriptCore
 
 package extension VS {
-    struct ScreenInstance: Sendable, Hashable {
+    struct ScreenInstance: Hashable {
         let id: String
         let navigatorId: String
         let configuration: VC.Screen

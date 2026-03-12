@@ -38,7 +38,7 @@ extension VS {
 }
 
 extension VS.JSActionDispatcher {
-    func execute(_ action: VC.Action, in context: JSContext) -> Bool {
+    func execute(_: VC.Action, in _: JSContext) -> Bool {
         false
     }
 }

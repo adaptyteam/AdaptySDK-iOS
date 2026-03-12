@@ -13,15 +13,15 @@ package extension Schema {
 
 extension Schema.Version {
     private var asIntArray: [Int] {
-        self.components(separatedBy: CharacterSet(charactersIn: " -.")).map { Int($0) ?? 0 }
+        components(separatedBy: CharacterSet(charactersIn: " -.")).map { Int($0) ?? 0 }
     }
 
     func isSameOrNewerVersion(than older: Self) -> Bool {
-        self.asIntArray.isSameOrNewerVersion(than: older.asIntArray)
+        asIntArray.isSameOrNewerVersion(than: older.asIntArray)
     }
 
     var isNotLegacyVersion: Bool {
-        self.asIntArray.isSameOrNewerVersion(than: [4, 8])
+        asIntArray.isSameOrNewerVersion(than: [4, 8])
     }
 }
 

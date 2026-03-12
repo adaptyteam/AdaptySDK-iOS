@@ -16,18 +16,33 @@ private extension SchemaTests.RichTextTests {
         // MARK: - Helpers
 
         static let attrsWithColor = Attributes(
-            fontAssetId: nil, size: nil, txtColor: .assetId("red"),
-            imageTintColor: nil, background: nil, strike: nil, underline: nil
+            fontAssetId: nil,
+            size: nil,
+            txtColor: .assetId("red"),
+            imageTintColor: nil,
+            background: nil,
+            strike: nil,
+            underline: nil
         )
 
         static let attrsWithSize = Attributes(
-            fontAssetId: nil, size: 14, txtColor: nil,
-            imageTintColor: nil, background: nil, strike: nil, underline: nil
+            fontAssetId: nil,
+            size: 14,
+            txtColor: nil,
+            imageTintColor: nil,
+            background: nil,
+            strike: nil,
+            underline: nil
         )
 
         static let attrsWithTint = Attributes(
-            fontAssetId: nil, size: nil, txtColor: nil,
-            imageTintColor: .assetId("tint_color"), background: nil, strike: nil, underline: nil
+            fontAssetId: nil,
+            size: nil,
+            txtColor: nil,
+            imageTintColor: .assetId("tint_color"),
+            background: nil,
+            strike: nil,
+            underline: nil
         )
 
         // MARK: - Test Data

@@ -38,7 +38,8 @@ extension VS {
 
             actionDispatcher = JSActionDispatcher(
                 actionHandler,
-                configuration)
+                configuration
+            )
 
             context.setObject(actionDispatcher, forKeyedSubscript: "SDK" as NSString)
         }
@@ -109,7 +110,7 @@ extension VS.JSState {
     }
 
     func getValue<T: JSValueRepresentable>(
-        _ type: T.Type,
+        _: T.Type,
         variable: VC.Variable,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) -> T? {
@@ -142,29 +143,29 @@ extension VS.JSState {
 
     private func convert(value: JSValue, convertor: VC.Variable.Converter) throws(VS.Error) -> JSValue {
         switch convertor {
-        case .isEqual(let a, _):
+        case let .isEqual(a, _):
             let rhs = a.toJSValue(in: context)
             let result = value.isEqual(to: rhs)
             return result.toJSValue(in: context)
-        case .unknown(let name, _):
+        case let .unknown(name, _):
             throw .notFoundConvertor(name)
         }
     }
 
     private func backConvert(value: some JSValueConvertable, convertor: VC.Variable.Converter) throws(VS.Error) -> VC.Parameter {
         switch convertor {
-        case .isEqual(let a, let b):
+        case let .isEqual(a, b):
             let boolValue = value.toJSValue(in: context).toBool()
             guard !boolValue else { return a }
             if let b { return b }
             return .null
-        case .unknown(let name, _):
+        case let .unknown(name, _):
             throw .notFoundConvertor(name)
         }
     }
 
     private func invokeMethod<T: JSValueRepresentable>(
-        _ type: T.Type,
+        _: T.Type,
         path: [String],
         args functionArguments: [any JSValueConvertable] = []
     ) throws(VS.Error) -> T? {
@@ -177,11 +178,13 @@ extension VS.JSState {
         }
         let value: JSValue? = parent.invokeMethod(
             name,
-            withArguments: functionArguments.map { $0.toJSValue(in: context) })
+            withArguments: functionArguments.map { $0.toJSValue(in: context) }
+        )
 
         if let value = T.fromJSValue(value) {
             log.debug(
-                "method called \(path.joined(separator: ".")) -> \(String(describing: value))")
+                "method called \(path.joined(separator: ".")) -> \(String(describing: value))"
+            )
             return value
         } else {
             log.debug("method called \(path.joined(separator: "."))")
@@ -248,7 +251,8 @@ extension VS.JSState {
             _ = try invokeMethod(
                 Bool.self,
                 path: action.pathWithScreenContext(screenInstance.contextPath),
-                args: [object])
+                args: [object]
+            )
         }
 
         objectWillChange.send()

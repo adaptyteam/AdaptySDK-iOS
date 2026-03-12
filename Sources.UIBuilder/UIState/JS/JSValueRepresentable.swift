@@ -14,7 +14,7 @@ protocol JSValueRepresentable: Sendable, Hashable {
 
 extension JSValueRepresentable {
     static func fromJSValue(_ value: JSValue?) -> Self? {
-        if case .some(let value) = value {
+        if case let .some(value) = value {
             fromJSValue(value)
         } else {
             nil

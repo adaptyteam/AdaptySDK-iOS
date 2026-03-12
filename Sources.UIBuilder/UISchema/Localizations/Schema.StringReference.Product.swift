@@ -37,10 +37,10 @@ extension Schema.StringReference.Product: Codable {
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
-        case .id(let productId, let suffix):
+        case let .id(productId, suffix):
             try container.encode(productId, forKey: .product)
             try container.encodeIfPresent(suffix, forKey: .suffix)
-        case .variable(let variable, let suffix):
+        case let .variable(variable, suffix):
             try container.encode(variable, forKey: .product)
             try container.encodeIfPresent(suffix, forKey: .suffix)
         }

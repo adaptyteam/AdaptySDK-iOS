@@ -27,12 +27,12 @@ extension Schema {
                 assets = assets.merging(other, uniquingKeysWith: { _, other in other })
             }
 
-            self.configuarationId = id
+            configuarationId = id
             self.source = source
             self.localeId = localization?.id ?? localeId
-            self.isRightToLeft = localization?.isRightToLeft ?? false
+            isRightToLeft = localization?.isRightToLeft ?? false
             self.assets = assets
-            self.strings = localization?.strings?.mapValues {
+            strings = localization?.strings?.mapValues {
                 VC.RichText(
                     items: $0.value.items,
                     fallback: $0.fallback?.items
@@ -54,7 +54,6 @@ extension Schema.ConfigurationBuilder: Hashable {
 
 extension Schema.ConfigurationBuilder {
     func localize() throws -> AdaptyUIConfiguration {
-
         templateIds.removeAll()
         return try .init(
             id: configuarationId,
@@ -68,4 +67,3 @@ extension Schema.ConfigurationBuilder {
         )
     }
 }
-

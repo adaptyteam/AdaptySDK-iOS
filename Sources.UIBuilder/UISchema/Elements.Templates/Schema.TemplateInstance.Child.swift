@@ -1,5 +1,5 @@
 //
-//  Schema.templateInstance.swift
+//  Schema.TemplateInstance.Child.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 10.02.2026.
@@ -24,8 +24,9 @@ extension Schema.TemplateInstance {
         case unknown
     }
 }
+
 //
-//extension Schema.TemplateInstance.Child: Encodable, DecodableWithConfiguration {
+// extension Schema.TemplateInstance.Child: Encodable, DecodableWithConfiguration {
 //    init(from decoder: any Decoder, configuration: DecodingConfiguration) throws {
 //        if let container = try? decoder.singleValueContainer(),
 //           let v = try container.decodeChild()
@@ -84,9 +85,9 @@ extension Schema.TemplateInstance {
 //    func encode(to encoder: any Encoder) throws {
 //        // TODO: implement after Element encodable
 //    }
-//}
+// }
 //
-//private extension SingleValueDecodingContainer {
+// private extension SingleValueDecodingContainer {
 //    func decodeChild() throws -> Schema.TemplateInstance.Child? {
 //        if decodeNil() {
 //            .null
@@ -104,4 +105,4 @@ extension Schema.TemplateInstance {
 //            nil
 //        }
 //    }
-//}
+// }

@@ -27,9 +27,9 @@ extension Schema.AssetIdentifierOrValue: Codable {
         var container = encoder.singleValueContainer()
 
         switch self {
-        case .assetId(let value):
+        case let .assetId(value):
             try container.encode(value)
-        case .color(let color):
+        case let .color(color):
             try container.encode(color)
         }
     }

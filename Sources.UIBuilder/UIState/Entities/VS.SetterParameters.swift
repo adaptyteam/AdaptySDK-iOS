@@ -9,7 +9,7 @@ import Foundation
 import JavaScriptCore
 
 extension VS {
-    struct SetterParameters<T: JSValueConvertable>: Sendable, Hashable {
+    struct SetterParameters<T: JSValueConvertable>: Hashable {
         let screenInstance: ScreenInstance
         let name: String
         let value: T

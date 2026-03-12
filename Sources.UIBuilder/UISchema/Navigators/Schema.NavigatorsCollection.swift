@@ -18,7 +18,7 @@ extension Schema {
                 values[Schema.Navigator.default.id] = Schema.Navigator.default
             }
 
-            self.navigators = values
+            navigators = values
         }
     }
 }

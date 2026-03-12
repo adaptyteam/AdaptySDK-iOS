@@ -1,5 +1,5 @@
 //
-//  Schema.StringReference.TagValue.swift
+//   Schema.StringReference.TagValue.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 04.03.2026.
@@ -26,9 +26,9 @@ extension Schema.StringReference.TagValue: Codable {
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
-        case .value(let value):
+        case let .value(value):
             try container.encode(value)
-        case .variable(let variable):
+        case let .variable(variable):
             try container.encode(variable)
         }
     }

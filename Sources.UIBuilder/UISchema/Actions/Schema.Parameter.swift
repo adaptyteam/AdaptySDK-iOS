@@ -45,17 +45,17 @@ extension Schema.Parameter: Codable {
         switch self {
         case .null:
             try container.encodeNil()
-        case .bool(let value):
+        case let .bool(value):
             try container.encode(value)
-        case .int32(let value):
+        case let .int32(value):
             try container.encode(value)
-        case .uint32(let value):
+        case let .uint32(value):
             try container.encode(value)
-        case .double(let value):
+        case let .double(value):
             try container.encode(value)
-        case .string(let value):
+        case let .string(value):
             try container.encode(value)
-        case .object(let value):
+        case let .object(value):
             try container.encode(value)
         }
     }

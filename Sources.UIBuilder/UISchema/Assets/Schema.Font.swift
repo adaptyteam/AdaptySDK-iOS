@@ -83,8 +83,7 @@ extension Schema.Font: Codable {
         if defaultSize != Self.default.defaultSize {
             try container.encode(defaultSize, forKey: .defaultSize)
         }
-        if  defaultColor != Self.default.defaultColor
-        {
+        if defaultColor != Self.default.defaultColor {
             try container.encode(defaultColor, forKey: .defaultColor)
         }
     }

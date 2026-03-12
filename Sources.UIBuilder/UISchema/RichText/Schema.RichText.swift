@@ -15,7 +15,9 @@ extension Schema {
 }
 
 extension Schema.RichText {
-    var isEmpty: Bool { items.isEmpty }
+    var isEmpty: Bool {
+        items.isEmpty
+    }
 }
 
 extension Schema.RichText: Codable {

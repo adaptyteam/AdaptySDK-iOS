@@ -9,7 +9,7 @@ import Foundation
 
 extension JSONDecoder {
     func decode<T: DecodableWithConfiguration>(
-        _ type: T.Type,
+        _: T.Type,
         from data: Data,
         with configuration: T.DecodingConfiguration
     ) throws -> T where T.DecodingConfiguration: Sendable {

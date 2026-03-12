@@ -68,7 +68,7 @@ private extension Decoder {
                     spacing: 0,
                     items: [
                         .element(.scrrenHolder),
-                        .element(overlay)
+                        .element(overlay),
                     ]
                 ), nil)
             } else {
@@ -92,7 +92,7 @@ private extension Decoder {
         let legacyBottomSheetNavigator = legacyBottomSheetNavigator()
         return [
             legacyDefaultNavigator.id: legacyDefaultNavigator,
-            legacyBottomSheetNavigator.id: legacyBottomSheetNavigator
+            legacyBottomSheetNavigator.id: legacyBottomSheetNavigator,
         ]
     }
 
@@ -179,7 +179,7 @@ private extension Decoder {
             order: Schema.Navigator.default.order + 100,
             appearances: [
                 VC.Navigator.AppearanceTransition.onAppearKey: onAppear,
-                VC.Navigator.AppearanceTransition.onDisappearKey: onDisappear
+                VC.Navigator.AppearanceTransition.onDisappearKey: onDisappear,
             ],
             transitions: nil,
             defaultScreenActions: .init(
@@ -187,7 +187,7 @@ private extension Decoder {
                     path: ["SDK", "closeScreen"],
                     params: [
                         "navigatorId": .string(navigatorId),
-                        "transitionId": .string(VC.Navigator.AppearanceTransition.onDisappearKey)
+                        "transitionId": .string(VC.Navigator.AppearanceTransition.onDisappearKey),
                     ],
                     scope: .global
                 )],

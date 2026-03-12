@@ -13,4 +13,3 @@ extension Schema.Template {
         case binding
     }
 }
-

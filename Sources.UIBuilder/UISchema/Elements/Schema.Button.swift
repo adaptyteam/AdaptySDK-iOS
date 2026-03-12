@@ -72,14 +72,14 @@ extension Schema.Button: DecodableWithConfiguration {
             Schema.LegacyStateCondition.self,
             forKey: .legacySelectedCondition
         ) {
-        case .selectedProduct(let productId, let groupId):
+        case let .selectedProduct(productId, groupId):
             .init(
                 path: ["Legacy", "productGroup", groupId],
                 setter: nil,
                 scope: .global,
                 converter: .isEqual(.string(productId), falseValue: nil)
             )
-        case .selectedSection(let sectionId, let index):
+        case let .selectedSection(sectionId, index):
             .init(
                 path: ["Legacy", "sections", sectionId],
                 setter: nil,

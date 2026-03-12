@@ -173,7 +173,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         }
     }
 
-    func encode(to encoder: any Encoder) throws {
+    func encode(to _: any Encoder) throws {
         // TODO: implement
     }
 }

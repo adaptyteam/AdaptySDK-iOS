@@ -16,7 +16,7 @@ extension Schema.Stack {
 
 extension Schema.Stack.Item: DecodableWithConfiguration {
     static let typeForSpace = "space"
-    
+
     enum CodingKeys: String, CodingKey {
         case type
         case count

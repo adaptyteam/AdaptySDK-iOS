@@ -15,4 +15,3 @@ package extension VC {
         case curveDown
     }
 }
-
