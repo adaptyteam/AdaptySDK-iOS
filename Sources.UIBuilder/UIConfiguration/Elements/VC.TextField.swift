@@ -7,9 +7,9 @@
 
 import Foundation
 
-
 package extension VC {
     struct TextField: Hashable {
+        let kind: Kind
         package let value: Variable
         let placeholder: Placeholder?
         let secureEntry: Bool
@@ -19,11 +19,7 @@ package extension VC {
         package let defaultTextAttributes: Text.Attributes?
         let invalidTextAttributes: Text.Attributes?
         let keyboardOptions: KeyboardOptions?
-//         let maxRows: Int?
+        let maxRows: Int?
+        let minRows: Int?
     }
 }
-
-
-
-
-

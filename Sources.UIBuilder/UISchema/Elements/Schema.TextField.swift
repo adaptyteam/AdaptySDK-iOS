@@ -13,6 +13,7 @@ extension Schema {
 
 extension Schema.TextField: Codable {
     enum CodingKeys: String, CodingKey {
+        case type
         case value
         case placeholder
         case secureEntry = "secure_entry"
@@ -21,12 +22,15 @@ extension Schema.TextField: Codable {
         case validation
         case invalidTextAttributes = "invalid_attributes"
         case keyboardOptions = "keyboard_options"
-//        case maxRows = "max_rows"
+        case maxRows = "max_rows"
+        case minRows = "min_rows"
         case overflowMode = "on_overflow"
     }
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(Schema.Element.ContentType.self, forKey: .type)
+        kind = type == .textEditor ? .multiLine : .singleLine
         value = try container.decode(Schema.Variable.self, forKey: .value)
         placeholder = try container.decodeIfPresent(Schema.TextField.Placeholder.self, forKey: .placeholder)
         secureEntry = try container.decodeIfPresent(Bool.self, forKey: .secureEntry) ?? false
@@ -49,6 +53,14 @@ extension Schema.TextField: Codable {
         let options = try container.decodeIfPresent(Schema.TextField.KeyboardOptions.self, forKey: .keyboardOptions)
 
         keyboardOptions = options?.nonEmptyOrNil
+
+        if kind == .multiLine {
+            maxRows = try container.decodeIfPresent(Int.self, forKey: .maxRows)
+            minRows = try container.decodeIfPresent(Int.self, forKey: .minRows)
+        } else {
+            maxRows = nil
+            minRows = nil
+        }
     }
 
     package func encode(to encoder: any Encoder) throws {
@@ -56,6 +68,12 @@ extension Schema.TextField: Codable {
             try defaultTextAttributes.encode(to: encoder)
         }
         var container = encoder.container(keyedBy: CodingKeys.self)
+        switch kind {
+        case .singleLine:
+            try container.encode(Schema.Element.ContentType.textField, forKey: .type)
+        case .multiLine:
+            try container.encode(Schema.Element.ContentType.textEditor, forKey: .type)
+        }
         try container.encode(value, forKey: .value)
         if let placeholder {
             try container.encode(placeholder, forKey: .placeholder)
@@ -79,6 +97,11 @@ extension Schema.TextField: Codable {
 
         if let keyboardOptions, !keyboardOptions.isEmpty {
             try container.encode(keyboardOptions, forKey: .keyboardOptions)
+        }
+
+        if kind == .multiLine {
+            try container.encodeIfPresent(maxRows, forKey: .maxRows)
+            try container.encodeIfPresent(minRows, forKey: .minRows)
         }
     }
 }

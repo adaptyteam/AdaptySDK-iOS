@@ -89,6 +89,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
     enum ContentType: String, Codable {
         case text
         case textField = "text_field"
+        case textEditor = "text_editor"
         case image
         case video
         case button
@@ -144,7 +145,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
             self = try .button(Schema.Button(from: decoder, configuration: configuration), propertyOrNil())
         case .text:
             self = try .text(Schema.Text(from: decoder), propertyOrNil())
-        case .textField:
+        case .textField, .textEditor:
             self = try .textField(Schema.TextField(from: decoder), propertyOrNil())
         case .image:
             self = try .image(Schema.Image(from: decoder), propertyOrNil())
