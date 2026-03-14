@@ -59,6 +59,9 @@ let package = Package(
             name: "Adapty",
             dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
             path: "Sources",
+            exclude: [
+                "Events/adapty.events.schema.yaml",
+            ],
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(

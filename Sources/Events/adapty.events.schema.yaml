@@ -1,0 +1,288 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://adapty.io/events/4_0_0/schema"
+title: "Adapty SDK Event"
+type: object
+
+required:
+  - event_id
+  - profile_id
+  - session_id
+  - platform
+  - device_id
+  - created_at
+  - event_name
+  - counter
+
+properties:
+
+  event_id:
+    type: string
+    format: uuid
+
+  profile_id:
+    type: string
+    format: uuid
+
+  session_id:
+    type: string
+    format: uuid
+
+  device_id:
+    type: string
+    format: uuid
+
+  platform:
+    type: string
+    enum:
+      - macOS
+      - iPadOS
+      - iOS
+      - tvOS
+      - visionOS
+      - android
+
+  created_at:
+    type: datetime
+
+  counter:
+    type: integer
+
+  oneOf:
+    - $ref: "#/$events/FlowSDKEvent"
+    - $ref: "#/$events/FlowVariationAssignedSDKEvent"
+    - $ref: "#/$events/AppOpenedEvent"
+    - $ref: "#/$events/PaywallVariationAssignedEvent"
+    - $ref: "#/$events/PaywallShowedEvent"
+    - $ref: "#/$events/OnboardingVariationAssignedEvent"
+    - $ref: "#/$events/AdaptyUIOnboardingScreenShowedParameters"
+    - $ref: "#/$events/ConsentToCollectingDataEvent"
+    - $ref: "#/$events/RefundPreferenceEvent"
+    # - $ref: "#/$events/SystemLogEvent"
+
+$events:
+
+  FlowSDKEvent:
+    type: object
+    required:
+      - event_name
+    properties: 
+      event_name: 
+        const: flow_event
+      variation_id:
+        type: string
+        format: uuid
+      event_type:
+        type: string
+        enum:
+          - flow_screen_showed
+      screen_id:
+        type: string
+      screen_order:
+        type: integer
+      screens_total:
+        type: integer
+      is_last_screen:
+        type: boolean
+  
+  FlowVariationAssignedSDKEvent:
+    type: object
+    required:
+      - event_name
+    properties: 
+      event_name: 
+        const: flow_variation_assigned
+      variation_id:
+        type: string
+        format: uuid
+      placement_audience_version_id:
+        type: string
+        format: uuid
+
+
+  AppOpenedEvent:
+    type: object
+    required:
+      - event_name
+    properties:
+      event_name:
+        const: app_opened
+
+  PaywallVariationAssignedEvent:
+    type: object
+    required:
+      - event_name
+      - variation_id
+      - placement_audience_version_id
+    properties:
+      event_name:
+        const: paywall_variation_assigned
+      variation_id:
+        type: string
+        format: uuid
+      paywall_builder_id:
+        type: string
+        format: uuid
+      placement_audience_version_id:
+        type: string
+        format: uuid
+
+  PaywallShowedEvent:
+    type: object
+    required:
+      - event_name
+      - variation_id
+    properties:
+      event_name:
+        const: paywall_showed
+      variation_id:
+        type: string
+        format: uuid
+      paywall_builder_id:
+        type: string
+        format: uuid
+
+  OnboardingVariationAssignedEvent:
+    type: object
+    required:
+      - event_name
+      - variation_id
+      - placement_audience_version_id
+    properties:
+      event_name:
+        const: onboarding_variation_assigned
+      variation_id:
+        type: string
+        format: uuid
+      placement_audience_version_id:
+        type: string
+        format: uuid
+
+  AdaptyUIOnboardingScreenShowedParameters:
+    type: object
+    required:
+      - event_name
+      - variation_id
+      - onboarding_screen_order
+      - onboarding_latest_screen
+    properties:
+      event_name:
+        const: new_onboarding_screen_showed
+      variation_id:
+        type: string
+        format: uuid
+      onboarding_screen_name:
+        type: string
+      onboarding_screen_order:
+        type: string
+      onboarding_latest_screen:
+        type: boolean
+        
+  ConsentToCollectingDataEvent:
+    type: object
+    required:
+      - consent
+      - event_name
+    properties:
+      event_name:
+        const: profile_refund_saver_settings
+      consent:
+        type: boolean
+
+  RefundPreferenceEvent:
+    type: object
+    required:
+      - event_name
+      - custom_preference
+    properties:
+      event_name:
+        const: profile_refund_saver_settings
+      custom_preference:
+        type: string
+        enum:
+          - no_preference
+          - grant
+          - decline
+      
+  SystemLogEvent:
+    type: object
+    required:
+      - event_name
+      - custom_data
+    properties:
+      event_name: 
+        const: system_log
+      custom_data:
+        oneOf:
+          - $ref: "#/$systemlog/BackendAPI/RequestParameters"
+          - $ref: "#/$systemlog/BackendAPI/ResponseParameters"
+
+          - $ref: "#/$systemlog/SDKPublicMethod/RequestParameters"
+          - $ref: "#/$systemlog/SDKPublicMethod/ResponseParameters"
+
+          - $ref: "#/$systemlog/Apple/RequestParameters"
+          - $ref: "#/$systemlog/Apple/ResponseParameters"
+          - $ref: "#/$systemlog/Apple/EventQueueHandlerParameters"
+
+          - $ref: "#/$systemlog/InternalEventParameters"
+
+# $systemlog:
+
+#   SDKPublicMethod:
+#     RequestParameters:
+#     ResponseParameters:
+
+#   BackendAPI:
+#     Method:
+#       type: string
+#       enum:
+#         - get_products
+#         - create_profile
+#         - get_profile
+#         - update_profile
+#         - get_paywall_variations
+#         - get_onboarding_variations
+#         - get_fallback_paywall_variations
+#         - get_fallback_onboarding_variations
+#         - get_paywall_variations_for_default_audience
+#         - get_onboarding_variations_for_default_audience
+#         - get_paywall_builder
+#         - get_fallback_paywall_builder
+#         - get_cross_placement_state
+#         - get_onboarding
+#         - get_paywall
+#         - get_fallback_paywall
+#         - validate_transaction
+#         - validate_receipt
+
+#         - set_asa_token
+#         - set_attribution_data
+#         - set_integration_identifier
+#         - sign_offer
+
+#         - get_net_config
+
+#         - get_all_products_info
+
+#         - reqister_install
+#         - send_events
+
+  #   RequestParameters:
+  #     type: object
+  #     required:
+  #       - event_name
+  #       - sdk_flow_id
+  #     properties:
+  #       event_name:
+  #         $ref: "#/$systemlog/BackendAPI/Method"
+  #       sdk_flow_id:
+  #         type: string
+
+  #   ResponseParameters:
+
+  # Apple:
+  #   RequestParameters:
+  #   ResponseParameters:
+  #   EventQueueHandlerParameters:
+
+  # InternalEventParameters:
+

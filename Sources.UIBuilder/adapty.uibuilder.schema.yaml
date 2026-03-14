@@ -830,7 +830,9 @@ UI:
     type: object
     allOf: 
       - $ref: "#/UI/TextField"
-      - properties:
+      - required: [type]
+        properties:
+          type: { const: "text_editor" }
           min_rows: { type: integer, minimum: 1 }
           max_rows: { type: integer, minimum: 1 }
 

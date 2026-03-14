@@ -68,7 +68,8 @@ extension VC.Action {
         guard !path.isEmpty else {
             throw DecodingError.dataCorrupted(
                 .init(
-                    codingPath: [], debugDescription: "wrong function name in path of url: \(url)"
+                    codingPath: [],
+                    debugDescription: "wrong function name in path of url: \(url)"
                 )
             )
         }
@@ -122,17 +123,17 @@ private extension VC.Parameter {
         switch self {
         case .null:
             [URLQueryItem(name: name, value: nil)]
-        case .string(let value):
+        case let .string(value):
             [URLQueryItem(name: name + Suffix.string.rawValue, value: value)]
-        case .bool(let value):
+        case let .bool(value):
             [URLQueryItem(name: name + Suffix.bool.rawValue, value: value.description)]
-        case .int32(let value):
+        case let .int32(value):
             [URLQueryItem(name: name + Suffix.int32.rawValue, value: value.description)]
-        case .uint32(let value):
+        case let .uint32(value):
             [URLQueryItem(name: name + Suffix.uint32.rawValue, value: value.description)]
-        case .double(let value):
+        case let .double(value):
             [URLQueryItem(name: name + Suffix.double.rawValue, value: value.description)]
-        case .object(let dict):
+        case let .object(dict):
             dict
                 .sorted(by: { $0.key < $1.key })
                 .flatMap { $0.value.asQueryItems(name: "\(name).\($0.key)") }
@@ -152,7 +153,8 @@ private extension VC.Parameter {
         guard let suffix else {
             throw DecodingError.dataCorrupted(
                 .init(
-                    codingPath: [], debugDescription: "key: \(key) without suffix specified"
+                    codingPath: [],
+                    debugDescription: "key: \(key) without suffix specified"
                 )
             )
         }
@@ -235,7 +237,7 @@ private extension [String: VC.Parameter] {
             self[key] = value
         } else {
             var subParams: [String: VC.Parameter] =
-                if case .object(let existing) = self[key] {
+                if case let .object(existing) = self[key] {
                     existing
                 } else {
                     [:]
@@ -245,3 +247,4 @@ private extension [String: VC.Parameter] {
         }
     }
 }
+
