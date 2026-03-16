@@ -80,21 +80,31 @@ struct AdaptyUITextField: View {
                 label: { EmptyView() }
             )
         } else {
-            TextField(
-                text: text,
-                prompt: promptText,
-                label: { EmptyView() }
-            )
+            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
+                TextField(
+                    text: text,
+                    prompt: promptText,
+                    axis: .vertical,
+                    label: { EmptyView() }
+                )
+                .applyLineLimit(
+                    kind: textField.kind,
+                    minRows: textField.minRows,
+                    maxRows: textField.maxRows
+                )
+            } else {
+                TextField(
+                    text: text,
+                    prompt: promptText,
+                    label: { EmptyView() }
+                )
+                .lineLimit(1)
+            }
         }
     }
 
     var body: some View {
         coreTextComponent
-            .applyLineLimit(
-                kind: textField.kind,
-                minRows: textField.minRows,
-                maxRows: textField.maxRows
-            )
             .onSubmit {
                 stateViewModel.execute(
                     actions: textField.keyboardSubmitActions,

@@ -12,6 +12,7 @@ import SwiftUI
 // MARK: - Line Limit
 
 extension View {
+    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
     @ViewBuilder
     func applyLineLimit(
         kind: VC.TextField.Kind,
@@ -26,19 +27,11 @@ extension View {
             case (.none, .none):
                 lineLimit(nil)
             case (.some(let minRows), .none):
-                if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                    lineLimit(minRows...)
-                } else {
-                    lineLimit(nil)
-                }
+                lineLimit(minRows...)
             case (.none, .some(let maxRows)):
                 lineLimit(maxRows)
             case (.some(let minRows), .some(let maxRows)):
-                if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-                    lineLimit(minRows ... maxRows)
-                } else {
-                    lineLimit(maxRows)
-                }
+                lineLimit(minRows ... maxRows)
             }
         }
     }
@@ -60,9 +53,17 @@ extension View {
             Font(attr?.size.map { fa.font.withSize(CGFloat($0)) } ?? fa.font)
         } ?? attr?.size.map { Font.system(size: CGFloat($0)) }
 
-        self
-            .font(resolvedFont)
-            .foregroundColor(colorAsset ?? fontAsset?.defaultColor)
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
+            self
+                .font(resolvedFont)
+                .foregroundColor(colorAsset ?? fontAsset?.defaultColor)
+                .underline(attr?.underline ?? false)
+                .strikethrough(attr?.strike ?? false)
+        } else {
+            self
+                .font(resolvedFont)
+                .foregroundColor(colorAsset ?? fontAsset?.defaultColor)
+        }
     }
 }
 
@@ -74,7 +75,7 @@ private enum TextFieldConstraintRegexCache {
     static func regex(for pattern: String) -> NSRegularExpression? {
         if let cached = cache[pattern] { return cached }
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
-        cache[pattern] = regex
+        self.cache[pattern] = regex
         return regex
     }
 }
@@ -124,13 +125,23 @@ extension View {
                 self
                     .onAppear { lastValid.wrappedValue = text.wrappedValue }
                     .onChange(of: text.wrappedValue) { _, newValue in
-                        applyTextConstraints(newValue, constraints: constraints, lastValid: lastValid, text: text)
+                        applyTextConstraints(
+                            newValue,
+                            constraints: constraints,
+                            lastValid: lastValid,
+                            text: text
+                        )
                     }
             } else {
                 self
                     .onAppear { lastValid.wrappedValue = text.wrappedValue }
                     .onChange(of: text.wrappedValue) { newValue in
-                        applyTextConstraints(newValue, constraints: constraints, lastValid: lastValid, text: text)
+                        applyTextConstraints(
+                            newValue,
+                            constraints: constraints,
+                            lastValid: lastValid,
+                            text: text
+                        )
                     }
             }
         } else {
