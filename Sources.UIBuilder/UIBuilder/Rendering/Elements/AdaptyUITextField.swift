@@ -95,6 +95,12 @@ struct AdaptyUITextField: View {
                 minRows: textField.minRows,
                 maxRows: textField.maxRows
             )
+            .onSubmit {
+                stateViewModel.execute(
+                    actions: textField.keyboardSubmitActions,
+                    screen: screen
+                )
+            }
             .multilineTextAlignment(textField.horizontalAlign)
             .applyTextAttributes(
                 resolvedRichTextAttributes,
