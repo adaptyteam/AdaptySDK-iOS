@@ -1,6 +1,6 @@
 //
 //  Schema.RangeTextFormat.swift
-//  Adapty
+//  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 15.03.2026.
 //

@@ -169,6 +169,16 @@ Entities:
           unit: { enum: [point, screen], default: point }
         additionalProperties: false
 
+  DateTime:
+    description: "Date/time value"
+    oneOf:
+      - type: number
+        description: "Unix timestamp in milliseconds"
+      - type: string
+        pattern: "^[0-9]{4}-((0[1-9])|(1[012]))-(([0-2][1-9])|(3[01])) (([01][0-9])|(2[0123])):([0-5][0-9]):([0-5][0-9])$"
+        description: "Date string: 6 numeric components (year, month, day, hour, minute, second) separated by any of: space, dash, colon, dot, comma, semicolon, slash, backslash"
+
+
 ###### Animations ######
 
 Animation:
@@ -528,6 +538,7 @@ UI:
               - $ref: "#/UI/Video"
               - $ref: "#/UI/Text"
               - $ref: "#/UI/TextField"
+              - $ref: "#/UI/TextEditor"
               - $ref: "#/UI/Toggle"
               - $ref: "#/UI/Slider"
               - $ref: "#/UI/Button"
@@ -538,6 +549,9 @@ UI:
               - $ref: "#/UI/Column"
               - $ref: "#/UI/Timer"
               - $ref: "#/UI/Pager"
+              - $ref: "#/UI/DateTimePicker"
+              - $ref: "#/UI/WheelRangePicker"
+              - $ref: "#/UI/WheelItemsPicker"
           - properties:
               decorator: { $ref: "#/UI/Element/Decorator" }
               padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
@@ -953,9 +967,7 @@ UI:
       - oneOf:
           - required: [end_time, behaviour]
             properties:
-              end_time:
-                type: string
-                pattern: "^[0-9]{4}-((0[1-9])|(1[012]))-(([0-2][1-9])|(3[01])) (([01][0-9])|(2[0123])):([0-5][0-9]):([0-5][0-9])$"
+              end_time: { $ref: "#/Entities/DateTime"}
               behaviour:
                 type: string
                 enum:
@@ -1040,6 +1052,49 @@ UI:
           additionalProperties: false
           properties:
             parent: { type: number }
+
+  DateTimePicker:
+    type: object
+    required: [type, value, components]
+    properties:
+      type: { enum: ["compact_datetime_picker", "wheel_datetime_picker", "graphical_datetime_picker"] }
+      value: { $ref: "#/Script/DataBinding" }
+      components:
+          type: array
+          items:
+            type: string
+            enum: [date, hour_and_minute]
+          uniqueItems: true
+          minItems: 1
+      min:
+        $ref: "#/Entities/DateTime"
+      max:
+        $ref: "#/Entities/DateTime"
+      color: { $ref: "#/AssetIdOrColor/Binding" }
+      string_in_local_time:
+        type: boolean
+        default: false
+        description: "If true, min/max date strings are interpreted in local time zone; otherwise UTC"
+
+  WheelRangePicker:
+    type: object
+    allOf:
+      - $ref: "#/UI/Text/Attributes"
+      - required: [type, value, min, max, format]
+        properties:
+          type: { const: "wheel_range_picker" }
+          value: { $ref: "#/Script/DataBinding" }
+          min: { type: number }
+          max: { type: number }
+          step: { type: number, default: 1.0 }
+          format: { $ref: "#/UI/Timer/Format" }
+
+  WheelItemsPicker:
+    type: object
+    required: [type, value]
+    properties:
+      type: { const: "wheel_items_picker" }
+      value: { $ref: "#/Script/DataBinding" }
 
 ###### Rich Text ######
 
@@ -1414,3 +1469,328 @@ Script:
               - type: boolean
               - type: number
     additionalProperties: false
+
+
+###### DateTime ######
+#
+# Объекты:
+#   DateTime                   — точка во времени (oneOf: компоненты / relative / timestamp)
+#   DateTime/TimeZone          — формат time zone 
+#   DateTime/Relative          — дата относительно опорной точки (now, startOfDay и т.д.)
+#   DateTime/Interval          — длительность / смещение
+#
+# Фиксированные настройки (не включены как поля):
+#   calendar    → всегда ISO 8601 
+#   era         → всегда AD
+#   nanosecond  → всегда 0
+
+DateTime:
+  description: >
+    Точка во времени. Три формата:
+    1) Объект — конкретная дата/время через компоненты (year/month/day + time) Используется для локального времени.
+    2) DateTimeRelative — относительно опорной точки (now, startOfDay и т.д.)
+    3) Unix timestamp в миллисекундах (double) Самый быстрый вариант для вычислений
+  oneOf:
+    - title: Date components for local time
+      type: object
+      description: >
+        Конкретная дата/время через год, месяц и день.
+        Если известена timeZone, то используйте unix timestamp, это быстрее.
+        Календарь всегда ISO 8601.
+      properties:
+
+        timeZone:
+          default: null
+          $ref: "#/DateTime/TimeZone"
+          description: >
+            Time zone. См. TimeZoneIdentifier для форматов.
+            When null: используется часовой пояс из настроек
+            устройства пользователя.
+
+        year:
+          type: integer
+          default: 1
+          description: Год.
+          minimum: 1
+          example: 2026
+
+        month:
+          type: integer
+          default: 1
+          description: "Месяц. 1 = January, 12 = December."
+          minimum: 1
+          maximum: 12 
+
+        day:
+          type: integer
+          default: 1
+          description: День месяца.
+          minimum: 1
+          maximum: 31
+
+        hour:
+          type: integer
+          default: 0
+          description: "Час (0–23)."
+          minimum: 0
+          maximum: 23
+
+        minute:
+          type: integer
+          default: 0
+          description: "Минута (0–59)."
+          minimum: 0
+          maximum: 59
+
+        second:
+          type: integer
+          default: 0
+          description: "Секунда (0–59). Leap seconds не представлены."
+          minimum: 0
+          maximum: 59
+
+      additionalProperties: false
+
+    - $ref: "#/DateTime/Relative"
+
+    - title: Unix timestamp (milliseconds)
+      type: number
+      description: >
+        Миллисекунды с 1 января 1970 00:00:00 UTC (Unix epoch).
+        Всегда UTC — timeZone не нужен.
+        Double позволяет передавать дробные миллисекунды.
+
+  examples:
+    # Конкретная дата + время
+    - {"year": 2026, "month": 3, "day": 15, "hour": 14, "minute": 30, "timeZone": "Europe/Podgorica"}
+    # Только дата (время = 00:00:00)
+    - {"year": 2026, "month": 3, "day": 15}
+    # День рождения (без года — year defaults to 1)
+    - {"month": 7, "day": 22}
+    # Относительная (DateTimeRelative)
+    - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"hour": 9}}
+    # Текущий момент
+    - {"anchor": "now"}
+    # Unix timestamp в миллисекундах
+    - 1742054400000
+
+  # 1. DateTime/TimeZone — часовые пояса
+
+  TimeZone:
+    description: >
+      Time zone identifier. В JSON всегда строка.
+      Два формата: IANA identifier или UTC offset.
+
+      ВАЖНО: IANA identifier (e.g. "Europe/Podgorica") автоматически
+      учитывает переход на летнее/зимнее время (DST).
+      UTC offset (e.g. "+0100") — фиксированное смещение,
+      DST не учитывается.
+
+      Пример: "Europe/Podgorica" зимой = UTC+1, летом = UTC+2.
+      Если указать "+0100", то летом время будет на час раньше
+      реального местного. Поэтому для задания "местного времени
+      пользователя" всегда используй IANA identifier.
+      UTC offset подходит только когда нужно точное фиксированное
+      смещение без DST.
+    oneOf:
+      - title: IANA identifier
+        type: string
+        description: >
+          IANA time zone identifier.
+          Рекомендуемый формат — учитывает DST автоматически.
+          Полный список: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        pattern: "^[A-Za-z_]+/[A-Za-z_/]+$"
+        examples:
+          - "Europe/Podgorica"
+          - "America/New_York"
+          - "Asia/Tokyo"
+          - "Europe/Paris"
+
+      - title: UTC
+        const: "UTC"
+
+      - title: Offset
+        type: string
+        description: >
+          Смещение от UTC в формате ±HHmm (без двоеточия).
+          Фиксированное смещение — DST не учитывается.
+        pattern: "^[+-]\\d{4}$"
+        examples:
+          - "+0300"
+          - "-0530"
+          - "+0000"
+
+  # 2. DateTime/Relative — дата относительно опорной точки
+
+  Relative:
+    type: object
+    description: >
+      Дата/время, вычисляемая относительно опорной точки (anchor).
+      Формула: результат = anchor + offset
+      Это кастомная схема, не входящая в стандартный DateComponents.
+    required: [anchor]
+    properties:
+
+      anchor:
+        type: string
+        description: >
+          Опорная точка для вычислений.
+          - now: текущий момент UTC. anchorTimeZone не требуется.
+          - startOfDay: полночь (00:00:00) текущего дня. anchorTimeZone обязателен.
+          - startOfWeek: полночь понедельника текущей недели (ISO 8601).
+            anchorTimeZone обязателен.
+          - startOfMonth: полночь 1-го числа текущего месяца. anchorTimeZone обязателен.
+          - startOfYear: полночь 1 января текущего года. anchorTimeZone обязателен.
+        enum:
+          - now
+          - startOfDay
+          - startOfWeek
+          - startOfMonth
+          - startOfYear
+
+      anchorTimeZone:
+        $ref: "#/TimeZoneIdentifier"
+        description: >
+          Time zone для определения опорной точки.
+          Обязателен для startOfDay, startOfWeek, startOfMonth, startOfYear.
+          Игнорируется для now (текущий момент UTC одинаков везде).
+          When null: используется часовой пояс из настроек
+          устройства пользователя.
+
+      offset:
+        $ref: "#/DateTime/Interval"
+        description: >
+          Смещение от опорной точки.
+          When null: смещение не применяется, результат = anchor.
+
+    additionalProperties: false
+
+    examples:
+      # --- now ---
+      # Текущий момент
+      - {"anchor": "now"}
+      # Через 30 минут от сейчас
+      - {"anchor": "now", "offset": {"minute": 30}}
+      # 2 часа назад
+      - {"anchor": "now", "offset": {"hour": -2}}
+
+      # --- startOfDay ---
+      # Начало сегодняшнего дня
+      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica"}
+      # Сегодня в 14:30
+      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"hour": 14, "minute": 30}}
+      # Конец сегодняшнего дня (23:59:59)
+      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"hour": 23, "minute": 59, "second": 59}}
+      # Начало завтрашнего дня
+      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": 1}}
+      # Начало вчерашнего дня
+      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": -1}}
+      # 7 дней назад, в 9:00
+      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": -7, "hour": 9}}
+
+      # --- startOfWeek (понедельник, ISO 8601) ---
+      # Начало текущей недели (понедельник 00:00)
+      - {"anchor": "startOfWeek", "anchorTimeZone": "Europe/Podgorica"}
+      # Пятница этой недели в 18:00
+      - {"anchor": "startOfWeek", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": 4, "hour": 18}}
+      # Воскресенье (для стран где неделя с воскресенья)
+      - {"anchor": "startOfWeek", "anchorTimeZone": "America/New_York", "offset": {"day": -1}}
+
+      # --- startOfMonth ---
+      # Начало текущего месяца
+      - {"anchor": "startOfMonth", "anchorTimeZone": "Europe/Podgorica"}
+      # 15-е число этого месяца в 10:00
+      - {"anchor": "startOfMonth", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": 14, "hour": 10}}
+      # Начало прошлого месяца
+      - {"anchor": "startOfMonth", "anchorTimeZone": "Europe/Podgorica", "offset": {"month": -1}}
+
+      # --- startOfYear ---
+      # Начало текущего года
+      - {"anchor": "startOfYear", "anchorTimeZone": "Europe/Podgorica"}
+      # 1 марта текущего года
+      - {"anchor": "startOfYear", "anchorTimeZone": "Europe/Podgorica", "offset": {"month": 2}}
+      # 100-й день текущего года
+      - {"anchor": "startOfYear", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": 99}}
+
+  #  DateTime/Interval — длительность / смещение
+
+  Interval:
+    description: >
+      Длительность или смещение. 
+      Два формата:
+      1) Объект с календарными/временными компонентами - учитывает календарь (месяц = 28–31 день,
+      DST и т.д.).
+      2) Число (double) — точные миллисекунды без календарной логики.
+    oneOf:
+      - title: Calendar components
+        type: object
+        description: >
+          Смещение в календарных/временных единицах.
+          Значения могут быть отрицательными (отнять).
+          Незаданные поля (default: 0) не изменяют исходную дату.
+
+          Не включены (вычисляются из базовых):
+          - week: 1 week = 7 days → используй day: 7
+          - nanosecond: всегда 0, точность до секунд достаточна
+        properties:
+          year:
+            type: integer
+            default: 0
+            description: Количество лет. Отрицательное = назад.
+            example: 1
+          month:
+            type: integer
+            default: 0
+            description: Количество месяцев. Отрицательное = назад.
+            example: -3
+          day:
+            type: integer
+            default: 0
+            description: Количество дней. Отрицательное = назад.
+            example: 5
+          hour:
+            type: integer
+            default: 0
+            description: Количество часов. Отрицательное = назад.
+            example: 3
+          minute:
+            type: integer
+            default: 0
+            description: Количество минут. Отрицательное = назад.
+            example: 30
+          second:
+            type: integer
+            default: 0
+            description: Количество секунд. Отрицательное = назад.
+            example: -90
+        additionalProperties: false
+
+      - title: Milliseconds 
+        type: number
+        description: >
+          Смещение в миллисекундах.
+          Отрицательное = назад. Дробное = микросекунды.
+          Не учитывает календарь — просто прибавляет/отнимает
+          точное количество миллисекунд.
+
+    examples:
+      # --- Объектный формат (календарный) ---
+      # Добавить 2 месяца и 5 дней
+      - {"month": 2, "day": 5}
+      # Отнять 1 год и 6 месяцев
+      - {"year": -1, "month": -6}
+      # Добавить 3 часа 30 минут
+      - {"hour": 3, "minute": 30}
+      # Добавить 1 месяц и 12 часов
+      - {"month": 1, "hour": 12}
+      # Отнять 7 дней
+      - {"day": -7}
+      # --- Числовой формат (миллисекунды) ---
+      # Добавить 1 час (3600000 мс)
+      - 3600000
+      # Отнять 1 день (86400000 мс)
+      - -86400000
+      # Добавить 30 минут и 500 мс
+      - 1800500
+
+

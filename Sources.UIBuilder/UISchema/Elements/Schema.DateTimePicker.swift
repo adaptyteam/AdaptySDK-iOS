@@ -44,7 +44,7 @@ extension Schema.DateTimePicker: Codable {
 
         value = try container.decode(Schema.Variable.self, forKey: .value)
 
-        components = try container.decodeIfPresent(Schema.DateTimePicker.Components.self, forKey: .components) ?? []
+        components = try container.decode(Schema.DateTimePicker.Components.self, forKey: .components)
 
         let stringInLocalTime = try container.decodeIfPresent(Bool.self, forKey: .stringInLocalTime) ?? false
 
