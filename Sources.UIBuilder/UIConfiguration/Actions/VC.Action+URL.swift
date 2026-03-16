@@ -11,7 +11,7 @@ extension VC.Action {
     private static let scheme = "sdk"
     private static let host = "action"
 
-    package var asURL: URL? {
+    var asURL: URL? {
         var components = URLComponents()
         components.scheme = Self.scheme
         components.host = [scope.rawValue, Self.host].joined(separator: ".")
@@ -28,7 +28,7 @@ extension VC.Action {
         return components.url
     }
 
-    package init(
+    init(
         url: URL,
         autodetectType: Bool = false
     ) throws {
@@ -247,4 +247,3 @@ private extension [String: VC.Parameter] {
         }
     }
 }
-

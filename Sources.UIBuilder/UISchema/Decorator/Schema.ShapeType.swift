@@ -23,7 +23,7 @@ extension Schema.ShapeType: Codable {
         case curveDown = "curve_down"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         switch try Types(rawValue: container.decode(String.self)) {
         case nil:
@@ -39,7 +39,7 @@ extension Schema.ShapeType: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
         case .rectangle:

@@ -28,7 +28,7 @@ extension Schema.RichText.Attributes: Codable {
         case underline
     }
 
-    package init(from decoder: any Decoder) throws {
+    init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             fontAssetId: container.decodeIfPresent(Schema.AssetIdentifier.self, forKeys: .fontAssetId),
@@ -41,7 +41,7 @@ extension Schema.RichText.Attributes: Codable {
         )
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(fontAssetId, forKey: .fontAssetId)
         try container.encodeIfPresent(size, forKey: .size)

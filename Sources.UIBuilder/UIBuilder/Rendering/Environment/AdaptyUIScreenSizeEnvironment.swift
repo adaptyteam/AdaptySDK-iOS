@@ -43,25 +43,26 @@ extension EnvironmentValues {
         get { self[AdaptyUIScreenInstanceKey.self] }
         set { self[AdaptyUIScreenInstanceKey.self] = newValue }
     }
-    
+
     var adaptyDisplayMissingTags: Bool {
         get { self[AdaptyUIDisplayMissingTagsKey.self] }
         set { self[AdaptyUIDisplayMissingTagsKey.self] = newValue }
     }
 }
 
-package extension View {
-    func withScreenSize(_ value: CGSize) -> some View {
+extension View {
+   package func withScreenSize(_ value: CGSize) -> some View {
         environment(\.adaptyScreenSize, value)
     }
 
     func withScreenInstance(_ value: VS.ScreenInstance) -> some View {
         environment(\.adaptyScreenInstance, value)
     }
-    
+
     func withDisplayMissingTags(_ value: Bool) -> some View {
         environment(\.adaptyDisplayMissingTags, value)
     }
 }
 
 #endif
+

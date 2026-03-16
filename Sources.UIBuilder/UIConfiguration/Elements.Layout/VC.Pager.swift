@@ -7,15 +7,15 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Pager: Sendable, Hashable {
-        package let pageWidth: Length
-        package let pageHeight: Length
-        package let pagePadding: EdgeInsets
-        package let spacing: Double
-        package let content: [Element]
-        package let pageControl: PageControl?
-        package let animation: Animation?
-        package let interactionBehavior: InteractionBehavior
+        let pageWidth: Length
+        let pageHeight: Length
+        let pagePadding: EdgeInsets
+        let spacing: Double
+        let content: [Element]
+        let pageControl: PageControl?
+        let animation: Animation?
+        let interactionBehavior: InteractionBehavior
     }
 }

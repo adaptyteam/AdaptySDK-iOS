@@ -26,6 +26,9 @@ extension Schema {
         indirect case slider(Schema.Slider, Properties?) // VC
         indirect case timer(Schema.Timer, Properties?)
         indirect case pager(Schema.Pager, Properties?)
+        indirect case dateTimePicker(Schema.DateTimePicker, Properties?) // VC
+        indirect case wheelItemsPicker(Schema.WheelItemsPicker, Properties?) // VC
+        indirect case wheelRangePicker(Schema.WheelRangePicker, Properties?)
 
         indirect case unknown(String, Properties?)
     }
@@ -72,6 +75,12 @@ extension Schema.ConfigurationBuilder {
             return .timer(convertTimer(value), properties?.value)
         case let .pager(value, properties):
             planPager(value, properties?.value, in: &taskStack)
+        case let .dateTimePicker(value, properties):
+            return .dateTimePicker(value, properties?.value)
+        case let .wheelItemsPicker(value, properties):
+            return .wheelItemsPicker(value, properties?.value)
+        case let .wheelRangePicker(value, properties):
+            return .wheelRangePicker(convertWheelRangePicker(value), properties?.value)
         case let .unknown(value, properties):
             return .unknown(value, properties?.value)
         }
@@ -107,6 +116,11 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         case legacyReference = "reference"
         case pager
         case screenHolder = "screen_holder"
+        case compactDateTimePicker = "compact_datetime_picker"
+        case wheelDateTimePicker = "wheel_datetime_picker"
+        case graphicalDateTimePicker = "graphical_datetime_picker"
+        case wheelItemsPicker = "wheel_items_picker"
+        case wheelRangePicker = "wheel_range_picker"
     }
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -165,6 +179,12 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
             self = try .timer(Schema.Timer(from: decoder), propertyOrNil())
         case .pager:
             self = try .pager(Schema.Pager(from: decoder, configuration: configuration), propertyOrNil())
+        case .compactDateTimePicker, .graphicalDateTimePicker, .wheelDateTimePicker:
+            self = try .dateTimePicker(Schema.DateTimePicker(from: decoder), propertyOrNil())
+        case .wheelRangePicker:
+            self = try .wheelRangePicker(Schema.WheelRangePicker(from: decoder), propertyOrNil())
+        case .wheelItemsPicker:
+            self = try .wheelItemsPicker(Schema.WheelItemsPicker(from: decoder), propertyOrNil())
         }
 
         func propertyOrNil() -> Properties? {

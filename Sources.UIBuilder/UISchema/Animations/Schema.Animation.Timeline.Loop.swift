@@ -13,7 +13,7 @@ extension Schema.Animation.Timeline.Loop: RawRepresentable {
         static let pingPong = "ping_pong"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.normal: self = .normal
         case Key.pingPong: self = .pingPong
@@ -21,7 +21,7 @@ extension Schema.Animation.Timeline.Loop: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .normal: Key.normal
         case .pingPong: Key.pingPong

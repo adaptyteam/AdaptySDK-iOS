@@ -7,10 +7,10 @@
 
 import Foundation
 
-package extension VC.Animation {
+extension VC.Animation {
     struct ShadowParameters: Sendable, Hashable {
-        package let color: Range<VC.AssetReference>?
-        package let blurRadius: Range<Double>?
-        package let offset: Range<VC.Offset>?
+        let color: Range<VC.AssetReference>?
+        let blurRadius: Range<Double>?
+        let offset: Range<VC.Offset>?
     }
 }

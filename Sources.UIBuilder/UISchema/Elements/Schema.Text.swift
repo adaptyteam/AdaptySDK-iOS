@@ -19,7 +19,7 @@ extension Schema.Text: Codable {
         case overflowMode = "on_overflow"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let overflowMode =
@@ -29,7 +29,7 @@ extension Schema.Text: Codable {
                 try Set(container.decodeIfPresent([OverflowMode].self, forKey: .overflowMode) ?? [])
             }
 
-        let textAttributes = try Schema.Text.Attributes(from: decoder)
+        let textAttributes = try Schema.TextAttributes(from: decoder)
 
         try self.init(
             value: container.decode(Schema.StringReference.self, forKey: .stringId),
@@ -40,7 +40,7 @@ extension Schema.Text: Codable {
         )
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         if let defaultTextAttributes = defaultTextAttributes.nonEmptyOrNil {
             try defaultTextAttributes.encode(to: encoder)
         }

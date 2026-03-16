@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.Unit {
+extension VC.Unit {
     enum SafeArea: Sendable, Hashable {
         case start
         case end

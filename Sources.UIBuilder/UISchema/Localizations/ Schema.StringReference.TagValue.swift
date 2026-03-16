@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema.StringReference.TagValue: Codable {
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(String.self) {
             self = .value(value)
@@ -23,7 +23,7 @@ extension Schema.StringReference.TagValue: Codable {
         throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "must be string, or variable"))
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
         case let .value(value):

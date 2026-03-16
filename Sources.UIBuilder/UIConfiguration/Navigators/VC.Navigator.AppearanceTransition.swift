@@ -7,27 +7,29 @@
 
 import Foundation
 
-package extension VC.Navigator {
+extension VC.Navigator {
     struct AppearanceTransition: Sendable, Hashable {
-        package let background: VC.Animation.Background?
-        package let content: [VC.Animation]?
+        let background: VC.Animation.Background?
+        let content: [VC.Animation]?
     }
 }
 
-package extension VC.Navigator.AppearanceTransition {
+extension VC.Navigator.AppearanceTransition {
     static let onDisappearKey = "on_disappear"
     static let onAppearKey = "on_appear"
 
+    @inlinable
     var isEmpty: Bool {
         background == nil && (content?.isEmpty ?? true)
     }
 
+    @inlinable
     var isNotEmpty: Bool {
         !isEmpty
     }
 }
 
-package extension [String: VC.Navigator.AppearanceTransition] {
+extension [String: VC.Navigator.AppearanceTransition] {
     var onAppear: VC.Navigator.AppearanceTransition? {
         self[VC.Navigator.AppearanceTransition.onAppearKey]
     }

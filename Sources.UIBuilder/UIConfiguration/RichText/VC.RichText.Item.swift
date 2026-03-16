@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.RichText {
+extension VC.RichText {
     enum Item: Sendable, Hashable {
         case text(String, Attributes?, VC.Action?)
         case tag(String, Attributes?, VC.Action?)
@@ -16,7 +16,7 @@ package extension VC.RichText {
     }
 }
 
-package extension VC.RichText.Item {
+extension VC.RichText.Item {
     func apply(defaultAttributes: VC.RichText.Attributes?) -> Self {
         guard let defaultAttributes, !defaultAttributes.isEmpty else { return self }
 

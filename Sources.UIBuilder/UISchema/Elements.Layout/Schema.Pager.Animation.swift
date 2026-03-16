@@ -26,7 +26,7 @@ extension Schema.Pager.Animation: Codable {
         case afterInteractionDelay = "after_interaction_delay"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         try self.init(
@@ -43,7 +43,7 @@ extension Schema.Pager.Animation: Codable {
         )
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         if startDelay != Self.default.startDelay {

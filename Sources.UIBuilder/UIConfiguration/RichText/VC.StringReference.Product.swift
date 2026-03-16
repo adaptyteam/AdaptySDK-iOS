@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.StringReference {
+extension VC.StringReference {
     enum Product: Sendable, Hashable {
         case id(String, sufix: String?)
         case variable(VC.Variable, sufix: String?)

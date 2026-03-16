@@ -18,7 +18,7 @@ extension Schema.Navigator.ScreenTransition: Codable {
         case isIncomingOnTop = "is_incoming_on_top"
     }
 
-    package init(from decoder: any Decoder) throws {
+    init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         try self.init(
@@ -28,7 +28,7 @@ extension Schema.Navigator.ScreenTransition: Codable {
         )
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         if let outgoing, outgoing.isNotEmpty { try container.encode(outgoing, forKey: .outgoing) }
         if let incoming, incoming.isNotEmpty { try container.encode(incoming, forKey: .incoming) }

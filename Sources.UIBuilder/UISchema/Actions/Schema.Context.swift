@@ -21,7 +21,7 @@ extension Schema.Context: RawRepresentable {
         static let global = "global"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.screen: self = .screen
         case Key.global: self = .global
@@ -29,7 +29,7 @@ extension Schema.Context: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .screen: Key.screen
         case .global: Key.global

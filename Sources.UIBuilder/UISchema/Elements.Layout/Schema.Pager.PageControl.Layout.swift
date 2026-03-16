@@ -13,7 +13,7 @@ extension Schema.Pager.PageControl.Layout: RawRepresentable {
         static let stacked = "stacked"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.overlaid: self = .overlaid
         case Key.stacked: self = .stacked
@@ -21,7 +21,7 @@ extension Schema.Pager.PageControl.Layout: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .overlaid: Key.overlaid
         case .stacked: Key.stacked

@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.Box {
+extension VC.Box {
     enum Length: Sendable, Hashable {
         case fixed(VC.Unit)
         case flexible(min: VC.Unit?, max: VC.Unit?)

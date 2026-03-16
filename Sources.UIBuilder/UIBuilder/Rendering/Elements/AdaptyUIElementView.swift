@@ -20,31 +20,6 @@ extension View {
     }
 }
 
-extension VC.Element {
-    var properties: VC.Element.Properties? {
-        switch self {
-        case .space, .screenHolder:
-            nil
-        case let .box(_, properties),
-             let .stack(_, properties),
-             let .text(_, properties),
-             let .image(_, properties),
-             let .textField(_, properties),
-             let .button(_, properties),
-             let .row(_, properties),
-             let .column(_, properties),
-             let .section(_, properties),
-             let .toggle(_, properties),
-             let .timer(_, properties),
-             let .slider(_, properties),
-             let .pager(_, properties),
-             let .unknown(_, properties),
-             let .video(_, properties):
-            properties
-        }
-    }
-}
-
 @MainActor
 struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     private let element: VC.Element
@@ -116,6 +91,12 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             )
         case .screenHolder:
             screenHolderBuilder()
+        case .dateTimePicker:
+            AdaptyUIUnknownElementView(value: "date-time picker")
+        case .wheelItemsPicker:
+            AdaptyUIUnknownElementView(value: "wheel items picker")
+        case .wheelRangePicker:
+            AdaptyUIUnknownElementView(value: "wheel range picker")
         case let .unknown(value, _):
             AdaptyUIUnknownElementView(value: value)
         }
@@ -135,13 +116,13 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     }
 }
 
-package struct AdaptyUIElementView<ScreenHolderContent: View>: View {
+struct AdaptyUIElementView<ScreenHolderContent: View>: View {
     private let element: VC.Element
     private let additionalPadding: EdgeInsets?
     private let drawDecoratorBackground: Bool
     private let screenHolderBuilder: () -> ScreenHolderContent
 
-    package init(
+    init(
         _ element: VC.Element,
         @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent,
         additionalPadding: EdgeInsets? = nil,
@@ -156,7 +137,7 @@ package struct AdaptyUIElementView<ScreenHolderContent: View>: View {
     @State
     private var playOnAppearAnimations: [VC.Animation] = []
 
-    package var body: some View {
+    var body: some View {
         AdaptyUIElementWithoutPropertiesView(
             element,
             screenHolderBuilder: screenHolderBuilder
@@ -177,3 +158,4 @@ package struct AdaptyUIElementView<ScreenHolderContent: View>: View {
 }
 
 #endif
+

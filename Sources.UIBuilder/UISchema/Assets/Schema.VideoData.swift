@@ -27,7 +27,7 @@ extension Schema.VideoData: Codable {
         case customId = "custom_id"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             customId: container.decodeIfPresent(String.self, forKey: .customId),
@@ -36,7 +36,7 @@ extension Schema.VideoData: Codable {
         )
     }
 
-    package func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.assetType, forKey: .type)
         try container.encodeIfPresent(customId, forKey: .customId)

@@ -19,7 +19,7 @@ extension Schema.Box.Length: Codable {
         case fillMax = "fill_max"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(Schema.Unit.self) {
             self = .fixed(value)
         } else {
@@ -38,7 +38,7 @@ extension Schema.Box.Length: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         switch self {
         case let .fixed(unit):
             try unit.encode(to: encoder)

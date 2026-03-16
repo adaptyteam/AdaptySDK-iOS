@@ -7,12 +7,12 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct CornerRadius: Sendable, Hashable {
-        package let topLeading: Double
-        package let topTrailing: Double
-        package let bottomTrailing: Double
-        package let bottomLeading: Double
+        let topLeading: Double
+        let topTrailing: Double
+        let bottomTrailing: Double
+        let bottomLeading: Double
     }
 }
 
@@ -26,6 +26,7 @@ extension VC.CornerRadius {
         )
     }
 
+    @inlinable
     var isZero: Bool {
         topLeading.isZero
             && topTrailing.isZero
@@ -33,6 +34,7 @@ extension VC.CornerRadius {
             && bottomLeading.isZero
     }
 
+    @inlinable
     var isSameRadius: Bool {
         (topLeading == topTrailing)
             && (bottomLeading == bottomTrailing)

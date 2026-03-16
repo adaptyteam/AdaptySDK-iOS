@@ -11,7 +11,7 @@ extension Schema {
     typealias Point = VC.Point
 }
 
-package extension Schema.Point {
+extension Schema.Point {
     static let zero = Self(x: 0.0, y: 0.0)
     static let one = Self(x: 1.0, y: 1.0)
     static let center = Self(x: 0.5, y: 0.5)
@@ -23,7 +23,7 @@ extension Schema.Point: Codable {
         case y
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let values = try? container.decode([Double].self) {
             switch values.count {
@@ -40,7 +40,7 @@ extension Schema.Point: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode([y, x])
     }

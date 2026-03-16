@@ -8,7 +8,7 @@
 import Foundation
 
 @available(*, deprecated, renamed: "test", message: "test")
-package extension VC {
+extension VC {
     enum Filling: Sendable, Hashable {
         case solidColor(Color)
         case colorGradient(ColorGradient)
@@ -82,3 +82,4 @@ extension VC.Asset {
         return value
     }
 }
+

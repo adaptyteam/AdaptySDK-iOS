@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     enum Unit: Sendable, Hashable {
         case point(Double)
         case screen(Double)

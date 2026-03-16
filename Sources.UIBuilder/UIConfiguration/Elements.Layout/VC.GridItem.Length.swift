@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.GridItem {
+extension VC.GridItem {
     enum Length: Sendable, Hashable {
         case fixed(VC.Unit)
         case weight(Int)

@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     enum AspectRatio: Sendable, Hashable {
         case fit
         case fill

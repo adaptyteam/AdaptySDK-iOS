@@ -947,17 +947,7 @@ UI:
         properties:
           type: { const: timer }
           id: { type: string }
-          format:
-            oneOf:
-              - type: string
-              - type: array
-                minItems: 1
-                items:
-                  type: object
-                  required: [from, string_id]
-                  properties:
-                    from: { type: number }
-                    string_id: { type: string }
+          format: { $ref: "#/UI/Timer/Format"}
           align: { $ref: "#/Entities/HorizontalAlignment", default: leading }
           action: { $ref: "#/Script/ActionOrArray" }
       - oneOf:
@@ -983,6 +973,18 @@ UI:
                 default: start_at_first_appear
       - $ref: "#/UI/Text/Attributes"
 
+    Format:  
+      oneOf:
+        - type: string
+        - type: array
+          minItems: 1
+          items:
+            type: object
+            required: [from, string_id]
+            properties:
+              from: { type: number }
+              string_id: { type: string }
+              
   Pager:
     type: object
     required: [type, content]

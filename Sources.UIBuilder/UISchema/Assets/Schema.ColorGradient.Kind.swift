@@ -12,7 +12,7 @@ extension Schema.ColorGradient.Kind: RawRepresentable {
         static let colorConicGradient = "conic-gradient"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.colorLinearGradient: self = .linear
         case Key.colorRadialGradient: self = .radial
@@ -21,7 +21,7 @@ extension Schema.ColorGradient.Kind: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .linear: Key.colorLinearGradient
         case .radial: Key.colorRadialGradient

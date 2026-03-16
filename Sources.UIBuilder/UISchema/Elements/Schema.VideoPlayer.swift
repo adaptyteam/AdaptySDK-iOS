@@ -18,7 +18,7 @@ extension Schema.VideoPlayer: Codable {
         case loop
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let asset = try container.decode(Schema.AssetReference.self, forKey: .assetId)
         if asset.isColor {
@@ -37,7 +37,7 @@ extension Schema.VideoPlayer: Codable {
         )
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(asset, forKey: .assetId)
         if aspect != .default {

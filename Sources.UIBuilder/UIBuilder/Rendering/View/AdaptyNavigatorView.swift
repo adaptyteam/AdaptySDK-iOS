@@ -9,7 +9,7 @@
 
 import SwiftUI
 
-package extension VC {
+extension VC {
     static let templateIdBasic = "basic"
     static let templateIdFlat = "flat"
     static let templateIdTransparent = "transparent"
@@ -146,3 +146,4 @@ extension View {
 }
 
 #endif
+

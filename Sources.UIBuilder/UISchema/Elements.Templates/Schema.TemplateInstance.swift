@@ -19,7 +19,7 @@ extension Schema.TemplateInstance: Encodable, DecodableWithConfiguration {
         case type
     }
 
-    package init(from decoder: Decoder, configuration _: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration _: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         guard type.hasPrefix(Schema.Template.keyPrefix), type.count < 2 else {
@@ -59,7 +59,7 @@ extension Schema.TemplateInstance: Encodable, DecodableWithConfiguration {
 //        return childs.isEmpty ? nil : childs
 //    }
 
-    package func encode(to _: any Encoder) throws {
+    func encode(to _: any Encoder) throws {
         // TODO: implement after Element encodable
     }
 }

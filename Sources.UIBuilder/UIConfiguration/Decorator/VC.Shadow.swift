@@ -7,10 +7,10 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Shadow: Sendable, Hashable {
-        package let filling: AssetReference
-        package let blurRadius: Double
-        package let offset: Offset
+        let filling: AssetReference
+        let blurRadius: Double
+        let offset: Offset
     }
 }

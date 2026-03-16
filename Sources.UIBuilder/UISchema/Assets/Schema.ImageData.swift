@@ -28,13 +28,13 @@ extension Schema.ImageData: Codable {
         case customId = "custom_id"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let customId = try container.decodeIfPresent(String.self, forKey: .customId)
 
         if let base64EncodedData = try container.decodeIfPresent(String.self, forKey: .data),
-           !base64EncodedData.isEmpty
+           base64EncodedData.isNotEmpty
         {
             guard let data = Data(base64Encoded: base64EncodedData) else {
                 throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.data], debugDescription: "must base64 encoded data"))
@@ -46,7 +46,7 @@ extension Schema.ImageData: Codable {
         var previewRaster: Data? = nil
 
         if let base64EncodedData = try container.decodeIfPresent(String.self, forKey: .previewData),
-           !base64EncodedData.isEmpty
+           base64EncodedData.isNotEmpty
         {
             guard let data = Data(base64Encoded: base64EncodedData) else {
                 throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.previewData], debugDescription: "must base64 encoded data"))
@@ -61,7 +61,7 @@ extension Schema.ImageData: Codable {
         )
     }
 
-    package func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(Self.assetType, forKey: .type)

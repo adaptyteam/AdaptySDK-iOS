@@ -7,14 +7,14 @@
 
 import Foundation
 
-package extension VC.Animation {
+extension VC.Animation {
     struct Timeline: Sendable, Hashable {
-        package let duration: TimeInterval
-        package let interpolator: Interpolator
-        package let startDelay: TimeInterval
-        package let loop: Loop?
-        package let loopDelay: TimeInterval
-        package let pingPongDelay: TimeInterval
-        package let loopCount: Int?
+        let duration: TimeInterval
+        let interpolator: Interpolator
+        let startDelay: TimeInterval
+        let loop: Loop?
+        let loopDelay: TimeInterval
+        let pingPongDelay: TimeInterval
+        let loopCount: Int?
     }
 }

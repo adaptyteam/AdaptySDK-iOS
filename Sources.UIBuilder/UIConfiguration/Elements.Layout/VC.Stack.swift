@@ -7,17 +7,18 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Stack: Sendable, Hashable {
-        package let type: Kind
-        package let horizontalAlignment: HorizontalAlignment
-        package let verticalAlignment: VerticalAlignment
-        package let spacing: Double
-        package let items: [Item]
+        let type: Kind
+        let horizontalAlignment: HorizontalAlignment
+        let verticalAlignment: VerticalAlignment
+        let spacing: Double
+        let items: [Item]
     }
 }
 
-package extension VC.Stack {
+extension VC.Stack {
+    @inlinable
     var content: [VC.Element] {
         items.map {
             switch $0 {

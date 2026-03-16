@@ -19,21 +19,24 @@ extension Schema.Slider: Codable {
         case stepValue = "step"
     }
 
-    package init(from decoder: any Decoder) throws {
+    init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             value: container.decode(Schema.Variable.self, forKey: .value),
             maxValue: container.decode(Double.self, forKey: .maxValue),
             minValue: container.decode(Double.self, forKey: .minValue),
-            stepValue: container.decodeIfPresent(Double.self, forKey: .stepValue)
+            stepValue: container.decodeIfPresent(Double.self, forKey: .stepValue) ?? 1.0
         )
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(value, forKey: .value)
         try container.encode(maxValue, forKey: .maxValue)
         try container.encode(minValue, forKey: .minValue)
-        try container.encode(stepValue, forKey: .stepValue)
+        if stepValue != 1.0 {
+            try container.encode(stepValue, forKey: .stepValue)
+        }
     }
 }
+

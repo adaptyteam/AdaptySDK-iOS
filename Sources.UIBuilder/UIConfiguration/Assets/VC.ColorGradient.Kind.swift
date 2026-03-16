@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.ColorGradient {
+extension VC.ColorGradient {
     enum Kind: Sendable, Hashable {
         case linear
         case conic

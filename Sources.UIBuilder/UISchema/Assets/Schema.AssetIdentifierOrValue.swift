@@ -12,7 +12,7 @@ extension Schema {
 }
 
 extension Schema.AssetIdentifierOrValue: Codable {
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let value = try decoder.singleValueContainer().decode(String.self)
 
         self =
@@ -23,7 +23,7 @@ extension Schema.AssetIdentifierOrValue: Codable {
             }
     }
 
-    package func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
 
         switch self {

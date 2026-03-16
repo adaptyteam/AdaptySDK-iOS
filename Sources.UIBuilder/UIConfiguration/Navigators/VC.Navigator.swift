@@ -7,14 +7,14 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Navigator: Sendable, Hashable {
-        package let id: NavigatorIdentifier
-        package let background: AssetReference?
-        package let content: Element
-        package let order: Int
-        package let appearances: [String: AppearanceTransition]?
-        package let transitions: [String: ScreenTransition]?
-        package let defaultScreenActions: ScreenActions
+        let id: NavigatorIdentifier
+        let background: AssetReference?
+        let content: Element
+        let order: Int
+        let appearances: [String: AppearanceTransition]?
+        let transitions: [String: ScreenTransition]?
+        let defaultScreenActions: ScreenActions
     }
 }

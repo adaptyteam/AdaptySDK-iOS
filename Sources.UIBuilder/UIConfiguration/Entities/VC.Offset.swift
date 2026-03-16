@@ -7,14 +7,15 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Offset: Sendable, Hashable {
-        package let x: Unit
-        package let y: Unit
+        let x: Unit
+        let y: Unit
     }
 }
 
-package extension VC.Offset {
+extension VC.Offset {
+    @inlinable
     var isZero: Bool {
         x.isZero && y.isZero
     }

@@ -13,7 +13,7 @@ extension Schema.Text.OverflowMode: RawRepresentable {
         static let unknown = "unknown"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.scale: self = .scale
         case Key.unknown: self = .unknown
@@ -21,7 +21,7 @@ extension Schema.Text.OverflowMode: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .scale: Key.scale
         case .unknown: Key.unknown

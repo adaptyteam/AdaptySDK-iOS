@@ -8,14 +8,12 @@
 import Foundation
 
 extension VS {
-    @inlinable
     func richText(
         _ stringId: VC.StringIdentifier
     ) throws(VS.Error) -> VC.RichText? {
         configuration.strings[stringId]
     }
 
-    @inlinable
     func richTextForNonSelectedProduct(
         suffix: String?
     ) throws(VS.Error) -> VC.RichText? {
@@ -26,7 +24,6 @@ extension VS {
         ]
     }
 
-    @inlinable
     func richText(
         adaptyProductId: String,
         byPaymentMode paymentMode: PaymentModeValue = nil,

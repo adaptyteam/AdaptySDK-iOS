@@ -27,7 +27,7 @@ extension Schema.TransitionSlide: Codable {
         case interpolator
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay))
@@ -39,7 +39,7 @@ extension Schema.TransitionSlide: Codable {
         interpolator = try (container.decodeIfPresent(Schema.Animation.Interpolator.self, forKey: .interpolator)) ?? Self.default.interpolator
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode("slide", forKey: .type)

@@ -7,11 +7,11 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Slider: Sendable, Hashable {
-        package let value: Variable
-        package let maxValue: Double
-        package let minValue: Double
-        package let stepValue: Double?
+        let value: Variable
+        let maxValue: Double
+        let minValue: Double
+        let stepValue: Double
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     enum Animation: Sendable, Hashable {
         case opacity(Timeline, Range<Double>)
         case offset(Timeline, Range<Offset>)
@@ -20,7 +20,7 @@ package extension VC {
     }
 }
 
-package extension VC.Animation {
+extension VC.Animation {
     var timeline: Timeline {
         switch self {
         case let .opacity(timeline, _):

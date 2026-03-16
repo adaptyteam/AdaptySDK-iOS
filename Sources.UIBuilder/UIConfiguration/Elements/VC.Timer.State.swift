@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.Timer {
+extension VC.Timer {
     enum State: Sendable, Hashable {
         case endedAt(Date)
         case duration(TimeInterval, start: StartBehavior)

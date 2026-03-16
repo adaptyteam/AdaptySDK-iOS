@@ -7,9 +7,9 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Section: Sendable, Hashable {
-        package let index: Variable
-        package let content: [Element]
+        let index: Variable
+        let content: [Element]
     }
 }

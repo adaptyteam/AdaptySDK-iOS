@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     enum ImageData: Sendable, Hashable {
         case raster(customId: String?, Data)
         case url(customId: String?, URL, previewRaster: Data?)
@@ -15,7 +15,8 @@ package extension VC {
 }
 
 extension VC.ImageData {
-    package var customId: String? {
+    @inlinable
+    var customId: String? {
         switch self {
         case let .raster(customId, _),
              let .url(customId, _, _):
@@ -23,6 +24,7 @@ extension VC.ImageData {
         }
     }
 
+    @inlinable
     var url: URL? {
         switch self {
         case let .url(_, url, _): url

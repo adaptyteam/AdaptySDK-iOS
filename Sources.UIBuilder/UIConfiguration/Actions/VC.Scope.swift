@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     enum Scope: Sendable, Hashable {
         case screen
         case global

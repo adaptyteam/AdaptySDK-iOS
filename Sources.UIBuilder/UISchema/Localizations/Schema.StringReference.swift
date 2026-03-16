@@ -19,7 +19,7 @@ extension Schema.StringReference: Codable {
         case legacyProduct = "type"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         guard let container = try? decoder.container(keyedBy: CodingKeys.self) else {
             self = try .stringId(decoder.singleValueContainer().decode(String.self), nil)
             return
@@ -51,12 +51,12 @@ extension Schema.StringReference: Codable {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "value must be string_id or variable "))
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
 
         switch self {
         case let .stringId(string, tags):
-            guard let tags, !tags.isEmpty else {
+            guard let tags, tags.isNotEmpty else {
                 try container.encode(string)
                 return
             }

@@ -13,7 +13,7 @@ extension Schema.Animation.Background: Codable {
         case color
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let typeName = try container.decode(String.self, forKey: .type)
 
@@ -27,7 +27,7 @@ extension Schema.Animation.Background: Codable {
         )
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Schema.Animation.Types.background.rawValue, forKey: .type)
         try range.encode(to: encoder)

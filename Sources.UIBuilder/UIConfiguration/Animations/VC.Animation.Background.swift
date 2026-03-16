@@ -7,9 +7,9 @@
 
 import Foundation
 
-package extension VC.Animation {
+extension VC.Animation {
     struct Background: Sendable, Hashable {
-        package let timeline: Timeline
-        package let range: Range<VC.AssetReference>
+        let timeline: Timeline
+        let range: Range<VC.AssetReference>
     }
 }

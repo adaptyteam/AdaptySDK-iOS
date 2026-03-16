@@ -25,7 +25,7 @@ extension Schema.Toggle: DecodableWithConfiguration {
         case legacy2OnCondition = "on_condition"
     }
 
-    package init(from decoder: Decoder, configuration: AdaptyUISchema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: AdaptyUISchema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         guard configuration.isLegacy else {

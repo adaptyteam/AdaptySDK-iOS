@@ -7,11 +7,11 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct GridItem: Sendable, Hashable {
-        package let length: Length
-        package let horizontalAlignment: VC.HorizontalAlignment
-        package let verticalAlignment: VC.VerticalAlignment
-        package let content: VC.Element
+        let length: Length
+        let horizontalAlignment: VC.HorizontalAlignment
+        let verticalAlignment: VC.VerticalAlignment
+        let content: VC.Element
     }
 }

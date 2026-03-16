@@ -25,7 +25,7 @@ extension Schema.Animation.Interpolator: Codable {
         case easeInOutBounce = "ease_in_out_bounce"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let values = try? container.decode([Double].self) {
             guard values.count == 4 else {
@@ -62,7 +62,7 @@ extension Schema.Animation.Interpolator: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
         case .easeInOut:

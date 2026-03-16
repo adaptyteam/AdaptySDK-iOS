@@ -7,10 +7,10 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct TransitionSlide: Sendable, Hashable {
-        package let startDelay: TimeInterval
-        package let duration: TimeInterval
-        package let interpolator: VC.Animation.Interpolator
+        let startDelay: TimeInterval
+        let duration: TimeInterval
+        let interpolator: VC.Animation.Interpolator
     }
 }

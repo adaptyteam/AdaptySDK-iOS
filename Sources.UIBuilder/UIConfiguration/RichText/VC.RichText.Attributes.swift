@@ -7,19 +7,20 @@
 
 import Foundation
 
-package extension VC.RichText {
+extension VC.RichText {
     struct Attributes: Sendable, Hashable {
-        package let fontAssetId: VC.AssetIdentifier? // default?
-        package let size: Double? // default?
-        package let txtColor: VC.AssetIdentifierOrValue? // default?
-        package let imageTintColor: VC.AssetIdentifierOrValue?
-        package let background: VC.AssetIdentifierOrValue?
-        package let strike: Bool? // default: false
-        package let underline: Bool? // default: false
+        let fontAssetId: VC.AssetIdentifier? // default?
+        let size: Double? // default?
+        let txtColor: VC.AssetIdentifierOrValue? // default?
+        let imageTintColor: VC.AssetIdentifierOrValue?
+        let background: VC.AssetIdentifierOrValue?
+        let strike: Bool? // default: false
+        let underline: Bool? // default: false
     }
 }
 
 extension VC.RichText.Attributes {
+    @inlinable
     var isEmpty: Bool {
         fontAssetId == nil
             && size == nil
@@ -30,10 +31,12 @@ extension VC.RichText.Attributes {
             && (underline ?? false) == false
     }
 
+    @inlinable
     var nonEmptyOrNil: Self? {
         isEmpty ? nil : self
     }
 
+    @inlinable
     func apply(
         default other: VC.RichText.Attributes?
     ) -> Self {

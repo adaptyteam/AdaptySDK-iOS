@@ -7,14 +7,14 @@
 
 import Foundation
 
-package extension VC.Pager {
+extension VC.Pager {
     struct PageControl: Sendable, Hashable {
-        package let layout: Layout
-        package let verticalAlignment: VC.VerticalAlignment
-        package let padding: VC.EdgeInsets
-        package let dotSize: Double
-        package let spacing: Double
-        package let color: VC.AssetReference?
-        package let selectedColor: VC.AssetReference?
+        let layout: Layout
+        let verticalAlignment: VC.VerticalAlignment
+        let padding: VC.EdgeInsets
+        let dotSize: Double
+        let spacing: Double
+        let color: VC.AssetReference?
+        let selectedColor: VC.AssetReference?
     }
 }

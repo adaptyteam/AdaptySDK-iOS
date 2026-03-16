@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.Pager {
+extension VC.Pager {
     enum Length: Sendable, Hashable {
         case fixed(VC.Unit)
         case parent(Double)

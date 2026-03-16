@@ -13,7 +13,7 @@ extension Schema.Animation.BoxParameters: Codable {
         case height
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         width = try container.decodeIfPresent(Schema.Animation.Range<Schema.Unit>.self, forKey: .width)
         height = try container.decodeIfPresent(Schema.Animation.Range<Schema.Unit>.self, forKey: .height)
@@ -23,7 +23,7 @@ extension Schema.Animation.BoxParameters: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(width, forKey: .width)
         try container.encodeIfPresent(height, forKey: .height)

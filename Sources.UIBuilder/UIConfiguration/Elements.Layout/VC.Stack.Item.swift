@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.Stack {
+extension VC.Stack {
     enum Item: Sendable, Hashable {
         case space(Int)
         case element(VC.Element)

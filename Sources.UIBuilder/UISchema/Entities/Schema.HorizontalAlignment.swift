@@ -21,7 +21,7 @@ extension Schema.HorizontalAlignment: RawRepresentable {
         static let justified = "justified"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.leading: self = .leading
         case Key.trailing: self = .trailing
@@ -33,7 +33,7 @@ extension Schema.HorizontalAlignment: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .leading: Key.leading
         case .trailing: Key.trailing

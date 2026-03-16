@@ -21,7 +21,7 @@ extension Schema.Decorator: Decodable {
         case shadow
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let shape = (try? container.decode(Schema.ShapeType.self, forKey: .shapeType)) ?? .default
 

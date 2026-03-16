@@ -20,7 +20,7 @@ extension Schema.Pager.Length: Decodable {
         case parent
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(VC.Unit.self) {
             self = .fixed(value)
         } else {

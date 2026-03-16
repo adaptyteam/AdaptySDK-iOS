@@ -13,13 +13,13 @@ extension Schema.Animation.Range: Codable where T: Codable {
         case end
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         start = try container.decode(T.self, forKey: .start)
         end = try container.decode(T.self, forKey: .end)
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(start, forKey: .start)
         try container.encode(end, forKey: .end)

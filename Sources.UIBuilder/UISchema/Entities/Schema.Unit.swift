@@ -9,7 +9,7 @@ extension Schema {
     typealias Unit = VC.Unit
 }
 
-package extension Schema.Unit {
+extension Schema.Unit {
     static let zero = Self.point(0.0)
 }
 
@@ -22,7 +22,7 @@ extension Schema.Unit: Codable {
         case screen
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         if let points = try? decoder.singleValueContainer().decode(Double.self) {
             self = .point(points)
         } else {
@@ -48,7 +48,7 @@ extension Schema.Unit: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         switch self {
         case let .point(value):
             try value.encode(to: encoder)

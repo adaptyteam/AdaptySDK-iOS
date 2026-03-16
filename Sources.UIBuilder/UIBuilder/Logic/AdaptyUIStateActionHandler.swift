@@ -31,7 +31,7 @@ package final class AdaptyUIStateHolder {
             actionHandler: actionHandler,
             isInspectable: isInspectable
         )
-        
+
         actionHandler.registerState(state)
     }
 
@@ -66,7 +66,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         self.screensViewModel = screensViewModel
         self.logic = logic
     }
-    
+
     package nonisolated func registerState(_ state: AdaptyUIState) {
         Task { @MainActor [weak self] in
             self?.state = state
@@ -75,7 +75,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 
     package nonisolated func openUrl(
         url: URL,
-        openIn: VC.Action.WebOpenInParameter
+        openIn _: VC.Action.WebOpenInParameter
     ) {
         Task { @MainActor [weak self] in
             self?.logic.reportDidPerformAction(.openURL(url: url))
@@ -88,7 +88,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 
     package nonisolated func openUrl(
         stringId: String,
-        openIn: VC.Action.WebOpenInParameter
+        openIn _: VC.Action.WebOpenInParameter
     ) {
         Task { @MainActor [weak self] in
             guard
@@ -112,7 +112,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 
     package nonisolated func purchaseProduct(
         productId: String,
-        paywallId: String,
+        paywallId _: String,
         service: VC.Action.PaymentService
     ) {
         Task { @MainActor [weak self] in
@@ -124,7 +124,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     }
 
     package nonisolated func openWebPaywall(
-        openIn: VC.Action.WebOpenInParameter
+        openIn _: VC.Action.WebOpenInParameter
     ) {
         // TODO: Deperecated
     }
@@ -188,3 +188,4 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 }
 
 #endif
+

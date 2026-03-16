@@ -160,3 +160,4 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 }
 
 #endif
+

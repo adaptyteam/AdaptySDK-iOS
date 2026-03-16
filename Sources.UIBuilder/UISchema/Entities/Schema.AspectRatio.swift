@@ -22,7 +22,7 @@ extension Schema.AspectRatio: RawRepresentable {
         static let stretch = "stretch"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.fit: self = .fit
         case Key.fill: self = .fill
@@ -31,7 +31,7 @@ extension Schema.AspectRatio: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .fit: Key.fit
         case .fill: Key.fill

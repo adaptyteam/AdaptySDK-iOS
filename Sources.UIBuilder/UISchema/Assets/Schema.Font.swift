@@ -43,7 +43,7 @@ extension Schema.Font: Codable {
         case defaultColor = "color"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         customId = try container.decodeIfPresent(String.self, forKey: .customId)
         if let v = (try? container.decode([String].self, forKey: .alias))?.first {
@@ -64,7 +64,7 @@ extension Schema.Font: Codable {
         defaultColor = try container.decodeIfPresent(Schema.Color.self, forKey: .defaultColor) ?? Self.default.defaultColor
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Self.assetType, forKey: .type)
 

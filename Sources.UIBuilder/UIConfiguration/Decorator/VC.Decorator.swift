@@ -7,11 +7,11 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Decorator: Sendable, Hashable {
-        package let shapeType: ShapeType
-        package let background: AssetReference?
-        package let border: Border?
-        package let shadow: Shadow?
+        let shapeType: ShapeType
+        let background: AssetReference?
+        let border: Border?
+        let shadow: Shadow?
     }
 }

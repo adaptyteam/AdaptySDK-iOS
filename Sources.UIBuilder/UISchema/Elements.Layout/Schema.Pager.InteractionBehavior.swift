@@ -22,7 +22,7 @@ extension Schema.Pager.InteractionBehavior: RawRepresentable {
         static let pauseAnimation = "pause_animation"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.none: self = .none
         case Key.cancelAnimation: self = .cancelAnimation
@@ -31,7 +31,7 @@ extension Schema.Pager.InteractionBehavior: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .none: Key.none
         case .cancelAnimation: Key.cancelAnimation

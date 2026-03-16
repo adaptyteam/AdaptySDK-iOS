@@ -7,18 +7,19 @@
 
 import Foundation
 
-package extension VC.Element {
+extension VC.Element {
     struct Properties: Sendable, Hashable {
-        package let decorator: VC.Decorator?
-        package let padding: VC.EdgeInsets
-        package let offset: VC.Offset
+        let decorator: VC.Decorator?
+        let padding: VC.EdgeInsets
+        let offset: VC.Offset
 
-        package let opacity: Double
-        package let onAppear: [VC.Animation]
+        let opacity: Double
+        let onAppear: [VC.Animation]
     }
 }
 
-package extension VC.Element.Properties {
+extension VC.Element.Properties {
+    @inlinable
     var isEmpty: Bool {
         decorator == nil
             && padding.isZero

@@ -18,7 +18,7 @@ extension Schema.Stack.Kind: RawRepresentable {
         static let z = "z_stack"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.vertical: self = .vertical
         case Key.horizontal: self = .horizontal
@@ -27,7 +27,7 @@ extension Schema.Stack.Kind: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .vertical: Key.vertical
         case .horizontal: Key.horizontal

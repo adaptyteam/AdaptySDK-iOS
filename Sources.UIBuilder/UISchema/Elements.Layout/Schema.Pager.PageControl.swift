@@ -34,7 +34,7 @@ extension Schema.Pager.PageControl: Decodable {
         case selectedColorAssetId = "selected_color"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             layout: container.decodeIfPresent(Layout.self, forKey: .layout)

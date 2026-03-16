@@ -7,19 +7,22 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct RichText: Hashable {
-        package let items: [Item]
-        package let fallback: [Item]?
+        let items: [Item]
+        let fallback: [Item]?
     }
 }
 
-package extension VC.RichText {
+extension VC.RichText {
     static let empty: Self = .init(items: [], fallback: nil)
+
+    @inlinable
     var isEmpty: Bool {
         items.isEmpty
     }
 
+    @inlinable
     var asString: String? {
         items.first.flatMap {
             if case let .text(value, attributes, _) = $0, attributes == nil { value } else { nil }

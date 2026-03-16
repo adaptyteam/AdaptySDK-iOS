@@ -24,7 +24,7 @@ extension Schema.AssetReference {
 }
 
 extension Schema.AssetReference: Codable {
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         guard let value = try? decoder.singleValueContainer().decode(String.self) else {
             self = try .variable(Schema.Variable(from: decoder))
             return
@@ -38,7 +38,7 @@ extension Schema.AssetReference: Codable {
             }
     }
 
-    package func encode(to encoder: Encoder) throws {
+    func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
 
         switch self {

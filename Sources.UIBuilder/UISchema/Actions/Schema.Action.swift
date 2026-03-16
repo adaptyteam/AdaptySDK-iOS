@@ -24,7 +24,7 @@ extension Schema.Action: Codable {
         if container.contains(.function) {
             let function = try container.decode(String.self, forKey: .function)
             let path = function.split(separator: ".").map(String.init)
-            guard !path.isEmpty else {
+            guard path.isNotEmpty else {
                 throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.function], debugDescription: "not found function name"))
             }
             try self.init(
@@ -41,7 +41,7 @@ extension Schema.Action: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         let function = path.joined(separator: ".")
         try container.encode(function, forKey: .function)
-        if let params, !params.isEmpty {
+        if let params, params.isNotEmpty {
             try container.encode(params, forKey: .params)
         }
         if scope != .default {

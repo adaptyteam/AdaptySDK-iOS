@@ -11,6 +11,6 @@ extension VC.TextField {
     struct Placeholder: Hashable {
         let value: VC.StringReference
         let overflowMode: Set<VC.Text.OverflowMode>
-        let defaultTextAttributes: VC.Text.Attributes?
+        let defaultTextAttributes: VC.TextAttributes?
     }
 }

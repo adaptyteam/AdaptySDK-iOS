@@ -7,13 +7,13 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Screen: Sendable, Hashable {
-        package let id: String
-        package let layoutBehaviour: LayoutBehaviour
-        package let cover: Box?
-        package let content: Element
-        package let footer: Element?
-        package let screenActions: ScreenActions
+        let id: String
+        let layoutBehaviour: LayoutBehaviour
+        let cover: Box?
+        let content: Element
+        let footer: Element?
+        let screenActions: ScreenActions
     }
 }

@@ -5,7 +5,7 @@
 //  Created by Aleksei Valiano on 15.09.2025.
 //
 
-package extension Schema {
+extension Schema {
     @usableFromInline
     enum Error: Swift.Error {
         case unsupportedElement(String)

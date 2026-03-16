@@ -7,11 +7,11 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Button: Sendable, Hashable {
-        package let actions: [Action]
-        package let normalState: Element
-        package let selectedState: Element?
-        package let isSelectedState: Variable?
+        let actions: [Action]
+        let normalState: Element
+        let selectedState: Element?
+        let isSelectedState: Variable?
     }
 }

@@ -9,7 +9,7 @@ extension Schema {
     typealias Offset = VC.Offset
 }
 
-package extension Schema.Offset {
+extension Schema.Offset {
     static let zero = Self(x: .zero, y: .zero)
     static let one = Self(x: .point(1.0), y: .point(1.0))
 }
@@ -20,7 +20,7 @@ extension Schema.Offset: Codable {
         case y
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Schema.Unit.self) {
             self.init(x: .zero, y: value)
@@ -39,7 +39,7 @@ extension Schema.Offset: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         if case .point(0) = x {
             try container.encode(y)

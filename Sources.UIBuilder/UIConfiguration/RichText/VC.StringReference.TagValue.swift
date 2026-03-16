@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.StringReference {
+extension VC.StringReference {
     enum TagValue: Sendable, Hashable {
         case value(String)
         case variable(VC.Variable)

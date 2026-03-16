@@ -24,7 +24,7 @@ extension Schema.TextField.Placeholder: Codable {
                 try Set(container.decodeIfPresent([Schema.Text.OverflowMode].self, forKey: .overflowMode) ?? [])
             }
 
-        let textAttributes = try Schema.Text.Attributes(from: decoder)
+        let textAttributes = try Schema.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil
     }
 

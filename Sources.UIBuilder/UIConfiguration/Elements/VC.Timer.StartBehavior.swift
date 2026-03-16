@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.Timer {
+extension VC.Timer {
     enum StartBehavior: Sendable, Hashable {
         case everyAppear
         case firstAppear

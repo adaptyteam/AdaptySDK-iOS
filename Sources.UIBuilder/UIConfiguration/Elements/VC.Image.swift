@@ -7,10 +7,10 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Image: Sendable, Hashable {
-        package let asset: AssetReference
-        package let aspect: AspectRatio
-        package let tint: AssetReference?
+        let asset: AssetReference
+        let aspect: AspectRatio
+        let tint: AssetReference?
     }
 }

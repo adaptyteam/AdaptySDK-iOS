@@ -7,9 +7,9 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Border: Sendable, Hashable {
-        package let filling: AssetReference
-        package let thickness: Double
+        let filling: AssetReference
+        let thickness: Double
     }
 }

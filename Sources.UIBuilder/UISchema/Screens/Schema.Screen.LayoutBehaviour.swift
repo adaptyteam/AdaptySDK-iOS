@@ -17,7 +17,7 @@ extension Schema.Screen.LayoutBehaviour: RawRepresentable {
         static let hero = "hero"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.default: self = .default
         case Key.flat: self = .flat
@@ -27,7 +27,7 @@ extension Schema.Screen.LayoutBehaviour: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .default: Key.default
         case .flat: Key.flat

@@ -7,6 +7,6 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     typealias AssetIdentifier = String
 }

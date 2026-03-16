@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.Animation {
+extension VC.Animation {
     enum Interpolator: Sendable, Hashable {
         case easeInOut
         case easeIn

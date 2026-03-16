@@ -26,7 +26,7 @@ extension Schema.Shadow: Decodable {
         case offset
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         try self.init(

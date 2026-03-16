@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.Pager.PageControl {
+extension VC.Pager.PageControl {
     enum Layout: Sendable, Hashable {
         case overlaid
         case stacked

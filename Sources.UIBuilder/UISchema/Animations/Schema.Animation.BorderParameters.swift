@@ -13,7 +13,7 @@ extension Schema.Animation.BorderParameters: Codable {
         case thickness
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         color = try container.decodeIfPresent(Schema.Animation.Range<Schema.AssetReference>.self, forKey: .color)
         thickness = try container.decodeIfPresent(Schema.Animation.Range<Double>.self, forKey: .thickness)
@@ -23,7 +23,7 @@ extension Schema.Animation.BorderParameters: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(color, forKey: .color)
         try container.encodeIfPresent(thickness, forKey: .thickness)

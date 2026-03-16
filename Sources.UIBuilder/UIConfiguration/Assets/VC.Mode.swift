@@ -8,7 +8,7 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     enum Mode: Sendable, Hashable {
         case light
         case dark

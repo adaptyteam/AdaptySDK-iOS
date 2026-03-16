@@ -7,14 +7,15 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Point: Sendable, Hashable {
-        package let x: Double
-        package let y: Double
+        let x: Double
+        let y: Double
     }
 }
 
-package extension VC.Point {
+extension VC.Point {
+    @inlinable
     var isZero: Bool {
         x == 0.0 && y == 0.0
     }

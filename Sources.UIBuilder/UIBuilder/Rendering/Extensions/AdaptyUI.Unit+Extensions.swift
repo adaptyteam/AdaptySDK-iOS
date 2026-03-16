@@ -9,7 +9,7 @@
 
 import SwiftUI
 
-package extension VC.Unit {
+extension VC.Unit {
     func points(screenSize: Double, safeAreaStart: Double, safeAreaEnd: Double) -> Double {
         switch self {
         case let .point(value): value
@@ -50,3 +50,4 @@ package extension VC.Unit {
 }
 
 #endif
+

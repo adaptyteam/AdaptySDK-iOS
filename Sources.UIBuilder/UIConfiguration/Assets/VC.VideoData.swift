@@ -7,10 +7,10 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct VideoData: Sendable, Hashable {
-        package let customId: String?
-        package let url: URL
-        package let image: ImageData
+        let customId: String?
+        let url: URL
+        let image: ImageData
     }
 }

@@ -13,7 +13,7 @@ extension Schema.StringReference.Product: Codable {
         case suffix
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         guard container.contains(.product) else {
@@ -34,7 +34,7 @@ extension Schema.StringReference.Product: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case let .id(productId, suffix):

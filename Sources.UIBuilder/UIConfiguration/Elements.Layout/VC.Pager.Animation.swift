@@ -7,11 +7,11 @@
 
 import Foundation
 
-package extension VC.Pager {
+extension VC.Pager {
     struct Animation: Sendable, Hashable {
-        package let startDelay: TimeInterval
-        package let pageTransition: VC.TransitionSlide
-        package let repeatTransition: VC.TransitionSlide?
-        package let afterInteractionDelay: TimeInterval
+        let startDelay: TimeInterval
+        let pageTransition: VC.TransitionSlide
+        let repeatTransition: VC.TransitionSlide?
+        let afterInteractionDelay: TimeInterval
     }
 }

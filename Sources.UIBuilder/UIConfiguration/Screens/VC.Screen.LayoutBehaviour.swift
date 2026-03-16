@@ -7,7 +7,7 @@
 
 import Foundation
 
-package extension VC.Screen {
+extension VC.Screen {
     enum LayoutBehaviour: Sendable, Hashable {
         case `default`
         case flat

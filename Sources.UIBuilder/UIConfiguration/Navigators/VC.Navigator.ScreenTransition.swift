@@ -7,25 +7,27 @@
 
 import Foundation
 
-package extension VC.Navigator {
+extension VC.Navigator {
     struct ScreenTransition: Sendable, Hashable {
-        package let outgoing: [VC.Animation]?
-        package let incoming: [VC.Animation]?
-        package let isIncomingOnTop: Bool
+        let outgoing: [VC.Animation]?
+        let incoming: [VC.Animation]?
+        let isIncomingOnTop: Bool
     }
 }
 
-package extension VC.Navigator.ScreenTransition {
+extension VC.Navigator.ScreenTransition {
+    @inlinable
     var isEmpty: Bool {
         (outgoing?.isEmpty ?? true) && (incoming?.isEmpty ?? true)
     }
 
+    @inlinable
     var isNotEmpty: Bool {
         !isEmpty
     }
 }
 
-package extension [String: VC.Navigator.ScreenTransition] {
+extension [String: VC.Navigator.ScreenTransition] {
     var forward: VC.Navigator.ScreenTransition? {
         self["forward"]
     }

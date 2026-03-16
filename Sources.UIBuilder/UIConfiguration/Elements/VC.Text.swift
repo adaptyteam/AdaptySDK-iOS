@@ -7,12 +7,12 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Text: Sendable, Hashable {
-        package let value: StringReference
-        package let horizontalAlign: HorizontalAlignment
-        package let maxRows: Int?
-        package let overflowMode: Set<OverflowMode>
-        package let defaultTextAttributes: Attributes?
+        let value: StringReference
+        let horizontalAlign: HorizontalAlignment
+        let maxRows: Int?
+        let overflowMode: Set<OverflowMode>
+        let defaultTextAttributes: VC.TextAttributes?
     }
 }

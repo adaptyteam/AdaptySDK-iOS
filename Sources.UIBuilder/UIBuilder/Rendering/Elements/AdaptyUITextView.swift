@@ -208,7 +208,7 @@ extension [VC.RichText.Item] {
 @MainActor
 extension VC.RichText {
     func convertToSwiftUIText(
-        defaultAttributes: VC.Text.Attributes?,
+        defaultAttributes: VC.TextAttributes?,
         assetsCache: AdaptyUIAssetsCache,
         stateViewModel: AdaptyUIStateViewModel,
         tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,

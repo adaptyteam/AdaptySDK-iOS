@@ -13,7 +13,7 @@ extension Schema.Unit.SafeArea: RawRepresentable {
         static let end = "end"
     }
 
-    package init?(rawValue value: String) {
+    init?(rawValue value: String) {
         switch value {
         case Key.start: self = .start
         case Key.end: self = .end
@@ -21,7 +21,7 @@ extension Schema.Unit.SafeArea: RawRepresentable {
         }
     }
 
-    package var rawValue: String {
+    var rawValue: String {
         switch self {
         case .start: Key.start
         case .end: Key.end

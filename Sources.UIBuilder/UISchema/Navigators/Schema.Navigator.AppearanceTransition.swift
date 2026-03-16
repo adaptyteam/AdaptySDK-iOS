@@ -17,7 +17,7 @@ extension Schema.Navigator.AppearanceTransition: Codable {
         case content
     }
 
-    package init(from decoder: any Decoder) throws {
+    init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             background: container.decodeIfPresent(Schema.Animation.Background.self, forKey: .background),
@@ -25,7 +25,7 @@ extension Schema.Navigator.AppearanceTransition: Codable {
         )
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         if let background { try container.encode(background, forKey: .background) }
         if let content, content.isNotEmpty { try container.encode(content, forKey: .content) }

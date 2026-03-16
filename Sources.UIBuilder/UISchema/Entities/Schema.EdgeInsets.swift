@@ -11,7 +11,7 @@ extension Schema {
     typealias EdgeInsets = VC.EdgeInsets
 }
 
-package extension Schema.EdgeInsets {
+extension Schema.EdgeInsets {
     static let zero = Self(same: .zero)
 }
 
@@ -23,7 +23,7 @@ extension Schema.EdgeInsets: Decodable {
         case bottom
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Schema.Unit.self) {
             self.init(same: value)

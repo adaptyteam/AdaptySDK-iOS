@@ -9,12 +9,12 @@ import Foundation
 
 package extension VC {
     struct Color: Sendable, Hashable {
-        package let customId: String?
+        let customId: String?
         let data: UInt64
     }
 }
 
-package extension VC.Color {
+extension VC.Color {
     var red: Double {
         Double((data & 0xFF000000) >> 24) / 255
     }

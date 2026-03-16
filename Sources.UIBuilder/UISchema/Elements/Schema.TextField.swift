@@ -25,9 +25,10 @@ extension Schema.TextField: Codable {
         case maxRows = "max_rows"
         case minRows = "min_rows"
         case overflowMode = "on_overflow"
+        case keyboardSubmitActions = "submit_action"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(Schema.Element.ContentType.self, forKey: .type)
         kind = type == .textEditor ? .multiLine : .singleLine
@@ -40,19 +41,21 @@ extension Schema.TextField: Codable {
 
         validation = try container.decodeIfPresent(Schema.Variable.self, forKey: .validation)
 
-        let textAttributes = try Schema.Text.Attributes(from: decoder)
+        let textAttributes = try Schema.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil
 
         if validation == nil {
             invalidTextAttributes = nil
         } else {
-            let invalidTextAttributes = try container.decodeIfPresent(Schema.Text.Attributes.self, forKey: .invalidTextAttributes)
+            let invalidTextAttributes = try container.decodeIfPresent(Schema.TextAttributes.self, forKey: .invalidTextAttributes)
             self.invalidTextAttributes = invalidTextAttributes?.nonEmptyOrNil
         }
 
         let options = try container.decodeIfPresent(Schema.TextField.KeyboardOptions.self, forKey: .keyboardOptions)
 
         keyboardOptions = options?.nonEmptyOrNil
+
+        keyboardSubmitActions = try container.decodeIfPresentActions(forKey: .keyboardSubmitActions) ?? []
 
         if kind == .multiLine {
             maxRows = try container.decodeIfPresent(Int.self, forKey: .maxRows)
@@ -63,7 +66,7 @@ extension Schema.TextField: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         if let defaultTextAttributes = defaultTextAttributes.nonEmptyOrNil {
             try defaultTextAttributes.encode(to: encoder)
         }
@@ -97,6 +100,10 @@ extension Schema.TextField: Codable {
 
         if let keyboardOptions, !keyboardOptions.isEmpty {
             try container.encode(keyboardOptions, forKey: .keyboardOptions)
+        }
+
+        if keyboardSubmitActions.isNotEmpty {
+            try container.encode(keyboardSubmitActions, forKey: .keyboardSubmitActions)
         }
 
         if kind == .multiLine {

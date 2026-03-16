@@ -7,9 +7,9 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Column: Sendable, Hashable {
-        package let spacing: Double
-        package let items: [GridItem]
+        let spacing: Double
+        let items: [GridItem]
     }
 }

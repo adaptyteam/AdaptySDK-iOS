@@ -18,7 +18,7 @@ extension Schema.Image: Decodable {
         case tintAssetId = "tint"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let asset = try container.decode(Schema.AssetReference.self, forKey: .assetId)
         if asset.isColor {

@@ -20,7 +20,7 @@ extension Schema.RichText.Item: Codable {
         case action
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         if let value = try? (try? decoder.singleValueContainer())?.decode(String.self) {
             self = .text(value, nil, nil)
             return
@@ -50,7 +50,7 @@ extension Schema.RichText.Item: Codable {
             }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         switch self {
         case let .text(text, attributes, action):
             if attributes?.isEmpty ?? true, action == nil {

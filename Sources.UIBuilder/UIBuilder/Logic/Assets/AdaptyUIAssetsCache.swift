@@ -68,7 +68,7 @@ final class AdaptyUIAssetsCache {
     }
 
     func resolveDataBinding(
-        _ attr: VC.Text.Attributes?,
+        _ attr: VC.TextAttributes?,
         _ screen: VS.ScreenInstance
     ) -> VC.RichText.Attributes? {
         guard let attr else { return nil }

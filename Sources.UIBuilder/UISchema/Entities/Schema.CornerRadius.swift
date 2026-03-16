@@ -11,7 +11,7 @@ extension Schema {
     typealias CornerRadius = VC.CornerRadius
 }
 
-package extension Schema.CornerRadius {
+extension Schema.CornerRadius {
     static let zero = Self(same: .zero)
 }
 
@@ -23,7 +23,7 @@ extension Schema.CornerRadius: Codable {
         case bottomLeading = "bottom_leading"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
 
         if let value = try? container.decode(Double.self) {
@@ -47,7 +47,7 @@ extension Schema.CornerRadius: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         if !topLeading.isZero { try container.encode(topLeading, forKey: .topLeading) }
         if !topTrailing.isZero { try container.encode(topTrailing, forKey: .topTrailing) }

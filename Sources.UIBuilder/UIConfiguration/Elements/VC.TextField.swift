@@ -7,18 +7,19 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct TextField: Hashable {
         let kind: Kind
-        package let value: Variable
+        let value: Variable
         let placeholder: Placeholder?
         let secureEntry: Bool
-        package let horizontalAlign: HorizontalAlignment
+        let horizontalAlign: HorizontalAlignment
         let inputConstraints: InputConstraints?
         let validation: Variable?
-        package let defaultTextAttributes: Text.Attributes?
-        let invalidTextAttributes: Text.Attributes?
+        let defaultTextAttributes: TextAttributes?
+        let invalidTextAttributes: TextAttributes?
         let keyboardOptions: KeyboardOptions?
+        let keyboardSubmitActions: [Action]
         let maxRows: Int?
         let minRows: Int?
     }

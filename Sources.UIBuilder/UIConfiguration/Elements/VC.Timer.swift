@@ -7,12 +7,12 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct Timer: Sendable, Hashable {
-        package let id: String
-        package let state: State
-        package let format: Format
-        package let actions: [Action]
-        package let horizontalAlign: VC.HorizontalAlignment
+        let id: String
+        let state: State
+        let format: VC.RangeTextFormat
+        let actions: [Action]
+        let horizontalAlign: VC.HorizontalAlignment
     }
 }

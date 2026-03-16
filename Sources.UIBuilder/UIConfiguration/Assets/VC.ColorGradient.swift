@@ -9,10 +9,10 @@ import Foundation
 
 package extension VC {
     struct ColorGradient: Sendable, Hashable {
-        package let customId: String?
-        package let kind: Kind
-        package let start: Point
-        package let end: Point
-        package let items: [Item]
+        let customId: String?
+        let kind: Kind
+        let start: Point
+        let end: Point
+        let items: [Item]
     }
 }

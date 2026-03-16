@@ -7,9 +7,9 @@
 
 import Foundation
 
-package extension VC {
+extension VC {
     struct ScreenActions: Sendable, Hashable {
-        package let onOutsideTap: [Action]?
-        package let onDeviceBack: [Action]?
+        let onOutsideTap: [Action]?
+        let onDeviceBack: [Action]?
     }
 }

@@ -19,7 +19,7 @@ extension Schema.Variable: Codable {
         case converter
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let path = try container.decode(String.self, forKey: .path)
@@ -31,7 +31,7 @@ extension Schema.Variable: Codable {
         )
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(path.joined(separator: "."), forKey: .path)
         try container.encodeIfPresent(setter, forKey: .setter)

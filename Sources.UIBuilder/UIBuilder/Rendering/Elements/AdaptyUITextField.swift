@@ -43,7 +43,7 @@ struct AdaptyUITextField: View {
         return stateViewModel.getValue(validation, defaultValue: true, screen: screen)
     }
 
-    private var activeTextAttributes: VC.Text.Attributes? {
+    private var activeTextAttributes: VC.TextAttributes? {
         if !isValid, let invalid = textField.invalidTextAttributes { return invalid }
         return textField.defaultTextAttributes
     }

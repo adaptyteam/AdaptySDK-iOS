@@ -28,7 +28,7 @@ extension Schema.LegacyStateCondition: Codable {
         case selectedProduct = "selected_product"
     }
 
-    package init(from decoder: Decoder) throws {
+    init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         switch try Types(rawValue: container.decode(String.self, forKey: .type)) {
         case nil:
@@ -46,7 +46,7 @@ extension Schema.LegacyStateCondition: Codable {
         }
     }
 
-    package func encode(to encoder: any Encoder) throws {
+    func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case let .selectedSection(sectionId, index):
