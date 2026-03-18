@@ -49,8 +49,9 @@ extension Schema.Timer: Decodable {
         case everyAppear = "start_at_every_appear"
         case firstAppear = "start_at_first_appear"
         case firstAppearPersisted = "start_at_first_appear_persisted"
-        case endAtLocalTime = "end_at_local_time"
-        case endAtUTC = "end_at_utc_time"
+        case endAt = "end_at_time"
+        case legacyEndAtLocalTime = "end_at_local_time"
+        case legacyEndAtUTC = "end_at_utc_time"
         case custom
     }
 
@@ -63,10 +64,12 @@ extension Schema.Timer: Decodable {
 
         state =
             switch behavior {
-            case BehaviorType.endAtUTC.rawValue:
-                try .endedAt(container.decodeDate(forKey: .endTime, in: TimeZone(identifier: "UTC")))
-            case BehaviorType.endAtLocalTime.rawValue:
-                try .endedAt(container.decodeDate(forKey: .endTime, in: .current))
+            case BehaviorType.legacyEndAtUTC.rawValue:
+                try .endedAt(container.decodeLegacyEndTimeString(forKey: .endTime, in: TimeZone(identifier: "UTC")))
+            case BehaviorType.legacyEndAtLocalTime.rawValue:
+                try .endedAt(container.decodeLegacyEndTimeString(forKey: .endTime, in: .current))
+            case BehaviorType.endAt.rawValue:
+                try .endedAt(container.decodeDateTime(forKey: .endTime))
             case nil:
                 try .duration(container.decode(TimeInterval.self, forKey: .duration), start: .default)
             case BehaviorType.everyAppear.rawValue:

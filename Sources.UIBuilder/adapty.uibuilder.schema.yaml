@@ -1497,6 +1497,10 @@ DateTime:
         Конкретная дата/время через год, месяц и день.
         Если известена timeZone, то используйте unix timestamp, это быстрее.
         Календарь всегда ISO 8601.
+      required:
+        - year
+        - month
+        - day
       properties:
 
         timeZone:
@@ -1509,21 +1513,18 @@ DateTime:
 
         year:
           type: integer
-          default: 1
           description: Год.
           minimum: 1
           example: 2026
 
         month:
           type: integer
-          default: 1
           description: "Месяц. 1 = January, 12 = December."
           minimum: 1
           maximum: 12 
 
         day:
           type: integer
-          default: 1
           description: День месяца.
           minimum: 1
           maximum: 31
@@ -1565,8 +1566,6 @@ DateTime:
     - {"year": 2026, "month": 3, "day": 15, "hour": 14, "minute": 30, "timeZone": "Europe/Podgorica"}
     # Только дата (время = 00:00:00)
     - {"year": 2026, "month": 3, "day": 15}
-    # День рождения (без года — year defaults to 1)
-    - {"month": 7, "day": 22}
     # Относительная (DateTimeRelative)
     - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"hour": 9}}
     # Текущий момент
@@ -1792,5 +1791,3 @@ DateTime:
       - -86400000
       # Добавить 30 минут и 500 мс
       - 1800500
-
-

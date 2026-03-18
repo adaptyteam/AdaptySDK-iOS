@@ -15,3 +15,4 @@ extension Schema {
         case notFoundTemplate(String)
     }
 }
+

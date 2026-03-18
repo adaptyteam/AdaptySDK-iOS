@@ -19,7 +19,6 @@ extension Schema.DateTimePicker: Codable {
         case maxDate = "max"
         case minDate = "min"
         case color
-        case stringInLocalTime = "string_in_local_time"
     }
 
     init(from decoder: any Decoder) throws {
@@ -43,15 +42,9 @@ extension Schema.DateTimePicker: Codable {
         }
 
         value = try container.decode(Schema.Variable.self, forKey: .value)
-
         components = try container.decode(Schema.DateTimePicker.Components.self, forKey: .components)
-
-        let stringInLocalTime = try container.decodeIfPresent(Bool.self, forKey: .stringInLocalTime) ?? false
-
-        let timeZone = stringInLocalTime ? TimeZone.current : TimeZone(identifier: "UTC")
-
-        maxDate = try container.decodeDateIfPresent(forKey: .maxDate, in: timeZone)
-        minDate = try container.decodeDateIfPresent(forKey: .minDate, in: timeZone)
+        maxDate = try container.decodeDateTimeIfPresent(forKey: .maxDate)
+        minDate = try container.decodeDateTimeIfPresent(forKey: .minDate)
         color = try container.decodeIfPresent(Schema.AssetReference.self, forKey: .color)
     }
 
