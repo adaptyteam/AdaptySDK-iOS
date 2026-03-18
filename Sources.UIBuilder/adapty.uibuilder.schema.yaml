@@ -1,1793 +1,1888 @@
-$schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/ui/5_0_0/schema"
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+$id: "https://adapty.io/uibuilder/5.0.0-draft/schema"
 title: "AdaptyUI Configuration"
 type: object
 required: [format, screens, scripts]
 properties:
-  format:
-    type: string
-    const: "5.0.0-SNAPSHOT"
-  assets:
-    title: "Default assets"
-    $ref: "#/Assets"
-  localizations:
-    title: "Localizations"
-    type: array
-    items: { $ref: "#/Localization" }
-    uniqueItems: true
-    minItems: 1
-  default_localization:
-    title: "Default localizations locale identifier"
-    $ref: "#/Localization/Identifier"
-  templates:
-    title: "Templates"
-    type: object
-    additionalProperties: { $ref: "#/Template" }
-  navigators:
-    title: "Navigators"
-    type: object
-    properties:
-      default: 
-        $ref: "#/Navigator"
-        default: {
-          "background": "#000000FF",
-          "content": { "type": "screen_holder" },
-          "order": 0
-        }
-    additionalProperties: { $ref: "#/Navigator" }
-  screens:
-    title: "Screens"
-    type: object
-    additionalProperties: { $ref: "#/Screen" }
-  scripts:
-    type: array
-    items: { $ref: "#/Script" }
-    uniqueItems: true
+    format:
+        type: string
+        const: "5.0.0-draft"
+    assets:
+        title: "Default assets"
+        $ref: "#/Assets"
+    localizations:
+        title: "Localizations"
+        type: array
+        items: { $ref: "#/Localization" }
+        uniqueItems: true
+        minItems: 1
+    default_localization:
+        title: "Default localizations locale identifier"
+        $ref: "#/Localization/Identifier"
+    templates:
+        title: "Templates"
+        type: object
+        additionalProperties: { $ref: "#/Template" }
+    navigators:
+        title: "Navigators"
+        type: object
+        properties:
+            default:
+                $ref: "#/Navigator"
+                default:
+                    {
+                        "background": "#000000FF",
+                        "content": { "type": "screen_holder" },
+                        "order": 0,
+                    }
+        additionalProperties: { $ref: "#/Navigator" }
+    screens:
+        title: "Screens"
+        type: object
+        additionalProperties: { $ref: "#/Screen" }
+    scripts:
+        type: array
+        items: { $ref: "#/Script" }
+        uniqueItems: true
 additionalProperties: false
 
 ###### Entities ######
 
 Entities:
+    VerticalAlignment:
+        type: string
+        enum:
+            - top
+            - center
+            - bottom
 
-  VerticalAlignment:
-    type: string
-    enum:
-      - top
-      - center
-      - bottom
+    HorizontalAlignment:
+        type: string
+        enum:
+            - leading
+            - trailing
+            - left
+            - center
+            - right
+            - justified
 
-  HorizontalAlignment:
-    type: string
-    enum:
-      - leading
-      - trailing
-      - left
-      - center
-      - right
-      - justified
+    AspectRatio:
+        title: "Aspect ratio"
+        type: string
+        enum:
+            - fit
+            - fill
+            - stretch
 
-  AspectRatio:
-    title: "Aspect ratio"
-    type: string
-    enum:
-      - fit
-      - fill
-      - stretch
+    CornerRadius:
+        title: "Corner radius"
+        oneOf:
+            - type: number
+              description: "Same radius for all corners"
+            - type: array
+              items: { type: number }
+              description: "[top_leading,top_trailing,bottom_trailing,bottom_leading], default: 0"
+            - type: object
+              properties:
+                  top_leading:
+                      title: "Top leading corner radius"
+                      type: number
+                      default: 0
+                  top_trailing:
+                      title: "Top trailing corner radius"
+                      type: number
+                      default: 0
+                  bottom_trailing:
+                      title: "Bottom trailing corner radius"
+                      type: number
+                      default: 0
+                  bottom_leading:
+                      title: "Bottom leading corner radius"
+                      type: number
+                      default: 0
+              additionalProperties: false
 
-  CornerRadius:
-    title: "Corner radius"
-    oneOf:
-      - type: number
-        description: "Same radius for all corners"
-      - type: array
-        items: { type: number }
-        description: "[top_leading,top_trailing,bottom_trailing,bottom_leading], default: 0"
-      - type: object
-        properties:
-          top_leading:
-            title: "Top leading corner radius"
-            type: number
-            default: 0
-          top_trailing:
-            title: "Top trailing corner radius"
-            type: number
-            default: 0
-          bottom_trailing:
-            title: "Bottom trailing corner radius"
-            type: number
-            default: 0
-          bottom_leading:
-            title: "Bottom leading corner radius"
-            type: number
-            default: 0
-        additionalProperties: false
+    EdgeInsets:
+        title: "Edge Insets"
+        oneOf:
+            - $ref: "#/Entities/Unit"
+            - type: array
+              items: { $ref: "#/Entities/Unit" }
+              description: "[], default 0;  [allEdges]; [verticalEdges,horizontalEdges]; [leading,top,trailing,bottom], default 0"
+            - type: object
+              properties:
+                  top: { $ref: "#/Entities/Unit", default: 0 }
+                  leading: { $ref: "#/Entities/Unit", default: 0 }
+                  bottom: { $ref: "#/Entities/Unit", default: 0 }
+                  trailing: { $ref: "#/Entities/Unit", default: 0 }
+              additionalProperties: false
 
-  EdgeInsets:
-    title: "Edge Insets"
-    oneOf:
-      - $ref: "#/Entities/Unit"
-      - type: array
-        items: { $ref: "#/Entities/Unit" }
-        description: "[], default 0;  [allEdges]; [verticalEdges,horizontalEdges]; [leading,top,trailing,bottom], default 0"
-      - type: object
-        properties:
-          top: { $ref: "#/Entities/Unit", default: 0 }
-          leading: { $ref: "#/Entities/Unit", default: 0 }
-          bottom: { $ref: "#/Entities/Unit", default: 0 }
-          trailing: { $ref: "#/Entities/Unit", default: 0 }
-        additionalProperties: false
+    Point:
+        title: Point
+        oneOf:
+            - type: array
+              items: { type: number }
+              description: "[y,x], default 0"
+            - type: object
+              properties:
+                  y: { type: number, default: 0 }
+                  x: { type: number, default: 0 }
+              additionalProperties: false
 
-  Point:
-    title: Point
-    oneOf:
-      - type: array
-        items: { type: number }
-        description: "[y,x], default 0"
-      - type: object
-        properties:
-          y: { type: number, default: 0 }
-          x: { type: number, default: 0 }
-        additionalProperties: false
+    Offset:
+        title: Offset
+        oneOf:
+            - { $ref: "#/Entities/Unit", description: "y value, x:0" }
+            - type: array
+              items: { $ref: "#/Entities/Unit" }
+              description: "[] => y:0,x:0, [y] => x:0, [y,x]"
+            - type: object
+              properties:
+                  y: { $ref: "#/Entities/Unit", default: 0 }
+                  x: { $ref: "#/Entities/Unit", default: 0 }
+              additionalProperties: false
 
-  Offset:
-    title: Offset
-    oneOf:
-      - { $ref: "#/Entities/Unit", description: "y value, x:0" }
-      - type: array
-        items: { $ref: "#/Entities/Unit" }
-        description: "[] => y:0,x:0, [y] => x:0, [y,x]"
-      - type: object
-        properties:
-          y: { $ref: "#/Entities/Unit", default: 0 }
-          x: { $ref: "#/Entities/Unit", default: 0 }
-        additionalProperties: false
+    Unit:
+        title: Unit
+        oneOf:
+            - type: number
+              description: "Value in points"
+            - type: object
+              required: [point]
+              properties:
+                  point: { type: number, title: "Value in points" }
+              additionalProperties: false
+            - type: object
+              required: [screen]
+              properties:
+                  screen:
+                      { type: number, title: "Value in parts of the screen" }
+              additionalProperties: false
+            - type: object
+              required: [safe_area]
+              properties:
+                  safe_area: { enum: [start, end] }
+              additionalProperties: false
+            - type: object
+              required: [value]
+              properties:
+                  value: { type: number }
+                  unit: { enum: [point, screen], default: point }
+              additionalProperties: false
 
-  Unit:
-    title: Unit
-    oneOf:
-      - type: number
-        description: "Value in points"
-      - type: object
-        required: [point]
-        properties:
-          point: { type: number, title: "Value in points" }
-        additionalProperties: false
-      - type: object
-        required: [screen]
-        properties:
-          screen: { type: number, title: "Value in parts of the screen" }
-        additionalProperties: false
-      - type: object
-        required: [safe_area]
-        properties:
-          safe_area: { enum: [start, end] }
-        additionalProperties: false
-      - type: object
-        required: [value]
-        properties:
-          value: { type: number }
-          unit: { enum: [point, screen], default: point }
-        additionalProperties: false
-
-  DateTime:
-    description: "Date/time value"
-    oneOf:
-      - type: number
-        description: "Unix timestamp in milliseconds"
-      - type: string
-        pattern: "^[0-9]{4}-((0[1-9])|(1[012]))-(([0-2][1-9])|(3[01])) (([01][0-9])|(2[0123])):([0-5][0-9]):([0-5][0-9])$"
-        description: "Date string: 6 numeric components (year, month, day, hour, minute, second) separated by any of: space, dash, colon, dot, comma, semicolon, slash, backslash"
-
+    DateTime:
+        description: "Date/time value"
+        oneOf:
+            - type: number
+              description: "Unix timestamp in milliseconds"
+            - type: string
+              pattern: "^[0-9]{4}-((0[1-9])|(1[012]))-(([0-2][1-9])|(3[01])) (([01][0-9])|(2[0123])):([0-5][0-9]):([0-5][0-9])$"
+              description: "Date string: 6 numeric components (year, month, day, hour, minute, second) separated by any of: space, dash, colon, dot, comma, semicolon, slash, backslash"
 
 ###### Animations ######
 
 Animation:
-  type: object
-  allOf:
-    - properties:
-        interpolator:
-          $ref: "#/Animation/Interpolator"
-          default: ease_in_out
-        start_delay:
-          type: integer
-          default: 0
-          description: milliseconds
-        duration: 
-          type: integer
-          default: 300
-          description: milliseconds
-        loop: { enum: [normal, ping_pong] }
-        loop_delay: 
-          type: integer
-          default: 0
-          description: milliseconds
-        ping_pong_delay:
-          type: integer
-          default: 0
-          description: milliseconds
-        loop_count: { type: integer }
-    - oneOf:
-        - $ref: "#/Animation/Opacity" 
-        - $ref: "#/Animation/Offset" 
-        - $ref: "#/Animation/Rotation"
-        - $ref: "#/Animation/Scale"
-        - $ref: "#/Animation/Box"
-        - $ref: "#/Animation/Background"
-        - $ref: "#/Animation/Border"
-        - $ref: "#/Animation/Shadow"
-  additionalProperties: false
-
-  Interpolator:
-    oneOf:
-      - type: string
-        enum:
-          - ease_in_out
-          - ease_in
-          - ease_out
-          - linear
-          - ease_in_elastic
-          - ease_out_elastic
-          - ease_in_out_elastic
-          - ease_in_bounce
-          - ease_out_bounce
-          - ease_in_out_bounce
-      - type: array
-        items: { type: number }
-        description: "[x1, y1, x2, y2] 4 numbers used for 2 point Cubic-Bezier curve"
-        minItems: 4
-        maxItems: 4
-    default: ease_in_out
-
-  Opacity:
     type: object
-    required: [type]
-    properties:
-      type: { const: opacity }
-      opacity:
+    allOf:
+        - properties:
+              interpolator:
+                  $ref: "#/Animation/Interpolator"
+                  default: ease_in_out
+              start_delay:
+                  type: integer
+                  default: 0
+                  description: milliseconds
+              duration:
+                  type: integer
+                  default: 300
+                  description: milliseconds
+              loop: { enum: [normal, ping_pong] }
+              loop_delay:
+                  type: integer
+                  default: 0
+                  description: milliseconds
+              ping_pong_delay:
+                  type: integer
+                  default: 0
+                  description: milliseconds
+              loop_count: { type: integer }
+        - oneOf:
+              - $ref: "#/Animation/Opacity"
+              - $ref: "#/Animation/Offset"
+              - $ref: "#/Animation/Rotation"
+              - $ref: "#/Animation/Scale"
+              - $ref: "#/Animation/Box"
+              - $ref: "#/Animation/Background"
+              - $ref: "#/Animation/Border"
+              - $ref: "#/Animation/Shadow"
+    additionalProperties: false
+
+    Interpolator:
+        oneOf:
+            - type: string
+              enum:
+                  - ease_in_out
+                  - ease_in
+                  - ease_out
+                  - linear
+                  - ease_in_elastic
+                  - ease_out_elastic
+                  - ease_in_out_elastic
+                  - ease_in_bounce
+                  - ease_out_bounce
+                  - ease_in_out_bounce
+            - type: array
+              items: { type: number }
+              description: "[x1, y1, x2, y2] 4 numbers used for 2 point Cubic-Bezier curve"
+              minItems: 4
+              maxItems: 4
+        default: ease_in_out
+
+    Opacity:
         type: object
-        required: [start, end]
+        required: [type]
         properties:
-          start: { type: number }
-          end: { type: number }
-        default: { "start": 0, "end": 1 }
+            type: { const: opacity }
+            opacity:
+                type: object
+                required: [start, end]
+                properties:
+                    start: { type: number }
+                    end: { type: number }
+                default: { "start": 0, "end": 1 }
+                additionalProperties: false
         additionalProperties: false
-    additionalProperties: false
 
-  Offset:
-    type: object
-    required: [type, offset]
-    properties:
-      type: { const: offset }
-      offset:
+    Offset:
         type: object
-        required: [start, end]
+        required: [type, offset]
         properties:
-          start: { $ref: "#/Entities/Offset" }
-          end: { $ref: "#/Entities/Offset" }
+            type: { const: offset }
+            offset:
+                type: object
+                required: [start, end]
+                properties:
+                    start: { $ref: "#/Entities/Offset" }
+                    end: { $ref: "#/Entities/Offset" }
+                additionalProperties: false
         additionalProperties: false
-    additionalProperties: false
 
-  Rotation:
-    type: object
-    required: [type, angle]
-    properties:
-      type: { const: rotation }
-      angle:
+    Rotation:
         type: object
-        required: [start, end]
+        required: [type, angle]
         properties:
-          start: { type: number, description: "degrees" }
-          end: { type: number, description: "degrees" }
+            type: { const: rotation }
+            angle:
+                type: object
+                required: [start, end]
+                properties:
+                    start: { type: number, description: "degrees" }
+                    end: { type: number, description: "degrees" }
+                additionalProperties: false
+            anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
         additionalProperties: false
-      anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
-    additionalProperties: false
 
-  Scale:
-    type: object
-    required: [type, scale]
-    properties:
-      type: { const: scale }
-      scale:
+    Scale:
         type: object
-        required: [start, end]
+        required: [type, scale]
         properties:
-          start: { $ref: "#/Entities/Point" }
-          end: { $ref: "#/Entities/Point" }
+            type: { const: scale }
+            scale:
+                type: object
+                required: [start, end]
+                properties:
+                    start: { $ref: "#/Entities/Point" }
+                    end: { $ref: "#/Entities/Point" }
+                additionalProperties: false
+            anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
         additionalProperties: false
-      anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
-    additionalProperties: false
 
-  Box:
-    type: object
-    required: [type]
-    properties:
-      type: { const: box }
-    anyOf:
-      - required: [width]
-        properties:
-          width:
-            type: object
-            required: [start, end]
-            properties:
-              start: { $ref: "#/Entities/Unit" }
-              end: { $ref: "#/Entities/Unit" }
-            additionalProperties: false
-      - required: [height]
-        properties:
-          height:
-            type: object
-            required: [start, end]
-            properties:
-              start: { $ref: "#/Entities/Unit" }
-              end: { $ref: "#/Entities/Unit" }
-            additionalProperties: false
-    additionalProperties: false
-
-  Background:
-    type: object
-    required: [type, color]
-    properties:
-      type: { const: background }
-      color:
+    Box:
         type: object
-        required: [start, end]
+        required: [type]
         properties:
-          start: { $ref: "#/AssetIdOrColor/Binding"}
-          end: { $ref: "#/AssetIdOrColor/Binding"}
+            type: { const: box }
+        anyOf:
+            - required: [width]
+              properties:
+                  width:
+                      type: object
+                      required: [start, end]
+                      properties:
+                          start: { $ref: "#/Entities/Unit" }
+                          end: { $ref: "#/Entities/Unit" }
+                      additionalProperties: false
+            - required: [height]
+              properties:
+                  height:
+                      type: object
+                      required: [start, end]
+                      properties:
+                          start: { $ref: "#/Entities/Unit" }
+                          end: { $ref: "#/Entities/Unit" }
+                      additionalProperties: false
         additionalProperties: false
-    additionalProperties: false
 
-  Border:
-    type: object
-    required: [type]
-    properties:
-      type: { const: border }
-    anyOf:
-      - required: [color]
+    Background:
+        type: object
+        required: [type, color]
         properties:
-          color:
-            type: object
-            required: [start, end]
-            properties:
-              start: { $ref: "#/AssetIdOrColor/Binding" }
-              end: { $ref: "#/AssetIdOrColor/Binding" }
-            additionalProperties: false
-      - required: [thickness]
-        properties:
-          thickness:
-            type: object
-            required: [start, end]
-            properties:
-              start: { type: number }
-              end: { type: number }
-            additionalProperties: false
-    additionalProperties: false
+            type: { const: background }
+            color:
+                type: object
+                required: [start, end]
+                properties:
+                    start: { $ref: "#/AssetIdOrColor/Binding" }
+                    end: { $ref: "#/AssetIdOrColor/Binding" }
+                additionalProperties: false
+        additionalProperties: false
 
-  Shadow:
-    type: object
-    required: [type]
-    properties:
-      type: { const: shadow }
-    anyOf:
-      - required: [color]
+    Border:
+        type: object
+        required: [type]
         properties:
-          color:
-            type: object
-            required: [start, end]
-            properties:
-              start: { $ref: "#/AssetIdOrColor/Binding" }
-              end: { $ref: "#/AssetIdOrColor/Binding" }
-            additionalProperties: false
-      - required: [blur_radius]
-        properties:
-          blur_radius:
-            type: object
-            required: [start, end]
-            properties:
-              start: { type: number }
-              end: { type: number }
-            additionalProperties: false
-      - required: [offset]
-        properties:
-          offset:
-            type: object
-            required: [start, end]
-            properties:
-              start: { $ref: "#/Entities/Offset" }
-              end: { $ref: "#/Entities/Offset" }
-            additionalProperties: false
-    additionalProperties: false
+            type: { const: border }
+        anyOf:
+            - required: [color]
+              properties:
+                  color:
+                      type: object
+                      required: [start, end]
+                      properties:
+                          start: { $ref: "#/AssetIdOrColor/Binding" }
+                          end: { $ref: "#/AssetIdOrColor/Binding" }
+                      additionalProperties: false
+            - required: [thickness]
+              properties:
+                  thickness:
+                      type: object
+                      required: [start, end]
+                      properties:
+                          start: { type: number }
+                          end: { type: number }
+                      additionalProperties: false
+        additionalProperties: false
 
-  Transition.Slide:
-    type: object
-    required: [type]
-    properties:
-      type: { const: slide }
-      start_delay: { type: integer, default: 0 }
-      duration: { type: integer, default: 300 }
-      interpolator:
-        { $ref: "#/Animation/Interpolator", default: ease_in_out }
-    additionalProperties: false
+    Shadow:
+        type: object
+        required: [type]
+        properties:
+            type: { const: shadow }
+        anyOf:
+            - required: [color]
+              properties:
+                  color:
+                      type: object
+                      required: [start, end]
+                      properties:
+                          start: { $ref: "#/AssetIdOrColor/Binding" }
+                          end: { $ref: "#/AssetIdOrColor/Binding" }
+                      additionalProperties: false
+            - required: [blur_radius]
+              properties:
+                  blur_radius:
+                      type: object
+                      required: [start, end]
+                      properties:
+                          start: { type: number }
+                          end: { type: number }
+                      additionalProperties: false
+            - required: [offset]
+              properties:
+                  offset:
+                      type: object
+                      required: [start, end]
+                      properties:
+                          start: { $ref: "#/Entities/Offset" }
+                          end: { $ref: "#/Entities/Offset" }
+                      additionalProperties: false
+        additionalProperties: false
+
+    Transition.Slide:
+        type: object
+        required: [type]
+        properties:
+            type: { const: slide }
+            start_delay: { type: number, default: 0 }
+            duration: { type: number, default: 300 }
+            interpolator:
+                { $ref: "#/Animation/Interpolator", default: ease_in_out }
+        additionalProperties: false
 
 ###### Navigators ######
 
 Navigator:
-  type: object
-  required: [background, order]
-  properties:
-    background: { $ref: "#/AssetIdOrColor/Binding" }
-    content:
-      $ref: "#/UI/Element"
-      default: { $ref: "#/Screen/Holder" }
-    order: { type: integer }
-    default_screen_actions:
-      type: object
-      properties:
-        on_outside_tap: { $ref: "#/Script/ActionOrArray" }
-        on_device_back: { $ref: "#/Script/ActionOrArray" }
-      additionalProperties: false
-    appearances:
-      type: object
-      properties:
-        on_appear: { $ref: "#/Navigator/Appearance" }
-        on_disappear: { $ref: "#/Navigator/Appearance" }
-      additionalProperties: { $ref: "#/Navigator/Appearance" }
-    transitions:
-      type: object
-      properties:
-        forward: { $ref: "#/Navigator/ScreenTransition" }
-        backward: { $ref: "#/Navigator/ScreenTransition" }
-      additionalProperties: { $ref: "#/Navigator/ScreenTransition" }
-    
-  Appearance:
     type: object
+    required: [background, order]
     properties:
-      background: { $ref: "#/Animation/Background" }
-      content:
-        type: array
-        items: { $ref: "#/Animation" }
-        uniqueItems: true
-        minItems: 1
-    additionalProperties: false
+        background: { $ref: "#/AssetIdOrColor/Binding" }
+        content:
+            $ref: "#/UI/Element"
+            default: { $ref: "#/Screen/Holder" }
+        order: { type: integer }
+        default_screen_actions:
+            type: object
+            properties:
+                on_outside_tap: { $ref: "#/Script/ActionOrArray" }
+                on_device_back: { $ref: "#/Script/ActionOrArray" }
+            additionalProperties: false
+        appearances:
+            type: object
+            properties:
+                on_appear: { $ref: "#/Navigator/Appearance" }
+                on_disappear: { $ref: "#/Navigator/Appearance" }
+            additionalProperties: { $ref: "#/Navigator/Appearance" }
+        transitions:
+            type: object
+            properties:
+                forward: { $ref: "#/Navigator/ScreenTransition" }
+                backward: { $ref: "#/Navigator/ScreenTransition" }
+            additionalProperties: { $ref: "#/Navigator/ScreenTransition" }
 
-  ScreenTransition:
-    type: object
-    required: [is_incoming_on_top]
-    properties:
-      outgoing:
-        type: array
-        items: { $ref: "#/Animation" }
-        uniqueItems: true
-        minItems: 1
-      incoming:
-        type: array
-        items: { $ref: "#/Animation" }
-        uniqueItems: true
-        minItems: 1
-      is_incoming_on_top: { type: boolean }
-    additionalProperties: false
-
-###### Screens ######
-
-Screen:
-  type: object
-  required: [content]
-  properties:
-    cover: { $ref: "#/UI/Box" }
-    content: { $ref: "#/UI/Element" }
-    footer: { $ref: "#/UI/Element" }
-    layout_behaviour:
-      type: string
-      enum: [default, flat, hero, transparent]
-      default: default
-    on_outside_tap: { $ref: "#/Script/ActionOrArray" }
-    on_device_back: { $ref: "#/Script/ActionOrArray" }
-  additionalProperties: false
-
-  Holder:
-    title: "Placeholder for screen content inside navigator"
-    type: object
-    required: [type]
-    properties:
-      type: { const: "screen_holder" }
-    additionalProperties: false
-
-###### Templates ######
-
-Template:
-  type: object
-  required: [content]
-  properties:
-    content: { $ref: "#/UI/Element" }
-  additionalProperties: false
-
-  Child:
-    title: "Template child placeholder"
-    type: object
-    required: [type, name]
-    properties:
-      type: { const: "child" }
-      name: { type: string }
-    additionalProperties: false
-
-  Reference:
-    title: "Template reference"
-    type: object
-    required: [type]
-    properties:
-      type: { type: string, pattern: '^#' }
-    additionalProperties: false
-
-###### UI Components ######
-
-UI:
-
-  Element:
-    type: object
-    required: [type]
-    oneOf:
-      - $ref: "#/Template/Reference"
-      - $ref: "#/Template/Child"
-        description: Allowed use only in Template
-      - $ref: "#/Screen/Holder"
-        description: Allowed use only in Navigator
-      - $ref: "#/UI/If.Then.Else"
-      - allOf:
-          - oneOf:
-              - $ref: "#/UI/Image"
-              - $ref: "#/UI/Video"
-              - $ref: "#/UI/Text"
-              - $ref: "#/UI/TextField"
-              - $ref: "#/UI/TextEditor"
-              - $ref: "#/UI/Toggle"
-              - $ref: "#/UI/Slider"
-              - $ref: "#/UI/Button"
-              - $ref: "#/UI/Stack"
-              - $ref: "#/UI/Box"
-              - $ref: "#/UI/Section"
-              - $ref: "#/UI/Row"
-              - $ref: "#/UI/Column"
-              - $ref: "#/UI/Timer"
-              - $ref: "#/UI/Pager"
-              - $ref: "#/UI/DateTimePicker"
-              - $ref: "#/UI/WheelRangePicker"
-              - $ref: "#/UI/WheelItemsPicker"
-          - properties:
-              decorator: { $ref: "#/UI/Element/Decorator" }
-              padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
-              offset: { $ref: "#/Entities/Offset", default: 0 }
-              opacity: { type: number, default: 1.0 }
-              overlay:
-                type: array
-                items: { $ref: "#/UI/Element/Overlay" }
-                uniqueItems: true
-                minItems: 1
-              on_appear:
+    Appearance:
+        type: object
+        properties:
+            background: { $ref: "#/Animation/Background" }
+            content:
                 type: array
                 items: { $ref: "#/Animation" }
                 uniqueItems: true
                 minItems: 1
         additionalProperties: false
 
-    Overlay:
-      type: object
-      required: [content]
-      properties:
-        h_align: 
-          $ref: "#/Entities/HorizontalAlignment"
-          default: center
-        v_align: 
-          $ref: "#/Entities/VerticalAlignment"
-          default: center 
-        content: { $ref: "#/UI/Element" }
-
-
-    Decorator:
-      title: "Decorator for any element"
-      type: object
-      properties:
-        background: { $ref: "#/AssetIdOrColor/Binding" }
-        type: { $ref: "#/UI/Element/Decorator/ShapeType", default: rect }
-        border: { $ref: "#/AssetIdOrColor/Binding" }
-        shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
-      dependentSchemas:
-        border:
-          properties:
-            thickness: { type: number, default: 1 }
-      if:
-        properties:
-          type: { const: rect }
-      then:
-        properties:
-          rect_corner_radius: { $ref: "#/Entities/CornerRadius", default: 0 }
-      additionalProperties: false
-
-      ShapeType:
-        title: "Shape type"
-        type: string
-        enum:
-          - circle
-          - rect
-          - curve_up
-          - curve_down
-
-      Shadow:
-        title: "Shadow"
+    ScreenTransition:
         type: object
-        required: [color]
+        required: [is_incoming_on_top]
         properties:
-          color: { $ref: "#/AssetIdOrColor/Binding" }
-          blur_radius:
-            type: number
-            default: 0
-            description: "A measure of how much to blur the shadow. Larger values result in more blur."
-          offset: { $ref: "#/Entities/Offset", default: [0, 0] }
+            outgoing:
+                type: array
+                items: { $ref: "#/Animation" }
+                uniqueItems: true
+                minItems: 1
+            incoming:
+                type: array
+                items: { $ref: "#/Animation" }
+                uniqueItems: true
+                minItems: 1
+            is_incoming_on_top: { type: boolean }
         additionalProperties: false
 
-  If.Then.Else:
+###### Screens ######
+
+Screen:
     type: object
-    required: [type, then, else]
+    required: [content]
     properties:
-      type: { const: if }
-      platform: { enum: [ios, android] }
-      os_version:
-        type: string
-        pattern: "^[0-9]+\\.[0-9]+$"
-        description: "Minimum OS version (inclusive)"
-      version:
-        { type: string, pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
-      to_version:
-        { type: string, pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$" }
-      then: { $ref: "#/UI/Element" }
-      else: { $ref: "#/UI/Element" }
+        cover: { $ref: "#/UI/Box" }
+        content: { $ref: "#/UI/Element" }
+        footer: { $ref: "#/UI/Element" }
+        layout_behaviour:
+            type: string
+            enum: [default, flat, hero, transparent]
+            default: default
+        on_outside_tap: { $ref: "#/Script/ActionOrArray" }
+        on_device_back: { $ref: "#/Script/ActionOrArray" }
     additionalProperties: false
 
-
-  Box:
-    type: object
-    required: [type]
-    properties:
-      type: { const: box }
-      height: { $ref: "#/UI/Box/Length" }
-      width: { $ref: "#/UI/Box/Length" }
-      h_align: 
-        $ref: "#/Entities/HorizontalAlignment"
-        default: center
-      v_align: 
-        $ref: "#/Entities/VerticalAlignment"
-        default: center 
-      content: { $ref: "#/UI/Element" }
-
-    Length:
-      oneOf:
-        - title: Fixed length
-          $ref: "#/Entities/Unit"
-        - title: Fill max
-          type: object
-          required: [fill_max]
-          properties:
-            fill_max: { type: boolean, const: true }
-          additionalProperties: false
-        - title: Set min, and optional max
-          type: object
-          required: [min]
-          properties:
-            min: { $ref: "#/Entities/Unit" }
-            max: { $ref: "#/Entities/Unit" }
-          additionalProperties: false
-        - title: Set shrink, and optional max
-          type: object
-          required: [shrink]
-          properties:
-            shrink: { $ref: "#/Entities/Unit" }
-            max: { $ref: "#/Entities/Unit" }
-          additionalProperties: false
-
-  Image:
-    type: object
-    required: [type, asset_id]
-    properties:
-      type: { const: "image" }
-      asset_id: { $ref: "#/AssetId/Binding" }
-      aspect:
-        $ref: "#/Entities/AspectRatio"
-        default: fit
-      tint: { $ref: "#/AssetIdOrColor/Binding" }
-
-  Video:
-    type: object
-    required: [type, asset_id]
-    properties:
-      type: { const: "video" }
-      asset_id: { $ref: "#/AssetId/Binding" }
-      aspect:
-        $ref: "#/Entities/AspectRatio"
-        default: fit
-      loop: { type: boolean, default: true }
-
-  Text:
-    type: object
-    allOf:
-      - $ref: "#/UI/Text/Attributes"
-      - required: [type, string_id]
+    Holder:
+        title: "Placeholder for screen content inside navigator"
+        type: object
+        required: [type]
         properties:
-          type: { const: "text" }
-          string_id: { $ref: "#/Localization/StringId/Binding" }
-          align: { $ref: "#/Entities/HorizontalAlignment", default: leading }
-          max_rows: { type: integer, minimum: 1 }
-          on_overflow: { $ref: "#/UI/Text/OverflowMode" }
+            type: { const: "screen_holder" }
+        additionalProperties: false
 
-    OverflowMode:
-      anyOf:
-        - $ref: "#/UI/Text/OverflowMode/Value"
-        - type: array
-          items: { $ref: "#/UI/Text/OverflowMode/Value" }
-          uniqueItems: true
-          minItems: 1
+###### Templates ######
 
-      Value:
-        type: string
-        enum:
-          - scale
-
-    Attributes:
-      title: Attributes for RichText
-      type: object
-      properties:
-        font: 
-          title: "Font Asset identifier"
-          $ref: "#/AssetId/Binding"
-        size: 
-          title: "Font size"
-          type: number
-        strike: 
-          type: boolean
-        underline:
-          type: boolean 
-        color: 
-          title: "Text color[-gradient] Asset identifier" 
-          $ref: "#/AssetIdOrColor/Binding"
-        background:
-          title: Background color of text
-          $ref: "#/AssetIdOrColor/Binding"
-        tint:
-          title: Tint color of image
-          $ref: "#/AssetIdOrColor/Binding"
-      additionalProperties: false
-
-
-  TextField:
+Template:
     type: object
-    allOf:
-      - $ref: "#/UI/Text/Attributes"
-      - required: [type, value]
+    required: [content]
+    properties:
+        content: { $ref: "#/UI/Element" }
+    additionalProperties: false
+
+    Child:
+        title: "Template child placeholder"
+        type: object
+        required: [type, name]
         properties:
-          type: { const: "text_field" }
-          value: { $ref: "#/Script/DataBinding" }
-          placeholder: 
+            type: { const: "child" }
+            name: { type: string }
+        additionalProperties: false
+
+    Reference:
+        title: "Template reference"
+        type: object
+        required: [type]
+        properties:
+            type: { type: string, pattern: "^#" }
+        additionalProperties: false
+
+###### UI Components ######
+
+UI:
+    Element:
+        type: object
+        required: [type]
+        oneOf:
+            - $ref: "#/Template/Reference"
+            - $ref: "#/Template/Child"
+              description: Allowed use only in Template
+            - $ref: "#/Screen/Holder"
+              description: Allowed use only in Navigator
+            - $ref: "#/UI/If.Then.Else"
+            - allOf:
+                  - oneOf:
+                        - $ref: "#/UI/Image"
+                        - $ref: "#/UI/Video"
+                        - $ref: "#/UI/Text"
+                        - $ref: "#/UI/TextField"
+                        - $ref: "#/UI/TextEditor"
+                        - $ref: "#/UI/Toggle"
+                        - $ref: "#/UI/Slider"
+                        - $ref: "#/UI/Button"
+                        - $ref: "#/UI/Stack"
+                        - $ref: "#/UI/Box"
+                        - $ref: "#/UI/Section"
+                        - $ref: "#/UI/Row"
+                        - $ref: "#/UI/Column"
+                        - $ref: "#/UI/Timer"
+                        - $ref: "#/UI/Pager"
+                        - $ref: "#/UI/DateTimePicker"
+                        - $ref: "#/UI/WheelRangePicker"
+                        - $ref: "#/UI/WheelItemsPicker"
+                  - properties:
+                        decorator: { $ref: "#/UI/Element/Decorator" }
+                        padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
+                        offset: { $ref: "#/Entities/Offset", default: 0 }
+                        opacity: { type: number, default: 1.0 }
+                        overlay:
+                            type: array
+                            items: { $ref: "#/UI/Element/Overlay" }
+                            uniqueItems: true
+                            minItems: 1
+                        on_appear:
+                            type: array
+                            items: { $ref: "#/Animation" }
+                            uniqueItems: true
+                            minItems: 1
+              additionalProperties: false
+
+        Overlay:
             type: object
-            allOf:
-              - $ref: "#/UI/Text/Attributes"
-              - required: [string_id]
+            required: [content]
+            properties:
+                h_align:
+                    $ref: "#/Entities/HorizontalAlignment"
+                    default: center
+                v_align:
+                    $ref: "#/Entities/VerticalAlignment"
+                    default: center
+                content: { $ref: "#/UI/Element" }
+
+        Decorator:
+            title: "Decorator for any element"
+            type: object
+            properties:
+                background: { $ref: "#/AssetIdOrColor/Binding" }
+                type:
+                    { $ref: "#/UI/Element/Decorator/ShapeType", default: rect }
+                border: { $ref: "#/AssetIdOrColor/Binding" }
+                shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
+            dependentSchemas:
+                border:
+                    properties:
+                        thickness: { type: number, default: 1 }
+            if:
                 properties:
-                  string_id: { $ref: "#/Localization/StringId/Binding" }
-                  on_overflow: { $ref: "#/UI/Text/OverflowMode" }
-            additionalProperties: false
-          secure_entry: { type: boolean , default: false }
-          align: { $ref: "#/Entities/HorizontalAlignment", default: leading }
-          input_constraints: 
-            type: object
-            properties:
-              regex: { type: string }
-              max_length: { type: integer }
-            additionalProperties: false
-          validation: { $ref: "#/Script/DataBinding" }
-          invalid_attributes: { $ref: "#/UI/Text/Attributes" }   
-          keyboard_options: 
-            type: object
-            properties:
-              keyboard: 
-                enum:
-                  - default
-                  - email
-                  - number
-                  - decimal
-                  - phone
-                  - url
-                  - ascii
-              content_type:
-                enum:
-                  - email
-                  - phone
-                  - username
-                  - password
-                  - new_password
-                  - name
-                  - given_name
-                  - family_name
-                  - middle_name
-                  - name_prefix
-                  - name_suffix
-                  - one_time_code
-                  - postal_code
-                  - street_address
-                  - city
-                  - state
-                  - country
-                  - credit_card_number
-                  - credit_card_security_code
-                  - credit_card_expiration
-                  - credit_card_expiration_month
-                  - credit_card_expiration_year
-                  - birthdate
-                  - birthdate_day
-                  - birthdate_month
-                  - birthdate_year
-                  - flight_number
-              auto_capitalization:
-                enum:
-                  - never
-                  - sentences
-                  - words
-                  - characters
-              submit_button:
-                enum:
-                  - done
-                  - go 
-                  - search
-                  - send
-                  - next
-                  - return
+                    type: { const: rect }
+            then:
+                properties:
+                    rect_corner_radius:
+                        { $ref: "#/Entities/CornerRadius", default: 0 }
             additionalProperties: false
 
-  TextEditor:
-    type: object
-    allOf: 
-      - $ref: "#/UI/TextField"
-      - required: [type]
-        properties:
-          type: { const: "text_editor" }
-          min_rows: { type: integer, minimum: 1 }
-          max_rows: { type: integer, minimum: 1 }
-
-  Toggle:
-    type: object
-    required: [type, value]
-    properties:
-      type: { const: toggle }
-      color: { $ref: "#/AssetIdOrColor/Binding" }
-      value: { $ref: "#/Script/DataBinding" }
-
-  Slider:
-    type: object
-    required: [type, value, min, max]
-    properties:
-      type: { const: slider }
-      value: { $ref: "#/Script/DataBinding", title: "Two-way data binding to number" }
-      min: { type: number }
-      max: { type: number }
-      step: { type: number }
-
-  Button:
-    type: object
-    required: [type, action, normal]
-    properties:
-      type: { const: button }
-      action: { $ref: "#/Script/ActionOrArray" }
-      normal: { $ref: "#/UI/Element" }
-      selected: { $ref: "#/UI/Element" }
-      is_selected: { $ref: "#/Script/DataBinding", title: "One-way data binding to boolean"}
-
-  Stack:
-    type: object
-    required: [type, content]
-    properties:
-      type: { enum: [ v_stack, h_stack, z_stack] }
-      h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
-      v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
-      spacing: { type: number, default: 0 }
-      content:
-        title: "Child elements"
-        type: array
-        minItems: 1
-        items:
-          oneOf:
-            - $ref: "#/UI/Stack/Space"
-            - $ref: "#/UI/Element"
-
-    Space:
-      title: "Space in stack"
-      type: object
-      properties:
-        type: { const: space }
-        count: { type: integer, default: 1, minimum: 1 }
-      additionalProperties: false
-
-  Section:
-    type: object
-    required: [type, index, content]
-    properties:
-      type: { const: section }
-      index: { $ref: "#/Script/DataBinding", title: "One-way data binding to integer"}
-      content:
-        type: array
-        minItems: 1
-        items: { $ref: "#/UI/Element" }
-
-  Row:
-    type: object
-    required: [type, items]
-    properties:
-      type: { const: row }
-      spacing: { type: number, default: 0 }
-      items:
-        type: array
-        minItems: 1
-        items: { $ref: "#/UI/GridItem" }
-
-  Column:
-    type: object
-    required: [type, items]
-    properties:
-      type: { const: column }
-      spacing: { type: number, default: 0 }
-      items:
-        type: array
-        minItems: 1
-        items: { $ref: "#/UI/GridItem" }
-
-  GridItem:
-    type: object
-    required: [type, content]
-    allOf:
-      - oneOf:
-          - required: [fixed]
-            properties:
-              fixed: { $ref: "#/Entities/Unit" }
-          - required: [weight]
-            properties:
-              weight: { type: integer }
-      - properties:
-          type: { const: grid_item }
-          h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
-          v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
-          content: { $ref: "#/UI/Element" }
-    additionalProperties: false
-
-  Timer:
-    type: object
-    allOf:
-      - required: [type, id, format]
-        properties:
-          type: { const: timer }
-          id: { type: string }
-          format: { $ref: "#/UI/Timer/Format"}
-          align: { $ref: "#/Entities/HorizontalAlignment", default: leading }
-          action: { $ref: "#/Script/ActionOrArray" }
-      - oneOf:
-          - required: [end_time, behaviour]
-            properties:
-              end_time: { $ref: "#/Entities/DateTime"}
-              behaviour:
+            ShapeType:
+                title: "Shape type"
                 type: string
                 enum:
-                  - end_at_utc_time
-                  - end_at_local_time
-          - required: [duration, behaviour]
-            properties:
-              duration: { type: number, description: seconds }
-              behaviour:
+                    - circle
+                    - rect
+                    - curve_up
+                    - curve_down
+
+            Shadow:
+                title: "Shadow"
+                type: object
+                required: [color]
+                properties:
+                    color: { $ref: "#/AssetIdOrColor/Binding" }
+                    blur_radius:
+                        type: number
+                        default: 0
+                        description: "A measure of how much to blur the shadow. Larger values result in more blur."
+                    offset: { $ref: "#/Entities/Offset", default: [0, 0] }
+                additionalProperties: false
+
+    If.Then.Else:
+        type: object
+        required: [type, then, else]
+        properties:
+            type: { const: if }
+            platform: { enum: [ios, android] }
+            os_version:
+                type: string
+                pattern: "^[0-9]+\\.[0-9]+$"
+                description: "Minimum OS version (inclusive)"
+            version:
+                {
+                    type: string,
+                    pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$",
+                }
+            to_version:
+                {
+                    type: string,
+                    pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$",
+                }
+            then: { $ref: "#/UI/Element" }
+            else: { $ref: "#/UI/Element" }
+        additionalProperties: false
+
+    Box:
+        type: object
+        required: [type]
+        properties:
+            type: { const: box }
+            height: { $ref: "#/UI/Box/Length" }
+            width: { $ref: "#/UI/Box/Length" }
+            h_align:
+                $ref: "#/Entities/HorizontalAlignment"
+                default: center
+            v_align:
+                $ref: "#/Entities/VerticalAlignment"
+                default: center
+            content: { $ref: "#/UI/Element" }
+
+        Length:
+            oneOf:
+                - title: Fixed length
+                  $ref: "#/Entities/Unit"
+                - title: Fill max
+                  type: object
+                  required: [fill_max]
+                  properties:
+                      fill_max: { type: boolean, const: true }
+                  additionalProperties: false
+                - title: Set min, and optional max
+                  type: object
+                  required: [min]
+                  properties:
+                      min: { $ref: "#/Entities/Unit" }
+                      max: { $ref: "#/Entities/Unit" }
+                  additionalProperties: false
+                - title: Set shrink, and optional max
+                  type: object
+                  required: [shrink]
+                  properties:
+                      shrink: { $ref: "#/Entities/Unit" }
+                      max: { $ref: "#/Entities/Unit" }
+                  additionalProperties: false
+
+    Image:
+        type: object
+        required: [type, asset_id]
+        properties:
+            type: { const: "image" }
+            asset_id: { $ref: "#/AssetId/Binding" }
+            aspect:
+                $ref: "#/Entities/AspectRatio"
+                default: fit
+            tint: { $ref: "#/AssetIdOrColor/Binding" }
+
+    Video:
+        type: object
+        required: [type, asset_id]
+        properties:
+            type: { const: "video" }
+            asset_id: { $ref: "#/AssetId/Binding" }
+            aspect:
+                $ref: "#/Entities/AspectRatio"
+                default: fit
+            loop: { type: boolean, default: true }
+
+    Text:
+        type: object
+        allOf:
+            - $ref: "#/UI/Text/Attributes"
+            - required: [type, string_id]
+              properties:
+                  type: { const: "text" }
+                  string_id: { $ref: "#/Localization/StringId/Binding" }
+                  align:
+                      {
+                          $ref: "#/Entities/HorizontalAlignment",
+                          default: leading,
+                      }
+                  max_rows: { type: integer, minimum: 1 }
+                  on_overflow: { $ref: "#/UI/Text/OverflowMode" }
+
+        OverflowMode:
+            anyOf:
+                - $ref: "#/UI/Text/OverflowMode/Value"
+                - type: array
+                  items: { $ref: "#/UI/Text/OverflowMode/Value" }
+                  uniqueItems: true
+                  minItems: 1
+
+            Value:
+                type: string
                 enum:
-                  - start_at_every_appear
-                  - start_at_first_appear
-                  - start_at_first_appear_persisted
-                  - custom
-                default: start_at_first_appear
-      - $ref: "#/UI/Text/Attributes"
+                    - scale
 
-    Format:  
-      oneOf:
-        - type: string
-        - type: array
-          minItems: 1
-          items:
+        Attributes:
+            title: Attributes for RichText
             type: object
-            required: [from, string_id]
             properties:
-              from: { type: number }
-              string_id: { type: string }
-              
-  Pager:
-    type: object
-    required: [type, content]
-    properties:
-      type: { const: pager }
-      page_width: 
-        $ref: "#/UI/Pager/Length"
-        default: { parent: 1 }
-      page_height: 
-        $ref: "#/UI/Pager/Length"
-        default: { parent: 1 } 
-      page_padding: { $ref: "#/Entities/EdgeInsets" }
-      spacing: { type: number, default: 0 }
-      content:
-        type: array
-        minItems: 1
-        items: { $ref: "#/UI/Element" }
-      page_control:
+                font:
+                    title: "Font Asset identifier"
+                    $ref: "#/AssetId/Binding"
+                size:
+                    title: "Font size"
+                    type: number
+                strike:
+                    type: boolean
+                underline:
+                    type: boolean
+                color:
+                    title: "Text color[-gradient] Asset identifier"
+                    $ref: "#/AssetIdOrColor/Binding"
+                background:
+                    title: Background color of text
+                    $ref: "#/AssetIdOrColor/Binding"
+                tint:
+                    title: Tint color of image
+                    $ref: "#/AssetIdOrColor/Binding"
+            additionalProperties: false
+
+    TextField:
         type: object
-        properties:
-          layout: { enum: [overlaid, stacked] }
-          v_align: { $ref: "#/Entities/VerticalAlignment", default: bottom }
-          padding: { $ref: "#/Entities/EdgeInsets", default: 6 }
-          dot_size: { type: number, default: 6 }
-          spacing: { type: number, default: 6 }
-          color:  { $ref: "#/AssetIdOrColor/Binding" }
-          selected_color: { $ref: "#/AssetIdOrColor/Binding" }
-        additionalProperties: false
-      animation:
+        allOf:
+            - $ref: "#/UI/Text/Attributes"
+            - required: [type, value]
+              properties:
+                  type: { const: "text_field" }
+                  value: { $ref: "#/Script/DataBinding" }
+                  placeholder:
+                      type: object
+                      allOf:
+                          - $ref: "#/UI/Text/Attributes"
+                          - required: [string_id]
+                            properties:
+                                string_id:
+                                    { $ref: "#/Localization/StringId/Binding" }
+                                on_overflow: { $ref: "#/UI/Text/OverflowMode" }
+                      additionalProperties: false
+                  secure_entry: { type: boolean, default: false }
+                  align:
+                      {
+                          $ref: "#/Entities/HorizontalAlignment",
+                          default: leading,
+                      }
+                  input_constraints:
+                      type: object
+                      properties:
+                          regex: { type: string }
+                          max_length: { type: integer }
+                      additionalProperties: false
+                  validation: { $ref: "#/Script/DataBinding" }
+                  invalid_attributes: { $ref: "#/UI/Text/Attributes" }
+                  keyboard_options:
+                      type: object
+                      properties:
+                          keyboard:
+                              enum:
+                                  - default
+                                  - email
+                                  - number
+                                  - decimal
+                                  - phone
+                                  - url
+                                  - ascii
+                          content_type:
+                              enum:
+                                  - email
+                                  - phone
+                                  - username
+                                  - password
+                                  - new_password
+                                  - name
+                                  - given_name
+                                  - family_name
+                                  - middle_name
+                                  - name_prefix
+                                  - name_suffix
+                                  - one_time_code
+                                  - postal_code
+                                  - street_address
+                                  - city
+                                  - state
+                                  - country
+                                  - credit_card_number
+                                  - credit_card_security_code
+                                  - credit_card_expiration
+                                  - credit_card_expiration_month
+                                  - credit_card_expiration_year
+                                  - birthdate
+                                  - birthdate_day
+                                  - birthdate_month
+                                  - birthdate_year
+                                  - flight_number
+                          auto_capitalization:
+                              enum:
+                                  - never
+                                  - sentences
+                                  - words
+                                  - characters
+                          submit_button:
+                              enum:
+                                  - done
+                                  - go
+                                  - search
+                                  - send
+                                  - next
+                                  - return
+                      additionalProperties: false
+
+    TextEditor:
         type: object
+        allOf:
+            - $ref: "#/UI/TextField"
+            - required: [type]
+              properties:
+                  type: { const: "text_editor" }
+                  min_rows: { type: integer, minimum: 1 }
+                  max_rows: { type: integer, minimum: 1 }
+
+    Toggle:
+        type: object
+        required: [type, value]
         properties:
-          start_delay: { type: number, default: 0 }
-          page_transition:
-            $ref: "#/Animation/Transition.Slide"
-            default: { type: slide } 
-          repeat_transition: { $ref: "#/Animation/Transition.Slide" }
-          after_interaction_delay: { type: number, default: 3000 }
+            type: { const: toggle }
+            color: { $ref: "#/AssetIdOrColor/Binding" }
+            value: { $ref: "#/Script/DataBinding" }
+
+    Slider:
+        type: object
+        required: [type, value, min, max]
+        properties:
+            type: { const: slider }
+            value:
+                {
+                    $ref: "#/Script/DataBinding",
+                    title: "Two-way data binding to number",
+                }
+            min: { type: number }
+            max: { type: number }
+            step: { type: number }
+
+    Button:
+        type: object
+        required: [type, action, normal]
+        properties:
+            type: { const: button }
+            action: { $ref: "#/Script/ActionOrArray" }
+            normal: { $ref: "#/UI/Element" }
+            selected: { $ref: "#/UI/Element" }
+            is_selected:
+                {
+                    $ref: "#/Script/DataBinding",
+                    title: "One-way data binding to boolean",
+                }
+
+    Stack:
+        type: object
+        required: [type, content]
+        properties:
+            type: { enum: [v_stack, h_stack, z_stack] }
+            h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
+            v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
+            spacing: { type: number, default: 0 }
+            content:
+                title: "Child elements"
+                type: array
+                minItems: 1
+                items:
+                    oneOf:
+                        - $ref: "#/UI/Stack/Space"
+                        - $ref: "#/UI/Element"
+
+        Space:
+            title: "Space in stack"
+            type: object
+            properties:
+                type: { const: space }
+                count: { type: integer, default: 1, minimum: 1 }
+            additionalProperties: false
+
+    Section:
+        type: object
+        required: [type, index, content]
+        properties:
+            type: { const: section }
+            index:
+                {
+                    $ref: "#/Script/DataBinding",
+                    title: "One-way data binding to integer",
+                }
+            content:
+                type: array
+                minItems: 1
+                items: { $ref: "#/UI/Element" }
+
+    Row:
+        type: object
+        required: [type, items]
+        properties:
+            type: { const: row }
+            spacing: { type: number, default: 0 }
+            items:
+                type: array
+                minItems: 1
+                items: { $ref: "#/UI/GridItem" }
+
+    Column:
+        type: object
+        required: [type, items]
+        properties:
+            type: { const: column }
+            spacing: { type: number, default: 0 }
+            items:
+                type: array
+                minItems: 1
+                items: { $ref: "#/UI/GridItem" }
+
+    GridItem:
+        type: object
+        required: [type, content]
+        allOf:
+            - oneOf:
+                  - required: [fixed]
+                    properties:
+                        fixed: { $ref: "#/Entities/Unit" }
+                  - required: [weight]
+                    properties:
+                        weight: { type: integer }
+            - properties:
+                  type: { const: grid_item }
+                  h_align:
+                      {
+                          $ref: "#/Entities/HorizontalAlignment",
+                          default: center,
+                      }
+                  v_align:
+                      { $ref: "#/Entities/VerticalAlignment", default: center }
+                  content: { $ref: "#/UI/Element" }
         additionalProperties: false
-      interaction:
-        type: string
-        enum:
-          - none
-          - cancel_animation
-          - pause_animation
-        default: pause_animation
 
-    Length:
-      oneOf:
-        - $ref: "#/Entities/Unit"
-          description: "Fixed length"
-        - type: object
-          required: [parent]
-          additionalProperties: false
-          properties:
-            parent: { type: number }
+    Timer:
+        type: object
+        allOf:
+            - required: [type, id, format]
+              properties:
+                  type: { const: timer }
+                  id: { type: string }
+                  format: { $ref: "#/UI/Timer/Format" }
+                  align:
+                      {
+                          $ref: "#/Entities/HorizontalAlignment",
+                          default: leading,
+                      }
+                  action: { $ref: "#/Script/ActionOrArray" }
+            - oneOf:
+                  - required: [end_time, behaviour]
+                    properties:
+                        end_time: { $ref: "#/Entities/DateTime" }
+                        behaviour:
+                            type: string
+                            const: end_at_time
+                  - required: [duration, behaviour]
+                    properties:
+                        duration: { type: number, description: seconds }
+                        behaviour:
+                            enum:
+                                - start_at_every_appear
+                                - start_at_first_appear
+                                - start_at_first_appear_persisted
+                                - custom
+                            default: start_at_first_appear
+            - $ref: "#/UI/Text/Attributes"
 
-  DateTimePicker:
-    type: object
-    required: [type, value, components]
-    properties:
-      type: { enum: ["compact_datetime_picker", "wheel_datetime_picker", "graphical_datetime_picker"] }
-      value: { $ref: "#/Script/DataBinding" }
-      components:
-          type: array
-          items:
-            type: string
-            enum: [date, hour_and_minute]
-          uniqueItems: true
-          minItems: 1
-      min:
-        $ref: "#/Entities/DateTime"
-      max:
-        $ref: "#/Entities/DateTime"
-      color: { $ref: "#/AssetIdOrColor/Binding" }
-      string_in_local_time:
-        type: boolean
-        default: false
-        description: "If true, min/max date strings are interpreted in local time zone; otherwise UTC"
+        Format:
+            oneOf:
+                - type: string
+                - type: array
+                  minItems: 1
+                  items:
+                      type: object
+                      required: [from, string_id]
+                      properties:
+                          from: { type: number }
+                          string_id: { type: string }
 
-  WheelRangePicker:
-    type: object
-    allOf:
-      - $ref: "#/UI/Text/Attributes"
-      - required: [type, value, min, max, format]
+    Pager:
+        type: object
+        required: [type, content]
         properties:
-          type: { const: "wheel_range_picker" }
-          value: { $ref: "#/Script/DataBinding" }
-          min: { type: number }
-          max: { type: number }
-          step: { type: number, default: 1.0 }
-          format: { $ref: "#/UI/Timer/Format" }
+            type: { const: pager }
+            page_width:
+                $ref: "#/UI/Pager/Length"
+                default: { parent: 1 }
+            page_height:
+                $ref: "#/UI/Pager/Length"
+                default: { parent: 1 }
+            page_padding: { $ref: "#/Entities/EdgeInsets" }
+            spacing: { type: number, default: 0 }
+            content:
+                type: array
+                minItems: 1
+                items: { $ref: "#/UI/Element" }
+            page_control:
+                type: object
+                properties:
+                    layout: { enum: [overlaid, stacked] }
+                    v_align:
+                        {
+                            $ref: "#/Entities/VerticalAlignment",
+                            default: bottom,
+                        }
+                    padding: { $ref: "#/Entities/EdgeInsets", default: 6 }
+                    dot_size: { type: number, default: 6 }
+                    spacing: { type: number, default: 6 }
+                    color: { $ref: "#/AssetIdOrColor/Binding" }
+                    selected_color: { $ref: "#/AssetIdOrColor/Binding" }
+                additionalProperties: false
+            animation:
+                type: object
+                properties:
+                    start_delay: { type: number, default: 0 }
+                    page_transition:
+                        $ref: "#/Animation/Transition.Slide"
+                        default: { type: slide }
+                    repeat_transition: { $ref: "#/Animation/Transition.Slide" }
+                    after_interaction_delay: { type: number, default: 3000 }
+                additionalProperties: false
+            interaction:
+                type: string
+                enum:
+                    - none
+                    - cancel_animation
+                    - pause_animation
+                default: pause_animation
 
-  WheelItemsPicker:
-    type: object
-    required: [type, value]
-    properties:
-      type: { const: "wheel_items_picker" }
-      value: { $ref: "#/Script/DataBinding" }
+        Length:
+            oneOf:
+                - $ref: "#/Entities/Unit"
+                  description: "Fixed length"
+                - type: object
+                  required: [parent]
+                  additionalProperties: false
+                  properties:
+                      parent: { type: number }
+
+    DateTimePicker:
+        type: object
+        required: [type, value, components]
+        properties:
+            type:
+                {
+                    enum:
+                        [
+                            "compact_datetime_picker",
+                            "wheel_datetime_picker",
+                            "graphical_datetime_picker",
+                        ],
+                }
+            value: { $ref: "#/Script/DataBinding" }
+            components:
+                type: array
+                items:
+                    type: string
+                    enum: [date, hour_and_minute]
+                uniqueItems: true
+                minItems: 1
+            min:
+                $ref: "#/Entities/DateTime"
+            max:
+                $ref: "#/Entities/DateTime"
+            color: { $ref: "#/AssetIdOrColor/Binding" }
+            string_in_local_time:
+                type: boolean
+                default: false
+                description: "If true, min/max date strings are interpreted in local time zone; otherwise UTC"
+
+    WheelRangePicker:
+        type: object
+        allOf:
+            - $ref: "#/UI/Text/Attributes"
+            - required: [type, value, min, max, format]
+              properties:
+                  type: { const: "wheel_range_picker" }
+                  value: { $ref: "#/Script/DataBinding" }
+                  min: { type: number }
+                  max: { type: number }
+                  step: { type: number, default: 1.0 }
+                  format: { $ref: "#/UI/Timer/Format" }
+
+    WheelItemsPicker:
+        type: object
+        required: [type, value]
+        properties:
+            type: { const: "wheel_items_picker" }
+            value: { $ref: "#/Script/DataBinding" }
 
 ###### Rich Text ######
 
 RichText:
-  oneOf:
-    - $ref: "#/RichText/Item"
-    - type: array
-      items: { $ref: "#/RichText/Item" }
-      minItems: 1
-
-  Item:
     oneOf:
-      - $ref: "#/RichText/Text"
-      - $ref: "#/RichText/Tag"
-      - $ref: "#/RichText/Image"
+        - $ref: "#/RichText/Item"
+        - type: array
+          items: { $ref: "#/RichText/Item" }
+          minItems: 1
 
-  Text:
-    title: Text item in RichText
-    oneOf:
-      - type: string
-        title: Text
-      - type: object
-        required: [text]
+    Item:
+        oneOf:
+            - $ref: "#/RichText/Text"
+            - $ref: "#/RichText/Tag"
+            - $ref: "#/RichText/Image"
+
+    Text:
+        title: Text item in RichText
+        oneOf:
+            - type: string
+              title: Text
+            - type: object
+              required: [text]
+              properties:
+                  text: { title: Text, type: string }
+                  attributes: { $ref: "#/RichText/Attributes" }
+                  action: { $ref: "#/Script/Action" }
+              additionalProperties: false
+
+    Tag:
+        title: Tag item in RichText
+        type: object
+        required: [tag]
         properties:
-          text: { title: Text, type: string }
-          attributes: { $ref: "#/RichText/Attributes" }
-          action: { $ref: "#/Script/Action" }
+            tag: { type: string, title: "Tag value" }
+            attributes: { $ref: "#/RichText/Attributes" }
+            action: { $ref: "#/Script/Action" }
         additionalProperties: false
 
-  Tag:
-    title: Tag item in RichText
-    type: object
-    required: [tag]
-    properties:
-      tag: { type: string, title: "Tag value" }
-      attributes: { $ref: "#/RichText/Attributes" }
-      action: { $ref: "#/Script/Action" }
-    additionalProperties: false
+    Image:
+        title: Image item in RichText
+        type: object
+        required: [image]
+        properties:
+            image: { type: string, title: "Image asset identifier" }
+            attributes: { $ref: "#/RichText/Attributes" }
+        additionalProperties: false
 
-  Image:
-    title: Image item in RichText
-    type: object
-    required: [image]
-    properties:
-      image: { type: string, title: "Image asset identifier" }
-      attributes: { $ref: "#/RichText/Attributes" }
-    additionalProperties: false
-
-  Attributes:
-    title: Attributes for RichText
-    type: object
-    properties:
-      font: 
-        title: "Font Asset identifier"
-        $ref: "#/AssetId"
-      size: 
-        title: "Font size"
-        type: number
-      strike: 
-        type: boolean
-      underline:
-        type: boolean 
-      color: 
-        title: "Text color[-gradient] Asset identifier" 
-        $ref: "#/AssetIdOrColor"
-      background:
-        title: Background color of text
-        $ref: "#/AssetIdOrColor"
-      tint:
-        title: Tint color of image
-        $ref: "#/AssetIdOrColor"
-    additionalProperties: false
+    Attributes:
+        title: Attributes for RichText
+        type: object
+        properties:
+            font:
+                title: "Font Asset identifier"
+                $ref: "#/AssetId"
+            size:
+                title: "Font size"
+                type: number
+            strike:
+                type: boolean
+            underline:
+                type: boolean
+            color:
+                title: "Text color[-gradient] Asset identifier"
+                $ref: "#/AssetIdOrColor"
+            background:
+                title: Background color of text
+                $ref: "#/AssetIdOrColor"
+            tint:
+                title: Tint color of image
+                $ref: "#/AssetIdOrColor"
+        additionalProperties: false
 
 ###### Localization ######
 
 Localization:
-  title: Localization by locale identifier
-  type: object
-  required: [id]
-  properties:
-    id: { $ref: "#/Localization/Identifier" }
-    is_right_to_left: { type: boolean, default: false }
-    assets: { $ref: "#/Assets" }
-    strings:
-      type: array
-      items: { $ref: "#/Localization/String" }
-      uniqueItems: true
-      minItems: 1
-  additionalProperties: false
-
-  Identifier:
-    type: string
-    pattern: "^[a-z]{2,4}([_-][A-Z][a-z]{3})?([_-]([A-Z]{2,3}|[0-9]{3}))?$"
-    examples:
-      - en-Latn-US
-      - ru-Cyrl-RU
-
-  String:
+    title: Localization by locale identifier
     type: object
-    required: [id, value]
+    required: [id]
     properties:
-      id:
-        title: Localized string identifier
-        type: string
-      value: { $ref: "#/RichText" }
-      fallback: { $ref: "#/RichText" }
+        id: { $ref: "#/Localization/Identifier" }
+        is_right_to_left: { type: boolean, default: false }
+        assets: { $ref: "#/Assets" }
+        strings:
+            type: array
+            items: { $ref: "#/Localization/String" }
+            uniqueItems: true
+            minItems: 1
     additionalProperties: false
 
-  StringId:
-    Binding:
-      oneOf:
-        - title: Localization string id
-          type: string
-        - title: Localization string id with values tags
-          $ref: "#/Localization/StringIdWithTagValues/Binding"
-        - title: One way binding to localization string id
-          $ref: "#/Script/DataBinding"
-        - title: Product string id
-          $ref: "#/Localization/ProductStringId/Binding"
+    Identifier:
+        type: string
+        pattern: "^[a-z]{2,4}([_-][A-Z][a-z]{3})?([_-]([A-Z]{2,3}|[0-9]{3}))?$"
+        examples:
+            - en-Latn-US
+            - ru-Cyrl-RU
 
-  StringIdWithTagValues:
-    Binding:
-      type: object
-      required: [string_id]
-      properties:
-        string_id: { type: string }
-      additionalProperties:
-        oneOf:
-          - title: String value
-            type: string
-          - title: One way binding to string value
-            $ref: "#/Script/DataBinding"
+    String:
+        type: object
+        required: [id, value]
+        properties:
+            id:
+                title: Localized string identifier
+                type: string
+            value: { $ref: "#/RichText" }
+            fallback: { $ref: "#/RichText" }
+        additionalProperties: false
 
-  ProductStringId:
-    Binding:
-      type: object
-      required: [product]
-      properties:
-        product:
-          oneOf:
-            - title: Adapty product id
-              type: string
-            - title: One way binding to Adapty product id
-              $ref: "#/Script/DataBinding"
-        suffix: { type: string }
-      additionalProperties: false
+    StringId:
+        Binding:
+            oneOf:
+                - title: Localization string id
+                  type: string
+                - title: Localization string id with values tags
+                  $ref: "#/Localization/StringIdWithTagValues/Binding"
+                - title: One way binding to localization string id
+                  $ref: "#/Script/DataBinding"
+                - title: Product string id
+                  $ref: "#/Localization/ProductStringId/Binding"
+
+    StringIdWithTagValues:
+        Binding:
+            type: object
+            required: [string_id]
+            properties:
+                string_id: { type: string }
+            additionalProperties:
+                oneOf:
+                    - title: String value
+                      type: string
+                    - title: One way binding to string value
+                      $ref: "#/Script/DataBinding"
+
+    ProductStringId:
+        Binding:
+            type: object
+            required: [product]
+            properties:
+                product:
+                    oneOf:
+                        - title: Adapty product id
+                          type: string
+                        - title: One way binding to Adapty product id
+                          $ref: "#/Script/DataBinding"
+                suffix: { type: string }
+            additionalProperties: false
 
 ###### Assets ######
 
 Assets:
-  type: array
-  items: { $ref: "#/Assets/Asset" }
-  uniqueItems: true
-  minItems: 1
+    type: array
+    items: { $ref: "#/Assets/Asset" }
+    uniqueItems: true
+    minItems: 1
 
-  Asset:
-    title: Asset
-    type: object
-    required: [id, type]
-    properties:
-      id:
-        title: Asset identifier
-        type: string
-      custom_id:
-        title: User asset identifier
-        type: string
-    oneOf:
-      - $ref: "#/Assets/Color"
-      - $ref: "#/Assets/ColorGradient"
-      - $ref: "#/Assets/Font"
-      - $ref: "#/Assets/Image"
-      - $ref: "#/Assets/Video"
-    additionalProperties: false
-
-  Color:
-    title: Color asset
-    type: object
-    required: [type, value]
-    properties:
-      type: { const: color }
-      value: { $ref: "#/Assets/Color/HexString" }
-    additionalProperties: false
-
-    HexString:
-      title: "Color #RRGGBBAA"
-      type: string
-      pattern: "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"
-
-  ColorGradient:
-    title: Color gradient asset
-    type: object
-    required: [type, values, points]
-    properties:
-      type:
-        type: string
-        enum:
-          - linear-gradient
-          - radial-gradient
-          - conic-gradient
-      values:
-        type: array
-        items:
-          type: object
-          required: [color, p]
-          properties:
-            color: { $ref: "#/Assets/Color/HexString" }
-            p: { type: number }
-        minItems: 1
-      points:
+    Asset:
+        title: Asset
         type: object
-        required: [x0, y0, x1, y1]
+        required: [id, type]
         properties:
-          x0: { type: number }
-          y0: { type: number }
-          x1: { type: number }
-          y1: { type: number }
-    additionalProperties: false
-
-  Font:
-    title: Font asset
-    type: object
-    required: [type, value]
-    properties:
-      type: { const: font }
-      value:
-        title: font alias for ios only
+            id:
+                title: Asset identifier
+                type: string
+            custom_id:
+                title: User asset identifier
+                type: string
         oneOf:
-          - type: string
-          - type: array
-            items: { type: string }
-            minItems: 1
-            uniqueItems: true
-      resources:
-        title: Resource name for android only
-        type: array
-        items: { type: string }
-        uniqueItems: true
-        minItems: 1
-      family_name:
-        oneOf:
-          - type: string
-            default: adapty_system
-          - type: array
-            items: { type: string }
-            minItems: 1
-            uniqueItems: true
-      weight: { type: integer, minimum: 0, default: 400 }
-      italic: { type: boolean, default: false }
-      size: { type: number, default: 15 }
-      color: { $ref: "#/Assets/Color/HexString", default: "#000000FF" }
-    additionalProperties: false
+            - $ref: "#/Assets/Color"
+            - $ref: "#/Assets/ColorGradient"
+            - $ref: "#/Assets/Font"
+            - $ref: "#/Assets/Image"
+            - $ref: "#/Assets/Video"
+        additionalProperties: false
 
-  Image:
-    title: Image asset
-    type: object
-    allOf:
-      - required: [type]
+    Color:
+        title: Color asset
+        type: object
+        required: [type, value]
         properties:
-          type: { const: image }
-      - $ref: "#/Assets/Image/Data"
-    additionalProperties: false
+            type: { const: color }
+            value: { $ref: "#/Assets/Color/HexString" }
+        additionalProperties: false
 
-    Data:
-      type: object
-      oneOf:
-        - title: Base64 encoded image
-          required: [value]
-          properties:
-            value: { type: string, contentEncoding: base64 }
-        - title: URL to image
-          required: [url, preview_value]
-          properties:
+        HexString:
+            title: "Color #RRGGBBAA"
+            type: string
+            pattern: "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$"
+
+    ColorGradient:
+        title: Color gradient asset
+        type: object
+        required: [type, values, points]
+        properties:
+            type:
+                type: string
+                enum:
+                    - linear-gradient
+                    - radial-gradient
+                    - conic-gradient
+            values:
+                type: array
+                items:
+                    type: object
+                    required: [color, p]
+                    properties:
+                        color: { $ref: "#/Assets/Color/HexString" }
+                        p: { type: number }
+                minItems: 1
+            points:
+                type: object
+                required: [x0, y0, x1, y1]
+                properties:
+                    x0: { type: number }
+                    y0: { type: number }
+                    x1: { type: number }
+                    y1: { type: number }
+        additionalProperties: false
+
+    Font:
+        title: Font asset
+        type: object
+        required: [type, value]
+        properties:
+            type: { const: font }
+            value:
+                title: font alias for ios only
+                oneOf:
+                    - type: string
+                    - type: array
+                      items: { type: string }
+                      minItems: 1
+                      uniqueItems: true
+            resources:
+                title: Resource name for android only
+                type: array
+                items: { type: string }
+                uniqueItems: true
+                minItems: 1
+            family_name:
+                oneOf:
+                    - type: string
+                      default: adapty_system
+                    - type: array
+                      items: { type: string }
+                      minItems: 1
+                      uniqueItems: true
+            weight: { type: integer, minimum: 0, default: 400 }
+            italic: { type: boolean, default: false }
+            size: { type: number, default: 15 }
+            color: { $ref: "#/Assets/Color/HexString", default: "#000000FF" }
+        additionalProperties: false
+
+    Image:
+        title: Image asset
+        type: object
+        allOf:
+            - required: [type]
+              properties:
+                  type: { const: image }
+            - $ref: "#/Assets/Image/Data"
+        additionalProperties: false
+
+        Data:
+            type: object
+            oneOf:
+                - title: Base64 encoded image
+                  required: [value]
+                  properties:
+                      value: { type: string, contentEncoding: base64 }
+                - title: URL to image
+                  required: [url, preview_value]
+                  properties:
+                      url: { type: string }
+                      preview_value: { type: string, contentEncoding: base64 }
+
+    Video:
+        title: Video asset
+        type: object
+        required: [type, url, image]
+        properties:
+            type: { const: video }
             url: { type: string }
-            preview_value: { type: string, contentEncoding: base64 }
-
-  Video:
-    title: Video asset
-    type: object
-    required: [type, url, image]
-    properties:
-      type: { const: video }
-      url: { type: string }
-      image: { $ref: "#/Assets/Image/Data" }
-    additionalProperties: false
+            image: { $ref: "#/Assets/Image/Data" }
+        additionalProperties: false
 
 AssetId:
-  title: Asset identifier
-  type: string
+    title: Asset identifier
+    type: string
 
-  Binding:
-     oneOf:
-      - $ref: "#/AssetId"
-      - title: One way binding to asset identifier
-        $ref: "#/Script/DataBinding"
+    Binding:
+        oneOf:
+            - $ref: "#/AssetId"
+            - title: One way binding to asset identifier
+              $ref: "#/Script/DataBinding"
 
 AssetIdOrColor:
-  oneOf:
-    - $ref: "#/AssetId"
-    - $ref: "#/Assets/Color/HexString"
-
-  Binding:
     oneOf:
-      - $ref: "#/AssetId"
-      - $ref: "#/Assets/Color/HexString"
-      - title: One way binding to asset identifier or color hex string
-        $ref: "#/Script/DataBinding"
+        - $ref: "#/AssetId"
+        - $ref: "#/Assets/Color/HexString"
 
+    Binding:
+        oneOf:
+            - $ref: "#/AssetId"
+            - $ref: "#/Assets/Color/HexString"
+            - title: One way binding to asset identifier or color hex string
+              $ref: "#/Script/DataBinding"
 
 ###### Scripts, Actions & Data Binding ######
 
 Script:
-  title: "Script code block"
-  type: object
-  required: [content]
-  properties:
-    type: { type: string, default: "js" }
-    content: { type: string }
-  additionalProperties: false
-
-  Action:
-    title: "Action calling a Script method"
+    title: "Script code block"
     type: object
-    required: [func]
+    required: [content]
     properties:
-      func:
-        type: string
-        description: "Path to Script method (dot-separated)"
-      params:
+        type: { type: string, default: "js" }
+        content: { type: string }
+    additionalProperties: false
+
+    Action:
+        title: "Action calling a Script method"
         type: object
-        default: {}
-        description: "Parameters passed to the method"
-      scope:
-        type: string
-        enum: [global, screen]
-        default: screen
-    additionalProperties: false
+        required: [func]
+        properties:
+            func:
+                type: string
+                description: "Path to Script method (dot-separated)"
+            params:
+                type: object
+                default: {}
+                description: "Parameters passed to the method"
+            scope:
+                type: string
+                enum: [global, screen]
+                default: screen
+        additionalProperties: false
 
-  ActionOrArray:
-    title: "Single action or array of actions"
-    oneOf:
-      - $ref: "#/Script/Action"
-      - type: array
-        items: { $ref: "#/Script/Action" }
-        uniqueItems: true
-        minItems: 1
-
-  DataBinding:
-    title: "Binding to a Script variable"
-    type: object
-    required: [var]
-    properties:
-      var:
-        type: string
-        description: "Path to Script property (dot-separated)"
-      setter:
-        type: string
-        description: "Alternative setter method name for two-way binding"
-      scope:
-        type: string
-        enum: [global, screen]
-        default: screen
-      converter: { enum: [is_equal] }
-      converter_params: 
+    ActionOrArray:
+        title: "Single action or array of actions"
         oneOf:
-          - type: string
-          - type: boolean
-          - type: number
-          - type: object
-            additionalProperties:
-              oneOf:
-              - type: string
-              - type: boolean
-              - type: number
-    additionalProperties: false
+            - $ref: "#/Script/Action"
+            - type: array
+              items: { $ref: "#/Script/Action" }
+              uniqueItems: true
+              minItems: 1
 
+    DataBinding:
+        title: "Binding to a Script variable"
+        type: object
+        required: [var]
+        properties:
+            var:
+                type: string
+                description: "Path to Script property (dot-separated)"
+            setter:
+                type: string
+                description: "Alternative setter method name for two-way binding"
+            scope:
+                type: string
+                enum: [global, screen]
+                default: screen
+            converter: { enum: [is_equal] }
+            converter_params:
+                oneOf:
+                    - type: string
+                    - type: boolean
+                    - type: number
+                    - type: object
+                      additionalProperties:
+                          oneOf:
+                              - type: string
+                              - type: boolean
+                              - type: number
+        additionalProperties: false
 
 ###### DateTime ######
 #
 # Объекты:
 #   DateTime                   — точка во времени (oneOf: компоненты / relative / timestamp)
-#   DateTime/TimeZone          — формат time zone 
+#   DateTime/TimeZone          — формат time zone
 #   DateTime/Relative          — дата относительно опорной точки (now, startOfDay и т.д.)
 #   DateTime/Interval          — длительность / смещение
 #
 # Фиксированные настройки (не включены как поля):
-#   calendar    → всегда ISO 8601 
+#   calendar    → всегда ISO 8601
 #   era         → всегда AD
 #   nanosecond  → всегда 0
 
 DateTime:
-  description: >
-    Точка во времени. Три формата:
-    1) Объект — конкретная дата/время через компоненты (year/month/day + time) Используется для локального времени.
-    2) DateTimeRelative — относительно опорной точки (now, startOfDay и т.д.)
-    3) Unix timestamp в миллисекундах (double) Самый быстрый вариант для вычислений
-  oneOf:
-    - title: Date components for local time
-      type: object
-      description: >
-        Конкретная дата/время через год, месяц и день.
-        Если известена timeZone, то используйте unix timestamp, это быстрее.
-        Календарь всегда ISO 8601.
-      required:
-        - year
-        - month
-        - day
-      properties:
-
-        timeZone:
-          default: null
-          $ref: "#/DateTime/TimeZone"
-          description: >
-            Time zone. См. TimeZoneIdentifier для форматов.
-            When null: используется часовой пояс из настроек
-            устройства пользователя.
-
-        year:
-          type: integer
-          description: Год.
-          minimum: 1
-          example: 2026
-
-        month:
-          type: integer
-          description: "Месяц. 1 = January, 12 = December."
-          minimum: 1
-          maximum: 12 
-
-        day:
-          type: integer
-          description: День месяца.
-          minimum: 1
-          maximum: 31
-
-        hour:
-          type: integer
-          default: 0
-          description: "Час (0–23)."
-          minimum: 0
-          maximum: 23
-
-        minute:
-          type: integer
-          default: 0
-          description: "Минута (0–59)."
-          minimum: 0
-          maximum: 59
-
-        second:
-          type: integer
-          default: 0
-          description: "Секунда (0–59). Leap seconds не представлены."
-          minimum: 0
-          maximum: 59
-
-      additionalProperties: false
-
-    - $ref: "#/DateTime/Relative"
-
-    - title: Unix timestamp (milliseconds)
-      type: number
-      description: >
-        Миллисекунды с 1 января 1970 00:00:00 UTC (Unix epoch).
-        Всегда UTC — timeZone не нужен.
-        Double позволяет передавать дробные миллисекунды.
-
-  examples:
-    # Конкретная дата + время
-    - {"year": 2026, "month": 3, "day": 15, "hour": 14, "minute": 30, "timeZone": "Europe/Podgorica"}
-    # Только дата (время = 00:00:00)
-    - {"year": 2026, "month": 3, "day": 15}
-    # Относительная (DateTimeRelative)
-    - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"hour": 9}}
-    # Текущий момент
-    - {"anchor": "now"}
-    # Unix timestamp в миллисекундах
-    - 1742054400000
-
-  # 1. DateTime/TimeZone — часовые пояса
-
-  TimeZone:
     description: >
-      Time zone identifier. В JSON всегда строка.
-      Два формата: IANA identifier или UTC offset.
-
-      ВАЖНО: IANA identifier (e.g. "Europe/Podgorica") автоматически
-      учитывает переход на летнее/зимнее время (DST).
-      UTC offset (e.g. "+0100") — фиксированное смещение,
-      DST не учитывается.
-
-      Пример: "Europe/Podgorica" зимой = UTC+1, летом = UTC+2.
-      Если указать "+0100", то летом время будет на час раньше
-      реального местного. Поэтому для задания "местного времени
-      пользователя" всегда используй IANA identifier.
-      UTC offset подходит только когда нужно точное фиксированное
-      смещение без DST.
+        Точка во времени. Три формата:
+        1) Объект — конкретная дата/время через компоненты (year/month/day + time) Используется для локального времени.
+        2) DateTimeRelative — относительно опорной точки (now, startOfDay и т.д.)
+        3) Unix timestamp в миллисекундах (double) Самый быстрый вариант для вычислений
     oneOf:
-      - title: IANA identifier
-        type: string
-        description: >
-          IANA time zone identifier.
-          Рекомендуемый формат — учитывает DST автоматически.
-          Полный список: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-        pattern: "^[A-Za-z_]+/[A-Za-z_/]+$"
-        examples:
-          - "Europe/Podgorica"
-          - "America/New_York"
-          - "Asia/Tokyo"
-          - "Europe/Paris"
+        - title: Date components for local time
+          type: object
+          description: >
+              Конкретная дата/время через год, месяц и день.
+              Если известена timeZone, то используйте unix timestamp, это быстрее.
+              Календарь всегда ISO 8601.
+          required:
+              - year
+              - month
+              - day
+          properties:
+              timeZone:
+                  default: null
+                  $ref: "#/DateTime/TimeZone"
+                  description: >
+                      Time zone. См. TimeZoneIdentifier для форматов.
+                      When null: используется часовой пояс из настроек
+                      устройства пользователя.
 
-      - title: UTC
-        const: "UTC"
+              year:
+                  type: integer
+                  description: Год.
+                  minimum: 1
+                  example: 2026
 
-      - title: Offset
-        type: string
-        description: >
-          Смещение от UTC в формате ±HHmm (без двоеточия).
-          Фиксированное смещение — DST не учитывается.
-        pattern: "^[+-]\\d{4}$"
-        examples:
-          - "+0300"
-          - "-0530"
-          - "+0000"
+              month:
+                  type: integer
+                  description: "Месяц. 1 = January, 12 = December."
+                  minimum: 1
+                  maximum: 12
 
-  # 2. DateTime/Relative — дата относительно опорной точки
+              day:
+                  type: integer
+                  description: День месяца.
+                  minimum: 1
+                  maximum: 31
 
-  Relative:
-    type: object
-    description: >
-      Дата/время, вычисляемая относительно опорной точки (anchor).
-      Формула: результат = anchor + offset
-      Это кастомная схема, не входящая в стандартный DateComponents.
-    required: [anchor]
-    properties:
+              hour:
+                  type: integer
+                  default: 0
+                  description: "Час (0–23)."
+                  minimum: 0
+                  maximum: 23
 
-      anchor:
-        type: string
-        description: >
-          Опорная точка для вычислений.
-          - now: текущий момент UTC. anchorTimeZone не требуется.
-          - startOfDay: полночь (00:00:00) текущего дня. anchorTimeZone обязателен.
-          - startOfWeek: полночь понедельника текущей недели (ISO 8601).
-            anchorTimeZone обязателен.
-          - startOfMonth: полночь 1-го числа текущего месяца. anchorTimeZone обязателен.
-          - startOfYear: полночь 1 января текущего года. anchorTimeZone обязателен.
-        enum:
-          - now
-          - startOfDay
-          - startOfWeek
-          - startOfMonth
-          - startOfYear
+              minute:
+                  type: integer
+                  default: 0
+                  description: "Минута (0–59)."
+                  minimum: 0
+                  maximum: 59
 
-      anchorTimeZone:
-        $ref: "#/TimeZoneIdentifier"
-        description: >
-          Time zone для определения опорной точки.
-          Обязателен для startOfDay, startOfWeek, startOfMonth, startOfYear.
-          Игнорируется для now (текущий момент UTC одинаков везде).
-          When null: используется часовой пояс из настроек
-          устройства пользователя.
+              second:
+                  type: integer
+                  default: 0
+                  description: "Секунда (0–59). Leap seconds не представлены."
+                  minimum: 0
+                  maximum: 59
 
-      offset:
-        $ref: "#/DateTime/Interval"
-        description: >
-          Смещение от опорной точки.
-          When null: смещение не применяется, результат = anchor.
+          additionalProperties: false
 
-    additionalProperties: false
+        - $ref: "#/DateTime/Relative"
+
+        - title: Unix timestamp (milliseconds)
+          type: number
+          description: >
+              Миллисекунды с 1 января 1970 00:00:00 UTC (Unix epoch).
+              Всегда UTC — timeZone не нужен.
+              Double позволяет передавать дробные миллисекунды.
 
     examples:
-      # --- now ---
-      # Текущий момент
-      - {"anchor": "now"}
-      # Через 30 минут от сейчас
-      - {"anchor": "now", "offset": {"minute": 30}}
-      # 2 часа назад
-      - {"anchor": "now", "offset": {"hour": -2}}
+        # Конкретная дата + время
+        - {
+              "year": 2026,
+              "month": 3,
+              "day": 15,
+              "hour": 14,
+              "minute": 30,
+              "timeZone": "Europe/Podgorica",
+          }
+        # Только дата (время = 00:00:00)
+        - { "year": 2026, "month": 3, "day": 15 }
+        # Относительная (DateTimeRelative)
+        - {
+              "anchor": "startOfDay",
+              "anchorTimeZone": "Europe/Podgorica",
+              "offset": { "hour": 9 },
+          }
+        # Текущий момент
+        - { "anchor": "now" }
+        # Unix timestamp в миллисекундах
+        - 1742054400000
 
-      # --- startOfDay ---
-      # Начало сегодняшнего дня
-      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica"}
-      # Сегодня в 14:30
-      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"hour": 14, "minute": 30}}
-      # Конец сегодняшнего дня (23:59:59)
-      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"hour": 23, "minute": 59, "second": 59}}
-      # Начало завтрашнего дня
-      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": 1}}
-      # Начало вчерашнего дня
-      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": -1}}
-      # 7 дней назад, в 9:00
-      - {"anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": -7, "hour": 9}}
+    # 1. DateTime/TimeZone — часовые пояса
 
-      # --- startOfWeek (понедельник, ISO 8601) ---
-      # Начало текущей недели (понедельник 00:00)
-      - {"anchor": "startOfWeek", "anchorTimeZone": "Europe/Podgorica"}
-      # Пятница этой недели в 18:00
-      - {"anchor": "startOfWeek", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": 4, "hour": 18}}
-      # Воскресенье (для стран где неделя с воскресенья)
-      - {"anchor": "startOfWeek", "anchorTimeZone": "America/New_York", "offset": {"day": -1}}
+    TimeZone:
+        description: >
+            Time zone identifier. В JSON всегда строка.
+            Два формата: IANA identifier или UTC offset.
 
-      # --- startOfMonth ---
-      # Начало текущего месяца
-      - {"anchor": "startOfMonth", "anchorTimeZone": "Europe/Podgorica"}
-      # 15-е число этого месяца в 10:00
-      - {"anchor": "startOfMonth", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": 14, "hour": 10}}
-      # Начало прошлого месяца
-      - {"anchor": "startOfMonth", "anchorTimeZone": "Europe/Podgorica", "offset": {"month": -1}}
+            ВАЖНО: IANA identifier (e.g. "Europe/Podgorica") автоматически
+            учитывает переход на летнее/зимнее время (DST).
+            UTC offset (e.g. "+0100") — фиксированное смещение,
+            DST не учитывается.
 
-      # --- startOfYear ---
-      # Начало текущего года
-      - {"anchor": "startOfYear", "anchorTimeZone": "Europe/Podgorica"}
-      # 1 марта текущего года
-      - {"anchor": "startOfYear", "anchorTimeZone": "Europe/Podgorica", "offset": {"month": 2}}
-      # 100-й день текущего года
-      - {"anchor": "startOfYear", "anchorTimeZone": "Europe/Podgorica", "offset": {"day": 99}}
+            Пример: "Europe/Podgorica" зимой = UTC+1, летом = UTC+2.
+            Если указать "+0100", то летом время будет на час раньше
+            реального местного. Поэтому для задания "местного времени
+            пользователя" всегда используй IANA identifier.
+            UTC offset подходит только когда нужно точное фиксированное
+            смещение без DST.
+        oneOf:
+            - title: IANA identifier
+              type: string
+              description: >
+                  IANA time zone identifier.
+                  Рекомендуемый формат — учитывает DST автоматически.
+                  Полный список: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+              pattern: "^[A-Za-z_]+/[A-Za-z_/]+$"
+              examples:
+                  - "Europe/Podgorica"
+                  - "America/New_York"
+                  - "Asia/Tokyo"
+                  - "Europe/Paris"
 
-  #  DateTime/Interval — длительность / смещение
+            - title: UTC
+              const: "UTC"
 
-  Interval:
-    description: >
-      Длительность или смещение. 
-      Два формата:
-      1) Объект с календарными/временными компонентами - учитывает календарь (месяц = 28–31 день,
-      DST и т.д.).
-      2) Число (double) — точные миллисекунды без календарной логики.
-    oneOf:
-      - title: Calendar components
+            - title: Offset
+              type: string
+              description: >
+                  Смещение от UTC в формате ±HHmm (без двоеточия).
+                  Фиксированное смещение — DST не учитывается.
+              pattern: "^[+-]\\d{4}$"
+              examples:
+                  - "+0300"
+                  - "-0530"
+                  - "+0000"
+
+    # 2. DateTime/Relative — дата относительно опорной точки
+
+    Relative:
         type: object
         description: >
-          Смещение в календарных/временных единицах.
-          Значения могут быть отрицательными (отнять).
-          Незаданные поля (default: 0) не изменяют исходную дату.
-
-          Не включены (вычисляются из базовых):
-          - week: 1 week = 7 days → используй day: 7
-          - nanosecond: всегда 0, точность до секунд достаточна
+            Дата/время, вычисляемая относительно опорной точки (anchor).
+            Формула: результат = anchor + offset
+            Это кастомная схема, не входящая в стандартный DateComponents.
+        required: [anchor]
         properties:
-          year:
-            type: integer
-            default: 0
-            description: Количество лет. Отрицательное = назад.
-            example: 1
-          month:
-            type: integer
-            default: 0
-            description: Количество месяцев. Отрицательное = назад.
-            example: -3
-          day:
-            type: integer
-            default: 0
-            description: Количество дней. Отрицательное = назад.
-            example: 5
-          hour:
-            type: integer
-            default: 0
-            description: Количество часов. Отрицательное = назад.
-            example: 3
-          minute:
-            type: integer
-            default: 0
-            description: Количество минут. Отрицательное = назад.
-            example: 30
-          second:
-            type: integer
-            default: 0
-            description: Количество секунд. Отрицательное = назад.
-            example: -90
+            anchor:
+                type: string
+                description: >
+                    Опорная точка для вычислений.
+                    - now: текущий момент UTC. anchorTimeZone не требуется.
+                    - startOfDay: полночь (00:00:00) текущего дня. anchorTimeZone обязателен.
+                    - startOfWeek: полночь понедельника текущей недели (ISO 8601).
+                      anchorTimeZone обязателен.
+                    - startOfMonth: полночь 1-го числа текущего месяца. anchorTimeZone обязателен.
+                    - startOfYear: полночь 1 января текущего года. anchorTimeZone обязателен.
+                enum:
+                    - now
+                    - startOfDay
+                    - startOfWeek
+                    - startOfMonth
+                    - startOfYear
+
+            anchorTimeZone:
+                $ref: "#/TimeZoneIdentifier"
+                description: >
+                    Time zone для определения опорной точки.
+                    Обязателен для startOfDay, startOfWeek, startOfMonth, startOfYear.
+                    Игнорируется для now (текущий момент UTC одинаков везде).
+                    When null: используется часовой пояс из настроек
+                    устройства пользователя.
+
+            offset:
+                $ref: "#/DateTime/Interval"
+                description: >
+                    Смещение от опорной точки.
+                    When null: смещение не применяется, результат = anchor.
+
         additionalProperties: false
 
-      - title: Milliseconds 
-        type: number
-        description: >
-          Смещение в миллисекундах.
-          Отрицательное = назад. Дробное = микросекунды.
-          Не учитывает календарь — просто прибавляет/отнимает
-          точное количество миллисекунд.
+        examples:
+            # --- now ---
+            # Текущий момент
+            - { "anchor": "now" }
+            # Через 30 минут от сейчас
+            - { "anchor": "now", "offset": { "minute": 30 } }
+            # 2 часа назад
+            - { "anchor": "now", "offset": { "hour": -2 } }
 
-    examples:
-      # --- Объектный формат (календарный) ---
-      # Добавить 2 месяца и 5 дней
-      - {"month": 2, "day": 5}
-      # Отнять 1 год и 6 месяцев
-      - {"year": -1, "month": -6}
-      # Добавить 3 часа 30 минут
-      - {"hour": 3, "minute": 30}
-      # Добавить 1 месяц и 12 часов
-      - {"month": 1, "hour": 12}
-      # Отнять 7 дней
-      - {"day": -7}
-      # --- Числовой формат (миллисекунды) ---
-      # Добавить 1 час (3600000 мс)
-      - 3600000
-      # Отнять 1 день (86400000 мс)
-      - -86400000
-      # Добавить 30 минут и 500 мс
-      - 1800500
+            # --- startOfDay ---
+            # Начало сегодняшнего дня
+            - { "anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica" }
+            # Сегодня в 14:30
+            - {
+                  "anchor": "startOfDay",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "hour": 14, "minute": 30 },
+              }
+            # Конец сегодняшнего дня (23:59:59)
+            - {
+                  "anchor": "startOfDay",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "hour": 23, "minute": 59, "second": 59 },
+              }
+            # Начало завтрашнего дня
+            - {
+                  "anchor": "startOfDay",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "day": 1 },
+              }
+            # Начало вчерашнего дня
+            - {
+                  "anchor": "startOfDay",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "day": -1 },
+              }
+            # 7 дней назад, в 9:00
+            - {
+                  "anchor": "startOfDay",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "day": -7, "hour": 9 },
+              }
+
+            # --- startOfWeek (понедельник, ISO 8601) ---
+            # Начало текущей недели (понедельник 00:00)
+            - { "anchor": "startOfWeek", "anchorTimeZone": "Europe/Podgorica" }
+            # Пятница этой недели в 18:00
+            - {
+                  "anchor": "startOfWeek",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "day": 4, "hour": 18 },
+              }
+            # Воскресенье (для стран где неделя с воскресенья)
+            - {
+                  "anchor": "startOfWeek",
+                  "anchorTimeZone": "America/New_York",
+                  "offset": { "day": -1 },
+              }
+
+            # --- startOfMonth ---
+            # Начало текущего месяца
+            - { "anchor": "startOfMonth", "anchorTimeZone": "Europe/Podgorica" }
+            # 15-е число этого месяца в 10:00
+            - {
+                  "anchor": "startOfMonth",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "day": 14, "hour": 10 },
+              }
+            # Начало прошлого месяца
+            - {
+                  "anchor": "startOfMonth",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "month": -1 },
+              }
+
+            # --- startOfYear ---
+            # Начало текущего года
+            - { "anchor": "startOfYear", "anchorTimeZone": "Europe/Podgorica" }
+            # 1 марта текущего года
+            - {
+                  "anchor": "startOfYear",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "month": 2 },
+              }
+            # 100-й день текущего года
+            - {
+                  "anchor": "startOfYear",
+                  "anchorTimeZone": "Europe/Podgorica",
+                  "offset": { "day": 99 },
+              }
+
+    #  DateTime/Interval — длительность / смещение
+
+    Interval:
+        description: >
+            Длительность или смещение. 
+            Два формата:
+            1) Объект с календарными/временными компонентами - учитывает календарь (месяц = 28–31 день,
+            DST и т.д.).
+            2) Число (double) — точные миллисекунды без календарной логики.
+        oneOf:
+            - title: Calendar components
+              type: object
+              description: >
+                  Смещение в календарных/временных единицах.
+                  Значения могут быть отрицательными (отнять).
+                  Незаданные поля (default: 0) не изменяют исходную дату.
+
+                  Не включены (вычисляются из базовых):
+                  - week: 1 week = 7 days → используй day: 7
+                  - nanosecond: всегда 0, точность до секунд достаточна
+              properties:
+                  year:
+                      type: integer
+                      default: 0
+                      description: Количество лет. Отрицательное = назад.
+                      example: 1
+                  month:
+                      type: integer
+                      default: 0
+                      description: Количество месяцев. Отрицательное = назад.
+                      example: -3
+                  day:
+                      type: integer
+                      default: 0
+                      description: Количество дней. Отрицательное = назад.
+                      example: 5
+                  hour:
+                      type: integer
+                      default: 0
+                      description: Количество часов. Отрицательное = назад.
+                      example: 3
+                  minute:
+                      type: integer
+                      default: 0
+                      description: Количество минут. Отрицательное = назад.
+                      example: 30
+                  second:
+                      type: integer
+                      default: 0
+                      description: Количество секунд. Отрицательное = назад.
+                      example: -90
+              additionalProperties: false
+
+            - title: Milliseconds
+              type: number
+              description: >
+                  Смещение в миллисекундах.
+                  Отрицательное = назад. Дробное = микросекунды.
+                  Не учитывает календарь — просто прибавляет/отнимает
+                  точное количество миллисекунд.
+
+        examples:
+            # --- Объектный формат (календарный) ---
+            # Добавить 2 месяца и 5 дней
+            - { "month": 2, "day": 5 }
+            # Отнять 1 год и 6 месяцев
+            - { "year": -1, "month": -6 }
+            # Добавить 3 часа 30 минут
+            - { "hour": 3, "minute": 30 }
+            # Добавить 1 месяц и 12 часов
+            - { "month": 1, "hour": 12 }
+            # Отнять 7 дней
+            - { "day": -7 }
+            # --- Числовой формат (миллисекунды) ---
+            # Добавить 1 час (3600000 мс)
+            - 3600000
+            # Отнять 1 день (86400000 мс)
+            - -86400000
+            # Добавить 30 минут и 500 мс
+            - 1800500
