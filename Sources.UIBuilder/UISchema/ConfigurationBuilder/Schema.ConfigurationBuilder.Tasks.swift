@@ -69,6 +69,7 @@ extension Schema.ConfigurationBuilder {
 extension [VC.Element] {
     @inlinable
     mutating func popLastElements(_ n: Int) throws(Schema.Error) -> Self {
+        guard n > 0 else { return []}
         guard count >= n else {
             throw .unsupportedElement("empty element tree")
         }

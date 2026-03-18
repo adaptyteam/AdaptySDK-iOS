@@ -14,7 +14,7 @@ extension Schema {
         let cover: Box?
         let content: Element
         let footer: Element?
-        let overlay: Element?
+        let overlay: [Element]?
         let screenActions: ScreenActions
     }
 }
@@ -31,7 +31,9 @@ extension Schema.ConfigurationBuilder {
             taskStack.append(.planElement(footer))
         }
         if let overlay = from.overlay {
-            taskStack.append(.planElement(overlay))
+            for el in overlay.reversed() {
+                taskStack.append(.planElement(el))
+            }
         }
         var elementStack = try startTasks(&taskStack)
         return try buildScreen(from, &elementStack)
@@ -47,14 +49,14 @@ extension Schema.ConfigurationBuilder {
         }
         let content = try elementStack.popLastElement()
         let footer = try elementStack.popLastElement(from.footer != nil)
-        let overlay = try elementStack.popLastElement(from.overlay != nil)
+        let overlay = try elementStack.popLastElements(from.overlay?.count ?? 0)
         return .init(
             id: from.id,
             layoutBehaviour: from.layoutBehaviour,
             cover: cover,
             content: content,
             footer: footer,
-            overlay: overlay,
+            overlay: overlay.isEmpty ? nil : overlay,
             screenActions: from.screenActions
         )
     }
@@ -86,13 +88,22 @@ extension Schema.Screen: Encodable, DecodableWithConfiguration {
                 throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown screen id"))
             }
 
+        let overlay: [Schema.Element]? =
+            if !container.contains(.overlay) {
+                nil
+            } else if let one = try? container.decode(Schema.Element.self, forKey: .overlay, configuration: configuration) {
+                [one]
+            } else {
+                try? container.decode([Schema.Element].self, forKey: .overlay, configuration: configuration)
+            }
+
         try self.init(
             id: screenId,
             layoutBehaviour: layoutBehaviour,
             cover: layoutBehaviour == .hero ? container.decodeIfPresent(Schema.Box.self, forKey: .cover, configuration: configuration) : nil,
             content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
             footer: layoutBehaviour != .default ? container.decodeIfPresent(Schema.Element.self, forKey: .footer, configuration: configuration) : nil,
-            overlay: container.decodeIfPresent(Schema.Element.self, forKey: .overlay, configuration: configuration),
+            overlay: overlay,
             screenActions: Schema.ScreenActions(from: decoder)
         )
     }
