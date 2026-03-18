@@ -23,6 +23,7 @@ struct AdaptyUIScreenInstanceKey: EnvironmentKey {
             cover: nil,
             content: .unknown("fake", nil),
             footer: nil,
+            overlay: nil,
             screenActions: .empty
         ),
         contextPath: []

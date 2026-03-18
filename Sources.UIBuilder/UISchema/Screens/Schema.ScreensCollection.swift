@@ -45,7 +45,6 @@ private let legacyScreenCodingKey = AnyCodingKey("default")
 
 private enum LegacyScreenCodingKeys: String, CodingKey {
     case background
-    case overlay
 }
 
 private extension Decoder {
@@ -59,26 +58,10 @@ private extension Decoder {
         var nestedConfiguration = configuration
         nestedConfiguration.insideScreenId = defaultScreenId
 
-        let content: Schema.Element =
-            if let overlay = try legacyScreen.decodeIfPresent(Schema.Element.self, forKey: .overlay, configuration: nestedConfiguration) {
-                .stack(.init(
-                    type: .z,
-                    horizontalAlignment: .center,
-                    verticalAlignment: .bottom,
-                    spacing: 0,
-                    items: [
-                        .element(.scrrenHolder),
-                        .element(overlay),
-                    ]
-                ), nil)
-            } else {
-                .scrrenHolder
-            }
-
         let legacyDefaultNavigator = try Schema.Navigator(
             id: Schema.Navigator.default.id,
             background: legacyScreen.decode(Schema.AssetReference.self, forKey: .background),
-            content: content,
+            content: .scrrenHolder,
             order: Schema.Navigator.default.order,
             appearances: nil,
             transitions: nil,
@@ -196,3 +179,4 @@ private extension Decoder {
         )
     }
 }
+

@@ -14,6 +14,8 @@ extension VC {
         let cover: Box?
         let content: Element
         let footer: Element?
+        let overlay: Element?
         let screenActions: ScreenActions
     }
 }
+

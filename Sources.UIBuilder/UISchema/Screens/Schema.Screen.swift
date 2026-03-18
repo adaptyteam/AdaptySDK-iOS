@@ -14,6 +14,7 @@ extension Schema {
         let cover: Box?
         let content: Element
         let footer: Element?
+        let overlay: Element?
         let screenActions: ScreenActions
     }
 }
@@ -29,6 +30,9 @@ extension Schema.ConfigurationBuilder {
         if let footer = from.footer {
             taskStack.append(.planElement(footer))
         }
+        if let overlay = from.overlay {
+            taskStack.append(.planElement(overlay))
+        }
         var elementStack = try startTasks(&taskStack)
         return try buildScreen(from, &elementStack)
     }
@@ -43,12 +47,14 @@ extension Schema.ConfigurationBuilder {
         }
         let content = try elementStack.popLastElement()
         let footer = try elementStack.popLastElement(from.footer != nil)
+        let overlay = try elementStack.popLastElement(from.overlay != nil)
         return .init(
             id: from.id,
             layoutBehaviour: from.layoutBehaviour,
             cover: cover,
             content: content,
             footer: footer,
+            overlay: overlay,
             screenActions: from.screenActions
         )
     }
@@ -60,6 +66,7 @@ extension Schema.Screen: Encodable, DecodableWithConfiguration {
         case cover
         case content
         case footer
+        case overlay
     }
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -85,7 +92,9 @@ extension Schema.Screen: Encodable, DecodableWithConfiguration {
             cover: layoutBehaviour == .hero ? container.decodeIfPresent(Schema.Box.self, forKey: .cover, configuration: configuration) : nil,
             content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
             footer: layoutBehaviour != .default ? container.decodeIfPresent(Schema.Element.self, forKey: .footer, configuration: configuration) : nil,
+            overlay: container.decodeIfPresent(Schema.Element.self, forKey: .overlay, configuration: configuration),
             screenActions: Schema.ScreenActions(from: decoder)
         )
     }
 }
+

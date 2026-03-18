@@ -476,6 +476,7 @@ Screen:
         cover: { $ref: "#/UI/Box" }
         content: { $ref: "#/UI/Element" }
         footer: { $ref: "#/UI/Element" }
+        overlay: { $ref: "#/UI/Element" }
         layout_behaviour:
             type: string
             enum: [default, flat, hero, transparent]
@@ -1530,21 +1531,21 @@ DateTime:
     description: >
         Точка во времени. Три формата:
         1) Объект — конкретная дата/время через компоненты (year/month/day + time) Используется для локального времени.
-        2) DateTimeRelative — относительно опорной точки (now, startOfDay и т.д.)
+        2) DateTimeRelative — относительно опорной точки (now, start_of_day и т.д.)
         3) Unix timestamp в миллисекундах (double) Самый быстрый вариант для вычислений
     oneOf:
         - title: Date components for local time
           type: object
           description: >
               Конкретная дата/время через год, месяц и день.
-              Если известена timeZone, то используйте unix timestamp, это быстрее.
+              Если известена time_zone, то используйте unix timestamp, это быстрее.
               Календарь всегда ISO 8601.
           required:
               - year
               - month
               - day
           properties:
-              timeZone:
+              time_zone:
                   default: null
                   $ref: "#/DateTime/TimeZone"
                   description: >
@@ -1599,7 +1600,7 @@ DateTime:
           type: number
           description: >
               Миллисекунды с 1 января 1970 00:00:00 UTC (Unix epoch).
-              Всегда UTC — timeZone не нужен.
+              Всегда UTC — time_zone не нужен.
               Double позволяет передавать дробные миллисекунды.
 
     examples:
@@ -1610,14 +1611,14 @@ DateTime:
               "day": 15,
               "hour": 14,
               "minute": 30,
-              "timeZone": "Europe/Podgorica",
+              "time_zone": "Europe/Podgorica",
           }
         # Только дата (время = 00:00:00)
         - { "year": 2026, "month": 3, "day": 15 }
         # Относительная (DateTimeRelative)
         - {
-              "anchor": "startOfDay",
-              "anchorTimeZone": "Europe/Podgorica",
+              "anchor": "start_of_day",
+              "anchor_time_zone": "Europe/Podgorica",
               "offset": { "hour": 9 },
           }
         # Текущий момент
@@ -1685,20 +1686,20 @@ DateTime:
                 type: string
                 description: >
                     Опорная точка для вычислений.
-                    - now: текущий момент UTC. anchorTimeZone не требуется.
-                    - startOfDay: полночь (00:00:00) текущего дня. anchorTimeZone обязателен.
-                    - startOfWeek: полночь понедельника текущей недели (ISO 8601).
-                      anchorTimeZone обязателен.
-                    - startOfMonth: полночь 1-го числа текущего месяца. anchorTimeZone обязателен.
-                    - startOfYear: полночь 1 января текущего года. anchorTimeZone обязателен.
+                    - now: текущий момент UTC. anchor_time_zone не требуется.
+                    - start_of_day: полночь (00:00:00) текущего дня. anchor_time_zone обязателен.
+                    - start_of_week: полночь понедельника текущей недели (ISO 8601).
+                      anchor_time_zone обязателен.
+                    - start_of_month: полночь 1-го числа текущего месяца. anchor_time_zone обязателен.
+                    - start_of_year: полночь 1 января текущего года. anchor_time_zone обязателен.
                 enum:
                     - now
-                    - startOfDay
-                    - startOfWeek
-                    - startOfMonth
-                    - startOfYear
+                    - start_of_day
+                    - start_of_week
+                    - start_of_month
+                    - start_of_year
 
-            anchorTimeZone:
+            anchor_time_zone:
                 $ref: "#/TimeZoneIdentifier"
                 description: >
                     Time zone для определения опорной точки.
@@ -1726,83 +1727,83 @@ DateTime:
 
             # --- startOfDay ---
             # Начало сегодняшнего дня
-            - { "anchor": "startOfDay", "anchorTimeZone": "Europe/Podgorica" }
+            - { "anchor": "start_of_day", "anchor_time_zone": "Europe/Podgorica" }
             # Сегодня в 14:30
             - {
-                  "anchor": "startOfDay",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_day",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "hour": 14, "minute": 30 },
               }
             # Конец сегодняшнего дня (23:59:59)
             - {
-                  "anchor": "startOfDay",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_day   ",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "hour": 23, "minute": 59, "second": 59 },
               }
             # Начало завтрашнего дня
             - {
-                  "anchor": "startOfDay",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_day",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "day": 1 },
               }
             # Начало вчерашнего дня
             - {
-                  "anchor": "startOfDay",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_day",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "day": -1 },
               }
             # 7 дней назад, в 9:00
             - {
-                  "anchor": "startOfDay",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_day",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "day": -7, "hour": 9 },
               }
 
             # --- startOfWeek (понедельник, ISO 8601) ---
             # Начало текущей недели (понедельник 00:00)
-            - { "anchor": "startOfWeek", "anchorTimeZone": "Europe/Podgorica" }
+            - { "anchor": "start_of_week", "anchor_time_zone": "Europe/Podgorica" }
             # Пятница этой недели в 18:00
             - {
-                  "anchor": "startOfWeek",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_week",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "day": 4, "hour": 18 },
               }
             # Воскресенье (для стран где неделя с воскресенья)
             - {
-                  "anchor": "startOfWeek",
-                  "anchorTimeZone": "America/New_York",
+                  "anchor": "start_of_week",
+                  "anchor_time_zone": "America/New_York",
                   "offset": { "day": -1 },
               }
 
             # --- startOfMonth ---
             # Начало текущего месяца
-            - { "anchor": "startOfMonth", "anchorTimeZone": "Europe/Podgorica" }
+            - { "anchor": "start_of_month", "anchor_time_zone": "Europe/Podgorica" }
             # 15-е число этого месяца в 10:00
             - {
-                  "anchor": "startOfMonth",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_month",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "day": 14, "hour": 10 },
               }
             # Начало прошлого месяца
             - {
-                  "anchor": "startOfMonth",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_month",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "month": -1 },
               }
 
             # --- startOfYear ---
             # Начало текущего года
-            - { "anchor": "startOfYear", "anchorTimeZone": "Europe/Podgorica" }
+            - { "anchor": "start_of_year", "anchor_time_zone": "Europe/Podgorica" }
             # 1 марта текущего года
             - {
-                  "anchor": "startOfYear",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_year",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "month": 2 },
               }
             # 100-й день текущего года
             - {
-                  "anchor": "startOfYear",
-                  "anchorTimeZone": "Europe/Podgorica",
+                  "anchor": "start_of_year",
+                  "anchor_time_zone": "Europe/Podgorica",
                   "offset": { "day": 99 },
               }
 
