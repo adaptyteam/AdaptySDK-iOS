@@ -67,12 +67,10 @@ struct AdaptyUIFlatContainerView: View {
                 }
                 
                 if let overlay = screen.overlay {
-                    ForEach(overlay.indices) { idx in
-                        AdaptyUIElementView(
-                            overlay[idx].content, // TODO: dont use vAlign + hAlign !!
-                            screenHolderBuilder: { EmptyView() }, // TODO: x check
-                        )
-                    }
+                    AdaptyUIOverlayElementsView(
+                        overlays: overlay,
+                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                    )
                 }
             }
             .ignoresSafeArea()

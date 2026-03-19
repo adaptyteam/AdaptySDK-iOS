@@ -149,6 +149,10 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             includeBackground: drawDecoratorBackground
         )
         .animatableProperties(element.properties, play: $playOnAppearAnimations)
+        .modifier(ElementOverlayModifier(
+            overlays: element.properties?.overlay,
+            screenHolderBuilder: screenHolderBuilder
+        ))
         .padding(element.properties?.padding)
         .modifier(DebugOverlayModifier())
         .onAppear {
@@ -158,4 +162,3 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
 }
 
 #endif
-
