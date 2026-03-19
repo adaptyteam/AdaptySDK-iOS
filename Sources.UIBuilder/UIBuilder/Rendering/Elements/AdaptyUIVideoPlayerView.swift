@@ -84,6 +84,8 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 
 struct AdaptyUIVideoView: View {
     @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
+    @EnvironmentObject
     private var viewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
@@ -132,6 +134,7 @@ struct AdaptyUIVideoView: View {
                     )
                 }
             }
+            .id(videoAsset.id)
         } else {
             Rectangle()
         }

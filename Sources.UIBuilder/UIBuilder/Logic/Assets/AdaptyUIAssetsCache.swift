@@ -142,9 +142,9 @@ final class AdaptyUIAssetsCache {
             return newAsset
         }
 
-        let customAsset: AdaptyUICustomAsset? =
+        let customAsset: AdaptyUIResolvedAsset? =
             if let customId = stateAsset.customId {
-                customAssetsResolver.asset(for: customId)
+                customAssetsResolver.asset(for: customId)?.resolved(id: customId)
             } else {
                 nil
             }
@@ -153,7 +153,7 @@ final class AdaptyUIAssetsCache {
             customId: stateAsset.customId,
             mode: mode,
             stateValue: stateAsset.resolved(),
-            customValue: customAsset?.resolved()
+            customValue: customAsset
         )
 
         return newAsset

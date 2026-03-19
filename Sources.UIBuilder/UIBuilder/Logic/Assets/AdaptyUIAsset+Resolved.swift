@@ -73,8 +73,9 @@ extension VC.ImageData {
 import AVKit
 
 extension VC.VideoData {
-    var resolvedVideo: AdaptyUIResolvedVideoAsset {
+    func resolvedVideo() -> AdaptyUIResolvedVideoAsset {
         AdaptyUIResolvedVideoAsset(
+            id: url.absoluteString,
             asset: AVAsset(url: url),
             image: image.resolvedImage
         )
@@ -91,7 +92,7 @@ extension VC.Asset {
         case .image(let image):
             .image(image.resolvedImage)
         case .video(let video):
-            .video(video.resolvedVideo)
+            .video(video.resolvedVideo())
         case .font(let font):
                 .font(.create(font, withSize: font.defaultSize), defaultColor: font.defaultColor.resolvedColor)
         case .unknown:

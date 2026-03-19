@@ -70,16 +70,18 @@ extension AdaptyUICustomImageAsset {
 import AVKit
 
 extension AdaptyUICustomVideoAsset {
-    var resolvedVideo: AdaptyUIResolvedVideoAsset {
+    func resolvedVideo(id: String) -> AdaptyUIResolvedVideoAsset {
         switch self {
         case .file(let url, let preview),
              .remote(let url, let preview):
             return .init(
+                id: id,
                 asset: AVAsset(url: url),
                 image: preview.flatMap(\.resolvedImage)
             )
-        case .player(let item, _, let preview):
+        case .player(let item, let player, let preview):
             return .init(
+                id: id,
                 asset: item.asset,
                 image: preview.flatMap(\.resolvedImage)
             )
@@ -88,7 +90,7 @@ extension AdaptyUICustomVideoAsset {
 }
 
 extension AdaptyUICustomAsset {
-    func resolved() -> AdaptyUIResolvedAsset? {
+    func resolved(id: String) -> AdaptyUIResolvedAsset? {
         switch self {
         case .color(let color):
             .color(color.resolvedColor)
@@ -101,9 +103,12 @@ extension AdaptyUICustomAsset {
                 AdaptyUIResolvedAsset?.none
             }
         case .video(let video):
-            .video(video.resolvedVideo)
+            .video(video.resolvedVideo(id: id))
         case .font(let font): // TODO: default color of Custom fonts
-            .font(font, defaultColor: SwiftUI.Color(UIColor.adaptyDefaultTextColor))
+            .font(
+                font,
+                defaultColor: SwiftUI.Color(UIColor.adaptyDefaultTextColor)
+            )
         }
     }
 }

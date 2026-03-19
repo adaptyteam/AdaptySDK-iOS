@@ -61,6 +61,15 @@ struct AdaptyUIBasicContainerView: View {
                     footerView(footer, globalProxy: globalProxy)
                         .onGeometrySizeChange { footerSize = $0 }
                 }
+
+                if let overlay = screen.overlay {
+                    ForEach(overlay.indices) { idx in
+                        AdaptyUIElementView(
+                            overlay[idx],
+                            screenHolderBuilder: { EmptyView() }, // TODO: x check
+                        )
+                    }
+                }
             }
             .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
             .ignoresSafeArea()
@@ -123,8 +132,7 @@ struct AdaptyUIBasicContainerView: View {
         }
         .frame(height: height)
     }
-    
-    
+
     @State
     private var playOnAppearAnimations: [VC.Animation] = []
 

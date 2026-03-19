@@ -65,6 +65,15 @@ struct AdaptyUIFlatContainerView: View {
                     footerView(footer, globalProxy: globalProxy)
                         .onGeometrySizeChange { footerSize = $0 }
                 }
+                
+                if let overlay = screen.overlay {
+                    ForEach(overlay.indices) { idx in
+                        AdaptyUIElementView(
+                            overlay[idx],
+                            screenHolderBuilder: { EmptyView() }, // TODO: x check
+                        )
+                    }
+                }
             }
             .ignoresSafeArea()
         }
