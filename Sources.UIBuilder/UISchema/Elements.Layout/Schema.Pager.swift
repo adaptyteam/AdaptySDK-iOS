@@ -36,12 +36,10 @@ extension Schema.Pager {
 extension Schema.ConfigurationBuilder {
     @inlinable
     func planPager(
-        _ value: Schema.Pager,
-        _ properties: VC.Element.Properties?,
-        in taskStack: inout [Task]
+        _ from: Schema.Pager,
+        in taskStack: inout TasksStack
     ) {
-        taskStack.append(.buildPager(value, properties))
-        for item in value.content.reversed() {
+        for item in from.content.reversed() {
             taskStack.append(.planElement(item))
         }
     }
@@ -49,9 +47,9 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func buildPager(
         _ from: Schema.Pager,
-        _ elementStack: inout [VC.Element]
+        _ resultStack: inout ResultStack
     ) throws(Schema.Error) -> VC.Pager {
-        let content = try elementStack.popLastElements(from.content.count)
+        let content = try resultStack.popLastElements(from.content.count)
         return .init(
             pageWidth: from.pageWidth,
             pageHeight: from.pageHeight,

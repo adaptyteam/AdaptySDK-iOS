@@ -19,24 +19,22 @@ extension Schema {
 extension Schema.ConfigurationBuilder {
     @inlinable
     func planButton(
-        _ value: Schema.Button,
-        _ properties: VC.Element.Properties?,
-        in taskStack: inout [Task]
+        _ from: Schema.Button,
+        in taskStack: inout TasksStack
     ) {
-        taskStack.append(.buildButton(value, properties))
-        if let sel = value.selectedState {
+        if let sel = from.selectedState {
             taskStack.append(.planElement(sel))
         }
-        taskStack.append(.planElement(value.normalState))
+        taskStack.append(.planElement(from.normalState))
     }
 
     @inlinable
     func buildButton(
         _ from: Schema.Button,
-        _ elementStack: inout [VC.Element]
+        _ resultStack: inout ResultStack
     ) throws(Schema.Error) -> VC.Button {
-        let selectedState = try elementStack.popLastElement(from.selectedState != nil)
-        let normalState = try elementStack.popLastElement()
+        let selectedState = try resultStack.popLastElement(from.selectedState != nil)
+        let normalState = try resultStack.popLastElement()
         return .init(
             actions: from.actions,
             normalState: normalState,
@@ -98,3 +96,4 @@ extension Schema.Button: DecodableWithConfiguration {
         )
     }
 }
+

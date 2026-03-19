@@ -10,8 +10,8 @@ import Foundation
 extension Schema.Element {
     struct Properties: Sendable, Hashable {
         let legacyElementId: String?
-        let background: [Schema.Element]?
-        let overlay: [Schema.Element]?
+        let background: [Schema.Element.Overlay]?
+        let overlay: [Schema.Element.Overlay]?
         let value: VC.Element.Properties?
     }
 }
@@ -24,50 +24,81 @@ extension Schema.Element.Properties {
     )
 }
 
-// extension Schema.ConfigurationBuilder {
-//    @inlinable
-//    func planElementProperties(
-//        _ from: Schema.Element.Properties,
-//        in taskStack: inout [Task]
-//    ) {
-//        if let background = from.background {
-//            for el in background.reversed() {
-//                taskStack.append(.planElement(el))
-//            }
-//        }
-//        if let overlay = from.overlay {
-//            for el in overlay.reversed() {
-//                taskStack.append(.planElement(el))
-//            }
-//        }
-//    }
-//
-//    @inlinable
-//    func buildElementProperties(
-//        _ from: Schema.Element.Properties,
-//        _ elementStack: inout [VC.Element]
-//    ) throws(Schema.Error) -> VC.Element.Properties {
-//
-//        if let background = from.background {
-//            try elementStack.popLastElements(background.count)
-//        }
-//        if let overlay = from.overlay {
-//            try elementStack.popLastElements(overlay.count)
-//        }
-//
-//        let content = try elementStack.popLastElements(from.content.count)
-//        return .init(
-//            pageWidth: from.pageWidth,
-//            pageHeight: from.pageHeight,
-//            pagePadding: from.pagePadding,
-//            spacing: from.spacing,
-//            content: content,
-//            pageControl: from.pageControl,
-//            animation: from.animation,
-//            interactionBehavior: from.interactionBehavior
-//        )
-//    }
-// }
+extension Schema.ConfigurationBuilder {
+    @inlinable
+    func planElementProperties(
+        _ from: Schema.Element.Properties?,
+        in taskStack: inout TasksStack
+    ) {
+        guard let from else { return }
+        if let background = from.background, background.isNotEmpty {
+            for overlay in background.reversed() {
+                taskStack.append(.planElement(overlay.content))
+            }
+        }
+        if let overlays = from.overlay, overlays.isNotEmpty {
+            for overlay in overlays.reversed() {
+                taskStack.append(.planElement(overlay.content))
+            }
+        }
+    }
+
+    @inlinable
+    func buildElementProperties(
+        _ from: Schema.Element.Properties?,
+        _ resultStack: inout ResultStack
+    ) throws(Schema.Error) -> VC.Element.Properties? {
+        guard let from else { return nil }
+
+        var background: [VC.Element.Overlay]? =
+            if let backgrounds = from.background, backgrounds.isNotEmpty {
+                try convertElementOverlays(
+                    backgrounds,
+                    resultStack.popLastElements(backgrounds.count)
+                )
+            } else {
+                nil
+            }
+        var overlay: [VC.Element.Overlay]? =
+            if let overlays = from.overlay, overlays.isNotEmpty {
+                try convertElementOverlays(
+                    overlays,
+                    resultStack.popLastElements(overlays.count)
+                )
+            } else {
+                nil
+            }
+
+        if background?.isEmpty ?? false { background = nil }
+        if overlay?.isEmpty ?? false { overlay = nil }
+
+        if let value = from.value, !value.isEmpty {
+            return .init(
+                decorator: value.decorator,
+                padding: value.padding,
+                offset: value.offset,
+                opacity: value.opacity,
+                background: background,
+                overlay: overlay,
+                onAppear: value.onAppear
+            )
+        }
+
+        guard background == .none, overlay == .none else {
+            return nil
+        }
+
+        return .init(
+            decorator: nil,
+            padding: Schema.Element.Properties.default.padding,
+            offset: Schema.Element.Properties.default.offset,
+            opacity: Schema.Element.Properties.default.opacity,
+            background: background,
+            overlay: overlay,
+            onAppear: []
+        )
+    }
+}
 
 extension Schema.Element.Properties: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
@@ -106,11 +137,13 @@ extension Schema.Element.Properties: DecodableWithConfiguration {
             padding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .padding) ?? Self.default.padding,
             offset: container.decodeIfPresent(Schema.Offset.self, forKey: .offset) ?? Self.default.offset,
             opacity: opacity,
+            background: nil,
+            overlay: nil,
             onAppear: onAppear
         )
 
-        let overlay = try container.decodeIfPresent([Schema.Element].self, forKey: .overlay, configuration: configuration)
-        let background = try container.decodeIfPresent([Schema.Element].self, forKey: .overlay, configuration: configuration)
+        let overlay = try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .overlay, configuration: configuration)
+        let background = try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .overlay, configuration: configuration)
 
         try self.init(
             legacyElementId: container.decodeIfPresent(String.self, forKey: .legacyElementId),

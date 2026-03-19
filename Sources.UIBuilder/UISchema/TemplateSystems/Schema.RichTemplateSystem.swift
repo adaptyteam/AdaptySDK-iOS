@@ -27,7 +27,7 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func planTemplateInstance(
         _ instance: Schema.TemplateInstance,
-        in taskStack: inout [Task]
+        in taskStack: inout TasksStack
     ) throws(Schema.Error) {
         let id = instance.type
         guard !templateIds.contains(id) else {

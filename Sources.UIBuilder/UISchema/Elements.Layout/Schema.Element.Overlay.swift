@@ -22,6 +22,25 @@ extension Schema.Element.Overlay {
     )
 }
 
+extension Schema.ConfigurationBuilder {
+    @inlinable
+    func convertElementOverlays(
+        _ items: [Schema.Element.Overlay],
+        _ elements: [VC.Element]
+    ) -> [VC.Element.Overlay] {
+        var overlays = [VC.Element.Overlay]()
+        overlays.reserveCapacity(elements.count)
+        for (i, item) in items.enumerated() {
+            overlays.append(.init(
+                horizontalAlignment: item.horizontalAlignment,
+                verticalAlignment: item.verticalAlignment,
+                content: elements[i]
+            ))
+        }
+        return overlays
+    }
+}
+
 extension Schema.Element.Overlay: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case horizontalAlignment = "h_align"

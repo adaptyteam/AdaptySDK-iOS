@@ -476,7 +476,16 @@ Screen:
         cover: { $ref: "#/UI/Box" }
         content: { $ref: "#/UI/Element" }
         footer: { $ref: "#/UI/Element" }
-        overlay: { $ref: "#/UI/Element" }
+        background:
+            type: array
+            items: { $ref: "#/UI/Element/Overlay" }
+            uniqueItems: true
+            minItems: 1
+        overlay:
+            type: array
+            items: { $ref: "#/UI/Element/Overlay" }
+            uniqueItems: true
+            minItems: 1
         layout_behaviour:
             type: string
             enum: [default, flat, hero, transparent]
@@ -557,6 +566,11 @@ UI:
                         padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
                         offset: { $ref: "#/Entities/Offset", default: 0 }
                         opacity: { type: number, default: 1.0 }
+                        background:
+                            type: array
+                            items: { $ref: "#/UI/Element/Overlay" }
+                            uniqueItems: true
+                            minItems: 1
                         overlay:
                             type: array
                             items: { $ref: "#/UI/Element/Overlay" }
@@ -710,6 +724,7 @@ UI:
                 $ref: "#/Entities/AspectRatio"
                 default: fit
             loop: { type: boolean, default: true }
+            action: { $ref: "#/Script/ActionOrArray" }
 
     Text:
         type: object

@@ -34,16 +34,16 @@ extension Schema.Navigator {
 extension Schema.ConfigurationBuilder {
     @inlinable
     func convertNavigator(_ from: Schema.Navigator) throws(Schema.Error) -> VC.Navigator {
-        var taskStack: [Task] = [.planElement(from.content)]
-        var elementStack = try startTasks(&taskStack)
-        return try buildNavigator(from, &elementStack)
+        var taskStack: TasksStack = [.planElement(from.content)]
+        var resultStack = try startTasks(&taskStack)
+        return try buildNavigator(from, &resultStack)
     }
 
     private func buildNavigator(
         _ from: Schema.Navigator,
-        _ elementStack: inout [VC.Element]
+        _ resultStack: inout ResultStack
     ) throws(Schema.Error) -> VC.Navigator {
-        let content = try elementStack.popLastElement()
+        let content = try resultStack.popLastElement()
         return .init(
             id: from.id,
             background: from.background,

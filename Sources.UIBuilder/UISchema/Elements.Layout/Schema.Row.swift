@@ -17,12 +17,10 @@ extension Schema {
 extension Schema.ConfigurationBuilder {
     @inlinable
     func planRow(
-        _ value: Schema.Row,
-        _ properties: VC.Element.Properties?,
-        in taskStack: inout [Task]
+        _ from: Schema.Row,
+        in taskStack: inout TasksStack
     ) {
-        taskStack.append(.buildRow(value, properties))
-        for item in value.items.reversed() {
+        for item in from.items.reversed() {
             taskStack.append(.planElement(item.content))
         }
     }
@@ -30,9 +28,9 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func buildRow(
         _ from: Schema.Row,
-        _ elementStack: inout [VC.Element]
+        _ resultStack: inout ResultStack
     ) throws(Schema.Error) -> VC.Row {
-        let elements = try elementStack.popLastElements(from.items.count)
+        let elements = try resultStack.popLastElements(from.items.count)
         return .init(
             spacing: from.spacing,
             items: convertGridItems(from.items, elements)

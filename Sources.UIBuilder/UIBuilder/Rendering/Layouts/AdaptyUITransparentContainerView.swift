@@ -58,12 +58,12 @@ struct AdaptyUITransparentContainerView: View {
                         globalProxy: p
                     )
                 }
-                
+
                 if let overlay = screen.overlay {
                     ForEach(overlay.indices) { idx in
                         AdaptyUIElementView(
-                            overlay[idx],
-                            screenHolderBuilder: { EmptyView() }, // TODO: x check
+                            overlay[idx].content, // TODO: dont use vAlign + hAlign !!
+                            screenHolderBuilder: { EmptyView() } // TODO: x check
                         )
                     }
                 }
@@ -74,3 +74,4 @@ struct AdaptyUITransparentContainerView: View {
 }
 
 #endif
+
