@@ -23,7 +23,7 @@ extension Schema.Navigator {
     static let `default`: Self = .init(
         id: "default",
         background: .color(.black),
-        content: .scrrenHolder,
+        content: .screenHolder,
         order: 0,
         appearances: nil,
         transitions: nil,

@@ -12,5 +12,6 @@ extension VC {
         let asset: AssetReference
         let aspect: AspectRatio
         let loop: Bool
+        let actions: [Action]
     }
 }

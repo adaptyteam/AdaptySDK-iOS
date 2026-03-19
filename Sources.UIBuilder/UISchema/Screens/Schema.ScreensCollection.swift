@@ -61,7 +61,7 @@ private extension Decoder {
         let legacyDefaultNavigator = try Schema.Navigator(
             id: Schema.Navigator.default.id,
             background: legacyScreen.decode(Schema.AssetReference.self, forKey: .background),
-            content: .scrrenHolder,
+            content: .screenHolder,
             order: Schema.Navigator.default.order,
             appearances: nil,
             transitions: nil,
@@ -157,7 +157,7 @@ private extension Decoder {
                 height: .fillMax,
                 horizontalAlignment: .center,
                 verticalAlignment: .bottom,
-                content: .scrrenHolder
+                content: .screenHolder
             ), nil),
             order: Schema.Navigator.default.order + 100,
             appearances: [

@@ -11,7 +11,7 @@ extension Schema {
     enum Element: Sendable, Hashable {
         case legacyReference(String)
         indirect case templateInstance(Schema.TemplateInstance)
-        case scrrenHolder
+        case screenHolder
         indirect case stack(Schema.Stack, Properties?)
         indirect case text(Schema.Text, Properties?) // VC
         indirect case textField(Schema.TextField, Properties?) // VC
@@ -34,18 +34,50 @@ extension Schema {
     }
 }
 
+extension Schema.Element {
+    var properties: Schema.Element.Properties? {
+        switch self {
+        case .legacyReference, .templateInstance, .screenHolder:
+            nil
+        case let .box(_, properties),
+             let .stack(_, properties),
+             let .text(_, properties),
+             let .image(_, properties),
+             let .textField(_, properties),
+             let .button(_, properties),
+             let .row(_, properties),
+             let .column(_, properties),
+             let .section(_, properties),
+             let .toggle(_, properties),
+             let .timer(_, properties),
+             let .slider(_, properties),
+             let .pager(_, properties),
+             let .unknown(_, properties),
+             let .video(_, properties),
+             let .dateTimePicker(_, properties),
+             let .wheelItemsPicker(_, properties),
+             let .wheelRangePicker(_, properties):
+            properties
+        }
+    }
+}
+
 extension Schema.ConfigurationBuilder {
     @inlinable
     func planElement(
         _ from: Schema.Element,
         in taskStack: inout [Task]
     ) throws(Schema.Error) -> VC.Element? {
+//        if let properties = from.properties {
+//            planElementProperties(properties, in: &taskStack)
+//        }
+
         switch from {
         case let .legacyReference(id):
             try planLegacyReference(id, in: &taskStack)
         case let .templateInstance(value):
             try planTemplateInstance(value, in: &taskStack)
-        case .scrrenHolder:
+        case .screenHolder:
             return .screenHolder
         case let .stack(value, properties):
             planStack(value, properties?.value, in: &taskStack)
@@ -147,7 +179,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
             }
         case .screenHolder:
             if configuration.isNavigator {
-                self = .scrrenHolder
+                self = .screenHolder
             } else {
                 throw Schema.Error.unsupportedElement(type)
             }
@@ -188,7 +220,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         }
 
         func propertyOrNil() -> Properties? {
-            guard let properties = try? Properties(from: decoder) else { return nil }
+            guard let properties = try? Properties(from: decoder, configuration: configuration) else { return nil }
             return (properties.legacyElementId == nil && properties.value == nil) ? nil : properties
         }
     }
@@ -197,3 +229,4 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         // TODO: implement
     }
 }
+

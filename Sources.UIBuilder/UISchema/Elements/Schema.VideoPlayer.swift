@@ -16,6 +16,7 @@ extension Schema.VideoPlayer: Codable {
         case assetId = "asset_id"
         case aspect
         case loop
+        case actions = "action"
     }
 
     init(from decoder: Decoder) throws {
@@ -33,7 +34,8 @@ extension Schema.VideoPlayer: Codable {
             aspect: container.decodeIfPresent(Schema.AspectRatio.self, forKey: .aspect)
                 ?? .default,
             loop: container.decodeIfPresent(Bool.self, forKey: .loop)
-                ?? true
+                ?? true,
+            actions: container.decodeIfPresentActions(forKey: .actions) ?? []
         )
     }
 
@@ -48,3 +50,4 @@ extension Schema.VideoPlayer: Codable {
         }
     }
 }
+
