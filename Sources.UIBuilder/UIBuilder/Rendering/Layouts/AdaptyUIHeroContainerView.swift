@@ -1,5 +1,5 @@
 //
-//  AdaptyUIBasicContainerView.swift
+//  AdaptyUIHeroContainerView.swift
 //
 //
 //  Created by Aleksey Goncharov on 03.05.2024.
@@ -9,10 +9,10 @@
 import SwiftUI
 
 extension CoordinateSpace {
-    static let adaptyBasicName = "adapty.container.basic"
+    static let adaptyHeroName = "adapty.container.hero"
 }
 
-struct AdaptyUIBasicContainerView: View {
+struct AdaptyUIHeroContainerView: View {
     @EnvironmentObject
     private var paywallViewModel: AdaptyUIPaywallViewModel
     @Environment(\.adaptyScreenSize)
@@ -71,7 +71,7 @@ struct AdaptyUIBasicContainerView: View {
                     }
                 }
             }
-            .coordinateSpace(name: CoordinateSpace.adaptyBasicName)
+            .coordinateSpace(name: CoordinateSpace.adaptyHeroName)
             .ignoresSafeArea()
         }
         .coordinateSpace(name: CoordinateSpace.adaptyGlobalName)
@@ -96,7 +96,7 @@ struct AdaptyUIBasicContainerView: View {
         }()
 
         GeometryReader { p in
-            let minY = p.frame(in: .named(CoordinateSpace.adaptyBasicName)).minY
+            let minY = p.frame(in: .named(CoordinateSpace.adaptyHeroName)).minY
             let height = p.size.height
             let isScrollingDown = minY > 0
             let isScrollingUp = minY < 0
