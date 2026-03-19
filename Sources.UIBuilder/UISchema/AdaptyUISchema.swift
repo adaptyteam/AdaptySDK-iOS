@@ -124,9 +124,9 @@ extension AdaptyUISchema: Codable {
         try container.encode(AssetsCollection(value: assets), forKey: .assets)
         try container.encode(Array(localizations.values), forKey: .localizations)
         try container.encodeIfPresent(defaultLocalization?.id, forKey: .defaultLocalId)
-        try container.encode(screens, forKey: .screens)
-        try container.encode(screens, forKey: .templates)
-        try container.encode(screens, forKey: .navigators)
+        //    try container.encode(screens, forKey: .screens)
+//        try container.encode(screens, forKey: .templates)
+//        try container.encode(screens, forKey: .navigators)
 
         if scripts.isNotEmpty {
             var container = container.nestedUnkeyedContainer(forKey: .scripts)
@@ -195,3 +195,4 @@ private extension Decoder {
         return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
     }
 }
+

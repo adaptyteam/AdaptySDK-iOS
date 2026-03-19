@@ -17,12 +17,10 @@ extension Schema {
 extension Schema.ConfigurationBuilder {
     @inlinable
     func planSection(
-        _ value: Schema.Section,
-        _ properties: VC.Element.Properties?,
-        in taskStack: inout [Task]
+        _ from: Schema.Section,
+        in taskStack: inout TasksStack
     ) {
-        taskStack.append(.buildSection(value, properties))
-        for item in value.content.reversed() {
+        for item in from.content.reversed() {
             taskStack.append(.planElement(item))
         }
     }
@@ -30,9 +28,9 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func buildSection(
         _ from: Schema.Section,
-        _ elementStack: inout [VC.Element]
+        _ resultStack: inout ResultStack
     ) throws(Schema.Error) -> VC.Section {
-        let content = try elementStack.popLastElements(from.content.count)
+        let content = try resultStack.popLastElements(from.content.count)
         return .init(
             index: from.index,
             content: content

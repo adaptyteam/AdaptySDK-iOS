@@ -30,12 +30,10 @@ extension Schema.Stack {
 extension Schema.ConfigurationBuilder {
     @inlinable
     func planStack(
-        _ stack: Schema.Stack,
-        _ properties: VC.Element.Properties?,
-        in taskStack: inout [Task]
+        _ from: Schema.Stack,
+        in taskStack: inout TasksStack
     ) {
-        taskStack.append(.buildStack(stack, properties))
-        for item in stack.items.reversed() {
+        for item in from.items.reversed() {
             if case let .element(el) = item {
                 taskStack.append(.planElement(el))
             }
@@ -45,12 +43,12 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func buildStack(
         _ from: Schema.Stack,
-        _ elementStack: inout [VC.Element]
+        _ resultStack: inout ResultStack
     ) throws(Schema.Error) -> VC.Stack {
         let elementCount = from.items.count { item in
             if case .element = item { true } else { false }
         }
-        let elements = try elementStack.popLastElements(elementCount)
+        let elements = try resultStack.popLastElements(elementCount)
         return .init(
             type: from.type,
             horizontalAlignment: from.horizontalAlignment,

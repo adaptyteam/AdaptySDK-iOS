@@ -27,12 +27,10 @@ extension Schema.Box {
 extension Schema.ConfigurationBuilder {
     @inlinable
     func planBox(
-        _ value: Schema.Box,
-        _ properties: VC.Element.Properties?,
-        in taskStack: inout [Task]
+        _ from: Schema.Box,
+        in taskStack: inout TasksStack
     ) {
-        taskStack.append(.buildBox(value, properties))
-        if let content = value.content {
+        if let content = from.content {
             taskStack.append(.planElement(content))
         }
     }
@@ -40,9 +38,9 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func buildBox(
         _ from: Schema.Box,
-        _ elementStack: inout [VC.Element]
+        _ resultStack: inout ResultStack
     ) throws(Schema.Error) -> VC.Box {
-        let content = try elementStack.popLastElement(from.content != nil)
+        let content = try resultStack.popLastElement(from.content != nil)
         return .init(
             width: from.width,
             height: from.height,

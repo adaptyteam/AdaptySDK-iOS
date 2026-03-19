@@ -33,7 +33,7 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func planLegacyReference(
         _ id: String,
-        in taskStack: inout [Task]
+        in taskStack: inout TasksStack
     ) throws(Schema.Error) {
         guard !templateIds.contains(id) else {
             throw Schema.Error.elementsTreeCycle(id)

@@ -14,6 +14,10 @@ extension VC.Element {
         let offset: VC.Offset
 
         let opacity: Double
+
+        let background: [VC.Element.Overlay]?
+        let overlay: [VC.Element.Overlay]?
+
         let onAppear: [VC.Animation]
     }
 }
@@ -21,10 +25,13 @@ extension VC.Element {
 extension VC.Element.Properties {
     @inlinable
     var isEmpty: Bool {
-        decorator == nil
+        decorator == .none
             && padding.isZero
             && offset.isZero
             && opacity == 1.0
+            && background?.isEmpty ?? true
+            && overlay?.isEmpty ?? true
             && onAppear.isEmpty
     }
 }
+

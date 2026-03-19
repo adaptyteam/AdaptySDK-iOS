@@ -34,89 +34,129 @@ extension Schema {
     }
 }
 
-extension Schema.Element {
-    var properties: Schema.Element.Properties? {
-        switch self {
-        case .legacyReference, .templateInstance, .screenHolder:
-            nil
-        case let .box(_, properties),
-             let .stack(_, properties),
-             let .text(_, properties),
-             let .image(_, properties),
-             let .textField(_, properties),
-             let .button(_, properties),
-             let .row(_, properties),
-             let .column(_, properties),
-             let .section(_, properties),
-             let .toggle(_, properties),
-             let .timer(_, properties),
-             let .slider(_, properties),
-             let .pager(_, properties),
-             let .unknown(_, properties),
-             let .video(_, properties),
-             let .dateTimePicker(_, properties),
-             let .wheelItemsPicker(_, properties),
-             let .wheelRangePicker(_, properties):
-            properties
-        }
-    }
-}
-
 extension Schema.ConfigurationBuilder {
     @inlinable
     func planElement(
         _ from: Schema.Element,
-        in taskStack: inout [Task]
-    ) throws(Schema.Error) -> VC.Element? {
-//        if let properties = from.properties {
-//            planElementProperties(properties, in: &taskStack)
-//        }
-
+        in taskStack: inout TasksStack
+    ) throws(Schema.Error) {
         switch from {
         case let .legacyReference(id):
             try planLegacyReference(id, in: &taskStack)
         case let .templateInstance(value):
             try planTemplateInstance(value, in: &taskStack)
+        case let .text(_, properties),
+             let .image(_, properties),
+             let .textField(_, properties),
+             let .toggle(_, properties),
+             let .timer(_, properties),
+             let .slider(_, properties),
+             let .video(_, properties),
+             let .dateTimePicker(_, properties),
+             let .wheelItemsPicker(_, properties),
+             let .wheelRangePicker(_, properties),
+             let .unknown(_, properties):
+            taskStack.append(.buildElement(from))
+            planElementProperties(properties, in: &taskStack)
+        case let .stack(value, properties):
+            taskStack.append(.buildElement(from))
+            planStack(value, in: &taskStack)
+            planElementProperties(properties, in: &taskStack)
+        case let .button(value, properties):
+            taskStack.append(.buildElement(from))
+            planButton(value, in: &taskStack)
+            planElementProperties(properties, in: &taskStack)
+        case let .box(value, properties):
+            taskStack.append(.buildElement(from))
+            planBox(value, in: &taskStack)
+            planElementProperties(properties, in: &taskStack)
+        case let .row(value, properties):
+            taskStack.append(.buildElement(from))
+            planRow(value, in: &taskStack)
+            planElementProperties(properties, in: &taskStack)
+        case let .column(value, properties):
+            taskStack.append(.buildElement(from))
+            planColumn(value, in: &taskStack)
+            planElementProperties(properties, in: &taskStack)
+        case let .section(value, properties):
+            taskStack.append(.buildElement(from))
+            planSection(value, in: &taskStack)
+            planElementProperties(properties, in: &taskStack)
+        case let .pager(value, properties):
+            taskStack.append(.buildElement(from))
+            planPager(value, in: &taskStack)
+            planElementProperties(properties, in: &taskStack)
+        case .screenHolder:
+            break
+        }
+    }
+
+    @inlinable
+    func buildElement(
+        _ from: Schema.Element,
+        _ resultStack: inout ResultStack
+    ) throws(Schema.Error) -> VC.Element? {
+        switch from {
+        case .legacyReference,
+             .templateInstance:
+            return nil
         case .screenHolder:
             return .screenHolder
-        case let .stack(value, properties):
-            planStack(value, properties?.value, in: &taskStack)
         case let .text(value, properties):
-            return .text(value, properties?.value)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .text(value, properties)
         case let .textField(value, properties):
-            return .textField(value, properties?.value)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .textField(value, properties)
         case let .image(value, properties):
-            return .image(value, properties?.value)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .image(value, properties)
         case let .video(value, properties):
-            return .video(value, properties?.value)
-        case let .button(value, properties):
-            planButton(value, properties?.value, in: &taskStack)
-        case let .box(value, properties):
-            planBox(value, properties?.value, in: &taskStack)
-        case let .row(value, properties):
-            planRow(value, properties?.value, in: &taskStack)
-        case let .column(value, properties):
-            planColumn(value, properties?.value, in: &taskStack)
-        case let .section(value, properties):
-            planSection(value, properties?.value, in: &taskStack)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .video(value, properties)
         case let .toggle(value, properties):
-            return .toggle(value, properties?.value)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .toggle(value, properties)
         case let .slider(value, properties):
-            return .slider(value, properties?.value)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .slider(value, properties)
         case let .timer(value, properties):
-            return .timer(convertTimer(value), properties?.value)
-        case let .pager(value, properties):
-            planPager(value, properties?.value, in: &taskStack)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .timer(convertTimer(value), properties)
         case let .dateTimePicker(value, properties):
-            return .dateTimePicker(value, properties?.value)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .dateTimePicker(value, properties)
         case let .wheelItemsPicker(value, properties):
-            return .wheelItemsPicker(value, properties?.value)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .wheelItemsPicker(value, properties)
         case let .wheelRangePicker(value, properties):
-            return .wheelRangePicker(convertWheelRangePicker(value), properties?.value)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .wheelRangePicker(convertWheelRangePicker(value), properties)
+        case let .button(value, properties):
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return try .button(buildButton(value, &resultStack), properties)
+        case let .stack(value, properties):
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return try .stack(buildStack(value, &resultStack), properties)
+        case let .box(value, properties):
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return try .box(buildBox(value, &resultStack), properties)
+        case let .row(value, properties):
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return try .row(buildRow(value, &resultStack), properties)
+        case let .column(value, properties):
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return try .column(buildColumn(value, &resultStack), properties)
+        case let .section(value, properties):
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return try .section(buildSection(value, &resultStack), properties)
+        case let .pager(value, properties):
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return try .pager(buildPager(value, &resultStack), properties)
         case let .unknown(value, properties):
-            return .unknown(value, properties?.value)
+            let properties: VC.Element.Properties? = try buildElementProperties(properties, &resultStack)
+            return .unknown(value, properties)
         }
-        return nil
     }
 }
 
