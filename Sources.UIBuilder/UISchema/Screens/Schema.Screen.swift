@@ -31,17 +31,17 @@ extension Schema.ConfigurationBuilder {
         if let footer = from.footer {
             taskStack.append(.planElement(footer))
         }
-        if let backgrounds = from.background {
-            for overlay in backgrounds.reversed() {
-                taskStack.append(.planElement(overlay.content))
-            }
-        }
-
-        if let overlays = from.overlay {
-            for overlay in overlays.reversed() {
-                taskStack.append(.planElement(overlay.content))
-            }
-        }
+//        if let backgrounds = from.background {
+//            for overlay in backgrounds.reversed() {
+//                taskStack.append(.planElement(overlay.content))
+//            }
+//        }
+//
+//        if let overlays = from.overlay {
+//            for overlay in overlays.reversed() {
+//                taskStack.append(.planElement(overlay.content))
+//            }
+//        }
         var resultStack = try startTasks(&taskStack)
         return try buildScreen(from, &resultStack)
     }
@@ -56,28 +56,26 @@ extension Schema.ConfigurationBuilder {
         }
         let content = try resultStack.popLastElement()
         let footer = try resultStack.popLastElement(from.footer != nil)
-//        let backgrounds = try resultStack.popLastElements(from.background?.count ?? 0)
-//        let overlays = try resultStack.popLastElements(from.overlay?.count ?? 0)
 
-        let background: [VC.Element.Overlay]? =
-            if let backgrounds = from.background, backgrounds.isNotEmpty {
-                try convertElementOverlays(
-                    backgrounds,
-                    resultStack.popLastElements(backgrounds.count)
-                )
-            } else {
-                nil
-            }
+        let background: [VC.Element.Overlay]? = nil
+//            if let backgrounds = from.background, backgrounds.isNotEmpty {
+//                try convertElementOverlays(
+//                    backgrounds,
+//                    resultStack.popLastElements(backgrounds.count)
+//                )
+//            } else {
+//                nil
+//            }
 
-        let overlay: [VC.Element.Overlay]? =
-            if let overlays = from.overlay, overlays.isNotEmpty {
-                try convertElementOverlays(
-                    overlays,
-                    resultStack.popLastElements(overlays.count)
-                )
-            } else {
-                nil
-            }
+        let overlay: [VC.Element.Overlay]? = nil
+//            if let overlays = from.overlay, overlays.isNotEmpty {
+//                try convertElementOverlays(
+//                    overlays,
+//                    resultStack.popLastElements(overlays.count)
+//                )
+//            } else {
+//                nil
+//            }
 
         return .init(
             id: from.id,

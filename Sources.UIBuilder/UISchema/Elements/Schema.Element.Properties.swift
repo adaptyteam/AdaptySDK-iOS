@@ -30,17 +30,17 @@ extension Schema.ConfigurationBuilder {
         _ from: Schema.Element.Properties?,
         in taskStack: inout TasksStack
     ) {
-        guard let from else { return }
-        if let background = from.background, background.isNotEmpty {
-            for overlay in background.reversed() {
-                taskStack.append(.planElement(overlay.content))
-            }
-        }
-        if let overlays = from.overlay, overlays.isNotEmpty {
-            for overlay in overlays.reversed() {
-                taskStack.append(.planElement(overlay.content))
-            }
-        }
+//        guard let from else { return }
+//        if let background = from.background, background.isNotEmpty {
+//            for overlay in background.reversed() {
+//                taskStack.append(.planElement(overlay.content))
+//            }
+//        }
+//        if let overlays = from.overlay, overlays.isNotEmpty {
+//            for overlay in overlays.reversed() {
+//                taskStack.append(.planElement(overlay.content))
+//            }
+//        }
     }
 
     @inlinable
@@ -50,24 +50,24 @@ extension Schema.ConfigurationBuilder {
     ) throws(Schema.Error) -> VC.Element.Properties? {
         guard let from else { return nil }
 
-        var background: [VC.Element.Overlay]? =
-            if let backgrounds = from.background, backgrounds.isNotEmpty {
-                try convertElementOverlays(
-                    backgrounds,
-                    resultStack.popLastElements(backgrounds.count)
-                )
-            } else {
-                nil
-            }
-        var overlay: [VC.Element.Overlay]? =
-            if let overlays = from.overlay, overlays.isNotEmpty {
-                try convertElementOverlays(
-                    overlays,
-                    resultStack.popLastElements(overlays.count)
-                )
-            } else {
-                nil
-            }
+        var background: [VC.Element.Overlay]? = nil
+//            if let backgrounds = from.background, backgrounds.isNotEmpty {
+//                try convertElementOverlays(
+//                    backgrounds,
+//                    resultStack.popLastElements(backgrounds.count)
+//                )
+//            } else {
+//                nil
+//            }
+        var overlay: [VC.Element.Overlay]? = nil
+//            if let overlays = from.overlay, overlays.isNotEmpty {
+//                try convertElementOverlays(
+//                    overlays,
+//                    resultStack.popLastElements(overlays.count)
+//                )
+//            } else {
+//                nil
+//            }
 
         if background?.isEmpty ?? false { background = nil }
         if overlay?.isEmpty ?? false { overlay = nil }
