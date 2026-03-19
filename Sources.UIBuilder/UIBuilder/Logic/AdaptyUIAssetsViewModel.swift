@@ -137,14 +137,14 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     // MARK: - Video Player Logic
 
-    private var playerManagers = [VC.AssetReference: AdaptyUIVideoPlayerManager]()
+    private var playerManagers = [String: AdaptyUIVideoPlayerManager]()
 
     func getOrCreatePlayerManager(
         for video: AdaptyUIResolvedVideoAsset,
         assetRef: VC.AssetReference,
         loop: Bool
     ) -> AdaptyUIVideoPlayerManager {
-        if let manager = playerManagers[assetRef] {
+        if let manager = playerManagers[video.id] {
             return manager
         }
 
@@ -153,7 +153,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
             loop: loop
         )
 
-        playerManagers[assetRef] = manager
+        playerManagers[video.id] = manager
 
         return manager
     }

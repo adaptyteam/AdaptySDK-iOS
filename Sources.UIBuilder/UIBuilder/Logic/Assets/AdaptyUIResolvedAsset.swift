@@ -7,6 +7,7 @@
 
 #if canImport(UIKit)
 
+import AVKit
 import SwiftUI
 import UIKit
 
@@ -24,9 +25,8 @@ enum AdaptyUIResolvedImageAsset {
     case remote(url: URL, preview: UIImage?)
 }
 
-import AVKit
-
 struct AdaptyUIResolvedVideoAsset {
+    let id: String
     let asset: AVAsset
     let image: AdaptyUIResolvedImageAsset?
 }
