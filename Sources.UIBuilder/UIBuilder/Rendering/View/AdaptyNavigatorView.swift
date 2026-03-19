@@ -54,7 +54,7 @@ struct AdaptyScreenView: View {
     ) -> some View {
         switch layout {
         case .hero:
-            AdaptyUIBasicContainerView(screen: screen)
+            AdaptyUIHeroContainerView(screen: screen)
         case .flat:
             AdaptyUIFlatContainerView(screen: screen)
         case .transparent:
