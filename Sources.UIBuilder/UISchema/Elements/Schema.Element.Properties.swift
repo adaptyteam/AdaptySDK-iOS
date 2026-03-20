@@ -111,7 +111,7 @@ extension Schema.Element.Properties: DecodableWithConfiguration {
         case transitionIn = "transition_in"
         case onAppear = "on_appear"
         case overlay
-        case background
+        case backgound
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -143,7 +143,7 @@ extension Schema.Element.Properties: DecodableWithConfiguration {
         )
 
         let overlay = try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .overlay, configuration: configuration)
-        let background = try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .background, configuration: configuration)
+        let background = try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .overlay, configuration: configuration)
 
         try self.init(
             legacyElementId: container.decodeIfPresent(String.self, forKey: .legacyElementId),

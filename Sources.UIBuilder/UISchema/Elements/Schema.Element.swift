@@ -87,7 +87,7 @@ extension Schema.ConfigurationBuilder {
             planPager(value, in: &taskStack)
             planElementProperties(properties, in: &taskStack)
         case .screenHolder:
-            taskStack.append(.buildElement(from))
+            break
         }
     }
 
