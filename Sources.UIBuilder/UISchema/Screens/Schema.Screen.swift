@@ -31,17 +31,18 @@ extension Schema.ConfigurationBuilder {
         if let footer = from.footer {
             taskStack.append(.planElement(footer))
         }
-//        if let backgrounds = from.background {
-//            for overlay in backgrounds.reversed() {
-//                taskStack.append(.planElement(overlay.content))
-//            }
-//        }
-//
-//        if let overlays = from.overlay {
-//            for overlay in overlays.reversed() {
-//                taskStack.append(.planElement(overlay.content))
-//            }
-//        }
+
+        if let array = from.background {
+            for overlay in array.reversed() {
+                taskStack.append(.planElement(overlay.content))
+            }
+        }
+
+        if let array = from.overlay {
+            for overlay in array.reversed() {
+                taskStack.append(.planElement(overlay.content))
+            }
+        }
         var resultStack = try startTasks(&taskStack)
         return try buildScreen(from, &resultStack)
     }
@@ -57,25 +58,27 @@ extension Schema.ConfigurationBuilder {
         let content = try resultStack.popLastElement()
         let footer = try resultStack.popLastElement(from.footer != nil)
 
-        let background: [VC.Element.Overlay]? = nil
-//            if let backgrounds = from.background, backgrounds.isNotEmpty {
-//                try convertElementOverlays(
-//                    backgrounds,
-//                    resultStack.popLastElements(backgrounds.count)
-//                )
-//            } else {
-//                nil
-//            }
+        var background: [VC.Element.Overlay]?
+        if let from = from.background, from.isNotEmpty {
+            background = try convertElementOverlays(
+                from,
+                resultStack.popLastElements(from.count)
+            )
+            if background.isEmpty {
+                background = nil
+            }
+        }
 
-        let overlay: [VC.Element.Overlay]? = nil
-//            if let overlays = from.overlay, overlays.isNotEmpty {
-//                try convertElementOverlays(
-//                    overlays,
-//                    resultStack.popLastElements(overlays.count)
-//                )
-//            } else {
-//                nil
-//            }
+        var overlay: [VC.Element.Overlay]?
+        if let from = from.overlay, from.isNotEmpty {
+            overlay = try convertElementOverlays(
+                from,
+                resultStack.popLastElements(from.count)
+            )
+            if overlay.isEmpty {
+                overlay = nil
+            }
+        }
 
         return .init(
             id: from.id,
@@ -83,8 +86,8 @@ extension Schema.ConfigurationBuilder {
             cover: cover,
             content: content,
             footer: footer,
-            background: background.isEmpty ? nil : background,
-            overlay: overlay.isEmpty ? nil : overlay,
+            background: background,
+            overlay: overlay,
             screenActions: from.screenActions
         )
     }
@@ -125,16 +128,18 @@ extension Schema.Screen: DecodableWithConfiguration {
             }
 
         let overlay: [Schema.Element.Overlay]? =
-            if !container.contains(.overlay) {
-                nil
-            } else if let one = try? container.decode(Schema.Element.self, forKey: .overlay, configuration: configuration) {
-                [Schema.Element.Overlay(
-                    horizontalAlignment: Schema.Element.Overlay.default.horizontalAlignment,
-                    verticalAlignment: Schema.Element.Overlay.default.verticalAlignment,
-                    content: one
-                )]
+            if configuration.isLegacy {
+                if let one = try container.decodeIfPresent(Schema.Element.self, forKey: .overlay, configuration: configuration) {
+                    [Schema.Element.Overlay(
+                        horizontalAlignment: Schema.Element.Overlay.default.horizontalAlignment,
+                        verticalAlignment: Schema.Element.Overlay.default.verticalAlignment,
+                        content: one
+                    )]
+                } else {
+                    nil
+                }
             } else {
-                try container.decode([Schema.Element.Overlay].self, forKey: .overlay, configuration: configuration)
+                try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .overlay, configuration: configuration)
             }
 
         try self.init(
@@ -149,4 +154,3 @@ extension Schema.Screen: DecodableWithConfiguration {
         )
     }
 }
-

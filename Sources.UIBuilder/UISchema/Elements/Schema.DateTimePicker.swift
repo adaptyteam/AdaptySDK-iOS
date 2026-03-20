@@ -68,4 +68,3 @@ extension Schema.DateTimePicker: Codable {
         try container.encodeIfPresent(color, forKey: .color)
     }
 }
-

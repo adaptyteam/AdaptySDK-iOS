@@ -39,4 +39,3 @@ extension Schema.Slider: Codable {
         }
     }
 }
-

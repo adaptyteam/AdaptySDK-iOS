@@ -97,4 +97,3 @@ extension Schema.Pager: DecodableWithConfiguration {
         )
     }
 }
-

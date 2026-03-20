@@ -87,7 +87,7 @@ extension Schema.ConfigurationBuilder {
             planPager(value, in: &taskStack)
             planElementProperties(properties, in: &taskStack)
         case .screenHolder:
-            break
+            taskStack.append(.buildElement(from))
         }
     }
 
@@ -269,4 +269,3 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         // TODO: implement
     }
 }
-

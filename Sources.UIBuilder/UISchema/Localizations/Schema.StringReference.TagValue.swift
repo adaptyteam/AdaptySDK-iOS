@@ -1,5 +1,5 @@
 //
-//   Schema.StringReference.TagValue.swift
+//  Schema.StringReference.TagValue.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 04.03.2026.

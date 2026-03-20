@@ -101,4 +101,3 @@ extension Schema.Timer: Decodable {
         horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
     }
 }
-
