@@ -60,32 +60,32 @@ extension Schema.ConfigurationBuilder {
             planElementProperties(properties, in: &taskStack)
         case let .stack(value, properties):
             taskStack.append(.buildElement(from))
-            planStack(value, in: &taskStack)
             planElementProperties(properties, in: &taskStack)
+            planStack(value, in: &taskStack)
         case let .button(value, properties):
             taskStack.append(.buildElement(from))
-            planButton(value, in: &taskStack)
             planElementProperties(properties, in: &taskStack)
+            planButton(value, in: &taskStack)
         case let .box(value, properties):
             taskStack.append(.buildElement(from))
-            planBox(value, in: &taskStack)
             planElementProperties(properties, in: &taskStack)
+            planBox(value, in: &taskStack)
         case let .row(value, properties):
             taskStack.append(.buildElement(from))
-            planRow(value, in: &taskStack)
             planElementProperties(properties, in: &taskStack)
+            planRow(value, in: &taskStack)
         case let .column(value, properties):
             taskStack.append(.buildElement(from))
-            planColumn(value, in: &taskStack)
             planElementProperties(properties, in: &taskStack)
+            planColumn(value, in: &taskStack)
         case let .section(value, properties):
             taskStack.append(.buildElement(from))
-            planSection(value, in: &taskStack)
             planElementProperties(properties, in: &taskStack)
+            planSection(value, in: &taskStack)
         case let .pager(value, properties):
             taskStack.append(.buildElement(from))
-            planPager(value, in: &taskStack)
             planElementProperties(properties, in: &taskStack)
+            planPager(value, in: &taskStack)
         case .screenHolder:
             taskStack.append(.buildElement(from))
         }
