@@ -39,12 +39,12 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     }
 
     @Published var playerState: PlayerState = .invalid
-    @Published var player: AVQueuePlayer?
+    @Published var player: AVPlayer?
 
     private let onStateUpdated: (PlayerState) -> Void
 
-    private var playerLooper: AVPlayerLooper?
     private var playerStatusObservation: NSKeyValueObservation?
+    private nonisolated(unsafe) var loopObserver: (any NSObjectProtocol)?
 
     init(
         video: VC.VideoData,
@@ -54,20 +54,25 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     ) {
         let video = video.resolve(with: assetsResolver)
         player = video.player
-        // preview image : video.image
-        if loop {
-            playerLooper = AVPlayerLooper(player: video.player, templateItem: video.item)
-        } else {
-            playerLooper = nil
-        }
-
         self.onStateUpdated = onStateUpdated
 
         super.init()
 
+        if loop {
+            video.player.actionAtItemEnd = .none
+            loopObserver = NotificationCenter.default.addObserver(
+                forName: .AVPlayerItemDidPlayToEndTime,
+                object: video.item,
+                queue: .main
+            ) { [weak self] _ in
+                self?.player?.seek(to: .zero)
+                self?.player?.play()
+            }
+        }
+
         playerStatusObservation = video.item.observe(
             \.status,
-            options: [.old, .new, .initial, .prior],
+            options: [.new, .initial],
             changeHandler: { [weak self] item, _ in
                 DispatchQueue.main.async { [weak self] in
                     self?.playerStatusDidChange(item.status, item: item)
@@ -103,6 +108,9 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     deinit {
         playerStatusObservation?.invalidate()
         playerStatusObservation = nil
+        if let loopObserver {
+            NotificationCenter.default.removeObserver(loopObserver)
+        }
     }
 }
 
