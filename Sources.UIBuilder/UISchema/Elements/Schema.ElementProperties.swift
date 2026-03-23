@@ -161,7 +161,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         )
 
         let overlay = try container.decodeIfPresent([Schema.AlignedElement].self, forKey: .overlay, configuration: configuration)
-        let background = try container.decodeIfPresent([Schema.AlignedElement].self, forKey: .overlay, configuration: configuration)
+        let background = try container.decodeIfPresent([Schema.AlignedElement].self, forKey: .background, configuration: configuration)
 
         try self.init(
             legacyElementId: container.decodeIfPresent(String.self, forKey: .legacyElementId),
