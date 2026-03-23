@@ -11,6 +11,16 @@ extension Schema {
     typealias DateTimePicker = VC.DateTimePicker
 }
 
+extension Schema.DateTimePicker: Schema.SimpleElement {
+    @inlinable
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        .dateTimePicker(self, properties)
+    }
+}
+
 extension Schema.DateTimePicker: Codable {
     enum CodingKeys: String, CodingKey {
         case type
@@ -63,8 +73,8 @@ extension Schema.DateTimePicker: Codable {
             try container.encode(components, forKey: .components)
         }
 
-        try container.encodeIfPresent(maxDate, forKey: .maxDate)
-        try container.encodeIfPresent(minDate, forKey: .minDate)
+//        try container.encodeIfPresent(maxDate, forKey: .maxDate)
+//        try container.encodeIfPresent(minDate, forKey: .minDate)
         try container.encodeIfPresent(color, forKey: .color)
     }
 }

@@ -11,6 +11,16 @@ extension Schema {
     typealias Slider = VC.Slider
 }
 
+extension Schema.Slider: Schema.SimpleElement {
+    @inlinable
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .slider(self, properties)
+    }
+}
+
 extension Schema.Slider: Codable {
     enum CodingKeys: String, CodingKey {
         case value

@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct WheelRangePicker: Hashable {
+    struct WheelRangePicker: Sendable {
         let value: Variable
         let maxValue: Double
         let minValue: Double
@@ -17,15 +17,21 @@ extension Schema {
     }
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.WheelRangePicker: Schema.SimpleElement {
     @inlinable
-    func convertWheelRangePicker(_ from: Schema.WheelRangePicker) -> VC.WheelRangePicker {
-        .init(
-            value: from.value,
-            maxValue: from.maxValue,
-            minValue: from.minValue,
-            stepValue: from.stepValue,
-            format: convertRangeTextFormat(from.format)
+    func buildElement(
+        _ builder: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .wheelRangePicker(
+            .init(
+                value: value,
+                maxValue: maxValue,
+                minValue: minValue,
+                stepValue: stepValue,
+                format: builder.convertRangeTextFormat(format)
+            ),
+            properties
         )
     }
 }

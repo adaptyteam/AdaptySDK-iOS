@@ -11,7 +11,7 @@ extension Schema {
 
 extension Schema.Offset {
     static let zero = Self(x: .zero, y: .zero)
-    static let one = Self(x: .point(1.0), y: .point(1.0))
+//    static let one = Self(x: .point(1.0), y: .point(1.0))
 }
 
 extension Schema.Offset: Codable {

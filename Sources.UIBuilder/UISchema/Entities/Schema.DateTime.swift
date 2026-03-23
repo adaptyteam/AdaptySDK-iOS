@@ -39,7 +39,7 @@ private enum RelativeDateTimeCodingKeys: String, CodingKey {
 }
 
 private enum DateTimeAnchor: String, Codable {
-    case now
+    case now = "start"
     case startOfDay = "start_of_day"
     case startOfWeek = "start_of_week"
     case startOfMonth = "start_of_month"
@@ -69,9 +69,9 @@ private enum DateTimeAnchor: String, Codable {
 }
 
 extension KeyedDecodingContainer {
-    func decodeDateTime(forKey key: Key) throws -> Date {
+    func decodeDateTime(forKey key: Key) throws -> VC.DateTime {
         if let unixtimestamp = try? decode(Double.self, forKey: key) {
-            return Date(timeIntervalSince1970: unixtimestamp / 1000.0)
+            return .date(Date(timeIntervalSince1970: unixtimestamp / 1000.0))
         }
 
         let container = try nestedContainer(keyedBy: RelativeDateTimeCodingKeys.self, forKey: key)
@@ -85,11 +85,14 @@ extension KeyedDecodingContainer {
             }
 
             guard container.contains(.offset) else {
-                return startDate
+                return .date(startDate)
             }
 
             if let value = try? container.decode(Double.self, forKey: .offset) {
-                return startDate.addingTimeInterval(value / 1000.0)
+                if anchor == .now {
+                    return .fromStart(value / 1000.0)
+                }
+                return .date(startDate.addingTimeInterval(value / 1000.0))
             }
 
             let interval = try container.decodeIntervalComponents(forKey: .offset)
@@ -97,13 +100,17 @@ extension KeyedDecodingContainer {
             guard let date = calendar.date(byAdding: interval, to: startDate) else {
                 throw DecodingError.dataCorruptedError(forKey: .offset, in: container, debugDescription: "Invalid time interval components")
             }
-            return date
+
+            if anchor == .now {
+                return .fromStart(date.timeIntervalSince(startDate))
+            }
+            return .date(date)
         }
 
-        return try decodeDateComponents(forKey: key)
+        return try .date(decodeDateComponents(forKey: key))
     }
 
-    func decodeDateTimeIfPresent(forKey key: Key) throws -> Date? {
+    func decodeDateTimeIfPresent(forKey key: Key) throws -> VC.DateTime? {
         guard contains(key) else { return nil }
         return try decodeDateTime(forKey: key)
     }
@@ -205,3 +212,4 @@ private extension KeyedDecodingContainer {
         return try decodeTimeZone(forKey: key)
     }
 }
+

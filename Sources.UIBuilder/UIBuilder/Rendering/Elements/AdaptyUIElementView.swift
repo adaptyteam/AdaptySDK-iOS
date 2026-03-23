@@ -35,12 +35,6 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
 
     var body: some View {
         switch element {
-        case let .space(count):
-            if count > 0 {
-                ForEach(0 ..< count, id: \.self) { _ in
-                    Spacer()
-                }
-            }
         case let .box(box, props):
             elementOrEmpty(box.content)
                 .animatableFrame(
@@ -97,7 +91,7 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             AdaptyUIUnknownElementView(value: "wheel items picker")
         case let .wheelRangePicker(wheelRangePicker, _):
             AdaptyUIWheelRangePickerView(wheelRangePicker)
-        case let .unknown(value, _):
+        case let .unknown(value):
             AdaptyUIUnknownElementView(value: value)
         }
     }

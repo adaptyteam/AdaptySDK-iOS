@@ -35,6 +35,7 @@ extension VS {
     func onSelectProduct(_ params: JSValue)
     func openScreen(_ params: JSValue)
     func closeScreen(_ params: JSValue)
+    func changeFocus(_ params: JSValue)
 }
 
 extension VS.JSActionDispatcher {
@@ -237,4 +238,16 @@ extension VS.JSActionDispatcher: JSActionBridge {
             transitionId: transitionId ?? VC.Navigator.AppearanceTransition.onDisappearKey
         )
     }
+
+    func changeFocus(_ params: JSValue) {
+        var focusId: String?
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+            focusId = dict["id"] as? String
+        }
+
+        handler?.changeFocus(
+            id: focusId
+        )
+    }
 }
+

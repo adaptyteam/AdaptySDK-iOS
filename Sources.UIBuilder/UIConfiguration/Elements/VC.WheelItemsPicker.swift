@@ -8,8 +8,8 @@
 import Foundation
 
 extension VC {
-    struct WheelItemsPicker: Hashable {
+    struct WheelItemsPicker: Sendable, Hashable {
         let value: Variable
-//        items
+        let items: [Item]
     }
 }

@@ -58,7 +58,7 @@ struct AdaptyUIDateTimePickerView: View {
             DatePicker(
                 "",
                 selection: dateBinding,
-                in: minDate ... maxDate,
+                in: minDate.asDate(startAt: Date()) ... maxDate.asDate(startAt: Date()), // TODO: date of start flow
                 displayedComponents: displayedComponents
             )
             .labelsHidden()
@@ -66,7 +66,7 @@ struct AdaptyUIDateTimePickerView: View {
             DatePicker(
                 "",
                 selection: dateBinding,
-                in: minDate...,
+                in: minDate.asDate(startAt: Date())..., // TODO: date of start flow
                 displayedComponents: displayedComponents
             )
             .labelsHidden()
@@ -74,7 +74,7 @@ struct AdaptyUIDateTimePickerView: View {
             DatePicker(
                 "",
                 selection: dateBinding,
-                in: ...maxDate,
+                in: ...maxDate.asDate(startAt: Date()), // TODO: date of start flow
                 displayedComponents: displayedComponents
             )
             .labelsHidden()

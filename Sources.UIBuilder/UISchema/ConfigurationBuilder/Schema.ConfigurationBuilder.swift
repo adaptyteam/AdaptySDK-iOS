@@ -42,16 +42,6 @@ extension Schema {
     }
 }
 
-extension Schema.ConfigurationBuilder: Hashable {
-    static func == (lhs: Schema.ConfigurationBuilder, rhs: Schema.ConfigurationBuilder) -> Bool {
-        lhs.id == rhs.id
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}
-
 extension Schema.ConfigurationBuilder {
     func localize() throws -> AdaptyUIConfiguration {
         templateIds.removeAll()

@@ -21,7 +21,7 @@ struct AdaptyUIScreenInstanceKey: EnvironmentKey {
             id: "fake",
             layoutBehaviour: .default,
             cover: nil,
-            content: .unknown("fake", nil),
+            content: .unknown("fake"),
             footer: nil,
             background: nil,
             overlay: nil,

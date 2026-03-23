@@ -11,6 +11,16 @@ extension Schema {
     typealias TextField = VC.TextField
 }
 
+extension Schema.TextField: Schema.SimpleElement {
+    @inlinable
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .textField(self, properties)
+    }
+}
+
 extension Schema.TextField: Codable {
     enum CodingKeys: String, CodingKey {
         case type

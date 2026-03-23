@@ -11,5 +11,6 @@ extension VC {
     struct ScreenActions: Sendable, Hashable {
         let onOutsideTap: [Action]?
         let onDeviceBack: [Action]?
+        let onFocusChange: [Action]?
     }
 }

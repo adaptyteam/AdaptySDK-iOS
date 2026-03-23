@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Box: Sendable, Hashable {
+    struct Box: Sendable {
         let width: Length?
         let height: Length?
         let horizontalAlignment: HorizontalAlignment
@@ -24,29 +24,39 @@ extension Schema.Box {
     )
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Box: Schema.CompositeElement {
     @inlinable
-    func planBox(
-        _ from: Schema.Box,
-        in taskStack: inout TasksStack
-    ) {
-        if let content = from.content {
+    func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
+        if let content {
             taskStack.append(.planElement(content))
         }
     }
 
     @inlinable
+    func buildElement(
+        _ builder: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+    ) throws(Schema.Error) -> VC.Element {
+        try .box(
+            builder.buildBox(self, &resultStack),
+            properties
+        )
+    }
+}
+
+extension Schema.ConfigurationBuilder {
+    @inlinable
     func buildBox(
         _ from: Schema.Box,
         _ resultStack: inout ResultStack
     ) throws(Schema.Error) -> VC.Box {
-        let content = try resultStack.popLastElement(from.content != nil)
-        return .init(
+        try .init(
             width: from.width,
             height: from.height,
             horizontalAlignment: from.horizontalAlignment,
             verticalAlignment: from.verticalAlignment,
-            content: content
+            content: resultStack.popLastElement(from.content != nil)
         )
     }
 }

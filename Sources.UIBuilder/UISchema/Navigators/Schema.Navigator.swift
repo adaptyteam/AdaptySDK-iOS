@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Navigator: Sendable, Hashable {
+    struct Navigator: Sendable {
         let id: NavigatorIdentifier
         let background: AssetReference
         let content: Element

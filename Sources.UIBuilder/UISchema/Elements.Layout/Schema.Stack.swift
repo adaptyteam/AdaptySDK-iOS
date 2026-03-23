@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Stack: Sendable, Hashable {
+    struct Stack: Sendable {
         let type: Kind
         let horizontalAlignment: HorizontalAlignment
         let verticalAlignment: VerticalAlignment
@@ -27,13 +27,10 @@ extension Schema.Stack {
     )
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Stack: Schema.CompositeElement {
     @inlinable
-    func planStack(
-        _ from: Schema.Stack,
-        in taskStack: inout TasksStack
-    ) {
-        for item in from.items.reversed() {
+    func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
+        for item in items.reversed() {
             if case let .element(el) = item {
                 taskStack.append(.planElement(el))
             }
@@ -41,25 +38,29 @@ extension Schema.ConfigurationBuilder {
     }
 
     @inlinable
-    func buildStack(
-        _ from: Schema.Stack,
-        _ resultStack: inout ResultStack
-    ) throws(Schema.Error) -> VC.Stack {
-        let elementCount = from.items.count { item in
+    func buildElement(
+        _ builder: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+    ) throws(Schema.Error) -> VC.Element {
+        let itemsCount = items.count { item in
             if case .element = item { true } else { false }
         }
-        let elements = try resultStack.popLastElements(elementCount)
-        return .init(
-            type: from.type,
-            horizontalAlignment: from.horizontalAlignment,
-            verticalAlignment: from.verticalAlignment,
-            spacing: from.spacing,
-            items: buildStackItems(from.items, elements)
+        return try .stack(
+            .init(
+                type: type,
+                horizontalAlignment: horizontalAlignment,
+                verticalAlignment: verticalAlignment,
+                spacing: spacing,
+                items: builder.convertStackItems(items, resultStack.popLastElements(itemsCount))
+            ),
+            properties
         )
     }
+}
 
-    @inlinable
-    func buildStackItems(
+extension Schema.ConfigurationBuilder {
+    func convertStackItems(
         _ items: [Schema.Stack.Item],
         _ elements: [VC.Element]
     ) -> [VC.Stack.Item] {

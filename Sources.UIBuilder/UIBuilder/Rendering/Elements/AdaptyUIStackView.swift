@@ -30,33 +30,11 @@ struct AdaptyUIStackView<ScreenHolderContent: View>: View {
             VStack(alignment: stack.horizontalAlignment.swiftuiValue(with: layoutDirection),
                    spacing: stack.spacing)
             {
-                ForEach(0 ..< stack.content.count, id: \.self) { idx in
-                    AdaptyUIElementView(
-                        stack.content[idx],
-                        screenHolderBuilder: {
-//                            if idx == 0 {
-                                screenHolderBuilder() // TODO: x check
-//                            } else {
-//                                EmptyView()
-//                            }
-                        }
-                    )
-                }
+                stackItems(usesFirstElementOnly: false)
             }
         case .horizontal:
             HStack(alignment: stack.verticalAlignment.swiftuiValue, spacing: stack.spacing) {
-                ForEach(0 ..< stack.content.count, id: \.self) { idx in
-                    AdaptyUIElementView(
-                        stack.content[idx],
-                        screenHolderBuilder: {
-                            if idx == 0 {
-                                screenHolderBuilder() // TODO: x check
-                            } else {
-                                EmptyView()
-                            }
-                        }
-                    )
-                }
+                stackItems(usesFirstElementOnly: true)
             }
         case .z:
             ZStack(
@@ -65,18 +43,35 @@ struct AdaptyUIStackView<ScreenHolderContent: View>: View {
                     vertical: stack.verticalAlignment.swiftuiValue
                 )
             ) {
-                ForEach(0 ..< stack.content.count, id: \.self) { idx in
-                    AdaptyUIElementView(
-                        stack.content[idx],
-                        screenHolderBuilder: {
-                            if idx == 0 {
-                                screenHolderBuilder() // TODO: x check
-                            } else {
-                                EmptyView()
-                            }
-                        }
-                    )
+                stackItems(usesFirstElementOnly: true)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func stackItems(usesFirstElementOnly: Bool) -> some View {
+        ForEach(0 ..< stack.items.count, id: \.self) { idx in
+            switch stack.items[idx] {
+            case let .space(count):
+                if count > 0 {
+                    ForEach(0 ..< count, id: \.self) { _ in
+                        Spacer()
+                    }
                 }
+            case let .element(element):
+                AdaptyUIElementView(
+                    element,
+                    screenHolderBuilder: {
+// Wrong: this gates screenHolder by stack item position.
+// screenHolder must be consumed once on first actual encounter in the tree,
+// then all subsequent screenHolders should become EmptyView().
+//                        if idx == 0 {
+                            screenHolderBuilder() // TODO: x check
+//                        } else {
+//                            EmptyView()
+//                        }
+                    }
+                )
             }
         }
     }

@@ -38,7 +38,7 @@ struct AdaptyUISliderView: View {
                 screen: screen
             ),
             in: slider.minValue ... slider.maxValue,
-            step: slider.stepValue ?? 0.1
+            step: slider.stepValue
         )
     }
 }

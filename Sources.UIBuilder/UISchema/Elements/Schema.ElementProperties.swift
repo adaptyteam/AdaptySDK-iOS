@@ -1,5 +1,5 @@
 //
-//  Schema.Element.Properties.swift
+//  Schema.ElementProperties.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 26.11.2025.
@@ -7,19 +7,19 @@
 
 import Foundation
 
-extension Schema.Element {
-    struct Properties: Sendable, Hashable {
+extension Schema {
+    struct ElementProperties: Sendable {
         let legacyElementId: String?
-        let background: [Schema.Element.Overlay]?
-        let overlay: [Schema.Element.Overlay]?
+        let background: [Schema.AlignedElement]?
+        let overlay: [Schema.AlignedElement]?
         let value: VC.Element.Properties?
     }
 }
 
-extension Schema.Element.Properties {
+extension Schema.ElementProperties {
     static let `default` = (
         padding: VC.EdgeInsets.zero,
-        offset: VC.Offset.zero,
+        transform: VC.AffineTransform.empty,
         opacity: 1.0
     )
 }
@@ -27,7 +27,7 @@ extension Schema.Element.Properties {
 extension Schema.ConfigurationBuilder {
     @inlinable
     func planElementProperties(
-        _ from: Schema.Element.Properties?,
+        _ from: Schema.ElementProperties?,
         in taskStack: inout TasksStack
     ) {
         guard let from else { return }
@@ -45,14 +45,14 @@ extension Schema.ConfigurationBuilder {
 
     @inlinable
     func buildElementProperties(
-        _ from: Schema.Element.Properties?,
-        _ resultStack: inout ResultStack
+        _ from: Schema.ElementProperties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
     ) throws(Schema.Error) -> VC.Element.Properties? {
         guard let from else { return nil }
 
-        var background: [VC.Element.Overlay]?
+        var background: [VC.AlignedElement]?
         if let array = from.background, array.isNotEmpty {
-            background = try convertElementOverlays(
+            background = try convertAlignedElement(
                 array,
                 resultStack.popLastElements(array.count)
             )
@@ -61,9 +61,9 @@ extension Schema.ConfigurationBuilder {
             }
         }
 
-        var overlay: [VC.Element.Overlay]?
+        var overlay: [VC.AlignedElement]?
         if let array = from.overlay, array.isNotEmpty {
-            overlay = try convertElementOverlays(
+            overlay = try convertAlignedElement(
                 array,
                 resultStack.popLastElements(array.count)
             )
@@ -80,38 +80,45 @@ extension Schema.ConfigurationBuilder {
             .init(
                 decorator: value.decorator,
                 padding: value.padding,
-                offset: value.offset,
+                transform: value.transform,
                 opacity: value.opacity,
                 background: background ?? [],
                 overlay: overlay ?? [],
-                onAppear: value.onAppear
+                onAppear: value.onAppear,
+                focusId: value.focusId,
+                interactionEnabled: value.interactionEnabled
             )
         } else {
             .init(
                 decorator: nil,
-                padding: Schema.Element.Properties.default.padding,
-                offset: Schema.Element.Properties.default.offset,
-                opacity: Schema.Element.Properties.default.opacity,
+                padding: Schema.ElementProperties.default.padding,
+                transform: Schema.ElementProperties.default.transform,
+                opacity: Schema.ElementProperties.default.opacity,
                 background: background,
                 overlay: overlay,
-                onAppear: []
+                onAppear: [],
+                focusId: nil,
+                interactionEnabled: nil
             )
         }
     }
 }
 
-extension Schema.Element.Properties: DecodableWithConfiguration {
+extension Schema.ElementProperties: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case legacyElementId = "element_id"
         case decorator
         case padding
         case offset
+        case transform
         case visibility
         case opacity
         case transitionIn = "transition_in"
         case onAppear = "on_appear"
         case overlay
         case background
+        case focusId = "focus_id"
+        case interactionEnabled = "ui_enabled"
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -132,18 +139,29 @@ extension Schema.Element.Properties: DecodableWithConfiguration {
             try container.decodeIfPresent(Double.self, forKey: .opacity) ?? Self.default.opacity
         }
 
+        let transform =
+            if container.contains(.transform) {
+                try container.decode(Schema.AffineTransform.self, forKey: .transform)
+            } else if container.contains(.offset) {
+                try container.decode(Schema.Offset.self, forKey: .offset).asAffineTransform
+            } else {
+                Self.default.transform
+            }
+
         let value = try VC.Element.Properties(
             decorator: container.decodeIfPresent(Schema.Decorator.self, forKey: .decorator),
             padding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .padding) ?? Self.default.padding,
-            offset: container.decodeIfPresent(Schema.Offset.self, forKey: .offset) ?? Self.default.offset,
+            transform: transform,
             opacity: opacity,
             background: nil,
             overlay: nil,
-            onAppear: onAppear
+            onAppear: onAppear,
+            focusId: container.decodeIfPresent(String.self, forKey: .focusId),
+            interactionEnabled: container.decodeIfPresent(Schema.Variable.self, forKey: .interactionEnabled)
         )
 
-        let overlay = try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .overlay, configuration: configuration)
-        let background = try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .overlay, configuration: configuration)
+        let overlay = try container.decodeIfPresent([Schema.AlignedElement].self, forKey: .overlay, configuration: configuration)
+        let background = try container.decodeIfPresent([Schema.AlignedElement].self, forKey: .overlay, configuration: configuration)
 
         try self.init(
             legacyElementId: container.decodeIfPresent(String.self, forKey: .legacyElementId),
@@ -153,3 +171,4 @@ extension Schema.Element.Properties: DecodableWithConfiguration {
         )
     }
 }
+

@@ -11,14 +11,16 @@ extension VC.Element {
     struct Properties: Sendable, Hashable {
         let decorator: VC.Decorator?
         let padding: VC.EdgeInsets
-        let offset: VC.Offset
+        let transform: VC.AffineTransform
 
         let opacity: Double
 
-        let background: [VC.Element.Overlay]?
-        let overlay: [VC.Element.Overlay]?
+        let background: [VC.AlignedElement]?
+        let overlay: [VC.AlignedElement]?
 
         let onAppear: [VC.Animation]
+        let focusId: String?
+        let interactionEnabled: VC.Variable?
     }
 }
 
@@ -27,11 +29,13 @@ extension VC.Element.Properties {
     var isEmpty: Bool {
         decorator == .none
             && padding.isZero
-            && offset.isZero
+            && transform.isEmpty
             && opacity == 1.0
             && background?.isEmpty ?? true
             && overlay?.isEmpty ?? true
             && onAppear.isEmpty
+            && focusId == .none
+            && interactionEnabled == .none
     }
 }
 

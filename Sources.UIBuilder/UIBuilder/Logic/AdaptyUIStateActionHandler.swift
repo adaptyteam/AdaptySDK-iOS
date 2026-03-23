@@ -185,6 +185,14 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             )
         }
     }
+
+    package nonisolated func changeFocus(
+        id: String?
+    ) {
+        Task { @MainActor [weak self] in
+            // TODO: set to focusId or reset focus
+        }
+    }
 }
 
 #endif

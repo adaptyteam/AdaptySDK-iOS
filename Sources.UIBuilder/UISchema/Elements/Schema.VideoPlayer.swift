@@ -11,6 +11,16 @@ extension Schema {
     typealias VideoPlayer = VC.VideoPlayer
 }
 
+extension Schema.VideoPlayer: Schema.SimpleElement {
+    @inlinable
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .video(self, properties)
+    }
+}
+
 extension Schema.VideoPlayer: Codable {
     enum CodingKeys: String, CodingKey {
         case assetId = "asset_id"

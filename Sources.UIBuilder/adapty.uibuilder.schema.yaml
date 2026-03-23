@@ -142,6 +142,18 @@ Entities:
                   x: { $ref: "#/Entities/Unit", default: 0 }
               additionalProperties: false
 
+    AffineTransform:
+        title: Affine Transform
+        type: object
+        properties:
+            a: { type: number, default: 1 }
+            b: { type: number, default: 0 }
+            c: { type: number, default: 0 }
+            d: { type: number, default: 1 }
+            x: { $ref: "#/Entities/Unit", default: 0 }
+            y: { $ref: "#/Entities/Unit", default: 0 }
+        additionalProperties: false
+
     Unit:
         title: Unit
         oneOf:
@@ -425,6 +437,7 @@ Navigator:
             properties:
                 on_outside_tap: { $ref: "#/Script/ActionOrArray" }
                 on_device_back: { $ref: "#/Script/ActionOrArray" }
+                on_focus_change: { $ref: "#/Script/ActionOrArray" }
             additionalProperties: false
         appearances:
             type: object
@@ -478,12 +491,12 @@ Screen:
         footer: { $ref: "#/UI/Element" }
         background:
             type: array
-            items: { $ref: "#/UI/Element/Overlay" }
+            items: { $ref: "#/UI/Element/AlignedElement" }
             uniqueItems: true
             minItems: 1
         overlay:
             type: array
-            items: { $ref: "#/UI/Element/Overlay" }
+            items: { $ref: "#/UI/Element/AlignedElement" }
             uniqueItems: true
             minItems: 1
         layout_behaviour:
@@ -492,6 +505,7 @@ Screen:
             default: default
         on_outside_tap: { $ref: "#/Script/ActionOrArray" }
         on_device_back: { $ref: "#/Script/ActionOrArray" }
+        on_focus_change: { $ref: "#/Script/ActionOrArray" }
     additionalProperties: false
 
     Holder:
@@ -564,16 +578,18 @@ UI:
                   - properties:
                         decorator: { $ref: "#/UI/Element/Decorator" }
                         padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
-                        offset: { $ref: "#/Entities/Offset", default: 0 }
+                        oneOf:
+                            - offset: { $ref: "#/Entities/Offset" }
+                            - transform: { $ref: "#/Entities/AffineTransform", default: 0 }
                         opacity: { type: number, default: 1.0 }
                         background:
                             type: array
-                            items: { $ref: "#/UI/Element/Overlay" }
+                            items: { $ref: "#/UI/Element/AlignedElement" }
                             uniqueItems: true
                             minItems: 1
                         overlay:
                             type: array
-                            items: { $ref: "#/UI/Element/Overlay" }
+                            items: { $ref: "#/UI/Element/AlignedElement" }
                             uniqueItems: true
                             minItems: 1
                         on_appear:
@@ -581,9 +597,15 @@ UI:
                             items: { $ref: "#/Animation" }
                             uniqueItems: true
                             minItems: 1
+                        focus_id:
+                            type: string
+                            description: "Identifier for focus management"
+                        ui_enabled:
+                            $ref: "#/Script/DataBinding"
+                            title: One-way data binding to boolean
               additionalProperties: false
 
-        Overlay:
+        AlignedElement:
             type: object
             required: [content]
             properties:
@@ -1151,10 +1173,24 @@ UI:
 
     WheelItemsPicker:
         type: object
-        required: [type, value]
+        required: [type, value, items]
         properties:
             type: { const: "wheel_items_picker" }
             value: { $ref: "#/Script/DataBinding" }
+            items: 
+                type: array
+                items: 
+                    type: object
+                    required: [value, label]
+                    properties:
+                        string_id: { type: string }
+                        value: 
+                            oneOf:
+                                - type: string 
+                                - type: number
+                                - type: boolean
+                uniqueItems: true
+                minItems: 1
 
 ###### Rich Text ######
 

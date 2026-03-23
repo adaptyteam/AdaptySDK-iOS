@@ -11,6 +11,16 @@ extension Schema {
     typealias Toggle = VC.Toggle
 }
 
+extension Schema.Toggle: Schema.SimpleElement {
+    @inlinable
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .toggle(self, properties)
+    }
+}
+
 extension Schema.Toggle: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case value

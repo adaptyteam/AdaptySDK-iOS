@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct GridItem: Sendable, Hashable {
+    struct GridItem: Sendable {
         let length: Length
         let horizontalAlignment: HorizontalAlignment
         let verticalAlignment: VerticalAlignment

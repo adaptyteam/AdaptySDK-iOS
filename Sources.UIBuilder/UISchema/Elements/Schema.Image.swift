@@ -11,6 +11,16 @@ extension Schema {
     typealias Image = VC.Image
 }
 
+extension Schema.Image: Schema.SimpleElement {
+    @inlinable
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .image(self, properties)
+    }
+}
+
 extension Schema.Image: Decodable {
     enum CodingKeys: String, CodingKey {
         case assetId = "asset_id"

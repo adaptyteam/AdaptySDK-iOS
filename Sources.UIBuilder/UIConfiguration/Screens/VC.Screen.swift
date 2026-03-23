@@ -14,8 +14,8 @@ extension VC {
         let cover: Box?
         let content: Element
         let footer: Element?
-        let background: [Element.Overlay]?
-        let overlay: [Element.Overlay]?
+        let background: [AlignedElement]?
+        let overlay: [AlignedElement]?
         let screenActions: ScreenActions
     }
 }

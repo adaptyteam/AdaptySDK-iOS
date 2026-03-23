@@ -8,32 +8,32 @@
 import Foundation
 
 extension Schema {
-    struct Section: Sendable, Hashable {
+    struct Section: Sendable {
         let index: Variable
         let content: [Schema.Element]
     }
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Section: Schema.CompositeElement {
     @inlinable
-    func planSection(
-        _ from: Schema.Section,
-        in taskStack: inout TasksStack
-    ) {
-        for item in from.content.reversed() {
+    func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
+        for item in content.reversed() {
             taskStack.append(.planElement(item))
         }
     }
 
     @inlinable
-    func buildSection(
-        _ from: Schema.Section,
-        _ resultStack: inout ResultStack
-    ) throws(Schema.Error) -> VC.Section {
-        let content = try resultStack.popLastElements(from.content.count)
-        return .init(
-            index: from.index,
-            content: content
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+    ) throws(Schema.Error) -> VC.Element {
+        try .section(
+            .init(
+                index: index,
+                content: resultStack.popLastElements(content.count)
+            ),
+            properties
         )
     }
 }

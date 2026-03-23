@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol AdaptyUISchemaTemplateSystem: Sendable, Hashable {}
+protocol AdaptyUISchemaTemplateSystem: Sendable {}
 
 extension AdaptyUISchema {
     typealias TemplateSystem = AdaptyUISchemaTemplateSystem

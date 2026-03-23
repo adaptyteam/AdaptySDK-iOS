@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Template: Sendable, Hashable {
+    struct Template: Sendable {
         let content: Element
     }
 }

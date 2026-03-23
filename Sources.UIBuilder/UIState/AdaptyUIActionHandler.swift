@@ -20,4 +20,5 @@ package protocol AdaptyUIActionHandler: AnyObject {
     func closeScreen(navigatorId: String, transitionId: String)
 
     func registerState(_ state: AdaptyUIState)
+    func changeFocus(id: String? )
 }

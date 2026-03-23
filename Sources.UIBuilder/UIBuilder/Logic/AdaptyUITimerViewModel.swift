@@ -13,7 +13,7 @@ import SwiftUI
 package struct AdaptyUIDefaultTimerResolver: AdaptyUITimerResolver {
     package init() {}
 
-    package func timerEndAtDate(for timerId: String) -> Date {
+    package func timerEndAtDate(for _: String) -> Date {
         Date(timeIntervalSinceNow: 3600.0)
     }
 }
@@ -57,6 +57,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
     private func initializeTimer(_ timer: VC.Timer, at: Date) -> Date {
         switch timer.state {
         case let .endedAt(endAt):
+            let endAt = endAt.asDate(startAt: Date()) // TODO: date of start flow
             timers[timer.id] = endAt
             return endAt
         case let .duration(duration, startBehaviour):
@@ -118,3 +119,4 @@ package final class AdaptyUITimerViewModel: ObservableObject {
 }
 
 #endif
+

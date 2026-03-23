@@ -9,7 +9,6 @@ import Foundation
 
 extension VC {
     enum Element: Sendable, Hashable {
-        case space(Int)
         indirect case stack(Stack, Properties?)
         indirect case text(Text, Properties?)
         indirect case textField(TextField, Properties?)
@@ -29,14 +28,14 @@ extension VC {
         indirect case wheelRangePicker(WheelRangePicker, Properties?)
 
         case screenHolder
-        indirect case unknown(String, Properties?)
+        indirect case unknown(String)
     }
 }
 
 extension VC.Element {
     var properties: VC.Element.Properties? {
         switch self {
-        case .space, .screenHolder:
+        case .screenHolder, .unknown:
             nil
         case let .box(_, properties),
              let .stack(_, properties),
@@ -51,7 +50,6 @@ extension VC.Element {
              let .timer(_, properties),
              let .slider(_, properties),
              let .pager(_, properties),
-             let .unknown(_, properties),
              let .video(_, properties),
              let .dateTimePicker(_, properties),
              let .wheelItemsPicker(_, properties),

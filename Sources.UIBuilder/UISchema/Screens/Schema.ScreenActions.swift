@@ -14,7 +14,8 @@ extension Schema {
 extension Schema.ScreenActions {
     static let empty = Self(
         onOutsideTap: nil,
-        onDeviceBack: nil
+        onDeviceBack: nil,
+        onFocusChange: nil
     )
 }
 
@@ -22,13 +23,15 @@ extension Schema.ScreenActions: Codable {
     enum CodingKeys: String, CodingKey {
         case onOutsideTap = "on_outside_tap"
         case onDeviceBack = "on_device_back"
+        case onFocusChange = "on_focus_change"
     }
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             onOutsideTap: container.decodeIfPresentActions(forKey: .onOutsideTap),
-            onDeviceBack: container.decodeIfPresentActions(forKey: .onDeviceBack)
+            onDeviceBack: container.decodeIfPresentActions(forKey: .onDeviceBack),
+            onFocusChange: container.decodeIfPresentActions(forKey: .onDeviceBack)
         )
     }
 
@@ -36,5 +39,7 @@ extension Schema.ScreenActions: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(onOutsideTap, forKey: .onOutsideTap)
         try container.encodeIfPresent(onDeviceBack, forKey: .onDeviceBack)
+        try container.encodeIfPresent(onFocusChange, forKey: .onFocusChange)
     }
 }
+

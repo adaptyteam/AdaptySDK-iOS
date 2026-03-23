@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Button: Sendable, Hashable {
+    struct Button: Sendable {
         let actions: [Schema.Action]
         let normalState: Schema.Element
         let selectedState: Schema.Element?
@@ -16,30 +16,29 @@ extension Schema {
     }
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Button: Schema.CompositeElement {
     @inlinable
-    func planButton(
-        _ from: Schema.Button,
-        in taskStack: inout TasksStack
-    ) {
-        if let sel = from.selectedState {
-            taskStack.append(.planElement(sel))
+    func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
+        taskStack.append(.planElement(normalState))
+        if let selectedState {
+            taskStack.append(.planElement(selectedState))
         }
-        taskStack.append(.planElement(from.normalState))
     }
 
     @inlinable
-    func buildButton(
-        _ from: Schema.Button,
-        _ resultStack: inout ResultStack
-    ) throws(Schema.Error) -> VC.Button {
-        let selectedState = try resultStack.popLastElement(from.selectedState != nil)
-        let normalState = try resultStack.popLastElement()
-        return .init(
-            actions: from.actions,
-            normalState: normalState,
-            selectedState: selectedState,
-            isSelectedState: from.isSelectedState
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+    ) throws(Schema.Error) -> VC.Element {
+        try .button(
+            .init(
+                actions: actions,
+                normalState: resultStack.popLastElement(),
+                selectedState: resultStack.popLastElement(selectedState != nil),
+                isSelectedState: isSelectedState
+            ),
+            properties
         )
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct TemplateInstance: Sendable, Hashable {
+    struct TemplateInstance: Sendable {
         let type: String
 //        let childs: [String: Child]?
     }

@@ -1,5 +1,5 @@
 //
-//  Schema.Element.Overlay.swift
+//  Schema.AlignedElement.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 12.03.2026.
@@ -7,15 +7,15 @@
 
 import Foundation
 
-extension Schema.Element {
-    struct Overlay: Hashable {
+extension Schema {
+    struct AlignedElement: Sendable {
         let horizontalAlignment: Schema.HorizontalAlignment
         let verticalAlignment: Schema.VerticalAlignment
         let content: Schema.Element
     }
 }
 
-extension Schema.Element.Overlay {
+extension Schema.AlignedElement {
     static let `default` = (
         horizontalAlignment: VC.HorizontalAlignment.center,
         verticalAlignment: VC.VerticalAlignment.center
@@ -24,11 +24,11 @@ extension Schema.Element.Overlay {
 
 extension Schema.ConfigurationBuilder {
     @inlinable
-    func convertElementOverlays(
-        _ items: [Schema.Element.Overlay],
+    func convertAlignedElement(
+        _ items: [Schema.AlignedElement],
         _ elements: [VC.Element]
-    ) -> [VC.Element.Overlay] {
-        var overlays = [VC.Element.Overlay]()
+    ) -> [VC.AlignedElement] {
+        var overlays = [VC.AlignedElement]()
         overlays.reserveCapacity(elements.count)
         for (i, item) in items.enumerated() {
             overlays.append(.init(
@@ -41,7 +41,7 @@ extension Schema.ConfigurationBuilder {
     }
 }
 
-extension Schema.Element.Overlay: DecodableWithConfiguration {
+extension Schema.AlignedElement: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case horizontalAlignment = "h_align"
         case verticalAlignment = "v_align"

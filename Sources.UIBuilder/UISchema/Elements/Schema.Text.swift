@@ -11,6 +11,16 @@ extension Schema {
     typealias Text = VC.Text
 }
 
+extension Schema.Text: Schema.SimpleElement {
+    @inlinable
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .text(self, properties)
+    }
+}
+
 extension Schema.Text: Codable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"

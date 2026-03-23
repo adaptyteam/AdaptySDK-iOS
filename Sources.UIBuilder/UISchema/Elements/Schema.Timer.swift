@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Timer: Sendable, Hashable {
+    struct Timer: Sendable {
         let id: String
         let state: State
         let format: Schema.RangeTextFormat
@@ -21,15 +21,21 @@ extension VC.Timer.StartBehavior {
     static let `default` = Self.firstAppear
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Timer: Schema.SimpleElement {
     @inlinable
-    func convertTimer(_ from: Schema.Timer) -> VC.Timer {
-        .init(
-            id: from.id,
-            state: from.state,
-            format: convertRangeTextFormat(from.format),
-            actions: from.actions,
-            horizontalAlign: from.horizontalAlign
+    func buildElement(
+        _ builder: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .timer(
+            .init(
+                id: id,
+                state: state,
+                format: builder.convertRangeTextFormat(format),
+                actions: actions,
+                horizontalAlign: horizontalAlign
+            ),
+            properties
         )
     }
 }
@@ -65,9 +71,9 @@ extension Schema.Timer: Decodable {
         state =
             switch behavior {
             case BehaviorType.legacyEndAtUTC.rawValue:
-                try .endedAt(container.decodeLegacyEndTimeString(forKey: .endTime, in: TimeZone(identifier: "UTC")))
+                try .endedAt(.date(container.decodeLegacyEndTimeString(forKey: .endTime, in: TimeZone(identifier: "UTC"))))
             case BehaviorType.legacyEndAtLocalTime.rawValue:
-                try .endedAt(container.decodeLegacyEndTimeString(forKey: .endTime, in: .current))
+                try .endedAt(.date(container.decodeLegacyEndTimeString(forKey: .endTime, in: .current)))
             case BehaviorType.endAt.rawValue:
                 try .endedAt(container.decodeDateTime(forKey: .endTime))
             case nil:
@@ -101,3 +107,4 @@ extension Schema.Timer: Decodable {
         horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
     }
 }
+
