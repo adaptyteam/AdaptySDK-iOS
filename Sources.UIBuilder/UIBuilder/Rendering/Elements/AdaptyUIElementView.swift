@@ -18,6 +18,25 @@ extension View {
             self
         }
     }
+
+    @ViewBuilder
+    func transformEffect(_ transform: VC.AffineTransform?) -> some View {
+        if let transform {
+            let f = transform.full
+            transformEffect(
+                CGAffineTransform(
+                    a: CGFloat(f.a),
+                    b: CGFloat(f.b),
+                    c: CGFloat(f.c),
+                    d: CGFloat(f.d),
+                    tx: 0,
+                    ty: 0
+                )
+            )
+        } else {
+            self
+        }
+    }
 }
 
 @MainActor
@@ -142,7 +161,12 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             animations: element.properties?.onAppear,
             includeBackground: drawDecoratorBackground
         )
+        .transformEffect(element.properties?.transform)
         .animatableProperties(element.properties, play: $playOnAppearAnimations)
+        .modifier(ElementBackgroundModifier(
+            backgrounds: element.properties?.background,
+            screenHolderBuilder: screenHolderBuilder
+        ))
         .modifier(ElementOverlayModifier(
             overlays: element.properties?.overlay,
             screenHolderBuilder: screenHolderBuilder

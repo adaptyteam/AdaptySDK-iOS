@@ -60,7 +60,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
         self.initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
 
-        self.animations = properties.onAppear ?? []
+        self.animations = properties.onAppear
         self.play = play
     }
 
