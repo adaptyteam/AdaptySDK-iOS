@@ -255,7 +255,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
 
         func propertyOrNil() -> Schema.ElementProperties? {
             guard let properties = try? Schema.ElementProperties(from: decoder, configuration: configuration) else { return nil }
-            return (properties.legacyElementId == nil && properties.value == nil) ? nil : properties
+            return properties.isEmpty ? nil : properties
         }
     }
 

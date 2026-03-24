@@ -17,6 +17,16 @@ extension Schema {
 }
 
 extension Schema.ElementProperties {
+    @inlinable
+    var isEmpty: Bool {
+        legacyElementId == nil
+            && (background?.isEmpty ?? true)
+            && (overlay?.isEmpty ?? true)
+            && (value?.isEmpty ?? true)
+    }
+}
+
+extension Schema.ElementProperties {
     static let `default` = (
         padding: VC.EdgeInsets.zero,
         transform: VC.AffineTransform.empty,
