@@ -172,6 +172,7 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             screenHolderBuilder: screenHolderBuilder
         ))
         .padding(element.properties?.padding)
+        .modifier(ElementInteractionEnabledModifier(element.properties?.interactionEnabled))
         .modifier(DebugOverlayModifier())
         .onAppear {
             playOnAppearAnimations = element.properties?.onAppear ?? []
