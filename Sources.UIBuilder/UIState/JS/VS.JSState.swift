@@ -241,13 +241,27 @@ extension VS.JSState {
 
     func execute(
         actions: [VC.Action],
+        additionalParams: [String: VC.Parameter]?,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
         guard !actions.isEmpty else { return }
 
         for action in actions {
             guard !actionDispatcher.execute(action, in: context) else { continue }
-            let object = VS.ActionParameters(screenInstance: screenInstance, params: action.params)
+
+            let params: [String: VC.Parameter]? =
+                switch (action.params, additionalParams) {
+                case (let params, nil),
+                     (nil, let params):
+                    params
+                case let (params?, additional?):
+                    params.merging(additional) { _, new in new }
+                }
+
+            let object = VS.ActionParameters(
+                screenInstance: screenInstance,
+                params: params
+            )
             _ = try invokeMethod(
                 Bool.self,
                 path: action.pathWithScreenContext(screenInstance.contextPath),
@@ -303,3 +317,4 @@ extension VS.JSState {
         return debug(path: path.joined(separator: "."), filter: filter)
     }
 }
+
