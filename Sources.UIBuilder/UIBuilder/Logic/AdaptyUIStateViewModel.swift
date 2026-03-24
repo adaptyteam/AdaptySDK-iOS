@@ -21,6 +21,8 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    @Published var focusedId: String?
+
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,

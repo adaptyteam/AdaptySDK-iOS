@@ -68,8 +68,8 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             )
         case let .text(text, _):
             AdaptyUITextView(text)
-        case let .textField(textField, _):
-            AdaptyUITextField(textField)
+        case let .textField(textField, props):
+            AdaptyUITextField(textField, focusId: props?.focusId)
         case let .slider(slider, _):
             AdaptyUISliderView(slider)
         case let .image(image, _):

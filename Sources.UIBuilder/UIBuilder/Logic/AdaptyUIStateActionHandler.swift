@@ -56,6 +56,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 
     private let logic: AdaptyUIBuilderLogic
     private weak var state: AdaptyUIState?
+    weak var stateViewModel: AdaptyUIStateViewModel?
 
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
@@ -190,7 +191,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         id: String?
     ) {
         Task { @MainActor [weak self] in
-            // TODO: set to focusId or reset focus
+            self?.stateViewModel?.focusedId = id
         }
     }
 }
