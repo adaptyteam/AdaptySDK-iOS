@@ -150,4 +150,51 @@ extension View {
     }
 }
 
+
+// MARK: - Focus ID
+
+@MainActor
+private struct FocusIdModifier: ViewModifier {
+    let focusId: String
+    @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
+    @FocusState private var isFocused: Bool
+
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+            content
+                .focused($isFocused)
+                .onChange(of: stateViewModel.focusedId) { _, newId in
+                    isFocused = (newId == focusId)
+                }
+                .onChange(of: isFocused) { _, focused in
+                    if !focused, stateViewModel.focusedId == focusId {
+                        stateViewModel.focusedId = nil
+                    }
+                }
+        } else {
+            content
+                .focused($isFocused)
+                .onChange(of: stateViewModel.focusedId) { newId in
+                    isFocused = (newId == focusId)
+                }
+                .onChange(of: isFocused) { focused in
+                    if !focused, stateViewModel.focusedId == focusId {
+                        stateViewModel.focusedId = nil
+                    }
+                }
+        }
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func applyFocusId(_ focusId: String?) -> some View {
+        if let focusId {
+            modifier(FocusIdModifier(focusId: focusId))
+        } else {
+            self
+        }
+    }
+}
+
 #endif
