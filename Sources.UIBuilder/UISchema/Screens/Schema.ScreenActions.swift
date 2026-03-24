@@ -31,7 +31,7 @@ extension Schema.ScreenActions: Codable {
         try self.init(
             onOutsideTap: container.decodeIfPresentActions(forKey: .onOutsideTap),
             onDeviceBack: container.decodeIfPresentActions(forKey: .onDeviceBack),
-            onFocusChange: container.decodeIfPresentActions(forKey: .onDeviceBack)
+            onFocusChange: container.decodeIfPresentActions(forKey: .onFocusChange)
         )
     }
 
