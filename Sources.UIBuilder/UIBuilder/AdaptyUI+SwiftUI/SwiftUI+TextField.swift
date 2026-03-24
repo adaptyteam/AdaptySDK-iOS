@@ -157,18 +157,41 @@ extension View {
 private struct FocusIdModifier: ViewModifier {
     let focusId: String
     @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
+    @EnvironmentObject var navigatorViewModel: AdaptyUINavigatorViewModel
+    @Environment(\.adaptyScreenInstance) var screen: VS.ScreenInstance
     @FocusState private var isFocused: Bool
+
+    private var onFocusChangeActions: [VC.Action]? {
+        navigatorViewModel.navigator.defaultScreenActions.onFocusChange
+            ?? navigatorViewModel.screens.last?.configuration.screenActions.onFocusChange
+    }
+
+    private func handleFocusChanged(oldFocusId: String?, newFocusId: String?) {
+        if let actions = onFocusChangeActions, !actions.isEmpty {
+            stateViewModel.fireFocusChangeActions(
+                oldFocusId: oldFocusId,
+                newFocusId: newFocusId,
+                actions: actions,
+                screen: screen
+            )
+        }
+    }
 
     func body(content: Content) -> some View {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
             content
                 .focused($isFocused)
-                .onChange(of: stateViewModel.focusedId) { _, newId in
+                .onChange(of: stateViewModel.focusedId) { oldId, newId in
                     isFocused = (newId == focusId)
                 }
                 .onChange(of: isFocused) { _, focused in
-                    if !focused, stateViewModel.focusedId == focusId {
+                    let oldFocusId = stateViewModel.focusedId
+                    if focused {
+                        stateViewModel.focusedId = focusId
+                        handleFocusChanged(oldFocusId: oldFocusId, newFocusId: focusId)
+                    } else if oldFocusId == focusId {
                         stateViewModel.focusedId = nil
+                        handleFocusChanged(oldFocusId: oldFocusId, newFocusId: nil)
                     }
                 }
         } else {
@@ -178,8 +201,13 @@ private struct FocusIdModifier: ViewModifier {
                     isFocused = (newId == focusId)
                 }
                 .onChange(of: isFocused) { focused in
-                    if !focused, stateViewModel.focusedId == focusId {
+                    let oldFocusId = stateViewModel.focusedId
+                    if focused {
+                        stateViewModel.focusedId = focusId
+                        handleFocusChanged(oldFocusId: oldFocusId, newFocusId: focusId)
+                    } else if oldFocusId == focusId {
                         stateViewModel.focusedId = nil
+                        handleFocusChanged(oldFocusId: oldFocusId, newFocusId: nil)
                     }
                 }
         }

@@ -55,12 +55,33 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         }
     }
 
-    func execute(actions: [VC.Action], screen: VS.ScreenInstance) {
+    func execute(actions: [VC.Action], additionalParams: [String: VC.Parameter]? = nil, screen: VS.ScreenInstance) {
         do {
-            try stateHolder.state.execute(actions: actions, screenInstance: screen)
+            try stateHolder.state.execute(actions: actions, additionalParams: additionalParams, screenInstance: screen)
         } catch {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
         }
+    }
+
+    func fireFocusChangeActions(
+        oldFocusId: String?,
+        newFocusId: String?,
+        actions: [VC.Action],
+        screen: VS.ScreenInstance
+    ) {
+        var additionalParams: [String: VC.Parameter] = [:]
+        if let newFocusId {
+            additionalParams["focus_id"] = .string(newFocusId)
+        }
+        if let oldFocusId {
+            additionalParams["old_focus_id"] = .string(oldFocusId)
+        }
+
+        execute(
+            actions: actions,
+            additionalParams: additionalParams.isEmpty ? nil : additionalParams,
+            screen: screen
+        )
     }
 
     func getValue<T: JSValueRepresentable & JSValueConvertable>(
