@@ -41,7 +41,8 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     @Published var player: AVPlayer?
 
     private var playerStatusObservation: NSKeyValueObservation?
-    private nonisolated(unsafe) var loopObserver: (any NSObjectProtocol)?
+    private nonisolated(unsafe) var endObserver: (any NSObjectProtocol)?
+    var onPlayToEnd: (() -> Void)?
 
     init(
         asset: AVAsset,
@@ -57,13 +58,19 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
 
         if loop {
             newPlayer.actionAtItemEnd = .none
-            loopObserver = NotificationCenter.default.addObserver(
-                forName: .AVPlayerItemDidPlayToEndTime,
-                object: newItem,
-                queue: .main
-            ) { [weak self] _ in
-                self?.player?.seek(to: .zero)
-                self?.player?.play()
+        }
+
+        endObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: newItem,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                if loop {
+                    self?.player?.seek(to: .zero)
+                    self?.player?.play()
+                }
+                self?.onPlayToEnd?()
             }
         }
 
@@ -106,8 +113,8 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     deinit {
         playerStatusObservation?.invalidate()
         playerStatusObservation = nil
-        if let loopObserver {
-            NotificationCenter.default.removeObserver(loopObserver)
+        if let endObserver {
+            NotificationCenter.default.removeObserver(endObserver)
         }
     }
 }

@@ -142,9 +142,11 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
     func getOrCreatePlayerManager(
         for video: AdaptyUIResolvedVideoAsset,
         assetRef: VC.AssetReference,
-        loop: Bool
+        loop: Bool,
+        onPlayToEnd: (() -> Void)?
     ) -> AdaptyUIVideoPlayerManager {
         if let manager = playerManagers[video.id] {
+            manager.onPlayToEnd = onPlayToEnd
             return manager
         }
 
@@ -152,6 +154,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
             asset: video.asset,
             loop: loop
         )
+        manager.onPlayToEnd = onPlayToEnd
 
         playerManagers[video.id] = manager
 

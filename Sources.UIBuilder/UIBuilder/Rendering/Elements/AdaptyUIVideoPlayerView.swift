@@ -110,7 +110,10 @@ struct AdaptyUIVideoView: View {
             let playerManager = viewModel.getOrCreatePlayerManager(
                 for: videoAsset,
                 assetRef: video.asset,
-                loop: video.loop
+                loop: video.loop,
+                onPlayToEnd: video.actions.isEmpty ? nil : { [weak stateViewModel] in
+                    stateViewModel?.execute(actions: video.actions, screen: screen)
+                }
             )
 
             ZStack {

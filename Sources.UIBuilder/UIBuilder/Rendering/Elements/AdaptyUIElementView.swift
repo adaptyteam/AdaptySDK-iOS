@@ -106,8 +106,8 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             screenHolderBuilder()
         case let .dateTimePicker(dateTimePicker, _):
             AdaptyUIDateTimePickerView(dateTimePicker)
-        case .wheelItemsPicker:
-            AdaptyUIUnknownElementView(value: "wheel items picker")
+        case let .wheelItemsPicker(wheelItemsPicker, _):
+            AdaptyUIWheelItemsPickerView(wheelItemsPicker)
         case let .wheelRangePicker(wheelRangePicker, _):
             AdaptyUIWheelRangePickerView(wheelRangePicker)
         case let .unknown(value):
