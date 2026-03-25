@@ -25,7 +25,9 @@ struct AdaptyUIScreenInstanceKey: EnvironmentKey {
             footer: nil,
             background: nil,
             overlay: nil,
-            screenActions: .empty
+            screenActions: .empty,
+            contentScrollValue: nil,
+            footerScrollValue: nil
         ),
         contextPath: []
     )
@@ -53,7 +55,7 @@ extension EnvironmentValues {
 }
 
 extension View {
-   package func withScreenSize(_ value: CGSize) -> some View {
+    package func withScreenSize(_ value: CGSize) -> some View {
         environment(\.adaptyScreenSize, value)
     }
 

@@ -17,6 +17,8 @@ extension VC {
         let background: [AlignedElement]?
         let overlay: [AlignedElement]?
         let screenActions: ScreenActions
+        let contentScrollValue: Variable?
+        let footerScrollValue: Variable?
     }
 }
 

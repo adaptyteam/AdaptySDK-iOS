@@ -36,6 +36,8 @@ extension VS {
     func openScreen(_ params: JSValue)
     func closeScreen(_ params: JSValue)
     func changeFocus(_ params: JSValue)
+    func setTimer(_ params: JSValue)
+    func moveScroll(_ params: JSValue)
 }
 
 extension VS.JSActionDispatcher {
@@ -97,7 +99,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let userCustomId else {
-            Log.viewState.error("SDK.userCustomAction: required parameter \"userCustomId\" is missing")
+            Log.viewState.error(#"SDK.userCustomAction: required parameter "userCustomId" is missing"#)
             return
         }
         handler?.userCustomAction(id: userCustomId)
@@ -113,12 +115,12 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let productId else {
-            Log.viewState.error("SDK.purchaseProduct: required parameter \"productId\" is missing")
+            Log.viewState.error(#"SDK.purchaseProduct: required parameter "productId" is missing"#)
             return
         }
 
         guard let paywallId else {
-            Log.viewState.error("SDK.purchaseProduct: required parameter \"paywallId\" is missing")
+            Log.viewState.error(#"SDK.purchaseProduct: required parameter "paywallId" is missing"#)
             return
         }
 
@@ -137,12 +139,12 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let productId else {
-            Log.viewState.error("SDK.webPurchaseProduct: required parameter \"productId\" is missing")
+            Log.viewState.error(#"SDK.webPurchaseProduct: required parameter "productId" is missing"#)
             return
         }
 
         guard let paywallId else {
-            Log.viewState.error("SDK.purchaseProduct: required parameter \"paywallId\" is missing")
+            Log.viewState.error(#"SDK.purchaseProduct: required parameter "paywallId" is missing"#)
             return
         }
 
@@ -167,11 +169,11 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let productId else {
-            Log.viewState.error("SDK.onSelectProduct: required parameter \"productId\" is missing")
+            Log.viewState.error(#"SDK.onSelectProduct: required parameter "productId" is missing"#)
             return
         }
         guard let paywallId else {
-            Log.viewState.error("SDK.purchaseProduct: required parameter \"paywallId\" is missing")
+            Log.viewState.error(#"SDK.purchaseProduct: required parameter "paywallId" is missing"#)
             return
         }
 
@@ -196,20 +198,20 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         guard let screenType else {
-            Log.viewState.error("SDK.openScreen: required parameter \"type\" is missing")
+            Log.viewState.error(#"SDK.openScreen: required parameter "type" is missing"#)
             return
         }
         guard let configuration = configuration.screens[screenType] else {
-            Log.viewState.error("SDK.openScreen: not found screen type: \(screenType)")
+            Log.viewState.error(#"SDK.openScreen: not found screen type: \#(screenType)"#)
             return
         }
         guard let instanceId else {
-            Log.viewState.error("SDK.openScreen: required parameter \"instanceId\" is missing")
+            Log.viewState.error(#"SDK.openScreen: required parameter "instanceId" is missing"#)
             return
         }
 
         guard let transitionId else {
-            Log.viewState.error("SDK.openScreen: required parameter \"transitionId\" is missing")
+            Log.viewState.error(#"SDK.openScreen: required parameter "transitionId" is missing"#)
             return
         }
 
@@ -247,6 +249,81 @@ extension VS.JSActionDispatcher: JSActionBridge {
 
         handler?.changeFocus(
             id: focusId
+        )
+    }
+
+    func setTimer(_ params: JSValue) {
+        var timerId: String?
+        var endAt: Date?
+        var duration: Double?
+        var behavior: VC.SetTimerBehavior?
+
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+            timerId = dict["id"] as? String
+
+            if let value = dict["endAt"] as? Double {
+                endAt = Date(timeIntervalSince1970: value / 1000)
+            }
+
+            duration = dict["duration"] as? Double
+
+            if let value = dict["behavior"] as? String {
+                behavior = .init(rawValue: value)
+            }
+        }
+
+        guard let timerId else {
+            Log.viewState.error(#"SDK.setTimer: required parameter "timerId" is missing"#)
+            return
+        }
+
+        if let endAt {
+            handler?.setTimer(id: timerId, endAt: endAt)
+            return
+        }
+
+        if let duration {
+            handler?.setTimer(id: timerId, duration: duration, behavior: behavior ?? .restart)
+            return
+        }
+    }
+
+    func moveScroll(_ params: JSValue) {
+        var instanceId: String?
+        var kind: VC.ScrollKind?
+        var value: VC.ScrollValue?
+
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+            instanceId = dict["instanceId"] as? String
+
+            if let v = dict["kind"] as? String {
+                kind = .init(rawValue: v)
+            }
+
+            if let v = dict["value"] as? String {
+                kind = .init(rawValue: v)
+            }
+        }
+
+        guard let instanceId else {
+            Log.viewState.error(#"SDK.moveScroll: required parameter "instanceId" is missing"#)
+            return
+        }
+
+        guard let kind else {
+            Log.viewState.error(#"SDK.moveScroll: required parameter "kind" is missing or corupted"#)
+            return
+        }
+
+        guard let value else {
+            Log.viewState.error(#"SDK.moveScroll: required parameter "value" is missing or corupted"#)
+            return
+        }
+
+        handler?.moveScroll(
+            instanceId: instanceId,
+            kind: kind,
+            value: value
         )
     }
 }

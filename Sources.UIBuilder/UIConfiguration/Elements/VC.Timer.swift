@@ -10,7 +10,6 @@ import Foundation
 extension VC {
     struct Timer: Sendable, Hashable {
         let id: String
-        let state: State
         let format: VC.RangeTextFormat
         let actions: [Action]
         let horizontalAlign: VC.HorizontalAlignment

@@ -68,6 +68,40 @@ extension String: JSValueRepresentable {
     }
 }
 
+//extension VC.Parameter: JSValueRepresentable {
+//    static func fromJSValue(_ value: JSValue) -> VC.Parameter? {
+//        if value.isUndefined { nil }
+//        else if value.isNull { .null }
+//        else if value.isBoolean { .bool(value.toBool()) }
+//        else if value.isNumber {
+//            let d = value.toDouble()
+//            if d == d.rounded(.towardZero) {
+//                if let i = Int32(exactly: d) {
+//                    .int32(i)
+//                } else if let u = UInt32(exactly: d) {
+//                    .uint32(u)
+//                } else {
+//                    .double(d)
+//                }
+//            } else {
+//                .double(d)
+//            }
+//        } else if value.isString { value.toString().map { .string($0) } }
+//        else if value.isObject, let dict = value.toDictionary() as? [String: Any] {
+//            var result = [String: VC.Parameter]()
+//            for (key, _) in dict {
+//                if let jsVal = value.objectForKeyedSubscript(key),
+//                   let param = fromJSValue(jsVal) {
+//                    result[key] = param
+//                }
+//            }
+//            .object(result)
+//        } else {
+//            nil
+//        }
+//    }
+//}
+
 extension VC.AssetIdentifierOrValue: JSValueRepresentable {
     static func fromJSValue(_ value: JSValue) -> VC.AssetIdentifierOrValue? {
         if value.isUndefined { nil }

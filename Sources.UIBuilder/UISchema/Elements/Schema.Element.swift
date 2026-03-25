@@ -229,7 +229,7 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
         case .timer:
             try self.init(
                 properties: propertyOrNil(),
-                node: .simpleElement(Schema.Timer(from: decoder))
+                node: .simpleElement(Schema.Timer(from: decoder, configuration: configuration))
             )
         case .pager:
             try self.init(

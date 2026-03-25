@@ -194,6 +194,23 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             self?.stateViewModel?.focusedId = id
         }
     }
+
+    package nonisolated func setTimer(
+        id: String,
+        endAt: Date
+    ) {}
+
+    package nonisolated func setTimer(
+        id: String,
+        duration: TimeInterval,
+        behavior: VC.SetTimerBehavior
+    ) {}
+
+    package nonisolated func moveScroll(
+        instanceId: String,
+        kind: VC.ScrollKind,
+        value: VC.ScrollValue
+    ) {}
 }
 
 #endif

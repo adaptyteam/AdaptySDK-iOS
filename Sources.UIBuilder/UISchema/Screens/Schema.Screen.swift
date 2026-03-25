@@ -17,6 +17,9 @@ extension Schema {
         let background: [AlignedElement]?
         let overlay: [AlignedElement]?
         let screenActions: ScreenActions
+
+        let contentScrollValue: Variable?
+        let footerScrollValue: Variable?
     }
 }
 
@@ -88,7 +91,9 @@ extension Schema.ConfigurationBuilder {
             footer: footer,
             background: background,
             overlay: overlay,
-            screenActions: from.screenActions
+            screenActions: from.screenActions,
+            contentScrollValue: from.contentScrollValue,
+            footerScrollValue: from.footerScrollValue
         )
     }
 }
@@ -101,6 +106,9 @@ extension Schema.Screen: DecodableWithConfiguration {
         case footer
         case background
         case overlay
+
+        case contentScrollValue = "content_scroll_value"
+        case footerScrollValue = "footer_scroll_value"
     }
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -150,7 +158,10 @@ extension Schema.Screen: DecodableWithConfiguration {
             footer: layoutBehaviour != .default ? container.decodeIfPresent(Schema.Element.self, forKey: .footer, configuration: configuration) : nil,
             background: background,
             overlay: overlay,
-            screenActions: Schema.ScreenActions(from: decoder)
+            screenActions: Schema.ScreenActions(from: decoder),
+            contentScrollValue: container.decodeIfPresent(Schema.Variable.self, forKey: .contentScrollValue),
+            footerScrollValue: container.decodeIfPresent(Schema.Variable.self, forKey: .footerScrollValue)
         )
     }
 }
+

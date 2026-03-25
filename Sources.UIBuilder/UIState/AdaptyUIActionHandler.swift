@@ -20,5 +20,30 @@ package protocol AdaptyUIActionHandler: AnyObject {
     func closeScreen(navigatorId: String, transitionId: String)
 
     func registerState(_ state: AdaptyUIState)
-    func changeFocus(id: String? )
+    func changeFocus(id: String?)
+    func setTimer(id: String, endAt: Date)
+    func setTimer(id: String, duration: TimeInterval, behavior: VC.SetTimerBehavior)
+    func moveScroll(instanceId: String, kind: VC.ScrollKind, value: VC.ScrollValue)
 }
+
+package extension VC {
+    enum SetTimerBehavior: String, Sendable, Hashable {
+        case restart
+        case `continue`
+        case pesisted
+        case custom
+    }
+}
+
+package extension VC {
+    enum ScrollKind: String, Sendable, Hashable {
+        case content
+        case footer
+    }
+
+    enum ScrollValue: String, Sendable, Hashable {
+        case start
+        case end
+    }
+}
+
