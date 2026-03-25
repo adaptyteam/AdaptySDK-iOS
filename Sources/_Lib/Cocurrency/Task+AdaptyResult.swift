@@ -5,6 +5,9 @@
 //  Created by Aleksei Valiano on 08.10.2025.
 //
 
+
+package typealias AdaptyResultTask<Success> = Task<AdaptyResult<Success>, Never>
+
 //#if swift(>=6.3)
 //package extension Task {
 //    @inlinable

@@ -192,6 +192,8 @@ private extension Decoder {
             scripts += [Schema.LegacyScripts.legacySelectSectionScript(sectionId: section.key, index: section.value)]
         }
 
+        scripts.append(contentsOf: collector.legacyTimers.values)
+
         return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
     }
 }

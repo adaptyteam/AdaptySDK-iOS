@@ -56,7 +56,7 @@ extension Adapty {
 
         AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: viewConfiguration.locale.id)
 
-        let extractLocaleTask = Task.detachedAsResultTask(priority: .userInitiated) { () async throws(AdaptyError) -> AdaptyUIConfiguration in
+        let extractLocaleTask = Task.detachedWithThrowsTyped(priority: .userInitiated) { () async throws(AdaptyError) -> AdaptyUIConfiguration in
             do {
                 return try schema.extractUIConfiguration(
                     id: viewConfiguration.id,
@@ -67,7 +67,7 @@ extension Adapty {
             }
         }
 
-        return try await extractLocaleTask.value.get()
+        return try await extractLocaleTask.valueWithThrowsTyped()
     }
 
     private func restore(

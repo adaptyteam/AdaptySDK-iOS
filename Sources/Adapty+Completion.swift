@@ -11,7 +11,6 @@ public typealias AdaptyResult<Success> = Swift.Result<Success, AdaptyError>
 
 public typealias AdaptyErrorCompletion = @Sendable (AdaptyError?) -> Void
 public typealias AdaptyResultCompletion<Success> = @Sendable (AdaptyResult<Success>) -> Void
-package typealias AdaptyResultTask<Success> = Task<AdaptyResult<Success>, Never>
 
 public extension Result where Failure == AdaptyError {
     var error: AdaptyError? {

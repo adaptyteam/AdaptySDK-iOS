@@ -63,9 +63,9 @@ extension Schema.Timer: DecodableWithConfiguration {
 
         horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
 
-//        if configuration.isLegacy {
-//            _ = try LegacyState(from: decoder)
-//        }
+        if configuration.isLegacy {
+            configuration.collector.legacyTimers[id] = try Schema.decodeLegacySetTimer(id: id, from: decoder)
+        }
     }
 }
 

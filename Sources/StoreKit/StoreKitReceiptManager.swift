@@ -69,12 +69,12 @@ extension StoreKitReceiptManager {
         if let syncing, userId.isEqualProfileId(syncing.userId) {
             task = syncing.task
         } else {
-            task = Task.detachedAsResultTask { () async throws(AdaptyError) in
+            task = Task.detachedWithThrowsTyped { () async throws(AdaptyError) in
                 try await self.syncReceipt(for: userId)
             }
             syncing = (task, userId)
         }
-        try await task.value.get()
+        try await task.valueWithThrowsTyped()
     }
 
     private func syncReceipt(for userId: AdaptyUserId) async throws(AdaptyError) {

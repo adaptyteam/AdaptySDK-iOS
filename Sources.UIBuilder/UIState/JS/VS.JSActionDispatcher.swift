@@ -283,7 +283,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         if let duration {
-            handler?.setTimer(id: timerId, duration: duration, behavior: behavior ?? .restart)
+            handler?.setTimer(id: timerId, duration: duration, behavior: behavior ?? .continue)
             return
         }
     }
