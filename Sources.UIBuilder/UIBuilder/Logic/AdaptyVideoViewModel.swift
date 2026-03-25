@@ -65,11 +65,13 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
             object: newItem,
             queue: .main
         ) { [weak self] _ in
-            if loop {
-                self?.player?.seek(to: .zero)
-                self?.player?.play()
+            MainActor.assumeIsolated {
+                if loop {
+                    self?.player?.seek(to: .zero)
+                    self?.player?.play()
+                }
+                self?.onPlayToEnd?()
             }
-            self?.onPlayToEnd?()
         }
 
         playerStatusObservation = newItem.observe(
