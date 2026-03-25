@@ -12,7 +12,42 @@
     },
     {
       "runner": "macos-15",
+      "xcode": "26.3",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "26.1",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "26.0",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "16.0",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
       "xcode": "16.1",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "16.2",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "16.3",
+      "informational": false
+    },
+    {
+      "runner": "macos-15",
+      "xcode": "16.4",
       "informational": false
     }
   ],
