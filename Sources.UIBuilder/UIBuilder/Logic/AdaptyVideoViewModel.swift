@@ -65,8 +65,10 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
                 object: video.item,
                 queue: .main
             ) { [weak self] _ in
-                self?.player?.seek(to: .zero)
-                self?.player?.play()
+                MainActor.assumeIsolated {
+                    self?.player?.seek(to: .zero)
+                    self?.player?.play()
+                }
             }
         }
 
