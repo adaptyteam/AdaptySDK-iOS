@@ -58,15 +58,15 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
 
     func makePurchase(
         product: ProductResolver,
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     ) {
         onStart()
         events.event_didStartPurchase(product: product)
 
         Task { @MainActor in
             try await Task.sleep(nanoseconds: 3 * 1_000_000_000)
-            
+
             onFinish()
         }
     }
@@ -79,8 +79,8 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     }
 
     func restorePurchases(
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     ) {
         events.event_didStartRestore()
     }
