@@ -69,4 +69,9 @@ package final class AdaptyUIState: ObservableObject {
     func execute(actions: [VC.Action], additionalParams: [String: VC.Parameter]? = nil, screenInstance: VS.ScreenInstance) throws(VS.Error) {
         try jsState.execute(actions: actions, additionalParams: additionalParams, screenInstance: screenInstance)
     }
+
+    func execute(action: VS.JSAction, params: (some JSValueConvertable)?, screenInstance: VS.ScreenInstance) throws(VS.Error) {
+        try jsState.execute(action: action, params: params, screenInstance: screenInstance)
+    }
 }
+

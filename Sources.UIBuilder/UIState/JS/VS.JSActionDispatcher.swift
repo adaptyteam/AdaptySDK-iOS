@@ -38,6 +38,7 @@ extension VS {
     func changeFocus(_ params: JSValue)
     func setTimer(_ params: JSValue)
     func moveScroll(_ params: JSValue)
+    func showAlertDialog(_ params: JSValue)
 }
 
 extension VS.JSActionDispatcher {
@@ -324,6 +325,31 @@ extension VS.JSActionDispatcher: JSActionBridge {
             instanceId: instanceId,
             kind: kind,
             value: value
+        )
+    }
+
+    func showAlertDialog(_ params: JSValue) {
+        guard params.isObject, let dict = params.toDictionary() as? [String: Any] else {
+            Log.viewState.error(#"SDK.showAlertDialog: corupted params"#)
+            return
+        }
+
+
+        handler?.showAlertDialog(
+            params: VS.ShowAlertDialogParameters.fromDictionary(dict),
+            callback: VS.JSAction(from: dict["callback"])
+        )
+    }
+
+    func showRequestPermission(_ params: JSValue) {
+        guard params.isObject, let dict = params.toDictionary() as? [String: Any] else {
+            Log.viewState.error(#"SDK.showRequestPermission: corupted params"#)
+            return
+        }
+
+        handler?.showRequestPermission(
+            params: VS.ShowRequestPermissionParameters.fromDictionary(dict),
+            callback: VS.JSAction(from: dict["callback"])
         )
     }
 }

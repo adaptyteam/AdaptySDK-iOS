@@ -22,6 +22,26 @@ extension Optional: JSValueConvertable where Wrapped: JSValueConvertable {
     }
 }
 
+extension Dictionary: JSValueConvertable where Key == String, Value: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        let object = JSValue(newObjectIn: context)!
+        for (key, value) in self {
+            object.setObject(value.toJSValue(in: context), forKeyedSubscript: key as NSString)
+        }
+        return object
+    }
+}
+
+extension Array: JSValueConvertable where Element: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        let array = JSValue(newArrayIn: context)!
+        for (index, value) in enumerated() {
+            array.setObject(value.toJSValue(in: context), atIndexedSubscript: index)
+        }
+        return array
+    }
+}
+
 extension Bool: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         .init(bool: self, in: context)
@@ -67,12 +87,3 @@ extension VC.Parameter: JSValueConvertable {
     }
 }
 
-extension [String: VC.Parameter]: JSValueConvertable {
-    func toJSValue(in context: JSContext) -> JSValue {
-        let object = JSValue(newObjectIn: context)!
-        for (key, value) in self {
-            object.setObject(value.toJSValue(in: context), forKeyedSubscript: key as NSString)
-        }
-        return object
-    }
-}

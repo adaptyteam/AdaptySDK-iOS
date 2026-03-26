@@ -216,6 +216,16 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             self?.stateViewModel?.scrollCommand = .init(instanceId: instanceId, kind: kind, value: value)
         }
     }
+
+    package nonisolated func showAlertDialog(params: VS.ShowAlertDialogParameters, callback: VS.JSAction? ) {
+        // response ShowAlertDialogParametersResponse
+        // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
+    }
+
+    package nonisolated func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction? ) {
+        // use ShowRequestPermissionParametersResponse
+        // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
+    }
 }
 
 #endif
