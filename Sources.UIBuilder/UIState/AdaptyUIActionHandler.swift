@@ -30,7 +30,7 @@ package extension VC {
     enum SetTimerBehavior: String, Sendable, Hashable {
         case restart
         case `continue`
-        case pesisted
+        case persisted
         case custom
     }
 }

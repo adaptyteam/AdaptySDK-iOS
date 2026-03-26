@@ -48,7 +48,7 @@ extension Schema {
             behavior = .continue
         case BehaviorType.firstAppearPersisted.rawValue:
             duration = try container.decode(TimeInterval.self, forKey: .duration)
-            behavior = .pesisted
+            behavior = .persisted
         case BehaviorType.custom.rawValue:
             duration = try container.decode(TimeInterval.self, forKey: .duration)
             behavior = .custom
