@@ -503,6 +503,8 @@ Screen:
             type: string
             enum: [default, flat, hero, transparent]
             default: default
+        content_scroll_value: { $ref: "#/Script/DataBinding" }
+        footer_scroll_value: { $ref: "#/Script/DataBinding" }
         on_outside_tap: { $ref: "#/Script/ActionOrArray" }
         on_device_back: { $ref: "#/Script/ActionOrArray" }
         on_focus_change: { $ref: "#/Script/ActionOrArray" }
@@ -1036,23 +1038,6 @@ UI:
                           default: leading,
                       }
                   action: { $ref: "#/Script/ActionOrArray" }
-            - oneOf:
-                  - required: [end_time, behaviour]
-                    properties:
-                        end_time: { $ref: "#/Entities/DateTime" }
-                        behaviour:
-                            type: string
-                            const: end_at_time
-                  - required: [duration, behaviour]
-                    properties:
-                        duration: { type: number, description: seconds }
-                        behaviour:
-                            enum:
-                                - start_at_every_appear
-                                - start_at_first_appear
-                                - start_at_first_appear_persisted
-                                - custom
-                            default: start_at_first_appear
             - $ref: "#/UI/Text/Attributes"
 
         Format:
@@ -1600,7 +1585,6 @@ DateTime:
                   default: null
                   $ref: "#/DateTime/TimeZone"
                   description: >
-                      Time zone. См. TimeZoneIdentifier для форматов.
                       When null: используется часовой пояс из настроек
                       устройства пользователя.
 
@@ -1751,7 +1735,7 @@ DateTime:
                     - start_of_year
 
             anchor_time_zone:
-                $ref: "#/TimeZoneIdentifier"
+                $ref: "#/DateTime/TimeZone"
                 description: >
                     Time zone для определения опорной точки.
                     Обязателен для startOfDay, startOfWeek, startOfMonth, startOfYear.
