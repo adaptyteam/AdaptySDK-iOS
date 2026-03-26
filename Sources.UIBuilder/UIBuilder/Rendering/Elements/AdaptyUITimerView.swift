@@ -201,6 +201,12 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
             .onDisappear {
                 stopTimer()
             }
+            .onReceive(viewModel.objectWillChange) { _ in
+                updateTime()
+                if timeLeft > 0, timeCounter == nil {
+                    startTimer()
+                }
+            }
     }
 
     @State private var timeCounter: Timer?
