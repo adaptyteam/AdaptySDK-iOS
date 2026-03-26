@@ -12,9 +12,20 @@ extension CoordinateSpace {
     static let adaptyHeroName = "adapty.container.hero"
 }
 
+private enum ScrollAnchor {
+    static let contentTop = "adapty.hero.content.top"
+    static let contentBottom = "adapty.hero.content.bottom"
+    static let footerTop = "adapty.hero.footer.top"
+    static let footerBottom = "adapty.hero.footer.bottom"
+}
+
 struct AdaptyUIHeroContainerView: View {
     @EnvironmentObject
     private var paywallViewModel: AdaptyUIPaywallViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
+    @Environment(\.adaptyScreenInstance)
+    private var screenInstance: VS.ScreenInstance
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
@@ -28,49 +39,64 @@ struct AdaptyUIHeroContainerView: View {
 
     var body: some View {
         GeometryReader { globalProxy in
-            ZStack(alignment: .bottom) {
-                if let coverBox = screen.cover, let coverContent = coverBox.content {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            coverView(
-                                coverBox,
-                                coverContent,
-                                nil
-                            )
+            ScrollViewReader { scrollProxy in
+                ZStack(alignment: .bottom) {
+                    if let coverBox = screen.cover, let coverContent = coverBox.content {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                coverView(
+                                    coverBox,
+                                    coverContent,
+                                    nil
+                                )
+                                .id(ScrollAnchor.contentTop)
 
-                            contentView(
-                                content: screen.content,
-                                coverBox: coverBox,
-                                globalProxy: globalProxy
-                            )
+                                contentView(
+                                    content: screen.content,
+                                    coverBox: coverBox,
+                                    globalProxy: globalProxy
+                                )
+
+                                Color.clear.frame(height: 0).id(ScrollAnchor.contentBottom)
+                            }
+                            .scrollProgressTracker(kind: .main, coordinateSpaceName: CoordinateSpace.adaptyHeroName, viewportHeight: globalProxy.size.height)
                         }
+                        .ignoresSafeArea()
+                        .scrollIndicatorsHidden_compatible()
+                        .onChange(of: stateViewModel.scrollCommand) { command in
+                            guard let command, command.instanceId == screenInstance.id, command.kind == .content else { return }
+                            withAnimation {
+                                scrollProxy.scrollTo(
+                                    command.value == .start ? ScrollAnchor.contentTop : ScrollAnchor.contentBottom,
+                                    anchor: command.value == .start ? .top : .bottom
+                                )
+                            }
+                        }
+                    } else {
+                        Rectangle()
+                            .hidden()
+                            .onAppear {
+                                paywallViewModel.reportDidFailRendering(
+                                    with: .wrongComponentType("screen.cover")
+                                )
+                            }
                     }
-                    .ignoresSafeArea()
-                    .scrollIndicatorsHidden_compatible()
-                } else {
-                    Rectangle()
-                        .hidden()
-                        .onAppear {
-                            paywallViewModel.reportDidFailRendering(
-                                with: .wrongComponentType("screen.cover")
-                            )
-                        }
-                }
 
-                if let footer = screen.footer {
-                    footerView(footer, globalProxy: globalProxy)
-                        .onGeometrySizeChange { footerSize = $0 }
-                }
+                    if let footer = screen.footer {
+                        footerView(footer, globalProxy: globalProxy, scrollProxy: scrollProxy)
+                            .onGeometrySizeChange { footerSize = $0 }
+                    }
 
-                if let overlay = screen.overlay {
-                    AdaptyUIOverlayElementsView(
-                        overlays: overlay,
-                        screenHolderBuilder: { EmptyView() } // TODO: x check
-                    )
+                    if let overlay = screen.overlay {
+                        AdaptyUIOverlayElementsView(
+                            overlays: overlay,
+                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                        )
+                    }
                 }
+                .coordinateSpace(name: CoordinateSpace.adaptyHeroName)
+                .ignoresSafeArea()
             }
-            .coordinateSpace(name: CoordinateSpace.adaptyHeroName)
-            .ignoresSafeArea()
         }
         .coordinateSpace(name: CoordinateSpace.adaptyGlobalName)
     }
@@ -177,7 +203,8 @@ struct AdaptyUIHeroContainerView: View {
     @ViewBuilder
     private func footerView(
         _ element: VC.Element,
-        globalProxy: GeometryProxy
+        globalProxy: GeometryProxy,
+        scrollProxy: ScrollViewProxy
     ) -> some View {
         if footerSize.height >= globalProxy.size.height {
             ScrollView {
@@ -186,8 +213,21 @@ struct AdaptyUIHeroContainerView: View {
                     screenHolderBuilder: { EmptyView() }, // TODO: x check
                     drawDecoratorBackground: drawFooterBackground
                 )
+                .id(ScrollAnchor.footerTop)
+                .scrollProgressTracker(kind: .footer, coordinateSpaceName: CoordinateSpace.adaptyHeroName, viewportHeight: globalProxy.size.height)
+
+                Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
             }
             .scrollIndicatorsHidden_compatible()
+            .onChange(of: stateViewModel.scrollCommand) { command in
+                guard let command, command.instanceId == screenInstance.id, command.kind == .footer else { return }
+                withAnimation {
+                    scrollProxy.scrollTo(
+                        command.value == .start ? ScrollAnchor.footerTop : ScrollAnchor.footerBottom,
+                        anchor: command.value == .start ? .top : .bottom
+                    )
+                }
+            }
         } else {
             AdaptyUIElementView(
                 element,

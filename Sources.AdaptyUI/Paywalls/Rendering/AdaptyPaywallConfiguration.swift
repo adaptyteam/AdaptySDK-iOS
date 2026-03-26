@@ -106,6 +106,7 @@ public extension AdaptyUI {
                 logic: logic,
                 stateHolder: stateHolder
             )
+            actionHandler.stateViewModel = stateViewModel
             timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),

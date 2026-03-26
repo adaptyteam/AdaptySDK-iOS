@@ -301,7 +301,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
             }
 
             if let v = dict["value"] as? String {
-                kind = .init(rawValue: v)
+                value = .init(rawValue: v)
             }
         }
 

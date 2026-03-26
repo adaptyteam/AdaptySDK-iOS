@@ -22,6 +22,14 @@ package final class AdaptyUIStateViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     @Published var focusedId: String?
+    @Published var scrollCommand: ScrollCommand?
+
+    struct ScrollCommand: Equatable {
+        let id = UUID()
+        let instanceId: String
+        let kind: VC.ScrollKind
+        let value: VC.ScrollValue
+    }
 
     package init(
         logId: String,
@@ -82,6 +90,22 @@ package final class AdaptyUIStateViewModel: ObservableObject {
             additionalParams: additionalParams.isEmpty ? nil : additionalParams,
             screen: screen
         )
+    }
+
+    func setScrollProgress(
+        _ progress: Double,
+        variable: VC.Variable,
+        screen: VS.ScreenInstance
+    ) {
+        do {
+            try stateHolder.state.setValue(
+                variable: variable,
+                value: progress,
+                screenInstance: screen
+            )
+        } catch {
+            Log.ui.error("#\(logId)# setScrollProgress error: \(error)")
+        }
     }
 
     func getValue<T: JSValueRepresentable & JSValueConvertable>(
