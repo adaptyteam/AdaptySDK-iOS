@@ -11,7 +11,9 @@ extension VC.Element {
     struct Properties: Sendable, Hashable {
         let decorator: VC.Decorator?
         let padding: VC.EdgeInsets
-        let transform: VC.AffineTransform
+        let offset: VC.Offset?
+        let rotation: VC.Rotation?
+        let scale: VC.Scale?
 
         let opacity: Double
 
@@ -29,7 +31,9 @@ extension VC.Element.Properties {
     var isEmpty: Bool {
         decorator == .none
             && padding.isZero
-            && transform.isEmpty
+            && offset?.isZero ?? true
+            && rotation?.isZero ?? true
+            && scale?.isEmpty ?? true
             && opacity == 1.0
             && background?.isEmpty ?? true
             && overlay?.isEmpty ?? true

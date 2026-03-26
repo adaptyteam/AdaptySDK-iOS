@@ -19,14 +19,5 @@ extension VC.Offset {
     var isZero: Bool {
         x.isZero && y.isZero
     }
-
-    @inlinable
-    var asAffineTransform: VC.AffineTransform {
-        if isZero {
-            .empty
-        } else {
-            .offset(self)
-        }
-    }
 }
 

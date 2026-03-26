@@ -54,7 +54,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.rotation = .zero
         self.rotationAnchor = .center
 
-        self.initialOffset = properties.transform.offsetComponent
+        self.initialOffset = properties.offset ?? .zero
 
         self.initialShadowFilling = properties.decorator?.shadow?.filling
         self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero

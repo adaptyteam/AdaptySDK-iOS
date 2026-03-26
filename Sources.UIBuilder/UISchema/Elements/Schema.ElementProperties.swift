@@ -29,7 +29,6 @@ extension Schema.ElementProperties {
 extension Schema.ElementProperties {
     static let `default` = (
         padding: VC.EdgeInsets.zero,
-        transform: VC.AffineTransform.empty,
         opacity: 1.0
     )
 }
@@ -90,7 +89,9 @@ extension Schema.ConfigurationBuilder {
             .init(
                 decorator: value.decorator,
                 padding: value.padding,
-                transform: value.transform,
+                offset: value.offset,
+                rotation: value.rotation,
+                scale: value.scale,
                 opacity: value.opacity,
                 background: background ?? [],
                 overlay: overlay ?? [],
@@ -102,7 +103,9 @@ extension Schema.ConfigurationBuilder {
             .init(
                 decorator: nil,
                 padding: Schema.ElementProperties.default.padding,
-                transform: Schema.ElementProperties.default.transform,
+                offset: nil,
+                rotation: nil,
+                scale: nil,
                 opacity: Schema.ElementProperties.default.opacity,
                 background: background,
                 overlay: overlay,
@@ -120,7 +123,8 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         case decorator
         case padding
         case offset
-        case transform
+        case rotation
+        case scale
         case visibility
         case opacity
         case transitionIn = "transition_in"
@@ -149,19 +153,16 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
             try container.decodeIfPresent(Double.self, forKey: .opacity) ?? Self.default.opacity
         }
 
-        let transform =
-            if container.contains(.transform) {
-                try container.decode(Schema.AffineTransform.self, forKey: .transform)
-            } else if container.contains(.offset) {
-                try container.decode(Schema.Offset.self, forKey: .offset).asAffineTransform
-            } else {
-                Self.default.transform
-            }
+        let offset = try container.decodeIfPresent(Schema.Offset.self, forKey: .offset)
+        let rotation = try container.decodeIfPresent(Schema.Rotation.self, forKey: .rotation)
+        let scale = try container.decodeIfPresent(Schema.Scale.self, forKey: .scale)
 
         let value = try VC.Element.Properties(
             decorator: container.decodeIfPresent(Schema.Decorator.self, forKey: .decorator),
             padding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .padding) ?? Self.default.padding,
-            transform: transform,
+            offset: offset?.isZero ?? true ? nil : offset,
+            rotation: rotation?.isZero ?? true ? nil : rotation,
+            scale: scale?.isEmpty ?? true ? nil : scale,
             opacity: opacity,
             background: nil,
             overlay: nil,

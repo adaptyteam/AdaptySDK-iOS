@@ -142,7 +142,7 @@ struct AdaptyUIHeroContainerView: View {
     ) -> some View {
         let bottomOverscrollHeight = screenSize.height
         let properties = content.properties
-        let offsetY = properties?.transform.offsetComponent.y.points(
+        let offsetY = properties?.offset?.y.points(
             screenSize: screenSize.width,
             safeAreaStart: safeArea.leading,
             safeAreaEnd: safeArea.trailing
