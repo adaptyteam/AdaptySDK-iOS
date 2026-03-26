@@ -56,7 +56,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 
     private let logic: AdaptyUIBuilderLogic
     private weak var state: AdaptyUIState?
-    weak var stateViewModel: AdaptyUIStateViewModel?
+    
+    package weak var stateViewModel: AdaptyUIStateViewModel?
 
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
@@ -210,7 +211,11 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         instanceId: String,
         kind: VC.ScrollKind,
         value: VC.ScrollValue
-    ) {}
+    ) {
+        Task { @MainActor [weak self] in
+            self?.stateViewModel?.scrollCommand = .init(instanceId: instanceId, kind: kind, value: value)
+        }
+    }
 }
 
 #endif
