@@ -47,12 +47,12 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     ) {
         self.opacity = properties.opacity
 
-        self.scaleX = 1.0
-        self.scaleY = 1.0
-        self.scaleAnchor = .center
+        self.scaleX = properties.scale?.scale.x ?? 1.0
+        self.scaleY = properties.scale?.scale.y ?? 1.0
+        self.scaleAnchor = properties.scale?.anchor.unitPoint ?? .center
 
-        self.rotation = .zero
-        self.rotationAnchor = .center
+        self.rotation = properties.rotation.map { .degrees($0.angle) } ?? .zero
+        self.rotationAnchor = properties.rotation?.anchor.unitPoint ?? .center
 
         self.initialOffset = properties.offset ?? .zero
 
