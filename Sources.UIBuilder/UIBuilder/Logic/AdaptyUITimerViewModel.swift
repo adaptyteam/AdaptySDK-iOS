@@ -54,48 +54,51 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         self.screensViewModel = screensViewModel
     }
 
-    private func initializeTimer(_ timer: VC.Timer, at: Date) -> Date {
-        Date()
-//        switch timer.state {
-//        case let .endedAt(endAt):
-//            let endAt = endAt.asDate(startAt: Date()) // TODO: date of start flow
-//            timers[timer.id] = endAt
-//            return endAt
-//        case let .duration(duration, startBehaviour):
-//            switch startBehaviour {
-//            case .everyAppear:
-//                let endAt = Date(timeIntervalSince1970: at.timeIntervalSince1970 + duration)
-//                timers[timer.id] = endAt
-//                return endAt
-//            case .firstAppear:
-//                if let globalEndAt = Self.globalTimers[timer.id] {
-//                    timers[timer.id] = globalEndAt
-//                    return globalEndAt
-//                } else {
-//                    let endAt = Date(timeIntervalSince1970: at.timeIntervalSince1970 + duration)
-//                    timers[timer.id] = endAt
-//                    Self.globalTimers[timer.id] = endAt
-//                    return endAt
-//                }
-//            case .firstAppearPersisted:
-//                let key = "AdaptySDK_Timer_\(timer.id)"
-//
-//                if let persistedEndAtTs = UserDefaults.standard.value(forKey: key) as? TimeInterval {
-//                    let endAt = Date(timeIntervalSince1970: persistedEndAtTs)
-//                    timers[timer.id] = endAt
-//                    return endAt
-//                } else {
-//                    let endAt = Date(timeIntervalSince1970: at.timeIntervalSince1970 + duration)
-//                    timers[timer.id] = endAt
-//                    UserDefaults.standard.set(endAt.timeIntervalSince1970, forKey: key)
-//                    return endAt
-//                }
-//            case .custom:
-//                let resolved = timerResolver.timerEndAtDate(for: timer.id)
-//                timers[timer.id] = resolved
-//                return resolved
-//            }
-//        }
+    func setEndDate(id: String, date: Date) {
+        Log.ui.verbose("#\(logId)# setTimer id: \(id), endAt: \(date)")
+        timers[id] = date
+        objectWillChange.send()
+    }
+
+    func setDuration(id: String, duration: TimeInterval, behavior: VC.SetTimerBehavior) {
+        Log.ui.verbose("#\(logId)# setTimer id: \(id), duration: \(duration), behavior: \(behavior)")
+
+        switch behavior {
+        case .restart:
+            let endAt = Date(timeIntervalSinceNow: duration)
+            timers[id] = endAt
+
+        case .continue:
+            if let existing = timers[id], existing.timeIntervalSinceNow > 0 {
+                return
+            }
+            if let globalEndAt = Self.globalTimers[id], globalEndAt.timeIntervalSinceNow > 0 {
+                timers[id] = globalEndAt
+            } else {
+                let endAt = Date(timeIntervalSinceNow: duration)
+                timers[id] = endAt
+                Self.globalTimers[id] = endAt
+            }
+
+        case .persisted:
+            let key = "AdaptySDK_Timer_\(id)"
+            if let persistedTs = UserDefaults.standard.value(forKey: key) as? TimeInterval {
+                let endAt = Date(timeIntervalSince1970: persistedTs)
+                if endAt.timeIntervalSinceNow > 0 {
+                    timers[id] = endAt
+                    return
+                }
+            }
+            let endAt = Date(timeIntervalSinceNow: duration)
+            timers[id] = endAt
+            UserDefaults.standard.set(endAt.timeIntervalSince1970, forKey: key)
+
+        case .custom:
+            let resolved = timerResolver.timerEndAtDate(for: id)
+            timers[id] = resolved
+        }
+
+        objectWillChange.send()
     }
 
     func timeLeft(
@@ -103,7 +106,10 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         at: Date,
         screen: VS.ScreenInstance
     ) -> TimeInterval {
-        let timerEndAt = timers[timer.id] ?? initializeTimer(timer, at: at)
+        guard let timerEndAt = timers[timer.id] else {
+            return 0.0
+        }
+
         let timeLeft = max(0.0, timerEndAt.timeIntervalSince1970 - Date().timeIntervalSince1970)
 
         if timeLeft <= 0.0 {

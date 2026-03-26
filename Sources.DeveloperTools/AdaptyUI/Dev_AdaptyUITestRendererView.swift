@@ -88,7 +88,7 @@ public extension AdaptyUI {
                 stateHolder: stateHolder
             )
             actionHandler.stateViewModel = stateViewModel
-            timerViewModel = AdaptyUITimerViewModel(
+            let timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
                 stateViewModel: stateViewModel,
@@ -96,6 +96,8 @@ public extension AdaptyUI {
                 productsViewModel: productsViewModel,
                 screensViewModel: screensViewModel
             )
+            self.timerViewModel = timerViewModel
+            actionHandler.timerViewModel = timerViewModel
             assetsViewModel = AdaptyUIAssetsViewModel(
                 logId: logId,
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),

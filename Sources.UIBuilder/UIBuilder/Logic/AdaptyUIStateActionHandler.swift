@@ -58,6 +58,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     private weak var state: AdaptyUIState?
     
     package weak var stateViewModel: AdaptyUIStateViewModel?
+    package weak var timerViewModel: AdaptyUITimerViewModel?
 
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
@@ -199,13 +200,21 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     package nonisolated func setTimer(
         id: String,
         endAt: Date
-    ) {}
+    ) {
+        Task { @MainActor [weak self] in
+            self?.timerViewModel?.setEndDate(id: id, date: endAt)
+        }
+    }
 
     package nonisolated func setTimer(
         id: String,
         duration: TimeInterval,
         behavior: VC.SetTimerBehavior
-    ) {}
+    ) {
+        Task { @MainActor [weak self] in
+            self?.timerViewModel?.setDuration(id: id, duration: duration, behavior: behavior)
+        }
+    }
 
     package nonisolated func moveScroll(
         instanceId: String,
