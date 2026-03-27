@@ -225,6 +225,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             self?.stateViewModel?.scrollCommand = .init(instanceId: instanceId, kind: kind, value: value)
         }
     }
+
 }
 
 #endif

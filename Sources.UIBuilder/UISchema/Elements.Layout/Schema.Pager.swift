@@ -17,6 +17,7 @@ extension Schema {
         let pageControl: PageControl?
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
+        let pageIndex: Schema.Variable?
     }
 }
 
@@ -29,7 +30,8 @@ extension Schema.Pager {
         content: [],
         pageControl: nil,
         animation: nil,
-        interactionBehavior: .default
+        interactionBehavior: .default,
+        pageIndex: nil
     )
 }
 
@@ -56,7 +58,8 @@ extension Schema.Pager: Schema.CompositeElement {
                 content: resultStack.popLastElements(content.count),
                 pageControl: pageControl,
                 animation: animation,
-                interactionBehavior: interactionBehavior
+                interactionBehavior: interactionBehavior,
+                pageIndex: pageIndex
             ),
             properties
         )
@@ -73,6 +76,7 @@ extension Schema.Pager: DecodableWithConfiguration {
         case pageControl = "page_control"
         case animation
         case interactionBehavior = "interaction"
+        case pageIndex = "page_index"
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -93,7 +97,8 @@ extension Schema.Pager: DecodableWithConfiguration {
             animation: container.decodeIfPresent(Animation.self, forKey: .animation),
 
             interactionBehavior: container.decodeIfPresent(InteractionBehavior.self, forKey: .interactionBehavior)
-                ?? Self.default.interactionBehavior
+                ?? Self.default.interactionBehavior,
+            pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex)
         )
     }
 }

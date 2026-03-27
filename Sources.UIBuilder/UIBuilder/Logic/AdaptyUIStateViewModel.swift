@@ -108,6 +108,22 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         }
     }
 
+    func setPageIndex(
+        _ index: Int,
+        variable: VC.Variable,
+        screen: VS.ScreenInstance
+    ) {
+        do {
+            try stateHolder.state.setValue(
+                variable: variable,
+                value: Int32(index),
+                screenInstance: screen
+            )
+        } catch {
+            Log.ui.error("#\(logId)# setPageIndex error: \(error)")
+        }
+    }
+
     func getValue<T: JSValueRepresentable & JSValueConvertable>(
         _ variable: VC.Variable,
         defaultValue: T,
