@@ -21,8 +21,8 @@ package protocol AdaptyUIActionHandler: AnyObject {
 
     func registerState(_ state: AdaptyUIState)
     func changeFocus(id: String?)
-    func setTimer(id: String, endAt: Date)
-    func setTimer(id: String, duration: TimeInterval, behavior: VC.SetTimerBehavior)
+    func setTimer(id: String, endAt: Date, callback: VS.JSAction?)
+    func setTimer(id: String, duration: TimeInterval, behavior: VC.SetTimerBehavior, callback: VS.JSAction?)
     func moveScroll(instanceId: String, kind: VC.ScrollKind, value: VC.ScrollValue)
 
     func showAlertDialog(params: VS.ShowAlertDialogParameters, callback: VS.JSAction?)

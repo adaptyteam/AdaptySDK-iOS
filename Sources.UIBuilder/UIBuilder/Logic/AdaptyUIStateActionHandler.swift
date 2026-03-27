@@ -199,20 +199,29 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 
     package nonisolated func setTimer(
         id: String,
-        endAt: Date
+        endAt: Date,
+        callback: VS.JSAction?
     ) {
         Task { @MainActor [weak self] in
             self?.timerViewModel?.setEndDate(id: id, date: endAt)
+
+            // response TimerResponse
+            // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
         }
     }
 
     package nonisolated func setTimer(
         id: String,
         duration: TimeInterval,
-        behavior: VC.SetTimerBehavior
+        behavior: VC.SetTimerBehavior,
+        callback: VS.JSAction?
     ) {
         Task { @MainActor [weak self] in
             self?.timerViewModel?.setDuration(id: id, duration: duration, behavior: behavior)
+
+            // response TimerResponse
+            // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
+
         }
     }
 
@@ -232,7 +241,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     }
 
     package nonisolated func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction? ) {
-        // use ShowRequestPermissionParametersResponse
+        // response ShowRequestPermissionParametersResponse
         // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
     }
 }
