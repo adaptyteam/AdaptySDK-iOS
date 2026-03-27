@@ -23,6 +23,11 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     @Published var focusedId: String?
     @Published var scrollCommand: ScrollCommand?
+    @Published var alertDialog: AlertDialogState?
+
+    struct AlertDialogState {
+        let params: VS.ShowAlertDialogParameters
+    }
 
     struct ScrollCommand: Equatable {
         let id = UUID()
@@ -140,6 +145,16 @@ package final class AdaptyUIStateViewModel: ObservableObject {
             Log.ui.error("#\(logId)# getValue error: \(error)")
             return defaultValue
         }
+    }
+
+    var onAlertDialogResponse: ((String?, VS.ScreenInstance?) -> Void)?
+
+    func showAlertDialog(params: VS.ShowAlertDialogParameters) {
+        guard alertDialog == nil else {
+            Log.ui.error("#\(logId)# showAlertDialog ignored: alert already presenting")
+            return
+        }
+        alertDialog = AlertDialogState(params: params)
     }
 
     func createBinding<T: JSValueRepresentable & JSValueConvertable>(

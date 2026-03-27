@@ -9,6 +9,16 @@
 
 import SwiftUI
 
+extension VS.ShowAlertDialogParameters.ActionStyle {
+    var buttonRole: ButtonRole? {
+        switch self {
+        case .default: nil
+        case .cancel: .cancel
+        case .destructive: .destructive
+        }
+    }
+}
+
 struct AdaptyUIPaywallRendererView: View {
     @EnvironmentObject
     private var paywallViewModel: AdaptyUIPaywallViewModel
@@ -16,6 +26,19 @@ struct AdaptyUIPaywallRendererView: View {
     private var productsViewModel: AdaptyUIProductsViewModel
     @EnvironmentObject
     private var screensViewModel: AdaptyUIScreensViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
+
+    private var alertIsPresented: Binding<Bool> {
+        Binding(
+            get: { stateViewModel.alertDialog != nil },
+            set: { newValue in
+                if !newValue {
+                    stateViewModel.alertDialog = nil
+                }
+            }
+        )
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -43,6 +66,27 @@ struct AdaptyUIPaywallRendererView: View {
         .onAppear {
             paywallViewModel.logShowPaywall()
         }
+        .alert(
+            stateViewModel.alertDialog?.params.title ?? "",
+            isPresented: alertIsPresented,
+            actions: {
+                if let buttons = stateViewModel.alertDialog?.params.buttons, !buttons.isEmpty {
+                    ForEach(buttons, id: \.self) { button in
+                        Button(button.title ?? "", role: button.style.buttonRole) {
+                            stateViewModel.onAlertDialogResponse?(
+                                button.actionId,
+                                screensViewModel.topmostScreenInstance
+                            )
+                        }
+                    }
+                }
+            },
+            message: {
+                if let message = stateViewModel.alertDialog?.params.message {
+                    Text(message)
+                }
+            }
+        )
     }
 }
 

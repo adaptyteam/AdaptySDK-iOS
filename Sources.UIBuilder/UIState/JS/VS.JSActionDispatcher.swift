@@ -340,7 +340,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
 
         handler?.showAlertDialog(
             params: VS.ShowAlertDialogParameters.fromDictionary(dict),
-            callback: VS.JSAction(from: dict["callback"])
+            callback: VS.JSAction(from: params.forProperty("callback"))
         )
     }
 
@@ -352,7 +352,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
 
         handler?.showRequestPermission(
             params: VS.ShowRequestPermissionParameters.fromDictionary(dict),
-            callback: VS.JSAction(from: dict["callback"])
+            callback: VS.JSAction(from: params.forProperty("callback"))
         )
     }
 }

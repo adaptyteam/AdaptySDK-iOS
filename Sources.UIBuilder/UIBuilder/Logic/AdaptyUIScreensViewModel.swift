@@ -34,6 +34,10 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         navigatorsViewModels = []
     }
 
+    var topmostScreenInstance: VS.ScreenInstance? {
+        navigatorsViewModels.max(by: { $0.order < $1.order })?.screens.last?.instance
+    }
+
     func present(
         screen: VS.ScreenInstance,
         transitionId: String,

@@ -57,8 +57,16 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     private let logic: AdaptyUIBuilderLogic
     private weak var state: AdaptyUIState?
     
-    package weak var stateViewModel: AdaptyUIStateViewModel?
+    package weak var stateViewModel: AdaptyUIStateViewModel? {
+        didSet {
+            stateViewModel?.onAlertDialogResponse = { [weak self] actionId, screenInstance in
+                self?.handleAlertDialogResponse(actionId: actionId, screenInstance: screenInstance)
+            }
+        }
+    }
     package weak var timerViewModel: AdaptyUITimerViewModel?
+
+    private nonisolated(unsafe) var pendingAlertDialogCallback: VS.JSAction?
 
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
@@ -235,9 +243,27 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
 
-    package nonisolated func showAlertDialog(params: VS.ShowAlertDialogParameters, callback: VS.JSAction? ) {
-        // response ShowAlertDialogParametersResponse
-        // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
+    package nonisolated func showAlertDialog(
+        params: VS.ShowAlertDialogParameters,
+        callback: VS.JSAction?
+    ) {
+        pendingAlertDialogCallback = callback
+        Task { @MainActor [weak self] in
+            self?.stateViewModel?.showAlertDialog(params: params)
+        }
+    }
+
+    package func handleAlertDialogResponse(actionId: String?, screenInstance: VS.ScreenInstance?) {
+        let callback = pendingAlertDialogCallback
+        pendingAlertDialogCallback = nil
+
+        guard let callback, let screenInstance else { return }
+        let response = VS.ShowAlertDialogParametersResponse(actionId: actionId)
+        do {
+            try state?.execute(action: callback, params: response, screenInstance: screenInstance)
+        } catch {
+            Log.ui.error("alertDialog callback error: \(error)")
+        }
     }
 
     package nonisolated func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction? ) {
