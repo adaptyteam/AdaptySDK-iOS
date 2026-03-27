@@ -176,6 +176,7 @@ extension VS.JSState {
         guard parent.hasProperty(name) else {
             throw .jsMethodNotFound(path.joined(separator: "."))
         }
+
         let value: JSValue? = parent.invokeMethod(
             name,
             withArguments: functionArguments.map { $0.toJSValue(in: context) }
@@ -190,6 +191,29 @@ extension VS.JSState {
             log.debug("method called \(path.joined(separator: "."))")
             return nil
         }
+    }
+
+    private func invokeMethod<T: JSValueRepresentable>(
+        _: T.Type,
+        function : JSValue,
+        args functionArguments: [any JSValueConvertable] = []
+    ) throws(VS.Error) -> T? {
+
+        let value: JSValue? = function.call(
+            withArguments: functionArguments.map { $0.toJSValue(in: context) }
+        )
+
+        let name = function.forProperty("name")?.toString() ?? ""
+        if let value = T.fromJSValue(value) {
+            log.debug(
+                "callback \(name) -> \(String(describing: value))"
+            )
+            return value
+        } else {
+            log.debug("callback \(name)")
+            return nil
+        }
+
     }
 
     func setValue(
@@ -236,6 +260,25 @@ extension VS.JSState {
         parent.setValue(value.toJSValue(in: context), forProperty: name as NSString)
 //        let after = self.debug(path: "", filter: .withoutFunction)
         log.debug("set variable \(path.joined(separator: ".")) = \(value)")
+        objectWillChange.send()
+    }
+
+    func execute(
+        action: VS.JSAction,
+        params: (some JSValueConvertable)?,
+        screenInstance: VS.ScreenInstance
+    ) throws(VS.Error) {
+        let object = VS.ActionParameters(
+            screenInstance: screenInstance,
+            params: params
+        )
+
+        _ = try invokeMethod(
+            Bool.self,
+            function: action.callback,
+            args: [object]
+        )
+
         objectWillChange.send()
     }
 

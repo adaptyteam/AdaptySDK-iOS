@@ -38,6 +38,7 @@ extension VS {
     func changeFocus(_ params: JSValue)
     func setTimer(_ params: JSValue)
     func moveScroll(_ params: JSValue)
+    func showAlertDialog(_ params: JSValue)
 }
 
 extension VS.JSActionDispatcher {
@@ -258,6 +259,8 @@ extension VS.JSActionDispatcher: JSActionBridge {
         var duration: Double?
         var behavior: VC.SetTimerBehavior?
 
+        var callback: VS.JSAction?
+
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             timerId = dict["id"] as? String
 
@@ -270,6 +273,8 @@ extension VS.JSActionDispatcher: JSActionBridge {
             if let value = dict["behavior"] as? String {
                 behavior = .init(rawValue: value)
             }
+
+            callback = VS.JSAction(from: dict["callback"])
         }
 
         guard let timerId else {
@@ -278,12 +283,12 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         if let endAt {
-            handler?.setTimer(id: timerId, endAt: endAt)
+            handler?.setTimer(id: timerId, endAt: endAt, callback: callback)
             return
         }
 
         if let duration {
-            handler?.setTimer(id: timerId, duration: duration, behavior: behavior ?? .continue)
+            handler?.setTimer(id: timerId, duration: duration, behavior: behavior ?? .continue, callback: callback)
             return
         }
     }
@@ -324,6 +329,30 @@ extension VS.JSActionDispatcher: JSActionBridge {
             instanceId: instanceId,
             kind: kind,
             value: value
+        )
+    }
+
+    func showAlertDialog(_ params: JSValue) {
+        guard params.isObject, let dict = params.toDictionary() as? [String: Any] else {
+            Log.viewState.error(#"SDK.showAlertDialog: corupted params"#)
+            return
+        }
+
+        handler?.showAlertDialog(
+            params: VS.ShowAlertDialogParameters.fromDictionary(dict),
+            callback: VS.JSAction(from: dict["callback"])
+        )
+    }
+
+    func showRequestPermission(_ params: JSValue) {
+        guard params.isObject, let dict = params.toDictionary() as? [String: Any] else {
+            Log.viewState.error(#"SDK.showRequestPermission: corupted params"#)
+            return
+        }
+
+        handler?.showRequestPermission(
+            params: VS.ShowRequestPermissionParameters.fromDictionary(dict),
+            callback: VS.JSAction(from: dict["callback"])
         )
     }
 }
