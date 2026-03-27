@@ -274,7 +274,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
                 behavior = .init(rawValue: value)
             }
 
-            callback = VS.JSAction(from: dict["callback"])
+            callback = VS.JSAction(from: params.forProperty("callback"))
         }
 
         guard let timerId else {
