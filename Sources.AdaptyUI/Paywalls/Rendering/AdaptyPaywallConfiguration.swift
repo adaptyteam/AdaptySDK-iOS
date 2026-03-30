@@ -38,6 +38,7 @@ public extension AdaptyUI {
         fileprivate let tagResolver: AdaptyUITagResolver?
         fileprivate let timerResolver: AdaptyTimerResolver?
         fileprivate let assetsResolver: AdaptyUIAssetsResolver?
+        fileprivate let systemRequestsHandler: AdaptyUISystemRequestsHandler?
 
         package init(
             logId: String,
@@ -47,7 +48,8 @@ public extension AdaptyUI {
             observerModeResolver: AdaptyObserverModeResolver?,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
-            assetsResolver: AdaptyUIAssetsResolver?
+            assetsResolver: AdaptyUIAssetsResolver?,
+            systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
         ) {
             Log.ui.verbose("#\(logId)# init products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
 
@@ -62,6 +64,7 @@ public extension AdaptyUI {
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
+            self.systemRequestsHandler = systemRequestsHandler
             
 
 
@@ -117,6 +120,7 @@ public extension AdaptyUI {
             )
             self.timerViewModel = timerViewModel
             actionHandler.timerViewModel = timerViewModel
+            actionHandler.systemRequestsHandler = systemRequestsHandler
             assetsViewModel = AdaptyUIAssetsViewModel(
                 logId: logId,
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),

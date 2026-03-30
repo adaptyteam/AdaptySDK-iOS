@@ -66,7 +66,10 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     }
     package weak var timerViewModel: AdaptyUITimerViewModel?
 
+    package var systemRequestsHandler: AdaptyUISystemRequestsHandler?
+
     private nonisolated(unsafe) var pendingAlertDialogCallback: VS.JSAction?
+    private nonisolated(unsafe) var pendingPermissionCallback: VS.JSAction?
 
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
@@ -265,10 +268,41 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     }
 
 
-    package nonisolated func showAppRate() {}
-    package nonisolated func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction? ) {
-        // response ShowRequestPermissionParametersResponse
-        // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
+    package nonisolated func showAppRate() {
+        Task { @MainActor [weak self] in
+            await self?.systemRequestsHandler?.handleAppReviewRequest()
+        }
+    }
+
+    package nonisolated func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction?) {
+        pendingPermissionCallback = callback
+        Task { @MainActor [weak self] in
+            guard let self, let handler = self.systemRequestsHandler else { return }
+
+            let permission = AdaptyUIPermission(jsString: params.permission ?? "custom")
+            let result = await handler.handlePermission(permission, withCustomArgs: params.customArgs)
+
+            let callback = self.pendingPermissionCallback
+            self.pendingPermissionCallback = nil
+
+            guard let callback, let screenInstance = self.screensViewModel.topmostScreenInstance else { return }
+
+            let response = VS.ShowRequestPermissionParametersResponse(
+                request: params,
+                result: result.isGranted,
+                detailResult: result.detail
+            )
+
+            do {
+                try self.state?.execute(
+                    action: callback,
+                    params: response,
+                    screenInstance: screenInstance
+                )
+            } catch {
+                Log.ui.error("showRequestPermission callback error: \(error)")
+            }
+        }
     }
 }
 

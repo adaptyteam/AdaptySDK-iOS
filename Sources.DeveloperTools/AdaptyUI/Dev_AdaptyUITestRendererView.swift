@@ -39,7 +39,8 @@ public extension AdaptyUI {
             observerModeResolver: AdaptyObserverModeResolver?,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
-            assetsResolver: AdaptyUIAssetsResolver?
+            assetsResolver: AdaptyUIAssetsResolver?,
+            systemRequestsHandler: AdaptyUISystemRequestsHandler?
         ) {
             self.logId = logId
             self.observerModeResolver = observerModeResolver
@@ -88,6 +89,7 @@ public extension AdaptyUI {
                 stateHolder: stateHolder
             )
             actionHandler.stateViewModel = stateViewModel
+            actionHandler.systemRequestsHandler = systemRequestsHandler
             let timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
@@ -127,6 +129,7 @@ public struct Dev_AdaptyUIRendererView: View {
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
         assetsResolver: AdaptyUIAssetsResolver?,
+        systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
         safeAreaOverride: EdgeInsets? = nil,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
@@ -144,7 +147,8 @@ public struct Dev_AdaptyUIRendererView: View {
             observerModeResolver: nil,
             tagResolver: ["TEST_TAG": "Adapty"],
             timerResolver: nil,
-            assetsResolver: assetsResolver
+            assetsResolver: assetsResolver,
+            systemRequestsHandler: systemRequestsHandler
         )
 
         self.didAppear = didAppear
