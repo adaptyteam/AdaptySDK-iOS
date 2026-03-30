@@ -38,7 +38,9 @@ extension VS {
     func changeFocus(_ params: JSValue)
     func setTimer(_ params: JSValue)
     func moveScroll(_ params: JSValue)
+    func showAppRate(_ params: JSValue)
     func showAlertDialog(_ params: JSValue)
+    func showRequestPermission(_ params: JSValue)
 }
 
 extension VS.JSActionDispatcher {
@@ -311,6 +313,10 @@ extension VS.JSActionDispatcher: JSActionBridge {
             kind: kind,
             value: value
         )
+    }
+
+    func showAppRate(_ params: JSValue) {
+        handler?.showAppRate()
     }
 
     func showAlertDialog(_ params: JSValue) {

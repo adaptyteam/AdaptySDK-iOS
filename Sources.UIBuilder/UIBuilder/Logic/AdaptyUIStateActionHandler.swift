@@ -264,6 +264,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
 
+
+    package nonisolated func showAppRate() {}
     package nonisolated func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction? ) {
         // response ShowRequestPermissionParametersResponse
         // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
