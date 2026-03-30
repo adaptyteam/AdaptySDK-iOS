@@ -13,11 +13,11 @@ private let log = Log.storage
 final class PlacementStorage {
     private static func getPlacement<Content: PlacementContent>(_ placementId: String) -> VH<Content>? {
         if Content.self == AdaptyPaywall.self {
-            return PaywallStorage.paywallByPlacementId[placementId] as? VH<Content>
+            PaywallStorage.paywallByPlacementId[placementId] as? VH<Content>
         } else if Content.self == AdaptyOnboarding.self {
-            return OnboardingStorage.onboardingByPlacementId[placementId] as? VH<Content>
+            OnboardingStorage.onboardingByPlacementId[placementId] as? VH<Content>
         } else {
-            return nil
+            nil
         }
     }
 
@@ -68,8 +68,7 @@ final class PlacementStorage {
 
     private func getNewerPlacement<Content: PlacementContent>(than content: Content) -> Content? {
         guard var cached: Content = Self.getPlacement(content.placement.id)?.value,
-              cached.remoteConfig?.adaptyLocale == content.remoteConfig?.adaptyLocale,
-              cached.viewConfigurationLocale == content.viewConfigurationLocale,
+              cached.equalAllLocales(content),
               cached.variationId == content.variationId,
               cached.placement.isNewerThan(content.placement)
         else { return nil }
@@ -93,3 +92,4 @@ final class PlacementStorage {
         OnboardingStorage.clear()
     }
 }
+

@@ -43,7 +43,7 @@ final class Storage {
 
     @AdaptyActor
     private static func createAppInstallation() -> (identifier: String, time: Date?, appLaunchCount: Int?) {
-        let identifier = UUID().uuidString.lowercased()
+        let identifier = UUID().lowercased
         let time = Date()
         let appLaunchCount = 1
         log.debug("appInstallation identifier = \(identifier), time = \(time), appLaunchCount: \(appLaunchCount)")

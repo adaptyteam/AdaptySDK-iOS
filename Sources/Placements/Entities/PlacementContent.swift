@@ -10,51 +10,104 @@ protocol PlacementContent: Sendable, Codable {
     var instanceIdentity: String { get }
     var variationId: String { get }
     var name: String { get }
-    var remoteConfig: AdaptyRemoteConfig? { get }
 
     var requestLocale: AdaptyLocale { get set }
 }
 
 extension PlacementContent {
-    var viewConfigurationLocale: AdaptyLocale? {
-        guard let paywall = self as? AdaptyPaywall else { return nil }
-        return paywall.viewConfiguration?.locale
-    }
-
-    var locale: AdaptyLocale? {
-        var remoteConfigLocale = remoteConfig?.adaptyLocale
-        if remoteConfigLocale?.equalLanguageCode(.defaultPlacementLocale) ?? false {
-            remoteConfigLocale = nil
-        }
-        var viewConfigurationLocale = viewConfigurationLocale
-
-        if viewConfigurationLocale?.equalLanguageCode(.defaultPlacementLocale) ?? false {
-            viewConfigurationLocale = nil
-        }
-
-        return switch (remoteConfigLocale, viewConfigurationLocale) {
-        case (nil, nil): nil
-        case let (locale?, _),
-             let (_, locale?): locale
+    func equalAllLocales(_ other: PlacementContent) -> Bool {
+        if let paywall = self as? AdaptyPaywall, let other = other as? AdaptyPaywall {
+            paywall.viewConfiguration?.locale == other.viewConfiguration?.locale
+                && paywall.remoteConfig?.adaptyLocale == other.remoteConfig?.adaptyLocale
+        } else if let onbording = self as? AdaptyOnboarding, let other = other as? AdaptyOnboarding {
+            onbording.remoteConfig?.adaptyLocale == other.remoteConfig?.adaptyLocale
+        } else if let flow = self as? AdaptyFlow, let other = other as? AdaptyFlow {
+            Set(flow.remoteConfigs.map(\.adaptyLocale)) == Set(other.remoteConfigs.map(\.adaptyLocale))
+        } else {
+            false
         }
     }
 
-
-    
+    @inlinable
     func has(languageCode otherLocale: AdaptyLocale, orDefault: Bool = false) -> Bool {
-        let locale = locale ?? .defaultPlacementLocale
-        if locale.equalLanguageCode(otherLocale) { return true }
-        else if orDefault, locale.equalLanguageCode(.defaultPlacementLocale) { return true }
-        else { return false }
+        if let paywall = self as? AdaptyPaywall {
+            paywall.paywallHas(languageCode: otherLocale, orDefault: orDefault)
+        } else if let onbording = self as? AdaptyOnboarding {
+            onbording.onbordingHas(languageCode: otherLocale, orDefault: orDefault)
+        } else if self is AdaptyFlow {
+            true
+        } else {
+            false
+        }
     }
 
+    @inlinable
     func has(variationId: String?) -> Bool {
         guard let variationId else { return true }
         return self.variationId == variationId
     }
 }
 
+extension AdaptyPaywall {
+    func paywallHas(languageCode otherLocale: AdaptyLocale, orDefault: Bool = false) -> Bool {
+        let orDefault = otherLocale.equalLanguageCode(.defaultPlacementLocale) ? false : orDefault
+
+        return switch (remoteConfig?.adaptyLocale, viewConfiguration?.locale) {
+        case (nil, nil):
+            if orDefault {
+                true
+            } else {
+                otherLocale.equalLanguageCode(.defaultPlacementLocale)
+            }
+
+        case let (rcLocale?, vcLocale?):
+            if rcLocale.equalLanguageCode(otherLocale) || vcLocale.equalLanguageCode(otherLocale) {
+                true
+            } else if orDefault {
+                rcLocale.equalLanguageCode(.defaultPlacementLocale) || vcLocale.equalLanguageCode(.defaultPlacementLocale)
+            } else {
+                false
+            }
+
+        case let (locale?, _),
+             let (_, locale?):
+            if locale.equalLanguageCode(otherLocale) {
+                true
+            } else if orDefault {
+                locale.equalLanguageCode(.defaultPlacementLocale)
+            } else {
+                false
+            }
+        }
+    }
+}
+
+extension AdaptyOnboarding {
+    func onbordingHas(languageCode otherLocale: AdaptyLocale, orDefault: Bool = false) -> Bool {
+        let orDefault = otherLocale.equalLanguageCode(.defaultPlacementLocale) ? false : orDefault
+
+        return switch remoteConfig?.adaptyLocale {
+        case .none:
+            if orDefault {
+                true
+            } else {
+                otherLocale.equalLanguageCode(.defaultPlacementLocale)
+            }
+
+        case let .some(locale):
+            if locale.equalLanguageCode(otherLocale) {
+                true
+            } else if orDefault {
+                locale.equalLanguageCode(.defaultPlacementLocale)
+            } else {
+                false
+            }
+        }
+    }
+}
+
 extension VH where Value: PlacementContent {
+    @inlinable
     var requestLocale: AdaptyLocale {
         get { value.requestLocale }
         mutating set {
@@ -67,11 +120,14 @@ extension VH where Value: PlacementContent {
         }
     }
 
+    @inlinable
     func has(languageCode locale: AdaptyLocale, orDefault: Bool = false) -> Bool {
         value.has(languageCode: locale, orDefault: orDefault)
     }
 
+    @inlinable
     func has(variationId: String?) -> Bool {
         value.has(variationId: variationId)
     }
 }
+

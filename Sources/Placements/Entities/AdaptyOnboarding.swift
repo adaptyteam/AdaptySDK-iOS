@@ -34,9 +34,7 @@ public struct AdaptyOnboarding: PlacementContent {
 
 extension AdaptyOnboarding: CustomStringConvertible {
     public var description: String {
-        "(placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration)"
-            + (remoteConfig.map { ", remoteConfig: \($0)" } ?? "")
-            + ", requestLocale: \(requestLocale.id))"
+        "(onboarding, placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration), requestLocale: \(requestLocale.id))"
     }
 }
 

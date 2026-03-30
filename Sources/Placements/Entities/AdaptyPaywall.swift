@@ -37,9 +37,7 @@ public struct AdaptyPaywall: PlacementContent, WebPaywallURLProviding {
 
 extension AdaptyPaywall: CustomStringConvertible {
     public var description: String {
-        "(placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration)"
-            + (remoteConfig.map { ", remoteConfig: \($0)" } ?? "")
-            + ", vendorProductIds: [\(vendorProductIds.joined(separator: ", "))])"
+        "(paywall, placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration), requestLocale: \(requestLocale.id))"
     }
 }
 

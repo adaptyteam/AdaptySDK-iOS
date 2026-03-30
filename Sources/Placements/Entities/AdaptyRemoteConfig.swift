@@ -39,4 +39,10 @@ extension AdaptyRemoteConfig: Codable {
         adaptyLocale = try container.decode(AdaptyLocale.self, forKey: .adaptyLocale)
         jsonString = try container.decode(String.self, forKey: .jsonString)
     }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.adaptyLocale, forKey: .adaptyLocale)
+        try container.encode(self.jsonString, forKey: .jsonString)
+    }
 }

@@ -16,7 +16,7 @@ extension Event {
         let createdAt: Date
 
         init(
-            id: String = UUID().uuidString.lowercased(),
+            id: String = UUID().lowercased,
             event: Event,
             userId: AdaptyUserId,
             environment: Environment,
