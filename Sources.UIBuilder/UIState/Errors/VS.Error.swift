@@ -19,5 +19,7 @@ extension VS {
         case jsMethodNotFound(String)
 
         case notFoundConvertor(String)
+        case convertorError(String)
+
     }
 }

@@ -135,30 +135,51 @@ extension VS.JSState {
             return T.fromJSValue(result)
         }
 
-        let converted = try convert(value: result, convertor: convertor)
+        let converted = try readConvert(value: result, convertor: convertor)
         log.debug("convert to value: \(converted)")
 
         return T.fromJSValue(converted)
     }
 
-    private func convert(value: JSValue, convertor: VC.Variable.Converter) throws(VS.Error) -> JSValue {
+    private func readConvert(value: JSValue, convertor: VC.Variable.Converter) throws(VS.Error) -> JSValue {
         switch convertor {
         case let .isEqual(a, _):
             let rhs = a.toJSValue(in: context)
             let result = value.isEqual(to: rhs)
             return result.toJSValue(in: context)
+        case let .dataTimeWithFormat(format):
+            guard let unixtimestamp = Double.fromJSValue(value) else {
+                throw .convertorError("dataTimeWithStyle: expected a numeric timestamp")
+            }
+            let value = Date(timeIntervalSince1970: unixtimestamp / 1000.0)
+            let formatter = DateFormatter()
+//            formatter.locale
+            formatter.dateFormat = format
+            return formatter.string(from: value).toJSValue(in: context)
+        case let .dataTimeWithStyle(date, time):
+            guard let unixtimestamp = Double.fromJSValue(value) else {
+                throw .convertorError("dataTimeWithStyle: expected a numeric timestamp")
+            }
+            let value = Date(timeIntervalSince1970: unixtimestamp / 1000.0)
+            let formatter = DateFormatter()
+//            formatter.locale
+            formatter.dateStyle = date
+            formatter.timeStyle = time
+            return formatter.string(from: value).toJSValue(in: context)
         case let .unknown(name, _):
             throw .notFoundConvertor(name)
         }
     }
 
-    private func backConvert(value: some JSValueConvertable, convertor: VC.Variable.Converter) throws(VS.Error) -> VC.Parameter {
+    private func writeConvert(value: some JSValueConvertable, convertor: VC.Variable.Converter) throws(VS.Error) -> any JSValueConvertable {
         switch convertor {
         case let .isEqual(a, b):
             let boolValue = value.toJSValue(in: context).toBool()
             guard !boolValue else { return a }
             if let b { return b }
-            return .null
+            return VC.Parameter.null
+        case .dataTimeWithFormat, .dataTimeWithStyle:
+            return value
         case let .unknown(name, _):
             throw .notFoundConvertor(name)
         }
@@ -195,10 +216,9 @@ extension VS.JSState {
 
     private func invokeMethod<T: JSValueRepresentable>(
         _: T.Type,
-        function : JSValue,
+        function: JSValue,
         args functionArguments: [any JSValueConvertable] = []
     ) throws(VS.Error) -> T? {
-
         let value: JSValue? = function.call(
             withArguments: functionArguments.map { $0.toJSValue(in: context) }
         )
@@ -213,7 +233,6 @@ extension VS.JSState {
             log.debug("callback \(name)")
             return nil
         }
-
     }
 
     func setValue(
@@ -226,7 +245,7 @@ extension VS.JSState {
             return
         }
 
-        let converted = try backConvert(value: value, convertor: convertor)
+        let converted = try writeConvert(value: value, convertor: convertor)
         log.debug("convert \(value) to: \(converted)")
         try setValueWithoutConverter(variable: variable, value: converted, screenInstance: screenInstance)
     }

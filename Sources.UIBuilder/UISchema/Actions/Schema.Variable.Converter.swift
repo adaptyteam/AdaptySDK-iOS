@@ -15,6 +15,7 @@ extension Schema.Variable.Converter: Codable {
 
     private enum Names: String, Codable {
         case isEqual = "is_equal"
+        case dateTime = "date_time"
     }
 
     init(from decoder: Decoder) throws {
@@ -27,18 +28,65 @@ extension Schema.Variable.Converter: Codable {
         switch Names(rawValue: name) {
         case .isEqual:
             guard let params else {
-                throw DecodingError.keyNotFound(CodingKeys.params, .init(codingPath: container.codingPath, debugDescription: "Not found required key"))
+                throw DecodingError.keyNotFound(CodingKeys.params, .init(codingPath: container.codingPath, debugDescription: "Required key '\(CodingKeys.params.stringValue)' not found for 'is_equal' converter"))
             }
 
             switch params {
             case let .object(object):
                 guard let value = object["value"], value != .null else {
-                    throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.params], debugDescription: "Not found `value` key"))
+                    throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath + [CodingKeys.params], debugDescription: "Missing required 'value' key in 'is_equal' converter params"))
                 }
 
                 self = .isEqual(value, falseValue: object["false_value"])
             default:
                 self = .isEqual(params, falseValue: nil)
+            }
+
+        case .dateTime:
+            guard let params else {
+                throw DecodingError.keyNotFound(CodingKeys.params, .init(codingPath: container.codingPath, debugDescription: "Required key '\(CodingKeys.params.stringValue)' not found for 'date_time' converter"))
+            }
+
+            switch params {
+            case let .object(object):
+                if let format = object["format"] {
+                    if case let .string(value) = format {
+                        self = .dataTimeWithFormat(value)
+                        return
+                    }
+                    throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "The 'format' parameter must be a string in 'date_time' converter")
+                }
+
+                var dateStyle: DateFormatter.Style
+                var timeStyle: DateFormatter.Style
+
+                if let p = object["date"] {
+                    if case let .string(v) = p, let value = DateFormatter.Style(fromString: v) {
+                        dateStyle = value
+                    }
+                    throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "The 'date' parameter must be a string in 'date_time' converter")
+                } else {
+                    dateStyle = .none
+                }
+
+                if let p = object["time"] {
+                    if case let .string(v) = p, let value = DateFormatter.Style(fromString: v) {
+                        timeStyle = value
+                    }
+                    throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "The 'time' parameter must be a string in 'date_time' converter")
+                } else {
+                    timeStyle = .none
+                }
+
+                if dateStyle == .none, timeStyle == .none {
+                    throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "At least one of 'date', 'time', or 'format' string parameters is required for 'date_time' converter")
+                }
+
+                self = .dataTimeWithStyle(dateStyle, timeStyle)
+            case let .string(value):
+                self = .dataTimeWithFormat(value)
+            default:
+                throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "Unsupported parameter type for 'date_time' converter: expected an object or a string")
             }
 
         case nil:
@@ -58,9 +106,18 @@ extension Schema.Variable.Converter: Codable {
                     value
                 }
             try container.encode(params, forKey: .params)
+        case let .dataTimeWithFormat(format):
+            try container.encode(Names.dateTime, forKey: .name)
+            let params: VC.Parameter = .object(["format": .string(format)])
+            try container.encode(params, forKey: .params)
+        case let .dataTimeWithStyle(date, time):
+            try container.encode(Names.dateTime, forKey: .name)
+            let params: VC.Parameter = .object(["date_style": .string(date.stringValue), "time_style": .string(time.stringValue)])
+            try container.encode(params, forKey: .params)
         case let .unknown(name, params):
             try container.encode(name, forKey: .name)
             try container.encodeIfPresent(params, forKey: .params)
         }
     }
 }
+
