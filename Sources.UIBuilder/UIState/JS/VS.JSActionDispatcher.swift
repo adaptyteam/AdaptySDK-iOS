@@ -108,11 +108,9 @@ extension VS.JSActionDispatcher: JSActionBridge {
 
     func purchaseProduct(_ params: JSValue) {
         var productId: String?
-        var paywallId: String?
 
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             productId = dict["productId"] as? String
-            paywallId = dict["paywallId"] as? String
         }
 
         guard let productId else {
@@ -120,22 +118,15 @@ extension VS.JSActionDispatcher: JSActionBridge {
             return
         }
 
-        guard let paywallId else {
-            Log.viewState.error(#"SDK.purchaseProduct: required parameter "paywallId" is missing"#)
-            return
-        }
-
-        handler?.purchaseProduct(productId: productId, paywallId: paywallId, service: .storeKit)
+        handler?.purchaseProduct(productId: productId, service: .storeKit)
     }
 
     func webPurchaseProduct(_ params: JSValue) {
         var productId: String?
-        var paywallId: String?
         var openIn = VC.Action.WebOpenInParameter.browserOutApp
 
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             productId = dict["productId"] as? String
-            paywallId = dict["paywallId"] as? String
             openIn = (dict["openIn"] as? String).flatMap(VC.Action.WebOpenInParameter.init) ?? openIn
         }
 
@@ -144,12 +135,8 @@ extension VS.JSActionDispatcher: JSActionBridge {
             return
         }
 
-        guard let paywallId else {
-            Log.viewState.error(#"SDK.purchaseProduct: required parameter "paywallId" is missing"#)
-            return
-        }
 
-        handler?.purchaseProduct(productId: productId, paywallId: paywallId, service: .openWebPaywall(openIn: openIn))
+        handler?.purchaseProduct(productId: productId, service: .openWebPaywall(openIn: openIn))
     }
 
     func restorePurchases() {
@@ -162,23 +149,17 @@ extension VS.JSActionDispatcher: JSActionBridge {
 
     func onSelectProduct(_ params: JSValue) {
         var productId: String?
-        var paywallId: String?
 
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             productId = dict["productId"] as? String
-            paywallId = dict["paywallId"] as? String
         }
 
         guard let productId else {
             Log.viewState.error(#"SDK.onSelectProduct: required parameter "productId" is missing"#)
             return
         }
-        guard let paywallId else {
-            Log.viewState.error(#"SDK.purchaseProduct: required parameter "paywallId" is missing"#)
-            return
-        }
 
-        handler?.selectProduct(productId: productId, paywallId: paywallId)
+        handler?.selectProduct(productId: productId)
     }
 
     func openScreen(_ params: JSValue) {

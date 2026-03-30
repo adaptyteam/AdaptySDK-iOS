@@ -153,7 +153,7 @@ extension VS.JSState {
             }
             let value = Date(timeIntervalSince1970: unixtimestamp / 1000.0)
             let formatter = DateFormatter()
-//            formatter.locale
+// TODO: use locale of UIConfiguration           formatter.locale
             formatter.dateFormat = format
             return formatter.string(from: value).toJSValue(in: context)
         case let .dataTimeWithStyle(date, time):
@@ -162,7 +162,7 @@ extension VS.JSState {
             }
             let value = Date(timeIntervalSince1970: unixtimestamp / 1000.0)
             let formatter = DateFormatter()
-//            formatter.locale
+// TODO: use locale of UIConfiguration            formatter.locale
             formatter.dateStyle = date
             formatter.timeStyle = time
             return formatter.string(from: value).toJSValue(in: context)

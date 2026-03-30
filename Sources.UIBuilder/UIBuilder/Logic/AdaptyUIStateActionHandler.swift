@@ -123,7 +123,6 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 
     package nonisolated func purchaseProduct(
         productId: String,
-        paywallId _: String,
         service: VC.Action.PaymentService
     ) {
         Task { @MainActor [weak self] in
@@ -153,15 +152,14 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     }
 
     package nonisolated func selectProduct(
-        productId: String,
-        paywallId: String
+        productId: String
     ) {
         Task { @MainActor [weak self] in
             // TODO: move animation out of here
             withAnimation(.linear(duration: 0.0)) {
                 self?.productsViewModel.selectProduct(
                     id: productId,
-                    forGroupId: paywallId // TODO: x check
+                    forGroupId: "paywallId deprecated" // TODO: x check
                 )
             }
         }
