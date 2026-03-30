@@ -8,6 +8,8 @@
 #if canImport(UIKit)
 
 import Foundation
+import StoreKit
+import UIKit
 
 @MainActor
 public protocol AdaptyUITagResolver: Sendable {
@@ -68,6 +70,25 @@ package protocol AdaptyUIBuilderLogic {
     )
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError)
+}
+
+@MainActor
+public protocol AdaptyUISystemRequestsHandler: Sendable {
+    func handlePermission(
+        _ permission: AdaptyUIPermission,
+        withCustomArgs customArgs: [String: String]?
+    ) async -> AdaptyUIPermissionResult
+
+    func handleAppReviewRequest() async
+}
+
+extension AdaptyUISystemRequestsHandler {
+    public func handleAppReviewRequest() async {
+        if let windowScene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: windowScene)
+        }
+    }
 }
 
 #endif

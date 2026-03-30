@@ -197,6 +197,12 @@ public typealias AdaptyAssetsResolver = AdaptyUIAssetsResolver
 
 public typealias AdaptyCustomAsset = AdaptyUICustomAsset
 
+public typealias AdaptySystemRequestsHandler = AdaptyUISystemRequestsHandler
+
+public typealias AdaptyPermission = AdaptyUIPermission
+
+public typealias AdaptyPermissionResult = AdaptyUIPermissionResult
+
 #endif
 
 public protocol AdaptyObserverModeResolver: Sendable {
@@ -283,7 +289,8 @@ public extension AdaptyUI {
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
-        assetsResolver: AdaptyUIAssetsResolver? = nil
+        assetsResolver: AdaptyUIAssetsResolver? = nil,
+        systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
     ) async throws -> PaywallConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyUINotActivated
@@ -305,7 +312,8 @@ public extension AdaptyUI {
             observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
             timerResolver: timerResolver,
-            assetsResolver: assetsResolver
+            assetsResolver: assetsResolver,
+            systemRequestsHandler: systemRequestsHandler
         )
     }
 
