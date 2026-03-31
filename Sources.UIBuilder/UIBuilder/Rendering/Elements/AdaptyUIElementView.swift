@@ -9,18 +9,6 @@
 
 import SwiftUI
 
-extension View {
-    @ViewBuilder
-    func paddingIfNeeded(_ insets: EdgeInsets?) -> some View {
-        if let insets {
-            padding(insets)
-        } else {
-            self
-        }
-    }
-
-}
-
 @MainActor
 struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     private let element: VC.Element
@@ -113,19 +101,16 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
 
 struct AdaptyUIElementView<ScreenHolderContent: View>: View {
     private let element: VC.Element
-    private let additionalPadding: EdgeInsets?
     private let drawDecoratorBackground: Bool
     private let screenHolderBuilder: () -> ScreenHolderContent
 
     init(
         _ element: VC.Element,
         @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent,
-        additionalPadding: EdgeInsets? = nil,
         drawDecoratorBackground: Bool = true
     ) {
         self.element = element
         self.screenHolderBuilder = screenHolderBuilder
-        self.additionalPadding = additionalPadding
         self.drawDecoratorBackground = drawDecoratorBackground
     }
 
@@ -137,13 +122,11 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             element,
             screenHolderBuilder: screenHolderBuilder
         )
-        .paddingIfNeeded(additionalPadding)
         .animatableDecorator(
             element.properties?.decorator,
             animations: element.properties?.onAppear,
             includeBackground: drawDecoratorBackground
         )
-        .animatableProperties(element.properties, play: $playOnAppearAnimations)
         .modifier(ElementBackgroundModifier(
             backgrounds: element.properties?.background,
             screenHolderBuilder: screenHolderBuilder
@@ -152,6 +135,7 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             overlays: element.properties?.overlay,
             screenHolderBuilder: screenHolderBuilder
         ))
+        .animatableProperties(element.properties, play: $playOnAppearAnimations)
         .padding(element.properties?.padding)
         .modifier(ElementInteractionEnabledModifier(element.properties?.interactionEnabled))
         .modifier(DebugOverlayModifier())
