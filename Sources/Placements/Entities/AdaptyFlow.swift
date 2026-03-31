@@ -18,6 +18,12 @@ public struct AdaptyFlow: PlacementContent {
         viewConfiguration != nil
     }
 
+    let paywalls: [AdaptyFlow.Paywall]
+
+    /// Array of related products ids.
+
+    public var vendorProductIds: [String] { paywalls.flatMap(\.vendorProductIds) }
+
     let viewConfiguration: ViewConfiguration?
     var requestLocale: AdaptyLocale
 }
@@ -36,7 +42,7 @@ extension AdaptyFlow: Codable {
 
         case remoteConfigs = "remote_configs"
         case requestLocale = "request_locale"
-
+        case paywalls = "variations"
         case viewConfigurationExist = "flow_version_config_url"
     }
 
@@ -53,6 +59,9 @@ extension AdaptyFlow: Codable {
         } else {
             viewConfiguration = nil
         }
+
+        paywalls = try container.decodeIfPresent([AdaptyFlow.Paywall].self, forKey: .paywalls) ?? []
+
         requestLocale = try decoder.userInfo.requestLocaleOrNil ?? container.decode(AdaptyLocale.self, forKey: .requestLocale)
     }
 
@@ -67,6 +76,7 @@ extension AdaptyFlow: Codable {
         if let viewConfiguration {
             try viewConfiguration.encode(to: encoder)
         }
+        try container.encode(paywalls, forKey: .paywalls)
         try container.encode(requestLocale, forKey: .requestLocale)
         try placement.encode(to: encoder)
     }

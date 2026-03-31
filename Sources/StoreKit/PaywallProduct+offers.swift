@@ -101,7 +101,7 @@ extension Adapty {
 
         let eligibleWinBackOfferIds = try await eligibleWinBackOfferIds(for: Set(products.compactMap(\.subscriptionGroupId)))
 
-        var newProducts = [(product: StoreKit.Product, reference: AdaptyPaywall.ProductReference, offer: AdaptySubscriptionOffer?)]()
+        var newProducts = [(product: StoreKit.Product, reference: AdaptyProductReference, offer: AdaptySubscriptionOffer?)]()
         newProducts.reserveCapacity(products.count)
         for product in products {
             await newProducts.append(determineOfferFor(product, with: eligibleWinBackOfferIds))
@@ -124,14 +124,14 @@ extension Adapty {
 
     private typealias ProductTuple = (
         product: StoreKit.Product,
-        reference: AdaptyPaywall.ProductReference,
+        reference: AdaptyProductReference,
         offer: AdaptySubscriptionOffer?,
         determinedOffer: Bool,
         subscriptionGroupId: String?
     )
 
     private func subscriptionOfferAvailable(
-        _ reference: AdaptyPaywall.ProductReference,
+        _ reference: AdaptyProductReference,
         _ product: StoreKit.Product
     ) -> (offer: AdaptySubscriptionOffer?, determinedOffer: Bool) {
         if let promotionalOffer = promotionalOffer(with: reference.promotionalOfferId, from: product) {
@@ -146,7 +146,7 @@ extension Adapty {
     private func determineOfferFor(
         _ tuple: ProductTuple,
         with eligibleWinBackOfferIds: [String: [String]]
-    ) async -> (product: StoreKit.Product, reference: AdaptyPaywall.ProductReference, offer: AdaptySubscriptionOffer?) {
+    ) async -> (product: StoreKit.Product, reference: AdaptyProductReference, offer: AdaptySubscriptionOffer?) {
         guard !tuple.determinedOffer else { return (tuple.product, tuple.reference, tuple.offer) }
 
         if let subscriptionGroupId = tuple.subscriptionGroupId,

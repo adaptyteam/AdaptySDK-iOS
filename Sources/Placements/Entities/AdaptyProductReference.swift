@@ -1,5 +1,5 @@
 //
-//  AdaptyPaywall.ProductReference.swift
+//  AdaptyProductReference.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 11.05.2023
@@ -7,24 +7,25 @@
 
 import Foundation
 
-extension AdaptyPaywall {
-    struct ProductReference: Sendable, Hashable {
+    struct AdaptyProductReference: Sendable, Hashable {
         let paywallProductIndex: Int
+        let flowProductId: String?
         let adaptyProductId: String
         let productInfo: BackendProductInfo
         let promotionalOfferId: String?
         let winBackOfferId: String?
     }
-}
 
-extension AdaptyPaywall.ProductReference: CustomStringConvertible {
+
+extension AdaptyProductReference: CustomStringConvertible {
     public var description: String {
         "(vendorId: \(productInfo.vendorId), adaptyProductId: \(adaptyProductId), promotionalOfferId: \(promotionalOfferId ?? "nil")))"
     }
 }
 
-extension AdaptyPaywall.ProductReference: Encodable {
+extension AdaptyProductReference: Encodable {
     enum CodingKeys: String, CodingKey {
+        case flowProductId = "flow_product_id"
         case vendorId = "vendor_product_id"
         case adaptyProductId = "adapty_product_id"
         case promotionalOfferEligibility = "promotional_offer_eligibility"
@@ -35,6 +36,7 @@ extension AdaptyPaywall.ProductReference: Encodable {
     }
 
     init(from container: KeyedDecodingContainer<CodingKeys>, index: Int) throws {
+        self.flowProductId = try container.decodeIfPresent(String.self, forKey: .flowProductId)
         self.paywallProductIndex = index
         self.winBackOfferId = try container.decodeIfPresent(String.self, forKey: .winBackOfferId)
         self.adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
@@ -53,6 +55,7 @@ extension AdaptyPaywall.ProductReference: Encodable {
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(flowProductId, forKey: .flowProductId)
         try container.encode(productInfo.vendorId, forKey: .vendorId)
         try container.encode(adaptyProductId, forKey: .adaptyProductId)
         try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)

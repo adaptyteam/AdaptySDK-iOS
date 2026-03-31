@@ -25,7 +25,7 @@ public struct AdaptyPaywall: PlacementContent, WebPaywallURLProviding {
 
     let viewConfiguration: ViewConfiguration?
 
-    let products: [ProductReference]
+    let products: [AdaptyProductReference]
 
     package var webPaywallBaseUrl: URL?
 
@@ -74,12 +74,12 @@ extension AdaptyPaywall: Codable {
 
         products = try {
             var arrayContainer = try container.nestedUnkeyedContainer(forKey: .products)
-            var products = [ProductReference]()
+            var products = [AdaptyProductReference]()
             var index = 0
 
             while !arrayContainer.isAtEnd {
-                let product = try ProductReference(
-                    from: arrayContainer.nestedContainer(keyedBy: ProductReference.CodingKeys.self),
+                let product = try AdaptyProductReference(
+                    from: arrayContainer.nestedContainer(keyedBy: AdaptyProductReference.CodingKeys.self),
                     index: index
                 )
                 index += 1
