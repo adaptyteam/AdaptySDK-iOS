@@ -120,6 +120,7 @@ public extension AdaptyUI {
             )
             self.timerViewModel = timerViewModel
             actionHandler.timerViewModel = timerViewModel
+            timerViewModel.callbackHandler = actionHandler
             actionHandler.systemRequestsHandler = systemRequestsHandler
             assetsViewModel = AdaptyUIAssetsViewModel(
                 logId: logId,
