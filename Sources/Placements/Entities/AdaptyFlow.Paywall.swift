@@ -15,7 +15,7 @@ extension AdaptyFlow {
         let variationId: String
         var webPaywallBaseUrl: URL?
 
-        let products: [AdaptyProductReference]
+        let products: [AdaptyFlow.ProductReference]
 
         var vendorProductIds: [String] {
             products.map(\.productInfo.vendorId)
@@ -48,12 +48,12 @@ extension AdaptyFlow.Paywall: Codable {
 
         products = try {
             var arrayContainer = try container.nestedUnkeyedContainer(forKey: .products)
-            var products = [AdaptyProductReference]()
+            var products = [AdaptyFlow.ProductReference]()
             var index = 0
 
             while !arrayContainer.isAtEnd {
-                let product = try AdaptyProductReference(
-                    from: arrayContainer.nestedContainer(keyedBy: AdaptyProductReference.CodingKeys.self),
+                let product = try AdaptyFlow.ProductReference(
+                    from: arrayContainer.nestedContainer(keyedBy: AdaptyFlow.ProductReference.CodingKeys.self),
                     index: index
                 )
                 index += 1

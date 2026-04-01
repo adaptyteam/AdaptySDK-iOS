@@ -396,7 +396,7 @@ extension Adapty {
                         apiKeyPrefix: apiKeyPrefix,
                         userId: userId,
                         placementId: placementId,
-                        paywallVariationId: variationId,
+                        variationId: variationId,
                         locale: locale,
                         cached: nil,
                         disableServerCache: params?.isTestUser ?? false,
@@ -409,7 +409,6 @@ extension Adapty {
                         placementId: placementId,
                         locale: locale,
                         cached: params?.cached,
-                        crossPlacementEligible: false,
                         variationIdResolver: nil,
                         disableServerCache: params?.isTestUser ?? false,
                         timeoutInterval: timeoutInterval

@@ -21,16 +21,14 @@ public struct AdaptyFlow: PlacementContent {
     let paywalls: [AdaptyFlow.Paywall]
 
     /// Array of related products ids.
-
     public var vendorProductIds: [String] { paywalls.flatMap(\.vendorProductIds) }
 
     let viewConfiguration: ViewConfiguration?
-    var requestLocale: AdaptyLocale
 }
 
 extension AdaptyFlow: CustomStringConvertible {
     public var description: String {
-        "(flow, placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration), requestLocale: \(requestLocale.id))"
+        "(flow, placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration))"
     }
 }
 
@@ -41,7 +39,6 @@ extension AdaptyFlow: Codable {
         case name = "flow_name"
 
         case remoteConfigs = "remote_configs"
-        case requestLocale = "request_locale"
         case paywalls = "variations"
         case viewConfigurationExist = "flow_version_config_url"
     }
@@ -61,8 +58,6 @@ extension AdaptyFlow: Codable {
         }
 
         paywalls = try container.decodeIfPresent([AdaptyFlow.Paywall].self, forKey: .paywalls) ?? []
-
-        requestLocale = try decoder.userInfo.requestLocaleOrNil ?? container.decode(AdaptyLocale.self, forKey: .requestLocale)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -77,7 +72,6 @@ extension AdaptyFlow: Codable {
             try viewConfiguration.encode(to: encoder)
         }
         try container.encode(paywalls, forKey: .paywalls)
-        try container.encode(requestLocale, forKey: .requestLocale)
         try placement.encode(to: encoder)
     }
 }

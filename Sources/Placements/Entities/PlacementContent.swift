@@ -10,8 +10,6 @@ protocol PlacementContent: Sendable, Codable {
     var instanceIdentity: String { get }
     var variationId: String { get }
     var name: String { get }
-
-    var requestLocale: AdaptyLocale { get set }
 }
 
 extension PlacementContent {
@@ -108,19 +106,6 @@ extension AdaptyOnboarding {
 
 extension VH where Value: PlacementContent {
     @inlinable
-    var requestLocale: AdaptyLocale {
-        get { value.requestLocale }
-        mutating set {
-            guard newValue != value.requestLocale else { return }
-            self = mapValue {
-                var content = $0
-                content.requestLocale = newValue
-                return content
-            }
-        }
-    }
-
-    @inlinable
     func has(languageCode locale: AdaptyLocale, orDefault: Bool = false) -> Bool {
         value.has(languageCode: locale, orDefault: orDefault)
     }
@@ -131,3 +116,11 @@ extension VH where Value: PlacementContent {
     }
 }
 
+
+extension Sequence {
+    func asContentByPlacementId<T: PlacementContent>() -> [String: VH<T>] where Element == VH<T> {
+        Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
+            first.value.placement.isNewerThan(second.value.placement) ? first : second
+        })
+    }
+}

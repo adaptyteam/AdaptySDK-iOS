@@ -1,5 +1,5 @@
 //
-//  AdaptyProductReference.swift
+//  AdaptyFlow.ProductReference.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 11.05.2023
@@ -7,7 +7,8 @@
 
 import Foundation
 
-    struct AdaptyProductReference: Sendable, Hashable {
+extension AdaptyFlow {
+    struct ProductReference: Sendable, Hashable {
         let paywallProductIndex: Int
         let flowProductId: String?
         let adaptyProductId: String
@@ -15,15 +16,15 @@ import Foundation
         let promotionalOfferId: String?
         let winBackOfferId: String?
     }
+}
 
-
-extension AdaptyProductReference: CustomStringConvertible {
+extension AdaptyFlow.ProductReference: CustomStringConvertible {
     public var description: String {
         "(vendorId: \(productInfo.vendorId), adaptyProductId: \(adaptyProductId), promotionalOfferId: \(promotionalOfferId ?? "nil")))"
     }
 }
 
-extension AdaptyProductReference: Encodable {
+extension AdaptyFlow.ProductReference: Encodable {
     enum CodingKeys: String, CodingKey {
         case flowProductId = "flow_product_id"
         case vendorId = "vendor_product_id"
@@ -45,8 +46,9 @@ extension AdaptyProductReference: Encodable {
             accessLevelId: container.decode(String.self, forKey: .accessLevelId),
             period: container.decode(BackendProductInfo.Period.self, forKey: .backendProductPeriod)
         )
+        let promotionalOfferEligibility = try container.decode(Bool.self, forKey: .promotionalOfferEligibility)
         self.promotionalOfferId =
-            if (try? container.decode(Bool.self, forKey: .promotionalOfferEligibility)) ?? true {
+            if promotionalOfferEligibility {
                 try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
             } else {
                 nil
