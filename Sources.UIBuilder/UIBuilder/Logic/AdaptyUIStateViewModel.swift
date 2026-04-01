@@ -84,10 +84,10 @@ package final class AdaptyUIStateViewModel: ObservableObject {
     ) {
         var additionalParams: [String: VC.Parameter] = [:]
         if let newFocusId {
-            additionalParams["focus_id"] = .string(newFocusId)
+            additionalParams["focusId"] = .string(newFocusId)
         }
         if let oldFocusId {
-            additionalParams["old_focus_id"] = .string(oldFocusId)
+            additionalParams["oldFocusId"] = .string(oldFocusId)
         }
 
         execute(
