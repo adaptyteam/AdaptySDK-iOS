@@ -43,30 +43,89 @@ extension Backend.FallbackExecutor {
         apiKeyPrefix: String,
         userId: AdaptyUserId,
         placementId: String,
-        paywallVariationId: String,
-        locale: AdaptyLocale,
+        variationId: String,
+        locale: AdaptyLocale? = nil,
         cached: Content?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
-        try await _fetchFallbackPlacement(
-            apiKeyPrefix,
-            userId,
-            placementId,
-            paywallVariationId,
-            locale: locale,
-            locale,
-            cached,
-            disableServerCache,
-            timeoutInterval
-        )
+        if let locale {
+            try await _fetchFallbackPlacementByLocale(
+                apiKeyPrefix,
+                userId,
+                placementId,
+                variationId,
+                locale: locale,
+                locale,
+                cached,
+                disableServerCache,
+                timeoutInterval
+            )
+        } else {
+            try await _fetchFallbackPlacement(
+                apiKeyPrefix,
+                userId,
+                placementId,
+                variationId,
+                cached,
+                disableServerCache,
+                timeoutInterval
+            )
+        }
     }
 
     private func _fetchFallbackPlacement<Content: PlacementContent>(
         _ apiKeyPrefix: String,
         _ userId: AdaptyUserId,
         _ placementId: String,
-        _ paywallVariationId: String,
+        _ variationId: String,
+        _ cached: Content?,
+        _ disableServerCache: Bool,
+        _ timeoutInterval: TimeInterval?
+    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
+        let endpoint: HTTPEndpoint
+        let requestName: BackendRequestName
+
+        if Content.self == AdaptyFlow.self {
+            endpoint = HTTPEndpoint(
+                method: .get,
+                path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/\(variationId)/app_store/\(Adapty.uiBuilderVersion)/fallback.json"
+            )
+            requestName = .fetchFallbackFlow
+        } else {
+            throw .notAvailable("Not available for \(String(describing: Content.self))")
+        }
+
+        let logParams: EventParameters = [
+            "api_prefix": apiKeyPrefix,
+            "placement_id": placementId,
+            "variation_id": variationId,
+            "builder_version": Adapty.uiBuilderVersion,
+            "builder_config_format_version": Adapty.uiSchemaVersion,
+            "disable_server_cache": disableServerCache,
+        ]
+
+        let request = FetchFallbackPlacementRequest(
+            endpoint: endpoint,
+            disableServerCache: disableServerCache,
+            timeoutInterval: timeoutInterval,
+            logName: requestName,
+            logParams: logParams
+        )
+
+        let response = try await perform(request, withDecoder: AdaptyPlacementChosen.createDecoder(
+            withUserId: userId,
+            withCached: cached
+        ))
+
+        return response.body
+    }
+
+    private func _fetchFallbackPlacementByLocale<Content: PlacementContent>(
+        _ apiKeyPrefix: String,
+        _ userId: AdaptyUserId,
+        _ placementId: String,
+        _ variationId: String,
         locale: AdaptyLocale,
         _ requestLocale: AdaptyLocale,
         _ cached: Content?,
@@ -76,24 +135,20 @@ extension Backend.FallbackExecutor {
         let endpoint: HTTPEndpoint
         let requestName: BackendRequestName
 
-        if Content.self == AdaptyPaywall.self {
+        if Content.self == AdaptyOnboarding.self {
             endpoint = HTTPEndpoint(
                 method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(paywallVariationId)/app_store/\(locale.languageCode)/\(Adapty.uiBuilderVersion)/fallback.json"
+                path: "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(variationId)/\(locale.languageCode)/fallback.json"
             )
-            requestName = .fetchFallbackPaywall
+            requestName = .fetchFallbackOnbording
         } else {
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(paywallVariationId)/\(locale.languageCode)/fallback.json"
-            )
-            requestName = .fetchFallbackPaywall
+            throw .notAvailable("Not available for \(String(describing: Content.self))")
         }
 
         let logParams: EventParameters = [
             "api_prefix": apiKeyPrefix,
             "placement_id": placementId,
-            "variation_id": paywallVariationId,
+            "variation_id": variationId,
             "builder_version": Adapty.uiBuilderVersion,
             "builder_config_format_version": Adapty.uiSchemaVersion,
             "language_code": locale.languageCode,
@@ -126,11 +181,11 @@ extension Backend.FallbackExecutor {
                 throw error
             }
 
-            return try await _fetchFallbackPlacement(
+            return try await _fetchFallbackPlacementByLocale(
                 apiKeyPrefix,
                 userId,
                 placementId,
-                paywallVariationId,
+                variationId,
                 locale: .defaultPlacementLocale,
                 requestLocale,
                 cached,
@@ -140,3 +195,4 @@ extension Backend.FallbackExecutor {
         }
     }
 }
+

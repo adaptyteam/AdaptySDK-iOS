@@ -133,7 +133,6 @@ extension Adapty {
                 placementId: placementId,
                 locale: locale,
                 cached: cached,
-                crossPlacementEligible: false,
                 variationIdResolver: nil,
                 disableServerCache: isTestUser,
                 timeoutInterval: nil

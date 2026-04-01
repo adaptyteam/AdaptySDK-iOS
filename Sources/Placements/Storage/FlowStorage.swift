@@ -1,22 +1,20 @@
 //
-//  OnboardingStorage.swift
+//  FlowStorage.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 21.04.2025.
+//  Created by Aleksei Valiano on 01.04.2026.
 //
-
 import Foundation
 
 private let log = Log.storage
 
 @AdaptyActor
-final class OnboardingStorage {
-    typealias Content = AdaptyOnboarding
-
+final class FlowStorage {
+    typealias Content = AdaptyFlow
     private enum Constants {
-        static let storageKey = "AdaptySDK_Cached_Onboarding"
-        static let storageVersionKey = "AdaptySDK_Cached_Onboarding_Version"
-        static let currentStorageVersion = 2
+        static let storageKey = "AdaptySDK_Cached_Flow"
+        static let storageVersionKey = "AdaptySDK_Cached_Flow_Version"
+        static let currentStorageVersion = 1
     }
 
     private static let userDefaults = Storage.userDefaults
@@ -26,7 +24,6 @@ final class OnboardingStorage {
             return [:]
         }
         do {
-            var userInfo = CodingUserInfo()
             return try userDefaults.getJSON(
                 [VH<Content>].self,
                 forKey: Constants.storageKey
@@ -49,16 +46,17 @@ final class OnboardingStorage {
             try userDefaults.setJSON(array, forKey: Constants.storageKey)
             userDefaults.set(Constants.currentStorageVersion, forKey: Constants.storageVersionKey)
 
-            log.debug("Saving onboarding success.")
+            log.debug("Saving flow success.")
         } catch {
-            log.error("Saving onboarding fail. \(error.localizedDescription)")
+            log.error("Saving flow fail. \(error.localizedDescription)")
         }
     }
 
     static func clear() {
         contentByPlacementId = [:]
         userDefaults.removeObject(forKey: Constants.storageKey)
-        log.debug("Clear onboarding's.")
+        log.debug("Clear flows's.")
     }
 }
+
 

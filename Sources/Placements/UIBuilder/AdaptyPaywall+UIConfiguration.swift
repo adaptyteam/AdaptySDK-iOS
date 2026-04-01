@@ -46,12 +46,19 @@ extension Adapty {
             {
                 value
             } else {
-                try await fetchUISchema(
-                    paywallVariationId: paywall.variationId,
-                    paywallInstanceIdentity: paywall.instanceIdentity,
-                    locale: viewConfiguration.locale,
-                    loadTimeout: loadTimeout
+                throw .unknown(
+                    NSError(
+                        domain: AdaptyError.AdaptyErrorDomain,
+                        code: AdaptyError.ErrorCode.unknown.rawValue,
+                        userInfo: [NSLocalizedDescriptionKey: "UI schema loading is not implemented"]
+                    )
                 )
+//                try await fetchUISchema(
+//                    paywallVariationId: paywall.variationId,
+//                    paywallInstanceIdentity: paywall.instanceIdentity,
+//                    locale: viewConfiguration.locale,
+//                    loadTimeout: loadTimeout
+//                )
             }
 
         AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: viewConfiguration.locale.id)
@@ -98,44 +105,44 @@ extension Adapty {
         return nil
     }
 
-    private func fetchUISchema(
-        paywallVariationId: String,
-        paywallInstanceIdentity: String,
-        locale: AdaptyLocale,
-        loadTimeout: TaskDuration
-    ) async throws(AdaptyError) -> AdaptyUISchema {
-        let httpSession = httpSession
-        let apiKeyPrefix = apiKeyPrefix
-        let isTestUser = profileManager?.isTestUser ?? false
-
-        do {
-            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
-                try await httpSession.fetchUISchema(
-                    apiKeyPrefix: apiKeyPrefix,
-                    paywallVariationId: paywallVariationId,
-                    locale: locale,
-                    disableServerCache: isTestUser
-                )
-            }
-        } catch let error as HTTPError {
-            guard Backend.canUseFallbackServer(error) else {
-                throw error.asAdaptyError
-            }
-        } catch {
-            guard error is TimeoutError else {
-                throw .unknown(error)
-            }
-        }
-
-        do {
-            return try await httpFallbackSession.fetchFallbackUISchema(
-                apiKeyPrefix: apiKeyPrefix,
-                paywallInstanceIdentity: paywallInstanceIdentity,
-                locale: locale,
-                disableServerCache: isTestUser
-            )
-        } catch {
-            throw error.asAdaptyError
-        }
-    }
+//    private func fetchUISchema(
+//        paywallVariationId: String,
+//        paywallInstanceIdentity: String,
+//        locale: AdaptyLocale,
+//        loadTimeout: TaskDuration
+//    ) async throws(AdaptyError) -> AdaptyUISchema {
+//        let httpSession = httpSession
+//        let apiKeyPrefix = apiKeyPrefix
+//        let isTestUser = profileManager?.isTestUser ?? false
+//
+//        do {
+//            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
+//                try await httpSession.fetchUISchema(
+//                    apiKeyPrefix: apiKeyPrefix,
+//                    paywallVariationId: paywallVariationId,
+//                    locale: locale,
+//                    disableServerCache: isTestUser
+//                )
+//            }
+//        } catch let error as HTTPError {
+//            guard Backend.canUseFallbackServer(error) else {
+//                throw error.asAdaptyError
+//            }
+//        } catch {
+//            guard error is TimeoutError else {
+//                throw .unknown(error)
+//            }
+//        }
+//
+//        do {
+//            return try await httpFallbackSession.fetchFallbackUISchema(
+//                apiKeyPrefix: apiKeyPrefix,
+//                paywallInstanceIdentity: paywallInstanceIdentity,
+//                locale: locale,
+//                disableServerCache: isTestUser
+//            )
+//        } catch {
+//            throw error.asAdaptyError
+//        }
+//    }
 }

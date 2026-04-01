@@ -14,7 +14,7 @@ extension AdaptyPlacementChosen {
     static func createDecoder(
         withUserId userId: AdaptyUserId,
         withPlacementId placementId: String,
-        withRequestLocale requestLocale: AdaptyLocale,
+        withRequestLocale requestLocale: AdaptyLocale? = nil,
         withCached cached: Content?,
         variationIdResolver: VariationIdResolver?
     ) -> HTTPDecoder<AdaptyPlacementChosen> {
@@ -41,7 +41,9 @@ extension AdaptyPlacementChosen {
 
             jsonDecoder.userInfo.setPlacement(placement)
             jsonDecoder.userInfo.setUserId(userId)
-            jsonDecoder.userInfo.setRequestLocale(requestLocale)
+            if let requestLocale {
+                jsonDecoder.userInfo.setRequestLocale(requestLocale)
+            }
 
             let draw = try jsonDecoder.decode(
                 Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
@@ -71,7 +73,7 @@ extension AdaptyPlacementChosen {
     @inlinable
     static func createDecoder(
         withUserId userId: AdaptyUserId,
-        withRequestLocale requestLocale: AdaptyLocale,
+        withRequestLocale requestLocale: AdaptyLocale? = nil,
         withCached cached: Content?
     ) -> HTTPDecoder<AdaptyPlacementChosen> {
         return decoder
@@ -96,7 +98,9 @@ extension AdaptyPlacementChosen {
             }
 
             jsonDecoder.userInfo.setPlacement(placement)
-            jsonDecoder.userInfo.setRequestLocale(requestLocale)
+            if let requestLocale {
+                jsonDecoder.userInfo.setRequestLocale(requestLocale)
+            }
 
             let variation = try jsonDecoder.decode(
                 Backend.Response.Data<AdaptyPlacement.Variation>.self,

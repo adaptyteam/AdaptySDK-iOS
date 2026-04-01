@@ -35,7 +35,8 @@ enum BackendRequestName: String {
     case fetchOnboarding = "get_onboarding"
     case fetchPaywall = "get_paywall"
 
-    case fetchFallbackPaywall = "get_fallback_paywall"
+    case fetchFallbackFlow = "get_fallback_flow"
+    case fetchFallbackOnbording = "get_fallback_onbording"
 
     case validateTransaction = "validate_transaction"
     case validateReceipt = "validate_receipt"

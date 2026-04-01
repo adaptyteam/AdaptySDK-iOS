@@ -21,16 +21,20 @@ public struct AdaptyPaywall: PlacementContent, WebPaywallURLProviding {
     public let remoteConfig: AdaptyRemoteConfig?
 
     /// If `true`, it is possible to fetch the view ``AdaptyUIConfiguration`` object and use it with ``AdaptyUI`` library.
-    public var hasViewConfiguration: Bool { viewConfiguration != nil }
+    public var hasViewConfiguration: Bool {
+        viewConfiguration != nil
+    }
 
     let viewConfiguration: ViewConfiguration?
 
-    let products: [AdaptyProductReference]
+    let products: [AdaptyFlow.ProductReference]
 
     package var webPaywallBaseUrl: URL?
 
     /// Array of related products ids.
-    public var vendorProductIds: [String] { products.map { $0.productInfo.vendorId } }
+    public var vendorProductIds: [String] {
+        products.map(\.productInfo.vendorId)
+    }
 
     var requestLocale: AdaptyLocale
 }
@@ -74,12 +78,12 @@ extension AdaptyPaywall: Codable {
 
         products = try {
             var arrayContainer = try container.nestedUnkeyedContainer(forKey: .products)
-            var products = [AdaptyProductReference]()
+            var products = [AdaptyFlow.ProductReference]()
             var index = 0
 
             while !arrayContainer.isAtEnd {
-                let product = try AdaptyProductReference(
-                    from: arrayContainer.nestedContainer(keyedBy: AdaptyProductReference.CodingKeys.self),
+                let product = try AdaptyFlow.ProductReference(
+                    from: arrayContainer.nestedContainer(keyedBy: AdaptyFlow.ProductReference.CodingKeys.self),
                     index: index
                 )
                 index += 1
@@ -105,3 +109,4 @@ extension AdaptyPaywall: Codable {
         try placement.encode(to: encoder)
     }
 }
+

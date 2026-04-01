@@ -12,20 +12,20 @@ private let log = Log.storage
 @AdaptyActor
 final class PlacementStorage {
     private static func getPlacement<Content: PlacementContent>(_ placementId: String) -> VH<Content>? {
-        if Content.self == AdaptyPaywall.self {
-            PaywallStorage.paywallByPlacementId[placementId] as? VH<Content>
+        if Content.self == AdaptyFlow.self {
+            FlowStorage.contentByPlacementId[placementId] as? VH<Content>
         } else if Content.self == AdaptyOnboarding.self {
-            OnboardingStorage.onboardingByPlacementId[placementId] as? VH<Content>
+            OnboardingStorage.contentByPlacementId[placementId] as? VH<Content>
         } else {
             nil
         }
     }
 
     private static func setPlacement(_ content: some PlacementContent) {
-        if let paywall = content as? AdaptyPaywall {
-            PaywallStorage.setPaywall(paywall)
+        if let flow = content as? AdaptyFlow {
+            FlowStorage.set(content: flow)
         } else if let onboarding = content as? AdaptyOnboarding {
-            OnboardingStorage.setOnboarding(onboarding)
+            OnboardingStorage.set(content: onboarding)
         } else {
             return
         }
@@ -61,8 +61,6 @@ final class PlacementStorage {
             content.has(variationId: variationId),
             content.has(languageCode: locale, orDefault: orDefaultLocale)
         else { return nil }
-
-        content.requestLocale = locale
         return content
     }
 
@@ -72,7 +70,6 @@ final class PlacementStorage {
               cached.variationId == content.variationId,
               cached.placement.isNewerThan(content.placement)
         else { return nil }
-        cached.requestLocale = content.requestLocale
         return cached
     }
 
@@ -88,7 +85,7 @@ final class PlacementStorage {
     }
 
     static func clear() {
-        PaywallStorage.clear()
+        FlowStorage.clear()
         OnboardingStorage.clear()
     }
 }
