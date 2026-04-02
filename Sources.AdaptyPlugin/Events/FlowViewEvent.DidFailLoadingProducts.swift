@@ -1,5 +1,5 @@
 //
-//  PaywallViewEvent.DidFailLoadingProducts.swift
+//  FlowViewEvent.DidFailLoadingProducts.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 20.11.2024.
@@ -9,10 +9,10 @@ import Adapty
 import AdaptyUI
 import Foundation
 
-extension PaywallViewEvent {
+extension FlowViewEvent {
     struct DidFailLoadingProducts: AdaptyPluginEvent {
-        let id = "paywall_view_did_fail_loading_products"
-        let view: AdaptyUI.PaywallView
+        let id = "flow_view_did_fail_loading_products"
+        let view: AdaptyUI.FlowView
         let error: AdaptyError
 
         enum CodingKeys: String, CodingKey {

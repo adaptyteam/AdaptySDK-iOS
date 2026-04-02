@@ -1,5 +1,5 @@
 //
-//  AdaptyUIBuilder+PaywallView.swift
+//  AdaptyUIBuilder+FlowView.swift
 //  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 9/23/25.
@@ -10,13 +10,13 @@
 import SwiftUI
 
 @MainActor
-struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder: View {
+struct AdaptyUIFlowViewModifier<Placeholder>: ViewModifier where Placeholder: View {
     @Environment(\.presentationMode) private var presentationMode
 
     private let isPresented: Binding<Bool>
     private let fullScreen: Bool
 
-    private let paywallConfiguration: AdaptyUIBuilder.PaywallConfiguration?
+    private let flowConfiguration: AdaptyUIBuilder.FlowConfiguration?
 
     private let didAppear: (() -> Void)?
     private let didDisappear: (() -> Void)?
@@ -30,7 +30,7 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
     init(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
-        paywallConfiguration: AdaptyUIBuilder.PaywallConfiguration?,
+        flowConfiguration: AdaptyUIBuilder.FlowConfiguration?,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?,
@@ -42,7 +42,7 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
     ) {
         self.isPresented = isPresented
         self.fullScreen = fullScreen
-        self.paywallConfiguration = paywallConfiguration
+        self.flowConfiguration = flowConfiguration
         self.didAppear = didAppear
         self.didDisappear = didDisappear
         self.didPerformAction = didPerformAction
@@ -54,10 +54,10 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
     }
 
     @ViewBuilder
-    private var paywallOrProgressView: some View {
-        if let paywallConfiguration {
-            AdaptyUIPaywallView(
-                paywallConfiguration: paywallConfiguration,
+    private var flowOrProgressView: some View {
+        if let flowConfiguration {
+            AdaptyUIFlowView(
+                flowConfiguration: flowConfiguration,
                 didAppear: didAppear,
                 didDisappear: didDisappear,
                 didPerformAction: didPerformAction,
@@ -71,16 +71,16 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
         }
     }
 
-    public func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         if fullScreen {
             content
                 .fullScreenCover(
                     isPresented: isPresented,
                     onDismiss: {
-                        paywallConfiguration?.reportOnDisappear()
+                        flowConfiguration?.reportOnDisappear()
                     },
                     content: {
-                        paywallOrProgressView
+                        flowOrProgressView
                     }
                 )
         } else {
@@ -88,10 +88,10 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
                 .sheet(
                     isPresented: isPresented,
                     onDismiss: {
-                        paywallConfiguration?.reportOnDisappear()
+                        flowConfiguration?.reportOnDisappear()
                     },
                     content: {
-                        paywallOrProgressView
+                        flowOrProgressView
                     }
                 )
         }
@@ -100,10 +100,10 @@ struct AdaptyUIPaywallViewModifier<Placeholder>: ViewModifier where Placeholder:
 
 @MainActor
 public extension View {
-    func paywall<Placeholder: View>(
+    func flow<Placeholder: View>(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
-        paywallConfiguration: AdaptyUIBuilder.PaywallConfiguration?,
+        flowConfiguration: AdaptyUIBuilder.FlowConfiguration?,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUIBuilder.Action) -> Void)? = nil,
@@ -114,10 +114,10 @@ public extension View {
         placeholderBuilder: @escaping (() -> Placeholder)
     ) -> some View {
         modifier(
-            AdaptyUIPaywallViewModifier<Placeholder>(
+            AdaptyUIFlowViewModifier<Placeholder>(
                 isPresented: isPresented,
                 fullScreen: fullScreen,
-                paywallConfiguration: paywallConfiguration,
+                flowConfiguration: flowConfiguration,
                 didAppear: didAppear,
                 didDisappear: didDisappear,
                 didPerformAction: didPerformAction,
@@ -132,10 +132,10 @@ public extension View {
 }
 
 @MainActor
-public struct AdaptyUIPaywallView: View {
+public struct AdaptyUIFlowView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
-    private let paywallConfiguration: AdaptyUIBuilder.PaywallConfiguration
+    private let flowConfiguration: AdaptyUIBuilder.FlowConfiguration
 
     private let didAppear: (() -> Void)?
     private let didDisappear: (() -> Void)?
@@ -146,7 +146,7 @@ public struct AdaptyUIPaywallView: View {
     private let didFailRendering: ((AdaptyUIBuilderError) -> Void)?
 
     public init(
-        paywallConfiguration: AdaptyUIBuilder.PaywallConfiguration,
+        flowConfiguration: AdaptyUIBuilder.FlowConfiguration,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUIBuilder.Action) -> Void)? = nil,
@@ -155,7 +155,7 @@ public struct AdaptyUIPaywallView: View {
         didStartRestore: (() -> Void)? = nil,
         didFailRendering: @escaping (AdaptyUIBuilderError) -> Void
     ) {
-        self.paywallConfiguration = paywallConfiguration
+        self.flowConfiguration = flowConfiguration
         self.didAppear = didAppear
         self.didDisappear = didDisappear
         self.didPerformAction = didPerformAction
@@ -166,10 +166,10 @@ public struct AdaptyUIPaywallView: View {
     }
 
     public var body: some View {
-        paywallConfiguration.eventsHandler.didAppear = didAppear
-        paywallConfiguration.eventsHandler.didDisappear = didDisappear
+        flowConfiguration.eventsHandler.didAppear = didAppear
+        flowConfiguration.eventsHandler.didDisappear = didDisappear
 
-        paywallConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { action in
+        flowConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { action in
             switch action {
             case .close:
                 presentationMode.wrappedValue.dismiss()
@@ -180,27 +180,27 @@ public struct AdaptyUIPaywallView: View {
             }
         }
 
-        paywallConfiguration.eventsHandler.didSelectProduct = didSelectProduct ?? { _ in }
-        paywallConfiguration.eventsHandler.didStartPurchase = didStartPurchase ?? { _ in }
+        flowConfiguration.eventsHandler.didSelectProduct = didSelectProduct ?? { _ in }
+        flowConfiguration.eventsHandler.didStartPurchase = didStartPurchase ?? { _ in }
 
-        paywallConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
-        paywallConfiguration.eventsHandler.didFailRendering = didFailRendering
+        flowConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
+        flowConfiguration.eventsHandler.didFailRendering = didFailRendering
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false,
-            displayMissingTags: false,
+            displayMissingTags: false
         )
         .environmentObjects(
-            stateViewModel: paywallConfiguration.stateViewModel,
-            paywallViewModel: paywallConfiguration.paywallViewModel,
-            productsViewModel: paywallConfiguration.productsViewModel,
-            tagResolverViewModel: paywallConfiguration.tagResolverViewModel,
-            timerViewModel: paywallConfiguration.timerViewModel,
-            screensViewModel: paywallConfiguration.screensViewModel,
-            assetsViewModel: paywallConfiguration.assetsViewModel
+            stateViewModel: flowConfiguration.stateViewModel,
+            flowViewModel: flowConfiguration.flowViewModel,
+            productsViewModel: flowConfiguration.productsViewModel,
+            tagResolverViewModel: flowConfiguration.tagResolverViewModel,
+            timerViewModel: flowConfiguration.timerViewModel,
+            screensViewModel: flowConfiguration.screensViewModel,
+            assetsViewModel: flowConfiguration.assetsViewModel
         )
         .onAppear {
-            paywallConfiguration.reportOnAppear()
+            flowConfiguration.reportOnAppear()
         }
     }
 }

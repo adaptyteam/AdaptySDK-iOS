@@ -11,13 +11,13 @@ import Adapty
 import AdaptyUIBuilder
 import UIKit
 
-public extension AdaptyPaywallControllerDelegate {
-    func paywallControllerDidAppear(_ controller: AdaptyPaywallController) {}
+public extension AdaptyFlowControllerDelegate {
+    func paywallControllerDidAppear(_ controller: AdaptyFlowController) {}
 
-    func paywallControllerDidDisappear(_ controller: AdaptyPaywallController) {}
+    func paywallControllerDidDisappear(_ controller: AdaptyFlowController) {}
 
     func paywallController(
-        _ controller: AdaptyPaywallController,
+        _ controller: AdaptyFlowController,
         didPerform action: AdaptyUI.Action
     ) {
         switch action {
@@ -31,17 +31,17 @@ public extension AdaptyPaywallControllerDelegate {
     }
 
     func paywallController(
-        _ controller: AdaptyPaywallController,
+        _ controller: AdaptyFlowController,
         didSelectProduct product: any AdaptyPaywallProductWithoutDeterminingOffer
     ) {}
 
     func paywallController(
-        _ controller: AdaptyPaywallController,
+        _ controller: AdaptyFlowController,
         didStartPurchase product: AdaptyPaywallProduct
     ) {}
 
     func paywallController(
-        _ controller: AdaptyPaywallController,
+        _ controller: AdaptyFlowController,
         didFinishPurchase product: AdaptyPaywallProduct,
         purchaseResult: AdaptyPurchaseResult
     ) {
@@ -50,27 +50,27 @@ public extension AdaptyPaywallControllerDelegate {
         }
     }
 
-    func paywallControllerDidStartRestore(_ controller: AdaptyPaywallController) {}
+    func paywallControllerDidStartRestore(_ controller: AdaptyFlowController) {}
 
     func paywallController(
-        _ controller: AdaptyPaywallController,
+        _ controller: AdaptyFlowController,
         didFailRenderingWith error: AdaptyUIError
     ) {}
 
     func paywallController(
-        _ controller: AdaptyPaywallController,
+        _ controller: AdaptyFlowController,
         didFailLoadingProductsWith error: AdaptyError
     ) -> Bool {
         false
     }
 
     func paywallController(
-        _ controller: AdaptyPaywallController,
+        _ controller: AdaptyFlowController,
         didPartiallyLoadProducts failedIds: [String]
     ) {}
 
     func paywallController(
-        _ controller: AdaptyPaywallController,
+        _ controller: AdaptyFlowController,
         didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
         error: AdaptyError?
     ) {}

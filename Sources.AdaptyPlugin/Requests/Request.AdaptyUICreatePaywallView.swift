@@ -50,7 +50,7 @@ extension Request {
     struct AdaptyUICreatePaywallView: AdaptyPluginRequest {
         static let method = "adapty_ui_create_paywall_view"
 
-        let paywall: AdaptyPaywall
+        let flow: AdaptyFlow
         let loadTimeout: TimeInterval?
         let preloadProducts: Bool?
         let customTags: [String: String]?
@@ -58,7 +58,7 @@ extension Request {
         let customAssets: [AdaptyUICustomAsset.Identifiable]?
 
         enum CodingKeys: String, CodingKey {
-            case paywall
+            case flow
             case loadTimeout = "load_timeout"
             case preloadProducts = "preload_products"
             case customTags = "custom_tags"
@@ -72,8 +72,8 @@ extension Request {
 
         @MainActor
         func executeInMainActor() async throws -> AdaptyJsonData {
-            let result: AdaptyUI.PaywallView = try await AdaptyUI.Plugin.createPaywallView(
-                paywall: paywall,
+            let result: AdaptyUI.FlowView = try await AdaptyUI.Plugin.createFlowView(
+                flow: flow,
                 loadTimeout: loadTimeout,
                 preloadProducts: preloadProducts ?? false,
                 tagResolver: customTags,

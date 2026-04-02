@@ -8,7 +8,7 @@
 import Foundation
 
 public extension AdaptyUI {
-    struct PaywallView: Sendable {
+    struct FlowView: Sendable {
         package let id: String
         package let templateId: String
         package let placementId: String
@@ -24,20 +24,20 @@ public extension AdaptyUI {
 
 #if canImport(UIKit)
 
-package extension AdaptyPaywallUIView {
-    func toAdaptyUIView() -> AdaptyUI.PaywallView {
-        AdaptyUI.PaywallView(
+package extension AdaptyFlowUIView {
+    func toAdaptyUIView() -> AdaptyUI.FlowView {
+        AdaptyUI.FlowView(
             id: id,
-            templateId: "// TODO: todo", // configuration.paywallViewModel.viewConfiguration.deprecated_defaultScreen.templateId,
+            templateId: "// TODO: todo", // configuration.flowViewModel.viewConfiguration.deprecated_defaultScreen.templateId,
             placementId: configuration.paywallPlacementId,
             variationId: configuration.paywallVariationId
         )
     }
 }
 
-public extension AdaptyPaywallController {
-    func toAdaptyUIView() -> AdaptyUI.PaywallView {
-        AdaptyUI.PaywallView(
+public extension AdaptyFlowController {
+    func toAdaptyUIView() -> AdaptyUI.FlowView {
+        AdaptyUI.FlowView(
             id: id,
             templateId: "// TODO: todo",
             placementId: configuration.paywallVariationId,

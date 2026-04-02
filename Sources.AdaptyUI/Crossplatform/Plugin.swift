@@ -20,9 +20,9 @@ import UIKit
 extension UIViewController {
     var isOrContainsAdaptyController: Bool {
         guard let presentedViewController = presentedViewController else {
-            return self is AdaptyPaywallController
+            return self is AdaptyFlowController
         }
-        return presentedViewController is AdaptyPaywallController
+        return presentedViewController is AdaptyFlowController
     }
 }
 
@@ -54,9 +54,9 @@ package extension AdaptyUI {
     class Plugin {
 #if canImport(UIKit)
         
-        private static var paywallControllers = [String: AdaptyPaywallController]()
+        private static var paywallControllers = [String: AdaptyFlowController]()
         
-        private static func cachePaywallController(_ controller: AdaptyPaywallController, id: String) {
+        private static func cachePaywallController(_ controller: AdaptyFlowController, id: String) {
             paywallControllers[id] = controller
         }
         
@@ -64,7 +64,7 @@ package extension AdaptyUI {
             paywallControllers.removeValue(forKey: id)
         }
         
-        private static func cachedPaywallController(_ id: String) -> AdaptyPaywallController? {
+        private static func cachedPaywallController(_ id: String) -> AdaptyFlowController? {
             paywallControllers[id]
         }
         
@@ -84,24 +84,24 @@ package extension AdaptyUI {
 #endif
         
 #if canImport(UIKit)
-        package static func createPaywallView(
-            paywall: AdaptyPaywall,
+        package static func createFlowView(
+            flow: AdaptyFlow,
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyUIAssetsResolver?
-        ) async throws -> AdaptyUI.PaywallView {
+        ) async throws -> AdaptyUI.FlowView {
             let products: [AdaptyPaywallProduct]?
             
-            if preloadProducts {
-                products = try await Adapty.getPaywallProducts(paywall: paywall)
-            } else {
+//            if preloadProducts {
+//                products = try await Adapty.getPaywallProducts(paywall: paywall)
+//            } else {
                 products = nil
-            }
+//            }
             
-            let configuration = try await AdaptyUI.getPaywallConfiguration(
-                forPaywall: paywall,
+            let configuration = try await AdaptyUI.getFlowConfiguration(
+                forFlow: flow,
                 loadTimeout: loadTimeout,
                 products: products,
                 observerModeResolver: nil,
@@ -116,7 +116,7 @@ package extension AdaptyUI {
         }
 #endif
 
-        package static func presentPaywallView(
+        package static func presentFlowView(
             viewId: String,
             presentationStyle: AdaptyUIViewPresentationStyle?
         ) async throws {
@@ -146,7 +146,7 @@ package extension AdaptyUI {
 #endif
         }
         
-        package static func dismissPaywallView(
+        package static func dismissFlowView(
             viewId: String,
             destroy: Bool
         ) async throws {

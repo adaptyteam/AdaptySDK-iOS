@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  AdaptyPaywallView.swift
 //  Adapty
 //
 //  Created by Alexey Goncharov on 2/17/25.
@@ -12,10 +12,10 @@ import AdaptyUIBuilder
 import SwiftUI
 
 @MainActor
-public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
+public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
-    private let paywallConfiguration: AdaptyUI.PaywallConfiguration
+    private let flowConfiguration: AdaptyUI.FlowConfiguration
 
     private let didAppear: (() -> Void)?
     private let didDisappear: (() -> Void)?
@@ -35,7 +35,7 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
     private let showAlertBuilder: ((AlertItem) -> Alert)?
 
     public init(
-        paywallConfiguration: AdaptyUI.PaywallConfiguration,
+        flowConfiguration: AdaptyUI.FlowConfiguration,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
@@ -53,7 +53,7 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
         showAlertItem: Binding<AlertItem?> = Binding<AdaptyIdentifiablePlaceholder?>.constant(nil),
         showAlertBuilder: ((AlertItem) -> Alert)? = nil
     ) {
-        self.paywallConfiguration = paywallConfiguration
+        self.flowConfiguration = flowConfiguration
         self.didAppear = didAppear
         self.didDisappear = didDisappear
         self.didPerformAction = didPerformAction
@@ -73,10 +73,10 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
     }
 
     public var body: some View {
-        paywallConfiguration.eventsHandler.didAppear = didAppear
-        paywallConfiguration.eventsHandler.didDisappear = didDisappear
+        flowConfiguration.eventsHandler.didAppear = didAppear
+        flowConfiguration.eventsHandler.didDisappear = didDisappear
 
-        paywallConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { action in
+        flowConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { action in
             switch action {
             case .close:
                 presentationMode.wrappedValue.dismiss()
@@ -87,38 +87,38 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
             }
         }
 
-        paywallConfiguration.eventsHandler.didSelectProduct = didSelectProduct ?? { _ in }
-        paywallConfiguration.eventsHandler.didStartPurchase = didStartPurchase ?? { _ in }
-        paywallConfiguration.eventsHandler.didFinishPurchase = didFinishPurchase ?? { _, res in
+        flowConfiguration.eventsHandler.didSelectProduct = didSelectProduct ?? { _ in }
+        flowConfiguration.eventsHandler.didStartPurchase = didStartPurchase ?? { _ in }
+        flowConfiguration.eventsHandler.didFinishPurchase = didFinishPurchase ?? { _, res in
             if !res.isPurchaseCancelled {
                 presentationMode.wrappedValue.dismiss()
             }
         }
-        paywallConfiguration.eventsHandler.didFailPurchase = didFailPurchase
-        paywallConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
-        paywallConfiguration.eventsHandler.didFinishRestore = didFinishRestore
-        paywallConfiguration.eventsHandler.didFailRestore = didFailRestore
-        paywallConfiguration.eventsHandler.didFailRendering = didFailRendering
-        paywallConfiguration.eventsHandler.didFailLoadingProducts = didFailLoadingProducts ?? { _ in true }
-        paywallConfiguration.eventsHandler.didPartiallyLoadProducts = didPartiallyLoadProducts
+        flowConfiguration.eventsHandler.didFailPurchase = didFailPurchase
+        flowConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
+        flowConfiguration.eventsHandler.didFinishRestore = didFinishRestore
+        flowConfiguration.eventsHandler.didFailRestore = didFailRestore
+        flowConfiguration.eventsHandler.didFailRendering = didFailRendering
+        flowConfiguration.eventsHandler.didFailLoadingProducts = didFailLoadingProducts ?? { _ in true }
+        flowConfiguration.eventsHandler.didPartiallyLoadProducts = didPartiallyLoadProducts
 
-        paywallConfiguration.eventsHandler.didFinishWebPaymentNavigation = didFinishWebPaymentNavigation ?? { _, _ in }
+        flowConfiguration.eventsHandler.didFinishWebPaymentNavigation = didFinishWebPaymentNavigation ?? { _, _ in }
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false,
             displayMissingTags: false
         )
         .environmentObjects(
-            stateViewModel: paywallConfiguration.stateViewModel,
-            paywallViewModel: paywallConfiguration.paywallViewModel,
-            productsViewModel: paywallConfiguration.productsViewModel,
-            tagResolverViewModel: paywallConfiguration.tagResolverViewModel,
-            timerViewModel: paywallConfiguration.timerViewModel,
-            screensViewModel: paywallConfiguration.screensViewModel,
-            assetsViewModel: paywallConfiguration.assetsViewModel
+            stateViewModel: flowConfiguration.stateViewModel,
+            flowViewModel: flowConfiguration.flowViewModel,
+            productsViewModel: flowConfiguration.productsViewModel,
+            tagResolverViewModel: flowConfiguration.tagResolverViewModel,
+            timerViewModel: flowConfiguration.timerViewModel,
+            screensViewModel: flowConfiguration.screensViewModel,
+            assetsViewModel: flowConfiguration.assetsViewModel
         )
         .onAppear {
-            paywallConfiguration.reportOnAppear()
+            flowConfiguration.reportOnAppear()
         }
         .withAlert(item: showAlertItem, builder: showAlertBuilder)
     }

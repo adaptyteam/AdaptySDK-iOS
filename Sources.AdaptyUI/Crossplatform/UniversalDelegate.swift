@@ -12,12 +12,12 @@ import Foundation
 
 @MainActor
 extension AdaptyUI {
-    public static var universalDelegate: (AdaptyPaywallControllerDelegate & AdaptyOnboardingControllerDelegate)?
+    public static var universalDelegate: (AdaptyFlowControllerDelegate & AdaptyOnboardingControllerDelegate)?
 
     package static func paywallControllerWithUniversalDelegate(
-        _ paywallConfiguration: PaywallConfiguration,
+        _ paywallConfiguration: FlowConfiguration,
         showDebugOverlay: Bool = false
-    ) throws -> AdaptyPaywallController {
+    ) throws -> AdaptyFlowController {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivated
             Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
@@ -29,7 +29,7 @@ extension AdaptyUI {
             throw AdaptyError(AdaptyUI.PluginError.delegateIsNotRegestired)
         }
 
-        return AdaptyPaywallController(
+        return AdaptyFlowController(
             paywallConfiguration: paywallConfiguration,
             delegate: delegate,
             showDebugOverlay: showDebugOverlay

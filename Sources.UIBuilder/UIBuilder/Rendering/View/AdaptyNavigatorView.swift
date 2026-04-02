@@ -19,7 +19,7 @@ struct AdaptyScreenView: View {
     var screen: VC.Screen
 
     @EnvironmentObject
-    private var paywallViewModel: AdaptyUIPaywallViewModel
+    private var flowViewModel: AdaptyUIFlowViewModel
     @EnvironmentObject
     private var navigatorViewModel: AdaptyUINavigatorViewModel
     @EnvironmentObject

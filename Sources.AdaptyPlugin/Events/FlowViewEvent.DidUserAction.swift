@@ -1,5 +1,5 @@
 //
-//  PaywallViewEvent.DidUserAction.swift
+//  FlowViewEvent.DidUserAction.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 20.11.2024.
@@ -9,10 +9,10 @@ import Adapty
 import AdaptyUI
 import Foundation
 
-extension PaywallViewEvent {
+extension FlowViewEvent {
     struct DidUserAction: AdaptyPluginEvent {
-        let id = "paywall_view_did_perform_action"
-        let view: AdaptyUI.PaywallView
+        let id = "flow_view_did_perform_action"
+        let view: AdaptyUI.FlowView
         let action: AdaptyUI.Action
 
         enum CodingKeys: CodingKey {

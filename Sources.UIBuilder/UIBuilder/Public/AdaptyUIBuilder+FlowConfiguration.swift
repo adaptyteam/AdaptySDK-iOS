@@ -1,5 +1,5 @@
 //
-//  AdaptyUIBuilder+PaywallConfiguration.swift
+//  AdaptyUIBuilder+FlowConfiguration.swift
 //  AdaptyUIBuilder
 //
 //  Created by Alexey Goncharov on 9/23/25.
@@ -18,10 +18,10 @@ public extension AdaptyUIBuilder {
         tagResolver: AdaptyUITagResolver?,
         timerResolver: AdaptyUITimerResolver?,
         assetsResolver: AdaptyUIAssetsResolver?
-    ) async throws -> PaywallConfiguration {
+    ) async throws -> FlowConfiguration {
         let viewConfiguration = try schema.extractUIConfiguration(withLocaleId: localeId)
 
-        return PaywallConfiguration(
+        return FlowConfiguration(
             logId: Log.stamp,
             viewConfiguration: viewConfiguration,
             products: products,
@@ -34,13 +34,13 @@ public extension AdaptyUIBuilder {
 
 public extension AdaptyUIBuilder {
     @MainActor
-    final class PaywallConfiguration {
+    final class FlowConfiguration {
         let eventsHandler: AdaptyUIEventsHandler
 
         let presentationViewModel: AdaptyUIPresentationViewModel
         let stateViewModel: AdaptyUIStateViewModel
         let actionHandler: AdaptyUIStateActionHandler
-        let paywallViewModel: AdaptyUIPaywallViewModel
+        let flowViewModel: AdaptyUIFlowViewModel
         let productsViewModel: AdaptyUIProductsViewModel
         let tagResolverViewModel: AdaptyUITagResolverViewModel
         let timerViewModel: AdaptyUITimerViewModel
@@ -75,7 +75,7 @@ public extension AdaptyUIBuilder {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
-            paywallViewModel = AdaptyUIPaywallViewModel(
+            flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
                 logic: logic,
                 viewConfiguration: viewConfiguration
@@ -84,7 +84,7 @@ public extension AdaptyUIBuilder {
                 logId: logId,
                 logic: logic,
                 presentationViewModel: presentationViewModel,
-                paywallViewModel: paywallViewModel,
+                flowViewModel: flowViewModel,
                 products: products
             )
             screensViewModel = AdaptyUIScreensViewModel(
@@ -112,7 +112,7 @@ public extension AdaptyUIBuilder {
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
                 stateViewModel: stateViewModel,
-                paywallViewModel: paywallViewModel,
+                flowViewModel: flowViewModel,
                 productsViewModel: productsViewModel,
                 screensViewModel: screensViewModel
             )
@@ -131,12 +131,12 @@ public extension AdaptyUIBuilder {
 
         func reportOnAppear() {
             logic.reportViewDidAppear()
-            paywallViewModel.logShowPaywall()
+            flowViewModel.logShowPaywall()
         }
 
         func reportOnDisappear() {
             logic.reportViewDidDisappear()
-            paywallViewModel.resetLogShowPaywall()
+            flowViewModel.resetLogShowPaywall()
             productsViewModel.resetSelectedProducts()
             timerViewModel.resetTimersState()
         }

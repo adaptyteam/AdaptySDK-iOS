@@ -19,9 +19,9 @@ extension VS.ShowAlertDialogParameters.ActionStyle {
     }
 }
 
-struct AdaptyUIPaywallRendererView: View {
+struct AdaptyUIFlowRendererView: View {
     @EnvironmentObject
-    private var paywallViewModel: AdaptyUIPaywallViewModel
+    private var flowViewModel: AdaptyUIFlowViewModel
     @EnvironmentObject
     private var productsViewModel: AdaptyUIProductsViewModel
     @EnvironmentObject
@@ -64,7 +64,7 @@ struct AdaptyUIPaywallRendererView: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            paywallViewModel.logShowPaywall()
+            flowViewModel.logShowPaywall()
         }
         .alert(
             stateViewModel.alertDialog?.params.title ?? "",

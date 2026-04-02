@@ -12,7 +12,7 @@ import SwiftUI
 package extension View {
     func environmentObjects(
         stateViewModel: AdaptyUIStateViewModel,
-        paywallViewModel: AdaptyUIPaywallViewModel,
+        flowViewModel: AdaptyUIFlowViewModel,
         productsViewModel: AdaptyUIProductsViewModel,
         tagResolverViewModel: AdaptyUITagResolverViewModel,
         timerViewModel: AdaptyUITimerViewModel,
@@ -20,7 +20,7 @@ package extension View {
         assetsViewModel: AdaptyUIAssetsViewModel
     ) -> some View {
         environmentObject(stateViewModel)
-            .environmentObject(paywallViewModel)
+            .environmentObject(flowViewModel)
             .environmentObject(productsViewModel)
             .environmentObject(tagResolverViewModel)
             .environmentObject(timerViewModel)

@@ -24,13 +24,13 @@ public struct AdaptyLoadingPlaceholderView: View {
 
 
 @MainActor
-struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where AlertItem: Identifiable, Placeholder: View {
+struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertItem: Identifiable, Placeholder: View {
     @Environment(\.presentationMode) private var presentationMode
 
     private let isPresented: Binding<Bool>
     private let fullScreen: Bool
 
-    private let paywallConfiguration: AdaptyUI.PaywallConfiguration?
+    private let flowConfiguration: AdaptyUI.FlowConfiguration?
 
     private let didAppear: (() -> Void)?
     private let didDisappear: (() -> Void)?
@@ -53,7 +53,7 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
     init(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
-        paywallConfiguration: AdaptyUI.PaywallConfiguration?,
+        flowConfiguration: AdaptyUI.FlowConfiguration?,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)?,
@@ -74,7 +74,7 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
     ) {
         self.isPresented = isPresented
         self.fullScreen = fullScreen
-        self.paywallConfiguration = paywallConfiguration
+        self.flowConfiguration = flowConfiguration
         self.didAppear = didAppear
         self.didDisappear = didDisappear
         self.didPerformAction = didPerformAction
@@ -96,9 +96,9 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
 
     @ViewBuilder
     private var paywallOrProgressView: some View {
-        if let paywallConfiguration {
-            AdaptyPaywallView(
-                paywallConfiguration: paywallConfiguration,
+        if let flowConfiguration {
+            AdaptyFlowView(
+                flowConfiguration: flowConfiguration,
                 didAppear: didAppear,
                 didDisappear: didDisappear,
                 didPerformAction: didPerformAction,
@@ -129,7 +129,7 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
                 .fullScreenCover(
                     isPresented: isPresented,
                     onDismiss: {
-                        paywallConfiguration?.reportOnDisappear()
+                        flowConfiguration?.reportOnDisappear()
                     },
                     content: {
                         paywallOrProgressView
@@ -140,7 +140,7 @@ struct AdaptyPaywallViewModifier<Placeholder, AlertItem>: ViewModifier where Ale
                 .sheet(
                     isPresented: isPresented,
                     onDismiss: {
-                        paywallConfiguration?.reportOnDisappear()
+                        flowConfiguration?.reportOnDisappear()
                     },
                     content: {
                         paywallOrProgressView
@@ -159,7 +159,7 @@ public extension View {
     ///     - isPresented: A binding to a Boolean value that determines whether
     ///     to present the sheet.
     ///     - fullScreen: determines whether the screen will `.sheet` or `.fullScreenCover` function.
-    ///     - paywallConfiguration: an ``AdaptyUI.PaywallConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.paywallConfiguration(for:products:viewConfiguration:observerModeResolver:tagResolver:timerResolver:)`` method.
+    ///     - flowConfiguration: an ``AdaptyUI.FlowConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.flowConfiguration(for:products:viewConfiguration:observerModeResolver:tagResolver:timerResolver:)`` method.
     ///     - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
     ///     - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
     ///     - didAppear: This callback is invoked when the paywall view was presented.
@@ -180,7 +180,7 @@ public extension View {
     func paywall<Placeholder: View, AlertItem: Identifiable>(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
-        paywallConfiguration: AdaptyUI.PaywallConfiguration?,
+        flowConfiguration: AdaptyUI.FlowConfiguration?,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
@@ -200,10 +200,10 @@ public extension View {
         placeholderBuilder: (() -> Placeholder)? = { AdaptyLoadingPlaceholderView() }
     ) -> some View {
         modifier(
-            AdaptyPaywallViewModifier<Placeholder, AlertItem>(
+            AdaptyFlowViewModifier<Placeholder, AlertItem>(
                 isPresented: isPresented,
                 fullScreen: fullScreen,
-                paywallConfiguration: paywallConfiguration,
+                flowConfiguration: flowConfiguration,
                 didAppear: didAppear,
                 didDisappear: didDisappear,
                 didPerformAction: didPerformAction,
