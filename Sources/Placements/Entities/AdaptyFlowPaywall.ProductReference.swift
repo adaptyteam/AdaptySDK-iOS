@@ -1,5 +1,5 @@
 //
-//  AdaptyFlow.ProductReference.swift
+//  AdaptyFlowPaywall.ProductReference.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 11.05.2023
@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension AdaptyFlow {
+extension AdaptyFlowPaywall {
     struct ProductReference: Sendable, Hashable {
         let paywallProductIndex: Int
         let flowProductId: String?
@@ -18,13 +18,13 @@ extension AdaptyFlow {
     }
 }
 
-extension AdaptyFlow.ProductReference: CustomStringConvertible {
+extension AdaptyFlowPaywall.ProductReference: CustomStringConvertible {
     public var description: String {
         "(vendorId: \(productInfo.vendorId), adaptyProductId: \(adaptyProductId), promotionalOfferId: \(promotionalOfferId ?? "nil")))"
     }
 }
 
-extension AdaptyFlow.ProductReference: Encodable {
+extension AdaptyFlowPaywall.ProductReference: Encodable {
     enum CodingKeys: String, CodingKey {
         case flowProductId = "flow_product_id"
         case vendorId = "vendor_product_id"

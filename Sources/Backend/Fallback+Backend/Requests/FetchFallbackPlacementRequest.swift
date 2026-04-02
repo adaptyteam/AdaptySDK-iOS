@@ -49,8 +49,9 @@ extension Backend.FallbackExecutor {
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
-        if let locale {
-            try await _fetchFallbackPlacementByLocale(
+        if Content.self == AdaptyOnboarding.self {
+            let locale = locale ?? .defaultPlacementLocale
+            return try await _fetchFallbackPlacementByLocale(
                 apiKeyPrefix,
                 userId,
                 placementId,
@@ -62,7 +63,7 @@ extension Backend.FallbackExecutor {
                 timeoutInterval
             )
         } else {
-            try await _fetchFallbackPlacement(
+            return try await _fetchFallbackPlacement(
                 apiKeyPrefix,
                 userId,
                 placementId,

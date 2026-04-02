@@ -97,7 +97,7 @@ extension Backend.MainExecutor {
         userId: AdaptyUserId,
         placementId: String,
         variationId: String,
-        locale: AdaptyLocale,
+        locale: AdaptyLocale? = nil,
         cached: Content?,
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
@@ -116,7 +116,7 @@ extension Backend.MainExecutor {
                     userId: userId,
                     placementId: placementId,
                     variationId: variationId,
-                    locale: locale,
+                    locale: locale ?? .defaultPlacementLocale,
                     disableServerCache: disableServerCache
                 )
             }

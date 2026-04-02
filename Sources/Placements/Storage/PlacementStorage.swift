@@ -31,28 +31,28 @@ final class PlacementStorage {
         }
     }
 
-    func restorePaywall(
-        _ placementId: String,
-        withVariationId: String,
-        withInstanceIdentity: String,
-        withPlacementVersion: Int64,
-        withPlacementRevision: Int
-    ) -> AdaptyPaywall? {
-        guard let paywall: AdaptyPaywall = Self.getPlacement(placementId)?.value,
-              paywall.variationId == withVariationId,
-              paywall.instanceIdentity == withInstanceIdentity,
-              paywall.placement.version == withPlacementVersion,
-              paywall.placement.revision == withPlacementRevision
-        else {
-            return nil
-        }
-
-        return paywall
-    }
+//    func restoreFlow(
+//        _ placementId: String,
+//        withVariationId: String,
+//        withInstanceIdentity: String,
+//        withPlacementVersion: Int64,
+//        withPlacementRevision: Int
+//    ) -> AdaptyFlow? {
+//        guard let paywall: AdaptyFlow = Self.getPlacement(placementId)?.value,
+//              paywall.variationId == withVariationId,
+//              paywall.instanceIdentity == withInstanceIdentity,
+//              paywall.placement.version == withPlacementVersion,
+//              paywall.placement.revision == withPlacementRevision
+//        else {
+//            return nil
+//        }
+//
+//        return paywall
+//    }
 
     func getPlacementById<Content: PlacementContent>(
         _ placementId: String,
-        withLocale locale: AdaptyLocale,
+        withLocale locale: AdaptyLocale? = nil,
         orDefaultLocale: Bool,
         withVariationId variationId: String?
     ) -> VH<Content>? {

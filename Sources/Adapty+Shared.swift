@@ -11,7 +11,9 @@ private let log = Log.default
 
 @AdaptyActor
 extension Adapty {
-    public static var isActivated: Bool { shared != nil }
+    public static var isActivated: Bool {
+        shared != nil
+    }
 
     private enum Shared {
         case activated(Adapty)
@@ -23,7 +25,9 @@ extension Adapty {
         if shared == nil { shared = .activating(task) }
     }
 
-    static func set(shared sdk: Adapty) { shared = .activated(sdk) }
+    static func set(shared sdk: Adapty) {
+        shared = .activated(sdk)
+    }
 
     @AdaptyActor
     package static var activatedSDK: Adapty {
@@ -93,3 +97,4 @@ extension Adapty {
         }
     }
 }
+

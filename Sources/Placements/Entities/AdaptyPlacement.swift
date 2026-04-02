@@ -40,7 +40,12 @@ extension AdaptyPlacement: CustomStringConvertible {
     }
 }
 
+
+
 extension AdaptyPlacement: Codable {
+
+  
+
     enum CodingKeys: String, CodingKey {
         case placement
         case id = "developer_id"

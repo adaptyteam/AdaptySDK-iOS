@@ -8,51 +8,43 @@
 import AdaptyUIBuilder
 import Foundation
 
-extension Adapty {
+public extension Adapty {
     /// This method enables you to retrieve the paywall from the Default Audience without having to wait for the Adapty SDK to send all the user information required for segmentation to the server.
     ///
     /// - Parameters:
     ///   - placementId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
-    ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
-    ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
-    ///             Example: "en" means English, "en-US" represents US English.
-    ///             If the parameter is omitted, the paywall will be returned in the default locale.
     ///   - fetchPolicy: by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
-    /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    /// - Returns: The ``AdaptyFlow`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
     /// - Throws: An ``AdaptyError`` object
-    public nonisolated static func getPaywallForDefaultAudience(
+    nonisolated static func getFlowForDefaultAudience(
         placementId: String,
-        locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
-    ) async throws(AdaptyError) -> AdaptyPaywall {
-        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale
+    ) async throws(AdaptyError) -> AdaptyFlow {
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
 
         let logParams: EventParameters = [
             "placement_id": placementId,
-            "locale": locale,
             "fetch_policy": fetchPolicy,
         ]
 
-        return try await withActivatedSDK(methodName: .getPaywallForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
-            let paywall: AdaptyPaywall = try await sdk.getPlacementForDefaultAudience(
+        return try await withActivatedSDK(methodName: .getFlowForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
+            let flow: AdaptyFlow = try await sdk.getPlacementForDefaultAudience(
                 placementId,
-                locale,
                 fetchPolicy
             )
 
-            AdaptyUIBuilder.sendImageUrlsToObserver(paywall)
-            return paywall
+            AdaptyUIBuilder.sendImageUrlsToObserver(flow)
+            return flow
         }
     }
 
-    public nonisolated static func getOnboardingForDefaultAudience(
+    nonisolated static func getOnboardingForDefaultAudience(
         placementId: String,
         locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default
     ) async throws(AdaptyError) -> AdaptyOnboarding {
-        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale
+        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) }// ?? .defaultPlacementLocale
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
 
@@ -65,7 +57,7 @@ extension Adapty {
         return try await withActivatedSDK(methodName: .getOnboardingForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
             let onboarding: AdaptyOnboarding = try await sdk.getPlacementForDefaultAudience(
                 placementId,
-                locale,
+                locale: locale,
                 fetchPolicy
             )
 
@@ -75,7 +67,7 @@ extension Adapty {
 
     private func getPlacementForDefaultAudience<Content: PlacementContent>(
         _ placementId: String,
-        _ locale: AdaptyLocale,
+        locale: AdaptyLocale? = nil,
         _ fetchPolicy: AdaptyPlacementFetchPolicy
     ) async throws(AdaptyError) -> Content {
         let manager = profileManager
@@ -111,7 +103,7 @@ extension Adapty {
     private func fetchPlacementForDefaultAudience<Content: PlacementContent>(
         _ userId: AdaptyUserId,
         _ placementId: String,
-        _ locale: AdaptyLocale
+        _ locale: AdaptyLocale?
     ) async throws(AdaptyError) -> Content {
         let (cached, isTestUser): (Content?, Bool) = {
             guard let manager = try? profileManager(withProfileId: userId) else { return (nil, false) }
@@ -158,3 +150,4 @@ extension Adapty {
         }
     }
 }
+

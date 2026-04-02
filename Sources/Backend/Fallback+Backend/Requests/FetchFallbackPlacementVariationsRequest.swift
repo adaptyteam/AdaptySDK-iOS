@@ -48,8 +48,9 @@ extension Backend.FallbackExecutor {
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
-        if let locale {
-            try await _performFetchFallbackPlacementVariationsRequestByLocale(
+        if Content.self == AdaptyOnboarding.self {
+            let locale = locale ?? .defaultPlacementLocale
+            return try await _performFetchFallbackPlacementVariationsRequestByLocale(
                 apiKeyPrefix,
                 userId,
                 placementId,
@@ -61,7 +62,7 @@ extension Backend.FallbackExecutor {
                 timeoutInterval
             )
         } else {
-            try await _performFetchFallbackPlacementVariationsRequest(
+            return try await _performFetchFallbackPlacementVariationsRequest(
                 apiKeyPrefix,
                 userId,
                 placementId,
@@ -85,8 +86,9 @@ extension Backend.ConfigsExecutor {
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
-        if let locale {
-            try await _performFetchFallbackPlacementVariationsRequestByLocale(
+        if Content.self == AdaptyOnboarding.self {
+            let locale = locale ?? .defaultPlacementLocale
+            return try await _performFetchFallbackPlacementVariationsRequestByLocale(
                 apiKeyPrefix,
                 userId,
                 placementId,
@@ -98,7 +100,7 @@ extension Backend.ConfigsExecutor {
                 timeoutInterval
             )
         } else {
-            try await _performFetchFallbackPlacementVariationsRequest(
+            return try await _performFetchFallbackPlacementVariationsRequest(
                 apiKeyPrefix,
                 userId,
                 placementId,

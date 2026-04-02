@@ -18,10 +18,7 @@ public struct AdaptyFlow: PlacementContent {
         viewConfiguration != nil
     }
 
-    let paywalls: [AdaptyFlow.Paywall]
-
-    /// Array of related products ids.
-    public var vendorProductIds: [String] { paywalls.flatMap(\.vendorProductIds) }
+    let paywalls: [AdaptyFlowPaywall]
 
     let viewConfiguration: ViewConfiguration?
 }
@@ -32,7 +29,12 @@ extension AdaptyFlow: CustomStringConvertible {
     }
 }
 
-extension AdaptyFlow: Codable {
+extension AdaptyFlow: Encodable, Decodable,  DecodableWithConfiguration {
+
+    public struct DecodingConfiguration {
+        let placement: AdaptyPlacement
+    }
+
     enum CodingKeys: String, CodingKey {
         case instanceIdentity = "flow_id"
         case variationId = "variation_id" //
@@ -44,7 +46,12 @@ extension AdaptyFlow: Codable {
     }
 
     public init(from decoder: Decoder) throws {
-        placement = try decoder.userInfo.placementOrNil ?? AdaptyPlacement(from: decoder)
+        let configuration = try  DecodingConfiguration(placement: AdaptyPlacement(from: decoder))
+        try self.init(from: decoder, configuration: configuration)
+    }
+
+    public init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
+        placement = configuration.placement
         let container = try decoder.container(keyedBy: CodingKeys.self)
         instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
@@ -56,8 +63,7 @@ extension AdaptyFlow: Codable {
         } else {
             viewConfiguration = nil
         }
-
-        paywalls = try container.decodeIfPresent([AdaptyFlow.Paywall].self, forKey: .paywalls) ?? []
+        paywalls = try container.decodeIfPresent([AdaptyFlowPaywall].self, forKey: .paywalls, configuration: configuration) ?? []
     }
 
     public func encode(to encoder: Encoder) throws {

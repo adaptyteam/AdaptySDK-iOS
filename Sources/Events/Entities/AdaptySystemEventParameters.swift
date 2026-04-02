@@ -148,10 +148,10 @@ enum MethodName: String {
     case getCurrentInstallationStatus = "get_current_installation_status"
     case restorePurchases = "restore_purchases"
 
-    case getPaywall = "get_paywall"
+    case getFlow = "get_flow"
     case getOnboarding = "get_onboarding"
 
-    case getPaywallForDefaultAudience = "get_paywall_for_default_audience"
+    case getFlowForDefaultAudience = "get_flow_for_default_audience"
     case getOnboardingForDefaultAudience = "get_onboarding_for_default_audience"
 
     case setFallback = "set_fallback_file"

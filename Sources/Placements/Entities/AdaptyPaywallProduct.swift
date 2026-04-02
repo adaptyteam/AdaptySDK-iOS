@@ -23,13 +23,13 @@ public protocol AdaptyPaywallProductWithoutDeterminingOffer: AdaptyProduct {
 
     var paywallProductIndex: Int { get }
 
-    /// Same as `variationId` property of the parent AdaptyPaywall.
+    /// Same as `variationId` property of the parent AdaptyFlowPaywall.
     var variationId: String { get }
 
-    /// Same as `abTestName` property of the parent AdaptyPaywall.
+    /// Same as `abTestName` property of the parent AdaptyFlowPaywall.
     var paywallABTestName: String { get }
 
-    /// Same as `name` property of the parent AdaptyPaywall.
+    /// Same as `name` property of the parent AdaptyFlowPaywall.
     var paywallName: String { get }
 }
 

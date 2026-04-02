@@ -22,7 +22,7 @@ extension Adapty {
     public nonisolated static func setFallback(fileURL url: URL) async throws(AdaptyError) {
         try await withoutSDK(
             methodName: .setFallback
-        ) { @AdaptyActor () throws(AdaptyError) in
+        ) { @AdaptyActor () async throws(AdaptyError) in
             Adapty.fallbackPlacements = try FallbackPlacements(fileURL: url)
         }
     }
@@ -35,7 +35,7 @@ extension PlacementStorage {
         byPlacementId placementId: String,
         withVariationId variationId: String?,
         userId _: AdaptyUserId,
-        locale: AdaptyLocale
+        locale: AdaptyLocale?
     ) -> AdaptyPlacementChosen<Content>? {
         guard let placement: Content = getPlacementById(
             placementId,
@@ -51,7 +51,7 @@ extension PlacementStorage {
         byPlacementId placementId: String,
         withVariationId variationId: String?,
         userId: AdaptyUserId,
-        locale: AdaptyLocale
+        locale: AdaptyLocale?
     ) -> AdaptyPlacementChosen<Content>? {
         let cachedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
             : getPlacement(byPlacementId: placementId, withVariationId: variationId, userId: userId, locale: locale)
@@ -112,9 +112,8 @@ extension PlacementStorage {
             }
 
         default:
-            let fallBacked: AdaptyPlacementChosen<Content>?
-            if let variationId {
-                fallBacked = fallbackFile.getPlacement(
+            let fallBacked: AdaptyPlacementChosen<Content>? = if let variationId {
+                fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: variationId,
                     userId: userId,
@@ -126,7 +125,7 @@ extension PlacementStorage {
                     requestLocale: locale
                 )
             } else {
-                fallBacked = fallbackFile.getPlacement(
+                fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: nil,
                     userId: userId,

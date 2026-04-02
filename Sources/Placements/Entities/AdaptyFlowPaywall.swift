@@ -1,5 +1,5 @@
 //
-//  AdaptyFlow.Paywall.swift
+//  AdaptyFlowPaywall.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 31.03.2026.
@@ -7,29 +7,34 @@
 
 import Foundation
 
-extension AdaptyFlow {
-    struct Paywall: WebPaywallURLProviding {
-        let instanceIdentity: String
-        let name: String
+public struct AdaptyFlowPaywall: Sendable, WebPaywallURLProviding {
+    public let placement: AdaptyPlacement
 
-        let variationId: String
-        var webPaywallBaseUrl: URL?
+    public let instanceIdentity: String
 
-        let products: [AdaptyFlow.ProductReference]
+    /// An identifier of a variation, used to attribute purchases to this paywall.
+    public let variationId: String
 
-        var vendorProductIds: [String] {
-            products.map(\.productInfo.vendorId)
-        }
+    /// A paywall name.
+    public let name: String
+
+    let products: [AdaptyFlowPaywall.ProductReference]
+
+    package var webPaywallBaseUrl: URL?
+
+    /// Array of related products ids.
+    public var vendorProductIds: [String] {
+        products.map(\.productInfo.vendorId)
     }
 }
 
-extension AdaptyFlow.Paywall: CustomStringConvertible {
-    var description: String {
-        "(flow.paywall, instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId))"
+extension AdaptyFlowPaywall: CustomStringConvertible {
+    public var description: String {
+        "(paywall, placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId))"
     }
 }
 
-extension AdaptyFlow.Paywall: Codable {
+extension AdaptyFlowPaywall: Encodable, DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case instanceIdentity = "paywall_id"
         case name = "paywall_name"
@@ -38,9 +43,9 @@ extension AdaptyFlow.Paywall: Codable {
         case products
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder, configuration: AdaptyFlow.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-
+        placement = configuration.placement
         instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)
@@ -48,12 +53,12 @@ extension AdaptyFlow.Paywall: Codable {
 
         products = try {
             var arrayContainer = try container.nestedUnkeyedContainer(forKey: .products)
-            var products = [AdaptyFlow.ProductReference]()
+            var products = [AdaptyFlowPaywall.ProductReference]()
             var index = 0
 
             while !arrayContainer.isAtEnd {
-                let product = try AdaptyFlow.ProductReference(
-                    from: arrayContainer.nestedContainer(keyedBy: AdaptyFlow.ProductReference.CodingKeys.self),
+                let product = try AdaptyFlowPaywall.ProductReference(
+                    from: arrayContainer.nestedContainer(keyedBy: AdaptyFlowPaywall.ProductReference.CodingKeys.self),
                     index: index
                 )
                 index += 1
@@ -64,7 +69,7 @@ extension AdaptyFlow.Paywall: Codable {
         }()
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(instanceIdentity, forKey: .instanceIdentity)
         try container.encode(name, forKey: .name)

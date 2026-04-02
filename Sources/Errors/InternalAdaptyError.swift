@@ -237,22 +237,24 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), error.localizedDescription).asAdaptyError
     }
 
-    static func isNoViewConfigurationInPaywall(
+    static func isNoViewConfigurationInFlow(
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "AdaptyPaywall.viewConfiguration is nil").asAdaptyError
+        InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "AdaptyFlow.viewConfiguration is nil").asAdaptyError
     }
 
     static func paywallWithoutPurchaseUrl(
-        paywall: AdaptyPaywall,
+        paywall: AdaptyFlowPaywall,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Current method is not available for the paywall (placementId: \(paywall.placement.id), name: \(paywall.name), variationId: \(paywall.variationId))").asAdaptyError
     }
+
+
 
     static func productWithoutPurchaseUrl(
         adaptyProductId: String,

@@ -53,7 +53,7 @@ public extension Adapty {
     }
 
     nonisolated static func openWebPaywall(
-        for paywall: AdaptyPaywall,
+        for paywall: AdaptyFlowPaywall,
         in presentation: AdaptyWebPresentation = .externalBrowser
     ) async throws(AdaptyError) {
         try await withActivatedSDK(
@@ -70,7 +70,7 @@ public extension Adapty {
     }
 
     nonisolated static func createWebPaywallUrl(
-        for paywall: AdaptyPaywall
+        for paywall: AdaptyFlowPaywall
     ) async throws(AdaptyError) -> URL {
         try await withActivatedSDK(
             methodName: .createWebPaywallUrl,
@@ -96,7 +96,7 @@ public extension Adapty {
     }
 
     private func openWebPaywall(
-        for paywall: AdaptyPaywall,
+        for paywall: AdaptyFlowPaywall,
         presentation: AdaptyWebPresentation
     ) async throws(AdaptyError) {
         let url = try createWebPaywallUrl(for: paywall)
@@ -107,7 +107,7 @@ public extension Adapty {
     }
 
     private func createWebPaywallUrl(
-        for paywall: AdaptyPaywall
+        for paywall: AdaptyFlowPaywall
     ) throws(AdaptyError) -> URL {
         guard let webPaywallBaseUrl = paywall.webPaywallBaseUrl else {
             throw .paywallWithoutPurchaseUrl(paywall: paywall)

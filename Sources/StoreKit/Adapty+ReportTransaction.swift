@@ -35,7 +35,7 @@ public extension Adapty {
     ///
     /// - Parameters:
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
-    ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
+    ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyFlowPaywall`.
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func reportTransaction(
         _ transaction: StoreKit.Transaction,
@@ -76,7 +76,7 @@ public extension Adapty {
     ///
     /// - Parameters:
     ///   - transaction: A purchased verification result of transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/verificationresult).
-    ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
+    ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyFlowPaywall`.
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func reportTransaction(
         _ signedTransaction: StoreKit.VerificationResult<StoreKit.Transaction>,
@@ -98,7 +98,7 @@ public extension Adapty {
     ///
     /// - Parameters:
     ///   - purchaseResult: A product purchase result (note, that this method is suitable only for Store Kit version 2) [Product.PurchaseResult](https://developer.apple.com/documentation/storekit/product/purchaseresult).
-    ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
+    ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyFlowPaywall`.
     /// - Throws: An ``AdaptyError`` object
     nonisolated static func reportPurchaseResult(
         _ purchaseResult: StoreKit.Product.PurchaseResult,

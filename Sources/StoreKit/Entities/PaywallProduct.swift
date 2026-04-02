@@ -21,13 +21,13 @@ struct PaywallProduct: AdaptyProduct, AdaptyPaywallProduct, WebPaywallURLProvidi
 
     let subscriptionOffer: AdaptySubscriptionOffer?
 
-    /// Same as `variationId` property of the parent AdaptyPaywall.
+    /// Same as `variationId` property of the parent AdaptyFlowPaywall.
     let variationId: String
 
-    /// Same as `abTestName` property of the parent AdaptyPaywall.
+    /// Same as `abTestName` property of the parent AdaptyFlowPaywall.
     let paywallABTestName: String
 
-    /// Same as `name` property of the parent AdaptyPaywall.
+    /// Same as `name` property of the parent AdaptyFlowPaywall.
     let paywallName: String
 
     let webPaywallBaseUrl: URL?
@@ -48,13 +48,13 @@ struct PaywallProductWithoutDeterminingOffer: AdaptyProduct, AdaptyPaywallProduc
 
     let paywallProductIndex: Int
 
-    /// Same as `variationId` property of the parent AdaptyPaywall.
+    /// Same as `variationId` property of the parent AdaptyFlowPaywall.
     let variationId: String
 
-    /// Same as `abTestName` property of the parent AdaptyPaywall.
+    /// Same as `abTestName` property of the parent AdaptyFlowPaywall.
     let paywallABTestName: String
 
-    /// Same as `name` property of the parent AdaptyPaywall.
+    /// Same as `name` property of the parent AdaptyFlowPaywall.
     let paywallName: String
 
     let webPaywallBaseUrl: URL?

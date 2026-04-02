@@ -10,9 +10,7 @@ import Foundation
 extension Backend.Request {
     fileprivate static let authorizationHeaderKey = "Authorization"
     fileprivate static let hashHeaderKey = "adapty-sdk-previous-response-hash"
-    fileprivate static let paywallLocaleHeaderKey = "adapty-paywall-locale"
     fileprivate static let onboardingLocaleHeaderKey = "adapty-onboarding-locale"
-    fileprivate static let paywallBuilderLocaleHeaderKey = "adapty-paywall-builder-locale"
     fileprivate static let builderVersionHeaderKey = "adapty-builder-version"
     fileprivate static let builderConfigurationFormatVersionHeaderKey = "adapty-builder-schema-version"
     fileprivate static let onboardingUIVersionHeaderKey = "adapty-onboarding-ui-version"
@@ -70,16 +68,8 @@ private extension Backend.Response {
 }
 
 extension HTTPHeaders {
-    func setPaywallLocale(_ locale: AdaptyLocale?) -> Self {
-        updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallLocaleHeaderKey)
-    }
-
     func setOnboardingLocale(_ locale: AdaptyLocale?) -> Self {
         updateOrRemoveValue(locale?.id, forKey: Backend.Request.onboardingLocaleHeaderKey)
-    }
-
-    func setPaywallBuilderLocale(_ locale: AdaptyLocale?) -> Self {
-        updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallBuilderLocaleHeaderKey)
     }
 
     func setBuilderVersion(_ version: String?) -> Self {

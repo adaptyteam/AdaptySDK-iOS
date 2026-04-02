@@ -105,7 +105,7 @@ extension Backend.MainExecutor {
         apiKeyPrefix: String,
         userId: AdaptyUserId,
         placementId: String,
-        locale: AdaptyLocale,
+        locale: AdaptyLocale? = nil,
         segmentId: String,
         cached: Content?,
         crossPlacementEligible: Bool,
@@ -128,7 +128,7 @@ extension Backend.MainExecutor {
                     apiKeyPrefix: apiKeyPrefix,
                     userId: userId,
                     placementId: placementId,
-                    locale: locale,
+                    locale: locale ?? .defaultPlacementLocale,
                     segmentId: segmentId,
                     crossPlacementEligible: crossPlacementEligible,
                     disableServerCache: disableServerCache

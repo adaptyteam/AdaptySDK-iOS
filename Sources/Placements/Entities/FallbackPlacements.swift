@@ -12,8 +12,13 @@ private let log = Log.fallbackPlacements
 struct FallbackPlacements: Sendable {
     private let fileURL: URL
     private let head: Head
-    var formatVersion: Int { head.formatVersion }
-    var version: Int64 { head.version }
+    var formatVersion: Int {
+        head.formatVersion
+    }
+
+    var version: Int64 {
+        head.version
+    }
 
     init(fileURL url: URL) throws(AdaptyError) {
         guard url.isFileURL else {
@@ -33,13 +38,13 @@ struct FallbackPlacements: Sendable {
         head.placementIds?.contains(id)
     }
 
-    func restorePaywall(
+    func restoreFlow(
         _ id: String,
         withVariationId variationId: String,
         withInstanceIdentity: String,
         withPlacementRevision: Int
-    ) -> AdaptyPaywall? {
-        guard let chosen: AdaptyPlacementChosen<AdaptyPaywall> = getPlacement(
+    ) -> AdaptyFlow? {
+        guard let chosen: AdaptyPlacementChosen<AdaptyFlow> = getPlacement(
             byPlacementId: id,
             withVariationId: variationId,
             userId: AdaptyUserId(profileId: "", customerId: nil),
@@ -47,22 +52,22 @@ struct FallbackPlacements: Sendable {
         )
         else { return nil }
 
-        let paywall = chosen.content
+        let flow = chosen.content
 
-        guard paywall.instanceIdentity == withInstanceIdentity,
-              paywall.placement.revision == withPlacementRevision
+        guard flow.instanceIdentity == withInstanceIdentity,
+              flow.placement.revision == withPlacementRevision
         else {
             return nil
         }
 
-        return paywall
+        return flow
     }
 
     func getPlacement<Content: PlacementContent>(
         byPlacementId id: String,
         withVariationId: String?,
         userId: AdaptyUserId,
-        requestLocale: AdaptyLocale
+        requestLocale: AdaptyLocale?
     ) -> AdaptyPlacementChosen<Content>? {
         guard contains(placementId: id) ?? true else { return nil }
 
@@ -132,13 +137,15 @@ private extension FallbackPlacements {
         withUserId userId: AdaptyUserId,
         withPlacementId placementId: String,
         withVariationId variationId: String?,
-        withRequestLocale requestLocale: AdaptyLocale,
+        withRequestLocale requestLocale: AdaptyLocale?,
         version: Int64
     ) throws -> AdaptyPlacement.Draw<Content>? {
         let jsonDecoder = FallbackPlacements.decoder()
         jsonDecoder.userInfo.setPlacementId(placementId)
         jsonDecoder.userInfo.setUserId(userId)
-        jsonDecoder.userInfo.setRequestLocale(requestLocale)
+        if let requestLocale {
+            jsonDecoder.userInfo.setRequestLocale(requestLocale)
+        }
 
         if let variationId {
             jsonDecoder.userInfo.setPlacementVariationId(variationId)
@@ -241,3 +248,4 @@ private extension Backend.Response.Data {
         }
     }
 }
+
