@@ -6,7 +6,7 @@
 //
 
 package extension Adapty {
-    nonisolated static func logShowPaywallViaAdaptyUI(_ flow: AdaptyFlow) async throws(AdaptyError) {
+    nonisolated static func logShowFlowViaAdaptyUI(_ flow: AdaptyFlow) async throws(AdaptyError) {
         try await trackEvent(
             .flowShowed(.init(
                 variationId: flow.variationId,

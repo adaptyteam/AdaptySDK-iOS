@@ -39,7 +39,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
     private let timerResolver: AdaptyUITimerResolver
 
     private let stateViewModel: AdaptyUIStateViewModel
-    private let paywallViewModel: AdaptyUIPaywallViewModel
+    private let flowViewModel: AdaptyUIFlowViewModel
     private let productsViewModel: AdaptyUIProductsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
 
@@ -51,14 +51,14 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         logId: String,
         timerResolver: AdaptyUITimerResolver,
         stateViewModel: AdaptyUIStateViewModel,
-        paywallViewModel: AdaptyUIPaywallViewModel,
+        flowViewModel: AdaptyUIFlowViewModel,
         productsViewModel: AdaptyUIProductsViewModel,
         screensViewModel: AdaptyUIScreensViewModel
     ) {
         self.logId = logId
         self.timerResolver = timerResolver
         self.stateViewModel = stateViewModel
-        self.paywallViewModel = paywallViewModel
+        self.flowViewModel = flowViewModel
         self.productsViewModel = productsViewModel
         self.screensViewModel = screensViewModel
     }

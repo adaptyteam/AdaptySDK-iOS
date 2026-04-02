@@ -21,7 +21,7 @@ private enum ScrollAnchor {
 
 struct AdaptyUIHeroContainerView: View {
     @EnvironmentObject
-    private var paywallViewModel: AdaptyUIPaywallViewModel
+    private var flowViewModel: AdaptyUIFlowViewModel
     @EnvironmentObject
     private var stateViewModel: AdaptyUIStateViewModel
     @Environment(\.adaptyScreenInstance)
@@ -76,7 +76,7 @@ struct AdaptyUIHeroContainerView: View {
                         Rectangle()
                             .hidden()
                             .onAppear {
-                                paywallViewModel.reportDidFailRendering(
+                                flowViewModel.reportDidFailRendering(
                                     with: .wrongComponentType("screen.cover")
                                 )
                             }

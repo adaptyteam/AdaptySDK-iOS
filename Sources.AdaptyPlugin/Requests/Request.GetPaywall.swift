@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct GetPaywall: AdaptyPluginRequest {
-        static let method = "get_paywall"
+        static let method = "get_paywall" // TODO: x
 
         let placementId: String
         let locale: String?
@@ -25,9 +25,8 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try .success(await Adapty.getPaywall(
+            try .success(await Adapty.getFlow(
                 placementId: placementId,
-                locale: locale,
                 fetchPolicy: fetchPolicy ?? AdaptyPlacementFetchPolicy.default,
                 loadTimeout: loadTimeout
             ))

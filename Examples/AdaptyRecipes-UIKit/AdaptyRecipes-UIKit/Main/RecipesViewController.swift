@@ -25,14 +25,14 @@ class RecipesViewController: UITableViewController {
 
     private func presentPaywall() async {
         do {
-            let paywall = try await Adapty.getPaywall(placementId: placementId)
-            let paywallConfig = try await AdaptyUI.getPaywallConfiguration(
-                forPaywall: paywall
+            let flow = try await Adapty.getFlow(placementId: placementId)
+            let flowConfig = try await AdaptyUI.getFlowConfiguration(
+                forFlow: flow
 //              observerModeResolver: self // ⚠️ Pass AdaptyObserverModeResolver object to work in ObserverMode
             )
 
-            let vc = try AdaptyUI.paywallController(
-                with: paywallConfig,
+            let vc = try AdaptyUI.flowController(
+                with: flowConfig,
                 delegate: self
             )
 
@@ -54,24 +54,24 @@ class RecipesViewController: UITableViewController {
 //    }
 // }
 
-extension RecipesViewController: AdaptyPaywallControllerDelegate {
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+extension RecipesViewController: AdaptyFlowControllerDelegate {
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailPurchase product: AdaptyPaywallProduct,
         error: AdaptyError
     ) {
         // handle the error
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFinishRestoreWith profile: AdaptyProfile
     ) {
         // handle the restore result
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailRestoreWith error: AdaptyError
     ) {
         // handle the error

@@ -1,5 +1,5 @@
 //
-//  AdaptyPaywallUIView.swift
+//  AdaptyFlowUIView.swift
 //  Adapty
 //
 //  Created by Alexey Goncharov on 8/6/25.
@@ -12,15 +12,15 @@ import AdaptyUIBuilder
 import SwiftUI
 import UIKit
 
-package final class AdaptyPaywallUIView: UIView {
+package final class AdaptyFlowUIView: UIView {
     let id: String
-    let configuration: AdaptyUI.PaywallConfiguration
+    let configuration: AdaptyUI.FlowConfiguration
     let logId: String
     
     private let showDebugOverlay: Bool
 
     package init(
-        configuration: AdaptyUI.PaywallConfiguration,
+        configuration: AdaptyUI.FlowConfiguration,
         showDebugOverlay: Bool = false,
         id: String = UUID().uuidString
     ) {
@@ -41,41 +41,41 @@ package final class AdaptyPaywallUIView: UIView {
         Log.ui.verbose("#\(logId)# view deinit")
     }
 
-    weak var delegate: AdaptyPaywallViewDelegate?
+    weak var delegate: AdaptyFlowViewDelegate?
 
-    package func configure(delegate: AdaptyPaywallViewDelegate) {
+    package func configure(delegate: AdaptyFlowViewDelegate) {
         Log.ui.verbose("V #\(logId)# view configure")
 
         self.delegate = delegate
 
         configuration.eventsHandler.didAppear = { [weak self] in
             guard let self else { return }
-            self.delegate?.paywallViewDidAppear(self)
+            self.delegate?.flowViewDidAppear(self)
         }
 
         configuration.eventsHandler.didDisappear = { [weak self] in
             guard let self else { return }
-            self.delegate?.paywallViewDidDisappear(self)
+            self.delegate?.flowViewDidDisappear(self)
         }
 
         configuration.eventsHandler.didPerformAction = { [weak self] action in
             guard let self else { return }
-            self.delegate?.paywallView(self, didPerform: action)
+            self.delegate?.flowView(self, didPerform: action)
         }
 
         configuration.eventsHandler.didSelectProduct = { [weak self] underlying in
             guard let self else { return }
-            self.delegate?.paywallView(self, didSelectProduct: underlying)
+            self.delegate?.flowView(self, didSelectProduct: underlying)
         }
 
         configuration.eventsHandler.didStartPurchase = { [weak self] underlying in
             guard let self else { return }
-            self.delegate?.paywallView(self, didStartPurchase: underlying)
+            self.delegate?.flowView(self, didStartPurchase: underlying)
         }
 
         configuration.eventsHandler.didFinishPurchase = { [weak self] underlying, purchaseResult in
             guard let self else { return }
-            self.delegate?.paywallView(
+            self.delegate?.flowView(
                 self,
                 didFinishPurchase: underlying,
                 purchaseResult: purchaseResult
@@ -84,44 +84,44 @@ package final class AdaptyPaywallUIView: UIView {
 
         configuration.eventsHandler.didFailPurchase = { [weak self] underlying, error in
             guard let self else { return }
-            self.delegate?.paywallView(self, didFailPurchase: underlying, error: error)
+            self.delegate?.flowView(self, didFailPurchase: underlying, error: error)
         }
 
         configuration.eventsHandler.didStartRestore = { [weak self] in
             guard let self else { return }
-            self.delegate?.paywallViewDidStartRestore(self)
+            self.delegate?.flowViewDidStartRestore(self)
         }
 
         configuration.eventsHandler.didFinishRestore = { [weak self] profile in
             guard let self else { return }
-            self.delegate?.paywallView(self, didFinishRestoreWith: profile)
+            self.delegate?.flowView(self, didFinishRestoreWith: profile)
         }
 
         configuration.eventsHandler.didFailRestore = { [weak self] error in
             guard let self else { return }
-            self.delegate?.paywallView(self, didFailRestoreWith: error)
+            self.delegate?.flowView(self, didFailRestoreWith: error)
         }
 
         configuration.eventsHandler.didFailRendering = { [weak self] error in
             guard let self else { return }
-            self.delegate?.paywallView(self, didFailRenderingWith: error)
+            self.delegate?.flowView(self, didFailRenderingWith: error)
         }
 
         configuration.eventsHandler.didFailLoadingProducts = { [weak self] error in
             guard let self else { return false }
             guard let delegate = self.delegate else { return true }
-            return delegate.paywallView(self, didFailLoadingProductsWith: error)
+            return delegate.flowView(self, didFailLoadingProductsWith: error)
         }
 
         configuration.eventsHandler.didPartiallyLoadProducts = { [weak self] failedIds in
             guard let self else { return }
-            self.delegate?.paywallView(self, didPartiallyLoadProducts: failedIds)
+            self.delegate?.flowView(self, didPartiallyLoadProducts: failedIds)
         }
 
         configuration.eventsHandler.didFinishWebPaymentNavigation = { [weak self] product, error in
             guard let self else { return }
 
-            self.delegate?.paywallView(
+            self.delegate?.flowView(
                 self,
                 didFinishWebPaymentNavigation: product,
                 error: error
@@ -151,7 +151,7 @@ package final class AdaptyPaywallUIView: UIView {
             )
             .environmentObjects(
                 stateViewModel: configuration.stateViewModel,
-                paywallViewModel: configuration.paywallViewModel,
+                flowViewModel: configuration.flowViewModel,
                 productsViewModel: configuration.productsViewModel,
                 tagResolverViewModel: configuration.tagResolverViewModel,
                 timerViewModel: configuration.timerViewModel,

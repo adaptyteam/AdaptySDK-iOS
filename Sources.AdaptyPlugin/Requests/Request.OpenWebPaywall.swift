@@ -38,15 +38,15 @@ extension Request {
                     webPaywallBaseUrl: product.webPaywallBaseUrl
                 )
                 try await Adapty.openWebPaywall(for: product, in: presentation)
-            case .openPaywall(let paywall):
-                try await Adapty.openWebPaywall(for: paywall, in: presentation)
+//            case .openPaywall(let paywall): // TODO: x
+//                try await Adapty.openWebPaywall(for: paywall, in: presentation)
             }
             return .success()
         }
         
         enum Operation {
             case openProduct(AdaptyPluginPaywallProduct)
-            case openPaywall(AdaptyPaywall)
+//            case openPaywall(AdaptyPaywall) // TODO: x
             
             enum CodingKeys: CodingKey {
                 case product
@@ -55,11 +55,11 @@ extension Request {
             
             init(from decoder: any Decoder) throws {
                 let container = try decoder.container(keyedBy: CodingKeys.self)
-                if container.contains(.product) {
+//                if container.contains(.product) {
                     self = try .openProduct(container.decode(AdaptyPluginPaywallProduct.self, forKey: .product))
-                } else {
-                    self = try .openPaywall(container.decode(AdaptyPaywall.self, forKey: .paywall))
-                }
+//                } else {
+//                    self = try .openPaywall(container.decode(AdaptyPaywall.self, forKey: .paywall))  // TODO: x
+//                }
             }
         }
     }

@@ -59,7 +59,7 @@ struct AdaptyUIImageView: View {
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
     @EnvironmentObject
-    private var paywallViewModel: AdaptyUIPaywallViewModel
+    private var flowViewModel: AdaptyUIFlowViewModel
 
     @ViewBuilder
     private func rasterImage(
@@ -142,7 +142,7 @@ struct AdaptyUIImageView: View {
         } else {
             Rectangle()
                 .onAppear {
-                    paywallViewModel.reportDidFailRendering(
+                    flowViewModel.reportDidFailRendering(
                         with: .wrongAssetType("Expected image")
                     )
                 }

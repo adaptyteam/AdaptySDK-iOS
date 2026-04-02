@@ -1,5 +1,5 @@
 //
-//  PaywallViewEvent.DidDisappear.swift
+//  FlowViewEvent.DidDisappear.swift
 //  AdaptyPlugin
 //
 //  Created by Alexey Goncharov on 3/13/25.
@@ -9,10 +9,10 @@ import Adapty
 import AdaptyUI
 import Foundation
 
-extension PaywallViewEvent {
+extension FlowViewEvent {
     struct DidDisappear: AdaptyPluginEvent {
-        let id = "paywall_view_did_disappear"
-        let view: AdaptyUI.PaywallView
+        let id = "flow_view_did_disappear"
+        let view: AdaptyUI.FlowView
 
         enum CodingKeys: String, CodingKey {
             case id

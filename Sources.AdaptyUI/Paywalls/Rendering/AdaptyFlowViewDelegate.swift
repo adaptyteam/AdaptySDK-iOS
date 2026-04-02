@@ -1,5 +1,5 @@
 //
-//  AdaptyPaywallViewDelegate.swift
+//  AdaptyFlowViewDelegate.swift
 //  Adapty
 //
 //  Created by Alexey Goncharov on 8/6/25.
@@ -11,67 +11,67 @@ import Adapty
 import UIKit
 
 @MainActor
-package protocol AdaptyPaywallViewDelegate: AnyObject {
-    func paywallViewDidAppear(_ view: AdaptyPaywallUIView)
+package protocol AdaptyFlowViewDelegate: AnyObject {
+    func flowViewDidAppear(_ view: AdaptyFlowUIView)
 
-    func paywallViewDidDisappear(_ view: AdaptyPaywallUIView)
+    func flowViewDidDisappear(_ view: AdaptyFlowUIView)
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didPerform action: AdaptyUI.Action
     )
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
     )
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didStartPurchase product: AdaptyPaywallProduct
     )
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didFinishPurchase product: AdaptyPaywallProduct,
         purchaseResult: AdaptyPurchaseResult
     )
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didFailPurchase product: AdaptyPaywallProduct,
         error: AdaptyError
     )
 
-    func paywallViewDidStartRestore(_ view: AdaptyPaywallUIView)
+    func flowViewDidStartRestore(_ view: AdaptyFlowUIView)
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didFinishRestoreWith profile: AdaptyProfile
     )
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didFailRestoreWith error: AdaptyError
     )
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didFailRenderingWith error: AdaptyUIError
     )
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didFailLoadingProductsWith error: AdaptyError
     ) -> Bool
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didPartiallyLoadProducts failedIds: [String]
     )
 
-    func paywallView(
-        _ view: AdaptyPaywallUIView,
+    func flowView(
+        _ view: AdaptyFlowUIView,
         didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
         error: AdaptyError?
     )

@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct AdaptyUIPresentPaywallView: AdaptyPluginRequest {
-        static let method = "adapty_ui_present_paywall_view"
+        static let method = "adapty_ui_present_paywall_view" // TODO: x
 
         let viewId: String
         let presentationStyle: AdaptyUIViewPresentationStyle?
@@ -21,7 +21,7 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try await AdaptyUI.Plugin.presentPaywallView(
+            try await AdaptyUI.Plugin.presentFlowView(
                 viewId: viewId,
                 presentationStyle: presentationStyle
             )

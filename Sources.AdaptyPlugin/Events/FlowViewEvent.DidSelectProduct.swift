@@ -1,5 +1,5 @@
 //
-//  PaywallViewEvent.DidSelectProduct.swift
+//  FlowViewEvent.DidSelectProduct.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 20.11.2024.
@@ -9,10 +9,10 @@ import Adapty
 import AdaptyUI
 import Foundation
 
-extension PaywallViewEvent {
+extension FlowViewEvent {
     struct DidSelectProduct: AdaptyPluginEvent {
-        let id = "paywall_view_did_select_product"
-        let view: AdaptyUI.PaywallView
+        let id = "flow_view_did_select_product"
+        let view: AdaptyUI.FlowView
         let productVendorId: String
 
         enum CodingKeys: String, CodingKey {

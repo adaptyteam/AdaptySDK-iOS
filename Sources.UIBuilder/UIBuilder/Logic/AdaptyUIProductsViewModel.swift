@@ -32,7 +32,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
     private let logId: String
     private let logic: AdaptyUIBuilderLogic
-    private let paywallViewModel: AdaptyUIPaywallViewModel
+    private let flowViewModel: AdaptyUIFlowViewModel
     private let presentationViewModel: AdaptyUIPresentationViewModel
 
     @Published private var paywallProductsWithoutOffer: [ProductResolver]?
@@ -51,13 +51,13 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         logId: String,
         logic: AdaptyUIBuilderLogic,
         presentationViewModel: AdaptyUIPresentationViewModel,
-        paywallViewModel: AdaptyUIPaywallViewModel,
+        flowViewModel: AdaptyUIFlowViewModel,
         products: [any ProductResolver]?
     ) {
         self.logId = logId
         self.logic = logic
         self.presentationViewModel = presentationViewModel
-        self.paywallViewModel = paywallViewModel
+        self.flowViewModel = flowViewModel
 
         paywallProducts = products
         selectedProductsIds = [:] // TODO: use JS

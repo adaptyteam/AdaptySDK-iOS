@@ -18,7 +18,7 @@ public extension AdaptyUI {
         package let presentationViewModel: AdaptyUIPresentationViewModel
         package let stateViewModel: AdaptyUIStateViewModel
         package let actionHandler: AdaptyUIStateActionHandler
-        package let paywallViewModel: AdaptyUIPaywallViewModel
+        package let flowViewModel: AdaptyUIFlowViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
         package let timerViewModel: AdaptyUITimerViewModel
@@ -56,7 +56,7 @@ public extension AdaptyUI {
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
 
-            paywallViewModel = AdaptyUIPaywallViewModel(
+            flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
                 logic: logic,
                 viewConfiguration: viewConfiguration
@@ -65,7 +65,7 @@ public extension AdaptyUI {
                 logId: logId,
                 logic: logic,
                 presentationViewModel: presentationViewModel,
-                paywallViewModel: paywallViewModel,
+                flowViewModel: flowViewModel,
                 products: nil
             )
             screensViewModel = AdaptyUIScreensViewModel(
@@ -94,7 +94,7 @@ public extension AdaptyUI {
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
                 stateViewModel: stateViewModel,
-                paywallViewModel: paywallViewModel,
+                flowViewModel: flowViewModel,
                 productsViewModel: productsViewModel,
                 screensViewModel: screensViewModel
             )
@@ -181,7 +181,7 @@ public struct Dev_AdaptyUIRendererView: View {
         )
         .environmentObjects(
             stateViewModel: galleryConfiguration.stateViewModel,
-            paywallViewModel: galleryConfiguration.paywallViewModel,
+            flowViewModel: galleryConfiguration.flowViewModel,
             productsViewModel: galleryConfiguration.productsViewModel,
             tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
             timerViewModel: galleryConfiguration.timerViewModel,

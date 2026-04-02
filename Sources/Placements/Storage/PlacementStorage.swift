@@ -57,7 +57,7 @@ final class PlacementStorage {
         withVariationId variationId: String?
     ) -> VH<Content>? {
         guard
-            var content: VH<Content> = Self.getPlacement(placementId),
+            let content: VH<Content> = Self.getPlacement(placementId),
             content.has(variationId: variationId),
             content.has(languageCode: locale, orDefault: orDefaultLocale)
         else { return nil }
@@ -65,7 +65,7 @@ final class PlacementStorage {
     }
 
     private func getNewerPlacement<Content: PlacementContent>(than content: Content) -> Content? {
-        guard var cached: Content = Self.getPlacement(content.placement.id)?.value,
+        guard let cached: Content = Self.getPlacement(content.placement.id)?.value,
               cached.equalAllLocales(content),
               cached.variationId == content.variationId,
               cached.placement.isNewerThan(content.placement)

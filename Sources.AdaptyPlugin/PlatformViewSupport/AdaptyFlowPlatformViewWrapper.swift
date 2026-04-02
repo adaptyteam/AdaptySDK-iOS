@@ -1,5 +1,5 @@
 //
-//  AdaptyPaywallPlatformViewWrapper.swift
+//  AdaptyFlowPlatformViewWrapper.swift
 //  Adapty
 //
 //  Created by Alexey Goncharov on 8/6/25.
@@ -11,21 +11,21 @@
     import AdaptyUI
     import UIKit
 
-    public final class AdaptyPaywallPlatformViewWrapper: UIView {
+    public final class AdaptyFlowPlatformViewWrapper: UIView {
         private let eventHandler: EventHandler
-        private let paywallView: AdaptyPaywallUIView
+        private let flowView: AdaptyFlowUIView
         private let parentVC: UIViewController
 
         public init(
             viewId: String,
             eventHandler: EventHandler,
-            configuration: AdaptyUI.PaywallConfiguration,
+            configuration: AdaptyUI.FlowConfiguration,
             parentVC: UIViewController
         ) {
             self.eventHandler = eventHandler
             self.parentVC = parentVC
 
-            paywallView = AdaptyPaywallUIView(
+            flowView = AdaptyFlowUIView(
                 configuration: configuration,
                 id: viewId
             )
@@ -41,74 +41,73 @@
         }
 
         private func layout() {
-            paywallView.configure(delegate: self)
-            paywallView.layout(in: self, parentVC: parentVC)
-            paywallView.reportOnAppear()
+            flowView.configure(delegate: self)
+            flowView.layout(in: self, parentVC: parentVC)
+            flowView.reportOnAppear()
         }
     }
 
     @MainActor
-    extension AdaptyPaywallPlatformViewWrapper: AdaptyPaywallViewDelegate {
-        package func paywallViewDidAppear(_ view: AdaptyPaywallUIView) {
+    extension AdaptyFlowPlatformViewWrapper: AdaptyFlowViewDelegate {
+        package func flowViewDidAppear(_ view: AdaptyFlowUIView) {
             eventHandler.handle(
-                event: PaywallViewEvent.DidAppear(
+                event: FlowViewEvent.DidAppear(
                     view: view.toAdaptyUIView()
                 )
             )
         }
 
-        package func paywallViewDidDisappear(_ view: AdaptyPaywallUIView) {
+        package func flowViewDidDisappear(_ view: AdaptyFlowUIView) {
             eventHandler.handle(
-                event: PaywallViewEvent.DidDisappear(
+                event: FlowViewEvent.DidDisappear(
                     view: view.toAdaptyUIView()
                 )
             )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didPerform action: AdaptyUI.Action
         ) {
             eventHandler.handle(
-                event: PaywallViewEvent.DidUserAction(
+                event: FlowViewEvent.DidUserAction(
                     view: view.toAdaptyUIView(),
                     action: action
                 )
             )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
         ) {
             eventHandler.handle(
-                event: PaywallViewEvent.DidSelectProduct(
+                event: FlowViewEvent.DidSelectProduct(
                     view: view.toAdaptyUIView(),
                     productVendorId: product.vendorProductId
                 )
             )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didStartPurchase product: AdaptyPaywallProduct
         ) {
             eventHandler.handle(
-                event: PaywallViewEvent.WillPurchase(
+                event: FlowViewEvent.WillPurchase(
                     view: view.toAdaptyUIView(),
                     product: Response.AdaptyPluginPaywallProduct(product)
                 )
             )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didFinishPurchase product: AdaptyPaywallProduct,
             purchaseResult: AdaptyPurchaseResult
         ) {
-
             eventHandler.handle(
-                event: PaywallViewEvent.DidPurchase(
+                event: FlowViewEvent.DidPurchase(
                     view: view.toAdaptyUIView(),
                     product: Response.AdaptyPluginPaywallProduct(product),
                     purchasedResult: purchaseResult
@@ -116,13 +115,13 @@
             )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didFailPurchase product: AdaptyPaywallProduct,
             error: AdaptyError
         ) {
             eventHandler.handle(
-                event: PaywallViewEvent.DidFailPurchase(
+                event: FlowViewEvent.DidFailPurchase(
                     view: view.toAdaptyUIView(),
                     product: Response.AdaptyPluginPaywallProduct(product),
                     error: error
@@ -130,56 +129,56 @@
             )
         }
 
-        package func paywallViewDidStartRestore(_ view: AdaptyPaywallUIView) {
+        package func flowViewDidStartRestore(_ view: AdaptyFlowUIView) {
             eventHandler.handle(
-                event: PaywallViewEvent.WillRestorePurchases(
+                event: FlowViewEvent.WillRestorePurchases(
                     view: view.toAdaptyUIView()
                 )
             )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didFinishRestoreWith profile: AdaptyProfile
         ) {
             eventHandler.handle(
-                event: PaywallViewEvent.DidRestorePurchases(
+                event: FlowViewEvent.DidRestorePurchases(
                     view: view.toAdaptyUIView(),
                     profile: profile
                 )
             )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didFailRestoreWith error: AdaptyError
         ) {
             eventHandler.handle(
-                event: PaywallViewEvent.DidFailRestorePurchases(
+                event: FlowViewEvent.DidFailRestorePurchases(
                     view: view.toAdaptyUIView(),
                     error: error
                 )
             )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didFailRenderingWith error: AdaptyUIError
         ) {
             eventHandler.handle(
-                event: PaywallViewEvent.DidFailRendering(
+                event: FlowViewEvent.DidFailRendering(
                     view: view.toAdaptyUIView(),
                     error: error
                 )
             )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didFailLoadingProductsWith error: AdaptyError
         ) -> Bool {
             eventHandler.handle(
-                event: PaywallViewEvent.DidFailLoadingProducts(
+                event: FlowViewEvent.DidFailLoadingProducts(
                     view: view.toAdaptyUIView(),
                     error: error
                 )
@@ -187,25 +186,25 @@
             return false
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didPartiallyLoadProducts failedIds: [String]
         ) {
 //            eventHandler.handle(
-//                event: PaywallViewEvent.DidPartiallyLoadProducts(
+//                event: FlowViewEvent.DidPartiallyLoadProducts(
 //                    view: view.toAdaptyUIView(),
 //                    failedIds: failedIds
 //                )
 //            )
         }
 
-        package func paywallView(
-            _ view: AdaptyPaywallUIView,
+        package func flowView(
+            _ view: AdaptyFlowUIView,
             didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
             error: AdaptyError?
         ) {
             eventHandler.handle(
-                event: PaywallViewEvent.DidFinishWebPaymentNavigation(
+                event: FlowViewEvent.DidFinishWebPaymentNavigation(
                     view: view.toAdaptyUIView(),
                     product: product.map(Response.AdaptyPluginPaywallProduct.init),
                     error: error

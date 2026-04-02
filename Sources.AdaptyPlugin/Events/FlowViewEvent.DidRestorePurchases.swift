@@ -1,5 +1,5 @@
 //
-//  PaywallViewEvent.DidRestorePurchases.swift
+//  FlowViewEvent.DidRestorePurchases.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 20.11.2024.
@@ -9,10 +9,10 @@ import Adapty
 import AdaptyUI
 import Foundation
 
-extension PaywallViewEvent {
+extension FlowViewEvent {
     struct DidRestorePurchases: AdaptyPluginEvent {
-        let id = "paywall_view_did_finish_restore"
-        let view: AdaptyUI.PaywallView
+        let id = "flow_view_did_finish_restore"
+        let view: AdaptyUI.FlowView
         let profile: AdaptyProfile
 
         enum CodingKeys: CodingKey {

@@ -1,5 +1,5 @@
 //
-//  AdaptyUI.PaywallView.swift
+//  AdaptyUI.FlowView.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 13.11.2024.
@@ -8,7 +8,7 @@
 import AdaptyUI
 import Foundation
 
-extension AdaptyUI.PaywallView: Encodable {
+extension AdaptyUI.FlowView: Encodable {
     enum CodingKeys: String, CodingKey {
         case id
         case placementId = "placement_id"

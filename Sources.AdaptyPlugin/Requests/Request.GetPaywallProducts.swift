@@ -12,15 +12,16 @@ extension Request {
     struct GetPaywallProducts: AdaptyPluginRequest {
         static let method = "get_paywall_products"
 
-        let paywall: AdaptyPaywall
+//        let paywall: AdaptyFlowPaywall
 
-        enum CodingKeys: CodingKey {
-            case paywall
-        }
+//        enum CodingKeys: CodingKey {
+//            case paywall
+//        }
 
         func execute() async throws -> AdaptyJsonData {
-            let products = try await Adapty.getPaywallProducts(paywall: paywall)
-            return .success(products.map(Response.AdaptyPluginPaywallProduct.init))
+            return .failure(nil) // TODO: x
+//            let products = try await Adapty.getPaywallProducts(paywall: paywall)
+//            return .success(products.map(Response.AdaptyPluginPaywallProduct.init))
         }
     }
 }

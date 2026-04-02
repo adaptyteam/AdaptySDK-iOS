@@ -10,7 +10,7 @@
 import Foundation
 
 @MainActor
-package final class AdaptyUIPaywallViewModel: ObservableObject {
+package final class AdaptyUIFlowViewModel: ObservableObject {
     let logId: String
     package let logic: any AdaptyUIBuilderLogic
 

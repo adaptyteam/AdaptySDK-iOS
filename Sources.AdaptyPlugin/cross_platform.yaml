@@ -666,106 +666,106 @@ $events:
       id: { const: "on_installation_details_fail" }
       error: { $ref: "#/$defs/AdaptyError" }
 
-  PaywallViewEvent.DidAppear:
+  FlowViewEvent.DidAppear:
     type: object
     required: [id, view]
     properties:
-      id: { const: "paywall_view_did_appear" }
+      id: { const: "flow_view_did_appear" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
 
-  PaywallViewEvent.DidDisappear:
+  FlowViewEvent.DidDisappear:
     type: object
     required: [id, view]
     properties:
-      id: { const: "paywall_view_did_disappear" }
+      id: { const: "flow_view_did_disappear" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
 
-  PaywallViewEvent.DidUserAction:
+  FlowViewEvent.DidUserAction:
     type: object
     required: [id, view, action]
     properties:
-      id: { const: "paywall_view_did_perform_action" }
+      id: { const: "flow_view_did_perform_action" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       action: { $ref: "#/$defs/AdaptyUI.UserAction" }
 
-  PaywallViewEvent.DidSelectProduct:
+  FlowViewEvent.DidSelectProduct:
     type: object
     required: [id, view, product_id]
     properties:
-      id: { const: "paywall_view_did_select_product" }
+      id: { const: "flow_view_did_select_product" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product_id: { type: string }
 
-  PaywallViewEvent.WillPurchase:
+  FlowViewEvent.WillPurchase:
     type: object
     required: [id, view, product]
     properties:
-      id: { const: "paywall_view_did_start_purchase" }
+      id: { const: "flow_view_did_start_purchase" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
 
-  PaywallViewEvent.DidPurchase:
+  FlowViewEvent.DidPurchase:
     type: object
     required: [id, view, product, purchased_result]
     properties:
-      id: { const: "paywall_view_did_finish_purchase" }
+      id: { const: "flow_view_did_finish_purchase" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       purchased_result: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
-  PaywallViewEvent.DidFailPurchase:
+  FlowViewEvent.DidFailPurchase:
     type: object
     required: [id, view, product, error]
     properties:
-      id: { const: "paywall_view_did_fail_purchase" }
+      id: { const: "flow_view_did_fail_purchase" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       error: { $ref: "#/$defs/AdaptyError" }
 
-  PaywallViewEvent.WillRestorePurchase:
+  FlowViewEvent.WillRestorePurchase:
     type: object
     required: [id, view]
     properties:
-      id: { const: "paywall_view_did_start_restore" }
+      id: { const: "flow_view_did_start_restore" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
 
-  PaywallViewEvent.DidRestorePurchase:
+  FlowViewEvent.DidRestorePurchase:
     type: object
     required: [id, view, profile]
     properties:
-      id: { const: "paywall_view_did_finish_restore" }
+      id: { const: "flow_view_did_finish_restore" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       profile: { $ref: "#/$defs/AdaptyProfile" }
 
-  PaywallViewEvent.DidFailRestorePurchase:
+  FlowViewEvent.DidFailRestorePurchase:
     type: object
     required: [id, view, error]
     properties:
-      id: { const: "paywall_view_did_fail_restore" }
+      id: { const: "flow_view_did_fail_restore" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       error: { $ref: "#/$defs/AdaptyError" }
 
-  PaywallViewEvent.DidFailRendering:
+  FlowViewEvent.DidFailRendering:
     type: object
     required: [id, view, error]
     properties:
-      id: { const: "paywall_view_did_fail_rendering" }
+      id: { const: "flow_view_did_fail_rendering" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       error: { $ref: "#/$defs/AdaptyError" }
 
-  PaywallViewEvent.DidFailLoadingProducts:
+  FlowViewEvent.DidFailLoadingProducts:
     type: object
     required: [id, view, error]
     properties:
-      id: { const: "paywall_view_did_fail_loading_products" }
+      id: { const: "flow_view_did_fail_loading_products" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       error: { $ref: "#/$defs/AdaptyError" }
 
-  PaywallViewEvent.DidFinishWebPaymentNavigation:
+  FlowViewEvent.DidFinishWebPaymentNavigation:
     type: object
     required: [id, view]
     properties:
-      id: { const: "paywall_view_did_finish_web_payment_navigation" }
+      id: { const: "flow_view_did_finish_web_payment_navigation" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       error: { $ref: "#/$defs/AdaptyError" }
