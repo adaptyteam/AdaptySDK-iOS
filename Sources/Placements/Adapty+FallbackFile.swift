@@ -22,7 +22,7 @@ extension Adapty {
     public nonisolated static func setFallback(fileURL url: URL) async throws(AdaptyError) {
         try await withoutSDK(
             methodName: .setFallback
-        ) { @AdaptyActor async throws(AdaptyError) in
+        ) { () async throws(AdaptyError) in
             Adapty.fallbackPlacements = try FallbackPlacements(fileURL: url)
         }
     }
@@ -141,3 +141,4 @@ extension PlacementStorage {
         }
     }
 }
+
