@@ -22,7 +22,7 @@ public extension Adapty {
             logParams: ["placement_id": flow.placement.id]
         ) { sdk throws(AdaptyError) in
             try await sdk.getPaywallProducts(
-                flow: flow,
+                paywalls: flow.paywalls,
                 productsManager: sdk.productsManager
             )
         }
@@ -42,13 +42,14 @@ public extension Adapty {
             logParams: ["placement_id": paywall.placement.id]
         ) { sdk throws(AdaptyError) in
             try await sdk.getPaywallProducts(
-                paywall: paywall,
+                paywalls: [paywall],
                 productsManager: sdk.productsManager
             )
         }
     }
 
     package nonisolated static func getPaywallProduct(
+        flowProductId: String?,
         adaptyProductId: String,
         productInfo: BackendProductInfo,
         paywallProductIndex: Int,
@@ -60,6 +61,7 @@ public extension Adapty {
     ) async throws(AdaptyError) -> AdaptyPaywallProduct {
         let sdk = try await Adapty.activatedSDK
         return try await sdk.getPaywallProduct(
+            flowProductId: flowProductId,
             adaptyProductId: adaptyProductId,
             productInfo: productInfo,
             paywallProductIndex: paywallProductIndex,
@@ -78,3 +80,4 @@ public extension Adapty {
         await Adapty.optionalSDK?.purchasePayloadStorage.setOnboardingVariationId(variationId)
     }
 }
+

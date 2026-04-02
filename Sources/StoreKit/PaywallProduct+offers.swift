@@ -12,18 +12,23 @@ private let log = Log.productManager
 
 extension Adapty {
     func getPaywallProducts(
-        flow: AdaptyFlow,
+        paywalls: [AdaptyFlowPaywall],
         productsManager: ProductsManager
     ) async throws(AdaptyError) -> [AdaptyPaywallProduct] {
         let skProducts = try await productsManager.fetchProductsInSameOrder(
-            ids: flow.paywalls.flatMap(\.vendorProductIds),
+            ids: paywalls.flatMap(\.vendorProductIds),
             fetchPolicy: .returnCacheDataElseLoad
         )
 
-        let products: [ProductTuple] = flow.paywalls.flatMap { paywall in
-            paywall.products.compactMap { reference in
-                guard let skProduct = skProducts.first(where: { $0.id == reference.productInfo.vendorId }) else {
-                    return nil
+        let skProductsById = Dictionary(uniqueKeysWithValues: skProducts.map { ($0.id, $0) })
+
+        var products = [ProductTuple]()
+        products.reserveCapacity(paywalls.reduce(into: 0) { $0 += $1.products.count })
+
+        for paywall in paywalls {
+            for reference in paywall.products {
+                guard let skProduct = skProductsById[reference.productInfo.vendorId] else {
+                    continue
                 }
 
                 let ((offer, determinedOffer), subscriptionGroupId): ((AdaptySubscriptionOffer?, Bool), String?) =
@@ -33,7 +38,7 @@ extension Adapty {
                     } else {
                         (subscriptionOfferAvailable(reference, skProduct), nil)
                     }
-                return (skProduct, paywall, reference, offer, determinedOffer, subscriptionGroupId)
+                products.append((skProduct, paywall, reference, offer, determinedOffer, subscriptionGroupId))
             }
         }
 
@@ -48,55 +53,7 @@ extension Adapty {
         return newProducts.map {
             AdaptyPaywallProduct(
                 skProduct: $0.product,
-                flowProductId: nil,
-                adaptyProductId: $0.reference.adaptyProductId,
-                productInfo: $0.reference.productInfo,
-                paywallProductIndex: $0.reference.paywallProductIndex,
-                subscriptionOffer: $0.offer,
-                variationId: $0.paywall.variationId,
-                paywallABTestName: $0.paywall.placement.abTestName,
-                paywallName: $0.paywall.name,
-                webPaywallBaseUrl: $0.paywall.webPaywallBaseUrl
-            )
-        }
-    }
-
-    func getPaywallProducts(
-        paywall: AdaptyFlowPaywall,
-        productsManager: ProductsManager
-    ) async throws(AdaptyError) -> [AdaptyPaywallProduct] {
-        let skProducts = try await productsManager.fetchProductsInSameOrder(
-            ids: paywall.vendorProductIds,
-            fetchPolicy: .returnCacheDataElseLoad
-        )
-
-        let products: [ProductTuple] = paywall.products.compactMap { reference in
-            guard let skProduct = skProducts.first(where: { $0.id == reference.productInfo.vendorId }) else {
-                return nil
-            }
-
-            let ((offer, determinedOffer), subscriptionGroupId): ((AdaptySubscriptionOffer?, Bool), String?) =
-                if let subscriptionGroupId = skProduct.subscription?.subscriptionGroupID,
-                winBackOfferExist(with: reference.winBackOfferId, from: skProduct) {
-                    ((nil, false), subscriptionGroupId)
-                } else {
-                    (subscriptionOfferAvailable(reference, skProduct), nil)
-                }
-            return (skProduct, paywall, reference, offer, determinedOffer, subscriptionGroupId)
-        }
-
-        let eligibleWinBackOfferIds = try await eligibleWinBackOfferIds(for: Set(products.compactMap(\.subscriptionGroupId)))
-
-        var newProducts = [(product: StoreKit.Product, paywall: AdaptyFlowPaywall, reference: AdaptyFlowPaywall.ProductReference, offer: AdaptySubscriptionOffer?)]()
-        newProducts.reserveCapacity(products.count)
-        for product in products {
-            await newProducts.append(determineOfferFor(product, with: eligibleWinBackOfferIds))
-        }
-
-        return newProducts.map {
-            AdaptyPaywallProduct(
-                skProduct: $0.product,
-                flowProductId: nil,
+                flowProductId: $0.reference.flowProductId,
                 adaptyProductId: $0.reference.adaptyProductId,
                 productInfo: $0.reference.productInfo,
                 paywallProductIndex: $0.reference.paywallProductIndex,
@@ -110,6 +67,7 @@ extension Adapty {
     }
 
     func getPaywallProduct(
+        flowProductId: String?,
         adaptyProductId: String,
         productInfo: BackendProductInfo,
         paywallProductIndex: Int,
@@ -135,7 +93,7 @@ extension Adapty {
 
         return AdaptyPaywallProduct(
             skProduct: product,
-            flowProductId: nil,
+            flowProductId: flowProductId,
             adaptyProductId: adaptyProductId,
             productInfo: productInfo,
             paywallProductIndex: paywallProductIndex,
