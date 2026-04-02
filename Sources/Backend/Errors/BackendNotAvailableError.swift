@@ -16,4 +16,3 @@ extension HTTPError {
         .perform(.init(method: .connect, path: "not available"), error: BackendNotAvailableError(message: message))
     }
 }
-

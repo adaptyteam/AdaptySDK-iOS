@@ -19,12 +19,25 @@ final class EventsStorage {
         self.kind = kind
     }
 
-    var eventsCount: Int { AllEventsStorage.eventsCount[kind] ?? 0 }
-    var events: [Data]? { AllEventsStorage.events[kind] ?? nil }
+    var eventsCount: Int {
+        AllEventsStorage.eventsCount[kind] ?? 0
+    }
 
-    func incrementEventCount() { AllEventsStorage.incrementEventCount(kind) }
-    func setEvents(_ value: [Data]) { AllEventsStorage.setEvents(value, kind) }
-    func clear() { AllEventsStorage.clear(kind) }
+    var events: [Data]? {
+        AllEventsStorage.events[kind] ?? nil
+    }
+
+    func incrementEventCount() {
+        AllEventsStorage.incrementEventCount(kind)
+    }
+
+    func setEvents(_ value: [Data]) {
+        AllEventsStorage.setEvents(value, kind)
+    }
+
+    func clear() {
+        AllEventsStorage.clear(kind)
+    }
 
     static func clearAll() {
         all.forEach { $0.clear() }
@@ -42,8 +55,13 @@ private enum Kind: Sendable, Hashable, CaseIterable {
         }
     }
 
-    var eventsKey: String { "AdaptySDK_Cached_\(prefix)Events" }
-    var counterKey: String { "AdaptySDK_\(prefix)Event_Counter" }
+    var eventsKey: String {
+        "AdaptySDK_Cached_\(prefix)Events"
+    }
+
+    var counterKey: String {
+        "AdaptySDK_\(prefix)Event_Counter"
+    }
 }
 
 @EventsManagerActor

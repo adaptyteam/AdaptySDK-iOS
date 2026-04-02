@@ -9,7 +9,7 @@ extension VH<AdaptyProfile> {
     static func decoder(
         _ response: HTTPDataResponse,
         _ configuration: HTTPCodableConfiguration?,
-        _ request: HTTPRequest
+        _: HTTPRequest
     ) async throws -> HTTPResponse<VH<AdaptyProfile>> {
         let body = try response.decodeBody(Backend.Response.Data<AdaptyProfile>.self, with: configuration)
         return response.replaceBody(VH(body.value, hash: response.headers.getBackendResponseHash()))

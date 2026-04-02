@@ -104,7 +104,9 @@ final class EventsManager {
 
 @EventsManagerActor
 private extension [EventCollectionStorage] {
-    var hasEvents: Bool { contains { $0.isNotEmpty } }
+    var hasEvents: Bool {
+        contains { $0.isNotEmpty }
+    }
 
     func getEvents(limit: Int, blackList: Set<String>) -> (elements: [Data], endIndex: [Int?]) {
         var limit = limit

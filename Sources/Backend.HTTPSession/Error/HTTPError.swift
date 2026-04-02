@@ -68,7 +68,7 @@ extension HTTPError {
         }
     }
 
-    public var metrics: HTTPMetrics? {
+    var metrics: HTTPMetrics? {
         switch self {
         case let .network(_, _, metrics, _),
              let .decoding(_, _, _, _, metrics, _),
@@ -151,7 +151,9 @@ extension NSError {
 extension HTTPError {
     static func cancelled(
         _ endpoint: HTTPEndpoint,
-        file: String = #fileID, function: String = #function, line: UInt = #line
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         .network(
             endpoint,
@@ -168,7 +170,9 @@ extension HTTPError {
     static func perform(
         _ endpoint: HTTPEndpoint,
         error: Error,
-        file: String = #fileID, function: String = #function, line: UInt = #line
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         .perform(
             endpoint,
@@ -185,7 +189,9 @@ extension HTTPError {
         _ endpoint: HTTPEndpoint,
         metrics: HTTPMetrics?,
         error: Error,
-        file: String = #fileID, function: String = #function, line: UInt = #line
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         .network(
             endpoint,
@@ -202,7 +208,9 @@ extension HTTPError {
     static func decoding(
         _ response: HTTPDataResponse,
         error: Error,
-        file: String = #fileID, function: String = #function, line: UInt = #line
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         .decoding(
             response.endpoint,
@@ -221,7 +229,9 @@ extension HTTPError {
     static func backend(
         _ response: HTTPDataResponse,
         error: Error? = nil,
-        file: String = #fileID, function: String = #function, line: UInt = #line
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         .backend(
             response.endpoint,

@@ -69,7 +69,9 @@ final class UserAcquisitionStorage {
 
 @AdaptyActor
 extension UserAcquisitionStorage {
-    var version: Int { Self.version }
+    var version: Int {
+        Self.version
+    }
 
     var hasRegistrationInstallResponse: Bool {
         Self.hasRegistrationInstallResponse

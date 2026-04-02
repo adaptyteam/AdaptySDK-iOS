@@ -91,7 +91,7 @@ extension Backend.FallbackExecutor {
             endpoint = HTTPEndpoint(
                 method: .get,
                 path:
-                    "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/\(variationId)/app_store/fallback.json"
+                "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/\(variationId)/app_store/fallback.json"
             )
             requestName = .fetchFallbackFlow
         } else {
@@ -197,4 +197,3 @@ extension Backend.FallbackExecutor {
         }
     }
 }
-

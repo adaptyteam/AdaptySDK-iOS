@@ -22,7 +22,9 @@ public struct AdaptyProfileParameters: Sendable, Hashable {
 
     var codableCustomAttributes: AdaptyProfile.CustomAttributes?
     public internal(set) var analyticsDisabled: Bool?
-    public var customAttributes: [String: Any]? { codableCustomAttributes?.convertToSimpleDictionary() }
+    public var customAttributes: [String: Any]? {
+        codableCustomAttributes?.convertToSimpleDictionary()
+    }
 
     init() {}
 
@@ -45,7 +47,9 @@ public struct AdaptyProfileParameters: Sendable, Hashable {
 
 public extension AdaptyProfileParameters {
     static let empty: AdaptyProfileParameters = .init()
-    func builder() -> Builder { Builder(self) }
+    func builder() -> Builder {
+        Builder(self)
+    }
 }
 
 extension AdaptyProfileParameters: Encodable {

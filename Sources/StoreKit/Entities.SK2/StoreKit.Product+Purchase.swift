@@ -22,9 +22,10 @@ extension StoreKit.Product {
         } else {
             throw AdaptyError.cantMakePayments()
         }
-        #elseif(os(iOS) || os(tvOS)) && compiler(>=6.0.3)
+        #elseif (os(iOS) || os(tvOS)) && compiler(>=6.0.3)
         if #available(iOS 18.2, tvOS 18.2, *),
-           let viewController = UIApplication.shared.topPresentedController {
+           let viewController = UIApplication.shared.topPresentedController
+        {
             try await purchase(confirmIn: viewController, options: options)
         } else {
             try await purchase(options: options)

@@ -176,8 +176,8 @@ private extension BackendExecutor {
         if Content.self == AdaptyOnboarding.self {
             endpoint = HTTPEndpoint(
                 method: .get,
-                path: 
-                    "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(locale.languageCode.lowercased())/fallback.json"
+                path:
+                "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(locale.languageCode.lowercased())/fallback.json"
             )
             requestName = kind == .fallback ? .fetchFallbackOnboardingVariations : .fetchOnboardingVariationsForDefaultAudience
 
@@ -235,4 +235,3 @@ private extension BackendExecutor {
         }
     }
 }
-

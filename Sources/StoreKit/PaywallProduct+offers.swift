@@ -350,4 +350,3 @@ extension Adapty {
         return renewalInfo.eligibleWinBackOfferIDs
     }
 }
-

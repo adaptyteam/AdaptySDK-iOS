@@ -19,11 +19,15 @@ public struct AdaptyOnboarding: PlacementContent, Identifiable {
 
     public let remoteConfig: AdaptyRemoteConfig?
 
-    public var hasViewConfiguration: Bool { true }
+    public var hasViewConfiguration: Bool {
+        true
+    }
 
     package let viewConfiguration: ViewConfiguration
 
-    package var shouldTrackShown: Bool { placement.shouldTrackOnboardingShown }
+    package var shouldTrackShown: Bool {
+        placement.shouldTrackOnboardingShown
+    }
 
     var requestLocale: AdaptyLocale
 

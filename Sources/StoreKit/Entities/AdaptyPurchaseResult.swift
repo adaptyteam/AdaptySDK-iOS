@@ -64,7 +64,7 @@ public enum AdaptyPurchaseResult: Sendable {
     public var transaction: Transaction? {
         signedTransaction?.unsafePayloadValue
     }
-    
+
     public var jwsTransaction: String? {
         signedTransaction?.jwsRepresentation
     }

@@ -17,7 +17,9 @@ extension AdaptyPlacement {
 }
 
 extension AdaptyPlacement.Draw {
-    var participatesInCrossPlacementABTest: Bool { variationIdByPlacements.isNotEmpty }
+    var participatesInCrossPlacementABTest: Bool {
+        variationIdByPlacements.isNotEmpty
+    }
 }
 
 extension AdaptyPlacement.Draw: Decodable {

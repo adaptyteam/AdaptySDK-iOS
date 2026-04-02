@@ -68,7 +68,7 @@ extension AdaptyProfile.CustomAttributes {
     }
 
     func validateCount() throws(AdaptyError) {
-        if filter({ $1.hasValue }).count > 30 {
+        if count(where: { $1.hasValue }) > 30 {
             throw .wrongCountCustomAttributes()
         }
     }

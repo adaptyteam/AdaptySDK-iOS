@@ -78,4 +78,3 @@ extension AdaptyFlowPaywall: Encodable, DecodableWithConfiguration {
         try container.encodeIfPresent(webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
     }
 }
-

@@ -132,7 +132,7 @@ extension Backend {
 }
 
 extension Backend.Response {
-    struct Data<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+    struct Data<Value: Decodable & Sendable>: Sendable, Decodable {
         let value: Value
 
         init(from decoder: Decoder) throws {
@@ -142,7 +142,7 @@ extension Backend.Response {
         }
     }
 
-    struct OptionalData<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+    struct OptionalData<Value: Decodable & Sendable>: Sendable, Decodable {
         let value: Value?
 
         init(from decoder: Decoder) throws {
@@ -152,7 +152,7 @@ extension Backend.Response {
         }
     }
 
-    struct Meta<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+    struct Meta<Value: Decodable & Sendable>: Sendable, Decodable {
         let value: Value
 
         init(from decoder: Decoder) throws {

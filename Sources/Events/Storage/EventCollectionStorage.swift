@@ -19,9 +19,14 @@ final class EventCollectionStorage {
     private var events: EventCollection<Event.Packed>
 
     @inlinable
-    var isEmpty: Bool { events.isEmpty }
+    var isEmpty: Bool {
+        events.isEmpty
+    }
+
     @inlinable
-    var isNotEmpty: Bool { !isEmpty }
+    var isNotEmpty: Bool {
+        !isEmpty
+    }
 
     init(with storage: EventsStorage) {
         self.storage = storage
@@ -56,14 +61,14 @@ final class EventCollectionStorage {
         if let old, old.id != events.elements.first?.id {
             log.verbose("Event \(old.name) #\(old.counter) deleted due to exceeded the limit of \(Constants.limitEvents)")
         }
-        storage.setEvents(events.elements.map { $0.data })
+        storage.setEvents(events.elements.map(\.data))
     }
 
     func subtract(newStartIndex: Int) {
         let startIndex = events.startIndex
         events.subtract(newStartIndex: newStartIndex)
         guard startIndex != events.startIndex else { return }
-        storage.setEvents(events.elements.map { $0.data })
+        storage.setEvents(events.elements.map(\.data))
     }
 }
 

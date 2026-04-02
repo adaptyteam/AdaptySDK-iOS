@@ -53,8 +53,8 @@ struct AdaptyBackendAPIRequestParameters: AdaptySystemEventParameters {
     let params: EventParameters?
 
     init(requestName: BackendRequestName, requestStamp: String, params: EventParameters? = nil) {
-        self.name = requestName
-        self.stamp = requestStamp
+        name = requestName
+        stamp = requestStamp
         self.params = params
     }
 
@@ -92,21 +92,21 @@ struct AdaptyBackendAPIResponseParameters: AdaptySystemEventParameters {
 
     init(requestName: BackendRequestName, requestStamp: String, _ error: Error) {
         let httpError = error as? HTTPError
-        self.name = requestName
-        self.stamp = requestStamp
-        self.backendRequestId = httpError?.headers?.getBackendRequestId()
-        self.metrics = httpError?.metrics
-        self.headers = httpError?.headers?.filtered
+        name = requestName
+        stamp = requestStamp
+        backendRequestId = httpError?.headers?.getBackendRequestId()
+        metrics = httpError?.metrics
+        headers = httpError?.headers?.filtered
         self.error = httpError?.description ?? error.localizedDescription
     }
 
     init(requestName: BackendRequestName, requestStamp: String, _ response: HTTPResponse<some Sendable>) {
-        self.name = requestName
-        self.stamp = requestStamp
-        self.backendRequestId = response.headers.getBackendRequestId()
-        self.metrics = response.metrics
-        self.headers = response.headers.filtered
-        self.error = nil
+        name = requestName
+        stamp = requestStamp
+        backendRequestId = response.headers.getBackendRequestId()
+        metrics = response.metrics
+        headers = response.headers.filtered
+        error = nil
     }
 }
 
@@ -172,7 +172,7 @@ struct AdaptySDKMethodRequestParameters: AdaptySystemEventParameters {
     let params: EventParameters?
 
     init(methodName: MethodName, stamp: String, params: EventParameters? = nil) {
-        self.name = methodName
+        name = methodName
         self.stamp = stamp
         self.params = params
     }
@@ -192,7 +192,7 @@ struct AdaptySDKMethodResponseParameters: AdaptySystemEventParameters {
     let error: String?
 
     init(methodName: MethodName, stamp: String? = nil, params: EventParameters? = nil, error: String? = nil) {
-        self.name = methodName
+        name = methodName
         self.stamp = stamp
         self.params = params
         self.error = error
@@ -237,7 +237,7 @@ struct AdaptyAppleRequestParameters: AdaptySystemEventParameters {
     let params: EventParameters?
 
     init(methodName: AppleMethodName, stamp: String? = nil, params: EventParameters? = nil) {
-        self.name = methodName
+        name = methodName
         self.stamp = stamp
         self.params = params
     }
@@ -257,7 +257,7 @@ struct AdaptyAppleResponseParameters: AdaptySystemEventParameters {
     let error: String?
 
     init(methodName: AppleMethodName, stamp: String? = nil, params: EventParameters? = nil, error: String? = nil) {
-        self.name = methodName
+        name = methodName
         self.stamp = stamp
         self.params = params
         self.error = error

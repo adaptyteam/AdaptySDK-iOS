@@ -24,7 +24,7 @@ private struct FetchFallbackUISchemaRequest: BackendRequest {
             method: .get,
             path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(viewConfigurationId)/\(Adapty.uiBuilderVersion)/config.json"
         )
-        
+
         self.logParams = logParams
     }
 }
@@ -34,7 +34,7 @@ extension Backend.FallbackExecutor {
         apiKeyPrefix: String,
         flowId: String,
         viewConfigurationId: String,
-        disableServerCache: Bool
+        disableServerCache _: Bool
     ) async throws(HTTPError) -> AdaptyUISchema {
         let request = FetchFallbackUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
@@ -45,7 +45,7 @@ extension Backend.FallbackExecutor {
                 "flow_id": flowId,
                 "flow_version_id": viewConfigurationId,
                 "builder_version": Adapty.uiBuilderVersion,
-                "builder_schema_version": Adapty.uiSchemaVersion
+                "builder_schema_version": Adapty.uiSchemaVersion,
             ]
         )
 
@@ -53,4 +53,3 @@ extension Backend.FallbackExecutor {
         return response.body
     }
 }
-

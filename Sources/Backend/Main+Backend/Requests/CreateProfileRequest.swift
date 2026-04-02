@@ -40,7 +40,7 @@ private struct CreateProfileRequest: BackendEncodableRequest {
 
         logParams = [
             "customer_user_id": userId.customerId,
-            "app_account_token": appAccountToken?.uuidString
+            "app_account_token": appAccountToken?.uuidString,
         ]
     }
 

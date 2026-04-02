@@ -32,5 +32,3 @@ public protocol AdaptyPaywallProductWithoutDeterminingOffer: AdaptyProduct {
     /// Same as `name` property of the parent AdaptyFlowPaywall.
     var paywallName: String { get }
 }
-
-

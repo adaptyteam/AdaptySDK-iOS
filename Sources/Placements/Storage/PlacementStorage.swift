@@ -89,4 +89,3 @@ final class PlacementStorage {
         OnboardingStorage.clear()
     }
 }
-

@@ -8,7 +8,6 @@
 import StoreKit
 
 extension StoreKit.Transaction {
-
     func logParams(other: EventParameters?) -> EventParameters {
         guard let other else { return logParams }
         return logParams.merging(other) { _, new in new }

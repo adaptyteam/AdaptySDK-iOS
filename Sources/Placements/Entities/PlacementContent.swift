@@ -43,7 +43,6 @@ extension PlacementContent {
 
 extension AdaptyOnboarding {
     func onbordingHas(languageCode otherLocale: AdaptyLocale?, orDefault: Bool = false) -> Bool {
-
         let otherLocale = otherLocale ?? .defaultPlacementLocale
         let orDefault = otherLocale.equalLanguageCode(.defaultPlacementLocale) ? false : orDefault
 
@@ -78,7 +77,6 @@ extension VH where Value: PlacementContent {
         value.has(variationId: variationId)
     }
 }
-
 
 extension Sequence {
     func asContentByPlacementId<T: PlacementContent>() -> [String: VH<T>] where Element == VH<T> {

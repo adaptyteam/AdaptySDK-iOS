@@ -5,11 +5,10 @@
 //  Created by Aleksei Valiano on 08.10.2025.
 //
 
-
 package typealias AdaptyResultTask<Success> = Task<AdaptyResult<Success>, Never>
 
-//#if swift(>=6.3)
-//package extension Task {
+// #if swift(>=6.3)
+// package extension Task {
 //    @inlinable
 //    static func withThrowsTyped<T, E: Error>(
 //        priority: TaskPriority? = nil,
@@ -30,8 +29,8 @@ package typealias AdaptyResultTask<Success> = Task<AdaptyResult<Success>, Never>
 //    func valueWithThrowsTyped() async throws(Failure) -> Success {
 //        try await value
 //    }
-//}
-//#else
+// }
+// #else
 
 package extension Task where Failure == Never {
     @inlinable
@@ -69,5 +68,5 @@ package extension Task where Failure == Never {
         try await value.get()
     }
 }
-//#endif
 
+// #endif

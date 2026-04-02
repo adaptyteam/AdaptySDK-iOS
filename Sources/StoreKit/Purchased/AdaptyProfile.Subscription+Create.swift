@@ -5,9 +5,9 @@
 //  Created by Aleksei Valiano on 01.08.2025.
 //
 
-//import StoreKit
+// import StoreKit
 //
-//extension AdaptyProfile.Subscription {
+// extension AdaptyProfile.Subscription {
 //    init(
 //        transaction: StoreKit.Transaction,
 //        product: StoreKit.Product?,
@@ -39,4 +39,4 @@
 //            offerId: <#T##String?#>,
 //            cancellationReason: <#T##String?#>)
 //    }
-//}
+// }

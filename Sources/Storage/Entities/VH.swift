@@ -51,6 +51,3 @@ extension VH {
 extension VH: Encodable where Value: Encodable {}
 
 extension VH: Decodable where Value: Decodable {}
-
-
-

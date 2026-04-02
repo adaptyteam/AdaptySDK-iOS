@@ -55,7 +55,7 @@ private extension HTTPEndpoint {
 
 private extension HTTPDataResponse {
     var asLogString: String {
-        let headers = self.headers.map { "\($0): \($1)" }.joined(separator: "\" -H \"")
+        let headers = headers.map { "\($0): \($1)" }.joined(separator: "\" -H \"")
 
         return """
 

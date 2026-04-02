@@ -18,4 +18,3 @@ extension AdaptyPaywallShowedParameters: Codable {
         case viewConfigurationId = "paywall_builder_id"
     }
 }
-

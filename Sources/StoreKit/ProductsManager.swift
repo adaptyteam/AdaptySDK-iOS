@@ -78,7 +78,7 @@ extension ProductsManager {
     }
 
     func fetchProducts(ids productIds: Set<String>, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3)
-    async throws(AdaptyError) -> [StoreKit.Product]
+        async throws(AdaptyError) -> [StoreKit.Product]
     {
         guard productIds.isNotEmpty else {
             throw StoreKitManagerError.noProductIDsFound().asAdaptyError

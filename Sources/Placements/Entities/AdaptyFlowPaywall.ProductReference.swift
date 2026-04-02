@@ -19,7 +19,7 @@ extension AdaptyFlowPaywall {
 }
 
 extension AdaptyFlowPaywall.ProductReference: CustomStringConvertible {
-    public var description: String {
+    var description: String {
         "(vendorId: \(productInfo.vendorId), adaptyProductId: \(adaptyProductId), promotionalOfferId: \(promotionalOfferId ?? "nil")))"
     }
 }
@@ -37,17 +37,17 @@ extension AdaptyFlowPaywall.ProductReference: Encodable {
     }
 
     init(from container: KeyedDecodingContainer<CodingKeys>, index: Int) throws {
-        self.flowProductId = try container.decodeIfPresent(String.self, forKey: .flowProductId)
-        self.paywallProductIndex = index
-        self.winBackOfferId = try container.decodeIfPresent(String.self, forKey: .winBackOfferId)
-        self.adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
-        self.productInfo = try BackendProductInfo(
+        flowProductId = try container.decodeIfPresent(String.self, forKey: .flowProductId)
+        paywallProductIndex = index
+        winBackOfferId = try container.decodeIfPresent(String.self, forKey: .winBackOfferId)
+        adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
+        productInfo = try BackendProductInfo(
             vendorId: container.decode(String.self, forKey: .vendorId),
             accessLevelId: container.decode(String.self, forKey: .accessLevelId),
             period: container.decode(BackendProductInfo.Period.self, forKey: .backendProductPeriod)
         )
         let promotionalOfferEligibility = try container.decode(Bool.self, forKey: .promotionalOfferEligibility)
-        self.promotionalOfferId =
+        promotionalOfferId =
             if promotionalOfferEligibility {
                 try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
             } else {

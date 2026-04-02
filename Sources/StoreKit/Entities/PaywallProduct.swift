@@ -14,8 +14,13 @@ struct PaywallProduct: AdaptyProduct, AdaptyPaywallProduct, WebPaywallURLProvidi
 
     let productInfo: BackendProductInfo
 
-    var accessLevelId: String { productInfo.accessLevelId }
-    var adaptyProductType: String { productInfo.period.rawValue }
+    var accessLevelId: String {
+        productInfo.accessLevelId
+    }
+
+    var adaptyProductType: String {
+        productInfo.period.rawValue
+    }
 
     let paywallProductIndex: Int
 
@@ -43,8 +48,13 @@ struct PaywallProductWithoutDeterminingOffer: AdaptyProduct, AdaptyPaywallProduc
     let adaptyProductId: String
 
     let productInfo: BackendProductInfo
-    var accessLevelId: String { productInfo.accessLevelId }
-    var adaptyProductType: String { productInfo.period.rawValue }
+    var accessLevelId: String {
+        productInfo.accessLevelId
+    }
+
+    var adaptyProductType: String {
+        productInfo.period.rawValue
+    }
 
     let paywallProductIndex: Int
 

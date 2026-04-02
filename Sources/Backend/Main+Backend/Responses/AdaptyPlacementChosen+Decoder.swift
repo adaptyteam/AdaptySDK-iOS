@@ -24,7 +24,7 @@ extension AdaptyPlacementChosen {
         func decoder(
             _ response: HTTPDataResponse,
             _ configuration: HTTPCodableConfiguration?,
-            _ request: HTTPRequest
+            _: HTTPRequest
         ) async throws -> HTTPResponse<AdaptyPlacementChosen> {
             let body = response.body ?? Data()
             let jsonDecoder = JSONDecoder()
@@ -82,7 +82,7 @@ extension AdaptyPlacementChosen {
         func decoder(
             _ response: HTTPDataResponse,
             _ configuration: HTTPCodableConfiguration?,
-            _ request: HTTPRequest
+            _: HTTPRequest
         ) async throws -> HTTPResponse<AdaptyPlacementChosen> {
             let body = response.body ?? Data()
             let jsonDecoder = JSONDecoder()

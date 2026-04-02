@@ -532,4 +532,3 @@ private func withCompletion<T: Sendable>(
         }
     }
 }
-

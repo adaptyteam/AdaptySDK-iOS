@@ -33,27 +33,27 @@ public final class Adapty {
         configuration: AdaptyConfiguration,
         backend: Backend
     ) async {
-        self.observerMode = configuration.observerMode
-        self.apiKeyPrefix = configuration.apiKeyPrefix
+        observerMode = configuration.observerMode
+        apiKeyPrefix = configuration.apiKeyPrefix
         self.backend = backend
-        self.profileStorage = ProfileStorage()
-        self.httpSession = backend.createDefaultExecutor()
-        self.httpFallbackSession = backend.createFallbackExecutor()
-        self.httpConfigsSession = backend.createConfigsExecutor()
+        profileStorage = ProfileStorage()
+        httpSession = backend.createDefaultExecutor()
+        httpFallbackSession = backend.createFallbackExecutor()
+        httpConfigsSession = backend.createConfigsExecutor()
 
         let productVendorIdsStorage = BackendProductInfoStorage()
         await PurchasePayloadStorage.migration(for: ProfileStorage.userId)
-        self.purchasePayloadStorage = PurchasePayloadStorage()
+        purchasePayloadStorage = PurchasePayloadStorage()
 
         if configuration.transactionFinishBehavior != .manual {
             _ = await PurchasePayloadStorage.removeAllUnfinishedTransactionState()
         }
 
-        self.receiptManager = StoreKitReceiptManager(
+        receiptManager = StoreKitReceiptManager(
             httpSession: httpSession
         )
 
-        self.transactionManager = TransactionManager(
+        transactionManager = TransactionManager(
             httpSession: httpSession,
             storage: purchasePayloadStorage
         )
@@ -65,10 +65,10 @@ public final class Adapty {
         )
         self.productsManager = productsManager
 
-        self.sharedProfileManager = restoreProfileManager(configuration)
+        sharedProfileManager = restoreProfileManager(configuration)
 
         if !observerMode {
-            self.purchaser = StoreKitPurchaser.startObserving(
+            purchaser = StoreKitPurchaser.startObserving(
                 transactionSynchronizer: self,
                 subscriptionOfferSigner: self,
                 productsManager: productsManager,

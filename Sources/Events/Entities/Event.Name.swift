@@ -8,7 +8,10 @@
 import Foundation
 
 extension Event {
-    static var defaultBlackList: Set<String> { Set([Name.system.rawValue]) }
+    static var defaultBlackList: Set<String> {
+        Set([Name.system.rawValue])
+    }
+
     private enum Name: String, Sendable, Hashable {
         case appOpened = "app_opened"
         case flowShowed = "flow_showed"
@@ -16,7 +19,7 @@ extension Event {
 
         case system = "system_log"
         case flowVariationAssigned = "flow_variation_assigned"
-        //case paywallVariationAssigned = "paywall_variation_assigned"
+        // case paywallVariationAssigned = "paywall_variation_assigned"
         case onboardingVariationAssigned = "onboarding_variation_assigned"
         case onboardingScreenShowed = "new_onboarding_screen_showed"
 
@@ -29,7 +32,7 @@ extension Event {
             case .appOpened:
                 .appOpened
             case .paywallShowed:
-                    .paywallShowed
+                .paywallShowed
             case .flowShowed:
                 .flowShowed
             case .system:

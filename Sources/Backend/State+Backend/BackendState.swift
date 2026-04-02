@@ -21,7 +21,7 @@ extension BackendState {
             mainBaseUrls: [
                 .default: [Backend.defaultBaseUrl(kind: .main, by: .default)],
                 .eu: [Backend.defaultBaseUrl(kind: .main, by: .eu)],
-                .cn: [Backend.defaultBaseUrl(kind: .main, by: .cn)]
+                .cn: [Backend.defaultBaseUrl(kind: .main, by: .cn)],
             ],
             expiresAt: Date(timeIntervalSince1970: 0),
             extendSeconds: 1800

@@ -14,5 +14,7 @@ struct HTTPEndpoint: Sendable, Hashable {
 }
 
 extension HTTPEndpoint: CustomStringConvertible {
-    var description: String { "\(method) \(path)" }
+    var description: String {
+        "\(method) \(path)"
+    }
 }

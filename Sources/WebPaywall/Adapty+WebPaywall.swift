@@ -8,10 +8,10 @@
 import Foundation
 
 #if os(iOS)
-    import SafariServices
-    import UIKit
+import SafariServices
+import UIKit
 #elseif os(macOS)
-    import AppKit
+import AppKit
 #endif
 
 public extension Adapty {
@@ -152,21 +152,21 @@ extension URL {
     @MainActor
     package func open(presentation: AdaptyWebPresentation) async -> Bool {
         #if os(iOS)
-            switch presentation {
-            case .externalBrowser:
+        switch presentation {
+        case .externalBrowser:
+            return await UIApplication.shared.open(self, options: [:])
+        case .inAppBrowser:
+            guard let topViewController = UIApplication.shared.topPresentedController else {
                 return await UIApplication.shared.open(self, options: [:])
-            case .inAppBrowser:
-                guard let topViewController = UIApplication.shared.topPresentedController else {
-                    return await UIApplication.shared.open(self, options: [:])
-                }
-
-                let safariViewController = SFSafariViewController(url: self)
-                topViewController.present(safariViewController, animated: true)
-                return true
             }
-        #elseif os(macOS)
-            NSWorkspace.shared.open(self)
+
+            let safariViewController = SFSafariViewController(url: self)
+            topViewController.present(safariViewController, animated: true)
             return true
+        }
+        #elseif os(macOS)
+        NSWorkspace.shared.open(self)
+        return true
         #endif
     }
 

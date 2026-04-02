@@ -29,8 +29,7 @@ extension AdaptyFlow: CustomStringConvertible {
     }
 }
 
-extension AdaptyFlow: Encodable, Decodable,  DecodableWithConfiguration {
-
+extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
     public struct DecodingConfiguration {
         let placement: AdaptyPlacement
     }
@@ -46,7 +45,7 @@ extension AdaptyFlow: Encodable, Decodable,  DecodableWithConfiguration {
     }
 
     public init(from decoder: Decoder) throws {
-        let configuration = try  DecodingConfiguration(placement: AdaptyPlacement(from: decoder))
+        let configuration = try DecodingConfiguration(placement: AdaptyPlacement(from: decoder))
         try self.init(from: decoder, configuration: configuration)
     }
 
@@ -81,4 +80,3 @@ extension AdaptyFlow: Encodable, Decodable,  DecodableWithConfiguration {
         try placement.encode(to: encoder)
     }
 }
-

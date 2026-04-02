@@ -21,10 +21,14 @@ extension AdaptyUserId {
 
 extension AdaptyUserIdentifiable {
     @inlinable
-    var profileId: String { userId.profileId }
+    var profileId: String {
+        userId.profileId
+    }
 
     @inlinable
-    var customerUserId: String? { userId.customerId }
+    var customerUserId: String? {
+        userId.customerId
+    }
 
     @inlinable
     func isEqualProfileId(_ other: String) -> Bool {
@@ -60,7 +64,9 @@ extension AdaptyUserIdentifiable {
 extension AdaptyProfile: AdaptyUserIdentifiable {}
 
 extension VH<AdaptyProfile>: AdaptyUserIdentifiable {
-    var userId: AdaptyUserId { value.userId }
+    var userId: AdaptyUserId {
+        value.userId
+    }
 }
 
 extension ProfileStorage {

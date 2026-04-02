@@ -61,4 +61,3 @@ final class OnboardingStorage {
         log.debug("Clear onboarding's.")
     }
 }
-

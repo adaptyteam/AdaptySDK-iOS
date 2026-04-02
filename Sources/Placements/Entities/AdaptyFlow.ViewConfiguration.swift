@@ -105,4 +105,3 @@ extension AdaptyFlow.ViewConfiguration: Codable {
         try container.encode(json, forKey: .packedSource)
     }
 }
-

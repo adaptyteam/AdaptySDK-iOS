@@ -28,7 +28,7 @@ extension AdaptyPlacement {
         placement.version = version
         return placement
     }
-    
+
     func isNewerThan(_ other: AdaptyPlacement) -> Bool {
         version > other.version
     }
@@ -40,12 +40,7 @@ extension AdaptyPlacement: CustomStringConvertible {
     }
 }
 
-
-
 extension AdaptyPlacement: Codable {
-
-  
-
     enum CodingKeys: String, CodingKey {
         case placement
         case id = "developer_id"

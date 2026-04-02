@@ -18,10 +18,21 @@ final class ProfileManager {
     let crossPlacmentStorage = CrossPlacementStorage()
     let placementStorage = PlacementStorage()
 
-    var currentProfile: AdaptyProfile { cachedProfile.value }
-    var isTestUser: Bool { cachedProfile.value.isTestUser }
-    var segmentId: String { cachedProfile.value.segmentId }
-    var lastResponseHash: String? { cachedProfile.hash }
+    var currentProfile: AdaptyProfile {
+        cachedProfile.value
+    }
+
+    var isTestUser: Bool {
+        cachedProfile.value.isTestUser
+    }
+
+    var segmentId: String {
+        cachedProfile.value.segmentId
+    }
+
+    var lastResponseHash: String? {
+        cachedProfile.hash
+    }
 
     @AdaptyActor
     init(
@@ -29,9 +40,9 @@ final class ProfileManager {
         profile: VH<AdaptyProfile>,
         sentEnvironment: SentEnvironment
     ) {
-        self.userId = profile.userId
-        self.cachedProfile = profile
-        self.onceSentEnvironment = sentEnvironment
+        userId = profile.userId
+        cachedProfile = profile
+        onceSentEnvironment = sentEnvironment
         self.storage = storage
 
         Task { @AdaptyActor [weak self] in
@@ -197,9 +208,7 @@ extension Adapty {
         var verifiedCurrentEntitlements = await transactionManager.getVerifiedCurrentEntitlements()
 
         if await !transactionManager.hasUnfinishedTransactions {
-            verifiedCurrentEntitlements = verifiedCurrentEntitlements.filter {
-                $0.isXcodeEnvironment
-            }
+            verifiedCurrentEntitlements = verifiedCurrentEntitlements.filter(\.isXcodeEnvironment)
         }
 
         guard !verifiedCurrentEntitlements.isEmpty else { return serverProfile }

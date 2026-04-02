@@ -32,7 +32,7 @@ private struct SetAttributionDataRequest: BackendEncodableRequest {
         self.userId = userId
 
         logParams = [
-            "source": source
+            "source": source,
         ]
     }
 

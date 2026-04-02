@@ -15,4 +15,3 @@ extension AdaptyUIBuilder {
         sendImageUrlsToObserver(schema, forLocalId: nil)
     }
 }
-

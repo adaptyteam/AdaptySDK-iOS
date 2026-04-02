@@ -12,7 +12,9 @@ protocol BackendRequest: Sendable, HTTPRequest {
 }
 
 extension BackendRequest {
-    var logParams: EventParameters? { nil }
+    var logParams: EventParameters? {
+        nil
+    }
 }
 
 protocol BackendEncodableRequest: BackendRequest, HTTPEncodableRequest {}

@@ -103,7 +103,9 @@ extension InternalAdaptyError: CustomNSError {
         }
     }
 
-    var errorCode: Int { adaptyErrorCode.rawValue }
+    var errorCode: Int {
+        adaptyErrorCode.rawValue
+    }
 
     var errorUserInfo: [String: Any] {
         var data: [String: Any] = [
@@ -166,7 +168,8 @@ extension AdaptyError {
         line: UInt = #line
     ) -> Self {
         InternalAdaptyError.wrongParam(
-            AdaptyError.Source(file: file, function: function, line: line), "Is not file URL"
+            AdaptyError.Source(file: file, function: function, line: line),
+            "Is not file URL"
         ).asAdaptyError
     }
 
@@ -253,8 +256,6 @@ extension AdaptyError {
     ) -> Self {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), "Current method is not available for the paywall (placementId: \(paywall.placement.id), name: \(paywall.name), variationId: \(paywall.variationId))").asAdaptyError
     }
-
-
 
     static func productWithoutPurchaseUrl(
         adaptyProductId: String,
