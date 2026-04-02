@@ -12,9 +12,9 @@ import AdaptyUIBuilder
 import UIKit
 
 public extension AdaptyFlowControllerDelegate {
-    func flowControllerDidAppear(_ controller: AdaptyFlowController) {}
+    func flowControllerDidAppear(_: AdaptyFlowController) {}
 
-    func flowControllerDidDisappear(_ controller: AdaptyFlowController) {}
+    func flowControllerDidDisappear(_: AdaptyFlowController) {}
 
     func flowController(
         _ controller: AdaptyFlowController,
@@ -31,18 +31,18 @@ public extension AdaptyFlowControllerDelegate {
     }
 
     func flowController(
-        _ controller: AdaptyFlowController,
-        didSelectProduct product: any AdaptyPaywallProductWithoutDeterminingOffer
+        _: AdaptyFlowController,
+        didSelectProduct _: AdaptyPaywallProduct
+    ) {}
+
+    func flowController(
+        _: AdaptyFlowController,
+        didStartPurchase _: AdaptyPaywallProduct
     ) {}
 
     func flowController(
         _ controller: AdaptyFlowController,
-        didStartPurchase product: AdaptyPaywallProduct
-    ) {}
-
-    func flowController(
-        _ controller: AdaptyFlowController,
-        didFinishPurchase product: AdaptyPaywallProduct,
+        didFinishPurchase _: AdaptyPaywallProduct,
         purchaseResult: AdaptyPurchaseResult
     ) {
         if !purchaseResult.isPurchaseCancelled {
@@ -50,30 +50,31 @@ public extension AdaptyFlowControllerDelegate {
         }
     }
 
-    func flowControllerDidStartRestore(_ controller: AdaptyFlowController) {}
+    func flowControllerDidStartRestore(_: AdaptyFlowController) {}
 
     func flowController(
-        _ controller: AdaptyFlowController,
-        didFailRenderingWith error: AdaptyUIError
+        _: AdaptyFlowController,
+        didFailRenderingWith _: AdaptyUIError
     ) {}
 
     func flowController(
-        _ controller: AdaptyFlowController,
-        didFailLoadingProductsWith error: AdaptyError
+        _: AdaptyFlowController,
+        didFailLoadingProductsWith _: AdaptyError
     ) -> Bool {
         false
     }
 
     func flowController(
-        _ controller: AdaptyFlowController,
-        didPartiallyLoadProducts failedIds: [String]
+        _: AdaptyFlowController,
+        didPartiallyLoadProducts _: [String]
     ) {}
 
     func flowController(
-        _ controller: AdaptyFlowController,
-        didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
-        error: AdaptyError?
+        _: AdaptyFlowController,
+        didFinishWebPaymentNavigation _: AdaptyPaywallProduct?,
+        error _: AdaptyError?
     ) {}
 }
 
 #endif
+

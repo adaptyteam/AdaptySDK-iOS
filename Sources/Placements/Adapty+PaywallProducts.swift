@@ -48,30 +48,6 @@ public extension Adapty {
         }
     }
 
-    nonisolated static func getPaywallProductsWithoutDeterminingOffer(flow: AdaptyFlow) async throws(AdaptyError) -> [AdaptyPaywallProductWithoutDeterminingOffer] {
-        try await withActivatedSDK(
-            methodName: .getPaywallProductsWithoutDeterminingOffer,
-            logParams: ["placement_id": flow.placement.id]
-        ) { sdk throws(AdaptyError) in
-            try await sdk.getPaywallProductsWithoutOffers(
-                flow: flow,
-                productsManager: sdk.productsManager
-            )
-        }
-    }
-
-    nonisolated static func getPaywallProductsWithoutDeterminingOffer(paywall: AdaptyFlowPaywall) async throws(AdaptyError) -> [AdaptyPaywallProductWithoutDeterminingOffer] {
-        try await withActivatedSDK(
-            methodName: .getPaywallProductsWithoutDeterminingOffer,
-            logParams: ["placement_id": paywall.placement.id]
-        ) { sdk throws(AdaptyError) in
-            try await sdk.getPaywallProductsWithoutOffers(
-                paywall: paywall,
-                productsManager: sdk.productsManager
-            )
-        }
-    }
-
     package nonisolated static func getPaywallProduct(
         adaptyProductId: String,
         productInfo: BackendProductInfo,

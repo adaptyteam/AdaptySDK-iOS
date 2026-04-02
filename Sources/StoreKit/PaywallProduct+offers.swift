@@ -11,62 +11,6 @@ import StoreKit
 private let log = Log.productManager
 
 extension Adapty {
-    func getPaywallProductsWithoutOffers(
-        flow: AdaptyFlow,
-        productsManager: ProductsManager
-    ) async throws(AdaptyError) -> [AdaptyPaywallProductWithoutDeterminingOffer] {
-        let skProducts = try await productsManager.fetchProductsInSameOrder(
-            ids: flow.paywalls.flatMap(\.vendorProductIds),
-            fetchPolicy: .returnCacheDataElseLoad
-        )
-
-        return flow.paywalls.flatMap { paywall in
-            paywall.products.compactMap { reference in
-                guard let skProduct = skProducts.first(where: { $0.id == reference.productInfo.vendorId }) else {
-                    return nil
-                }
-
-                return PaywallProductWithoutDeterminingOffer(
-                    skProduct: skProduct,
-                    adaptyProductId: reference.adaptyProductId,
-                    productInfo: reference.productInfo,
-                    paywallProductIndex: reference.paywallProductIndex,
-                    variationId: paywall.variationId,
-                    paywallABTestName: paywall.placement.abTestName,
-                    paywallName: paywall.name,
-                    webPaywallBaseUrl: paywall.webPaywallBaseUrl
-                )
-            }
-        }
-    }
-
-    func getPaywallProductsWithoutOffers(
-        paywall: AdaptyFlowPaywall,
-        productsManager: ProductsManager
-    ) async throws(AdaptyError) -> [AdaptyPaywallProductWithoutDeterminingOffer] {
-        let skProducts = try await productsManager.fetchProductsInSameOrder(
-            ids: paywall.vendorProductIds,
-            fetchPolicy: .returnCacheDataElseLoad
-        )
-
-        return paywall.products.compactMap { reference in
-            guard let skProduct = skProducts.first(where: { $0.id == reference.productInfo.vendorId }) else {
-                return nil
-            }
-
-            return PaywallProductWithoutDeterminingOffer(
-                skProduct: skProduct,
-                adaptyProductId: reference.adaptyProductId,
-                productInfo: reference.productInfo,
-                paywallProductIndex: reference.paywallProductIndex,
-                variationId: paywall.variationId,
-                paywallABTestName: paywall.placement.abTestName,
-                paywallName: paywall.name,
-                webPaywallBaseUrl: paywall.webPaywallBaseUrl
-            )
-        }
-    }
-
     func getPaywallProducts(
         flow: AdaptyFlow,
         productsManager: ProductsManager
@@ -102,8 +46,9 @@ extension Adapty {
         }
 
         return newProducts.map {
-            PaywallProduct(
+            AdaptyPaywallProduct(
                 skProduct: $0.product,
+                flowProductId: nil,
                 adaptyProductId: $0.reference.adaptyProductId,
                 productInfo: $0.reference.productInfo,
                 paywallProductIndex: $0.reference.paywallProductIndex,
@@ -149,8 +94,9 @@ extension Adapty {
         }
 
         return newProducts.map {
-            PaywallProduct(
+            AdaptyPaywallProduct(
                 skProduct: $0.product,
+                flowProductId: nil,
                 adaptyProductId: $0.reference.adaptyProductId,
                 productInfo: $0.reference.productInfo,
                 paywallProductIndex: $0.reference.paywallProductIndex,
@@ -187,8 +133,9 @@ extension Adapty {
                 nil
             }
 
-        return PaywallProduct(
+        return AdaptyPaywallProduct(
             skProduct: product,
+            flowProductId: nil,
             adaptyProductId: adaptyProductId,
             productInfo: productInfo,
             paywallProductIndex: paywallProductIndex,
@@ -350,3 +297,4 @@ extension Adapty {
         return renewalInfo.eligibleWinBackOfferIDs
     }
 }
+

@@ -79,7 +79,7 @@
 
         package func flowView(
             _ view: AdaptyFlowUIView,
-            didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
+            didSelectProduct product: AdaptyPaywallProduct
         ) {
             eventHandler.handle(
                 event: FlowViewEvent.DidSelectProduct(

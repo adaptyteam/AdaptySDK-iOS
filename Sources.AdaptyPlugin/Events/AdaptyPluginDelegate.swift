@@ -86,7 +86,7 @@ extension AdaptyPluginDelegate: AdaptyFlowControllerDelegate {
 
     func flowController(
         _ controller: AdaptyFlowController,
-        didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
+        didSelectProduct product: AdaptyPaywallProduct
     ) {
         eventHandler.handle(event: FlowViewEvent.DidSelectProduct(
             view: controller.toAdaptyUIView(),

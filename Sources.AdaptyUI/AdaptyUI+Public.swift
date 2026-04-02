@@ -77,7 +77,7 @@ public protocol AdaptyFlowControllerDelegate: AnyObject {
     ///     - product: an ``AdaptyPaywallProduct`` which was selected.
     func flowController(
         _ controller: AdaptyFlowController,
-        didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
+        didSelectProduct product: AdaptyPaywallProduct
     )
 
     /// If user initiates the purchase process, this method will be invoked.
@@ -235,7 +235,7 @@ public extension AdaptyUI {
 
         Log.ui.verbose("Calling AdaptyUI activate [\(stamp)] with params: \(logParams)")
 
-#if canImport(UIKit)
+        #if canImport(UIKit)
         let sdk: Adapty
 
         do {
@@ -259,11 +259,11 @@ public extension AdaptyUI {
         AdaptyUIBuilder.ImageUrlPrefetcher.shared.initialize()
 
         Log.ui.info("AdaptyUI activated successfully. [\(stamp)]")
-#else
+        #else
         let err = AdaptyUIError.platformNotSupported
         Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(err).")
         throw err
-#endif
+        #endif
     }
 }
 
@@ -342,3 +342,4 @@ public extension AdaptyUI {
     }
 }
 #endif
+

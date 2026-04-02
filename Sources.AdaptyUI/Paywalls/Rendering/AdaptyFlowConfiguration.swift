@@ -85,7 +85,7 @@ public extension AdaptyUI {
                 logic: logic,
                 presentationViewModel: presentationViewModel,
                 flowViewModel: flowViewModel,
-                products: products?.map { AdaptyPaywallProductWrapper.full($0) }
+                products: products
             )
             screensViewModel = AdaptyUIScreensViewModel(
                 logId: logId,

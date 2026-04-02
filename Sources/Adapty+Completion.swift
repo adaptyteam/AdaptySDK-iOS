@@ -269,12 +269,19 @@ public extension Adapty {
         }
     }
 
-    nonisolated static func getPaywallProductsWithoutDeterminingOffer(
-        paywall: AdaptyFlowPaywall,
-        _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProductWithoutDeterminingOffer]>
+    /// Once you have a ``AdaptyFlow``, fetch corresponding products array using this method.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products)
+    ///
+    /// - Parameters:
+    ///   - flow: the ``AdaptyFlow`` for which you want to get a products
+    ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
+    nonisolated static func getPaywallProducts(
+        flow: AdaptyFlow,
+        _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await getPaywallProductsWithoutDeterminingOffer(paywall: paywall)
+            try await getPaywallProducts(flow: flow)
         }
     }
 
@@ -532,3 +539,4 @@ private func withCompletion<T: Sendable>(
         }
     }
 }
+

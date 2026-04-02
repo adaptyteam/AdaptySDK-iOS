@@ -20,7 +20,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
     private let didAppear: (() -> Void)?
     private let didDisappear: (() -> Void)?
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
-    private let didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
+    private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     private let didFailPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
@@ -39,7 +39,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
-        didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)? = nil,
+        didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
         didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,

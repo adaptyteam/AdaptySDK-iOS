@@ -137,7 +137,6 @@ enum MethodName: String {
 
     case reportTransaction = "report_transaction"
     case getPaywallProducts = "get_paywall_products"
-    case getPaywallProductsWithoutDeterminingOffer = "get_paywall_products_without_determining_offer"
     case getProductsIntroductoryOfferEligibilityByStrings = "get_products_introductory_offer_eligibility_by_strings"
     case getReceipt = "get_receipt"
     case makePurchase = "make_purchase"

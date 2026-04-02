@@ -134,7 +134,7 @@ extension AdaptyFlowController: AdaptyFlowViewDelegate {
 
     package func flowView(
         _ view: AdaptyFlowUIView,
-        didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
+        didSelectProduct product: AdaptyPaywallProduct
     ) {
         delegate?.flowController(self, didSelectProduct: product)
     }

@@ -18,7 +18,7 @@ package final class AdaptyEventsHandler {
     var didDisappear: (() -> Void)?
 
     var didPerformAction: ((AdaptyUI.Action) -> Void)?
-    var didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
+    var didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
     var didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     var didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     var didFailPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
@@ -61,7 +61,7 @@ package final class AdaptyEventsHandler {
         didPerformAction?(action)
     }
 
-    func event_didSelectProduct(_ product: AdaptyPaywallProductWithoutDeterminingOffer, automatic: Bool) {
+    func event_didSelectProduct(_ product: AdaptyPaywallProduct, automatic: Bool) {
         Log.ui.verbose("#\(logId)# event_didSelectProduct: \(product.vendorProductId) automatic: \(automatic)")
         didSelectProduct?(product)
     }

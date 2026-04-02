@@ -106,10 +106,6 @@ actor StoreKitPurchaser {
         appAccountToken: UUID?,
         product: AdaptyPaywallProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        guard let product = product as? PaywallProduct else {
-            throw .cantMakePayments()
-        }
-
         var options = Set<Product.PurchaseOption>()
 
         // options.insert(.simulatesAskToBuyInSandbox(true))
@@ -284,3 +280,4 @@ actor StoreKitPurchaser {
         }
     }
 }
+

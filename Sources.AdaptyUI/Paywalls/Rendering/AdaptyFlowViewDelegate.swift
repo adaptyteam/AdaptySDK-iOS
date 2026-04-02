@@ -23,7 +23,7 @@ package protocol AdaptyFlowViewDelegate: AnyObject {
 
     func flowView(
         _ view: AdaptyFlowUIView,
-        didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
+        didSelectProduct product: AdaptyPaywallProduct
     )
 
     func flowView(

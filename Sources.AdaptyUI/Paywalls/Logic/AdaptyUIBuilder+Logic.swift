@@ -42,17 +42,12 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     }
 
     func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {
-        guard let productWrapper = product as? AdaptyPaywallProductWrapper else {
-            Log.ui.error("#\(logId)# reportDidSelectProduct error: product is not AdaptyPaywallProductWrapper")
+        guard let product = product as? AdaptyPaywallProduct else {
+            Log.ui.error("#\(logId)# reportDidSelectProduct error: product is not AdaptyPaywallProduc")
             return
         }
 
-        switch productWrapper {
-        case .withoutOffer(let product):
-            events.event_didSelectProduct(product, automatic: automatic)
-        case .full(let product):
-            events.event_didSelectProduct(product, automatic: automatic)
-        }
+        events.event_didSelectProduct(product, automatic: automatic)
     }
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool {
@@ -116,8 +111,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         onStart: @MainActor @Sendable @escaping () -> Void,
         onFinish: @MainActor @Sendable @escaping () -> Void
     ) {
-        guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
-              case .full(let adaptyProduct) = adaptyProductWrapper
+        guard let adaptyProduct = product as? AdaptyPaywallProduct
         else {
             Log.ui.error("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
             return
@@ -166,8 +160,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     }
 
     func openWebPaywall(for product: ProductResolver, in openIn: VC.Action.WebOpenInParameter) async {
-        guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
-              case .full(let adaptyProduct) = adaptyProductWrapper
+        guard let adaptyProduct = product as? AdaptyPaywallProduct
         else {
             Log.ui.error("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
             return

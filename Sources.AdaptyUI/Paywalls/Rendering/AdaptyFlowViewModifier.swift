@@ -35,7 +35,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
     private let didAppear: (() -> Void)?
     private let didDisappear: (() -> Void)?
     private let didPerformAction: ((AdaptyUI.Action) -> Void)?
-    private let didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
+    private let didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
     private let didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     private let didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     private let didFailPurchase: (AdaptyPaywallProduct, AdaptyError) -> Void
@@ -57,7 +57,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUI.Action) -> Void)?,
-        didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?,
+        didSelectProduct: ((AdaptyPaywallProduct) -> Void)?,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)?,
         didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
