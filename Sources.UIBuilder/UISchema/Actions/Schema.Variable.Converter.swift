@@ -51,7 +51,7 @@ extension Schema.Variable.Converter: Codable {
             case let .object(object):
                 if let format = object["format"] {
                     if case let .string(value) = format {
-                        self = .dataTimeWithFormat(value)
+                        self = .dateTimeWithFormat(value)
                         return
                     }
                     throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "The 'format' parameter must be a string in 'date_time' converter")
@@ -63,8 +63,9 @@ extension Schema.Variable.Converter: Codable {
                 if let p = object["date"] {
                     if case let .string(v) = p, let value = DateFormatter.Style(fromString: v) {
                         dateStyle = value
+                    } else {
+                        throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "The 'date' parameter must be a string in 'date_time' converter")
                     }
-                    throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "The 'date' parameter must be a string in 'date_time' converter")
                 } else {
                     dateStyle = .none
                 }
@@ -72,8 +73,9 @@ extension Schema.Variable.Converter: Codable {
                 if let p = object["time"] {
                     if case let .string(v) = p, let value = DateFormatter.Style(fromString: v) {
                         timeStyle = value
+                    } else {
+                        throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "The 'time' parameter must be a string in 'date_time' converter")
                     }
-                    throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "The 'time' parameter must be a string in 'date_time' converter")
                 } else {
                     timeStyle = .none
                 }
@@ -82,9 +84,9 @@ extension Schema.Variable.Converter: Codable {
                     throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "At least one of 'date', 'time', or 'format' string parameters is required for 'date_time' converter")
                 }
 
-                self = .dataTimeWithStyle(dateStyle, timeStyle)
+                self = .dateTimeWithStyle(dateStyle, timeStyle)
             case let .string(value):
-                self = .dataTimeWithFormat(value)
+                self = .dateTimeWithFormat(value)
             default:
                 throw DecodingError.dataCorruptedError(forKey: .params, in: container, debugDescription: "Unsupported parameter type for 'date_time' converter: expected an object or a string")
             }
@@ -106,13 +108,13 @@ extension Schema.Variable.Converter: Codable {
                     value
                 }
             try container.encode(params, forKey: .params)
-        case let .dataTimeWithFormat(format):
+        case let .dateTimeWithFormat(format):
             try container.encode(Names.dateTime, forKey: .name)
             let params: VC.Parameter = .object(["format": .string(format)])
             try container.encode(params, forKey: .params)
-        case let .dataTimeWithStyle(date, time):
+        case let .dateTimeWithStyle(date, time):
             try container.encode(Names.dateTime, forKey: .name)
-            let params: VC.Parameter = .object(["date_style": .string(date.stringValue), "time_style": .string(time.stringValue)])
+            let params: VC.Parameter = .object(["date": .string(date.stringValue), "time": .string(time.stringValue)])
             try container.encode(params, forKey: .params)
         case let .unknown(name, params):
             try container.encode(name, forKey: .name)

@@ -147,7 +147,7 @@ extension VS.JSState {
             let rhs = a.toJSValue(in: context)
             let result = value.isEqual(to: rhs)
             return result.toJSValue(in: context)
-        case let .dataTimeWithFormat(format):
+        case let .dateTimeWithFormat(format):
             guard let unixtimestamp = Double.fromJSValue(value) else {
                 throw .convertorError("dataTimeWithStyle: expected a numeric timestamp")
             }
@@ -156,7 +156,7 @@ extension VS.JSState {
 // TODO: use locale of UIConfiguration           formatter.locale
             formatter.dateFormat = format
             return formatter.string(from: value).toJSValue(in: context)
-        case let .dataTimeWithStyle(date, time):
+        case let .dateTimeWithStyle(date, time):
             guard let unixtimestamp = Double.fromJSValue(value) else {
                 throw .convertorError("dataTimeWithStyle: expected a numeric timestamp")
             }
@@ -178,7 +178,7 @@ extension VS.JSState {
             guard !boolValue else { return a }
             if let b { return b }
             return VC.Parameter.null
-        case .dataTimeWithFormat, .dataTimeWithStyle:
+        case .dateTimeWithFormat, .dateTimeWithStyle:
             return value
         case let .unknown(name, _):
             throw .notFoundConvertor(name)

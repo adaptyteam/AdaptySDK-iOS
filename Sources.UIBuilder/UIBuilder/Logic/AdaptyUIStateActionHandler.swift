@@ -50,7 +50,7 @@ package final class AdaptyUIStateHolder {
 }
 
 @MainActor
-package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
+package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUITimerCallbackHandler {
     private let productsViewModel: AdaptyUIProductsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
 
@@ -70,6 +70,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 
     private nonisolated(unsafe) var pendingAlertDialogCallback: VS.JSAction?
     private nonisolated(unsafe) var pendingPermissionCallback: VS.JSAction?
+    private nonisolated(unsafe) var pendingTimerCallbacks: [String: VS.JSAction] = [:]
 
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
@@ -211,11 +212,11 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         endAt: Date,
         callback: VS.JSAction?
     ) {
+        if let callback { pendingTimerCallbacks[id] = callback }
         Task { @MainActor [weak self] in
-            self?.timerViewModel?.setEndDate(id: id, date: endAt)
-
-            // response TimerResponse
-            // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
+            guard let self else { return }
+            let cb = self.pendingTimerCallbacks.removeValue(forKey: id)
+            self.timerViewModel?.setEndDate(id: id, date: endAt, callback: cb)
         }
     }
 
@@ -225,12 +226,11 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         behavior: VC.SetTimerBehavior,
         callback: VS.JSAction?
     ) {
+        if let callback { pendingTimerCallbacks[id] = callback }
         Task { @MainActor [weak self] in
-            self?.timerViewModel?.setDuration(id: id, duration: duration, behavior: behavior)
-
-            // response TimerResponse
-            // call AdaptyUIState.execute( action:callback, params: response, screenInstance: )
-
+            guard let self else { return }
+            let cb = self.pendingTimerCallbacks.removeValue(forKey: id)
+            self.timerViewModel?.setDuration(id: id, duration: duration, behavior: behavior, callback: cb)
         }
     }
 
@@ -267,6 +267,15 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
         }
     }
 
+    package func handleTimerCallback(timerId: String, callback: VS.JSAction) {
+        guard let screenInstance = screensViewModel.topmostScreenInstance else { return }
+        let response = VS.TimerResponse(timerId: timerId)
+        do {
+            try state?.execute(action: callback, params: response, screenInstance: screenInstance)
+        } catch {
+            Log.ui.error("timer callback error: \(error)")
+        }
+    }
 
     package nonisolated func showAppRate() {
         Task { @MainActor [weak self] in

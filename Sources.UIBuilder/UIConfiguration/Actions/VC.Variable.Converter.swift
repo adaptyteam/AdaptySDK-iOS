@@ -10,8 +10,8 @@ import Foundation
 extension VC.Variable {
     enum Converter: Sendable, Hashable {
         case isEqual(VC.Parameter, falseValue: VC.Parameter?)
-        case dataTimeWithFormat(String)
-        case dataTimeWithStyle(DateFormatter.Style, DateFormatter.Style)
+        case dateTimeWithFormat(String)
+        case dateTimeWithStyle(DateFormatter.Style, DateFormatter.Style)
 
         case unknown(String, VC.Parameter?)
     }

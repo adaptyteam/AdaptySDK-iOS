@@ -25,6 +25,11 @@ extension [String: Date]: AdaptyUITimerResolver {
 }
 
 @MainActor
+package protocol AdaptyUITimerCallbackHandler: AnyObject {
+    func handleTimerCallback(timerId: String, callback: VS.JSAction)
+}
+
+@MainActor
 package final class AdaptyUITimerViewModel: ObservableObject {
     private let logId: String
 
@@ -37,6 +42,10 @@ package final class AdaptyUITimerViewModel: ObservableObject {
     private let paywallViewModel: AdaptyUIPaywallViewModel
     private let productsViewModel: AdaptyUIProductsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
+
+    private var timerCallbacks: [String: VS.JSAction] = [:]
+    private var centralTimer: Timer?
+    package weak var callbackHandler: AdaptyUITimerCallbackHandler?
 
     package init(
         logId: String,
@@ -54,14 +63,18 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         self.screensViewModel = screensViewModel
     }
 
-    func setEndDate(id: String, date: Date) {
+    func setEndDate(id: String, date: Date, callback: VS.JSAction?) {
         Log.ui.verbose("#\(logId)# setTimer id: \(id), endAt: \(date)")
         timers[id] = date
+        if let callback { timerCallbacks[id] = callback }
         objectWillChange.send()
+        startCentralTimerIfNeeded()
     }
 
-    func setDuration(id: String, duration: TimeInterval, behavior: VC.SetTimerBehavior) {
+    func setDuration(id: String, duration: TimeInterval, behavior: VC.SetTimerBehavior, callback: VS.JSAction?) {
         Log.ui.verbose("#\(logId)# setTimer id: \(id), duration: \(duration), behavior: \(behavior)")
+        if let callback { timerCallbacks[id] = callback }
+        startCentralTimerIfNeeded()
 
         switch behavior {
         case .restart:
@@ -122,6 +135,54 @@ package final class AdaptyUITimerViewModel: ObservableObject {
     package func resetTimersState() {
         Log.ui.verbose("#\(logId)# resetTimersState")
         timers.removeAll()
+        timerCallbacks.removeAll()
+        stopCentralTimer()
+    }
+
+    // MARK: - Central Timer Loop
+
+    private func startCentralTimerIfNeeded() {
+        guard centralTimer == nil else { return }
+        let timer = Timer(timeInterval: 1.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.tick()
+            }
+        }
+        RunLoop.current.add(timer, forMode: .common)
+        centralTimer = timer
+    }
+
+    private func tick() {
+        objectWillChange.send()
+        checkExpiredCallbacks()
+        stopCentralTimerIfIdle()
+    }
+
+    private func checkExpiredCallbacks() {
+        let now = Date()
+        for (id, endDate) in timers where timerCallbacks[id] != nil {
+            if endDate.timeIntervalSince(now) <= 0 {
+                if let callback = timerCallbacks.removeValue(forKey: id) {
+                    callbackHandler?.handleTimerCallback(
+                        timerId: id,
+                        callback: callback
+                    )
+                }
+            }
+        }
+    }
+
+    private func stopCentralTimerIfIdle() {
+        let hasActiveTimers = timers.values.contains { $0.timeIntervalSinceNow > 0 }
+        if !hasActiveTimers && timerCallbacks.isEmpty {
+            centralTimer?.invalidate()
+            centralTimer = nil
+        }
+    }
+
+    private func stopCentralTimer() {
+        centralTimer?.invalidate()
+        centralTimer = nil
     }
 }
 
