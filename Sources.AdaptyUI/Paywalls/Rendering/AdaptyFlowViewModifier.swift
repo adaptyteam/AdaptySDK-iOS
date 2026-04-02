@@ -177,7 +177,7 @@ public extension View {
     ///     - didFailLoadingProducts: This callback is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
     ///     - showAlertItem:
     ///     - showAlertBuilder:
-    func paywall<Placeholder: View, AlertItem: Identifiable>(
+    func flow<Placeholder: View, AlertItem: Identifiable>(
         isPresented: Binding<Bool>,
         fullScreen: Bool = true,
         flowConfiguration: AdaptyUI.FlowConfiguration?,

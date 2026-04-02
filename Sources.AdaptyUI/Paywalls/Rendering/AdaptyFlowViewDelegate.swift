@@ -1,5 +1,5 @@
 //
-//  AdaptyflowViewDelegate.swift
+//  AdaptyFlowViewDelegate.swift
 //  Adapty
 //
 //  Created by Alexey Goncharov on 8/6/25.

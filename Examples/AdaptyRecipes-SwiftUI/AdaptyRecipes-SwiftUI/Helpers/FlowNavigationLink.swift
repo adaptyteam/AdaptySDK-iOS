@@ -1,5 +1,5 @@
 //
-//  PaywallNavigationLink.swift
+//  FlowNavigationLink.swift
 //  AdaptyRecipes-SwiftUI
 //
 //  Created by Alexey Goncharov on 1/14/25.
@@ -9,10 +9,10 @@ import Adapty
 import AdaptyUI
 import SwiftUI
 
-struct PaywallNavigationLink<Label>: View where Label: View {
+struct FlowNavigationLink<Label>: View where Label: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
-    private var paywallConfiguration: AdaptyUI.PaywallConfiguration?
+    private var flowConfiguration: AdaptyUI.FlowConfiguration?
 
     @State private var alertError: IdentifiableErrorWrapper?
     @State private var alertPaywallError: IdentifiableErrorWrapper?
@@ -20,18 +20,18 @@ struct PaywallNavigationLink<Label>: View where Label: View {
     private var label: () -> Label
 
     init(
-        paywallConfiguration: AdaptyUI.PaywallConfiguration?,
+        flowConfiguration: AdaptyUI.FlowConfiguration?,
         label: @escaping () -> Label
     ) {
-        self.paywallConfiguration = paywallConfiguration
+        self.flowConfiguration = flowConfiguration
         self.label = label
     }
 
     var body: some View {
         NavigationLink {
-            if let paywallConfiguration {
-                AdaptyPaywallView(
-                    paywallConfiguration: paywallConfiguration,
+            if let flowConfiguration {
+                AdaptyFlowView(
+                    flowConfiguration: flowConfiguration,
                     didFailPurchase: { _, error in
                         alertPaywallError = .init(title: "didFailPurchase error!", error: error)
                     },

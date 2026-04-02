@@ -12,7 +12,7 @@ extension Request {
     enum CreateWebPaywallUrl: AdaptyPluginRequest {
         static let method = "create_web_paywall_url"
         case product(AdaptyPluginPaywallProduct)
-        case paywall(AdaptyPaywall)
+//        case paywall(AdaptyPaywall) // TODO: x
 
         enum CodingKeys: CodingKey {
             case product
@@ -21,11 +21,11 @@ extension Request {
 
         init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            if container.contains(.product) {
+//            if container.contains(.product) {
                 self = try .product(container.decode(AdaptyPluginPaywallProduct.self, forKey: .product))
-            } else {
-                self = try .paywall(container.decode(AdaptyPaywall.self, forKey: .paywall))
-            }
+//            } else {
+//                self = try .paywall(container.decode(AdaptyPaywall.self, forKey: .paywall))
+//            }
         }
 
         func execute() async throws -> AdaptyJsonData {
@@ -42,8 +42,8 @@ extension Request {
                     webPaywallBaseUrl: product.webPaywallBaseUrl
                 )
                 return try .success(await Adapty.createWebPaywallUrl(for: product).absoluteString)
-            case .paywall(let paywall):
-                return try .success(await Adapty.createWebPaywallUrl(for: paywall).absoluteString)
+//            case .paywall(let paywall):
+//                return try .success(await Adapty.createWebPaywallUrl(for: paywall).absoluteString)
             }
         }
     }

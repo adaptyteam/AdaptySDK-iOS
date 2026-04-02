@@ -12,11 +12,11 @@ import AdaptyUIBuilder
 import UIKit
 
 public extension AdaptyFlowControllerDelegate {
-    func paywallControllerDidAppear(_ controller: AdaptyFlowController) {}
+    func flowControllerDidAppear(_ controller: AdaptyFlowController) {}
 
-    func paywallControllerDidDisappear(_ controller: AdaptyFlowController) {}
+    func flowControllerDidDisappear(_ controller: AdaptyFlowController) {}
 
-    func paywallController(
+    func flowController(
         _ controller: AdaptyFlowController,
         didPerform action: AdaptyUI.Action
     ) {
@@ -30,17 +30,17 @@ public extension AdaptyFlowControllerDelegate {
         }
     }
 
-    func paywallController(
+    func flowController(
         _ controller: AdaptyFlowController,
         didSelectProduct product: any AdaptyPaywallProductWithoutDeterminingOffer
     ) {}
 
-    func paywallController(
+    func flowController(
         _ controller: AdaptyFlowController,
         didStartPurchase product: AdaptyPaywallProduct
     ) {}
 
-    func paywallController(
+    func flowController(
         _ controller: AdaptyFlowController,
         didFinishPurchase product: AdaptyPaywallProduct,
         purchaseResult: AdaptyPurchaseResult
@@ -50,26 +50,26 @@ public extension AdaptyFlowControllerDelegate {
         }
     }
 
-    func paywallControllerDidStartRestore(_ controller: AdaptyFlowController) {}
+    func flowControllerDidStartRestore(_ controller: AdaptyFlowController) {}
 
-    func paywallController(
+    func flowController(
         _ controller: AdaptyFlowController,
         didFailRenderingWith error: AdaptyUIError
     ) {}
 
-    func paywallController(
+    func flowController(
         _ controller: AdaptyFlowController,
         didFailLoadingProductsWith error: AdaptyError
     ) -> Bool {
         false
     }
 
-    func paywallController(
+    func flowController(
         _ controller: AdaptyFlowController,
         didPartiallyLoadProducts failedIds: [String]
     ) {}
 
-    func paywallController(
+    func flowController(
         _ controller: AdaptyFlowController,
         didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
         error: AdaptyError?
