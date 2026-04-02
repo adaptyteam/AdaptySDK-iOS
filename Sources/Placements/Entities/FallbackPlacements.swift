@@ -38,30 +38,30 @@ struct FallbackPlacements: Sendable {
         head.placementIds?.contains(id)
     }
 
-    func restoreFlow(
-        _ id: String,
-        withVariationId variationId: String,
-        withInstanceIdentity: String,
-        withPlacementRevision: Int
-    ) -> AdaptyFlow? {
-        guard let chosen: AdaptyPlacementChosen<AdaptyFlow> = getPlacement(
-            byPlacementId: id,
-            withVariationId: variationId,
-            userId: AdaptyUserId(profileId: "", customerId: nil),
-            requestLocale: .defaultPlacementLocale
-        )
-        else { return nil }
-
-        let flow = chosen.content
-
-        guard flow.instanceIdentity == withInstanceIdentity,
-              flow.placement.revision == withPlacementRevision
-        else {
-            return nil
-        }
-
-        return flow
-    }
+//    func restoreFlow(
+//        _ id: String,
+//        withVariationId variationId: String,
+//        withInstanceIdentity: String,
+//        withPlacementRevision: Int
+//    ) -> AdaptyFlow? {
+//        guard let chosen: AdaptyPlacementChosen<AdaptyFlow> = getPlacement(
+//            byPlacementId: id,
+//            withVariationId: variationId,
+//            userId: AdaptyUserId(profileId: "", customerId: nil),
+//            requestLocale: .defaultPlacementLocale
+//        )
+//        else { return nil }
+//
+//        let flow = chosen.content
+//
+//        guard flow.instanceIdentity == withInstanceIdentity,
+//              flow.placement.revision == withPlacementRevision
+//        else {
+//            return nil
+//        }
+//
+//        return flow
+//    }
 
     func getPlacement<Content: PlacementContent>(
         byPlacementId id: String,

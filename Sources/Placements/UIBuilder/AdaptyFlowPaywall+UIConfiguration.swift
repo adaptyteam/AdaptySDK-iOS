@@ -26,7 +26,7 @@ extension Adapty {
     private func getUIConfiguration(
         flow: AdaptyFlow,
         locale: AdaptyLocale,
-        loadTimeout _: TaskDuration
+        loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> AdaptyUIConfiguration {
         guard let viewConfiguration = flow.viewConfiguration else {
             throw .isNoViewConfigurationInFlow()
@@ -49,19 +49,11 @@ extension Adapty {
 //            {
 //                value
             } else {
-                throw .unknown(
-                    NSError(
-                        domain: AdaptyError.AdaptyErrorDomain,
-                        code: AdaptyError.ErrorCode.unknown.rawValue,
-                        userInfo: [NSLocalizedDescriptionKey: "UI schema loading is not implemented"]
-                    )
+                try await fetchUISchema(
+                    flowVariationId: flow.variationId,
+                    flowInstanceIdentity: flow.instanceIdentity,
+                    loadTimeout: loadTimeout
                 )
-//                try await fetchUISchema(
-//                    paywallVariationId: paywall.variationId,
-//                    paywallInstanceIdentity: paywall.instanceIdentity,
-//                    locale: viewConfiguration.locale,
-//                    loadTimeout: loadTimeout
-//                )
             }
 
         AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: locale.id)
@@ -108,45 +100,44 @@ extension Adapty {
 //        return nil
 //    }
 
-//    private func fetchUISchema(
-//        paywallVariationId: String,
-//        paywallInstanceIdentity: String,
-//        locale: AdaptyLocale,
-//        loadTimeout: TaskDuration
-//    ) async throws(AdaptyError) -> AdaptyUISchema {
-//        let httpSession = httpSession
-//        let apiKeyPrefix = apiKeyPrefix
-//        let isTestUser = profileManager?.isTestUser ?? false
-//
-//        do {
-//            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
-//                try await httpSession.fetchUISchema(
-//                    apiKeyPrefix: apiKeyPrefix,
-//                    paywallVariationId: paywallVariationId,
-//                    locale: locale,
-//                    disableServerCache: isTestUser
-//                )
-//            }
-//        } catch let error as HTTPError {
-//            guard Backend.canUseFallbackServer(error) else {
-//                throw error.asAdaptyError
-//            }
-//        } catch {
-//            guard error is TimeoutError else {
-//                throw .unknown(error)
-//            }
-//        }
-//
-//        do {
-//            return try await httpFallbackSession.fetchFallbackUISchema(
-//                apiKeyPrefix: apiKeyPrefix,
-//                paywallInstanceIdentity: paywallInstanceIdentity,
-//                locale: locale,
-//                disableServerCache: isTestUser
-//            )
-//        } catch {
-//            throw error.asAdaptyError
-//        }
-//    }
+
+
+    private func fetchUISchema(
+        flowVariationId: String,
+        flowInstanceIdentity: String,
+        loadTimeout: TaskDuration
+    ) async throws(AdaptyError) -> AdaptyUISchema {
+        let httpSession = httpSession
+        let apiKeyPrefix = apiKeyPrefix
+        let isTestUser = profileManager?.isTestUser ?? false
+
+        do {
+            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
+                try await httpSession.fetchUISchema(
+                    apiKeyPrefix: apiKeyPrefix,
+                    flowVariationId: flowVariationId,
+                    disableServerCache: isTestUser
+                )
+            }
+        } catch let error as HTTPError {
+            guard Backend.canUseFallbackServer(error) else {
+                throw error.asAdaptyError
+            }
+        } catch {
+            guard error is TimeoutError else {
+                throw .unknown(error)
+            }
+        }
+
+        do {
+            return try await httpFallbackSession.fetchFallbackUISchema(
+                apiKeyPrefix: apiKeyPrefix,
+                flowInstanceIdentity: flowInstanceIdentity,
+                disableServerCache: isTestUser
+            )
+        } catch {
+            throw error.asAdaptyError
+        }
+    }
 }
 
