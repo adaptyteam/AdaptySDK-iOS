@@ -128,7 +128,7 @@ private extension BackendExecutor {
         if Content.self == AdaptyFlow.self {
             endpoint = HTTPEndpoint(
                 method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/app_store/\(Adapty.uiBuilderVersion)/fallback.json"
+                path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/app_store/fallback.json"
             )
             requestName = kind == .fallback ? .fetchFallbackPaywallVariations : .fetchPaywallVariationsForDefaultAudience
 
@@ -176,7 +176,8 @@ private extension BackendExecutor {
         if Content.self == AdaptyOnboarding.self {
             endpoint = HTTPEndpoint(
                 method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(locale.languageCode.lowercased())/fallback.json"
+                path: 
+                    "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(locale.languageCode.lowercased())/fallback.json"
             )
             requestName = kind == .fallback ? .fetchFallbackOnboardingVariations : .fetchOnboardingVariationsForDefaultAudience
 

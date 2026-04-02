@@ -13,19 +13,20 @@ struct FetchUISchemaRequest: BackendRequest {
     let headers: HTTPHeaders
     let queryItems: QueryItems
     let stamp = Log.stamp
-    let requestName = BackendRequestName.fetchUISchema
+    let requestName = BackendRequestName.fetchFallBackUISchema
     let logParams: EventParameters?
 
     init(
         apiKeyPrefix: String,
-        flowVariationId: String,
-        md5Hash: String,
+        flowId: String,
+        viewConfigurationId: String,
         disableServerCache: Bool,
         logParams: EventParameters?
     ) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowVariationId)/\(md5Hash)/"
+            path:
+            "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(viewConfigurationId)/\(Adapty.uiBuilderVersion)/config/"
         )
 
         headers = HTTPHeaders()
@@ -50,24 +51,23 @@ extension AdaptyUISchema {
 }
 
 extension Backend.MainExecutor {
-    func fetchUISchema(
+    func fetchFallbackUISchema(
         apiKeyPrefix: String,
-        flowVariationId: String,
+        flowId: String,
+        viewConfigurationId: String,
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyUISchema {
-        let md5Hash = "{\"builder_version\":\"\(Adapty.uiBuilderVersion)\"}".md5.hexString
-
         let request = FetchUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
-            flowVariationId: flowVariationId,
-            md5Hash: md5Hash,
+            flowId: flowId,
+            viewConfigurationId: viewConfigurationId,
             disableServerCache: disableServerCache,
             logParams: [
                 "api_prefix": apiKeyPrefix,
-                "variation_id": flowVariationId,
+                "flow_id": flowId,
+                "flow_version_id": viewConfigurationId,
                 "builder_version": Adapty.uiBuilderVersion,
                 "builder_config_format_version": Adapty.uiSchemaVersion,
-                "md5": md5Hash,
                 "disable_server_cache": disableServerCache,
             ]
         )

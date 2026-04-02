@@ -10,45 +10,42 @@ import Foundation
 
 private struct FetchFallbackUISchemaRequest: BackendRequest {
     let endpoint: HTTPEndpoint
-    let queryItems: QueryItems
     let stamp = Log.stamp
-    let requestName = BackendRequestName.fetchFallbackUISchema
+    let requestName = BackendRequestName.fetchUISchema
     let logParams: EventParameters?
 
     init(
         apiKeyPrefix: String,
-        flowInstanceIdentity: String,
-        disableServerCache: Bool,
+        flowId: String,
+        viewConfigurationId: String,
         logParams: EventParameters
-
     ) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowInstanceIdentity)/\(Adapty.uiBuilderVersion)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(viewConfigurationId)/\(Adapty.uiBuilderVersion)/config.json"
         )
-
-        queryItems = QueryItems().setDisableServerCache(disableServerCache)
-
+        
         self.logParams = logParams
     }
 }
 
 extension Backend.FallbackExecutor {
-    func fetchFallbackUISchema(
+    func fetchUISchema(
         apiKeyPrefix: String,
-        flowInstanceIdentity: String,
+        flowId: String,
+        viewConfigurationId: String,
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyUISchema {
         let request = FetchFallbackUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
-            flowInstanceIdentity: flowInstanceIdentity,
-            disableServerCache: disableServerCache,
+            flowId: flowId,
+            viewConfigurationId: viewConfigurationId,
             logParams: [
                 "api_prefix": apiKeyPrefix,
-                "flow_id": flowInstanceIdentity,
+                "flow_id": flowId,
+                "flow_version_id": viewConfigurationId,
                 "builder_version": Adapty.uiBuilderVersion,
-                "builder_schema_version": Adapty.uiSchemaVersion,
-                "disable_server_cache": disableServerCache,
+                "builder_schema_version": Adapty.uiSchemaVersion
             ]
         )
 

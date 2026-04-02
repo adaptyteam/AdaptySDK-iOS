@@ -29,8 +29,8 @@ enum BackendRequestName: String {
     case fetchPaywallVariationsForDefaultAudience = "get_paywall_variations_for_default_audience"
     case fetchOnboardingVariationsForDefaultAudience = "get_onboarding_variations_for_default_audience"
 
-    case fetchUISchema = "get_paywall_builder"
-    case fetchFallbackUISchema = "get_fallback_paywall_builder"
+    case fetchFallBackUISchema = "get_fallback_ui_schema"
+    case fetchUISchema = "get_ui_schema"
     case fetchCrossPlacementState = "get_cross_placement_state"
     case fetchOnboarding = "get_onboarding"
     case fetchPaywall = "get_paywall"

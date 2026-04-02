@@ -7,10 +7,10 @@
 
 import Foundation
 
-public struct AdaptyFlowPaywall: Sendable, WebPaywallURLProviding {
+public struct AdaptyFlowPaywall: Sendable, WebPaywallURLProviding, Identifiable {
     public let placement: AdaptyPlacement
 
-    public let instanceIdentity: String
+    public let id: String
 
     /// An identifier of a variation, used to attribute purchases to this paywall.
     public let variationId: String
@@ -30,13 +30,13 @@ public struct AdaptyFlowPaywall: Sendable, WebPaywallURLProviding {
 
 extension AdaptyFlowPaywall: CustomStringConvertible {
     public var description: String {
-        "(paywall, placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId))"
+        "(paywall, placement:\(placement), id: \(id), name: \(name), variationId: \(variationId))"
     }
 }
 
 extension AdaptyFlowPaywall: Encodable, DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
-        case instanceIdentity = "paywall_id"
+        case id = "paywall_id"
         case name = "paywall_name"
         case variationId = "variation_id"
         case webPaywallBaseUrl = "web_purchase_url"
@@ -46,7 +46,7 @@ extension AdaptyFlowPaywall: Encodable, DecodableWithConfiguration {
     public init(from decoder: Decoder, configuration: AdaptyFlow.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         placement = configuration.placement
-        instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
+        id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)
         webPaywallBaseUrl = try container.decodeIfPresent(URL.self, forKey: .webPaywallBaseUrl)
@@ -71,7 +71,7 @@ extension AdaptyFlowPaywall: Encodable, DecodableWithConfiguration {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(instanceIdentity, forKey: .instanceIdentity)
+        try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(variationId, forKey: .variationId)
         try container.encode(products, forKey: .products)

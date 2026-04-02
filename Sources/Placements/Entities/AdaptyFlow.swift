@@ -7,9 +7,9 @@
 
 import Foundation
 
-public struct AdaptyFlow: PlacementContent {
+public struct AdaptyFlow: PlacementContent, Identifiable {
     public let placement: AdaptyPlacement
-    public let instanceIdentity: String
+    public let id: String
     public let variationId: String
     public let name: String
     public let remoteConfigs: [AdaptyRemoteConfig]
@@ -25,7 +25,7 @@ public struct AdaptyFlow: PlacementContent {
 
 extension AdaptyFlow: CustomStringConvertible {
     public var description: String {
-        "(flow, placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration))"
+        "(flow, placement:\(placement), id: \(id), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration))"
     }
 }
 
@@ -36,8 +36,8 @@ extension AdaptyFlow: Encodable, Decodable,  DecodableWithConfiguration {
     }
 
     enum CodingKeys: String, CodingKey {
-        case instanceIdentity = "flow_id"
-        case variationId = "variation_id" //
+        case id = "flow_id"
+        case variationId = "variation_id"
         case name = "flow_name"
 
         case remoteConfigs = "remote_configs"
@@ -53,7 +53,7 @@ extension AdaptyFlow: Encodable, Decodable,  DecodableWithConfiguration {
     public init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
         placement = configuration.placement
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
+        id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)
         remoteConfigs = try container.decodeIfPresent([AdaptyRemoteConfig].self, forKey: .remoteConfigs) ?? []
@@ -68,7 +68,7 @@ extension AdaptyFlow: Encodable, Decodable,  DecodableWithConfiguration {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(instanceIdentity, forKey: .instanceIdentity)
+        try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(variationId, forKey: .variationId)
         if remoteConfigs.isNotEmpty {

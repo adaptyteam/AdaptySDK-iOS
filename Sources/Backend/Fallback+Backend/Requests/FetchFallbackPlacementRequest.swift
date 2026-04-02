@@ -90,7 +90,8 @@ extension Backend.FallbackExecutor {
         if Content.self == AdaptyFlow.self {
             endpoint = HTTPEndpoint(
                 method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/\(variationId)/app_store/\(Adapty.uiBuilderVersion)/fallback.json"
+                path:
+                    "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/\(variationId)/app_store/fallback.json"
             )
             requestName = .fetchFallbackFlow
         } else {

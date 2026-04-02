@@ -10,7 +10,7 @@ import AdaptyUIBuilder
 import Foundation
 
 extension AdaptyFlow {
-    struct ViewConfiguration: Sendable {
+    struct ViewConfiguration: Sendable, Identifiable {
         let id: String
         let url: URL
         let fallbackUrl: URL?

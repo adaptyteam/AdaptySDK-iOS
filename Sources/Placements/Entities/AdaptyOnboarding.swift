@@ -7,10 +7,10 @@
 
 import Foundation
 
-public struct AdaptyOnboarding: PlacementContent {
+public struct AdaptyOnboarding: PlacementContent, Identifiable {
     public let placement: AdaptyPlacement
 
-    public let instanceIdentity: String
+    public let id: String
 
     public let variationId: String
 
@@ -34,13 +34,13 @@ public struct AdaptyOnboarding: PlacementContent {
 
 extension AdaptyOnboarding: CustomStringConvertible {
     public var description: String {
-        "(onboarding, placement:\(placement), instanceIdentity: \(instanceIdentity), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration), requestLocale: \(requestLocale.id))"
+        "(onboarding, placement:\(placement), id: \(id), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration), requestLocale: \(requestLocale.id))"
     }
 }
 
 extension AdaptyOnboarding: Codable {
     enum CodingKeys: String, CodingKey {
-        case instanceIdentity = "onboarding_id"
+        case id = "onboarding_id"
         case variationId = "variation_id"
         case name = "onboarding_name"
         case remoteConfig = "remote_config"
@@ -51,7 +51,7 @@ extension AdaptyOnboarding: Codable {
     public init(from decoder: Decoder) throws {
         placement = try decoder.userInfo.placementOrNil ?? AdaptyPlacement(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        instanceIdentity = try container.decode(String.self, forKey: .instanceIdentity)
+        id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         variationId = try container.decode(String.self, forKey: .variationId)
         remoteConfig = try container.decodeIfPresent(AdaptyRemoteConfig.self, forKey: .remoteConfig)
@@ -61,7 +61,7 @@ extension AdaptyOnboarding: Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(instanceIdentity, forKey: .instanceIdentity)
+        try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(variationId, forKey: .variationId)
         try container.encodeIfPresent(remoteConfig, forKey: .remoteConfig)

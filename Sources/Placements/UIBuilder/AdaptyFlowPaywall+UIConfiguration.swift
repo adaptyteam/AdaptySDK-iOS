@@ -50,8 +50,8 @@ extension Adapty {
 //                value
             } else {
                 try await fetchUISchema(
-                    flowVariationId: flow.variationId,
-                    flowInstanceIdentity: flow.instanceIdentity,
+                    flowId: flow.id,
+                    viewConfigurationId: viewConfiguration.id,
                     loadTimeout: loadTimeout
                 )
             }
@@ -100,22 +100,21 @@ extension Adapty {
 //        return nil
 //    }
 
-
-
     private func fetchUISchema(
-        flowVariationId: String,
-        flowInstanceIdentity: String,
+        flowId: String,
+        viewConfigurationId: String,
         loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> AdaptyUISchema {
-        let httpSession = httpSession
+        let session = httpFallbackSession
         let apiKeyPrefix = apiKeyPrefix
         let isTestUser = profileManager?.isTestUser ?? false
 
         do {
             return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
-                try await httpSession.fetchUISchema(
+                try await session.fetchUISchema(
                     apiKeyPrefix: apiKeyPrefix,
-                    flowVariationId: flowVariationId,
+                    flowId: flowId,
+                    viewConfigurationId: viewConfigurationId,
                     disableServerCache: isTestUser
                 )
             }
@@ -130,9 +129,10 @@ extension Adapty {
         }
 
         do {
-            return try await httpFallbackSession.fetchFallbackUISchema(
+            return try await httpSession.fetchFallbackUISchema(
                 apiKeyPrefix: apiKeyPrefix,
-                flowInstanceIdentity: flowInstanceIdentity,
+                flowId: flowId,
+                viewConfigurationId: viewConfigurationId,
                 disableServerCache: isTestUser
             )
         } catch {

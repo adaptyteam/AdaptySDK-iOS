@@ -7,7 +7,7 @@
 
 protocol PlacementContent: Sendable, Codable {
     var placement: AdaptyPlacement { get }
-    var instanceIdentity: String { get }
+    var id: String { get }
     var variationId: String { get }
     var name: String { get }
 }
