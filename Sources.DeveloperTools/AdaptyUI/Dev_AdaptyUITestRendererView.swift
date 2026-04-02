@@ -40,7 +40,8 @@ public extension AdaptyUI {
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyUIAssetsResolver?,
-            systemRequestsHandler: AdaptyUISystemRequestsHandler?
+            systemRequestsHandler: AdaptyUISystemRequestsHandler?,
+            rtlOverride: Bool?
         ) {
             self.logId = logId
             self.observerModeResolver = observerModeResolver
@@ -70,7 +71,8 @@ public extension AdaptyUI {
             )
             screensViewModel = AdaptyUIScreensViewModel(
                 logId: logId,
-                viewConfiguration: viewConfiguration
+                viewConfiguration: viewConfiguration,
+                rtlOverride: rtlOverride
             )
             actionHandler = AdaptyUIStateActionHandler(
                 productsViewModel: productsViewModel,
@@ -132,6 +134,7 @@ public struct Dev_AdaptyUIRendererView: View {
         assetsResolver: AdaptyUIAssetsResolver?,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
         safeAreaOverride: EdgeInsets? = nil,
+        rtlOverride: Bool? = nil,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUIBuilder.Action) -> Void)? = nil,
@@ -149,7 +152,8 @@ public struct Dev_AdaptyUIRendererView: View {
             tagResolver: ["TEST_TAG": "Adapty"],
             timerResolver: nil,
             assetsResolver: assetsResolver,
-            systemRequestsHandler: systemRequestsHandler
+            systemRequestsHandler: systemRequestsHandler,
+            rtlOverride: rtlOverride
         )
 
         self.didAppear = didAppear

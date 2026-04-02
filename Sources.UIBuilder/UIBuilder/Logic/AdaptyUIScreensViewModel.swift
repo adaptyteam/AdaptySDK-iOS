@@ -20,16 +20,20 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     private let logId: String
     private let viewConfiguration: VC
 
-    var isRightToLeft: Bool { viewConfiguration.isRightToLeft }
+    var isRightToLeft: Bool { rtlOverride ?? viewConfiguration.isRightToLeft }
+    
+    private let rtlOverride: Bool?
 
     @Published
     private(set) var navigatorsViewModels: [AdaptyUINavigatorViewModel]
 
     package init(
         logId: String,
-        viewConfiguration: AdaptyUIConfiguration
+        viewConfiguration: AdaptyUIConfiguration,
+        rtlOverride: Bool? = nil
     ) {
         self.logId = logId
+        self.rtlOverride = rtlOverride
         self.viewConfiguration = viewConfiguration
         navigatorsViewModels = []
     }
