@@ -49,12 +49,12 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
         case let .button(button, _):
             AdaptyUIButtonView(button)
         case let .row(row, _):
-            AdaptyUIRowView(
+            AdaptyUIFlexRowView(
                 row,
                 screenHolderBuilder: screenHolderBuilder
             )
         case let .column(column, _):
-            AdaptyUIColumnView(
+            AdaptyUIFlexColumnView(
                 column,
                 screenHolderBuilder: screenHolderBuilder
             )
