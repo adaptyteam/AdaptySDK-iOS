@@ -5,7 +5,9 @@
 //  Created by Aleksei Valiano on 08.04.2025.
 //
 
-protocol PlacementContent: Sendable, Codable {
+import Foundation
+
+protocol PlacementContent: Sendable, Encodable, DecodableWithConfiguration where DecodingConfiguration == AdaptyPlacement.DecodingConfiguration {
     var placement: AdaptyPlacement { get }
     var id: String { get }
     var variationId: String { get }
@@ -13,7 +15,7 @@ protocol PlacementContent: Sendable, Codable {
 }
 
 extension PlacementContent {
-    func equalAllLocales(_ other: PlacementContent) -> Bool {
+    func equalAllLocales(_ other: some PlacementContent) -> Bool {
         if let onbording = self as? AdaptyOnboarding, let other = other as? AdaptyOnboarding {
             onbording.remoteConfig?.adaptyLocale == other.remoteConfig?.adaptyLocale
         } else if let flow = self as? AdaptyFlow, let other = other as? AdaptyFlow {

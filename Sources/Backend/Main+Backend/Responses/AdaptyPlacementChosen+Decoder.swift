@@ -39,15 +39,17 @@ extension AdaptyPlacementChosen {
                 return response.replaceBody(AdaptyPlacementChosen.restore(cached))
             }
 
-            jsonDecoder.userInfo.setPlacement(placement)
-            jsonDecoder.userInfo.setUserId(userId)
-            if let requestLocale {
-                jsonDecoder.userInfo.setRequestLocale(requestLocale)
-            }
+            var configuration = AdaptyPlacement.DecodingConfiguration(
+                userId: userId,
+                placement: placement,
+                requestLocale: requestLocale,
+                variationId: nil
+            )
 
             let draw = try jsonDecoder.decode(
                 Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
-                from: body
+                from: body,
+                with: configuration
             ).value
 
             guard let variationId = try await variationIdResolver?(placementId, draw),
@@ -59,11 +61,12 @@ extension AdaptyPlacementChosen {
                 return response.replaceBody(AdaptyPlacementChosen.draw(draw))
             }
 
-            jsonDecoder.userInfo.setPlacementVariationId(variationId)
+            configuration.variationId = variationId
 
             let variation = try jsonDecoder.decode(
                 Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
-                from: body
+                from: body,
+                with: configuration
             ).value
 
             return response.replaceBody(AdaptyPlacementChosen.draw(variation))
@@ -97,19 +100,22 @@ extension AdaptyPlacementChosen {
                 return response.replaceBody(AdaptyPlacementChosen.restore(cached))
             }
 
-            jsonDecoder.userInfo.setPlacement(placement)
-            if let requestLocale {
-                jsonDecoder.userInfo.setRequestLocale(requestLocale)
-            }
-
             let variation = try jsonDecoder.decode(
                 Backend.Response.Data<AdaptyPlacement.Variation>.self,
                 from: body
             ).value
 
+            let configuration = AdaptyPlacement.DecodingConfiguration(
+                userId: userId,
+                placement: placement,
+                requestLocale: requestLocale,
+                variationId: nil
+            )
+
             let content = try jsonDecoder.decode(
                 Backend.Response.Data<Content>.self,
-                from: body
+                from: body,
+                with: configuration
             ).value
 
             let draw = AdaptyPlacement.Draw<Content>(
@@ -123,3 +129,4 @@ extension AdaptyPlacementChosen {
         }
     }
 }
+

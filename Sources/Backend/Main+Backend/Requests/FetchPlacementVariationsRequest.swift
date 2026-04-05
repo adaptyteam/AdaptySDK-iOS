@@ -81,7 +81,7 @@ private struct FetchOnboardingVariationsRequest: BackendRequest {
         headers = HTTPHeaders()
             .setOnboardingLocale(locale)
             .setUserProfileId(userId)
-            .setOnboardingUIVersion(AdaptyOnboarding.ViewConfiguration.uiVersion)
+            .setOnboardingUIVersion(AdaptyOnboarding.viewConfigurationVersion)
             .setCrossPlacementEligibility(crossPlacementEligible)
             .setSegmentId(segmentId)
 

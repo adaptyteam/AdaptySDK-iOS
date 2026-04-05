@@ -10,7 +10,7 @@ package extension Adapty {
         try await trackEvent(
             .flowShowed(.init(
                 variationId: flow.variationId,
-                viewConfigurationId: flow.viewConfiguration?.id
+                viewConfigurationId: flow.viewConfigurationId
             ))
         )
     }

@@ -31,25 +31,6 @@ final class PlacementStorage {
         }
     }
 
-//    func restoreFlow(
-//        _ placementId: String,
-//        withVariationId: String,
-//        withInstanceIdentity: String,
-//        withPlacementVersion: Int64,
-//        withPlacementRevision: Int
-//    ) -> AdaptyFlow? {
-//        guard let paywall: AdaptyFlow = Self.getPlacement(placementId)?.value,
-//              paywall.variationId == withVariationId,
-//              paywall.instanceIdentity == withInstanceIdentity,
-//              paywall.placement.version == withPlacementVersion,
-//              paywall.placement.revision == withPlacementRevision
-//        else {
-//            return nil
-//        }
-//
-//        return paywall
-//    }
-
     func getPlacementById<Content: PlacementContent>(
         _ placementId: String,
         withLocale locale: AdaptyLocale? = nil,
@@ -89,3 +70,4 @@ final class PlacementStorage {
         OnboardingStorage.clear()
     }
 }
+

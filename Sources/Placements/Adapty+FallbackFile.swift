@@ -59,11 +59,10 @@ extension PlacementStorage {
         let cachedB: AdaptyPlacementChosen<Content>? = cachedA != nil ? nil
             : getPlacement(byPlacementId: placementId, withVariationId: nil, userId: userId, locale: locale)
 
-        let cached = cachedA ?? cachedB
 
         guard let fallbackFile = Adapty.fallbackPlacements, fallbackFile.contains(placementId: placementId) ?? true
         else {
-            guard let cached else { return nil }
+            guard let cached = cachedA ?? cachedB else { return nil }
             Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version) no-fallback")
             return cached
         }

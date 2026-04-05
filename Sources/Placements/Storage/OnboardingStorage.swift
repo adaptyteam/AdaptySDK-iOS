@@ -26,7 +26,6 @@ final class OnboardingStorage {
             return [:]
         }
         do {
-            var userInfo = CodingUserInfo()
             return try userDefaults.getJSON(
                 [VH<Content>].self,
                 forKey: Constants.storageKey

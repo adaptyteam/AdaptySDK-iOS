@@ -29,13 +29,10 @@ public extension Adapty {
         ]
 
         return try await withActivatedSDK(methodName: .getFlowForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
-            let flow: AdaptyFlow = try await sdk.getPlacementForDefaultAudience(
+            try await sdk.getPlacementForDefaultAudience(
                 placementId,
                 fetchPolicy
             )
-
-            AdaptyUIBuilder.sendImageUrlsToObserver(flow)
-            return flow
         }
     }
 
@@ -150,3 +147,4 @@ public extension Adapty {
         }
     }
 }
+

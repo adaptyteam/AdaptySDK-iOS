@@ -28,40 +28,22 @@ extension Adapty {
         locale: AdaptyLocale,
         loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> AdaptyUIConfiguration {
-        guard let viewConfiguration = flow.viewConfiguration else {
+        guard let viewConfigurationId = flow.viewConfigurationId else {
             throw .isNoViewConfigurationInFlow()
         }
 
-        let schema: AdaptyUISchema =
-            if let value = try? viewConfiguration.schema {
-                value
-//            } else if let restored = restore(
-//                viewConfigurationLocale: viewConfiguration.locale,
-//                placementId: paywall.placement.id,
-//                paywallVariationId: paywall.variationId,
-//                paywallInstanceIdentity: paywall.instanceIdentity,
-//                placementRevision: paywall.placement.revision,
-//                placementVersion: paywall.placement.version
-//            ),
-//                let vc = restored.viewConfiguration,
-//                vc.locale == viewConfiguration.locale,
-//                let value = try? vc.schema
-//            {
-//                value
-            } else {
-                try await fetchUISchema(
-                    flowId: flow.id,
-                    viewConfigurationId: viewConfiguration.id,
-                    loadTimeout: loadTimeout
-                )
-            }
+        let schema = try await fetchUISchema(
+            flowId: flow.id,
+            viewConfigurationId: viewConfigurationId,
+            loadTimeout: loadTimeout
+        )
 
         AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: locale.id)
 
         let extractLocaleTask = Task.detachedWithThrowsTyped(priority: .userInitiated) { () async throws(AdaptyError) -> AdaptyUIConfiguration in
             do {
                 return try schema.extractUIConfiguration(
-                    id: viewConfiguration.id,
+                    id: viewConfigurationId,
                     withLocaleId: locale.id
                 )
             } catch {
@@ -71,34 +53,6 @@ extension Adapty {
 
         return try await extractLocaleTask.valueWithThrowsTyped()
     }
-
-//    private func restore(
-//        viewConfigurationLocale _: AdaptyLocale,
-//        placementId: String,
-//        variationId: String,
-//        instanceIdentity: String,
-//        placementRevision: Int,
-//        placementVersion: Int64
-//    ) -> AdaptyFlow? {
-//        if let cached: AdaptyFlow = profileManager?.placementStorage.restoreFlow(
-//            placementId,
-//            withVariationId: variationId,
-//            withInstanceIdentity: instanceIdentity,
-//            withPlacementVersion: placementVersion,
-//            withPlacementRevision: placementRevision
-//        ) { return cached }
-//
-//        if let fallbackFile = Adapty.fallbackPlacements,
-//           fallbackFile.version == placementVersion,
-//           let fallback: AdaptyFlow = fallbackFile.restoreFlow(
-//               placementId,
-//               withVariationId: variationId,
-//               withInstanceIdentity: instanceIdentity,
-//               withPlacementRevision: placementRevision
-//           ) { return fallback }
-//
-//        return nil
-//    }
 
     private func fetchUISchema(
         flowId: String,
@@ -140,3 +94,4 @@ extension Adapty {
         }
     }
 }
+

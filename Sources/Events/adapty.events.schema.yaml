@@ -1,4 +1,4 @@
-$schema: "https://json-schema.org/draft/2020-12/schema"
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
 $id: "https://adapty.io/events/4_0_0/schema"
 title: "Adapty SDK Event"
 type: object

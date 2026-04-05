@@ -76,7 +76,7 @@ private struct FetchOnboardingRequest: BackendRequest {
         headers = HTTPHeaders()
             .setOnboardingLocale(locale)
             .setUserProfileId(userId)
-            .setOnboardingUIVersion(AdaptyOnboarding.ViewConfiguration.uiVersion)
+            .setOnboardingUIVersion(AdaptyOnboarding.viewConfigurationVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
 

@@ -22,10 +22,10 @@ extension AdaptyPlacement.Draw {
     }
 }
 
-extension AdaptyPlacement.Draw: Decodable {
-    init(from decoder: Decoder) throws {
-        let userId = try decoder.userInfo.userId
-        let placement = try decoder.userInfo.placement
+extension AdaptyPlacement.Draw: DecodableWithConfiguration {
+    init(from decoder: Decoder, configuration: AdaptyPlacement.DecodingConfiguration) throws {
+        let userId = try configuration.userIdOrThrow
+        let placement = configuration.placement
         let placementAudienceVersionId = placement.audienceVersionId
 
         let variations = try [AdaptyPlacement.Variation](from: decoder)
@@ -35,7 +35,7 @@ extension AdaptyPlacement.Draw: Decodable {
         }
 
         let index: Int
-        if let variationId = decoder.userInfo.placementVariationIdOrNil {
+        if let variationId = configuration.variationId {
             guard let founded = variations.firstIndex(where: { $0.variationId == variationId }) else {
                 throw PlacementDecodingError.notFoundVariationId
             }
@@ -53,7 +53,7 @@ extension AdaptyPlacement.Draw: Decodable {
 
         let variation = variations[index]
 
-        let content = try Self.content(from: decoder, index: index)
+        let content = try Self.content(from: decoder, index: index, configuration: configuration)
 
         self.init(
             userId: userId,
@@ -63,17 +63,16 @@ extension AdaptyPlacement.Draw: Decodable {
         )
     }
 
-    private static func content(from decoder: Decoder, index: Int) throws -> Content {
+    private static func content(from decoder: Decoder, index: Int, configuration: AdaptyPlacement.DecodingConfiguration) throws -> Content {
         var array = try decoder.unkeyedContainer()
         while !array.isAtEnd {
-            if array.currentIndex == index {
-                return try array.decode(Content.self)
+            let currentIndex = array.currentIndex
+            let contentDecoder = try array.superDecoder()
+            if currentIndex == index {
+                return try Content(from: contentDecoder, configuration: configuration)
             }
-            _ = try array.decode(PassObject.self)
         }
 
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placement content with index \(index) not found"))
     }
 }
-
-private struct PassObject: Decodable {}

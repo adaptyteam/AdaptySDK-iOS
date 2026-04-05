@@ -1,13 +1,14 @@
 //
 //  JSONDecoder+DecodingConfiguration.swift
-//  AdaptyUIBuilder
+//  Adapty
 //
-//  Created by Aleksei Valiano on 05.12.2025.
+//  Created by Aleksei Valiano on 03.04.2026.
 //
 
 import Foundation
 
 extension JSONDecoder {
+    
     func decode<T: DecodableWithConfiguration>(
         _ type: T.Type,
         from data: Data,

@@ -36,14 +36,11 @@ extension Adapty {
         ]
 
         return try await withActivatedSDK(methodName: .getFlow, logParams: logParams) { sdk throws(AdaptyError) in
-            let flow: AdaptyFlow = try await sdk.getPlacement(
+            try await sdk.getPlacement(
                 placementId: placementId,
                 fetchPolicy: fetchPolicy,
                 loadTimeout: loadTimeout
             )
-            AdaptyUIBuilder.sendImageUrlsToObserver(flow)
-
-            return flow
         }
     }
 
@@ -329,21 +326,22 @@ extension Adapty {
         _ locale: AdaptyLocale?,
         withCrossPlacmentABTest: Bool
     ) -> Content? {
-        let chosen: AdaptyPlacementChosen<Content>? = if let manager = try? profileManager(withProfileId: userId) {
-            manager.placementStorage.getPlacementWithFallback(
-                byPlacementId: placementId,
-                withVariationId: withCrossPlacmentABTest ? manager.crossPlacmentStorage.state?.variationId(placementId: placementId) : nil,
-                userId: userId,
-                locale: locale
-            )
-        } else {
-            Adapty.fallbackPlacements?.getPlacement(
-                byPlacementId: placementId,
-                withVariationId: nil,
-                userId: userId,
-                requestLocale: locale
-            )
-        }
+        let chosen: AdaptyPlacementChosen<Content>? =
+            if let manager = try? profileManager(withProfileId: userId) {
+                manager.placementStorage.getPlacementWithFallback(
+                    byPlacementId: placementId,
+                    withVariationId: withCrossPlacmentABTest ? manager.crossPlacmentStorage.state?.variationId(placementId: placementId) : nil,
+                    userId: userId,
+                    locale: locale
+                )
+            } else {
+                Adapty.fallbackPlacements?.getPlacement(
+                    byPlacementId: placementId,
+                    withVariationId: nil,
+                    userId: userId,
+                    requestLocale: locale
+                )
+            }
 
         guard let chosen else { return nil }
 
@@ -465,3 +463,4 @@ private extension HTTPError {
         return decodingError.contains(value)
     }
 }
+
