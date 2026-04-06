@@ -19,7 +19,9 @@ extension Schema.Font {
         weight: 400,
         italic: false,
         defaultSize: 15,
-        defaultColor: .black
+        defaultColor: .black,
+        defaultLetterSpacing: nil,
+        defaultLineHeight: nil
     )
 }
 
@@ -41,6 +43,8 @@ extension Schema.Font: Codable {
         case italic
         case defaultSize = "size"
         case defaultColor = "color"
+        case defaultLetterSpacing = "letter_spacing"
+        case defaultLineHeight = "line_height"
     }
 
     init(from decoder: Decoder) throws {
@@ -62,6 +66,9 @@ extension Schema.Font: Codable {
         defaultSize = try container.decodeIfPresent(Double.self, forKey: .defaultSize) ?? Self.default.defaultSize
 
         defaultColor = try container.decodeIfPresent(Schema.Color.self, forKey: .defaultColor) ?? Self.default.defaultColor
+
+        defaultLetterSpacing = try container.decodeIfPresent(Double.self, forKey: .defaultLetterSpacing)
+        defaultLineHeight = try container.decodeIfPresent(Double.self, forKey: .defaultLineHeight)
     }
 
     func encode(to encoder: any Encoder) throws {
@@ -86,5 +93,9 @@ extension Schema.Font: Codable {
         if defaultColor != Self.default.defaultColor {
             try container.encode(defaultColor, forKey: .defaultColor)
         }
+
+        try container.encodeIfPresent(defaultLetterSpacing, forKey: .defaultLetterSpacing)
+        try container.encodeIfPresent(defaultLineHeight, forKey: .defaultLineHeight)
     }
 }
+

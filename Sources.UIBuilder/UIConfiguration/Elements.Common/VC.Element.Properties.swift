@@ -20,7 +20,7 @@ extension VC.Element {
         let background: [VC.AlignedElement]?
         let overlay: [VC.AlignedElement]?
 
-        let onAppear: [VC.Animation]
+        let eventHandlers: [VC.EventHandler]
         let focusId: String?
         let interactionEnabled: VC.Variable?
     }
@@ -37,9 +37,18 @@ extension VC.Element.Properties {
             && opacity == 1.0
             && background?.isEmpty ?? true
             && overlay?.isEmpty ?? true
-            && onAppear.isEmpty
+            && eventHandlers.isEmpty
             && focusId == .none
             && interactionEnabled == .none
+    }
+
+    @available(*, deprecated, message: "Use eventHandlers instead.")
+    var onAppear: [VC.Animation] {
+        eventHandlers.filter {
+            $0.animations.isNotEmpty && $0.triggers.contains(where: { trigger in
+                trigger.filter == nil && trigger.screenTransitions == nil && trigger.events.contains(.onWillAppiar)
+            })
+        }.flatMap(\.animations)
     }
 }
 

@@ -16,5 +16,8 @@ extension VC {
         let italic: Bool
         let defaultSize: Double
         let defaultColor: Color
+
+        let defaultLetterSpacing: Double?
+        let defaultLineHeight: Double?
     }
 }

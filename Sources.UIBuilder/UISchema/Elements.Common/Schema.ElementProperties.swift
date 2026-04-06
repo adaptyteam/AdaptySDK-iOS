@@ -95,7 +95,7 @@ extension Schema.ConfigurationBuilder {
                 opacity: value.opacity,
                 background: background ?? [],
                 overlay: overlay ?? [],
-                onAppear: value.onAppear,
+                eventHandlers: value.eventHandlers,
                 focusId: value.focusId,
                 interactionEnabled: value.interactionEnabled
             )
@@ -109,7 +109,7 @@ extension Schema.ConfigurationBuilder {
                 opacity: Schema.ElementProperties.default.opacity,
                 background: background,
                 overlay: overlay,
-                onAppear: [],
+                eventHandlers: [],
                 focusId: nil,
                 interactionEnabled: nil
             )
@@ -127,8 +127,9 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         case scale
         case visibility
         case opacity
-        case transitionIn = "transition_in"
-        case onAppear = "on_appear"
+        case legacyTransitionIn = "transition_in"
+        case eventHandlers = "event_handlers"
+        case legacyOnAppear = "on_appear"
         case overlay
         case background
         case focusId = "focus_id"
@@ -138,14 +139,35 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let onAppear: [Schema.Animation] =
-            if container.contains(.transitionIn), !container.contains(.onAppear) {
-                if let animation = try container.decodeIfPresent(Schema.Animation.self, forKey: .transitionIn) { [animation] } else { [] }
-            } else {
-                if let array = try? container.decodeIfPresent([Schema.Animation].self, forKey: .onAppear) {
-                    array
-                } else { [] }
-            }
+        let eventHandlers: [Schema.EventHandler]
+        if container.contains(.eventHandlers) {
+            eventHandlers = try container.decodeIfPresent([Schema.EventHandler].self, forKey: .eventHandlers) ?? []
+        } else {
+            let animations: [Schema.Animation] =
+                if container.contains(.legacyOnAppear) {
+                    if let array = try? container.decodeIfPresent([Schema.Animation].self, forKey: .legacyOnAppear) {
+                        array
+                    } else { [] }
+                } else {
+                    if let animation = try container.decodeIfPresent(Schema.Animation.self, forKey: .legacyTransitionIn) { [animation] } else { [] }
+                }
+
+            eventHandlers =
+                if animations.isEmpty {
+                    []
+                } else {
+                    [.init(
+                        triggers: [.init(
+                            events: [.onWillAppiar],
+                            filter: nil,
+                            screenTransitions: nil
+                        )],
+                        animations: animations,
+                        onAnimationsFinish: [],
+                        actions: []
+                    )]
+                }
+        }
 
         let opacity = if container.contains(.visibility), !container.contains(.opacity) {
             try container.decodeIfPresent(Bool.self, forKey: .visibility) ?? true ? 1.0 : 0.0
@@ -166,7 +188,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
             opacity: opacity,
             background: nil,
             overlay: nil,
-            onAppear: onAppear,
+            eventHandlers: eventHandlers.filter { !$0.isEmpty },
             focusId: container.decodeIfPresent(String.self, forKey: .focusId),
             interactionEnabled: container.decodeIfPresent(Schema.Variable.self, forKey: .interactionEnabled)
         )
