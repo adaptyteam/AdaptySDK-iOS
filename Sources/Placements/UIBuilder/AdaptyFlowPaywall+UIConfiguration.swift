@@ -72,15 +72,7 @@ extension Adapty {
                     disableServerCache: isTestUser
                 )
             }
-        } catch let error as HTTPError {
-            guard Backend.canUseFallbackServer(error) else {
-                throw error.asAdaptyError
-            }
-        } catch {
-            guard error is TimeoutError else {
-                throw .unknown(error)
-            }
-        }
+        } catch {}
 
         do {
             return try await httpSession.fetchFallbackUISchema(
