@@ -13,6 +13,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private let animations: [VC.Animation]
     private var play: Binding<[VC.Animation]>
 
+    private let initialBlurRadius: Double
+
     private let initialShadowFilling: VC.AssetReference?
     private let initialOffset: VC.Offset
     private let initialShadowOffset: VC.Offset
@@ -39,6 +41,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     @State private var opacity: Double
 
+    @State private var animatedBlurRadius: Double?
+
     @State private var animationTokens = Set<AdaptyUIAnimationToken>()
 
     init(
@@ -55,6 +59,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.rotationAnchor = properties.rotation?.anchor.unitPoint ?? .center
 
         self.initialOffset = properties.offset ?? .zero
+
+        self.initialBlurRadius = properties.decorator?.blurRadius ?? .zero
 
         self.initialShadowFilling = properties.decorator?.shadow?.filling
         self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
@@ -73,6 +79,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         initialRotation: Angle,
         initialRotationAnchor: UnitPoint,
         initialOffset: VC.Offset,
+        initialBlurRadius: Double,
         initialShadowFilling: VC.AssetReference?,
         initialShadowOffset: VC.Offset,
         initialShadowBlurRadius: Double,
@@ -87,6 +94,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.rotationAnchor = initialRotationAnchor
 
         self.initialOffset = initialOffset
+
+        self.initialBlurRadius = initialBlurRadius
 
         self.initialShadowFilling = initialShadowFilling
         self.initialShadowOffset = initialShadowOffset
@@ -104,6 +113,10 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             width: animatedOffsetX ?? initialOffset.x.points(.horizontal, screenSize, safeArea),
             height: animatedOffsetY ?? initialOffset.y.points(.vertical, screenSize, safeArea)
         )
+    }
+
+    private var resolvedBlurRadius: Double {
+        animatedBlurRadius ?? initialBlurRadius
     }
 
     @State private var animatedShadowFilling: VC.AssetReference?
@@ -143,6 +156,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                 blurRadius: resolvedShadowBlurRadius,
                 offset: resolvedShadowOffset
             )
+            .blur(radius: resolvedBlurRadius)
             .offset(resolvedOffset)
             .rotationEffect(rotation, anchor: rotationAnchor)
             .scaleEffect(x: scaleX, y: scaleY, anchor: scaleAnchor)
@@ -245,6 +259,16 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
+            case let .blur(timeline, value):
+                tokens.insert(
+                    timeline.animate(
+                        from: value.start,
+                        to: value.end,
+                        updateBlock: {
+                            self.animatedBlurRadius = $0
+                        }
+                    )
+                )
             default:
                 break
             }
@@ -282,6 +306,7 @@ extension View {
         initialRotation: Angle = .zero,
         initialRotationAnchor: UnitPoint = .center,
         initialOffset: VC.Offset = .zero,
+        initialBlurRadius: Double = .zero,
         initialShadowFilling: VC.AssetReference? = nil,
         initialShadowOffset: VC.Offset = .zero,
         initialShadowBlurRadius: Double = .zero,
@@ -296,6 +321,7 @@ extension View {
                 initialRotation: initialRotation,
                 initialRotationAnchor: initialRotationAnchor,
                 initialOffset: initialOffset,
+                initialBlurRadius: initialBlurRadius,
                 initialShadowFilling: initialShadowFilling,
                 initialShadowOffset: initialShadowOffset,
                 initialShadowBlurRadius: initialShadowBlurRadius,
