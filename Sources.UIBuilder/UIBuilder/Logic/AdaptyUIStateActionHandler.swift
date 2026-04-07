@@ -313,6 +313,10 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
             }
         }
     }
+
+    package nonisolated func sendEvents(instanceId: String?, eventIds: [String]) {
+        
+    }
 }
 
 #endif

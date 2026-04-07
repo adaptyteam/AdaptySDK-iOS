@@ -19,6 +19,7 @@ extension Schema.Decorator: Decodable {
         case borderThickness = "thickness"
         case shapeType = "type"
         case shadow
+        case blurRadius = "blur_radius"
     }
 
     init(from decoder: Decoder) throws {
@@ -47,7 +48,8 @@ extension Schema.Decorator: Decodable {
             shapeType: shapeType,
             background: container.decodeIfPresent(Schema.AssetReference.self, forKey: .backgroundAssetId),
             border: border,
-            shadow: container.decodeIfPresent(Schema.Shadow.self, forKey: .shadow)
+            shadow: container.decodeIfPresent(Schema.Shadow.self, forKey: .shadow),
+            blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius)
         )
     }
 }

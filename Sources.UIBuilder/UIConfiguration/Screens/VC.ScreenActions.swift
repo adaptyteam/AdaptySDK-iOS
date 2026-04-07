@@ -12,5 +12,11 @@ extension VC {
         let onOutsideTap: [Action]?
         let onDeviceBack: [Action]?
         let onFocusChange: [Action]?
+
+        let onWillAppiar:[Action]?
+        let onWillDisapper:[Action]?
+        let onDidAppiar:[Action]?
+        let onDidDisapper:[Action]?
     }
 }
+

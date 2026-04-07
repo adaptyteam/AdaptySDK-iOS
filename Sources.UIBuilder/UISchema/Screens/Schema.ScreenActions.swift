@@ -15,7 +15,11 @@ extension Schema.ScreenActions {
     static let empty = Self(
         onOutsideTap: nil,
         onDeviceBack: nil,
-        onFocusChange: nil
+        onFocusChange: nil,
+        onWillAppiar: nil,
+        onWillDisapper: nil,
+        onDidAppiar: nil,
+        onDidDisapper: nil
     )
 }
 
@@ -24,6 +28,10 @@ extension Schema.ScreenActions: Codable {
         case onOutsideTap = "on_outside_tap"
         case onDeviceBack = "on_device_back"
         case onFocusChange = "on_focus_change"
+        case onWillAppiar = "on_will_appiar"
+        case onWillDisapper = "on_will_disappiar"
+        case onDidAppiar = "on_did_appiar"
+        case onDidDisapper = "on_did_disappiar"
     }
 
     init(from decoder: any Decoder) throws {
@@ -31,7 +39,11 @@ extension Schema.ScreenActions: Codable {
         try self.init(
             onOutsideTap: container.decodeIfPresentActions(forKey: .onOutsideTap),
             onDeviceBack: container.decodeIfPresentActions(forKey: .onDeviceBack),
-            onFocusChange: container.decodeIfPresentActions(forKey: .onFocusChange)
+            onFocusChange: container.decodeIfPresentActions(forKey: .onFocusChange),
+            onWillAppiar: container.decodeIfPresentActions(forKey: .onWillAppiar),
+            onWillDisapper: container.decodeIfPresentActions(forKey: .onWillDisapper),
+            onDidAppiar: container.decodeIfPresentActions(forKey: .onDidAppiar),
+            onDidDisapper: container.decodeIfPresentActions(forKey: .onDidDisapper)
         )
     }
 
@@ -40,6 +52,10 @@ extension Schema.ScreenActions: Codable {
         try container.encodeIfPresent(onOutsideTap, forKey: .onOutsideTap)
         try container.encodeIfPresent(onDeviceBack, forKey: .onDeviceBack)
         try container.encodeIfPresent(onFocusChange, forKey: .onFocusChange)
+        try container.encodeIfPresent(onWillAppiar, forKey: .onWillAppiar)
+        try container.encodeIfPresent(onWillDisapper, forKey: .onWillDisapper)
+        try container.encodeIfPresent(onDidAppiar, forKey: .onDidAppiar)
+        try container.encodeIfPresent(onDidDisapper, forKey: .onDidDisapper)
     }
 }
 

@@ -178,7 +178,11 @@ private extension Decoder {
                     scope: .global
                 )],
                 onDeviceBack: nil,
-                onFocusChange: nil
+                onFocusChange: nil,
+                onWillAppiar: nil,
+                onWillDisapper: nil,
+                onDidAppiar: nil,
+                onDidDisapper: nil
             )
         )
     }

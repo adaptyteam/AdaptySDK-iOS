@@ -41,6 +41,7 @@ extension VS {
     func showAppRate(_ params: JSValue)
     func showAlertDialog(_ params: JSValue)
     func showRequestPermission(_ params: JSValue)
+    func sendEvents(_ params: JSValue)
 }
 
 extension VS.JSActionDispatcher {
@@ -136,7 +137,6 @@ extension VS.JSActionDispatcher: JSActionBridge {
             Log.viewState.error(#"SDK.webPurchaseProduct: required parameter "productId" is missing"#)
             return
         }
-
 
         handler?.purchaseProduct(productId: productId, service: .openWebPaywall(openIn: openIn))
     }
@@ -315,7 +315,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         )
     }
 
-    func showAppRate(_ params: JSValue) {
+    func showAppRate(_: JSValue) {
         handler?.showAppRate()
     }
 
@@ -341,6 +341,26 @@ extension VS.JSActionDispatcher: JSActionBridge {
             params: VS.ShowRequestPermissionParameters.fromDictionary(dict),
             callback: VS.JSAction(from: params.forProperty("callback"))
         )
+    }
+
+    func sendEvents(_ params: JSValue) {
+        var instanceId: String?
+        var events: [String]?
+
+        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
+            instanceId = dict["instanceId"] as? String
+
+            if let v = dict["events"] as? [String] {
+                events = v
+            }
+        }
+
+        guard let events, events.isNotEmpty else {
+            Log.viewState.error(#"SDK.sendEvents: required parameter "events" is missing or corupted"#)
+            return
+        }
+
+        handler?.sendEvents(instanceId: instanceId, eventIds: events)
     }
 }
 
