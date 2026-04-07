@@ -128,11 +128,13 @@ public struct Dev_AdaptyUIRendererView: View {
     private let didFailRendering: ((AdaptyUIBuilderError) -> Void)?
 
     private let safeAreaOverride: EdgeInsets?
+    private let showDebugOverlay: Bool
 
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
         assetsResolver: AdaptyUIAssetsResolver?,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
+        showDebugOverlay: Bool = false,
         safeAreaOverride: EdgeInsets? = nil,
         rtlOverride: Bool? = nil,
         didAppear: (() -> Void)? = nil,
@@ -144,6 +146,7 @@ public struct Dev_AdaptyUIRendererView: View {
         didFailRendering: ((AdaptyUIBuilderError) -> Void)? = nil
     ) {
         self.safeAreaOverride = safeAreaOverride
+        self.showDebugOverlay = showDebugOverlay
         self.viewConfiguration = viewConfiguration.wrapped
         galleryConfiguration = .init(
             logId: "test",
@@ -179,7 +182,7 @@ public struct Dev_AdaptyUIRendererView: View {
         galleryConfiguration.eventsHandler.didFailRendering = didFailRendering
 
         return AdaptyUIPaywallView_Internal(
-            showDebugOverlay: false,
+            showDebugOverlay: showDebugOverlay,
             displayMissingTags: true,
             safeAreaOverride: safeAreaOverride
         )
