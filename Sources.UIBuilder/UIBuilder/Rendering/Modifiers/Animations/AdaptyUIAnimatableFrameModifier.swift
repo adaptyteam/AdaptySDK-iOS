@@ -132,7 +132,7 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
                 }
 
                 if let startHeight = range.start.height {
-                    animatedWidth = startHeight.points(.horizontal, screenSize, safeArea)
+                    animatedHeight = startHeight.points(.vertical, screenSize, safeArea)
                 }
 
                 tokens.insert(
@@ -145,7 +145,7 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
                             }
 
                             if let currentHeight = v.height {
-                                animatedHeight = currentHeight.points(.horizontal, screenSize, safeArea)
+                                animatedHeight = currentHeight.points(.vertical, screenSize, safeArea)
                             }
                         }
                     )
