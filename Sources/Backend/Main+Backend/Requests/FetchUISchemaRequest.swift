@@ -26,7 +26,7 @@ struct FetchUISchemaRequest: BackendRequest {
         endpoint = HTTPEndpoint(
             method: .get,
             path:
-            "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(viewConfigurationId)/\(Adapty.uiBuilderVersion)/config/"
+            "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(viewConfigurationId)/config/"
         )
 
         headers = HTTPHeaders()
@@ -76,3 +76,4 @@ extension Backend.MainExecutor {
         return response.body
     }
 }
+
