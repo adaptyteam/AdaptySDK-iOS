@@ -10,7 +10,6 @@ extension VC {
         let triggers: [Trigger]
         let animations: [Animation]
         let onAnimationsFinish: [Action]
-        let actions: [Action]
     }
 }
 

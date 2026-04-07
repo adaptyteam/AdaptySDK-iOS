@@ -163,8 +163,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
                             screenTransitions: nil
                         )],
                         animations: animations,
-                        onAnimationsFinish: [],
-                        actions: []
+                        onAnimationsFinish: []
                     )]
                 }
         }

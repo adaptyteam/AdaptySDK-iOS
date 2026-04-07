@@ -15,7 +15,6 @@ extension Schema.EventHandler {
         triggers.isEmpty
             && animations.isEmpty
             && onAnimationsFinish.isEmpty
-            && actions.isEmpty
     }
 }
 
@@ -24,7 +23,6 @@ extension Schema.EventHandler: Codable {
         case triggers
         case animations
         case onAnimationsFinish = "on_animations_finish"
-        case actions = "action"
     }
 
     init(from decoder: any Decoder) throws {
@@ -36,27 +34,23 @@ extension Schema.EventHandler: Codable {
             self.init(
                 triggers: [],
                 animations: [],
-                onAnimationsFinish: [],
-                actions: []
+                onAnimationsFinish: []
             )
         }
 
-        let actions = try container.decodeIfPresentActions(forKey: .actions) ?? []
 
         if let animations = try container.decodeIfPresent([Schema.Animation].self, forKey: .animations), !animations.isEmpty {
             try self.init(
                 triggers: triggers,
                 animations: animations,
-                onAnimationsFinish: container.decodeIfPresentActions(forKey: .onAnimationsFinish) ?? [],
-                actions: actions
+                onAnimationsFinish: container.decodeIfPresentActions(forKey: .onAnimationsFinish) ?? []
             )
 
         } else {
             self.init(
                 triggers: triggers,
                 animations: [],
-                onAnimationsFinish: [],
-                actions: actions
+                onAnimationsFinish: []
             )
         }
     }
@@ -66,7 +60,6 @@ extension Schema.EventHandler: Codable {
         try container.encode(triggers, forKey: .triggers)
         try container.encode(animations, forKey: .animations)
         try container.encode(onAnimationsFinish, forKey: .onAnimationsFinish)
-        try container.encode(actions, forKey: .actions)
     }
 }
 
