@@ -12,7 +12,13 @@ import SwiftUI
 import UIKit
 
 typealias AdaptyUIResolvedColorAsset = Color
-typealias AdaptyUIResolvedFontAsset = UIFont
+
+struct AdaptyUIResolvedFontAsset {
+    let font: UIFont
+    let defaultColor: AdaptyUIResolvedColorAsset
+    let defaultLetterSpacing: Double?
+    let defaultLineHeight: Double?
+}
 
 enum AdaptyUIResolvedGradientAsset {
     case linear(LinearGradient)
@@ -48,7 +54,7 @@ enum AdaptyUIResolvedAsset {
     case image(AdaptyUIResolvedImageAsset)
 
     case video(AdaptyUIResolvedVideoAsset)
-    case font(AdaptyUIResolvedFontAsset, defaultColor: AdaptyUIResolvedColorAsset)
+    case font(AdaptyUIResolvedFontAsset)
 }
 
 extension AdaptyUIResolvedAsset {
@@ -105,12 +111,12 @@ extension AdaptyUIResolvedAsset {
         }
     }
 
-    var asFontAsset: (font: AdaptyUIResolvedFontAsset, defaultColor: AdaptyUIResolvedColorAsset)? {
-        guard case let .font(asset, defaultColor) = self else {
+    var asFontAsset: AdaptyUIResolvedFontAsset? {
+        guard case let .font(asset) = self else {
             return nil
         }
 
-        return (asset, defaultColor)
+        return asset
     }
 }
 

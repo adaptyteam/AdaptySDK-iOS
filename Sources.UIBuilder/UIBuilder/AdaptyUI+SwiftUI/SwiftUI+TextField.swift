@@ -53,12 +53,15 @@ extension View {
             Font(attr?.size.map { fa.font.withSize(CGFloat($0)) } ?? fa.font)
         } ?? attr?.size.map { Font.system(size: CGFloat($0)) }
 
+        let tracking = CGFloat(fontAsset?.defaultLetterSpacing ?? 0)
+
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             self
                 .font(resolvedFont)
                 .foregroundColor(colorAsset ?? fontAsset?.defaultColor)
                 .underline(attr?.underline ?? false)
                 .strikethrough(attr?.strike ?? false)
+                .tracking(tracking)
         } else {
             self
                 .font(resolvedFont)

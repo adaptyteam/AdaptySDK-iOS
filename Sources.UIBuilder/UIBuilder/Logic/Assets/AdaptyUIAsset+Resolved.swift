@@ -94,7 +94,14 @@ extension VC.Asset {
         case .video(let video):
             .video(video.resolvedVideo())
         case .font(let font):
-                .font(.create(font, withSize: font.defaultSize), defaultColor: font.defaultColor.resolvedColor)
+            .font(
+                .init(
+                    font: .create(font, withSize: font.defaultSize),
+                    defaultColor: font.defaultColor.resolvedColor,
+                    defaultLetterSpacing: font.defaultLetterSpacing,
+                    defaultLineHeight: font.defaultLineHeight
+                )
+            )
         case .unknown:
             nil
         }

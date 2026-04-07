@@ -106,8 +106,12 @@ extension AdaptyUICustomAsset {
             .video(video.resolvedVideo(id: id))
         case .font(let font): // TODO: default color of Custom fonts
             .font(
-                font,
-                defaultColor: SwiftUI.Color(UIColor.adaptyDefaultTextColor)
+                .init(
+                    font: font,
+                    defaultColor: SwiftUI.Color(UIColor.adaptyDefaultTextColor),
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
+                )
             )
         }
     }
