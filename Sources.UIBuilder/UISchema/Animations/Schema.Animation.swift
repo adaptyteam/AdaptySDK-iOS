@@ -33,6 +33,7 @@ extension Schema.Animation: Codable {
         case background
         case border
         case shadow
+        case blur
     }
 
     init(from decoder: Decoder) throws {
@@ -72,6 +73,11 @@ extension Schema.Animation: Codable {
             self = try .border(.init(from: decoder), .init(from: decoder))
         case .shadow:
             self = try .shadow(.init(from: decoder), .init(from: decoder))
+        case .blur:
+            self = try .blur(
+                .init(from: decoder),
+                container.decode(Range<Double>.self, forKey: .opacity)
+            )
         }
     }
 
@@ -111,6 +117,9 @@ extension Schema.Animation: Codable {
             try container.encode(Types.shadow.rawValue, forKey: .type)
             try value.encode(to: encoder)
             try timeline.encode(to: encoder)
+        case let .blur(timeline, value):
+            try container.encode(Types.blur.rawValue, forKey: .type)
+
         }
     }
 }
