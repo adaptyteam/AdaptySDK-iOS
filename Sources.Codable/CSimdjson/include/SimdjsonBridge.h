@@ -1,5 +1,3 @@
-
-/*
 #ifndef SIMDJSON_BRIDGE_H
 #define SIMDJSON_BRIDGE_H
 
@@ -58,5 +56,4 @@ void sdjson_free(const char* ptr);
 #endif
 
 #endif // SIMDJSON_BRIDGE_H
-*/
 

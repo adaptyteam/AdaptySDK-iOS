@@ -1,5 +1,3 @@
-
-/*
 #include "include/SimdjsonBridge.h"
 #include "simdjson.h"
 #include <cstring>
@@ -100,6 +98,6 @@ void sdjson_free(const char* ptr) {
 }
 
 } // extern "C"
-*/
+
 
 

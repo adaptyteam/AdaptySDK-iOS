@@ -48,7 +48,17 @@ private extension SchemaTests {
             ),
             // font
             (
-                .font(Schema.Font(customId: nil, alias: "Helvetica", familyName: "adapty_system", weight: 400, italic: false, defaultSize: 15, defaultColor: defaultFontColor)),
+                .font(Schema.Font(
+                    customId: nil,
+                    alias: "Helvetica",
+                    familyName: "adapty_system",
+                    weight: 400,
+                    italic: false,
+                    defaultSize: 15,
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
+                )),
                 Json(##"""
                 {
                     "type": "font",
@@ -189,3 +199,4 @@ private extension SchemaTests {
         }
     }
 }
+

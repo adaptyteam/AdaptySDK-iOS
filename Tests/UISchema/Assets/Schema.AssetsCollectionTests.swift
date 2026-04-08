@@ -50,7 +50,9 @@ private extension SchemaTests {
                         weight: 400,
                         italic: false,
                         defaultSize: 15,
-                        defaultColor: defaultFontColor
+                        defaultColor: defaultFontColor,
+                        defaultLetterSpacing: nil,
+                        defaultLineHeight: nil
                     )),
                 ],
                 Json(##"""
@@ -130,3 +132,4 @@ private extension SchemaTests {
         }
     }
 }
+

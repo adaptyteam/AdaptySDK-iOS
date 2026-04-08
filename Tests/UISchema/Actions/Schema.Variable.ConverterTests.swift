@@ -89,7 +89,6 @@ private extension SchemaTests.VariableTests {
                 } else {
                     #expect(obj["converter_params"] != nil)
                 }
-
             case let .unknown(name, param):
                 #expect(obj["converter"] as? String == name)
                 if let param {
@@ -97,6 +96,10 @@ private extension SchemaTests.VariableTests {
                 } else {
                     #expect(obj["converter_params"] == nil)
                 }
+            case .dateTimeWithFormat:
+                break
+            case .dateTimeWithStyle:
+                break
             }
         }
 
@@ -109,3 +112,4 @@ private extension SchemaTests.VariableTests {
         }
     }
 }
+

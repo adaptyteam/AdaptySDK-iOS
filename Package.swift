@@ -55,8 +55,25 @@ let package = Package(
             ]
         ),
         .target(
+            name: "CSimdjson",
+            path: "Sources.Codable/CSimdjson",
+            sources: [
+                "simdjson.cpp",
+                "SimdjsonBridge.cpp",
+            ],
+            publicHeadersPath: "include",
+            cxxSettings: [
+                .headerSearchPath("."),
+                .define("SIMDJSON_EXCEPTIONS", to: "0"),
+                .unsafeFlags(["-std=c++17", "-O2", "-DNDEBUG"]),
+            ],
+            linkerSettings: [
+                .linkedLibrary("c++"),
+            ]
+        ),
+        .target(
             name: "AdaptyCodable",
-            dependencies: [],
+            dependencies: ["CSimdjson"],
             path: "Sources.Codable",
             exclude: [
                 "CSimdjson",
@@ -129,7 +146,7 @@ let package = Package(
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger", "AdaptyCodable"],
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),
