@@ -13,13 +13,20 @@ struct JsonExtractTests {
     private struct Entity: Codable {
         let meta: Meta
         let placements: [Placement]
+        let enabled: Bool
+        let label: String
+        let count: Int
+        let empty: Empty?
 
         struct Meta: Codable {
             let version: Int
         }
 
+        struct Empty: Codable {}
+
         struct Placement: Codable {
             let onboarding: Onboarding
+            let settings: Onboarding
         }
 
         struct Onboarding: Codable {
@@ -69,11 +76,20 @@ struct JsonExtractTests {
                             }
                         }
                     ]
+                },
+                "settings": {
+                    "variations": []
                 }
             }
-        ]
+        ],
+        "enabled": true,
+        "label": "test",
+        "count": 42,
+        "empty": null
     }
     """.data(using: .utf8)!
+
+    // MARK: - jsonExtract
 
     @Test func extractPlacement() throws {
         let data = try JSON.jsonExtract(pointer: "/placements/0/onboarding")
@@ -129,6 +145,8 @@ struct JsonExtractTests {
         }
     }
 
+    // MARK: - jsonExtractMany
+
     @Test func extractMany() throws {
         let results = try JSON.jsonExtractMany(pointers: [
             "/meta",
@@ -146,6 +164,130 @@ struct JsonExtractTests {
         let paywall = try decoder.decode(Entity.Paywall.self, from: jsonPaywall)
         #expect(paywall.id == "paywall_a")
         #expect(paywall.schema.type == "fullscreen")
+    }
+
+    // MARK: - jsonContains
+
+    @Test func containsFound() throws {
+        #expect(try JSON.jsonContains(pointer: "/placements/0/onboarding") == true)
+    }
+
+    @Test func containsNotFound() throws {
+        #expect(try JSON.jsonContains(pointer: "/placements/0/nonexistent") == false)
+    }
+
+    @Test func containsDeepPath() throws {
+        #expect(try JSON.jsonContains(pointer: "/placements/0/onboarding/variations/0/paywall/id") == true)
+    }
+
+    @Test func containsEmptyDataThrows() throws {
+        #expect {
+            try Data().jsonContains(pointer: "/any")
+        } throws: { error in
+            if let e = error as? JsonExtractError,
+               case .dataIsEmpty = e
+            {
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    // MARK: - Inspect ( fast )
+
+    @Test func typeObject() throws {
+        #expect(try JSON.jsonFastInspect(pointer: "/meta") == .object(keys: []))
+    }
+
+    @Test func typeArray() throws {
+        #expect(try JSON.jsonFastInspect(
+            pointer: "/placements/0/onboarding/variations"
+        ) == .array(count: 0))
+    }
+
+    @Test func typeString() throws {
+        #expect(try JSON.jsonFastInspect(pointer: "/label") == .string)
+    }
+
+    @Test func typeNumber() throws {
+        #expect(try JSON.jsonFastInspect(pointer: "/count") == .number)
+    }
+
+    @Test func typeBool() throws {
+        #expect(try JSON.jsonFastInspect(pointer: "/enabled") == .bool)
+    }
+
+    @Test func typeNull() throws {
+        #expect(try JSON.jsonFastInspect(pointer: "/empty") == .null)
+    }
+
+    @Test func typePathNotFound() throws {
+        #expect {
+            try JSON.jsonFastInspect(pointer: "/nonexistent")
+        } throws: { error in
+            guard let e = error as? JsonExtractError,
+                  case let .pathNotFound(path) = e
+            else {
+                return false
+            }
+            return path == "/nonexistent"
+        }
+    }
+
+    // MARK: - Inspect ( full )
+
+    @Test func inspectObject() throws {
+        let info = try JSON.jsonInspect(pointer: "/placements/0")
+        #expect(info == .object(keys: ["onboarding", "settings"]))
+    }
+
+    @Test func inspectObject() throws {
+        let info = try JSON.jsonInspect(pointer: "/placements/0")
+        #expect(info == .object(keys: ["onboarding", "settings"]))
+    }
+
+    @Test func inspectArray() throws {
+        let info = try JSON.jsonInspect(pointer: "/placements/0/onboarding/variations")
+        #expect(info == .array(count: 2))
+    }
+
+    @Test func inspectEmptyArray() throws {
+        let info = try JSON.jsonInspect(pointer: "/placements/0/settings/variations")
+        #expect(info == .array(count: 0))
+    }
+
+    @Test func inspectString() throws {
+        let info = try JSON.jsonInspect(pointer: "/label")
+        #expect(info == .string)
+    }
+
+    @Test func inspectNumber() throws {
+        let info = try JSON.jsonInspect(pointer: "/count")
+        #expect(info == .number)
+    }
+
+    @Test func inspectBool() throws {
+        let info = try JSON.jsonInspect(pointer: "/enabled")
+        #expect(info == .bool)
+    }
+
+    @Test func inspectNull() throws {
+        let info = try JSON.jsonInspect(pointer: "/empty")
+        #expect(info == .null)
+    }
+
+    @Test func inspectPathNotFound() throws {
+        #expect {
+            try JSON.jsonInspect(pointer: "/nonexistent")
+        } throws: { error in
+            guard let e = error as? JsonExtractError,
+                  case let .pathNotFound(path) = e
+            else {
+                return false
+            }
+            return path == "/nonexistent"
+        }
     }
 }
 
