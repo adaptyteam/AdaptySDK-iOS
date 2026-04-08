@@ -43,7 +43,7 @@ extension AdaptyUICachedAsset {
         customValue?.asColorOrGradientOrImageAsset ?? stateValue?.asColorOrGradientOrImageAsset
     }
 
-    var asFontAsset: (font: AdaptyUIResolvedFontAsset, defaultColor: AdaptyUIResolvedColorAsset)? {
+    var asFontAsset: AdaptyUIResolvedFontAsset? {
         customValue?.asFontAsset ?? stateValue?.asFontAsset
     }
 

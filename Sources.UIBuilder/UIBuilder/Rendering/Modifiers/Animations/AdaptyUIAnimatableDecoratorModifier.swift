@@ -173,10 +173,10 @@ extension VC.ShapeType {
         case .curveUp:
             // Since there is no way to implement InsettableShape in a correct way, we make this hack with doubling the lineWidth
             CurveUpShape()
-                .stroke(asset: asset, lineWidth: lineWidth)
+                .stroke(asset: asset, lineWidth: lineWidth * 2.0)
         case .curveDown:
             CurveDownShape()
-                .stroke(asset: asset, lineWidth: lineWidth)
+                .stroke(asset: asset, lineWidth: lineWidth * 2.0)
         }
     }
 }

@@ -21,6 +21,7 @@ extension Schema.Animation: Codable {
         case angle
         case anchor
         case color
+        case blurRadius = "blur_radius"
     }
 
     enum Types: String {
@@ -76,7 +77,7 @@ extension Schema.Animation: Codable {
         case .blur:
             self = try .blur(
                 .init(from: decoder),
-                container.decode(Range<Double>.self, forKey: .opacity)
+                container.decode(Range<Double>.self, forKey: .blurRadius)
             )
         }
     }
@@ -119,7 +120,8 @@ extension Schema.Animation: Codable {
             try timeline.encode(to: encoder)
         case let .blur(timeline, value):
             try container.encode(Types.blur.rawValue, forKey: .type)
-
+            try container.encode(value, forKey: .blurRadius)
+            try timeline.encode(to: encoder)
         }
     }
 }
