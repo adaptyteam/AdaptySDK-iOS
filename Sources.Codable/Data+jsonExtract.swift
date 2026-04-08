@@ -7,31 +7,30 @@
 import CSimdjson
 import Foundation
 
-
 public enum JsonExtractError: Error, Sendable, CustomStringConvertible {
-    case parseError
-    case pathNotFound(String)
-    case serializationError
-    case allocationError
-    case unknown(Int32)
+    case dataIsEmpty
+    case pathNotFound(path: String)
+    case serializationError(path: String)
+    case allocationMemoryError
+    case unknown(Int32, path: String)
 
-    init(code: SDJsonError, pointer: String = "") {
+    init(code: SDJsonError, path: String) {
         switch code {
-        case SDJSON_ERR_PARSE: self = .parseError
-        case SDJSON_ERR_PATH_NOT_FOUND: self = .pathNotFound(pointer)
-        case SDJSON_ERR_SERIALIZE: self = .serializationError
-        case SDJSON_ERR_ALLOC: self = .allocationError
-        default: self = .unknown(Int32(code.rawValue))
+        case SDJSON_ERR_PARSE: self = .dataIsEmpty
+        case SDJSON_ERR_PATH_NOT_FOUND: self = .pathNotFound(path: path)
+        case SDJSON_ERR_SERIALIZE: self = .serializationError(path: path)
+        case SDJSON_ERR_ALLOC: self = .allocationMemoryError
+        default: self = .unknown(Int32(code.rawValue), path: path)
         }
     }
 
     public var description: String {
         switch self {
-        case .parseError: "Failed to parse JSON"
+        case .dataIsEmpty: "Failed to parse JSON, data is empty"
         case let .pathNotFound(path): "Path not found: \(path)"
-        case .serializationError: "Failed to serialize JSON fragment"
-        case .allocationError: "Memory allocation failed"
-        case let .unknown(code): "Unknown error (code: \(code))"
+        case let .serializationError(path): "Failed to serialize JSON fragment: \(path)"
+        case .allocationMemoryError: "Memory allocation failed"
+        case let .unknown(code, path): "Unknown error (code: \(code)) for: \(path)"
         }
     }
 }
@@ -57,30 +56,40 @@ public extension Data {
     /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
     /// - Returns: `Data` with the JSON fragment, ready for `JSONDecoder`
     /// - Throws: `JsonExtractorError`
-    func jsonExtract(pointer: String) throws -> Data {
-        try withUnsafeBytes { rawBuffer in
-            guard let baseAddress = rawBuffer.baseAddress else {
-                throw JsonExtractError.parseError
+    func jsonExtract(pointer: String) throws(JsonExtractError) -> Data {
+        let extractionResult: Result<Data, JsonExtractError> =
+            withUnsafeBytes { rawBuffer in
+                guard let baseAddress = rawBuffer.baseAddress else {
+                    return .failure(.dataIsEmpty)
+                }
+
+                let result = sdjson_extract(
+                    baseAddress.assumingMemoryBound(to: CChar.self),
+                    rawBuffer.count,
+                    pointer
+                )
+
+                if result.error != SDJSON_OK {
+                    return .failure(JsonExtractError(code: result.error, path: pointer))
+                }
+
+                guard let fragmentPtr = result.data else {
+                    return .failure(.allocationMemoryError)
+                }
+
+                // Copy into Data and free the C buffer
+                let fragmentData = Data(bytes: fragmentPtr, count: result.length)
+                sdjson_free(fragmentPtr)
+                return .success(fragmentData)
             }
+        return try extractionResult.get()
+    }
 
-            let result = sdjson_extract(
-                baseAddress.assumingMemoryBound(to: CChar.self),
-                rawBuffer.count,
-                pointer
-            )
-
-            if result.error != SDJSON_OK {
-                throw JsonExtractError(code: result.error, pointer: pointer)
-            }
-
-            guard let fragmentPtr = result.data else {
-                throw JsonExtractError.allocationError
-            }
-
-            // Copy into Data and free the C buffer
-            let fragmentData = Data(bytes: fragmentPtr, count: result.length)
-            sdjson_free(fragmentPtr)
-            return fragmentData
+    func jsonExtractIfPresent(pointer: String) throws(JsonExtractError) -> Data? {
+        do {
+            return try jsonExtract(pointer: pointer)
+        } catch .pathNotFound {
+            return nil
         }
     }
 
@@ -93,61 +102,63 @@ public extension Data {
     /// - Parameter pointers: Array of JSON Pointer strings
     /// - Returns: Dictionary `[pointer: Data]` of successful extractions
     /// - Throws: `JsonExtractorError` if at least one extraction fails
-    func jsonExtractMany(pointers: [String]) throws -> [String: Data] {
-        try withUnsafeBytes { rawBuffer in
-            guard let baseAddress = rawBuffer.baseAddress else {
-                throw JsonExtractError.parseError
-            }
+    func jsonExtractMany(pointers: [String]) throws(JsonExtractError) -> [String: Data] {
+        let extractionResult: Result<[String: Data], JsonExtractError> =
+            withUnsafeBytes { rawBuffer in
+                guard let baseAddress = rawBuffer.baseAddress else {
+                    return .failure(.dataIsEmpty)
+                }
 
-            let count = pointers.count
+                let count = pointers.count
 
-            // Prepare C array of string pointers
+                // Prepare C array of string pointers
 //            var cPointers: [UnsafePointer<CChar>?] = []
-            var cStrings: [ContiguousArray<CChar>] = []
+                var cStrings: [ContiguousArray<CChar>] = []
 
-            for p in pointers {
-                let cStr = ContiguousArray(p.utf8CString)
-                cStrings.append(cStr)
-            }
-
-            // Need to obtain stable pointers
-            return try cStrings.withUnsafeBufferPointers { stablePtrs in
-                var cPtrArray = stablePtrs.map(\.self)
-                var results = [SDJsonResult](
-                    repeating: SDJsonResult(data: nil, length: 0, error: SDJSON_OK),
-                    count: count
-                )
-
-                cPtrArray.withUnsafeMutableBufferPointer { ptrBuf in
-                    results.withUnsafeMutableBufferPointer { resBuf in
-                        sdjson_extract_many(
-                            baseAddress.assumingMemoryBound(to: CChar.self),
-                            rawBuffer.count,
-                            ptrBuf.baseAddress,
-                            count,
-                            resBuf.baseAddress
-                        )
-                    }
+                for p in pointers {
+                    let cStr = ContiguousArray(p.utf8CString)
+                    cStrings.append(cStr)
                 }
 
-                var dict = [String: Data](minimumCapacity: count)
-                for (i, pointer) in pointers.enumerated() {
-                    let r = results[i]
-                    if r.error != SDJSON_OK {
-                        // Free already allocated buffers
-                        for j in (i + 1) ..< count {
-                            if let ptr = results[j].data { sdjson_free(ptr) }
+                // Need to obtain stable pointers
+                return cStrings.withUnsafeBufferPointers { stablePtrs in
+                    var cPtrArray = stablePtrs.map(\.self)
+                    var results = [SDJsonResult](
+                        repeating: SDJsonResult(data: nil, length: 0, error: SDJSON_OK),
+                        count: count
+                    )
+
+                    cPtrArray.withUnsafeMutableBufferPointer { ptrBuf in
+                        results.withUnsafeMutableBufferPointer { resBuf in
+                            sdjson_extract_many(
+                                baseAddress.assumingMemoryBound(to: CChar.self),
+                                rawBuffer.count,
+                                ptrBuf.baseAddress,
+                                count,
+                                resBuf.baseAddress
+                            )
                         }
-                        throw JsonExtractError(code: r.error, pointer: pointer)
                     }
-                    if let ptr = r.data {
-                        dict[pointer] = Data(bytes: ptr, count: r.length)
-                        sdjson_free(ptr)
+
+                    var dict = [String: Data](minimumCapacity: count)
+                    for (i, pointer) in pointers.enumerated() {
+                        let r = results[i]
+                        if r.error != SDJSON_OK {
+                            // Free already allocated buffers
+                            for j in (i + 1) ..< count {
+                                if let ptr = results[j].data { sdjson_free(ptr) }
+                            }
+                            return .failure(JsonExtractError(code: r.error, path: pointer))
+                        }
+                        if let ptr = r.data {
+                            dict[pointer] = Data(bytes: ptr, count: r.length)
+                            sdjson_free(ptr)
+                        }
                     }
+                    return .success(dict)
                 }
-                return dict
             }
-        }
+        return try extractionResult.get()
     }
 }
 
