@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 extension KeyedDecodingContainer {
     private func findKey(_ key: Key, _ fallback: [Key]) -> Key {
@@ -36,15 +37,15 @@ extension KeyedDecodingContainer {
         try decode(type, forKey: findKey(key, fallback), configuration: configuration)
     }
 
-    func decodeIfPresent<T: DecodableWithConfiguration, C: DecodingConfigurationProviding>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: C.Type) throws -> T? where T.DecodingConfiguration == C.DecodingConfiguration {
-        try decodeIfPresent(type, forKey: findKey(key, fallback), configuration: configuration)
+    func decodeIfExist<T: DecodableWithConfiguration, C: DecodingConfigurationProviding>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: C.Type) throws -> T? where T.DecodingConfiguration == C.DecodingConfiguration {
+        try decodeIfExist(type, forKey: findKey(key, fallback), configuration: configuration)
     }
 
     func decode<T: DecodableWithConfiguration>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: T.DecodingConfiguration) throws -> T {
         try decode(type, forKey: findKey(key, fallback), configuration: configuration)
     }
 
-    func decodeIfPresent<T: DecodableWithConfiguration>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: T.DecodingConfiguration) throws -> T? {
-        try decodeIfPresent(type, forKey: findKey(key, fallback), configuration: configuration)
+    func decodeIfExist<T: DecodableWithConfiguration>(_ type: T.Type, forKeys key: Key, _ fallback: Key..., configuration: T.DecodingConfiguration) throws -> T? {
+        try decodeIfExist(type, forKey: findKey(key, fallback), configuration: configuration)
     }
 }

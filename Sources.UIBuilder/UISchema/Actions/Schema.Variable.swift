@@ -27,7 +27,7 @@ extension Schema.Variable: Codable {
             path: path.split(separator: ".").map(String.init),
             setter: container.decodeIfPresent(String.self, forKey: .setter),
             scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default,
-            converter: container.contains(.converter) ? VC.Variable.Converter(from: decoder) : nil
+            converter: container.exist(.converter) ? VC.Variable.Converter(from: decoder) : nil
         )
     }
 

@@ -21,7 +21,7 @@ extension Schema.Action: Codable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        if container.contains(.function) {
+        if container.exist(.function) {
             let function = try container.decode(String.self, forKey: .function)
             let path = function.split(separator: ".").map(String.init)
             guard path.isNotEmpty else {

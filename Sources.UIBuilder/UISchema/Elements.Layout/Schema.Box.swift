@@ -77,7 +77,7 @@ extension Schema.Box: Encodable, DecodableWithConfiguration {
             height: try? container.decodeIfPresent(Length.self, forKey: .height),
             horizontalAlignment: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? Self.default.horizontalAlignment,
             verticalAlignment: container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment) ?? Self.default.verticalAlignment,
-            content: container.decodeIfPresent(Schema.Element.self, forKey: .content, configuration: configuration)
+            content: container.decodeIfExist(Schema.Element.self, forKey: .content, configuration: configuration)
         )
     }
 

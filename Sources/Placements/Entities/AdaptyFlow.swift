@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 public struct AdaptyFlow: PlacementContent, Identifiable {
     public let placement: AdaptyPlacement
@@ -63,7 +64,7 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
             name: container.decode(String.self, forKey: .name),
             remoteConfigs: container.decodeIfPresent([AdaptyRemoteConfig].self, forKey: .remoteConfigs) ?? [],
             viewConfigurationId: container.decodeIfPresent(String.self, forKey: .viewConfigurationId),
-            paywalls: container.decodeIfPresent([AdaptyFlowPaywall].self, forKey: .paywalls, configuration: configuration) ?? []
+            paywalls: container.decodeIfExist([AdaptyFlowPaywall].self, forKey: .paywalls, configuration: configuration) ?? []
         )
     }
 

@@ -30,7 +30,9 @@ private extension SchemaTests {
                     weight: 400,
                     italic: false,
                     defaultSize: 15,
-                    defaultColor: defaultFontColor
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -48,7 +50,9 @@ private extension SchemaTests {
                     weight: 700,
                     italic: true,
                     defaultSize: 24,
-                    defaultColor: color_FF0000
+                    defaultColor: color_FF0000,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -72,7 +76,9 @@ private extension SchemaTests {
                     weight: 400,
                     italic: false,
                     defaultSize: 15,
-                    defaultColor: defaultFontColor
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -90,7 +96,9 @@ private extension SchemaTests {
                     weight: 400,
                     italic: false,
                     defaultSize: 15,
-                    defaultColor: defaultFontColor
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -109,7 +117,9 @@ private extension SchemaTests {
                     weight: 400,
                     italic: false,
                     defaultSize: 15,
-                    defaultColor: defaultFontColor
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -128,7 +138,9 @@ private extension SchemaTests {
                     weight: 400,
                     italic: false,
                     defaultSize: 15,
-                    defaultColor: defaultFontColor
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -147,7 +159,9 @@ private extension SchemaTests {
                     weight: 700,
                     italic: false,
                     defaultSize: 15,
-                    defaultColor: defaultFontColor
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -166,7 +180,9 @@ private extension SchemaTests {
                     weight: 400,
                     italic: true,
                     defaultSize: 15,
-                    defaultColor: defaultFontColor
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -185,7 +201,9 @@ private extension SchemaTests {
                     weight: 400,
                     italic: false,
                     defaultSize: 24,
-                    defaultColor: defaultFontColor
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -204,7 +222,9 @@ private extension SchemaTests {
                     weight: 400,
                     italic: false,
                     defaultSize: 12.5,
-                    defaultColor: defaultFontColor
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {
@@ -223,7 +243,9 @@ private extension SchemaTests {
                     weight: 400,
                     italic: false,
                     defaultSize: 15,
-                    defaultColor: color_FF0000
+                    defaultColor: color_FF0000,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
                 ),
                 Json(##"""
                 {

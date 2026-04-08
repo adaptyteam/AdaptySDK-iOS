@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 extension Schema {
     struct TemplatesCollection: Sendable {
