@@ -85,7 +85,8 @@ struct JsonExtractTests {
         "enabled": true,
         "label": "test",
         "count": 42,
-        "empty": null
+        "empty":     null
+
     }
     """.data(using: .utf8)!
 
@@ -96,6 +97,25 @@ struct JsonExtractTests {
         let str = try #require(String(data: data, encoding: .utf8))
         #expect(str.contains("variations"))
         #expect(str.contains("paywall_a"))
+    }
+
+    @Test func extractIfContainsNull() throws {
+        let empty = try JSON.jsonExtractIfPresent(pointer: "/empty")
+        #expect(empty == "null".data(using: .utf8)!)
+    }
+
+    @Test func extractIfExistNull() throws {
+        let empty = try JSON.jsonExtractIfExist(pointer: "/empty")
+        #expect(empty == nil)
+    }
+
+    @Test func decodeNull() throws {
+        let decoder = JSONDecoder()
+        let empty: Entity.Empty? = try decoder.decode(
+            Entity.Empty?.self,
+            from: JSON.jsonExtract(pointer: "/empty")
+        )
+        #expect(empty == nil)
     }
 
     @Test func extractNestedValue() throws {
@@ -194,6 +214,24 @@ struct JsonExtractTests {
         }
     }
 
+    @Test func existFound() throws {
+        let pointer = "/count"
+        #expect(try JSON.jsonContains(pointer: pointer) == true)
+        #expect(try JSON.jsonExist(pointer: pointer) == true)
+    }
+
+    @Test func existNotFound() throws {
+        let pointer = "/empty"
+        #expect(try JSON.jsonContains(pointer: pointer) == true)
+        #expect(try JSON.jsonExist(pointer: pointer) == false)
+    }
+
+    @Test func nonexistentNotFound() throws {
+        let pointer = "/nonexistent"
+        #expect(try JSON.jsonContains(pointer: pointer) == false)
+        #expect(try JSON.jsonExist(pointer: pointer) == false)
+    }
+
     // MARK: - Inspect ( fast )
 
     @Test func typeObject() throws {
@@ -282,6 +320,106 @@ struct JsonExtractTests {
                 return false
             }
             return path == "/nonexistent"
+        }
+    }
+
+    // MARK: - Range
+
+    let simpleJSON = """
+        {
+            "name":  "Привет",
+            "count":    42,
+            "items":      
+        [1,2,3]
+        ,
+            "empty": null
+        }
+        """
+//        #"{"name":"Привет","count":42,"items":[1,2,3],"empty":null}"#
+
+    @Test func rangeObjectProperty() throws {
+        let jsonStr = simpleJSON
+        let JSON = try #require(jsonStr.data(using: .utf8))
+
+        let result = try JSON.jsonExtractRange(pointer: "/name")
+
+        #expect(result.key != nil)
+
+        let key = try #require(result.key(from: simpleJSON))
+        #expect(key == "name")
+
+        let value = try #require(result.value(from: simpleJSON))
+        #expect(value == #""Привет""#)
+    }
+
+    @Test func rangeArrayElement() throws {
+        let jsonStr = simpleJSON
+        let JSON = try #require(jsonStr.data(using: .utf8))
+
+        let result = try JSON.jsonExtractRange(pointer: "/items/1")
+
+        #expect(result.key == nil)
+
+        let value = try #require(result.value(from: simpleJSON))
+        #expect(value == "2")
+    }
+
+    @Test func rangeNestedObject() throws {
+        let jsonStr = simpleJSON
+        let JSON = try #require(jsonStr.data(using: .utf8))
+
+        let result = try JSON.jsonExtractRange(pointer: "/items")
+
+        #expect(result.key != nil)
+
+        let key = try #require(result.key(from: simpleJSON))
+        #expect(key == "items")
+
+        let value = try #require(result.value(from: simpleJSON))
+        #expect(value == "[1,2,3]")
+    }
+
+    @Test func rangeNull() throws {
+        let jsonStr = simpleJSON
+        let JSON = try #require(jsonStr.data(using: .utf8))
+
+        let result = try JSON.jsonExtractRange(pointer: "/empty")
+
+        let key = try #require(result.key(from: simpleJSON))
+        #expect(key == "empty")
+
+        let value = try #require(result.value(from: simpleJSON))
+        #expect(value == #"null"#)
+    }
+
+    @Test func rangeCyrillicKey() throws {
+        let jsonStr = #"{"имя":"значение"}"#
+        let JSON = try #require(jsonStr.data(using: .utf8))
+
+        let result = try JSON.jsonExtractRange(pointer: "/имя")
+
+        #expect(result.key != nil)
+
+        let key = try #require(result.key(from: jsonStr))
+        #expect(key == "имя")
+
+        let value = try #require(result.value(from: jsonStr))
+        #expect(value == #""значение""#)
+    }
+
+    @Test func rangePathNotFound() throws {
+        let JSON = try #require(simpleJSON.data(using: .utf8))
+
+        #expect {
+            try JSON.jsonExtractRange(pointer: "/nonexistent")
+        } throws: { error in
+            if let e = error as? JsonExtractError,
+               case .pathNotFound = e
+            {
+                true
+            } else {
+                false
+            }
         }
     }
 }

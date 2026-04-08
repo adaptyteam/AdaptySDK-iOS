@@ -43,53 +43,55 @@ typedef struct {
     SDJsonError error;
 } SDJsonTypeResult;
 
-/// Результат inspect для object/array.
-/// Для object: keys содержит \0-separated ключи, count = количество ключей.
-/// Для array:  keys = NULL, count = количество элементов.
-/// Для scalar: keys = NULL, count = 0.
-/// Caller ОБЯЗАН вызвать sdjson_free(result.keys) если keys != NULL.
 typedef struct {
     SDJsonType  type;
     size_t      count;
-    const char* keys;        // \0-separated строка ключей (только для object)
-    size_t      keys_length; // полная длина keys буфера в байтах
+    const char* keys;
+    size_t      keys_length;
     SDJsonError error;
 } SDJsonInspectResult;
 
+/// Результат range — byte offsets внутри оригинального JSON буфера.
+/// key_offset/key_length = -1/0 если ключа нет (элемент массива).
+typedef struct {
+    int64_t     key_offset;     // byte offset начала имени ключа (без ")
+    size_t      key_length;     // длина имени ключа (без ")
+    size_t      value_offset;   // byte offset начала значения
+    size_t      value_length;   // длина значения в байтах
+    SDJsonError error;
+} SDJsonRangeResult;
+
 // ---- API ----
 
-/// Извлекает JSON-фрагмент по JSON Pointer пути.
 SDJsonResult sdjson_extract(const char* json_data,
                             size_t json_length,
                             const char* pointer);
 
-/// Извлекает несколько путей за один вызов.
 void sdjson_extract_many(const char* json_data,
                          size_t json_length,
                          const char** pointers,
                          size_t count,
                          SDJsonResult* out_results);
 
-/// Проверяет существование значения по JSON Pointer пути.
 bool sdjson_exists(const char* json_data,
                    size_t json_length,
                    const char* pointer,
                    SDJsonError* out_error);
 
-/// Возвращает тип значения по JSON Pointer пути. Быстрый — без доп. работы.
 SDJsonTypeResult sdjson_type(const char* json_data,
                              size_t json_length,
                              const char* pointer);
 
-/// Возвращает тип + дополнительную информацию:
-/// - object → тип + количество ключей + имена ключей
-/// - array  → тип + количество элементов
-/// - scalar → тип
 SDJsonInspectResult sdjson_inspect(const char* json_data,
                                    size_t json_length,
                                    const char* pointer);
 
-/// Освобождает память.
+/// Возвращает byte range ключа и значения по JSON Pointer.
+/// Для элементов массива key_offset = -1.
+SDJsonRangeResult sdjson_range(const char* json_data,
+                               size_t json_length,
+                               const char* pointer);
+
 void sdjson_free(const char* ptr);
 
 #ifdef __cplusplus
@@ -97,4 +99,3 @@ void sdjson_free(const char* ptr);
 #endif
 
 #endif // SIMDJSON_BRIDGE_H
-

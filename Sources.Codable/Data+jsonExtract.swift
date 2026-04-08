@@ -60,6 +60,26 @@ public extension Data {
         case null
     }
 
+    struct JsonPropertyRange: Sendable, Equatable {
+        public let key: Range<Int>?
+        public let value: Range<Int>
+
+        public func key(from str: String) -> String? {
+            guard let key else { return nil }
+            return substring(from: str, range: key)
+        }
+
+        public func value(from str: String) -> String? {
+            substring(from: str, range: value)
+        }
+
+        private func substring(from str: String, range: Range<Int>) -> String? {
+            let vStart = str.utf8.index(str.startIndex, offsetBy: range.lowerBound)
+            let vEnd = str.utf8.index(str.startIndex, offsetBy: range.upperBound)
+            return String(str.utf8[vStart ..< vEnd])
+        }
+    }
+
     /// Extracts a JSON fragment by JSON Pointer.
     ///
     /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
@@ -83,9 +103,19 @@ public extension Data {
         }
     }
 
+    @inlinable
     func jsonExtractIfPresent(pointer: String) throws(JsonExtractError) -> Data? {
         do {
             return try jsonExtract(pointer: pointer)
+        } catch .pathNotFound {
+            return nil
+        }
+    }
+
+    func jsonExtractIfExist(pointer: String) throws(JsonExtractError) -> Data? {
+        do {
+            let value = try jsonExtract(pointer: pointer)
+            return value == null ? nil : value
         } catch .pathNotFound {
             return nil
         }
@@ -101,6 +131,16 @@ public extension Data {
             }
 
             return found
+        }
+    }
+
+    @inlinable
+    func jsonExist(pointer: String) throws(JsonExtractError) -> Bool {
+        do {
+            let value = try jsonFastInspect(pointer: pointer)
+            return value == .null ? false : true
+        } catch .pathNotFound {
+            return false
         }
     }
 
@@ -152,6 +192,41 @@ public extension Data {
             case SDJSON_TYPE_NULL: return .null
             default: return .null
             }
+        }
+    }
+
+    // MARK: - Range
+
+    /// Возвращает byte range ключа и значения в оригинальном JSON-тексте.
+    ///
+    /// ```swift
+    /// let prop = try extractor.range(pointer: "/placements/onboarding")
+    ///
+    /// let jsonString = String(data: jsonData, encoding: .utf8)!
+    /// let start = jsonString.utf8.index(jsonString.startIndex, offsetBy: prop.value.lowerBound)
+    /// let end = jsonString.utf8.index(jsonString.startIndex, offsetBy: prop.value.upperBound)
+    /// let nsRange = NSRange(start..<end, in: jsonString)
+    /// ```
+    func jsonExtractRange(pointer: String) throws(JsonExtractError) -> JsonPropertyRange {
+        try withJsonBytes { base, length throws(JsonExtractError) in
+            let result = sdjson_range(base, length, pointer)
+
+            if result.error != SDJSON_OK {
+                throw JsonExtractError(code: result.error, path: pointer)
+            }
+
+            let keyRange: Range<Int>?
+            if result.key_offset >= 0 {
+                let start = Int(result.key_offset)
+                keyRange = start ..< (start + Int(result.key_length))
+            } else {
+                keyRange = nil
+            }
+
+            let valueStart = Int(result.value_offset)
+            let valueRange = valueStart ..< (valueStart + Int(result.value_length))
+
+            return JsonPropertyRange(key: keyRange, value: valueRange)
         }
     }
 
@@ -230,6 +305,8 @@ public extension Data {
 }
 
 // MARK: - Private helpers
+
+private let null = "null".data(using: .utf8)!
 
 private func parseNullSeparatedKeys(
     _ ptr: UnsafePointer<CChar>,
