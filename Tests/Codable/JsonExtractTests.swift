@@ -1,15 +1,16 @@
 //
-//  SimdjsonExtractTests.swift
+//  JsonExtractTests.swift
 //  AdaptyTests
 //
 //  Created by Aleksei Valiano on 08.04.2026.
 //
 
 @testable import AdaptyCodable
+import Foundation
 import Testing
 
-struct SimdjsonExtractTests {
-    let testJSON = """
+struct JsonExtractTests {
+    let JSON = """
     {
         "meta": { "version": 1 },
         "placements": {
@@ -36,43 +37,38 @@ struct SimdjsonExtractTests {
     """.data(using: .utf8)!
 
     @Test func extractPlacement() throws {
-        let extractor = SimdjsonExtractor(data: testJSON)
-        let fragment = try extractor.extract(pointer: "/placements/onboarding")
-
-        // Должен содержать variations
-        let str = try #require(String(data: fragment, encoding: .utf8))
+        let data = try JSON.jsonExtract(pointer: "/placements/onboarding")
+        let str = try #require(String(data: data, encoding: .utf8))
         #expect(str.contains("variations"))
         #expect(str.contains("paywall_a"))
     }
 
     @Test func extractNestedValue() throws {
-        let extractor = SimdjsonExtractor(data: testJSON)
-        let fragment = try extractor.extract(
+        let data = try JSON.jsonExtract(
             pointer: "/placements/onboarding/variations/0/paywall/id"
         )
-
-        let str = try #require(String(data: fragment, encoding: .utf8))
+        let str = try #require(String(data: data, encoding: .utf8))
         #expect(str.contains("paywall_a"))
     }
 
     @Test func extractMeta() throws {
-        let extractor = SimdjsonExtractor(data: testJSON)
 
         struct Meta: Codable { let version: Int }
-        let meta: Meta = try extractor.decode(at: "/meta", as: Meta.self)
+
+        let decoder = JSONDecoder()
+        let data = try JSON.jsonExtract(pointer: "/meta")
+        let meta: Meta = try decoder.decode(Meta.self, from: data)
         #expect(meta.version == 1)
     }
 
     @Test func pathNotFoundThrows() throws {
-        let extractor = SimdjsonExtractor(data: testJSON)
-        #expect(throws: SimdjsonError.self) {
-            try extractor.extract(pointer: "/placements/nonexistent")
+        #expect(throws: JsonExtractError.self) {
+            try JSON.jsonExtract(pointer: "/placements/nonexistent")
         }
     }
 
     @Test func extractMany() throws {
-        let extractor = SimdjsonExtractor(data: testJSON)
-        let results = try extractor.extractMany(pointers: [
+        let results = try JSON.jsonExtractMany(pointers: [
             "/meta",
             "/placements/onboarding/variations/0/paywall/id",
         ])
