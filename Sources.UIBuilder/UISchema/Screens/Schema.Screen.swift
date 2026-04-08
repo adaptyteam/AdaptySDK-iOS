@@ -132,12 +132,12 @@ extension Schema.Screen: DecodableWithConfiguration {
             if configuration.isLegacy {
                 nil
             } else {
-                try container.decodeIfPresent([Schema.AlignedElement].self, forKey: .background, configuration: configuration)
+                try container.decodeIfExist([Schema.AlignedElement].self, forKey: .background, configuration: configuration)
             }
 
         let overlay: [Schema.AlignedElement]? =
             if configuration.isLegacy {
-                if let one = try container.decodeIfPresent(Schema.Element.self, forKey: .overlay, configuration: configuration) {
+                if let one = try container.decodeIfExist(Schema.Element.self, forKey: .overlay, configuration: configuration) {
                     [Schema.AlignedElement(
                         horizontalAlignment: Schema.AlignedElement.default.horizontalAlignment,
                         verticalAlignment: Schema.AlignedElement.default.verticalAlignment,
@@ -147,15 +147,15 @@ extension Schema.Screen: DecodableWithConfiguration {
                     nil
                 }
             } else {
-                try container.decodeIfPresent([Schema.AlignedElement].self, forKey: .overlay, configuration: configuration)
+                try container.decodeIfExist([Schema.AlignedElement].self, forKey: .overlay, configuration: configuration)
             }
 
         try self.init(
             id: screenId,
             layoutBehaviour: layoutBehaviour,
-            cover: layoutBehaviour == .hero ? container.decodeIfPresent(Schema.Box.self, forKey: .cover, configuration: configuration) : nil,
+            cover: layoutBehaviour == .hero ? container.decodeIfExist(Schema.Box.self, forKey: .cover, configuration: configuration) : nil,
             content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
-            footer: layoutBehaviour != .default ? container.decodeIfPresent(Schema.Element.self, forKey: .footer, configuration: configuration) : nil,
+            footer: layoutBehaviour != .default ? container.decodeIfExist(Schema.Element.self, forKey: .footer, configuration: configuration) : nil,
             background: background,
             overlay: overlay,
             screenActions: Schema.ScreenActions(from: decoder),

@@ -76,7 +76,7 @@ extension KeyedDecodingContainer {
 
         let container = try nestedContainer(keyedBy: RelativeDateTimeCodingKeys.self, forKey: key)
 
-        if container.contains(.anchor) {
+        if container.exist(.anchor) {
             let anchorTimeZone = try container.decodeTimeZoneIfPresent(forKey: .anchorTimeZone)
             let anchor = try container.decode(DateTimeAnchor.self, forKey: .anchor)
             let calendar = Calendar.withTimeZone(anchorTimeZone)
@@ -84,7 +84,7 @@ extension KeyedDecodingContainer {
                 throw DecodingError.dataCorruptedError(forKey: .anchor, in: container, debugDescription: "Fail to calculate `\(anchor.rawValue)`")
             }
 
-            guard container.contains(.offset) else {
+            guard container.exist(.offset) else {
                 return .date(startDate)
             }
 

@@ -59,7 +59,7 @@ extension Schema.Button: DecodableWithConfiguration {
             try self.init(
                 actions: container.decodeActions(forKey: .actions),
                 normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
-                selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState, configuration: configuration),
+                selectedState: container.decodeIfExist(Schema.Element.self, forKey: .selectedState, configuration: configuration),
                 isSelectedState: container.decodeIfPresent(Schema.Variable.self, forKey: .isSelectedState)
             )
             return
@@ -90,7 +90,7 @@ extension Schema.Button: DecodableWithConfiguration {
         try self.init(
             actions: container.decodeActions(forKey: .actions),
             normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
-            selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState, configuration: configuration),
+            selectedState: container.decodeIfExist(Schema.Element.self, forKey: .selectedState, configuration: configuration),
             isSelectedState: isSelectedState
         )
     }

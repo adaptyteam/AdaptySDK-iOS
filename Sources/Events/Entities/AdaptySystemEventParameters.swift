@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 package protocol AdaptySystemEventParameters: Sendable, Encodable {}
 
@@ -39,10 +40,10 @@ extension EventParameters {
 private extension Encoder {
     func encode(_ params: EventParameters?) throws {
         guard let params else { return }
-        var container = container(keyedBy: AnyCodingKeys.self)
+        var container = container(keyedBy: AnyCodingKey.self)
         try params.forEach {
             guard let value = $1 else { return }
-            try container.encode(value, forKey: AnyCodingKeys(stringValue: $0))
+            try container.encode(value, forKey: AnyCodingKey(stringValue: $0))
         }
     }
 }

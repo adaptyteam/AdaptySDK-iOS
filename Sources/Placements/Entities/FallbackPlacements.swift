@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 private let log = Log.fallbackPlacements
 
@@ -191,15 +192,15 @@ private extension FallbackPlacements {
         let placementId: String
     }
 
-    static func dataContainer(from decoder: Decoder) throws -> KeyedDecodingContainer<AnyCodingKeys> {
+    static func dataContainer(from decoder: Decoder) throws -> KeyedDecodingContainer<AnyCodingKey> {
         try decoder
             .container(keyedBy: Backend.CodingKeys.self)
-            .nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .data)
+            .nestedContainer(keyedBy: AnyCodingKey.self, forKey: .data)
     }
 
     static func placementContainer(from decoder: Decoder, placementId: String) throws -> KeyedDecodingContainer<Backend.CodingKeys>? {
         let data = try dataContainer(from: decoder)
-        let placementId = AnyCodingKeys(stringValue: placementId)
+        let placementId = AnyCodingKey(stringValue: placementId)
 
         guard data.contains(placementId), try !data.decodeNil(forKey: placementId) else {
             return nil
@@ -222,7 +223,7 @@ extension Backend.Response.Data.Placement: DecodableWithConfiguration
         where Value: Decodable
     {
         let container = try FallbackPlacements.dataContainer(from: decoder)
-        let placementId = AnyCodingKeys(stringValue: configuration.placementId)
+        let placementId = AnyCodingKey(stringValue: configuration.placementId)
         value = try container.decodeIfPresent(Value.self, forKey: placementId)
     }
 }

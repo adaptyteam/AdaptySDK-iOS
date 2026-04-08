@@ -51,7 +51,7 @@ private extension Schema.StringReference.Product {
     enum LegacyCodingKeys: String, CodingKey {
         case type
         case productGroupId = "group_id"
-        case adaptyProductId = "id"
+        case productId = "id"
         case suffix
     }
 
@@ -60,25 +60,23 @@ private extension Schema.StringReference.Product {
 
         let suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
 
-        guard !container.contains(.adaptyProductId) else {
+        if let productId = try container.decodeIfPresent(String.self, forKey: .productId) {
             return try .id(
-                container.decode(String.self, forKey: .adaptyProductId),
+                productId,
                 sufix: suffix
             )
         }
 
-        guard !container.contains(.productGroupId) else {
-            return try .variable(
-                .init(
-                    path: ["Legacy", "productGroup", container.decode(String.self, forKey: .productGroupId)],
-                    setter: nil,
-                    scope: .global,
-                    converter: nil
-                ),
-                sufix: suffix
-            )
-        }
-
-        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "not found id or group_id "))
+        let productGroupId = try container.decodeIfPresent(String.self, forKey: .productGroupId) ?? "group_A"
+        return try .variable(
+            .init(
+                path: ["Legacy", "productGroup", productGroupId],
+                setter: nil,
+                scope: .global,
+                converter: nil
+            ),
+            sufix: suffix
+        )
     }
 }
+

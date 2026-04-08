@@ -72,7 +72,11 @@ extension Adapty {
                     disableServerCache: isTestUser
                 )
             }
-        } catch {}
+        } catch {
+            if let httpError = error as? HTTPError, case .decoding = httpError {
+                throw httpError.asAdaptyError
+            }
+        }
 
         do {
             return try await httpSession.fetchFallbackUISchema(

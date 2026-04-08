@@ -1,0 +1,4 @@
+//module CSimdjson {
+//     header "SimdjsonBridge.h"
+//     export *
+// }

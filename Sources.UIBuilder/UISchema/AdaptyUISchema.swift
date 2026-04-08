@@ -86,7 +86,7 @@ extension AdaptyUISchema: Codable {
 
         if configuration.isLegacy {
             navigators = screensCollection.legacyGeneratedNavigators ?? [:]
-        } else if let navigatorCollection = try container.decodeIfPresent(
+        } else if let navigatorCollection = try container.decodeIfExist(
             NavigatorsCollection.self,
             forKey: .navigators,
             configuration: configuration
@@ -97,7 +97,7 @@ extension AdaptyUISchema: Codable {
             navigators = navigatorCollection.navigators
         }
 
-        let templatesCollection = try container.decodeIfPresent(
+        let templatesCollection = try container.decodeIfExist(
             TemplatesCollection.self,
             forKey: .templates,
             configuration: configuration
@@ -153,11 +153,11 @@ private extension Decoder {
         var scripts = try container.nestedUnkeyedContainer(forKey: .scripts)
 
         while !scripts.isAtEnd {
-            let script = try scripts.nestedContainer(keyedBy: ScriptCodingKeys.self)
-            if script.contains(.type) {
-                guard try script.decode(String.self, forKey: .type) == "js" else { continue }
+            let itemContainer = try scripts.nestedContainer(keyedBy: ScriptCodingKeys.self)
+            if let value = try itemContainer.decodeIfPresent(String.self, forKey: .type) {
+                guard value == "js" else { continue }
             }
-            let content = try script.decode(String.self, forKey: .content)
+            let content = try itemContainer.decode(String.self, forKey: .content)
             return [content]
         }
 
@@ -176,7 +176,7 @@ private extension Decoder {
 
         var scripts = [String]()
 
-        if container.contains(.products) {
+        if container.exist(.products) {
             let container = try container.nestedContainer(keyedBy: LegacyCodingKeys.self, forKey: .products)
             if let selected = try? container.decodeIfPresent(String.self, forKey: .selected) {
                 scripts += [Schema.LegacyScripts.legacySelectProductScript(productId: selected)]
