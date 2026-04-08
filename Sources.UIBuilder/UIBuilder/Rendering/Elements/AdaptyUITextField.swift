@@ -107,6 +107,7 @@ struct AdaptyUITextField: View {
 
     var body: some View {
         coreTextComponent
+            .applyScrollAnchor(focusId)
             .applyFocusId(focusId)
             .onSubmit {
                 stateViewModel.execute(

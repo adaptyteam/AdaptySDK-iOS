@@ -59,10 +59,16 @@ struct AdaptyUIHeroContainerView: View {
 
                                 Color.clear.frame(height: 0).id(ScrollAnchor.contentBottom)
                             }
-                            .scrollProgressTracker(kind: .main, coordinateSpaceName: CoordinateSpace.adaptyHeroName, viewportHeight: globalProxy.size.height)
+                            .keyboardBottomPadding()
+                            .scrollProgressTracker(
+                                kind: .main,
+                                coordinateSpaceName: CoordinateSpace.adaptyHeroName,
+                                viewportHeight: globalProxy.size.height
+                            )
                         }
                         .ignoresSafeArea()
                         .scrollIndicatorsHidden_compatible()
+                        .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
                         .onChange(of: stateViewModel.scrollCommand) { command in
                             guard let command, command.instanceId == screenInstance.id, command.kind == .content else { return }
                             withAnimation {
@@ -214,11 +220,13 @@ struct AdaptyUIHeroContainerView: View {
                     drawDecoratorBackground: drawFooterBackground
                 )
                 .id(ScrollAnchor.footerTop)
+                .keyboardBottomPadding()
                 .scrollProgressTracker(kind: .footer, coordinateSpaceName: CoordinateSpace.adaptyHeroName, viewportHeight: globalProxy.size.height)
 
                 Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
             }
             .scrollIndicatorsHidden_compatible()
+            .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
             .onChange(of: stateViewModel.scrollCommand) { command in
                 guard let command, command.instanceId == screenInstance.id, command.kind == .footer else { return }
                 withAnimation {

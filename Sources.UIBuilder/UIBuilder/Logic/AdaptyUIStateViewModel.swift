@@ -22,6 +22,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
 
     @Published var focusedId: String?
+    var isAutoScrollingToFocus = false
     @Published var scrollCommand: ScrollCommand?
     @Published var alertDialog: AlertDialogState?
 

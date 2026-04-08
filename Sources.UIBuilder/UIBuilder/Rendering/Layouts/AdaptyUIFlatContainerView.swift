@@ -42,11 +42,13 @@ struct AdaptyUIFlatContainerView: View {
                     drawDecoratorBackground: drawFooterBackground
                 )
                 .id(ScrollAnchor.footerTop)
+                .keyboardBottomPadding()
                 .scrollProgressTracker(kind: .footer, coordinateSpaceName: CoordinateSpace.adaptyGlobalName, viewportHeight: globalProxy.size.height)
 
                 Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
             }
             .scrollIndicatorsHidden_compatible()
+            .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
             .onChange(of: stateViewModel.scrollCommand) { command in
                 guard let command, command.instanceId == screenInstance.id, command.kind == .footer else { return }
                 withAnimation {
@@ -86,9 +88,11 @@ struct AdaptyUIFlatContainerView: View {
 
                             Color.clear.frame(height: 0).id(ScrollAnchor.contentBottom)
                         }
+                        .keyboardBottomPadding()
                         .scrollProgressTracker(kind: .main, coordinateSpaceName: CoordinateSpace.adaptyGlobalName, viewportHeight: globalProxy.size.height)
                     }
                     .scrollIndicatorsHidden_compatible()
+                    .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
                     .onChange(of: stateViewModel.scrollCommand) { command in
                         guard let command, command.instanceId == screenInstance.id, command.kind == .content else { return }
                         withAnimation {

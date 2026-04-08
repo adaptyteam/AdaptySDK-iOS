@@ -64,15 +64,6 @@ private struct ScrollProgressTrackerModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        if scrollVariable != nil {
-            trackedContent(content)
-        } else {
-            content
-        }
-    }
-
-    @ViewBuilder
-    private func trackedContent(_ content: Content) -> some View {
         content
             .background {
                 GeometryReader { proxy in
@@ -82,25 +73,33 @@ private struct ScrollProgressTrackerModifier: ViewModifier {
                     let scrollableHeight = contentHeight - viewportHeight
                     Color.clear
                         .onChange(of: frame.origin.y) { _ in
+                            dismissKeyboardIfNeeded()
+
+                            guard let variable = scrollVariable else { return }
                             let currentFrame = proxy.frame(in: .named(scrollCoordinateSpaceName))
                             let currentOffset = -currentFrame.minY
                             let currentScrollable = currentFrame.height - viewportHeight
                             guard currentScrollable > 0 else { return }
                             let progress = min(max(currentOffset / currentScrollable, 0.0), 1.0)
-                            handleProgressChange(progress)
+                            handleProgressChange(progress, variable: variable)
                         }
                         .onAppear {
-                            guard scrollableHeight > 0 else { return }
+                            guard scrollableHeight > 0, let variable = scrollVariable else { return }
                             let progress = min(max(offset / scrollableHeight, 0.0), 1.0)
-                            handleProgressChange(progress)
+                            handleProgressChange(progress, variable: variable)
                         }
                 }
             }
     }
 
-    private func handleProgressChange(_ progress: Double) {
-        guard throttleState.shouldFire(progress: progress),
-              let variable = scrollVariable else { return }
+    private func dismissKeyboardIfNeeded() {
+        guard stateViewModel.focusedId != nil,
+              !stateViewModel.isAutoScrollingToFocus else { return }
+        stateViewModel.focusedId = nil
+    }
+
+    private func handleProgressChange(_ progress: Double, variable: VC.Variable) {
+        guard throttleState.shouldFire(progress: progress) else { return }
 
         stateViewModel.setScrollProgress(
             progress,

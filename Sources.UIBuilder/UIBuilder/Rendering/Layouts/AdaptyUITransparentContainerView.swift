@@ -42,11 +42,13 @@ struct AdaptyUITransparentContainerView: View {
             .id(ScrollAnchor.footerTop)
             .onGeometrySizeChange { footerSize = $0 }
             .padding(.top, additionalTopPadding > 0.0 ? additionalTopPadding : nil)
+            .keyboardBottomPadding()
             .scrollProgressTracker(kind: .footer, coordinateSpaceName: "adapty.container.transparent", viewportHeight: globalProxy.size.height)
 
             Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
         }
         .scrollIndicatorsHidden_compatible()
+        .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
         .onAppear {
             DispatchQueue.main.async {
                 scrollProxy.scrollTo(ScrollAnchor.footerBottom, anchor: .bottom)
