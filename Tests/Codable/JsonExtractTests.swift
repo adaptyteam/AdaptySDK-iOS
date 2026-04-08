@@ -242,11 +242,6 @@ struct JsonExtractTests {
         #expect(info == .object(keys: ["onboarding", "settings"]))
     }
 
-    @Test func inspectObject() throws {
-        let info = try JSON.jsonInspect(pointer: "/placements/0")
-        #expect(info == .object(keys: ["onboarding", "settings"]))
-    }
-
     @Test func inspectArray() throws {
         let info = try JSON.jsonInspect(pointer: "/placements/0/onboarding/variations")
         #expect(info == .array(count: 2))
