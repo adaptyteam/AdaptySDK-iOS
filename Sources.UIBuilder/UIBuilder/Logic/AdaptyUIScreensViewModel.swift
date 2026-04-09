@@ -38,6 +38,9 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         navigatorsViewModels = []
     }
 
+    /// Set by state action handler to enable screen lifecycle action execution
+    var executeActions: ((_ actions: [VC.Action], _ screen: VS.ScreenInstance) -> Void)?
+
     var topmostScreenInstance: VS.ScreenInstance? {
         navigatorsViewModels.max(by: { $0.order < $1.order })?.screens.last?.instance
     }
@@ -71,6 +74,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
                 appearTransitionId: transitionId
             )
 
+            navigatorVM.executeActions = executeActions
             navigatorsViewModels.append(navigatorVM)
 
             navigatorVM.startNavigatorTransition(
@@ -101,6 +105,12 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
             transitionId: transitionId,
             completion: { [weak self] in
                 guard let self else { return }
+
+                // Fire onDidDisappear for the navigator's screens
+                if let screen = navigatorVM.screens.last {
+                    navigatorVM.executeScreenActions(.onDidDisappear, screen: screen.instance)
+                }
+
                 self.navigatorsViewModels.remove(at: index)
 
                 Log.ui.verbose("#\(self.logId)# dismiss navigator:\(navigatorId) DONE")

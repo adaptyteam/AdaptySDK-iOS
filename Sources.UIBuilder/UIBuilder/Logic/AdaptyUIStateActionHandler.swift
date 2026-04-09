@@ -85,6 +85,9 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     package nonisolated func registerState(_ state: AdaptyUIState) {
         Task { @MainActor [weak self] in
             self?.state = state
+            self?.screensViewModel.executeActions = { [weak state] actions, screen in
+                try? state?.execute(actions: actions, screenInstance: screen)
+            }
         }
     }
 

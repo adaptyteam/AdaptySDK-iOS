@@ -205,15 +205,11 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
 
             if let allowedTransitions = trigger.screenTransitions {
                 guard let tid = event.transitionId,
-                      allowedTransitions.contains(tid) else {
-                    print("🔴 TRANSITIONS blocked: allowed=\(allowedTransitions) got=\(event.transitionId ?? "nil")")
-                    continue
-                }
+                      allowedTransitions.contains(tid) else { continue }
             }
 
             let count = eventBus.fireCount(screenInstanceId: event.screenInstanceId, eventId: event.eventId)
             if let filter = trigger.filter {
-                print("🟡 FILTER \(filter) event=\(event.eventId) sid=\(event.screenInstanceId ?? "nil") count=\(count)")
                 switch filter {
                 case .first: guard count <= 1 else { continue }
                 case .notFirst: guard count > 1 else { continue }
@@ -249,13 +245,15 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             }
             .max() ?? 0
 
-        guard totalDuration > 0 else { return }
-
         let actions = handler.onAnimationsFinish
         guard let screenInstance = navigatorViewModel.currentScreenInstanceIfSingle else { return }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration) { [weak stateViewModel] in
-            stateViewModel?.execute(actions: actions, screen: screenInstance)
+        if totalDuration > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration) { [weak stateViewModel] in
+                stateViewModel?.execute(actions: actions, screen: screenInstance)
+            }
+        } else {
+            stateViewModel.execute(actions: actions, screen: screenInstance)
         }
     }
 }

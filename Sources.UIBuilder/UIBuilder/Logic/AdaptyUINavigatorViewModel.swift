@@ -56,6 +56,9 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
     let eventBus = AdaptyUIEventBus()
 
+    /// Callback for executing screen-level lifecycle actions
+    var executeActions: ((_ actions: [VC.Action], _ screen: VS.ScreenInstance) -> Void)?
+
     @Published
     private(set) var screens: [AdaptyUIScreenViewModel]
 
@@ -98,6 +101,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         }
 
         // Fire onWillDisappear for outgoing screen
+        executeScreenActions(.onWillDisappear, screen: currentScreen.instance)
         eventBus.publish(
             eventId: .onWillDisappear,
             transitionId: transitionId,
@@ -113,6 +117,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             screens.append(screen)
 
             // Fire onWillAppear for incoming screen (no transition)
+            executeScreenActions(.onWillAppear, screen: screen.instance)
             eventBus.publish(
                 eventId: .onWillAppear,
                 transitionId: transitionId,
@@ -122,6 +127,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             completion?()
 
             // Fire onDidAppear immediately (no transition to wait for)
+            executeScreenActions(.onDidAppear, screen: screen.instance)
             eventBus.publish(
                 eventId: .onDidAppear,
                 transitionId: transitionId,
@@ -140,6 +146,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         newScreen.startIncomingTransition(transition.incoming)
 
         // Fire onWillAppear for incoming screen
+        executeScreenActions(.onWillAppear, screen: newScreen.instance)
         eventBus.publish(
             eventId: .onWillAppear,
             transitionId: transitionId,
@@ -155,6 +162,9 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
             Log.ui.verbose("#\(self.logId)# screen:\(screen.id) in navigator:\(self.navigator.id) - transition finished")
 
+            // Fire onDidDisappear for outgoing screen
+            self.executeScreenActions(.onDidDisappear, screen: currentScreen.instance)
+
             // Clear stale pending events for outgoing screen
             self.eventBus.clearPending(for: currentScreen.instance.id)
 
@@ -162,6 +172,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             completion?()
 
             // Fire onDidAppear for the new screen
+            self.executeScreenActions(.onDidAppear, screen: screen.instance)
             self.eventBus.publish(
                 eventId: .onDidAppear,
                 transitionId: transitionId,
@@ -186,6 +197,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         // Fire onWillAppear for the initial screen
         if let screen = screens.first {
             screen.transitionId = transitionId
+            executeScreenActions(.onWillAppear, screen: screen.instance)
             eventBus.publish(
                 eventId: .onWillAppear,
                 transitionId: transitionId,
@@ -204,6 +216,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
                 screenInstanceId: nil
             )
             if let screen = screens.first {
+                executeScreenActions(.onDidAppear, screen: screen.instance)
                 eventBus.publish(
                     eventId: .onDidAppear,
                     transitionId: transitionId,
@@ -234,6 +247,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
                 screenInstanceId: nil
             )
             if let screen = self.screens.first {
+                self.executeScreenActions(.onDidAppear, screen: screen.instance)
                 self.eventBus.publish(
                     eventId: .onDidAppear,
                     transitionId: transitionId,
@@ -245,6 +259,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
     func publishDismissEvents() {
         if let screen = screens.last {
+            executeScreenActions(.onWillDisappear, screen: screen.instance)
             eventBus.publish(
                 eventId: .onWillDisappear,
                 transitionId: nil,
@@ -256,6 +271,24 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             transitionId: nil,
             screenInstanceId: nil
         )
+    }
+
+    func executeScreenActions(_ eventId: VC.EventHandler.EventId, screen: VS.ScreenInstance) {
+        let actions: [VC.Action]? = switch eventId {
+        case .onWillAppear:
+            navigator.defaultScreenActions.onWillAppear ?? screen.configuration.screenActions.onWillAppear
+        case .onDidAppear:
+            navigator.defaultScreenActions.onDidAppear ?? screen.configuration.screenActions.onDidAppear
+        case .onWillDisappear:
+            navigator.defaultScreenActions.onWillDisappear ?? screen.configuration.screenActions.onWillDisappear
+        case .onDidDisappear:
+            navigator.defaultScreenActions.onDidDisappear ?? screen.configuration.screenActions.onDidDisappear
+        default:
+            nil
+        }
+        if let actions, !actions.isEmpty {
+            executeActions?(actions, screen)
+        }
     }
 }
 
