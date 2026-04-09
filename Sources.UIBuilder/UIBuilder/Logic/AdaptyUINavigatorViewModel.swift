@@ -17,6 +17,7 @@ final class AdaptyUIScreenViewModel: ObservableObject {
 
     let instance: VS.ScreenInstance
     var zIndex: Double = 1.0
+    var transitionId: String?
 
     @Published var playIncomingTransition: [VC.Animation]? = nil
     @Published var playOutgoingTransition: [VC.Animation]? = nil
@@ -53,9 +54,11 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         navigator.appearances?[appearTransitionId]
     }
 
+    let eventBus = AdaptyUIEventBus()
+
     @Published
     private(set) var screens: [AdaptyUIScreenViewModel]
-    
+
     var currentScreenInstanceIfSingle: VS.ScreenInstance? {
         screens.firstIfSingle?.instance
     }
@@ -94,21 +97,54 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             return // TODO: x throw error?
         }
 
+        // Fire onWillDisappear for outgoing screen
+        eventBus.publish(
+            eventId: .onWillDisappear,
+            transitionId: transitionId,
+            screenInstanceId: currentScreen.instance.id
+        )
+
         guard let transition = navigator.transitions?[transitionId] else {
             Log.ui.verbose("#\(logId)# screen:\(screen.id) in navigator:\(navigator.id) - no transition found")
 
             screens.removeAll()
+
+            screen.transitionId = transitionId
             screens.append(screen)
+
+            // Fire onWillAppear for incoming screen (no transition)
+            eventBus.publish(
+                eventId: .onWillAppear,
+                transitionId: transitionId,
+                screenInstanceId: screen.instance.id
+            )
+
             completion?()
+
+            // Fire onDidAppear immediately (no transition to wait for)
+            eventBus.publish(
+                eventId: .onDidAppear,
+                transitionId: transitionId,
+                screenInstanceId: screen.instance.id
+            )
+
             return
         }
 
         Log.ui.verbose("#\(logId)# screen:\(screen.id) in navigator:\(navigator.id) - transition found")
 
         var newScreen = screen
+        newScreen.transitionId = transitionId
 
         currentScreen.startOutgoingTransition(transition.outgoing)
         newScreen.startIncomingTransition(transition.incoming)
+
+        // Fire onWillAppear for incoming screen
+        eventBus.publish(
+            eventId: .onWillAppear,
+            transitionId: transitionId,
+            screenInstanceId: newScreen.instance.id
+        )
 
         screens.append(newScreen)
 
@@ -119,8 +155,18 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
             Log.ui.verbose("#\(self.logId)# screen:\(screen.id) in navigator:\(self.navigator.id) - transition finished")
 
+            // Clear stale pending events for outgoing screen
+            self.eventBus.clearPending(for: currentScreen.instance.id)
+
             self.screens.remove(at: 0)
             completion?()
+
+            // Fire onDidAppear for the new screen
+            self.eventBus.publish(
+                eventId: .onDidAppear,
+                transitionId: transitionId,
+                screenInstanceId: screen.instance.id
+            )
         }
     }
 
@@ -130,25 +176,86 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     ) {
         Log.ui.verbose("#\(logId)# startNavigatorTransition \(transitionId) in navigator:\(navigator.id)")
 
+        // Fire onWillAppear for navigator-level elements
+        eventBus.publish(
+            eventId: .onWillAppear,
+            transitionId: transitionId,
+            screenInstanceId: nil
+        )
+
+        // Fire onWillAppear for the initial screen
+        if let screen = screens.first {
+            screen.transitionId = transitionId
+            eventBus.publish(
+                eventId: .onWillAppear,
+                transitionId: transitionId,
+                screenInstanceId: screen.instance.id
+            )
+        }
+
         guard let transition = navigator.appearances?[transitionId] else {
             Log.ui.verbose("#\(logId)# navigator:\(navigator.id) - no transition found")
             completion?()
+
+            // Fire onDidAppear immediately (no transition)
+            eventBus.publish(
+                eventId: .onDidAppear,
+                transitionId: transitionId,
+                screenInstanceId: nil
+            )
+            if let screen = screens.first {
+                eventBus.publish(
+                    eventId: .onDidAppear,
+                    transitionId: transitionId,
+                    screenInstanceId: screen.instance.id
+                )
+            }
+
             return
         }
 
         backgroundAnimation = transition.background
         contentAnimations = transition.content
 
-        if let completion {
-            DispatchQueue.main.asyncAfter(
-                deadline: .now() + transition.totalDuration
-            ) { [weak self] in
-                guard let self else { return }
-                Log.ui.verbose("#\(self.logId)# navigator:\(self.navigator.id) - transition finished")
+        let totalDuration = transition.totalDuration
 
-                completion()
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + totalDuration
+        ) { [weak self] in
+            guard let self else { return }
+            Log.ui.verbose("#\(self.logId)# navigator:\(self.navigator.id) - transition finished")
+
+            completion?()
+
+            // Fire onDidAppear after transition completes
+            self.eventBus.publish(
+                eventId: .onDidAppear,
+                transitionId: transitionId,
+                screenInstanceId: nil
+            )
+            if let screen = self.screens.first {
+                self.eventBus.publish(
+                    eventId: .onDidAppear,
+                    transitionId: transitionId,
+                    screenInstanceId: screen.instance.id
+                )
             }
         }
+    }
+
+    func publishDismissEvents() {
+        if let screen = screens.last {
+            eventBus.publish(
+                eventId: .onWillDisappear,
+                transitionId: nil,
+                screenInstanceId: screen.instance.id
+            )
+        }
+        eventBus.publish(
+            eventId: .onWillDisappear,
+            transitionId: nil,
+            screenInstanceId: nil
+        )
     }
 }
 

@@ -41,14 +41,5 @@ extension VC.Element.Properties {
             && focusId == .none
             && interactionEnabled == .none
     }
-
-    @available(*, deprecated, message: "Use eventHandlers instead.")
-    var onAppear: [VC.Animation] {
-        eventHandlers.filter {
-            $0.animations.isNotEmpty && $0.triggers.contains(where: { trigger in
-                trigger.filter == nil && trigger.screenTransitions == nil && trigger.events.contains(.onWillAppiar)
-            })
-        }.flatMap(\.animations)
-    }
 }
 

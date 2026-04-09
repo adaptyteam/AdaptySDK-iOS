@@ -95,6 +95,8 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 
         let navigatorVM = navigatorsViewModels[index]
 
+        navigatorVM.publishDismissEvents()
+
         navigatorVM.startNavigatorTransition(
             transitionId: transitionId,
             completion: { [weak self] in
