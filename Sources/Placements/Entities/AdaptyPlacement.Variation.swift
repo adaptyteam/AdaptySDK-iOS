@@ -68,7 +68,7 @@ extension [AdaptyPlacement.Variation] {
 
         let index = sortedItems.firstIndex { item in
             weight -= item.element.weight
-            return weight <= 0
+            return weight < 0
         } ?? (countVariations - 1)
 
         return sortedItems[index].offset

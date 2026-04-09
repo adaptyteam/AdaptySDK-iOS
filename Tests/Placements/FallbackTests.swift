@@ -136,9 +136,7 @@ struct FallbackTests {
         for schemaId in schemas {
             let startTime = CFAbsoluteTimeGetCurrent()
             do {
-                _ = try runOnLargeStack {
-                    try fallback.getUISchema(byViewConfigurationId: schemaId)
-                }
+                _ = try fallback.getUISchema(byViewConfigurationId: schemaId)
             } catch {
                 Issue.record("schema[\(schemaId)]: \(error)")
             }
@@ -148,20 +146,6 @@ struct FallbackTests {
     }
 }
 
-private func runOnLargeStack<T>(stackSize: Int = 8 * 1024 * 1024, _ body: @escaping @Sendable () throws -> T) throws -> T {
-    let result = UnsafeMutablePointer<Result<T, any Error>>.allocate(capacity: 1)
-    defer { result.deallocate() }
-
-    let sema = DispatchSemaphore(value: 0)
-    let thread = Thread {
-        result.initialize(to: Result { try body() })
-        sema.signal()
-    }
-    thread.stackSize = stackSize
-    thread.start()
-    sema.wait()
-    return try result.move().get()
-}
 
 #endif
 
