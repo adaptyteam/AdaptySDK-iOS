@@ -52,6 +52,7 @@ static inline bool get_type(
 
 static inline SDJsonType map_type(ondemand::json_type jtype) {
     switch (jtype) {
+        case ondemand::json_type::unknown: return SDJSON_TYPE_NULL;
         case ondemand::json_type::object:  return SDJSON_TYPE_OBJECT;
         case ondemand::json_type::array:   return SDJSON_TYPE_ARRAY;
         case ondemand::json_type::string:  return SDJSON_TYPE_STRING;
@@ -62,13 +63,13 @@ static inline SDJsonType map_type(ondemand::json_type jtype) {
     return SDJSON_TYPE_NULL;
 }
 
-/// Разбивает JSON Pointer на сегменты.
-/// "/placements/onboarding/variations/0" → ["placements", "onboarding", "variations", "0"]
+/// Splits a JSON Pointer into segments.
+/// "/placements/onboarding/variations/0" -> ["placements", "onboarding", "variations", "0"]
 static std::vector<std::string> split_pointer(const char* pointer) {
     std::vector<std::string> segments;
     if (!pointer || pointer[0] == '\0') return segments;
 
-    // Пропускаем начальный /
+    // Skip the leading /
     const char* p = pointer;
     if (*p == '/') p++;
 
@@ -91,7 +92,7 @@ static std::vector<std::string> split_pointer(const char* pointer) {
     return segments;
 }
 
-/// Проверяет, является ли строка числовым индексом массива
+/// Checks whether the string is a numeric array index.
 static bool is_array_index(const std::string& s) {
     if (s.empty()) return false;
     for (char c : s) {
@@ -321,23 +322,23 @@ SDJsonRangeResult sdjson_range(const char* json_data,
     std::string last_segment = segments.back();
     bool last_is_array_index = is_array_index(last_segment);
 
-    // Строим parent pointer (всё кроме последнего сегмента)
+    // Build parent pointer (everything except the last segment)
     std::string parent_pointer;
     for (size_t i = 0; i < segments.size() - 1; i++) {
         parent_pointer += "/" + segments[i];
     }
 
     if (last_is_array_index) {
-        // Элемент массива — ключа нет
-        // Навигируем по полному пути, берём позицию значения
+        // Array element — no key.
+        // Navigate by the full path and get the value position.
         ondemand::value val;
         if (!navigate(doc, pointer, val, &result.error)) return result;
 
-        // raw_json_token() указывает на начало значения внутри буфера
+        // raw_json_token() points to the start of the value inside the buffer
         std::string_view raw_token = val.raw_json_token();
 
-        // Для получения полной длины значения используем to_json_string
-        // Нужен rewind — делаем заново
+        // to_json_string gives the full value length but consumes the value,
+        // so rewind and re-navigate.
         doc.rewind();
         ondemand::value val2;
         if (!navigate(doc, pointer, val2, &result.error)) return result;
@@ -352,8 +353,8 @@ SDJsonRangeResult sdjson_range(const char* json_data,
         result.value_length = full_value.size();
 
     } else {
-        // Поле объекта — нужно найти позицию ключа и значения
-        // Навигируем к родительскому объекту
+        // Object field — need to locate both key and value positions.
+        // Navigate to the parent object.
         ondemand::object parent_obj;
 
         if (parent_pointer.empty()) {
@@ -367,10 +368,10 @@ SDJsonRangeResult sdjson_range(const char* json_data,
             if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
         }
 
-        // Итерируем по полям родителя, ищем нужный ключ.
-        // ВАЖНО: в simdjson on-demand нельзя вызывать и key() и
-        // unescaped_key() на одном field — второй вызов вернёт невалидные
-        // данные. Поэтому используем только key() для позиции и сравнения.
+        // Iterate over the parent's fields looking for the target key.
+        // NOTE: in simdjson on-demand you must not call both key() and
+        // unescaped_key() on the same field — the second call returns
+        // invalid data. We use key() only for both position and comparison.
         bool found = false;
         for (auto field : parent_obj) {
             ondemand::raw_json_string raw_key;
@@ -379,13 +380,13 @@ SDJsonRangeResult sdjson_range(const char* json_data,
 
             if (!raw_key.unsafe_is_equal(last_segment.c_str())) continue;
 
-            // Нашли! raw() указывает ПОСЛЕ открывающей кавычки.
+            // Found! raw() points right AFTER the opening quote.
             const char* key_raw_ptr = raw_key.raw();
 
-            // Находим закрывающую кавычку ключа, учитывая escape-последовательности
+            // Find the closing quote of the key, respecting escape sequences
             const char* p = key_raw_ptr;
             while (*p != '"') {
-                if (*p == '\\') p++; // пропускаем escaped символ
+                if (*p == '\\') p++; // skip escaped character
                 p++;
             }
             size_t raw_key_len = p - key_raw_ptr;
@@ -393,7 +394,7 @@ SDJsonRangeResult sdjson_range(const char* json_data,
             result.key_offset = key_raw_ptr - buf_start;
             result.key_length = raw_key_len;
 
-            // Получаем позицию значения
+            // Get the value position
             ondemand::value field_val;
             err = field.value().get(field_val);
             if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
@@ -401,7 +402,7 @@ SDJsonRangeResult sdjson_range(const char* json_data,
             std::string_view val_token = field_val.raw_json_token();
             result.value_offset = val_token.data() - buf_start;
 
-            // to_json_string consume-ит value, поэтому rewind + at_pointer
+            // to_json_string consumes the value, so rewind + at_pointer
             doc.rewind();
 
             ondemand::value full_val;

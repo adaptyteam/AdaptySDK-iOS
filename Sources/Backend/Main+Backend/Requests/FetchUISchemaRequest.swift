@@ -42,10 +42,11 @@ struct FetchUISchemaRequest: BackendRequest {
 extension AdaptyUISchema {
     static func decoder(
         _ response: HTTPDataResponse,
-        _ configuration: HTTPCodableConfiguration?,
+        _: HTTPCodableConfiguration?,
         _: HTTPRequest
     ) async throws -> HTTPResponse<AdaptyUISchema> {
-        let schema = try response.decodeBody(AdaptyUISchema.self, with: configuration)
+        guard let data = response.body else { throw URLError(.cannotDecodeRawData) }
+        let schema = try AdaptyUISchema(from: data)
         return response.replaceBody(schema)
     }
 }

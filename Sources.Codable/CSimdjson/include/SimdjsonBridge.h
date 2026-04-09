@@ -51,13 +51,13 @@ typedef struct {
     SDJsonError error;
 } SDJsonInspectResult;
 
-/// Результат range — byte offsets внутри оригинального JSON буфера.
-/// key_offset/key_length = -1/0 если ключа нет (элемент массива).
+/// Range result — byte offsets within the original JSON buffer.
+/// key_offset/key_length = -1/0 when there is no key (array element).
 typedef struct {
-    int64_t     key_offset;     // byte offset начала имени ключа (без ")
-    size_t      key_length;     // длина имени ключа (без ")
-    size_t      value_offset;   // byte offset начала значения
-    size_t      value_length;   // длина значения в байтах
+    int64_t     key_offset;     // byte offset of the key name start (without ")
+    size_t      key_length;     // key name length (without ")
+    size_t      value_offset;   // byte offset of the value start
+    size_t      value_length;   // value length in bytes
     SDJsonError error;
 } SDJsonRangeResult;
 
@@ -86,8 +86,8 @@ SDJsonInspectResult sdjson_inspect(const char* json_data,
                                    size_t json_length,
                                    const char* pointer);
 
-/// Возвращает byte range ключа и значения по JSON Pointer.
-/// Для элементов массива key_offset = -1.
+/// Returns byte ranges of the key and value at the given JSON Pointer.
+/// For array elements key_offset = -1.
 SDJsonRangeResult sdjson_range(const char* json_data,
                                size_t json_length,
                                const char* pointer);

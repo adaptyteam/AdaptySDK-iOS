@@ -80,11 +80,12 @@ public extension Data {
         }
     }
 
-    /// Extracts a JSON fragment by JSON Pointer.
+    /// Extracts a JSON fragment at the given path.
     ///
     /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
-    /// - Returns: `Data` with the JSON fragment, ready for `JSONDecoder`
-    /// - Throws: `JsonExtractorError`
+    ///
+    /// Returns raw `Data` suitable for `JSONDecoder`. For `null` values
+    /// the result is the four-byte literal `null`.
     func jsonExtract(pointer: String) throws(JsonExtractError) -> Data {
         try withJsonBytes { base, length throws(JsonExtractError) in
             let result = sdjson_extract(base, length, pointer)
@@ -103,6 +104,11 @@ public extension Data {
         }
     }
 
+    /// Extracts a JSON fragment, returning `nil` when the path does not exist.
+    ///
+    /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
+    ///
+    /// A JSON `null` value is returned as `Data("null")`, not `nil`.
     @inlinable
     func jsonExtractIfPresent(pointer: String) throws(JsonExtractError) -> Data? {
         do {
@@ -112,6 +118,10 @@ public extension Data {
         }
     }
 
+    /// Extracts a JSON fragment, returning `nil` when the path does not exist
+    /// **or** the value is JSON `null`.
+    ///
+    /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
     func jsonExtractIfExist(pointer: String) throws(JsonExtractError) -> Data? {
         do {
             let value = try jsonExtract(pointer: pointer)
@@ -121,6 +131,9 @@ public extension Data {
         }
     }
 
+    /// Returns `true` if the path exists in the JSON, even if the value is `null`.
+    ///
+    /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
     func jsonContains(pointer: String) throws(JsonExtractError) -> Bool {
         try withJsonBytes { base, length throws(JsonExtractError) in
             var outError = SDJSON_OK
@@ -134,6 +147,9 @@ public extension Data {
         }
     }
 
+    /// Returns `true` if the path exists **and** its value is not JSON `null`.
+    ///
+    /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
     @inlinable
     func jsonExist(pointer: String) throws(JsonExtractError) -> Bool {
         do {
@@ -144,6 +160,13 @@ public extension Data {
         }
     }
 
+    /// Returns the JSON type at the given path without extra work.
+    ///
+    /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
+    ///
+    /// For objects and arrays, `keys` / `count` are not populated
+    /// (always empty list / zero). Use ``jsonInspect(pointer:)`` when you
+    /// need that detail.
     func jsonFastInspect(pointer: String) throws(JsonExtractError) -> JsonValueInfo {
         try withJsonBytes { base, length throws(JsonExtractError) in
             let result = sdjson_type(base, length, pointer)
@@ -164,6 +187,10 @@ public extension Data {
         }
     }
 
+    /// Returns the JSON type at the given path together with structural detail:
+    /// object key names for objects, element count for arrays.
+    ///
+    /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
     func jsonInspect(pointer: String) throws(JsonExtractError) -> JsonValueInfo {
         try withJsonBytes { base, length throws(JsonExtractError) in
             let result = sdjson_inspect(base, length, pointer)
@@ -197,16 +224,13 @@ public extension Data {
 
     // MARK: - Range
 
-    /// Возвращает byte range ключа и значения в оригинальном JSON-тексте.
+    /// Returns UTF-8 byte ranges of the key name and the value in the
+    /// original JSON buffer.
     ///
-    /// ```swift
-    /// let prop = try extractor.range(pointer: "/placements/onboarding")
+    /// - Parameter pointer: JSON Pointer (RFC 6901), e.g. `"/placements/onboarding"`
     ///
-    /// let jsonString = String(data: jsonData, encoding: .utf8)!
-    /// let start = jsonString.utf8.index(jsonString.startIndex, offsetBy: prop.value.lowerBound)
-    /// let end = jsonString.utf8.index(jsonString.startIndex, offsetBy: prop.value.upperBound)
-    /// let nsRange = NSRange(start..<end, in: jsonString)
-    /// ```
+    /// `key` points to the property name **without** surrounding quotes.
+    /// For array elements `key` is `nil`.
     func jsonExtractRange(pointer: String) throws(JsonExtractError) -> JsonPropertyRange {
         try withJsonBytes { base, length throws(JsonExtractError) in
             let result = sdjson_range(base, length, pointer)
@@ -234,11 +258,10 @@ public extension Data {
 
     /// Extracts multiple JSON fragments in a single call.
     ///
-    /// Each path is parsed with rewind, but padded_string is created only once.
+    /// - Parameter pointers: Array of JSON Pointer (RFC 6901) strings
     ///
-    /// - Parameter pointers: Array of JSON Pointer strings
-    /// - Returns: Dictionary `[pointer: Data]` of successful extractions
-    /// - Throws: `JsonExtractorError` if at least one extraction fails
+    /// The padded buffer is allocated once and reused for every pointer,
+    /// making this faster than calling ``jsonExtract(pointer:)`` in a loop.
     func jsonExtractMany(pointers: [String]) throws(JsonExtractError) -> [String: Data] {
         try withJsonBytes { base, length throws(JsonExtractError) in
             let count = pointers.count

@@ -21,16 +21,6 @@ public struct AdaptyUISchema: Sendable {
     let scripts: [String]
 }
 
-public extension AdaptyUISchema {
-    init(from jsonData: Data) throws {
-        self = try JSONDecoder().decode(AdaptyUISchema.self, from: jsonData)
-    }
-
-    init(from jsonData: String) throws {
-        try self.init(from: jsonData.data(using: .utf8) ?? Data())
-    }
-}
-
 extension AdaptyUISchema: Codable {
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
@@ -48,12 +38,12 @@ extension AdaptyUISchema: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        formatVersion = try container.decode(Version.self, forKey: .formatVersion)
+        formatVersion = try container.decodeIfPresent(Version.self, forKey: .formatVersion) ?? "4.4.1"
 
         var configuration = DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion)
 
         if configuration.isLegacy {
-            configuration.legacyTemplateId = try container.decode(String.self, forKey: .legacyTemplateId)
+            configuration.legacyTemplateId = try container.decodeIfPresent(String.self, forKey: .legacyTemplateId) ?? "default"
         }
 
         assets = try (container.decodeIfPresent(AssetsCollection.self, forKey: .assets))?.value ?? [:]
@@ -197,3 +187,4 @@ private extension Decoder {
         return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
     }
 }
+
