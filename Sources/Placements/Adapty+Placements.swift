@@ -335,7 +335,7 @@ extension Adapty {
                     locale: locale
                 )
             } else {
-                Adapty.fallbackPlacements?.getPlacement(
+                try? Adapty.fallbackPlacements?.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: nil,
                     userId: userId,

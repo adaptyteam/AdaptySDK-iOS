@@ -150,7 +150,6 @@ let package = Package(
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),
-                .process("Placements/fallback_large.json"),
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),

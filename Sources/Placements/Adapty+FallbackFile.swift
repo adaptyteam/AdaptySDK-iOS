@@ -59,7 +59,6 @@ extension PlacementStorage {
         let cachedB: AdaptyPlacementChosen<Content>? = cachedA != nil ? nil
             : getPlacement(byPlacementId: placementId, withVariationId: nil, userId: userId, locale: locale)
 
-
         guard let fallbackFile = Adapty.fallbackPlacements, fallbackFile.contains(placementId: placementId) ?? true
         else {
             guard let cached = cachedA ?? cachedB else { return nil }
@@ -70,7 +69,7 @@ extension PlacementStorage {
         switch (cachedA, cachedB) {
         case let (cached?, _):
             if fallbackFile.version > cached.content.placement.version,
-               let fallbacked: AdaptyPlacementChosen<Content> = fallbackFile.getPlacement(
+               let fallbacked: AdaptyPlacementChosen<Content> = try? fallbackFile.getPlacement(
                    byPlacementId: placementId,
                    withVariationId: variationId,
                    userId: userId,
@@ -86,7 +85,7 @@ extension PlacementStorage {
 
         case let (_, cached?):
             let fallBackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
-                : fallbackFile.getPlacement(
+                : try? fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: variationId,
                     userId: userId,
@@ -94,7 +93,7 @@ extension PlacementStorage {
                 )
 
             let fallBackedB: AdaptyPlacementChosen<Content>? = (fallBackedA != nil || cached.content.placement.version >= fallbackFile.version) ? nil
-                : fallbackFile.getPlacement(
+                : try? fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: nil,
                     userId: userId,
@@ -112,19 +111,19 @@ extension PlacementStorage {
 
         default:
             let fallBacked: AdaptyPlacementChosen<Content>? = if let variationId {
-                fallbackFile.getPlacement(
+                (try? fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: variationId,
                     userId: userId,
                     requestLocale: locale
-                ) ?? fallbackFile.getPlacement(
+                )) ?? (try? fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: nil,
                     userId: userId,
                     requestLocale: locale
-                )
+                ))
             } else {
-                fallbackFile.getPlacement(
+                try? fallbackFile.getPlacement(
                     byPlacementId: placementId,
                     withVariationId: nil,
                     userId: userId,

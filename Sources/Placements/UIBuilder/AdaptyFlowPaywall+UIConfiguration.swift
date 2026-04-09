@@ -59,6 +59,10 @@ extension Adapty {
         viewConfigurationId: String,
         loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> AdaptyUISchema {
+        if let schema = try? Adapty.fallbackPlacements?.getUISchema(byViewConfigurationId: viewConfigurationId) {
+            return schema
+        }
+
         let session = httpFallbackSession
         let apiKeyPrefix = apiKeyPrefix
         let isTestUser = profileManager?.isTestUser ?? false
