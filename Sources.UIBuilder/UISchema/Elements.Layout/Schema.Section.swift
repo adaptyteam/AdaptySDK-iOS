@@ -11,6 +11,7 @@ extension Schema {
     struct Section: Sendable {
         let index: Variable
         let content: [Schema.Element]
+        let animation: VC.Section.Animation?
     }
 }
 
@@ -31,7 +32,8 @@ extension Schema.Section: Schema.CompositeElement {
         try .section(
             .init(
                 index: index,
-                content: resultStack.popLastElements(content.count)
+                content: resultStack.popLastElements(content.count),
+                animation: animation
             ),
             properties
         )
@@ -43,6 +45,7 @@ extension Schema.Section: DecodableWithConfiguration {
         case legacySectionId = "id"
         case index
         case content
+        case animation
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -50,7 +53,8 @@ extension Schema.Section: DecodableWithConfiguration {
         guard configuration.isLegacy else {
             try self.init(
                 index: container.decode(Schema.Variable.self, forKey: .index),
-                content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
+                content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
+                animation: container.decodeIfPresent(VC.Section.Animation.self, forKey: .animation)
             )
             return
         }
@@ -66,7 +70,8 @@ extension Schema.Section: DecodableWithConfiguration {
                 scope: .global,
                 converter: nil
             ),
-            content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
+            content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
+            animation: nil
         )
     }
 }
