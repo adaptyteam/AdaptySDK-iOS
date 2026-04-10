@@ -190,7 +190,7 @@ extension VS.JSState {
         path: [String],
         args functionArguments: [any JSValueConvertable] = []
     ) throws(VS.Error) -> T? {
-        guard let name = path.last, path.count > 0 else { throw .jsPathToObjectIsEmpty }
+        guard let name = path.last else { throw .jsPathToObjectIsEmpty }
 
         let parent = try findObject(path: path.dropLast())
 
@@ -267,9 +267,14 @@ extension VS.JSState {
             objectWillChange.send()
             return
         } catch {
-            guard case .jsMethodNotFound = error else { throw error }
-            if variable.setter != nil {
-                log.warn("not found setter \(setter.joined(separator: "."))")
+            switch error {
+            case .jsMethodNotFound, .jsObjectNotFound:
+                guard variable.setter == nil else {
+                    log.warn("not found setter \(setter.joined(separator: "."))")
+                    throw error
+                }
+            default:
+                throw error
             }
         }
 
@@ -379,4 +384,3 @@ extension VS.JSState {
         return debug(path: path.joined(separator: "."), filter: filter)
     }
 }
-
