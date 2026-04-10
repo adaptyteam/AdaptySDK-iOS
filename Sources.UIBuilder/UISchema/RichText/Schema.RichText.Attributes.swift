@@ -26,6 +26,7 @@ extension Schema.RichText.Attributes: Codable {
         case background
         case strike
         case underline
+        case letterSpacing = "letter_spacing"
     }
 
     init(from decoder: any Decoder) throws {
@@ -37,7 +38,8 @@ extension Schema.RichText.Attributes: Codable {
             imageTintColor: container.decodeIfPresent(Schema.AssetIdentifierOrValue.self, forKeys: .imageTintColor),
             background: container.decodeIfPresent(Schema.AssetIdentifierOrValue.self, forKeys: .background),
             strike: container.decodeIfPresent(Bool.self, forKeys: .strike),
-            underline: container.decodeIfPresent(Bool.self, forKeys: .underline)
+            underline: container.decodeIfPresent(Bool.self, forKeys: .underline),
+            letterSpacing: container.decodeIfPresent(Double.self, forKey: .letterSpacing)
         )
     }
 
@@ -50,5 +52,7 @@ extension Schema.RichText.Attributes: Codable {
         try container.encodeIfPresent(background, forKey: .background)
         try container.encodeIfPresent(strike, forKey: .strike)
         try container.encodeIfPresent(underline, forKey: .underline)
+        try container.encodeIfPresent(letterSpacing, forKey: .letterSpacing)
+
     }
 }

@@ -38,12 +38,12 @@ extension AdaptyUISchema: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        formatVersion = try container.decodeIfPresent(Version.self, forKey: .formatVersion) ?? "4.4.1"
+        formatVersion = try container.decode(Version.self, forKey: .formatVersion)
 
         var configuration = DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion)
 
         if configuration.isLegacy {
-            configuration.legacyTemplateId = try container.decodeIfPresent(String.self, forKey: .legacyTemplateId) ?? "default"
+            configuration.legacyTemplateId = try container.decode(String.self, forKey: .legacyTemplateId)
         }
 
         assets = try (container.decodeIfPresent(AssetsCollection.self, forKey: .assets))?.value ?? [:]

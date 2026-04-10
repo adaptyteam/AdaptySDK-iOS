@@ -26,6 +26,8 @@ extension Schema.TextAttributes: Codable {
         case background
         case strike
         case underline
+        case letterSpacing = "letter_spacing"
+        case lineHeight = "line_height"
     }
 
     init(from decoder: any Decoder) throws {
@@ -38,7 +40,9 @@ extension Schema.TextAttributes: Codable {
             imageTintColor: container.decodeIfPresent(Schema.AssetReference.self, forKeys: .imageTintColor),
             background: container.decodeIfPresent(Schema.AssetReference.self, forKeys: .background),
             strike: container.decodeIfPresent(Bool.self, forKeys: .strike),
-            underline: container.decodeIfPresent(Bool.self, forKeys: .underline)
+            underline: container.decodeIfPresent(Bool.self, forKeys: .underline),
+            letterSpacing: container.decodeIfPresent(Double.self, forKey: .letterSpacing),
+            lineHeight: container.decodeIfPresent(Double.self, forKey: .lineHeight)
         )
     }
 
@@ -51,5 +55,8 @@ extension Schema.TextAttributes: Codable {
         try container.encodeIfPresent(background, forKey: .background)
         try container.encodeIfPresent(strike, forKey: .strike)
         try container.encodeIfPresent(underline, forKey: .underline)
+        try container.encodeIfPresent(letterSpacing, forKey: .letterSpacing)
+        try container.encodeIfPresent(lineHeight, forKey: .lineHeight)
     }
 }
+
