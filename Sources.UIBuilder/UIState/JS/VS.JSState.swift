@@ -89,7 +89,7 @@ extension VS.JSState {
             index += 1
         }
 
-        guard index < path.count - 1 else { return current }
+        guard index < path.count else { return current }
         guard createIfNeeded else {
             throw .jsObjectNotFound(path.joined(separator: "."))
         }
@@ -267,9 +267,14 @@ extension VS.JSState {
             objectWillChange.send()
             return
         } catch {
-            guard case .jsMethodNotFound = error else { throw error }
-            if variable.setter != nil {
-                log.warn("not found setter \(setter.joined(separator: "."))")
+            if case .jsMethodNotFound = error {
+                if variable.setter != nil {
+                    log.warn("not found setter \(setter.joined(separator: "."))")
+                }
+            } else if case .jsObjectNotFound = error {
+                // parent object doesn't exist yet — fall through to createIfNeeded
+            } else {
+                throw error
             }
         }
 
