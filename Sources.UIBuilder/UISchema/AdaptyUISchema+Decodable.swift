@@ -14,26 +14,27 @@ public extension AdaptyUISchema {
         }
     }
 
+    @inlinable
     init(from jsonData: String) throws {
         try self.init(from: jsonData.data(using: .utf8) ?? Data())
     }
 }
 
 extension AdaptyUISchema {
-    private final class DecodeResultBox<T>: @unchecked Sendable {
-        var value: Result<T, any Swift.Error>?
+    private final class DecodeResultBox: @unchecked Sendable {
+        var value: Result<AdaptyUISchema, any Swift.Error>?
     }
 
     /// Runs the decoding closure on a thread with an 8 MB stack
     /// to avoid stack overflow from deeply nested UI element recursion.
-    static func decodeOnLargeStack<T>(
-        _ body: @escaping @Sendable () throws -> T
-    ) throws -> T {
+    static func decodeOnLargeStack(
+        _ body: @escaping @Sendable () throws -> AdaptyUISchema
+    ) throws -> AdaptyUISchema {
         if Thread.isMainThread {
             return try body()
         }
 
-        let resultBox = DecodeResultBox<T>()
+        let resultBox = DecodeResultBox()
         let sema = DispatchSemaphore(value: 0)
         let thread = Thread {
             resultBox.value = Result { try body() }
@@ -46,3 +47,4 @@ extension AdaptyUISchema {
         return try resultBox.value!.get()
     }
 }
+

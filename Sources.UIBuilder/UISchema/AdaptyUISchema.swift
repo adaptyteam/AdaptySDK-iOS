@@ -21,7 +21,7 @@ public struct AdaptyUISchema: Sendable {
     let scripts: [String]
 }
 
-extension AdaptyUISchema: Codable {
+extension AdaptyUISchema: Decodable {
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
         case legacyTemplateId = "template_id"
@@ -106,24 +106,6 @@ extension AdaptyUISchema: Codable {
             } else {
                 try decoder.decodeScript(configuration: configuration)
             }
-    }
-
-    public func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(formatVersion, forKey: .formatVersion)
-        try container.encode(AssetsCollection(value: assets), forKey: .assets)
-        try container.encode(Array(localizations.values), forKey: .localizations)
-        try container.encodeIfPresent(defaultLocalization?.id, forKey: .defaultLocalId)
-//        try container.encode(screens, forKey: .screens)
-//        try container.encode(screens, forKey: .templates)
-//        try container.encode(screens, forKey: .navigators)
-
-        if scripts.isNotEmpty {
-            var container = container.nestedUnkeyedContainer(forKey: .scripts)
-            var script = container.nestedContainer(keyedBy: ScriptCodingKeys.self)
-            try script.encode("js", forKey: .type)
-            try script.encode(scripts.joined(), forKey: .content)
-        }
     }
 }
 

@@ -22,7 +22,8 @@ private extension SchemaTests.RichTextTests {
             imageTintColor: nil,
             background: nil,
             strike: nil,
-            underline: nil
+            underline: nil,
+            letterSpacing: nil
         )
 
         static let attrsWithSize = Attributes(
@@ -32,7 +33,8 @@ private extension SchemaTests.RichTextTests {
             imageTintColor: nil,
             background: nil,
             strike: nil,
-            underline: nil
+            underline: nil,
+            letterSpacing: nil
         )
 
         static let attrsWithTint = Attributes(
@@ -42,7 +44,8 @@ private extension SchemaTests.RichTextTests {
             imageTintColor: .assetId("tint_color"),
             background: nil,
             strike: nil,
-            underline: nil
+            underline: nil,
+            letterSpacing: nil
         )
 
         // MARK: - Test Data
