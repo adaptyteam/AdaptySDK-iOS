@@ -9,12 +9,6 @@
 
 import SwiftUI
 
-extension VC.Section.Animation {
-    var swiftUIAnimation: Animation {
-        interpolator.createAnimation(duration: duration)
-    }
-}
-
 struct AdaptyUISectionView<ScreenHolderContent: View>: View {
     @EnvironmentObject
     private var stateViewModel: AdaptyUIStateViewModel
@@ -64,8 +58,9 @@ struct AdaptyUISectionView<ScreenHolderContent: View>: View {
             currentIndex = selectedIndexInt
         }
         .onChange(of: selectedIndexInt) { newIndex in
-            if let animation = section.animation {
-                withAnimation(animation.swiftUIAnimation) {
+            if let duration = section.animationDuration {
+                let animation = section.animationInterpolator.createAnimation(duration: duration)
+                withAnimation(animation) {
                     currentIndex = newIndex
                 }
             } else {
