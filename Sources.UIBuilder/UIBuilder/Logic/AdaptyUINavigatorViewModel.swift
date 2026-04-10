@@ -142,6 +142,10 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         var newScreen = screen
         newScreen.transitionId = transitionId
 
+        if !transition.isIncomingOnTop {
+            newScreen.zIndex = 0.0
+        }
+
         currentScreen.startOutgoingTransition(transition.outgoing)
         newScreen.startIncomingTransition(transition.incoming)
 
@@ -155,8 +159,11 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
         screens.append(newScreen)
 
+        // Extra 0.1s buffer accounts for the delay between when the timer
+        // starts and when SwiftUI actually begins rendering the animations
+        // (view update pipeline: onReceive → onChange → startAnimations → Task).
         DispatchQueue.main.asyncAfter(
-            deadline: .now() + transition.totalDuration
+            deadline: .now() + transition.totalDuration + 0.1
         ) { [weak self] in
             guard let self else { return }
 
@@ -169,6 +176,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             self.eventBus.clearPending(for: currentScreen.instance.id)
 
             self.screens.remove(at: 0)
+            self.screens.first?.zIndex = 1.0
             completion?()
 
             // Fire onDidAppear for the new screen
@@ -306,7 +314,7 @@ extension VC.Navigator.AppearanceTransition {
         return
             (backgroundTimeline + (content?.map(\.timeline) ?? []))
                 .map { $0.duration + $0.startDelay }
-                .max { $0 > $1 } ?? 0.0
+                .max() ?? 0.0
     }
 
     var initialContentOpacity: Double {
@@ -346,7 +354,7 @@ extension [VC.Animation] {
     var totalDuration: TimeInterval {
         map(\.timeline)
             .map { $0.duration + $0.startDelay }
-            .max { $0 > $1 } ?? 0.0
+            .max() ?? 0.0
     }
 }
 
