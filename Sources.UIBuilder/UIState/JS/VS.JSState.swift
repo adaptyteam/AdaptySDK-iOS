@@ -89,7 +89,7 @@ extension VS.JSState {
             index += 1
         }
 
-        guard index < path.count - 1 else { return current }
+        guard index < path.count else { return current }
         guard createIfNeeded else {
             throw .jsObjectNotFound(path.joined(separator: "."))
         }
