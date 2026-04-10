@@ -24,8 +24,14 @@ struct AdaptyUIHeroContainerView: View {
     private var flowViewModel: AdaptyUIFlowViewModel
     @EnvironmentObject
     private var stateViewModel: AdaptyUIStateViewModel
+    @EnvironmentObject
+    private var eventBus: AdaptyUIEventBus
+    @EnvironmentObject
+    private var navigatorViewModel: AdaptyUINavigatorViewModel
     @Environment(\.adaptyScreenInstance)
     private var screenInstance: VS.ScreenInstance
+    @Environment(\.adaptyScreenInstanceId)
+    private var screenInstanceId: String?
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
@@ -165,6 +171,8 @@ struct AdaptyUIHeroContainerView: View {
 
     @State
     private var playOnAppearAnimations: [VC.Animation] = []
+    @State
+    private var lastProcessedSequence: UInt = 0
 
     @ViewBuilder
     func contentView(
@@ -183,6 +191,7 @@ struct AdaptyUIHeroContainerView: View {
         VStack(spacing: 0) {
             AdaptyUIElementWithoutPropertiesView(
                 content,
+                playAnimations: $playOnAppearAnimations,
                 screenHolderBuilder: { EmptyView() } // TODO: x check
             )
 
@@ -195,15 +204,47 @@ struct AdaptyUIHeroContainerView: View {
         .padding(.bottom, bottomOverscrollHeight - offsetY)
         .animatableDecorator(
             properties?.decorator,
-            animations: properties?.onAppear,
+            play: $playOnAppearAnimations,
             includeBackground: true
         )
         .animatableProperties(properties, play: $playOnAppearAnimations)
         .padding(properties?.padding)
         .padding(.bottom, offsetY - bottomOverscrollHeight)
         .onAppear {
-            playOnAppearAnimations = properties?.onAppear ?? []
+            consumeAndProcessPendingEvents(properties: properties)
         }
+        .onChange(of: eventBus.revision) { _ in
+            consumeAndProcessPendingEvents(properties: properties)
+        }
+    }
+
+    private func consumeAndProcessPendingEvents(properties: VC.Element.Properties?) {
+        guard let properties, properties.eventHandlers.isNotEmpty else { return }
+
+        let pending = eventBus.consumePending(
+            afterSequence: lastProcessedSequence,
+            screenInstanceId: screenInstanceId,
+            currentTopScreenInstanceId: navigatorViewModel.currentScreenInstanceIfSingle?.id
+        )
+        guard !pending.isEmpty else { return }
+
+        for event in pending {
+            for handler in properties.eventHandlers {
+                guard handler.triggers.contains(where: { $0.events.contains(event.eventId) }) else { continue }
+                if handler.animations.isNotEmpty {
+                    if playOnAppearAnimations == handler.animations {
+                        playOnAppearAnimations = []
+                        DispatchQueue.main.async {
+                            playOnAppearAnimations = handler.animations
+                        }
+                    } else {
+                        playOnAppearAnimations = handler.animations
+                    }
+                }
+            }
+        }
+
+        lastProcessedSequence = pending.last!.sequence
     }
 
     @ViewBuilder

@@ -159,7 +159,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
                 } else {
                     [.init(
                         triggers: [.init(
-                            events: [.onWillAppiar],
+                            events: [.onWillAppear],
                             filter: nil,
                             screenTransitions: nil
                         )],

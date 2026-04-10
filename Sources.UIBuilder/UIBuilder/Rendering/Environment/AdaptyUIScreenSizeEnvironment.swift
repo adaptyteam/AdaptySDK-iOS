@@ -33,6 +33,10 @@ struct AdaptyUIScreenInstanceKey: EnvironmentKey {
     )
 }
 
+struct AdaptyUIScreenInstanceIdKey: EnvironmentKey {
+    static let defaultValue: String? = nil
+}
+
 struct AdaptyUIDisplayMissingTagsKey: EnvironmentKey {
     static let defaultValue: Bool = false
 }
@@ -46,6 +50,11 @@ extension EnvironmentValues {
     var adaptyScreenInstance: VS.ScreenInstance {
         get { self[AdaptyUIScreenInstanceKey.self] }
         set { self[AdaptyUIScreenInstanceKey.self] = newValue }
+    }
+
+    var adaptyScreenInstanceId: String? {
+        get { self[AdaptyUIScreenInstanceIdKey.self] }
+        set { self[AdaptyUIScreenInstanceIdKey.self] = newValue }
     }
 
     var adaptyDisplayMissingTags: Bool {

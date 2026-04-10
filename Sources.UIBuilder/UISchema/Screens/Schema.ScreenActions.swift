@@ -16,10 +16,10 @@ extension Schema.ScreenActions {
         onOutsideTap: nil,
         onDeviceBack: nil,
         onFocusChange: nil,
-        onWillAppiar: nil,
-        onWillDisapper: nil,
-        onDidAppiar: nil,
-        onDidDisapper: nil
+        onWillAppear: nil,
+        onWillDisappear: nil,
+        onDidAppear: nil,
+        onDidDisappear: nil
     )
 }
 
@@ -28,10 +28,10 @@ extension Schema.ScreenActions: Codable {
         case onOutsideTap = "on_outside_tap"
         case onDeviceBack = "on_device_back"
         case onFocusChange = "on_focus_change"
-        case onWillAppiar = "on_will_appiar"
-        case onWillDisapper = "on_will_disappiar"
-        case onDidAppiar = "on_did_appiar"
-        case onDidDisapper = "on_did_disappiar"
+        case onWillAppear = "on_will_appear"
+        case onWillDisappear = "on_will_disappear"
+        case onDidAppear = "on_did_appear"
+        case onDidDisappear = "on_did_disappear"
     }
 
     init(from decoder: any Decoder) throws {
@@ -40,10 +40,10 @@ extension Schema.ScreenActions: Codable {
             onOutsideTap: container.decodeIfPresentActions(forKey: .onOutsideTap),
             onDeviceBack: container.decodeIfPresentActions(forKey: .onDeviceBack),
             onFocusChange: container.decodeIfPresentActions(forKey: .onFocusChange),
-            onWillAppiar: container.decodeIfPresentActions(forKey: .onWillAppiar),
-            onWillDisapper: container.decodeIfPresentActions(forKey: .onWillDisapper),
-            onDidAppiar: container.decodeIfPresentActions(forKey: .onDidAppiar),
-            onDidDisapper: container.decodeIfPresentActions(forKey: .onDidDisapper)
+            onWillAppear: container.decodeIfPresentActions(forKey: .onWillAppear),
+            onWillDisappear: container.decodeIfPresentActions(forKey: .onWillDisappear),
+            onDidAppear: container.decodeIfPresentActions(forKey: .onDidAppear),
+            onDidDisappear: container.decodeIfPresentActions(forKey: .onDidDisappear)
         )
     }
 
@@ -52,10 +52,9 @@ extension Schema.ScreenActions: Codable {
         try container.encodeIfPresent(onOutsideTap, forKey: .onOutsideTap)
         try container.encodeIfPresent(onDeviceBack, forKey: .onDeviceBack)
         try container.encodeIfPresent(onFocusChange, forKey: .onFocusChange)
-        try container.encodeIfPresent(onWillAppiar, forKey: .onWillAppiar)
-        try container.encodeIfPresent(onWillDisapper, forKey: .onWillDisapper)
-        try container.encodeIfPresent(onDidAppiar, forKey: .onDidAppiar)
-        try container.encodeIfPresent(onDidDisapper, forKey: .onDidDisapper)
+        try container.encodeIfPresent(onWillAppear, forKey: .onWillAppear)
+        try container.encodeIfPresent(onWillDisappear, forKey: .onWillDisappear)
+        try container.encodeIfPresent(onDidAppear, forKey: .onDidAppear)
+        try container.encodeIfPresent(onDidDisappear, forKey: .onDidDisappear)
     }
 }
-

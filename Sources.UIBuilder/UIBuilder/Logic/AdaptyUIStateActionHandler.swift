@@ -85,6 +85,9 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     package nonisolated func registerState(_ state: AdaptyUIState) {
         Task { @MainActor [weak self] in
             self?.state = state
+            self?.screensViewModel.executeActions = { [weak state] actions, screen in
+                try? state?.execute(actions: actions, screenInstance: screen)
+            }
         }
     }
 
@@ -177,9 +180,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
             self?.screensViewModel.present(
                 screen: instance,
                 transitionId: transitionId,
-                completion: {
-                    // TODO: x report completion to Script
-                }
+                completion: nil
             )
         }
     }
@@ -192,9 +193,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
             self?.screensViewModel.dismiss(
                 navigatorId: navigatorId,
                 transitionId: transitionId,
-                completion: {
-                    // TODO: x report completion to Script
-                }
+                completion: nil
             )
         }
     }
@@ -315,7 +314,33 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     }
 
     package nonisolated func sendEvents(instanceId: String?, eventIds: [String]) {
-        
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            for eventIdStr in eventIds {
+                let eventId = VC.EventHandler.EventId.custom(eventIdStr)
+
+                if let instanceId {
+                    for navigatorVM in self.screensViewModel.navigatorsViewModels {
+                        if navigatorVM.currentScreenInstanceIfSingle?.id == instanceId {
+                            navigatorVM.eventBus.publish(
+                                eventId: eventId,
+                                transitionId: nil,
+                                screenInstanceId: instanceId
+                            )
+                        }
+                    }
+                } else {
+                    for navigatorVM in self.screensViewModel.navigatorsViewModels {
+                        navigatorVM.eventBus.publish(
+                            eventId: eventId,
+                            transitionId: nil,
+                            screenInstanceId: nil
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -10,7 +10,6 @@
 import SwiftUI
 
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
-    private let animations: [VC.Animation]
     private var play: Binding<[VC.Animation]>
 
     private let initialBlurRadius: Double
@@ -66,7 +65,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
         self.initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
 
-        self.animations = properties.onAppear
         self.play = play
     }
 
@@ -101,7 +99,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.initialShadowOffset = initialShadowOffset
         self.initialShadowBlurRadius = initialShadowBlurRadius
 
-        self.animations = [] // animations
         self.play = play
     }
 

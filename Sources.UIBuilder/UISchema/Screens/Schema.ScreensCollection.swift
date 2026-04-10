@@ -180,10 +180,10 @@ private extension Decoder {
                 )],
                 onDeviceBack: nil,
                 onFocusChange: nil,
-                onWillAppiar: nil,
-                onWillDisapper: nil,
-                onDidAppiar: nil,
-                onDidDisapper: nil
+                onWillAppear: nil,
+                onWillDisappear: nil,
+                onDidAppear: nil,
+                onDidDisappear: nil
             )
         )
     }

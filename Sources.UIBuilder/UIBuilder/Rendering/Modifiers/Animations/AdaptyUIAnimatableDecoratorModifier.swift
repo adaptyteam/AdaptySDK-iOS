@@ -185,7 +185,7 @@ extension VC.ShapeType {
 struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private let decorator: VC.Decorator
     private let includeBackground: Bool
-    private let animations: [VC.Animation]?
+    private var play: Binding<[VC.Animation]>
 
     @State private var animatedBackgroundFilling: VC.AssetReference?
 
@@ -207,11 +207,11 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
 
     init(
         decorator: VC.Decorator,
-        animations: [VC.Animation]?,
+        play: Binding<[VC.Animation]>,
         includeBackground: Bool
     ) {
         self.decorator = decorator
-        self.animations = animations
+        self.play = play
         self.includeBackground = includeBackground
 
         self.initialBorderFilling = decorator.border?.filling
@@ -243,9 +243,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
             }
         }
         .clipShape(self.decorator.shapeType)
-        .onAppear {
-            self.startAnimations()
-        }
+        .onChange(of: play.wrappedValue) { self.startAnimations($0) }
         .onDisappear {
             self.animationTokens.forEach { $0.invalidate() }
             self.animationTokens.removeAll()
@@ -284,8 +282,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         }
     }
 
-    private func startAnimations() {
-        guard let animations, !animations.isEmpty else { return }
+    private func startAnimations(_ animations: [VC.Animation]) {
+        guard !animations.isEmpty else { return }
 
         var tokens = Set<AdaptyUIAnimationToken>()
 
@@ -340,14 +338,14 @@ extension View {
     @ViewBuilder
     func animatableDecorator(
         _ decorator: VC.Decorator?,
-        animations: [VC.Animation]?,
+        play: Binding<[VC.Animation]>,
         includeBackground: Bool
     ) -> some View {
         if let decorator {
             modifier(
                 AdaptyUIAnimatableDecoratorModifier(
                     decorator: decorator,
-                    animations: animations,
+                    play: play,
                     includeBackground: includeBackground
                 )
             )

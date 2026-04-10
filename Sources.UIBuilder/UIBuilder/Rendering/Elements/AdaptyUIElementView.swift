@@ -13,12 +13,15 @@ import SwiftUI
 struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     private let element: VC.Element
     private let screenHolderBuilder: () -> ScreenHolderContent
+    private var playAnimations: Binding<[VC.Animation]>
 
     init(
         _ element: VC.Element,
+        playAnimations: Binding<[VC.Animation]>,
         screenHolderBuilder: @escaping () -> ScreenHolderContent
     ) {
         self.element = element
+        self.playAnimations = playAnimations
         self.screenHolderBuilder = screenHolderBuilder
     }
 
@@ -28,7 +31,7 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             elementOrEmpty(box.content)
                 .animatableFrame(
                     box: box,
-                    animations: props?.onAppear
+                    play: playAnimations
                 )
                 .rangedFrame(box: box)
         case let .stack(stack, _):
@@ -114,17 +117,23 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
         self.drawDecoratorBackground = drawDecoratorBackground
     }
 
-    @State
-    private var playOnAppearAnimations: [VC.Animation] = []
+    @EnvironmentObject private var eventBus: AdaptyUIEventBus
+    @EnvironmentObject private var navigatorViewModel: AdaptyUINavigatorViewModel
+    @EnvironmentObject private var stateViewModel: AdaptyUIStateViewModel
+    @Environment(\.adaptyScreenInstanceId) private var screenInstanceId: String?
+
+    @State private var playAnimations: [VC.Animation] = []
+    @State private var lastProcessedSequence: UInt = 0
 
     var body: some View {
         AdaptyUIElementWithoutPropertiesView(
             element,
+            playAnimations: $playAnimations,
             screenHolderBuilder: screenHolderBuilder
         )
         .animatableDecorator(
             element.properties?.decorator,
-            animations: element.properties?.onAppear,
+            play: $playAnimations,
             includeBackground: drawDecoratorBackground
         )
         .modifier(ElementBackgroundModifier(
@@ -135,12 +144,116 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             overlays: element.properties?.overlay,
             screenHolderBuilder: screenHolderBuilder
         ))
-        .animatableProperties(element.properties, play: $playOnAppearAnimations)
+        .animatableProperties(element.properties, play: $playAnimations)
         .padding(element.properties?.padding)
         .modifier(ElementInteractionEnabledModifier(element.properties?.interactionEnabled))
         .modifier(DebugOverlayModifier())
         .onAppear {
-            playOnAppearAnimations = element.properties?.onAppear ?? []
+            consumeAndProcessPendingEvents()
+        }
+        .onChange(of: eventBus.revision) { _ in
+            consumeAndProcessPendingEvents()
+        }
+    }
+
+    private func consumeAndProcessPendingEvents() {
+        guard let properties = element.properties,
+              properties.eventHandlers.isNotEmpty else { return }
+
+        let pending = eventBus.consumePending(
+            afterSequence: lastProcessedSequence,
+            screenInstanceId: screenInstanceId,
+            currentTopScreenInstanceId: navigatorViewModel.currentScreenInstanceIfSingle?.id
+        )
+
+        guard !pending.isEmpty else { return }
+
+        for event in pending {
+            processEvent(event, properties: properties)
+        }
+
+        lastProcessedSequence = pending.last!.sequence
+    }
+
+    private func processEvent(_ event: AdaptyUIEventBus.Event, properties: VC.Element.Properties) {
+        for eventHandler in properties.eventHandlers {
+            guard shouldFireHandler(eventHandler, for: event) else { continue }
+            if eventHandler.animations.isNotEmpty {
+                if playAnimations == eventHandler.animations {
+                    // Same animations — reset first, defer re-set to next run loop
+                    playAnimations = []
+                    DispatchQueue.main.async {
+                        playAnimations = eventHandler.animations
+                    }
+                } else {
+                    playAnimations = eventHandler.animations
+                }
+            }
+
+            if eventHandler.onAnimationsFinish.isNotEmpty {
+                scheduleAnimationsFinish(eventHandler)
+            }
+        }
+    }
+
+    private func shouldFireHandler(
+        _ handler: VC.EventHandler,
+        for event: AdaptyUIEventBus.Event
+    ) -> Bool {
+        for trigger in handler.triggers {
+            guard trigger.events.contains(event.eventId) else { continue }
+
+            if let allowedTransitions = trigger.screenTransitions {
+                guard let tid = event.transitionId,
+                      allowedTransitions.contains(tid) else { continue }
+            }
+
+            let count = eventBus.fireCount(screenInstanceId: event.screenInstanceId, eventId: event.eventId)
+            if let filter = trigger.filter {
+                switch filter {
+                case .first: guard count <= 1 else { continue }
+                case .notFirst: guard count > 1 else { continue }
+                }
+            }
+
+            return true
+        }
+        return false
+    }
+
+    private func scheduleAnimationsFinish(_ handler: VC.EventHandler) {
+        // Infinite loops (loop != nil && loopCount == nil) never finish
+        let hasInfiniteLoop = handler.animations.contains {
+            $0.timeline.loop != nil && $0.timeline.loopCount == nil
+        }
+        guard !hasInfiniteLoop else { return }
+
+        let totalDuration = handler.animations
+            .map { animation -> TimeInterval in
+                let tl = animation.timeline
+                let baseDuration = tl.duration + tl.startDelay
+                guard let loop = tl.loop, let loopCount = tl.loopCount else {
+                    return baseDuration
+                }
+                let loopDuration: TimeInterval = switch loop {
+                case .normal:
+                    tl.duration + tl.loopDelay
+                case .pingPong:
+                    tl.duration * 2 + tl.pingPongDelay
+                }
+                return baseDuration + loopDuration * Double(loopCount)
+            }
+            .max() ?? 0
+
+        let actions = handler.onAnimationsFinish
+        guard let screenInstance = navigatorViewModel.currentScreenInstanceIfSingle else { return }
+
+        if totalDuration > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration) { [weak stateViewModel] in
+                stateViewModel?.execute(actions: actions, screen: screenInstance)
+            }
+        } else {
+            stateViewModel.execute(actions: actions, screen: screenInstance)
         }
     }
 }

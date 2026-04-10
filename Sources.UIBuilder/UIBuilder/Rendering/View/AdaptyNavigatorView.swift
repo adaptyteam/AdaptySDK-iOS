@@ -114,6 +114,7 @@ struct AdaptyNavigatorView: View {
                             }
                             .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
                             .environmentObject(screenInstance)
+                            .environment(\.adaptyScreenInstanceId, screenInstance.instance.id)
                         }
                     }
                 }
@@ -131,6 +132,7 @@ struct AdaptyNavigatorView: View {
             }
         }
         .environmentObject(navigatorViewModel)
+        .environmentObject(navigatorViewModel.eventBus)
         .zIndex(navigatorViewModel.order * 1000.0)
         .onReceive(navigatorViewModel.$contentAnimations) { contentAnimations = $0 ?? [] }
     }

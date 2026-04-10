@@ -13,10 +13,10 @@ extension VC {
         let onDeviceBack: [Action]?
         let onFocusChange: [Action]?
 
-        let onWillAppiar:[Action]?
-        let onWillDisapper:[Action]?
-        let onDidAppiar:[Action]?
-        let onDidDisapper:[Action]?
+        let onWillAppear: [Action]?
+        let onWillDisappear: [Action]?
+        let onDidAppear: [Action]?
+        let onDidDisappear: [Action]?
     }
 }
 
