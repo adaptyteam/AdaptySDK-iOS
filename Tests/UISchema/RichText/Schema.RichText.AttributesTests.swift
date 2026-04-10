@@ -24,7 +24,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: nil,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"{}"##)
             ),
@@ -37,7 +38,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: nil,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -54,7 +56,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: nil,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -71,7 +74,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: nil,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -88,7 +92,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: nil,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -105,7 +110,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: .assetId("icon_tint"),
                     background: nil,
                     strike: nil,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -122,7 +128,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: .assetId("highlight_color"),
                     strike: nil,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -139,7 +146,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: true,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -156,7 +164,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: false,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -173,7 +182,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: nil,
-                    underline: true
+                    underline: true,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -190,7 +200,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: nil,
-                    underline: false
+                    underline: false,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -207,7 +218,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: nil,
                     background: nil,
                     strike: nil,
-                    underline: nil
+                    underline: nil,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
@@ -226,7 +238,8 @@ private extension SchemaTests.RichTextTests {
                     imageTintColor: .assetId("icon_tint"),
                     background: .assetId("highlight_color"),
                     strike: true,
-                    underline: true
+                    underline: true,
+                    letterSpacing: nil
                 ),
                 Json(##"""
                 {
