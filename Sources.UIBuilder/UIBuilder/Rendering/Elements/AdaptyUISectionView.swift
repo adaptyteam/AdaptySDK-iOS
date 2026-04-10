@@ -27,28 +27,45 @@ struct AdaptyUISectionView<ScreenHolderContent: View>: View {
         self.screenHolderBuilder = screenHolderBuilder
     }
 
+    @State private var currentIndex: Int = 0
+
     var body: some View {
         let selectedIndexVariable = section.index
-        
+
         let selectedIndex = stateViewModel.getValue(
             selectedIndexVariable,
             defaultValue: 0.0,
             screen: screen
         )
-        
+
         let selectedIndexInt = Int(selectedIndex)
-        
-        if let content = section.content[safe: selectedIndexInt] {
-            AdaptyUIElementView(
-                content,
-                screenHolderBuilder: {
-                    if selectedIndexInt == 0 {
-                        screenHolderBuilder() // TODO: x check
-                    } else {
-                        EmptyView()
+
+        Group {
+            if let content = section.content[safe: currentIndex] {
+                AdaptyUIElementView(
+                    content,
+                    screenHolderBuilder: {
+                        if currentIndex == 0 {
+                            screenHolderBuilder() // TODO: x check
+                        } else {
+                            EmptyView()
+                        }
                     }
+                )
+            }
+        }
+        .onAppear {
+            currentIndex = selectedIndexInt
+        }
+        .onChange(of: selectedIndexInt) { newIndex in
+            if let duration = section.animationDuration {
+                let animation = section.animationInterpolator.createAnimation(duration: duration)
+                withAnimation(animation) {
+                    currentIndex = newIndex
                 }
-            )
+            } else {
+                currentIndex = newIndex
+            }
         }
     }
 }

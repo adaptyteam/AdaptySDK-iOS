@@ -11,6 +11,8 @@ extension Schema {
     struct Section: Sendable {
         let index: Variable
         let content: [Schema.Element]
+        let animationDuration: TimeInterval?
+        let animationInterpolator: VC.Animation.Interpolator
     }
 }
 
@@ -31,7 +33,9 @@ extension Schema.Section: Schema.CompositeElement {
         try .section(
             .init(
                 index: index,
-                content: resultStack.popLastElements(content.count)
+                content: resultStack.popLastElements(content.count),
+                animationDuration: animationDuration,
+                animationInterpolator: animationInterpolator
             ),
             properties
         )
@@ -43,14 +47,23 @@ extension Schema.Section: DecodableWithConfiguration {
         case legacySectionId = "id"
         case index
         case content
+        case animationDuration = "animation_duration"
+        case animationInterpolator = "animation_interpolator"
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         guard configuration.isLegacy else {
+            let durationMs = try container.decodeIfPresent(TimeInterval.self, forKey: .animationDuration)
+
             try self.init(
                 index: container.decode(Schema.Variable.self, forKey: .index),
-                content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
+                content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
+                animationDuration: durationMs.map { $0 / 1000.0 },
+                animationInterpolator: container.decodeIfPresent(
+                    VC.Animation.Interpolator.self,
+                    forKey: .animationInterpolator
+                ) ?? .easeInOut
             )
             return
         }
@@ -66,7 +79,9 @@ extension Schema.Section: DecodableWithConfiguration {
                 scope: .global,
                 converter: nil
             ),
-            content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
+            content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
+            animationDuration: nil,
+            animationInterpolator: .easeInOut
         )
     }
 }
