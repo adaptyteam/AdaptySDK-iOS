@@ -58,8 +58,8 @@ struct AdaptyUISectionView<ScreenHolderContent: View>: View {
             currentIndex = selectedIndexInt
         }
         .onChange(of: selectedIndexInt) { newIndex in
-            if let duration = section.animationDuration {
-                let animation = section.animationInterpolator.createAnimation(duration: duration)
+            if let duration = section.duration {
+                let animation = section.interpolator.createAnimation(duration: duration)
                 withAnimation(animation) {
                     currentIndex = newIndex
                 }
