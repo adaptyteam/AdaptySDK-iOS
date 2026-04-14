@@ -35,7 +35,7 @@ extension VS.ShowRequestPermissionParametersResponse: JSValueConvertable {
 }
 
 extension VS.ShowRequestPermissionParameters {
-    static func fromDictionary(_ dict: [String: Any]) -> Self {
+    static func fromDictionary(_ dict: [AnyHashable: Any]) -> Self {
         let permission = dict["permission"] as? String
 
         let customArgs: [String: String]? =
