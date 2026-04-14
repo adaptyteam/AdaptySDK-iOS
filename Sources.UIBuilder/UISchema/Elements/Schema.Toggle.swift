@@ -55,9 +55,14 @@ extension Schema.Toggle: DecodableWithConfiguration {
                 path: ["Legacy", "sections", sectionId],
                 setter: nil,
                 scope: .global,
-                converter: .isEqual(.int32(onIndex), falseValue: .int32(offIndex))
+                converter: Schema.Variable.IsEqualConvertor(
+                    value: Schema.AnyValue(onIndex),
+                    falseValue: Schema.AnyValue(offIndex)
+                )
+
             ),
             color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)
         )
     }
 }
+

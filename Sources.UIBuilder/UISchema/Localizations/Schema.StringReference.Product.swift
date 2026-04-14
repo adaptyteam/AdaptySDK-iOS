@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.StringReference.Product: Codable {
+extension Schema.StringReference.Product: Decodable {
     enum CodingKeys: String, CodingKey {
         case product
         case suffix
@@ -31,18 +31,6 @@ extension Schema.StringReference.Product: Codable {
                 container.decode(Schema.Variable.self, forKey: .product),
                 sufix: container.decodeIfPresent(String.self, forKey: .suffix)
             )
-        }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        switch self {
-        case let .id(productId, suffix):
-            try container.encode(productId, forKey: .product)
-            try container.encodeIfPresent(suffix, forKey: .suffix)
-        case let .variable(variable, suffix):
-            try container.encode(variable, forKey: .product)
-            try container.encodeIfPresent(suffix, forKey: .suffix)
         }
     }
 }

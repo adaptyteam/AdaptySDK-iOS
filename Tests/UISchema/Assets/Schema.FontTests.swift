@@ -282,50 +282,5 @@ private extension SchemaTests {
                 try invalid.decode(Value.self)
             }
         }
-
-        // MARK: - Encoding Tests
-
-        @Test("encode produces correct structure", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            let obj = try #require(encoded.deserilized as? [String: Any])
-            #expect(obj["type"] as? String == "font")
-            #expect(obj["value"] as? String == value.alias)
-            #expect(obj["custom_id"] as? String == value.customId)
-
-            if value.familyName != "adapty_system" {
-                #expect(obj["family_name"] as? String == value.familyName)
-            } else {
-                #expect(obj["family_name"] == nil)
-            }
-            if value.weight != 400 {
-                #expect(obj["weight"] as? Int == value.weight)
-            } else {
-                #expect(obj["weight"] == nil)
-            }
-            if value.italic {
-                #expect(obj["italic"] as? Bool == value.italic)
-            } else {
-                #expect(obj["italic"] == nil)
-            }
-            if value.defaultSize != 15 {
-                #expect(obj["size"] as? Double == value.defaultSize)
-            } else {
-                #expect(obj["size"] == nil)
-            }
-            if value.defaultColor != Self.defaultFontColor {
-                #expect(obj["color"] as? String == value.defaultColor.rawValue)
-            } else {
-                #expect(obj["color"] == nil)
-            }
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }

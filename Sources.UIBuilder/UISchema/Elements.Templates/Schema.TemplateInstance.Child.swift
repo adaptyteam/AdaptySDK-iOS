@@ -82,9 +82,6 @@ extension Schema.TemplateInstance {
 //        return nil
 //    }
 //
-//    func encode(to encoder: any Encoder) throws {
-//        // TODO: implement after Element encodable
-//    }
 // }
 //
 // private extension SingleValueDecodingContainer {

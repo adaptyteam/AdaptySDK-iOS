@@ -21,7 +21,7 @@ extension Schema.DateTimePicker: Schema.SimpleElement {
     }
 }
 
-extension Schema.DateTimePicker: Codable {
+extension Schema.DateTimePicker: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case value
@@ -58,23 +58,4 @@ extension Schema.DateTimePicker: Codable {
         color = try container.decodeIfPresent(Schema.AssetReference.self, forKey: .color)
     }
 
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        switch kind {
-        case .compact: try container.encode(Schema.Element.ContentType.compactDateTimePicker.rawValue, forKey: .type)
-        case .wheel: try container.encode(Schema.Element.ContentType.wheelDateTimePicker.rawValue, forKey: .type)
-        case .graphical: try container.encode(Schema.Element.ContentType.graphicalDateTimePicker.rawValue, forKey: .type)
-        }
-
-        try container.encode(value, forKey: .value)
-
-        if !components.isEmpty {
-            try container.encode(components, forKey: .components)
-        }
-
-//        try container.encodeIfPresent(maxDate, forKey: .maxDate)
-//        try container.encodeIfPresent(minDate, forKey: .minDate)
-        try container.encodeIfPresent(color, forKey: .color)
-    }
 }

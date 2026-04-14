@@ -71,7 +71,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         startCentralTimerIfNeeded()
     }
 
-    func setDuration(id: String, duration: TimeInterval, behavior: VC.SetTimerBehavior, callback: VS.JSAction?) {
+    func setDuration(id: String, duration: TimeInterval, behavior: VS.SetTimerBehavior, callback: VS.JSAction?) {
         Log.ui.verbose("#\(logId)# setTimer id: \(id), duration: \(duration), behavior: \(behavior)")
         if let callback { timerCallbacks[id] = callback }
         startCentralTimerIfNeeded()

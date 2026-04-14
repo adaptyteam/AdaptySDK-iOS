@@ -19,7 +19,7 @@ extension Schema.TransitionSlide {
     )
 }
 
-extension Schema.TransitionSlide: Codable {
+extension Schema.TransitionSlide: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case startDelay = "start_delay"
@@ -37,23 +37,5 @@ extension Schema.TransitionSlide: Codable {
             .map { $0 / 1000.0 }
             ?? Self.default.duration
         interpolator = try (container.decodeIfPresent(Schema.Animation.Interpolator.self, forKey: .interpolator)) ?? Self.default.interpolator
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try container.encode("slide", forKey: .type)
-
-        if startDelay != Self.default.startDelay {
-            try container.encode(startDelay * 1000, forKey: .startDelay)
-        }
-
-        if duration != Self.default.duration {
-            try container.encode(duration * 1000, forKey: .duration)
-        }
-
-        if interpolator != Self.default.interpolator {
-            try container.encode(interpolator, forKey: .interpolator)
-        }
     }
 }

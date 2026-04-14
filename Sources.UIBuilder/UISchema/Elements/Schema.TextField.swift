@@ -21,7 +21,7 @@ extension Schema.TextField: Schema.SimpleElement {
     }
 }
 
-extension Schema.TextField: Codable {
+extension Schema.TextField: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case value
@@ -76,49 +76,4 @@ extension Schema.TextField: Codable {
         }
     }
 
-    func encode(to encoder: any Encoder) throws {
-        if let defaultTextAttributes = defaultTextAttributes.nonEmptyOrNil {
-            try defaultTextAttributes.encode(to: encoder)
-        }
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        switch kind {
-        case .singleLine:
-            try container.encode(Schema.Element.ContentType.textField, forKey: .type)
-        case .multiLine:
-            try container.encode(Schema.Element.ContentType.textEditor, forKey: .type)
-        }
-        try container.encode(value, forKey: .value)
-        if let placeholder {
-            try container.encode(placeholder, forKey: .placeholder)
-        }
-        if secureEntry {
-            try container.encode(secureEntry, forKey: .secureEntry)
-        }
-        if horizontalAlign != .leading {
-            try container.encode(horizontalAlign, forKey: .horizontalAlign)
-        }
-        if let inputConstraints, !inputConstraints.isEmpty {
-            try container.encode(inputConstraints, forKey: .inputConstraints)
-        }
-        if let validation {
-            try container.encode(validation, forKey: .validation)
-
-            if let invalidTextAttributes, !invalidTextAttributes.isEmpty {
-                try container.encode(invalidTextAttributes, forKey: .invalidTextAttributes)
-            }
-        }
-
-        if let keyboardOptions, !keyboardOptions.isEmpty {
-            try container.encode(keyboardOptions, forKey: .keyboardOptions)
-        }
-
-        if keyboardSubmitActions.isNotEmpty {
-            try container.encode(keyboardSubmitActions, forKey: .keyboardSubmitActions)
-        }
-
-        if kind == .multiLine {
-            try container.encodeIfPresent(maxRows, forKey: .maxRows)
-            try container.encodeIfPresent(minRows, forKey: .minRows)
-        }
-    }
 }

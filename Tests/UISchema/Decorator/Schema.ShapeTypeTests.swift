@@ -48,20 +48,5 @@ private extension SchemaTests {
             }
         }
 
-        // MARK: - Encoding
-
-        @Test("encode produces correct JSON value", arguments: jsonCases)
-        func encode(value: Value, json: Json) throws {
-            let encoded = try Json.encode(value)
-            #expect(encoded == json)
-        }
-
-        // MARK: - Roundtrip
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }

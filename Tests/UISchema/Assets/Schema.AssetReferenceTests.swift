@@ -79,30 +79,5 @@ private extension SchemaTests {
             }
         }
 
-        // MARK: - Encoding Tests
-
-        @Test("encode produces correct structure", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            switch value {
-            case let .assetId(id):
-                let str = try #require(encoded.deserilized as? String)
-                #expect(str == id)
-            case let .color(color):
-                let str = try #require(encoded.deserilized as? String)
-                #expect(str == color.rawValue)
-            case let .variable(variable):
-                let obj = try #require(encoded.deserilized as? [String: Any])
-                #expect(obj["var"] as? String == variable.path.joined(separator: "."))
-            }
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }

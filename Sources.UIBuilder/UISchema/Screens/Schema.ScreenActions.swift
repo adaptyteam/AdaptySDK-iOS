@@ -23,7 +23,7 @@ extension Schema.ScreenActions {
     )
 }
 
-extension Schema.ScreenActions: Codable {
+extension Schema.ScreenActions: Decodable {
     enum CodingKeys: String, CodingKey {
         case onOutsideTap = "on_outside_tap"
         case onDeviceBack = "on_device_back"
@@ -47,14 +47,4 @@ extension Schema.ScreenActions: Codable {
         )
     }
 
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(onOutsideTap, forKey: .onOutsideTap)
-        try container.encodeIfPresent(onDeviceBack, forKey: .onDeviceBack)
-        try container.encodeIfPresent(onFocusChange, forKey: .onFocusChange)
-        try container.encodeIfPresent(onWillAppear, forKey: .onWillAppear)
-        try container.encodeIfPresent(onWillDisappear, forKey: .onWillDisappear)
-        try container.encodeIfPresent(onDidAppear, forKey: .onDidAppear)
-        try container.encodeIfPresent(onDidDisappear, forKey: .onDidDisappear)
-    }
 }

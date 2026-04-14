@@ -25,7 +25,7 @@ public extension Adapty {
                 "paywall_name": product.paywallName,
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
-                "web_purchase_url": (product as? WebPaywallURLProviding)?.webPaywallBaseUrl,
+                "web_purchase_url": product.webPaywallBaseUrl,
                 "paywall_product_index": product.paywallProductIndex,
                 "presentation": presentation.rawValue,
             ]
@@ -43,7 +43,7 @@ public extension Adapty {
                 "paywall_name": product.paywallName,
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
-                "web_purchase_url": (product as? WebPaywallURLProviding)?.webPaywallBaseUrl,
+                "web_purchase_url": product.webPaywallBaseUrl,
                 "paywall_product_index": product.paywallProductIndex,
                 "product_locale": product.localizedPrice,
             ]
@@ -124,7 +124,7 @@ public extension Adapty {
     private func createWebPaywallUrl(
         for product: AdaptyPaywallProduct
     ) throws(AdaptyError) -> URL {
-        guard let webPaywallBaseUrl = (product as? WebPaywallURLProviding)?.webPaywallBaseUrl else {
+        guard let webPaywallBaseUrl = product.webPaywallBaseUrl else {
             throw .productWithoutPurchaseUrl(adaptyProductId: product.adaptyProductId)
         }
 

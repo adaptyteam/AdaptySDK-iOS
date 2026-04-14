@@ -42,6 +42,7 @@ extension VS {
     func showAlertDialog(_ params: JSValue)
     func showRequestPermission(_ params: JSValue)
     func sendEvents(_ params: JSValue)
+    func sendAnalyticEvent(_ params: JSValue)
 }
 
 extension VS.JSActionDispatcher {
@@ -240,7 +241,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
         var timerId: String?
         var endAt: Date?
         var duration: Double?
-        var behavior: VC.SetTimerBehavior?
+        var behavior: VS.SetTimerBehavior?
 
         var callback: VS.JSAction?
 
@@ -278,8 +279,8 @@ extension VS.JSActionDispatcher: JSActionBridge {
 
     func moveScroll(_ params: JSValue) {
         var instanceId: String?
-        var kind: VC.ScrollKind?
-        var value: VC.ScrollValue?
+        var kind: VS.ScrollKind?
+        var value: VS.ScrollValue?
 
         if params.isObject, let dict = params.toDictionary() as? [String: Any] {
             instanceId = dict["instanceId"] as? String
@@ -361,6 +362,23 @@ extension VS.JSActionDispatcher: JSActionBridge {
         }
 
         handler?.sendEvents(instanceId: instanceId, eventIds: events)
+    }
+
+    func sendAnalyticEvent(_ params: JSValue) {
+        guard params.isObject, let dict = params.toDictionary() as? [String: any Sendable] else {
+            Log.viewState.error(#"SDK.sendAnalyticEvent: corupted params"#)
+            return
+        }
+
+        guard let name = (dict[VS.AnalyticEvent.CodingKeys.name.rawValue] ?? dict["name"]) as? String else {
+            Log.viewState.error(#"SDK.sendAnalyticEvent: required parameter "name" is missing or corupted"#)
+            return
+        }
+
+        handler?.sendAnalyticEvent(.init(
+            name: name,
+            params: dict
+        ))
     }
 }
 

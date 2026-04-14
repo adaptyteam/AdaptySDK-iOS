@@ -65,27 +65,30 @@ extension Schema.Button: DecodableWithConfiguration {
             return
         }
 
-        let isSelectedState: Schema.Variable? = switch try container.decodeIfPresent(
+        let legacySelectedCondition = try container.decodeIfPresent(
             Schema.LegacyStateCondition.self,
             forKey: .legacySelectedCondition
-        ) {
-        case let .selectedProduct(productId, groupId):
-            .init(
-                path: ["Legacy", "productGroup", groupId],
-                setter: nil,
-                scope: .global,
-                converter: .isEqual(.string(productId), falseValue: nil)
-            )
-        case let .selectedSection(sectionId, index):
-            .init(
-                path: ["Legacy", "sections", sectionId],
-                setter: nil,
-                scope: .global,
-                converter: .isEqual(.int32(index), falseValue: nil)
-            )
-        default:
-            nil
-        }
+        )
+
+        let isSelectedState: Schema.Variable? =
+            switch legacySelectedCondition {
+            case let .selectedProduct(productId, groupId):
+                .init(
+                    path: ["Legacy", "productGroup", groupId],
+                    setter: nil,
+                    scope: .global,
+                    converter: Schema.Variable.IsEqualConvertor(value: Schema.AnyValue(productId), falseValue: nil)
+                )
+            case let .selectedSection(sectionId, index):
+                .init(
+                    path: ["Legacy", "sections", sectionId],
+                    setter: nil,
+                    scope: .global,
+                    converter: Schema.Variable.IsEqualConvertor(value: Schema.AnyValue(index), falseValue: nil)
+                )
+            default:
+                nil
+            }
 
         try self.init(
             actions: container.decodeActions(forKey: .actions),
@@ -95,3 +98,4 @@ extension Schema.Button: DecodableWithConfiguration {
         )
     }
 }
+

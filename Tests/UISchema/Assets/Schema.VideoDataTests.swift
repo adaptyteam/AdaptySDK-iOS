@@ -124,25 +124,5 @@ private extension SchemaTests {
             }
         }
 
-        // MARK: - Encoding Tests
-
-        @Test("encode produces correct structure", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            let obj = try #require(encoded.deserilized as? [String: Any])
-            #expect(obj["type"] as? String == "video")
-            #expect(obj["custom_id"] as? String == value.customId)
-            #expect(obj["url"] as? String == value.url.absoluteString)
-            let image = try #require(obj["image"] as? [String: Any])
-            #expect(image["type"] as? String == "image")
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }

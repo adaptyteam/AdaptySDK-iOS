@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.Animation.BoxParameters: Codable {
+extension Schema.Animation.BoxParameters: Decodable {
     enum CodingKeys: String, CodingKey {
         case width
         case height
@@ -22,10 +22,5 @@ extension Schema.Animation.BoxParameters: Codable {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "The width and height parameters cannot be absent together."))
         }
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(width, forKey: .width)
-        try container.encodeIfPresent(height, forKey: .height)
-    }
 }
+

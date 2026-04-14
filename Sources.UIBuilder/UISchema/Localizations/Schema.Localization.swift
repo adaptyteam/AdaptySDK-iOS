@@ -21,7 +21,7 @@ extension Schema {
     }
 }
 
-extension Schema.Localization: Codable {
+extension Schema.Localization: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case strings
@@ -55,25 +55,5 @@ extension Schema.Localization: Codable {
             )
         }
         self.strings = strings.nonEmptyOrNil
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(id, forKey: .id)
-        try container.encodeIfPresent(isRightToLeft, forKey: .isRightToLeft)
-
-        if let assets = assets.nonEmptyOrNil {
-            try container.encode(Schema.AssetsCollection(value: assets), forKey: .assets)
-        }
-
-        if let strings {
-            for (key, item) in strings {
-                var stringsContainer = container.nestedUnkeyedContainer(forKey: .strings)
-                var itemContainer = stringsContainer.nestedContainer(keyedBy: ItemCodingKeys.self)
-                try itemContainer.encode(key, forKey: .id)
-                try itemContainer.encode(item.value, forKey: .value)
-                try itemContainer.encodeIfPresent(item.fallback, forKey: .fallback)
-            }
-        }
     }
 }

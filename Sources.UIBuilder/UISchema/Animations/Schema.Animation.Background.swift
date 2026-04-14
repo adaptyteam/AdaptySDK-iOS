@@ -6,7 +6,7 @@
 //
 import Foundation
 
-extension Schema.Animation.Background: Codable {
+extension Schema.Animation.Background: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case interpolator
@@ -26,11 +26,5 @@ extension Schema.Animation.Background: Codable {
             range: container.decode(Schema.Animation.Range<Schema.AssetReference>.self, forKey: .color)
         )
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(Schema.Animation.Types.background.rawValue, forKey: .type)
-        try range.encode(to: encoder)
-        try timeline.encode(to: encoder)
-    }
 }
+

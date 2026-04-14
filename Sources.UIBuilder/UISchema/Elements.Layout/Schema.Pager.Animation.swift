@@ -18,7 +18,7 @@ extension Schema.Pager.Animation {
     )
 }
 
-extension Schema.Pager.Animation: Codable {
+extension Schema.Pager.Animation: Decodable {
     enum CodingKeys: String, CodingKey {
         case startDelay = "start_delay"
         case pageTransition = "page_transition"
@@ -41,18 +41,5 @@ extension Schema.Pager.Animation: Codable {
                 .map { $0 / 1000.0 }
                 ?? Self.default.afterInteractionDelay
         )
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        if startDelay != Self.default.startDelay {
-            try container.encode(startDelay * 1000, forKey: .startDelay)
-        }
-        try container.encode(pageTransition, forKey: .pageTransition)
-        try container.encodeIfPresent(repeatTransition, forKey: .repeatTransition)
-        if afterInteractionDelay != Self.default.afterInteractionDelay {
-            try container.encode(afterInteractionDelay * 1000, forKey: .afterInteractionDelay)
-        }
     }
 }

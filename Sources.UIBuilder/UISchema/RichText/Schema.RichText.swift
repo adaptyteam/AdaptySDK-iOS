@@ -20,7 +20,7 @@ extension Schema.RichText {
     }
 }
 
-extension Schema.RichText: Codable {
+extension Schema.RichText: Decodable {
     init(from decoder: Decoder) throws {
         items =
             if let value = try? Item(from: decoder) {
@@ -30,14 +30,4 @@ extension Schema.RichText: Codable {
             }
     }
 
-    func encode(to encoder: any Encoder) throws {
-        let items = items.filter {
-            if case .unknown = $0 { false } else { true }
-        }
-        if items.count == 1 {
-            try items[0].encode(to: encoder)
-        } else {
-            try items.encode(to: encoder)
-        }
-    }
 }

@@ -33,8 +33,8 @@ package final class AdaptyUIStateViewModel: ObservableObject {
     struct ScrollCommand: Equatable {
         let id = UUID()
         let instanceId: String
-        let kind: VC.ScrollKind
-        let value: VC.ScrollValue
+        let kind: VS.ScrollKind
+        let value: VS.ScrollValue
     }
 
     package init(
@@ -69,9 +69,9 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         }
     }
 
-    func execute(actions: [VC.Action], additionalParams: [String: VC.Parameter]? = nil, screen: VS.ScreenInstance) {
+    func execute(actions: [VC.Action], params: [String: any VC.Value]? = nil, screen: VS.ScreenInstance) {
         do {
-            try stateHolder.state.execute(actions: actions, additionalParams: additionalParams, screenInstance: screen)
+            try stateHolder.state.execute(actions: actions, params: params, screenInstance: screen)
         } catch {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
         }
@@ -83,17 +83,17 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         actions: [VC.Action],
         screen: VS.ScreenInstance
     ) {
-        var additionalParams: [String: VC.Parameter] = [:]
+        var additionalParams: [String: any VC.Value] = [:]
         if let newFocusId {
-            additionalParams["focusId"] = .string(newFocusId)
+            additionalParams["focusId"] = newFocusId
         }
         if let oldFocusId {
-            additionalParams["oldFocusId"] = .string(oldFocusId)
+            additionalParams["oldFocusId"] = oldFocusId
         }
 
         execute(
             actions: actions,
-            additionalParams: additionalParams.isEmpty ? nil : additionalParams,
+            params: additionalParams.isEmpty ? nil : additionalParams,
             screen: screen
         )
     }

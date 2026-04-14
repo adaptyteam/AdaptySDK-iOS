@@ -19,7 +19,7 @@ extension SchemaTests {
             (
                 Value(
                     path: ["SDK", "openUrl"],
-                    params: ["stringId": .string("example_com")],
+                    params: ["stringId": VC.AnyValue("example_com")],
                     scope: .global
                 ),
                 Json(##"{"type":"open_url","url":"example_com"}"##)
@@ -41,7 +41,7 @@ extension SchemaTests {
             (
                 Value(
                     path: ["SDK", "userCustomAction"],
-                    params: ["userCustomId": .string("my_action")],
+                    params: ["userCustomId": VC.AnyValue("my_action")],
                     scope: .global
                 ),
                 Json(##"{"type":"custom","custom_id":"my_action"}"##)
@@ -51,7 +51,6 @@ extension SchemaTests {
 //                    path: ["SDK", "webPurchasePaywall"],
 //                    params: [
 //                        "openIn": .string("browser_out_app"),
-//                        "paywallId": .string("legacy-paywall-id"),
 //                    ],
 //                    scope: .global
 //                ),
@@ -62,7 +61,6 @@ extension SchemaTests {
 //                    path: ["SDK", "webPurchasePaywall"],
 //                    params: [
 //                        "openIn": .string("browser_in_app"),
-//                        "paywallId": .string("legacy-paywall-id"),
 //                    ],
 //                    scope: .global
 //                ),
@@ -72,8 +70,7 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "purchaseProduct"],
                     params: [
-                        "productId": .string("premium"),
-                        "paywallId": .string("legacy-paywall-id"),
+                        "productId": VC.AnyValue("premium"),
                     ],
                     scope: .global
                 ),
@@ -83,9 +80,8 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "webPurchaseProduct"],
                     params: [
-                        "productId": .string("premium"),
-                        "paywallId": .string("legacy-paywall-id"),
-                        "openIn": .string("browser_out_app"),
+                        "productId": VC.AnyValue("premium"),
+                        "openIn": VC.AnyValue("browser_out_app"),
                     ],
                     scope: .global
                 ),
@@ -95,10 +91,10 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "openScreen"],
                     params: [
-                        "type": .string("details"),
-                        "instanceId": .string("legacy-bottom-sheet"),
-                        "navigatorId": .string("legacy-bottom-sheet"),
-                        "transitionId": .string("on_appear"),
+                        "type": VC.AnyValue("details"),
+                        "instanceId": VC.AnyValue("legacy-bottom-sheet"),
+                        "navigatorId": VC.AnyValue("legacy-bottom-sheet"),
+                        "transitionId": VC.AnyValue("on_appear"),
                     ],
                     scope: .global
                 ),
@@ -108,7 +104,7 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "closeScreen"],
                     params: [
-                        "navigatorId": .string("legacy-bottom-sheet"),
+                        "navigatorId": VC.AnyValue("legacy-bottom-sheet"),
                     ],
                     scope: .global
                 ),
@@ -118,8 +114,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "selectProduct"],
                     params: [
-                        "productId": .string("prod1"),
-                        "groupId": .string("group_B"),
+                        "productId": VC.AnyValue("prod1"),
+                        "groupId": VC.AnyValue("group_B"),
                     ],
                     scope: .global
                 ),
@@ -129,8 +125,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "selectProduct"],
                     params: [
-                        "productId": .string("prod1"),
-                        "groupId": .string("group_A"),
+                        "productId": VC.AnyValue("prod1"),
+                        "groupId": VC.AnyValue("group_A"),
                     ],
                     scope: .global
                 ),
@@ -140,7 +136,7 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "unselectProduct"],
                     params: [
-                        "groupId": .string("group_B"),
+                        "groupId": VC.AnyValue("group_B"),
                     ],
                     scope: .global
                 ),
@@ -150,7 +146,7 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "unselectProduct"],
                     params: [
-                        "groupId": .string("group_A"),
+                        "groupId": VC.AnyValue("group_A"),
                     ],
                     scope: .global
                 ),
@@ -160,7 +156,7 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "purchaseSelectedProduct"],
                     params: [
-                        "groupId": .string("group_B"),
+                        "groupId": VC.AnyValue("group_B"),
                     ],
                     scope: .global
                 ),
@@ -170,7 +166,7 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "purchaseSelectedProduct"],
                     params: [
-                        "groupId": .string("group_A"),
+                        "groupId": VC.AnyValue("group_A"),
                     ],
                     scope: .global
                 ),
@@ -180,8 +176,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "webPurchaseSelectedProduct"],
                     params: [
-                        "groupId": .string("group_B"),
-                        "openIn": .string("browser_out_app"),
+                        "groupId": VC.AnyValue("group_B"),
+                        "openIn": VC.AnyValue("browser_out_app"),
                     ],
                     scope: .global
                 ),
@@ -191,8 +187,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "webPurchaseSelectedProduct"],
                     params: [
-                        "groupId": .string("group_A"),
-                        "openIn": .string("browser_out_app"),
+                        "groupId": VC.AnyValue("group_A"),
+                        "openIn": VC.AnyValue("browser_out_app"),
                     ],
                     scope: .global
                 ),
@@ -202,8 +198,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "switchSection"],
                     params: [
-                        "sectionId": .string("tabs"),
-                        "index": .int32(1),
+                        "sectionId": VC.AnyValue("tabs"),
+                        "index": VC.AnyValue(1),
                     ],
                     scope: .global
                 ),
@@ -220,3 +216,4 @@ extension SchemaTests {
         }
     }
 }
+

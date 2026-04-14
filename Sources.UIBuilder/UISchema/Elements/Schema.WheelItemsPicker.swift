@@ -24,7 +24,7 @@ extension Schema.WheelItemsPicker: Schema.SimpleElement {
     }
 }
 
-extension Schema.WheelItemsPicker: Codable {
+extension Schema.WheelItemsPicker: Decodable {
     enum CodingKeys: String, CodingKey {
         case value
         case items
@@ -36,12 +36,6 @@ extension Schema.WheelItemsPicker: Codable {
             value: container.decode(Schema.Variable.self, forKey: .value),
             items: container.decode([Schema.WheelItemsPicker.Item].self, forKey: .items)
         )
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(value, forKey: .value)
-        try container.encode(items, forKey: .items)
     }
 }
 

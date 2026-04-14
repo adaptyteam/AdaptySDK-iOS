@@ -33,7 +33,7 @@ extension Schema.Font {
     }
 }
 
-extension Schema.Font: Codable {
+extension Schema.Font: Decodable {
     private enum CodingKeys: String, CodingKey {
         case type
         case customId = "custom_id"
@@ -69,33 +69,6 @@ extension Schema.Font: Codable {
 
         defaultLetterSpacing = try container.decodeIfPresent(Double.self, forKey: .defaultLetterSpacing)
         defaultLineHeight = try container.decodeIfPresent(Double.self, forKey: .defaultLineHeight)
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(Self.assetType, forKey: .type)
-
-        try container.encodeIfPresent(customId, forKey: .customId)
-
-        try container.encode(alias, forKey: .alias)
-        if familyName != Self.default.familyName {
-            try container.encode(familyName, forKey: .familyName)
-        }
-        if weight != Self.default.weight {
-            try container.encode(weight, forKey: .weight)
-        }
-        if italic != Self.default.italic {
-            try container.encode(italic, forKey: .italic)
-        }
-        if defaultSize != Self.default.defaultSize {
-            try container.encode(defaultSize, forKey: .defaultSize)
-        }
-        if defaultColor != Self.default.defaultColor {
-            try container.encode(defaultColor, forKey: .defaultColor)
-        }
-
-        try container.encodeIfPresent(defaultLetterSpacing, forKey: .defaultLetterSpacing)
-        try container.encodeIfPresent(defaultLineHeight, forKey: .defaultLineHeight)
     }
 }
 

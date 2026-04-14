@@ -15,7 +15,7 @@ extension Schema.ShapeType {
     static let `default` = Self.rectangle(cornerRadius: .zero)
 }
 
-extension Schema.ShapeType: Codable {
+extension Schema.ShapeType: Decodable {
     enum Types: String {
         case circle
         case rectangle = "rect"
@@ -36,20 +36,6 @@ extension Schema.ShapeType: Codable {
             self = .rectangle(cornerRadius: Schema.CornerRadius.zero)
         case .circle:
             self = .circle
-        }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .rectangle:
-            try container.encode(Self.Types.rectangle.rawValue)
-        case .circle:
-            try container.encode(Self.Types.circle.rawValue)
-        case .curveUp:
-            try container.encode(Self.Types.curveUp.rawValue)
-        case .curveDown:
-            try container.encode(Self.Types.curveDown.rawValue)
         }
     }
 }

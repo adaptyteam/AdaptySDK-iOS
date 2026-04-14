@@ -19,7 +19,7 @@ extension Schema.ImageData {
     }
 }
 
-extension Schema.ImageData: Codable {
+extension Schema.ImageData: Decodable {
     private enum CodingKeys: String, CodingKey {
         case type
         case data = "value"
@@ -59,20 +59,5 @@ extension Schema.ImageData: Codable {
             container.decode(URL.self, forKey: .url),
             previewRaster: previewRaster
         )
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try container.encode(Self.assetType, forKey: .type)
-        switch self {
-        case let .raster(customId, value):
-            try container.encodeIfPresent(customId, forKey: .customId)
-            try container.encode(value.base64EncodedString(), forKey: .data)
-        case let .url(customId, url, previewRaster):
-            try container.encodeIfPresent(customId, forKey: .customId)
-            try container.encode(url, forKey: .url)
-            try container.encodeIfPresent(previewRaster?.base64EncodedString(), forKey: .previewData)
-        }
     }
 }

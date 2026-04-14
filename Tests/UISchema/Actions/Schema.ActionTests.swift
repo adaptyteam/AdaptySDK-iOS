@@ -38,7 +38,7 @@ extension SchemaTests {
             (
                 Value(
                     path: ["SDK", "openUrl"],
-                    params: ["url": .string("example_com")],
+                    params: ["url": VC.AnyValue("example_com")],
                     scope: .screen
                 ),
                 Json(##"""
@@ -82,7 +82,7 @@ extension SchemaTests {
             (
                 Value(
                     path: ["SDK", "openUrl"],
-                    params: ["url": .string("example_com")],
+                    params: ["url": VC.AnyValue("example_com")],
                     scope: .global
                 ),
                 Json(##"""
@@ -100,8 +100,8 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "webPurchaseProduct"],
                     params: [
-                        "productId": .string("premium"),
-                        "openIn": .string("browser_out_app"),
+                        "productId": VC.AnyValue("premium"),
+                        "openIn": VC.AnyValue("browser_out_app"),
                     ],
                     scope: .global
                 ),
@@ -175,33 +175,5 @@ extension SchemaTests {
             }
         }
 
-        // MARK: - Encoding Tests
-
-        @Test("encode produces correct structure", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            let obj = try #require(encoded.deserilized as? [String: Any])
-            #expect(obj["func"] as? String == value.path.joined(separator: "."))
-
-            if let params = value.params, !params.isEmpty {
-                #expect(obj["params"] is [String: Any])
-            } else {
-                #expect(obj["params"] == nil)
-            }
-
-            if value.scope != .screen {
-                #expect(obj["scope"] as? String == value.scope.rawValue)
-            } else {
-                #expect(obj["scope"] == nil)
-            }
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }

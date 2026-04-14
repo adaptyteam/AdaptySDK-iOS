@@ -61,7 +61,7 @@ extension Schema.ConfigurationBuilder {
     }
 }
 
-extension Schema.Box: Encodable, DecodableWithConfiguration {
+extension Schema.Box: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case width
         case height
@@ -79,18 +79,5 @@ extension Schema.Box: Encodable, DecodableWithConfiguration {
             verticalAlignment: container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment) ?? Self.default.verticalAlignment,
             content: container.decodeIfExist(Schema.Element.self, forKey: .content, configuration: configuration)
         )
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(width, forKey: .width)
-        try container.encodeIfPresent(height, forKey: .height)
-        if horizontalAlignment != .center {
-            try container.encode(horizontalAlignment, forKey: .horizontalAlignment)
-        }
-        if verticalAlignment != .center {
-            try container.encode(verticalAlignment, forKey: .verticalAlignment)
-        }
-        try container.encodeIfPresent(content, forKey: .content)
     }
 }
