@@ -28,7 +28,7 @@ extension VC.Pager.Length {
     }
 }
 
-extension VC.TransitionSlide {
+extension VC.Transition {
     var swiftUIAnimation: Animation {
         interpolator.createAnimation(duration: duration)
     }

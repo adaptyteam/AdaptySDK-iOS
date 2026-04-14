@@ -17,7 +17,7 @@ extension Schema.TextAttributes? {
     }
 }
 
-extension Schema.TextAttributes: Codable {
+extension Schema.TextAttributes: Decodable {
     enum CodingKeys: String, CodingKey {
         case size
         case fontAssetId = "font"
@@ -44,19 +44,6 @@ extension Schema.TextAttributes: Codable {
             letterSpacing: container.decodeIfPresent(Double.self, forKey: .letterSpacing),
             lineHeight: container.decodeIfPresent(Double.self, forKey: .lineHeight)
         )
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(fontAssetId, forKey: .fontAssetId)
-        try container.encodeIfPresent(size, forKey: .size)
-        try container.encodeIfPresent(txtColor, forKey: .txtColor)
-        try container.encodeIfPresent(imageTintColor, forKey: .imageTintColor)
-        try container.encodeIfPresent(background, forKey: .background)
-        try container.encodeIfPresent(strike, forKey: .strike)
-        try container.encodeIfPresent(underline, forKey: .underline)
-        try container.encodeIfPresent(letterSpacing, forKey: .letterSpacing)
-        try container.encodeIfPresent(lineHeight, forKey: .lineHeight)
     }
 }
 

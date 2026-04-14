@@ -56,7 +56,7 @@ extension Schema.ConfigurationBuilder {
     }
 }
 
-extension Schema.Navigator: Encodable, DecodableWithConfiguration {
+extension Schema.Navigator: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case background
         case content
@@ -86,3 +86,4 @@ extension Schema.Navigator: Encodable, DecodableWithConfiguration {
         )
     }
 }
+

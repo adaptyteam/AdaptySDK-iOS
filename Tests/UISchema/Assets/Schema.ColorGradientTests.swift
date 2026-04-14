@@ -211,30 +211,5 @@ extension SchemaTests {
                 try invalid.decode(Value.self)
             }
         }
-
-        // MARK: - Encoding Tests
-
-        @Test("encode produces correct structure", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            let obj = try #require(encoded.deserilized as? [String: Any])
-            #expect(obj["type"] as? String == value.kind.rawValue)
-            #expect(obj["custom_id"] as? String == value.customId)
-            let values = obj["values"] as? [Any]
-            #expect(values?.count == value.items.count)
-            let points = try #require(obj["points"] as? [String: Any])
-            #expect(points["x0"] as? Double == value.start.x)
-            #expect(points["y0"] as? Double == value.start.y)
-            #expect(points["x1"] as? Double == value.end.x)
-            #expect(points["y1"] as? Double == value.end.y)
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }

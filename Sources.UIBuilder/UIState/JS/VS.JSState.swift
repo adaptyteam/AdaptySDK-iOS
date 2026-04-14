@@ -135,54 +135,10 @@ extension VS.JSState {
             return T.fromJSValue(result)
         }
 
-        let converted = try readConvert(value: result, convertor: convertor)
+        let converted = try convertor.readValue(result, in: context)
         log.debug("convert to value: \(converted)")
 
         return T.fromJSValue(converted)
-    }
-
-    private func readConvert(value: JSValue, convertor: VC.Variable.Converter) throws(VS.Error) -> JSValue {
-        switch convertor {
-        case let .isEqual(a, _):
-            let rhs = a.toJSValue(in: context)
-            let result = value.isEqual(to: rhs)
-            return result.toJSValue(in: context)
-        case let .dateTimeWithFormat(format):
-            guard let unixtimestamp = Double.fromJSValue(value) else {
-                throw .convertorError("dataTimeWithStyle: expected a numeric timestamp")
-            }
-            let value = Date(timeIntervalSince1970: unixtimestamp / 1000.0)
-            let formatter = DateFormatter()
-// TODO: use locale of UIConfiguration           formatter.locale
-            formatter.dateFormat = format
-            return formatter.string(from: value).toJSValue(in: context)
-        case let .dateTimeWithStyle(date, time):
-            guard let unixtimestamp = Double.fromJSValue(value) else {
-                throw .convertorError("dataTimeWithStyle: expected a numeric timestamp")
-            }
-            let value = Date(timeIntervalSince1970: unixtimestamp / 1000.0)
-            let formatter = DateFormatter()
-// TODO: use locale of UIConfiguration            formatter.locale
-            formatter.dateStyle = date
-            formatter.timeStyle = time
-            return formatter.string(from: value).toJSValue(in: context)
-        case let .unknown(name, _):
-            throw .notFoundConvertor(name)
-        }
-    }
-
-    private func writeConvert(value: some JSValueConvertable, convertor: VC.Variable.Converter) throws(VS.Error) -> any JSValueConvertable {
-        switch convertor {
-        case let .isEqual(a, b):
-            let boolValue = value.toJSValue(in: context).toBool()
-            guard !boolValue else { return a }
-            if let b { return b }
-            return VC.Parameter.null
-        case .dateTimeWithFormat, .dateTimeWithStyle:
-            return value
-        case let .unknown(name, _):
-            throw .notFoundConvertor(name)
-        }
     }
 
     private func invokeMethod<T: JSValueRepresentable>(
@@ -245,7 +201,7 @@ extension VS.JSState {
             return
         }
 
-        let converted = try writeConvert(value: value, convertor: convertor)
+        let converted = try convertor.writeValue(value, in: context)
         log.debug("convert \(value) to: \(converted)")
         try setValueWithoutConverter(variable: variable, value: converted, screenInstance: screenInstance)
     }
@@ -308,7 +264,7 @@ extension VS.JSState {
 
     func execute(
         actions: [VC.Action],
-        additionalParams: [String: VC.Parameter]?,
+        params: [String: any VC.Value]?,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
         guard !actions.isEmpty else { return }
@@ -316,18 +272,17 @@ extension VS.JSState {
         for action in actions {
             guard !actionDispatcher.execute(action, in: context) else { continue }
 
-            let params: [String: VC.Parameter]? =
-                switch (action.params, additionalParams) {
-                case (let params, nil),
-                     (nil, let params):
-                    params
-                case let (params?, additional?):
-                    params.merging(additional) { _, new in new }
+            var mergedParams = action.params ?? [:]
+
+            if let params {
+                for (key, value) in params {
+                    mergedParams[key] = VC.AnyValue(value)
                 }
+            }
 
             let object = VS.ActionParameters(
                 screenInstance: screenInstance,
-                params: params
+                params: mergedParams
             )
             _ = try invokeMethod(
                 Bool.self,
@@ -384,3 +339,4 @@ extension VS.JSState {
         return debug(path: path.joined(separator: "."), filter: filter)
     }
 }
+

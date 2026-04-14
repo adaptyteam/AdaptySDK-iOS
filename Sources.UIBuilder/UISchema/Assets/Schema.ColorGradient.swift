@@ -17,7 +17,7 @@ extension Schema.ColorGradient {
     }
 }
 
-extension Schema.ColorGradient: Codable {
+extension Schema.ColorGradient: Decodable {
     private struct Points: Codable {
         let x0: Double
         let y0: Double
@@ -55,13 +55,5 @@ extension Schema.ColorGradient: Codable {
         end = points.end
         customId = try container.decodeIfPresent(String.self, forKey: .customId)
         kind = try container.decode(Kind.self, forKey: .kind)
-    }
-
-    package func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(items, forKey: .items)
-        try container.encode(Points(start: start, end: end), forKey: .points)
-        try container.encodeIfPresent(customId, forKey: .customId)
-        try container.encode(kind, forKey: .kind)
     }
 }

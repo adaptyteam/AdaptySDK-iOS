@@ -11,7 +11,7 @@ extension Schema.Box {
     typealias Length = VC.Box.Length
 }
 
-extension Schema.Box.Length: Codable {
+extension Schema.Box.Length: Decodable {
     enum CodingKeys: String, CodingKey {
         case min
         case max
@@ -37,22 +37,5 @@ extension Schema.Box.Length: Codable {
             }
         }
     }
-
-    func encode(to encoder: any Encoder) throws {
-        switch self {
-        case let .fixed(unit):
-            try unit.encode(to: encoder)
-        case let .flexible(min, max):
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encodeIfPresent(min, forKey: .min)
-            try container.encodeIfPresent(max, forKey: .max)
-        case let .shrinkable(min, max):
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(min, forKey: .shrink)
-            try container.encodeIfPresent(max, forKey: .max)
-        case .fillMax:
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(true, forKey: .fillMax)
-        }
-    }
 }
+

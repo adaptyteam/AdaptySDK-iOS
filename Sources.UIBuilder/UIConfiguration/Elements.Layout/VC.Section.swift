@@ -11,7 +11,8 @@ extension VC {
     struct Section: Sendable, Hashable {
         let index: Variable
         let content: [Element]
-        let duration: TimeInterval?
-        let interpolator: Animation.Interpolator
+        let transition: Transition?
     }
 }
+
+

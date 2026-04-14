@@ -28,7 +28,7 @@ extension Schema {
 
         var endAt: Date?
         var duration: TimeInterval?
-        var behavior: VC.SetTimerBehavior?
+        var behavior: VS.SetTimerBehavior?
 
         let value = try container.decodeIfPresent(String.self, forKey: .behavior)
 

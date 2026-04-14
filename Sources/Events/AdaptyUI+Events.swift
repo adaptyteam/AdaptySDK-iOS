@@ -6,12 +6,19 @@
 //
 
 package extension Adapty {
-    nonisolated static func logShowFlowViaAdaptyUI(_ flow: AdaptyFlow) async throws(AdaptyError) {
+    nonisolated static func logFlowAnalyticsViaAdaptyUI(
+        variationId: String,
+        viewConfigurationId: String,
+        params: AdaptyFlowAnalyticsPayload
+    ) async throws(AdaptyError) {
         try await trackEvent(
-            .flowShowed(.init(
-                variationId: flow.variationId,
-                viewConfigurationId: flow.viewConfigurationId
-            ))
+            .flowAnalytics(
+                .init(
+                    variationId: variationId,
+                    viewConfigurationId: viewConfigurationId,
+                    payload: params
+                )
+            )
         )
     }
 
@@ -21,3 +28,4 @@ package extension Adapty {
         )
     }
 }
+

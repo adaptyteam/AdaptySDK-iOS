@@ -186,48 +186,5 @@ private extension SchemaTests.RichTextTests {
             }
         }
 
-        // MARK: - Encoding Tests
-
-        @Test("encode produces correct structure", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            switch value {
-            case let .text(text, attributes, action):
-                if attributes != nil {
-                    let obj = try #require(encoded.deserilized as? [String: Any])
-                    #expect(obj["text"] as? String == text)
-                    #expect(obj["attributes"] is [String: Any])
-                } else {
-                    let str = try #require(encoded.deserilized as? String)
-                    #expect(str == text)
-                }
-            case let .tag(tag, attributes, action):
-                let obj = try #require(encoded.deserilized as? [String: Any])
-                #expect(obj["tag"] as? String == tag)
-                if attributes != nil {
-                    #expect(obj["attributes"] is [String: Any])
-                } else {
-                    #expect(obj["attributes"] == nil)
-                }
-            case let .image(_, attributes):
-                let obj = try #require(encoded.deserilized as? [String: Any])
-                #expect(obj["image"] != nil)
-                if attributes != nil {
-                    #expect(obj["attributes"] is [String: Any])
-                } else {
-                    #expect(obj["attributes"] == nil)
-                }
-            case .unknown:
-                break
-            }
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }

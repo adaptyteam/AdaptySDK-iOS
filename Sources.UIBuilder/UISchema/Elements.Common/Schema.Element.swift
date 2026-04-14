@@ -94,7 +94,7 @@ extension Schema.ConfigurationBuilder {
     }
 }
 
-extension Schema.Element: Encodable, DecodableWithConfiguration {
+extension Schema.Element: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case type
         case count
@@ -258,8 +258,5 @@ extension Schema.Element: Encodable, DecodableWithConfiguration {
             return properties.isEmpty ? nil : properties
         }
     }
-
-    func encode(to _: any Encoder) throws {
-        // TODO: implement
-    }
 }
+

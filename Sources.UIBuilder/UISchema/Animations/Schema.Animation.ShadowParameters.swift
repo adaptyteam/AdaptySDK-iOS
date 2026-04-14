@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.Animation.ShadowParameters: Codable {
+extension Schema.Animation.ShadowParameters: Decodable {
     enum CodingKeys: String, CodingKey {
         case color
         case blurRadius = "blur_radius"
@@ -24,11 +24,5 @@ extension Schema.Animation.ShadowParameters: Codable {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "The color, blur_radius, and offset parameters cannot be absent at the same time."))
         }
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(color, forKey: .color)
-        try container.encodeIfPresent(blurRadius, forKey: .blurRadius)
-        try container.encodeIfPresent(offset, forKey: .offset)
-    }
 }
+

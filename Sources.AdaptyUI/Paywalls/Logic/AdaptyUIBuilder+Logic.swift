@@ -57,7 +57,15 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     package func logShowPaywall(
         viewConfiguration: AdaptyUIConfiguration
     ) async {
-        try? await Adapty.logShowFlowViaAdaptyUI(flow)
+        try? await Adapty.logFlowAnalyticsViaAdaptyUI(
+            variationId: flow.variationId,
+            viewConfigurationId: viewConfiguration.id,
+            params: AdaptyUIFlowScreenShowedParameters( // TODO: log show screen
+                screenInstanceId: "unknown_screen",
+                screenOrder: 0,
+                isLatestScreen: false
+            )
+        )
     }
 
     package func getProducts(

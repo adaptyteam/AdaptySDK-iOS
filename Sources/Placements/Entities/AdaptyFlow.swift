@@ -39,7 +39,6 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
         case name = "flow_name"
         case remoteConfigs = "remote_configs"
         case paywalls = "variations"
-        case viewConfigurationExist = "flow_version_config_url"
         case viewConfigurationId = "flow_version_id"
     }
 

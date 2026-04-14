@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.TextField.Placeholder: Codable {
+extension Schema.TextField.Placeholder: Decodable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
         case overflowMode = "on_overflow"
@@ -28,19 +28,4 @@ extension Schema.TextField.Placeholder: Codable {
         defaultTextAttributes = textAttributes.nonEmptyOrNil
     }
 
-    func encode(to encoder: any Encoder) throws {
-        if let defaultTextAttributes = defaultTextAttributes.nonEmptyOrNil {
-            try defaultTextAttributes.encode(to: encoder)
-        }
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(value, forKey: .stringId)
-
-        if let first = overflowMode.first {
-            if overflowMode.count == 1 {
-                try container.encode(first, forKey: .overflowMode)
-            } else {
-                try container.encode(overflowMode, forKey: .overflowMode)
-            }
-        }
-    }
 }

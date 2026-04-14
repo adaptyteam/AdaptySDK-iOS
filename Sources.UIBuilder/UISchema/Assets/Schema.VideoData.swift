@@ -19,7 +19,7 @@ extension Schema.VideoData {
     }
 }
 
-extension Schema.VideoData: Codable {
+extension Schema.VideoData: Decodable {
     private enum CodingKeys: String, CodingKey {
         case type
         case url
@@ -34,13 +34,5 @@ extension Schema.VideoData: Codable {
             url: container.decode(URL.self, forKey: .url),
             image: container.decode(Schema.ImageData.self, forKey: .image)
         )
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(Self.assetType, forKey: .type)
-        try container.encodeIfPresent(customId, forKey: .customId)
-        try container.encode(url, forKey: .url)
-        try container.encode(image, forKey: .image)
     }
 }

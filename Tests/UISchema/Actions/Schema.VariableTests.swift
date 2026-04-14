@@ -43,7 +43,7 @@ extension SchemaTests {
             ),
             // With converter
             (
-                Value(path: ["section"], setter: nil, scope: .screen, converter: .isEqual(.int32(5), falseValue: nil)),
+                Value(path: ["section"], setter: nil, scope: .screen, converter: VC.Variable.IsEqualConvertor(value: VC.AnyValue(5), falseValue: nil)),
                 Json(##"""
                 {
                     "var": "section",
@@ -74,7 +74,8 @@ extension SchemaTests {
             ),
             // Full — all fields
             (
-                Value(path: ["data", "count"], setter: "setCount", scope: .global, converter: .unknown("to_string", .bool(true))),
+                Value(path: ["data", "count"], setter: "setCount", scope: .global, converter:
+                        VC.Variable.UnknownConverter(name: "to_string")),
                 Json(##"""
                 {
                     "var": "data.count",
@@ -111,27 +112,6 @@ extension SchemaTests {
             #expect(throws: (any Error).self, "JSON should be invalid: \(invalid)") {
                 try invalid.decode(Value.self)
             }
-        }
-
-        // MARK: - Encoding Tests
-
-        @Test("encode produces only var key", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            let obj = try #require(encoded.deserilized as? [String: Any])
-            #expect(obj["var"] as? String == value.path.joined(separator: "."))
-            #expect(obj["setter"] as? String == value.setter)
-            if value.scope != .screen {
-                #expect(obj["scope"] as? String == value.scope.rawValue)
-            }
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
         }
     }
 }

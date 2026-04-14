@@ -11,7 +11,7 @@ extension Schema {
     typealias Asset = VC.Asset
 }
 
-extension Schema.Asset: Codable {
+extension Schema.Asset: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case type
@@ -43,24 +43,5 @@ extension Schema.Asset: Codable {
             self = .unknown("asset.type: \(type)")
         }
     }
-
-    func encode(to encoder: any Encoder) throws {
-        switch self {
-        case let .solidColor(color):
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(Schema.Color.assetType, forKey: .type)
-            try container.encodeIfPresent(color.customId, forKey: .customId)
-            try container.encode(color, forKey: .value)
-        case let .colorGradient(gradient):
-            try gradient.encode(to: encoder)
-        case let .image(data):
-            try data.encode(to: encoder)
-        case let .video(data):
-            try data.encode(to: encoder)
-        case let .font(data):
-            try data.encode(to: encoder)
-        case .unknown:
-            break
-        }
-    }
 }
+

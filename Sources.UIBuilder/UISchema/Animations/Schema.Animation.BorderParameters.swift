@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.Animation.BorderParameters: Codable {
+extension Schema.Animation.BorderParameters: Decodable {
     enum CodingKeys: String, CodingKey {
         case color
         case thickness
@@ -22,10 +22,5 @@ extension Schema.Animation.BorderParameters: Codable {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "The color and thickness parameters cannot be absent together."))
         }
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(color, forKey: .color)
-        try container.encodeIfPresent(thickness, forKey: .thickness)
-    }
 }
+

@@ -22,16 +22,17 @@ package protocol AdaptyUIActionHandler: AnyObject {
     func registerState(_ state: AdaptyUIState)
     func changeFocus(id: String?)
     func setTimer(id: String, endAt: Date, callback: VS.JSAction?)
-    func setTimer(id: String, duration: TimeInterval, behavior: VC.SetTimerBehavior, callback: VS.JSAction?)
-    func moveScroll(instanceId: String, kind: VC.ScrollKind, value: VC.ScrollValue)
+    func setTimer(id: String, duration: TimeInterval, behavior: VS.SetTimerBehavior, callback: VS.JSAction?)
+    func moveScroll(instanceId: String, kind: VS.ScrollKind, value: VS.ScrollValue)
 
+    func sendAnalyticEvent(_: VS.AnalyticEvent)
     func sendEvents(instanceId: String?, eventIds: [String])
     func showAppRate()
     func showAlertDialog(params: VS.ShowAlertDialogParameters, callback: VS.JSAction?)
     func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction?)
 }
 
-package extension VC {
+package extension VS {
     enum SetTimerBehavior: String, Sendable, Hashable {
         case restart
         case `continue`
@@ -40,7 +41,7 @@ package extension VC {
     }
 }
 
-package extension VC {
+package extension VS {
     enum ScrollKind: String, Sendable, Hashable {
         case content
         case footer
@@ -49,6 +50,30 @@ package extension VC {
     enum ScrollValue: String, Sendable, Hashable {
         case start
         case end
+    }
+}
+
+package extension VS {
+    struct AnalyticEvent: Sendable {
+        package enum CodingKeys: String, CodingKey {
+            case name = "event_type"
+            case screenInstanceId = "screen_id"
+        }
+
+        package let name: String
+        package let params: [String: any Sendable]
+
+        package var screenInstanceId: String? {
+            (params[CodingKeys.screenInstanceId.rawValue] ?? params["instanceId"]) as? String
+        }
+
+        package var isBackend: Bool {
+            params["isBackendEvent"] as? Bool ?? false
+        }
+
+        package var isCustomer: Bool {
+            params["isCustomerEvent"] as? Bool ?? false
+        }
     }
 }
 

@@ -56,7 +56,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
     private let logic: AdaptyUIBuilderLogic
     private weak var state: AdaptyUIState?
-    
+
     package weak var stateViewModel: AdaptyUIStateViewModel? {
         didSet {
             stateViewModel?.onAlertDialogResponse = { [weak self] actionId, screenInstance in
@@ -64,6 +64,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
             }
         }
     }
+
     package weak var timerViewModel: AdaptyUITimerViewModel?
 
     package var systemRequestsHandler: AdaptyUISystemRequestsHandler?
@@ -222,7 +223,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     package nonisolated func setTimer(
         id: String,
         duration: TimeInterval,
-        behavior: VC.SetTimerBehavior,
+        behavior: VS.SetTimerBehavior,
         callback: VS.JSAction?
     ) {
         if let callback { pendingTimerCallbacks[id] = callback }
@@ -235,8 +236,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
     package nonisolated func moveScroll(
         instanceId: String,
-        kind: VC.ScrollKind,
-        value: VC.ScrollValue
+        kind: VS.ScrollKind,
+        value: VS.ScrollValue
     ) {
         Task { @MainActor [weak self] in
             self?.stateViewModel?.scrollCommand = .init(instanceId: instanceId, kind: kind, value: value)
@@ -339,6 +340,25 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                         )
                     }
                 }
+            }
+        }
+    }
+
+    package nonisolated func sendAnalyticEvent(_ event: VS.AnalyticEvent) {
+        Task { @MainActor [weak self] in
+            if event.isBackend {
+                // TODO: Event
+                //        try? await Adapty.logFlowAnalyticsViaAdaptyUI(
+                //            variationId: flow.variationId,
+                //            viewConfigurationId: viewConfiguration.id,
+                //            params: event
+                //        )
+            }
+
+            if event.isCustomer {
+                let name: String = event.name
+                let params: [String: any Sendable] = event.params
+                // TODO: send to customer name + params
             }
         }
     }

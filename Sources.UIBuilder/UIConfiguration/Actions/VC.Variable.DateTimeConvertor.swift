@@ -1,5 +1,5 @@
 //
-//  VC.Variable.Converter.swift
+//  VC.Variable.DateTimeConvertor.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 24.02.2026.
@@ -8,12 +8,13 @@
 import Foundation
 
 extension VC.Variable {
-    enum Converter: Sendable, Hashable {
-        case isEqual(VC.Parameter, falseValue: VC.Parameter?)
-        case dateTimeWithFormat(String)
-        case dateTimeWithStyle(DateFormatter.Style, DateFormatter.Style)
+    enum DateTimeConvertor: Converter {
+        var name: String {
+            "DateTime"
+        }
 
-        case unknown(String, VC.Parameter?)
+        case format(String)
+        case styles(date: DateFormatter.Style, time: DateFormatter.Style)
     }
 }
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.WheelItemsPicker.Item: Codable {
+extension Schema.WheelItemsPicker.Item: Decodable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
         case value
@@ -15,17 +15,14 @@ extension Schema.WheelItemsPicker.Item: Codable {
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let value = try container.decode(VC.Parameter.self, forKey: .value)
+        let value = try container.decode(Schema.AnyValue.self, forKey: .value)
 
-        switch value {
-        case .string,
-             .bool,
-             .int32,
-             .uint32,
-             .double:
-            break
-        default:
-            throw DecodingError.dataCorruptedError(forKey: .value, in: container, debugDescription: "value must be a primitive type (string, bool, int32, uint32, or double)")
+        if value.isArray || value.isObject {
+            throw DecodingError.dataCorruptedError(
+                forKey: .value,
+                in: container,
+                debugDescription: "value must be a primitive type (string, bool, int32, uint32, or double)"
+            )
         }
 
         try self.init(
@@ -33,11 +30,4 @@ extension Schema.WheelItemsPicker.Item: Codable {
             value: value
         )
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(stringId, forKey: .stringId)
-        try container.encode(value, forKey: .value)
-    }
 }
-

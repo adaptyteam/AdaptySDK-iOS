@@ -173,8 +173,8 @@ private extension Decoder {
                 onOutsideTap: [.init(
                     path: ["SDK", "closeScreen"],
                     params: [
-                        "navigatorId": .string(navigatorId),
-                        "transitionId": .string(VC.Navigator.AppearanceTransition.onDisappearKey),
+                        "navigatorId": VC.AnyValue(navigatorId),
+                        "transitionId": VC.AnyValue(VC.Navigator.AppearanceTransition.onDisappearKey),
                     ],
                     scope: .global
                 )],

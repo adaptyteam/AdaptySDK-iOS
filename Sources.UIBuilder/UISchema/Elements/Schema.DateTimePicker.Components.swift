@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.DateTimePicker.Components: Codable {
+extension Schema.DateTimePicker.Components: Decodable {
     private enum CodingKeys: String, Codable {
         case date
         case hourAndMinute = "hour_and_minute"
@@ -25,13 +25,5 @@ extension Schema.DateTimePicker.Components: Codable {
             }
         }
         self = components
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        var keys: [CodingKeys] = []
-        if contains(.date) { keys.append(.date) }
-        if contains(.hourAndMinute) { keys.append(.hourAndMinute) }
-        try container.encode(keys)
     }
 }

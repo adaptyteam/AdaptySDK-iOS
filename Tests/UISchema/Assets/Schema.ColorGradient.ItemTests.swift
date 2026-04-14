@@ -65,23 +65,5 @@ private extension SchemaTests.ColorGradientTests {
                 try invalid.decode(Value.self)
             }
         }
-
-        // MARK: - Encoding Tests
-
-        @Test("encode produces color and p fields", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            let deserilized = try #require(encoded.deserilized as? [String: Any])
-            #expect(deserilized["color"] as? String == value.color.rawValue)
-            #expect(deserilized["p"] as? Double == value.p)
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }

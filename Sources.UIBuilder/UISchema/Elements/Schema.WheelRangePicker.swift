@@ -36,7 +36,7 @@ extension Schema.WheelRangePicker: Schema.SimpleElement {
     }
 }
 
-extension Schema.WheelRangePicker: Codable {
+extension Schema.WheelRangePicker: Decodable {
     enum CodingKeys: String, CodingKey {
         case value
         case maxValue = "max"
@@ -68,25 +68,5 @@ extension Schema.WheelRangePicker: Codable {
             items: formatItems,
             textAttributes: Schema.TextAttributes(from: decoder)
         )
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        if let attributes = format.textAttributes {
-            try attributes.encode(to: encoder)
-        }
-
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try container.encode(value, forKey: .value)
-        try container.encode(maxValue, forKey: .maxValue)
-        try container.encode(minValue, forKey: .minValue)
-        if stepValue != 1.0 {
-            try container.encode(stepValue, forKey: .stepValue)
-        }
-
-        if format.items.count == 1, format.items[0].from == 0 {
-        } else {
-            try container.encode(format.items, forKey: .format)
-        }
     }
 }

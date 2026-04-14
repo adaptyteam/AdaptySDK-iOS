@@ -21,7 +21,7 @@ extension Schema.Slider: Schema.SimpleElement {
     }
 }
 
-extension Schema.Slider: Codable {
+extension Schema.Slider: Decodable {
     enum CodingKeys: String, CodingKey {
         case value
         case maxValue = "max"
@@ -38,14 +38,5 @@ extension Schema.Slider: Codable {
             stepValue: container.decodeIfPresent(Double.self, forKey: .stepValue) ?? 1.0
         )
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(value, forKey: .value)
-        try container.encode(maxValue, forKey: .maxValue)
-        try container.encode(minValue, forKey: .minValue)
-        if stepValue != 1.0 {
-            try container.encode(stepValue, forKey: .stepValue)
-        }
-    }
 }
+

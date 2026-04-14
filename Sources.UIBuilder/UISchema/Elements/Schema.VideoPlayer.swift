@@ -21,7 +21,7 @@ extension Schema.VideoPlayer: Schema.SimpleElement {
     }
 }
 
-extension Schema.VideoPlayer: Codable {
+extension Schema.VideoPlayer: Decodable {
     enum CodingKeys: String, CodingKey {
         case assetId = "asset_id"
         case aspect
@@ -47,16 +47,5 @@ extension Schema.VideoPlayer: Codable {
                 ?? true,
             actions: container.decodeIfPresentActions(forKey: .actions) ?? []
         )
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(asset, forKey: .assetId)
-        if aspect != .default {
-            try container.encode(aspect, forKey: .aspect)
-        }
-        if loop {
-            try container.encode(loop, forKey: .loop)
-        }
     }
 }

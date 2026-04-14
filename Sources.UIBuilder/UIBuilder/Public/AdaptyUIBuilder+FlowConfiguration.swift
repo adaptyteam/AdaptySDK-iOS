@@ -19,7 +19,10 @@ public extension AdaptyUIBuilder {
         timerResolver: AdaptyUITimerResolver?,
         assetsResolver: AdaptyUIAssetsResolver?
     ) async throws -> FlowConfiguration {
-        let viewConfiguration = try schema.extractUIConfiguration(withLocaleId: localeId)
+        let viewConfiguration = try schema.extractUIConfiguration(
+            id: UUID().uuidString,
+            withLocaleId: localeId
+        )
 
         return FlowConfiguration(
             logId: Log.stamp,

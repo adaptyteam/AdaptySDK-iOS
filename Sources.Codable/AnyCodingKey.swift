@@ -5,6 +5,8 @@
 //  Created by Aleksei Valiano on 05.12.2025.
 //
 
+import Foundation
+
 public struct AnyCodingKey: CodingKey {
     public var stringValue: String
     public var intValue: Int?
@@ -23,6 +25,11 @@ public struct AnyCodingKey: CodingKey {
 public extension AnyCodingKey {
     init(_ string: String) {
         self.init(stringValue: string)
+    }
+
+    init(_ value: any RawRepresentable<String>) {
+        stringValue = value.rawValue
+        intValue = nil
     }
 }
 

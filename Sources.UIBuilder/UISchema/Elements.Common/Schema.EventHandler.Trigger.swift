@@ -12,7 +12,7 @@ extension Schema.EventHandler.Trigger {
     }
 }
 
-extension Schema.EventHandler.Trigger: Codable {
+extension Schema.EventHandler.Trigger: Decodable {
     enum CodingKeys: String, CodingKey {
         case events
         case filter
@@ -36,13 +36,6 @@ extension Schema.EventHandler.Trigger: Codable {
                 screenTransitions: nil
             )
         }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(events, forKey: .events)
-        try container.encodeIfPresent(filter, forKey: .filter)
-        try container.encodeIfPresent(screenTransitions, forKey: .screenTransitions)
     }
 }
 

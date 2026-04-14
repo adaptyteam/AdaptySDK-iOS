@@ -16,7 +16,7 @@ struct AdaptyFlowVariationAssignedParameters: Sendable {
 extension AdaptyFlowVariationAssignedParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case variationId = "variation_id"
-        case viewConfigurationId = "paywall_builder_id"
+        case viewConfigurationId = "flow_version_id"
         case placementAudienceVersionId = "placement_audience_version_id"
     }
 }

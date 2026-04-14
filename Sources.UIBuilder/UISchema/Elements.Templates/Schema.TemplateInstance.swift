@@ -14,7 +14,7 @@ extension Schema {
     }
 }
 
-extension Schema.TemplateInstance: Encodable, DecodableWithConfiguration {
+extension Schema.TemplateInstance: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case type
     }
@@ -58,8 +58,5 @@ extension Schema.TemplateInstance: Encodable, DecodableWithConfiguration {
 //
 //        return childs.isEmpty ? nil : childs
 //    }
-
-    func encode(to _: any Encoder) throws {
-        // TODO: implement after Element encodable
-    }
 }
+

@@ -18,7 +18,7 @@ extension Schema.EventHandler {
     }
 }
 
-extension Schema.EventHandler: Codable {
+extension Schema.EventHandler: Decodable {
     enum CodingKeys: String, CodingKey {
         case triggers
         case animations
@@ -53,13 +53,6 @@ extension Schema.EventHandler: Codable {
                 onAnimationsFinish: []
             )
         }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(triggers, forKey: .triggers)
-        try container.encode(animations, forKey: .animations)
-        try container.encode(onAnimationsFinish, forKey: .onAnimationsFinish)
     }
 }
 
