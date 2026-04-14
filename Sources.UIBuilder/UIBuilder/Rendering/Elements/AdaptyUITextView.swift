@@ -45,7 +45,7 @@ struct AdaptyUITextView: View {
             screen: screen
         ).asFontAsset
 
-        let lineSpacing: CGFloat? = defaultFontAsset?.defaultLineHeight.map { lineHeight in
+        let lineSpacing: CGFloat? = (text.defaultTextAttributes?.lineHeight ?? defaultFontAsset?.defaultLineHeight).map { lineHeight in
             CGFloat(lineHeight) - (defaultFontAsset?.font.lineHeight ?? 0)
         }
 
@@ -401,7 +401,7 @@ extension AttributedString {
             result.underlineStyle = .single
         }
 
-        if let letterSpacing = fontAsset?.defaultLetterSpacing {
+        if let letterSpacing = attributes?.letterSpacing ?? fontAsset?.defaultLetterSpacing {
             result.kern = CGFloat(letterSpacing)
         }
 
