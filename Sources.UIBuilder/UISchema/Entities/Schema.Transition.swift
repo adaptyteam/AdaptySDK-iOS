@@ -1,5 +1,5 @@
 //
-//  Schema.TransitionSlide.swift
+//  Schema.Transition.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 01.12.2025.
@@ -8,10 +8,10 @@
 import Foundation
 
 extension Schema {
-    typealias TransitionSlide = VC.TransitionSlide
+    typealias Transition = VC.Transition
 }
 
-extension Schema.TransitionSlide {
+extension Schema.Transition {
     static let `default` = Self(
         startDelay: 0.0,
         duration: 0.3,
@@ -19,9 +19,8 @@ extension Schema.TransitionSlide {
     )
 }
 
-extension Schema.TransitionSlide: Decodable {
+extension Schema.Transition: Decodable {
     enum CodingKeys: String, CodingKey {
-        case type
         case startDelay = "start_delay"
         case duration
         case interpolator
@@ -30,10 +29,10 @@ extension Schema.TransitionSlide: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        startDelay = try (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay))
+        startDelay = try (container.decodeIfPresent(Double.self, forKey: .startDelay))
             .map { $0 / 1000.0 }
             ?? Self.default.startDelay
-        duration = try (container.decodeIfPresent(TimeInterval.self, forKey: .duration))
+        duration = try (container.decodeIfPresent(Double.self, forKey: .duration))
             .map { $0 / 1000.0 }
             ?? Self.default.duration
         interpolator = try (container.decodeIfPresent(Schema.Animation.Interpolator.self, forKey: .interpolator)) ?? Self.default.interpolator

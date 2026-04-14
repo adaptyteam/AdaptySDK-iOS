@@ -11,8 +11,7 @@ extension Schema {
     struct Section: Sendable {
         let index: Variable
         let content: [Schema.Element]
-        let animationDuration: TimeInterval?
-        let animationInterpolator: VC.Animation.Interpolator
+        let transition: Transition?
     }
 }
 
@@ -34,8 +33,7 @@ extension Schema.Section: Schema.CompositeElement {
             .init(
                 index: index,
                 content: resultStack.popLastElements(content.count),
-                animationDuration: animationDuration,
-                animationInterpolator: animationInterpolator
+                transition: transition
             ),
             properties
         )
@@ -47,23 +45,28 @@ extension Schema.Section: DecodableWithConfiguration {
         case legacySectionId = "id"
         case index
         case content
-        case animationDuration = "animation_duration"
-        case animationInterpolator = "animation_interpolator"
+        case duration
+        case interpolator
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         guard configuration.isLegacy else {
-            let durationMs = try container.decodeIfPresent(TimeInterval.self, forKey: .animationDuration)
+            let transition: Schema.Transition? =
+                if container.exist(.duration) {
+                    try .init(
+                        startDelay: 0,
+                        duration: container.decode(Double.self, forKey: .duration) / 1000.0,
+                        interpolator: container.decodeIfPresent(VC.Animation.Interpolator.self, forKey: .interpolator) ?? .default
+                    )
+                } else {
+                    nil
+                }
 
             try self.init(
                 index: container.decode(Schema.Variable.self, forKey: .index),
                 content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
-                animationDuration: durationMs.map { $0 / 1000.0 },
-                animationInterpolator: container.decodeIfPresent(
-                    VC.Animation.Interpolator.self,
-                    forKey: .animationInterpolator
-                ) ?? .easeInOut
+                transition: transition
             )
             return
         }
@@ -80,8 +83,8 @@ extension Schema.Section: DecodableWithConfiguration {
                 converter: nil
             ),
             content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
-            animationDuration: nil,
-            animationInterpolator: .easeInOut
+            transition: nil
         )
     }
 }
+

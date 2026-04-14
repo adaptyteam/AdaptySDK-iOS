@@ -99,6 +99,18 @@ struct AdaptyUIHeroContainerView: View {
                             .onGeometrySizeChange { footerSize = $0 }
                     }
 
+                }
+                .coordinateSpace(name: CoordinateSpace.adaptyHeroName)
+                .ignoresSafeArea()
+                .background {
+                    if let background = screen.background {
+                        AdaptyUIBackgroundElementsView(
+                            backgrounds: background,
+                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                        )
+                    }
+                }
+                .overlay {
                     if let overlay = screen.overlay {
                         AdaptyUIOverlayElementsView(
                             overlays: overlay,
@@ -106,8 +118,6 @@ struct AdaptyUIHeroContainerView: View {
                         )
                     }
                 }
-                .coordinateSpace(name: CoordinateSpace.adaptyHeroName)
-                .ignoresSafeArea()
             }
         }
         .coordinateSpace(name: CoordinateSpace.adaptyGlobalName)

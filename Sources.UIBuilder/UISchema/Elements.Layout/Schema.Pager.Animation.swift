@@ -33,9 +33,9 @@ extension Schema.Pager.Animation: Decodable {
             startDelay: (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay))
                 .map { $0 / 1000.0 }
                 ?? Self.default.startDelay,
-            pageTransition: container.decodeIfPresent(Schema.TransitionSlide.self, forKey: .pageTransition)
+            pageTransition: container.decodeIfPresent(Schema.Transition.self, forKey: .pageTransition)
                 ?? .default,
-            repeatTransition: container.decodeIfPresent(Schema.TransitionSlide.self, forKey: .repeatTransition),
+            repeatTransition: container.decodeIfPresent(Schema.Transition.self, forKey: .repeatTransition),
 
             afterInteractionDelay: (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay))
                 .map { $0 / 1000.0 }

@@ -74,6 +74,22 @@ struct AdaptyScreenView: View {
                 screen.content,
                 screenHolderBuilder: { EmptyView() } // TODO: x check
             )
+            .background {
+                if let background = screen.background {
+                    AdaptyUIBackgroundElementsView(
+                        backgrounds: background,
+                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                    )
+                }
+            }
+            .overlay {
+                if let overlay = screen.overlay {
+                    AdaptyUIOverlayElementsView(
+                        overlays: overlay,
+                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                    )
+                }
+            }
         }
     }
 }

@@ -82,6 +82,17 @@ struct AdaptyUITransparentContainerView: View {
                         )
                     }
 
+                }
+                .ignoresSafeArea()
+                .background {
+                    if let background = screen.background {
+                        AdaptyUIBackgroundElementsView(
+                            backgrounds: background,
+                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                        )
+                    }
+                }
+                .overlay {
                     if let overlay = screen.overlay {
                         AdaptyUIOverlayElementsView(
                             overlays: overlay,
@@ -89,7 +100,6 @@ struct AdaptyUITransparentContainerView: View {
                         )
                     }
                 }
-                .ignoresSafeArea()
             }
         }
         .coordinateSpace(name: "adapty.container.transparent")
