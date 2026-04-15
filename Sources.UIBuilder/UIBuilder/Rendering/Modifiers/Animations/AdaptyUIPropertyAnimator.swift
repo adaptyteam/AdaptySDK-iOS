@@ -17,26 +17,54 @@ extension VC.Animation.Timeline {
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
         switch loop {
-        case .normal: // reset value and repeat
-            AdaptyUIPropertyAnimator.animateBasicLoop(
-                token: nil,
-                timeline: self,
-                startDelay: startDelay,
-                loopCount: loopCount,
-                from: start,
-                to: end,
-                updateBlock: updateBlock
-            )
-        case .pingPong: // animate back and repeat
-            AdaptyUIPropertyAnimator.animatePingPongLoop(
-                token: nil,
-                timeline: self,
-                startDelay: startDelay,
-                loopCount: loopCount,
-                from: start,
-                to: end,
-                updateBlock: updateBlock
-            )
+        case .normal:
+            if loopDelay == 0 {
+                // Use native SwiftUI repeat for smooth looping without frame gaps
+                AdaptyUIPropertyAnimator.animateWithNativeRepeat(
+                    timeline: self,
+                    startDelay: startDelay,
+                    loopCount: loopCount,
+                    autoreverses: false,
+                    from: start,
+                    to: end,
+                    updateBlock: updateBlock
+                )
+            } else {
+                // Manual loop needed for delay between iterations
+                AdaptyUIPropertyAnimator.animateBasicLoop(
+                    token: nil,
+                    timeline: self,
+                    startDelay: startDelay,
+                    loopCount: loopCount,
+                    from: start,
+                    to: end,
+                    updateBlock: updateBlock
+                )
+            }
+        case .pingPong:
+            if loopDelay == 0 && pingPongDelay == 0 {
+                // Use native SwiftUI repeat for smooth looping without frame gaps
+                AdaptyUIPropertyAnimator.animateWithNativeRepeat(
+                    timeline: self,
+                    startDelay: startDelay,
+                    loopCount: loopCount,
+                    autoreverses: true,
+                    from: start,
+                    to: end,
+                    updateBlock: updateBlock
+                )
+            } else {
+                // Manual loop needed for delays between iterations
+                AdaptyUIPropertyAnimator.animatePingPongLoop(
+                    token: nil,
+                    timeline: self,
+                    startDelay: startDelay,
+                    loopCount: loopCount,
+                    from: start,
+                    to: end,
+                    updateBlock: updateBlock
+                )
+            }
         default: // no repeat
             AdaptyUIPropertyAnimator.animateOnce(
                 token: nil,
@@ -198,6 +226,62 @@ enum AdaptyUIPropertyAnimator {
                 }
             }
         )
+    }
+
+    @discardableResult
+    static func animateWithNativeRepeat<Value>(
+        timeline: VC.Animation.Timeline,
+        startDelay: TimeInterval,
+        loopCount: Int?,
+        autoreverses: Bool,
+        from start: Value,
+        to end: Value,
+        updateBlock: @escaping (Value) -> Void
+    ) -> AdaptyUIAnimationToken {
+        let token = AdaptyUIAnimationToken.create()
+        let baseAnimation = timeline.interpolator.createAnimation(duration: timeline.duration)
+
+        let animation: Animation
+        if let loopCount {
+            let count = autoreverses ? loopCount * 2 : loopCount
+            animation = baseAnimation.repeatCount(count, autoreverses: autoreverses)
+        } else {
+            animation = baseAnimation.repeatForever(autoreverses: autoreverses)
+        }
+
+        Task { @MainActor in
+            if startDelay > 0 {
+                try await Task.sleep(seconds: startDelay)
+                guard token.isActive else { return }
+            }
+
+            updateBlock(start)
+
+            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+                if loopCount != nil {
+                    withAnimation(animation) {
+                        updateBlock(end)
+                    } completion: {
+                        token.invalidate()
+                    }
+                } else {
+                    withAnimation(animation) {
+                        updateBlock(end)
+                    }
+                }
+            } else {
+                withAnimation(animation) {
+                    updateBlock(end)
+                }
+                if let loopCount {
+                    let totalSegments = autoreverses ? loopCount * 2 : loopCount
+                    try await Task.sleep(seconds: timeline.duration * Double(totalSegments))
+                    token.invalidate()
+                }
+            }
+        }
+
+        return token
     }
 
     static func animateOnce<Value>(
