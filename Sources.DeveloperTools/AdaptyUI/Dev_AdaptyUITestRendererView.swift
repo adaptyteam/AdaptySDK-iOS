@@ -126,6 +126,7 @@ public struct Dev_AdaptyUIRendererView: View {
     private let didStartPurchase: ((String) -> Void)?
     private let didStartRestore: (() -> Void)?
     private let didFailRendering: ((AdaptyUIBuilderError) -> Void)?
+    private let didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
 
     private let safeAreaOverride: EdgeInsets?
     private let showDebugOverlay: Bool
@@ -143,7 +144,8 @@ public struct Dev_AdaptyUIRendererView: View {
         didSelectProduct: ((String) -> Void)? = nil,
         didStartPurchase: ((String) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,
-        didFailRendering: ((AdaptyUIBuilderError) -> Void)? = nil
+        didFailRendering: ((AdaptyUIBuilderError) -> Void)? = nil,
+        didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)? = nil
     ) {
         self.safeAreaOverride = safeAreaOverride
         self.showDebugOverlay = showDebugOverlay
@@ -166,6 +168,7 @@ public struct Dev_AdaptyUIRendererView: View {
         self.didStartPurchase = didStartPurchase
         self.didStartRestore = didStartRestore
         self.didFailRendering = didFailRendering
+        self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
     }
 
     public var body: some View {
@@ -180,6 +183,7 @@ public struct Dev_AdaptyUIRendererView: View {
         }
         galleryConfiguration.eventsHandler.didStartRestore = didStartRestore
         galleryConfiguration.eventsHandler.didFailRendering = didFailRendering
+        galleryConfiguration.eventsHandler.didReceiveAnalyticEvent = didReceiveAnalyticEvent
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: showDebugOverlay,

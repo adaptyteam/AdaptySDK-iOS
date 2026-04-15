@@ -89,7 +89,9 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     func reportCustomerAnalyticEvent(
         name: String,
         params: [String: any Sendable]
-    ) {}
+    ) {
+        events.event_didReceiveAnalyticEvent(name: name, params: params)
+    }
 
     func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
 

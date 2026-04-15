@@ -21,6 +21,7 @@ package final class AdaptyUIEventsHandler {
     package var didStartPurchase: ((ProductResolver) -> Void)?
     package var didStartRestore: (() -> Void)?
     package var didFailRendering: ((AdaptyUIBuilderError) -> Void)?
+    package var didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
 
     package init(logId: String) {
         self.logId = logId
@@ -29,6 +30,7 @@ package final class AdaptyUIEventsHandler {
         self.didStartPurchase = nil
         self.didStartRestore = nil
         self.didFailRendering = nil
+        self.didReceiveAnalyticEvent = nil
     }
 
     package func event_viewDidAppear() {
@@ -65,6 +67,11 @@ package final class AdaptyUIEventsHandler {
     package func event_didFailRendering(with error: AdaptyUIBuilderError) {
         Log.app.error("#\(logId)# event_didFailRendering: \(error)")
         didFailRendering?(error)
+    }
+
+    package func event_didReceiveAnalyticEvent(name: String, params: [String: any Sendable]) {
+        Log.app.verbose("#\(logId)# event_didReceiveAnalyticEvent: \(name)")
+        didReceiveAnalyticEvent?(name, params)
     }
 }
 
