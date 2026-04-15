@@ -7,7 +7,7 @@
 import Foundation
 import JavaScriptCore
 
-extension VC.Variable.IsEqualConvertor {
+extension VC.Variable.IsEqualConvertor: VS.ExecutableConvertor {
     func readValue(_ jsValue: JSValue, in context: JSContext) throws(VS.Error) -> JSValue {
         let rhs = value.toJSValue(in: context)
         let result = jsValue.isEqual(to: rhs)

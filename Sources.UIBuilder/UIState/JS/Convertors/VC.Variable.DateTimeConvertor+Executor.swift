@@ -8,7 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-extension VC.Variable.DateTimeConvertor {
+extension VC.Variable.DateTimeConvertor: VS.ExecutableConvertor {
     func readValue(_ jsValue: JSValue, in context: JSContext) throws(VS.Error) -> JSValue {
         guard let unixtimestamp = Double.fromJSValue(jsValue) else {
             throw .convertorError("DateTimeConvertor: expected a numeric timestamp")

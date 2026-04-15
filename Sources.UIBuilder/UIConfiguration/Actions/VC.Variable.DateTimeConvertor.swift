@@ -9,10 +9,6 @@ import Foundation
 
 extension VC.Variable {
     enum DateTimeConvertor: Converter {
-        var name: String {
-            "DateTime"
-        }
-
         case format(String)
         case styles(date: DateFormatter.Style, time: DateFormatter.Style)
     }

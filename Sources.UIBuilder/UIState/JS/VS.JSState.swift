@@ -131,14 +131,19 @@ extension VS.JSState {
 
         log.debug("get variable \(path.joined(separator: ".")) = \(result)")
 
-        guard let convertor = variable.converter else {
+        guard let converter = variable.converter as? VS.ExecutableConvertor else {
             return T.fromJSValue(result)
         }
 
-        let converted = try convertor.readValue(result, in: context)
-        log.debug("convert to value: \(converted)")
+        do {
+            let converted = try converter.readValue(result, in: context)
+            log.debug("convert to value: \(converted)")
 
-        return T.fromJSValue(converted)
+            return T.fromJSValue(converted)
+        } catch {
+            log.error("convert \(path.joined(separator: ".")) = \(result) error: \(error) with \(converter)")
+            throw error
+        }
     }
 
     private func invokeMethod<T: JSValueRepresentable>(
@@ -196,7 +201,7 @@ extension VS.JSState {
         value: some JSValueConvertable,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
-        guard let convertor = variable.converter else {
+        guard let convertor = variable.converter as? VS.ExecutableConvertor else {
             try setValueWithoutConverter(variable: variable, value: value, screenInstance: screenInstance)
             return
         }

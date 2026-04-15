@@ -8,9 +8,7 @@
 import Foundation
 
 extension VC.Variable {
-    protocol Converter: Sendable, Hashable {
-        var name: String { get }
-    }
+    protocol Converter: Sendable, Hashable {}
     struct UnknownConverter: Converter {
         let name: String
     }
@@ -24,3 +22,4 @@ extension VC.Variable.Converter {
         return self == other
     }
 }
+

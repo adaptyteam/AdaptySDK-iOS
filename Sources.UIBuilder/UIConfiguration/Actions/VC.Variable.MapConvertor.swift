@@ -9,10 +9,6 @@ import Foundation
 
 extension VC.Variable {
     struct MapConvertor: Converter {
-        var name: String {
-            "Map"
-        }
-
         let values: [VC.AnyValue]
     }
 }

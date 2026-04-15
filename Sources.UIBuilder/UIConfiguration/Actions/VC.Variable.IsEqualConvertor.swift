@@ -9,10 +9,6 @@ import Foundation
 
 extension VC.Variable {
     struct IsEqualConvertor: Converter {
-        var name: String {
-            "IsEqual"
-        }
-
         let value: VC.AnyValue
         let falseValue: VC.AnyValue?
     }
