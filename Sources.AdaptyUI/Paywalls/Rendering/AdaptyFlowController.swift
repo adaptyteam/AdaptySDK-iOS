@@ -206,7 +206,23 @@ extension AdaptyFlowController: AdaptyFlowViewDelegate {
         didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
         error: AdaptyError?
     ) {
-        delegate?.flowController(self, didFinishWebPaymentNavigation: product, error: error)
+        delegate?.flowController(
+            self,
+            didFinishWebPaymentNavigation: product,
+            error: error
+        )
+    }
+
+    package func flowView(
+        _ view: AdaptyFlowUIView,
+        didReceiveAnalyticEvent name: String,
+        params: [String: any Sendable]
+    ) {
+        delegate?.flowController(
+            self,
+            didReceiveAnalyticEvent: name,
+            params: params
+        )
     }
 }
 

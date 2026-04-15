@@ -211,6 +211,14 @@
                 )
             )
         }
+
+        package func flowView(
+            _ view: AdaptyFlowUIView,
+            didReceiveAnalyticEvent name: String,
+            params: [String: any Sendable]
+        ) {
+            // TODO: forward via FlowViewEvent when cross-platform support is added
+        }
     }
 
 #endif

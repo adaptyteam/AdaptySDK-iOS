@@ -186,6 +186,21 @@ public protocol AdaptyFlowControllerDelegate: AnyObject {
         didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
         error: AdaptyError?
     )
+
+    /// This method is invoked when a custom analytic event is fired from the flow's script.
+    ///
+    /// Use this to forward flow-level analytics to your own analytics provider (e.g. Amplitude, Mixpanel).
+    /// Only events explicitly marked as customer-facing by the flow configuration are delivered here.
+    ///
+    /// - Parameters:
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
+    ///   - name: the event name (e.g. `"paywall_opened"`, `"cta_tapped"`).
+    ///   - params: an arbitrary dictionary of event parameters. The contents depend on the flow configuration and may include internal keys.
+    func flowController(
+        _ controller: AdaptyFlowController,
+        didReceiveAnalyticEvent name: String,
+        params: [String: any Sendable]
+    )
 }
 
 public typealias AdaptyTimerResolver = AdaptyUITimerResolver
@@ -342,4 +357,3 @@ public extension AdaptyUI {
     }
 }
 #endif
-

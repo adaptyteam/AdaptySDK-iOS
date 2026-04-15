@@ -75,6 +75,12 @@ package protocol AdaptyFlowViewDelegate: AnyObject {
         didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
         error: AdaptyError?
     )
+
+    func flowView(
+        _ view: AdaptyFlowUIView,
+        didReceiveAnalyticEvent name: String,
+        params: [String: any Sendable]
+    )
 }
 
 #endif

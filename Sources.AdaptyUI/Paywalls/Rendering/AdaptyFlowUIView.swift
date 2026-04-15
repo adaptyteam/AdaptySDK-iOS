@@ -16,7 +16,7 @@ package final class AdaptyFlowUIView: UIView {
     let id: String
     let configuration: AdaptyUI.FlowConfiguration
     let logId: String
-    
+
     private let showDebugOverlay: Bool
 
     package init(
@@ -36,7 +36,7 @@ package final class AdaptyFlowUIView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     deinit {
         Log.ui.verbose("#\(logId)# view deinit")
     }
@@ -127,6 +127,16 @@ package final class AdaptyFlowUIView: UIView {
                 error: error
             )
         }
+
+        configuration.eventsHandler.didReceiveAnalyticEvent = { [weak self] name, params in
+            guard let self else { return }
+
+            self.delegate?.flowView(
+                self,
+                didReceiveAnalyticEvent: name,
+                params: params
+            )
+        }
     }
 
     package func layout(in parentView: UIView, parentVC: UIViewController) {
@@ -161,13 +171,13 @@ package final class AdaptyFlowUIView: UIView {
             to: self
         )
     }
-    
+
     package func reportOnAppear() {
         Log.ui.verbose("#\(logId)# view reportOnAppear")
-        
+
         configuration.reportOnAppear()
     }
-    
+
     package func reportOnDisappear() {
         Log.ui.verbose("#\(logId)# view reportOnDisappear")
 

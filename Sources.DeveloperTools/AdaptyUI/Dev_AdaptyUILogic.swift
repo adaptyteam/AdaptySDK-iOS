@@ -13,7 +13,7 @@ import Foundation
 struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     let logId: String
     let events: AdaptyUIEventsHandler
-    
+
     init(
         logId: String,
         events: AdaptyUIEventsHandler
@@ -21,7 +21,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         self.logId = logId
         self.events = events
     }
-    
+
     func reportViewDidAppear() {
         events.event_viewDidAppear()
     }
@@ -42,8 +42,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
 
     package func logShowPaywall(
         viewConfiguration: AdaptyUIConfiguration
-    ) async {
-    }
+    ) async {}
 
     package func getProducts(
         determineOffers: Bool
@@ -74,9 +73,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     func openWebPaywall(
         for product: ProductResolver,
         in openIn: VC.Action.WebOpenInParameter
-    ) async {
-        
-    }
+    ) async {}
 
     func restorePurchases(
         onStart: @MainActor @Sendable @escaping () -> Void,
@@ -88,6 +85,17 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {
         events.event_didFailRendering(with: error)
     }
+
+    func reportCustomerAnalyticEvent(
+        name: String,
+        params: [String: any Sendable]
+    ) {
+        events.event_didReceiveAnalyticEvent(name: name, params: params)
+    }
+
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
+
+    func logScreenShowed(screenInstanceId: String) {}
 }
 
 #endif

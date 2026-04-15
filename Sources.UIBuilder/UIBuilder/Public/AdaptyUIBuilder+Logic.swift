@@ -73,6 +73,12 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {
         events.event_didFailRendering(with: error)
     }
+
+    func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable]) {}
+
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
+
+    func logScreenShowed(screenInstanceId: String) {}
 }
 
 #endif

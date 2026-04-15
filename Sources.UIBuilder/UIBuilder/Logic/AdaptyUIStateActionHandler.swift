@@ -183,6 +183,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 transitionId: transitionId,
                 completion: nil
             )
+            self?.logic.logScreenShowed(screenInstanceId: instance.id)
         }
     }
 
@@ -347,18 +348,14 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     package nonisolated func sendAnalyticEvent(_ event: VS.AnalyticEvent) {
         Task { @MainActor [weak self] in
             if event.isBackend {
-                // TODO: Event
-                //        try? await Adapty.logFlowAnalyticsViaAdaptyUI(
-                //            variationId: flow.variationId,
-                //            viewConfigurationId: viewConfiguration.id,
-                //            params: event
-                //        )
+                self?.logic.reportBackendAnalyticEvent(event)
             }
 
             if event.isCustomer {
-                let name: String = event.name
-                let params: [String: any Sendable] = event.params
-                // TODO: send to customer name + params
+                self?.logic.reportCustomerAnalyticEvent(
+                    name: event.name,
+                    params: event.params
+                )
             }
         }
     }
