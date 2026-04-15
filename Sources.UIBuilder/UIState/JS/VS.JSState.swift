@@ -270,7 +270,7 @@ extension VS.JSState {
         guard !actions.isEmpty else { return }
 
         for action in actions {
-            guard !actionDispatcher.execute(action, in: context) else { continue }
+            guard !actionDispatcher.fastExecute(action) else { continue }
 
             var mergedParams = action.params ?? [:]
 

@@ -142,6 +142,24 @@ Entities:
                   x: { $ref: "#/Entities/Unit", default: 0 }
               additionalProperties: false
 
+    Rotation:
+        title: Rotation
+        type: object
+        required: [angle]
+        properties:
+            angle: { type: number, default: 0 }
+            anchor: { $ref: "#/Entities/Point", default: [0.5,0.5] }
+        additionalProperties: false
+
+    Scale:
+        title: Scale
+        type: object
+        required: [scale]
+        properties:
+            scale: { $ref: "#/Entities/Point"}
+            anchor: { $ref: "#/Entities/Point", default: [0.5,0.5] }
+        additionalProperties: false
+
     AffineTransform:
         title: Affine Transform
         type: object
@@ -227,6 +245,7 @@ Animation:
               - $ref: "#/Animation/Background"
               - $ref: "#/Animation/Border"
               - $ref: "#/Animation/Shadow"
+              - $ref: "#/Animation/Blur"
     additionalProperties: false
 
     Interpolator:
@@ -410,6 +429,20 @@ Animation:
                       additionalProperties: false
         additionalProperties: false
 
+    Blur:
+        type: object
+        required: [type, blur_radius]
+        properties:
+            type: { const: blur }
+            blur_radius:
+                type: object
+                required: [start, end]
+                properties:
+                    start: { type: number }
+                    end: { type: number }
+                additionalProperties: false
+        additionalProperties: false
+
     Transition.Slide:
         type: object
         required: [type]
@@ -580,9 +613,9 @@ UI:
                   - properties:
                         decorator: { $ref: "#/UI/Element/Decorator" }
                         padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
-                        oneOf:
-                            - offset: { $ref: "#/Entities/Offset" }
-                            - transform: { $ref: "#/Entities/AffineTransform", default: 0 }
+                        offset: { $ref: "#/Entities/Offset" }
+                        rotation: { $ref: "#/Entities/Rotation" }
+                        scale: { $ref: "#/Entities/Scale" }
                         opacity: { type: number, default: 1.0 }
                         background:
                             type: array
@@ -973,6 +1006,14 @@ UI:
                 {
                     $ref: "#/Script/DataBinding",
                     title: "One-way data binding to integer",
+                }
+            duration:
+                title: "Animation duration in milliseconds. If absent, no animation."
+                type: number
+            interpolator:
+                {
+                    $ref: "#/Animation/Interpolator",
+                    default: ease_in_out,
                 }
             content:
                 type: array
@@ -1657,7 +1698,7 @@ DateTime:
               "offset": { "hour": 9 },
           }
         # Текущий момент
-        - { "anchor": "now" }
+        - { "anchor": "start" }
         # Unix timestamp в миллисекундах
         - 1742054400000
 
@@ -1721,14 +1762,14 @@ DateTime:
                 type: string
                 description: >
                     Опорная точка для вычислений.
-                    - now: текущий момент UTC. anchor_time_zone не требуется.
+                    - start: текущий момент - старта flow в UTC. anchor_time_zone не требуется.
                     - start_of_day: полночь (00:00:00) текущего дня. anchor_time_zone обязателен.
                     - start_of_week: полночь понедельника текущей недели (ISO 8601).
                       anchor_time_zone обязателен.
                     - start_of_month: полночь 1-го числа текущего месяца. anchor_time_zone обязателен.
                     - start_of_year: полночь 1 января текущего года. anchor_time_zone обязателен.
                 enum:
-                    - now
+                    - start
                     - start_of_day
                     - start_of_week
                     - start_of_month
@@ -1754,11 +1795,11 @@ DateTime:
         examples:
             # --- now ---
             # Текущий момент
-            - { "anchor": "now" }
+            - { "anchor": "start" }
             # Через 30 минут от сейчас
-            - { "anchor": "now", "offset": { "minute": 30 } }
+            - { "anchor": "start", "offset": { "minute": 30 } }
             # 2 часа назад
-            - { "anchor": "now", "offset": { "hour": -2 } }
+            - { "anchor": "start", "offset": { "hour": -2 } }
 
             # --- startOfDay ---
             # Начало сегодняшнего дня

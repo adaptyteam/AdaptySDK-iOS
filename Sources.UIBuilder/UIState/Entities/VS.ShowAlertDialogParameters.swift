@@ -45,7 +45,7 @@ extension VS.ShowAlertDialogParametersResponse: JSValueConvertable {
 }
 
 extension VS.ShowAlertDialogParameters {
-    static func fromDictionary(_ dict: [String: Any]) -> Self {
+    static func fromDictionary(_ dict: [AnyHashable: Any]) -> Self {
         let title = dict["title"] as? String
         let message = dict["message"] as? String
 

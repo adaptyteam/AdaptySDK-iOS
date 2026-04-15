@@ -23,4 +23,13 @@ extension VC.Action {
             path
         }
     }
+
+    var isSDK: Bool {
+        scope == .global && path.first == "SDK"
+    }
+
+    func paramsAsDictionary() -> [AnyHashable: Any]? {
+        params?.asObject
+    }
 }
+
