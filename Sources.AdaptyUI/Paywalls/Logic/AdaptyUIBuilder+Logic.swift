@@ -14,17 +14,20 @@ import Foundation
 struct AdaptyUILogic: AdaptyUIBuilderLogic {
     let logId: String
     let flow: AdaptyFlow
+    let viewConfigurationId: String
     let events: AdaptyEventsHandler
     let observerModeResolver: AdaptyObserverModeResolver?
 
     package init(
         logId: String,
         flow: AdaptyFlow,
+        viewConfigurationId: String,
         events: AdaptyEventsHandler,
         observerModeResolver: AdaptyObserverModeResolver?
     ) {
         self.logId = logId
         self.flow = flow
+        self.viewConfigurationId = viewConfigurationId
         self.events = events
         self.observerModeResolver = observerModeResolver
     }
@@ -219,6 +222,34 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {
         events.event_didFailRendering(with: error)
+    }
+
+    func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable]) {
+        events.event_didReceiveAnalyticEvent(name: name, params: params)
+    }
+
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {
+        Task {
+            try? await Adapty.logFlowAnalyticsViaAdaptyUI(
+                variationId: flow.variationId,
+                viewConfigurationId: viewConfigurationId,
+                params: event
+            )
+        }
+    }
+
+    func logScreenShowed(screenInstanceId: String) {
+        Task {
+            try? await Adapty.logFlowAnalyticsViaAdaptyUI(
+                variationId: flow.variationId,
+                viewConfigurationId: viewConfigurationId,
+                params: AdaptyUIFlowScreenShowedParameters(
+                    screenInstanceId: screenInstanceId,
+                    screenOrder: 0, // TODO: x
+                    isLatestScreen: false // TODO: x
+                )
+            )
+        }
     }
 }
 

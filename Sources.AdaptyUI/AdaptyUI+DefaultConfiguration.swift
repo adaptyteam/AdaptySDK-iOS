@@ -74,7 +74,12 @@ public extension AdaptyFlowControllerDelegate {
         didFinishWebPaymentNavigation _: AdaptyPaywallProduct?,
         error _: AdaptyError?
     ) {}
+
+    func flowController(
+        _: AdaptyFlowController,
+        didReceiveAnalyticEvent _: String,
+        params _: [String: any Sendable]
+    ) {}
 }
 
 #endif
-

@@ -70,6 +70,7 @@ public extension AdaptyUI {
             logic = AdaptyUILogic(
                 logId: logId,
                 flow: flow,
+                viewConfigurationId: viewConfiguration.id,
                 events: eventsHandler,
                 observerModeResolver: observerModeResolver
             )
