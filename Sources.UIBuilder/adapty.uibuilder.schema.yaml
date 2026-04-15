@@ -148,7 +148,7 @@ Entities:
         required: [angle]
         properties:
             angle: { type: number, default: 0 }
-            anchor: { $ref: "#/Entities/Point", default: [0.5,0.5] }
+            anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
         additionalProperties: false
 
     Scale:
@@ -156,20 +156,8 @@ Entities:
         type: object
         required: [scale]
         properties:
-            scale: { $ref: "#/Entities/Point"}
-            anchor: { $ref: "#/Entities/Point", default: [0.5,0.5] }
-        additionalProperties: false
-
-    AffineTransform:
-        title: Affine Transform
-        type: object
-        properties:
-            a: { type: number, default: 1 }
-            b: { type: number, default: 0 }
-            c: { type: number, default: 0 }
-            d: { type: number, default: 1 }
-            x: { $ref: "#/Entities/Unit", default: 0 }
-            y: { $ref: "#/Entities/Unit", default: 0 }
+            scale: { $ref: "#/Entities/Point" }
+            anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
         additionalProperties: false
 
     Unit:
@@ -443,17 +431,6 @@ Animation:
                 additionalProperties: false
         additionalProperties: false
 
-    Transition.Slide:
-        type: object
-        required: [type]
-        properties:
-            type: { const: slide }
-            start_delay: { type: number, default: 0 }
-            duration: { type: number, default: 300 }
-            interpolator:
-                { $ref: "#/Animation/Interpolator", default: ease_in_out }
-        additionalProperties: false
-
 ###### Navigators ######
 
 Navigator:
@@ -471,6 +448,10 @@ Navigator:
                 on_outside_tap: { $ref: "#/Script/ActionOrArray" }
                 on_device_back: { $ref: "#/Script/ActionOrArray" }
                 on_focus_change: { $ref: "#/Script/ActionOrArray" }
+                on_will_appear: { $ref: "#/Script/ActionOrArray" }
+                on_will_disappear: { $ref: "#/Script/ActionOrArray" }
+                on_did_appear: { $ref: "#/Script/ActionOrArray" }
+                on_did_disappear: { $ref: "#/Script/ActionOrArray" }
             additionalProperties: false
         appearances:
             type: object
@@ -541,6 +522,10 @@ Screen:
         on_outside_tap: { $ref: "#/Script/ActionOrArray" }
         on_device_back: { $ref: "#/Script/ActionOrArray" }
         on_focus_change: { $ref: "#/Script/ActionOrArray" }
+        on_will_appear: { $ref: "#/Script/ActionOrArray" }
+        on_will_disappear: { $ref: "#/Script/ActionOrArray" }
+        on_did_appear: { $ref: "#/Script/ActionOrArray" }
+        on_did_disappear: { $ref: "#/Script/ActionOrArray" }
     additionalProperties: false
 
     Holder:
@@ -627,9 +612,47 @@ UI:
                             items: { $ref: "#/UI/Element/AlignedElement" }
                             uniqueItems: true
                             minItems: 1
-                        on_appear:
+                        event_handlers:
                             type: array
-                            items: { $ref: "#/Animation" }
+                            items:
+                                type: object
+                                required: [triggers, animations]
+                                properties:
+                                    triggers:
+                                        type: array
+                                        items:
+                                            type: object
+                                            required: [events]
+                                            properties:
+                                                events:
+                                                    type: array
+                                                    items:
+                                                        oneOf:
+                                                            - const: "on_will_appear"
+                                                            - const: "on_will_disappear"
+                                                            - const: "on_did_appear"
+                                                            - const: "on_did_disappear"
+                                                            - type: string
+                                                    uniqueItems: true
+                                                    minItems: 1
+                                                filter:
+                                                    enum:
+                                                        - first
+                                                        - not_first
+                                                transitions:
+                                                    type: array
+                                                    items: { type: string }
+                                            additionalProperties: false
+                                        uniqueItems: true
+                                        minItems: 1
+                                    animations:
+                                        type: array
+                                        items: { $ref: "#/Animation" }
+                                        uniqueItems: true
+                                        minItems: 1
+                                    on_animations_finish:
+                                        { $ref: "#/Script/ActionOrArray" }
+                                additionalProperties: false
                             uniqueItems: true
                             minItems: 1
                         focus_id:
@@ -661,6 +684,7 @@ UI:
                     { $ref: "#/UI/Element/Decorator/ShapeType", default: rect }
                 border: { $ref: "#/AssetIdOrColor/Binding" }
                 shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
+                blur_radius: { type: number }
             dependentSchemas:
                 border:
                     properties:
@@ -835,6 +859,8 @@ UI:
                 tint:
                     title: Tint color of image
                     $ref: "#/AssetIdOrColor/Binding"
+                letter_spacing: { type: number }
+                line_height: { type: number }
             additionalProperties: false
 
     TextField:
@@ -960,17 +986,19 @@ UI:
 
     Button:
         type: object
-        required: [type, action, normal]
+        # required: [type, action, normal]
+        required: [type, action, content]
         properties:
             type: { const: button }
             action: { $ref: "#/Script/ActionOrArray" }
-            normal: { $ref: "#/UI/Element" }
-            selected: { $ref: "#/UI/Element" }
-            is_selected:
-                {
-                    $ref: "#/Script/DataBinding",
-                    title: "One-way data binding to boolean",
-                }
+            content: { $ref: "#/UI/Element" }
+            # normal: { $ref: "#/UI/Element" }
+            # selected: { $ref: "#/UI/Element" }
+            # is_selected:
+            #     {
+            #         $ref: "#/Script/DataBinding",
+            #         title: "One-way data binding to boolean",
+            #     }
 
     Stack:
         type: object
@@ -1011,10 +1039,7 @@ UI:
                 title: "Animation duration in milliseconds. If absent, no animation."
                 type: number
             interpolator:
-                {
-                    $ref: "#/Animation/Interpolator",
-                    default: ease_in_out,
-                }
+                { $ref: "#/Animation/Interpolator", default: ease_in_out }
             content:
                 type: array
                 minItems: 1
@@ -1110,6 +1135,7 @@ UI:
                 type: array
                 minItems: 1
                 items: { $ref: "#/UI/Element" }
+            page_index: { $ref: "#/Script/DataBinding" }
             page_control:
                 type: object
                 properties:
@@ -1130,9 +1156,9 @@ UI:
                 properties:
                     start_delay: { type: number, default: 0 }
                     page_transition:
-                        $ref: "#/Animation/Transition.Slide"
+                        $ref: "#/UI/Pager/Transition"
                         default: { type: slide }
-                    repeat_transition: { $ref: "#/Animation/Transition.Slide" }
+                    repeat_transition: { $ref: "#/UI/Pager/Transition" }
                     after_interaction_delay: { type: number, default: 3000 }
                 additionalProperties: false
             interaction:
@@ -1152,6 +1178,15 @@ UI:
                   additionalProperties: false
                   properties:
                       parent: { type: number }
+
+        Transition:
+            type: object
+            properties:
+                start_delay: { type: number, default: 0 }
+                duration: { type: number, default: 300 }
+                interpolator:
+                    { $ref: "#/Animation/Interpolator", default: ease_in_out }
+            additionalProperties: false
 
     DateTimePicker:
         type: object
@@ -1203,16 +1238,16 @@ UI:
         properties:
             type: { const: "wheel_items_picker" }
             value: { $ref: "#/Script/DataBinding" }
-            items: 
+            items:
                 type: array
-                items: 
+                items:
                     type: object
                     required: [value, label]
                     properties:
                         string_id: { type: string }
-                        value: 
+                        value:
                             oneOf:
-                                - type: string 
+                                - type: string
                                 - type: number
                                 - type: boolean
                 uniqueItems: true
@@ -1288,6 +1323,7 @@ RichText:
             tint:
                 title: Tint color of image
                 $ref: "#/AssetIdOrColor"
+            letter_spacing: { type: number }
         additionalProperties: false
 
 ###### Localization ######
@@ -1467,6 +1503,8 @@ Assets:
             italic: { type: boolean, default: false }
             size: { type: number, default: 15 }
             color: { $ref: "#/Assets/Color/HexString", default: "#000000FF" }
+            letter_spacing: { type: number }
+            line_height: { type: number }
         additionalProperties: false
 
     Image:
@@ -1551,6 +1589,7 @@ Script:
                 type: string
                 enum: [global, screen]
                 default: screen
+
         additionalProperties: false
 
     ActionOrArray:
@@ -1577,12 +1616,18 @@ Script:
                 type: string
                 enum: [global, screen]
                 default: screen
-            converter: { enum: [is_equal] }
+            converter: { enum: [is_equal, map, date_time] }
             converter_params:
                 oneOf:
                     - type: string
                     - type: boolean
                     - type: number
+                    - type: array
+                      items:
+                          oneOf:
+                              - type: string
+                              - type: boolean
+                              - type: number
                     - type: object
                       additionalProperties:
                           oneOf:
@@ -1803,7 +1848,10 @@ DateTime:
 
             # --- startOfDay ---
             # Начало сегодняшнего дня
-            - { "anchor": "start_of_day", "anchor_time_zone": "Europe/Podgorica" }
+            - {
+                  "anchor": "start_of_day",
+                  "anchor_time_zone": "Europe/Podgorica",
+              }
             # Сегодня в 14:30
             - {
                   "anchor": "start_of_day",
@@ -1837,7 +1885,10 @@ DateTime:
 
             # --- startOfWeek (понедельник, ISO 8601) ---
             # Начало текущей недели (понедельник 00:00)
-            - { "anchor": "start_of_week", "anchor_time_zone": "Europe/Podgorica" }
+            - {
+                  "anchor": "start_of_week",
+                  "anchor_time_zone": "Europe/Podgorica",
+              }
             # Пятница этой недели в 18:00
             - {
                   "anchor": "start_of_week",
@@ -1853,7 +1904,10 @@ DateTime:
 
             # --- startOfMonth ---
             # Начало текущего месяца
-            - { "anchor": "start_of_month", "anchor_time_zone": "Europe/Podgorica" }
+            - {
+                  "anchor": "start_of_month",
+                  "anchor_time_zone": "Europe/Podgorica",
+              }
             # 15-е число этого месяца в 10:00
             - {
                   "anchor": "start_of_month",
@@ -1869,7 +1923,10 @@ DateTime:
 
             # --- startOfYear ---
             # Начало текущего года
-            - { "anchor": "start_of_year", "anchor_time_zone": "Europe/Podgorica" }
+            - {
+                  "anchor": "start_of_year",
+                  "anchor_time_zone": "Europe/Podgorica",
+              }
             # 1 марта текущего года
             - {
                   "anchor": "start_of_year",

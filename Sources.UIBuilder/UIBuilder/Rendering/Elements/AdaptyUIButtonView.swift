@@ -23,17 +23,17 @@ struct AdaptyUIButtonView: View {
     }
 
     private var currentStateView: VC.Element {
-        guard let isSelectedVariable = button.isSelectedState,
+        guard let isSelectedVariable = button.legacyIsSelected,
               stateViewModel.getValue(
                   isSelectedVariable,
                   defaultValue: false,
                   screen: screen
               )
         else {
-            return button.normalState
+            return button.content
         }
 
-        return button.selectedState ?? button.normalState
+        return button.legacySelectedContent ?? button.content
     }
 
     var body: some View {

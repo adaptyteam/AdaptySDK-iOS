@@ -125,7 +125,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         case offset
         case rotation
         case scale
-        case visibility
+        case legacyVisibility = "visibility"
         case opacity
         case legacyTransitionIn = "transition_in"
         case eventHandlers = "event_handlers"
@@ -141,7 +141,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
 
         let eventHandlers: [Schema.EventHandler]
         if let array = try container.decodeIfPresent([Schema.EventHandler].self, forKey: .eventHandlers) {
-            eventHandlers = array
+            eventHandlers = array.filter{ !$0.isEmpty }
         } else {
             let animations: [Schema.Animation] =
 
@@ -172,7 +172,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         let opacity =
             if let value = try container.decodeIfPresent(Double.self, forKey: .opacity) {
                 value
-            } else if let value = try container.decodeIfPresent(Bool.self, forKey: .visibility) {
+            } else if let value = try container.decodeIfPresent(Bool.self, forKey: .legacyVisibility) {
                 value ? 1.0 : 0.0
             } else {
                 Self.default.opacity

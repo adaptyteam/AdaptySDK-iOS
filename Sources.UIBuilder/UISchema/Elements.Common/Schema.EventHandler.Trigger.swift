@@ -23,19 +23,21 @@ extension Schema.EventHandler.Trigger: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let events = try container.decode([Schema.EventHandler.EventId].self, forKey: .events)
-        if !events.isEmpty {
-            try self.init(
-                events: events,
-                filter: container.decodeIfPresent(Schema.EventHandler.Filter.self, forKey: .filter),
-                screenTransitions: container.decodeIfPresent([String].self, forKey: .screenTransitions)
-            )
-        } else {
+
+        guard !events.isEmpty else {
             self.init(
                 events: [],
                 filter: nil,
                 screenTransitions: nil
             )
+            return
         }
+
+        try self.init(
+            events: events,
+            filter: container.decodeIfPresent(Schema.EventHandler.Filter.self, forKey: .filter),
+            screenTransitions: container.decodeIfPresent([String].self, forKey: .screenTransitions)
+        )
     }
 }
 
