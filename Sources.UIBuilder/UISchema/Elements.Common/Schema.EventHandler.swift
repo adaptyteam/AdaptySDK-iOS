@@ -30,29 +30,32 @@ extension Schema.EventHandler: Decodable {
 
         var triggers = try container.decode([Schema.EventHandler.Trigger].self, forKey: .triggers)
         triggers = triggers.filter { !$0.isEmpty }
-        if triggers.isEmpty {
+
+        guard !triggers.isEmpty else {
             self.init(
                 triggers: [],
                 animations: [],
                 onAnimationsFinish: []
             )
+            return
         }
 
+        let animations = try container.decode([Schema.Animation].self, forKey: .animations)
 
-        if let animations = try container.decodeIfPresent([Schema.Animation].self, forKey: .animations), !animations.isEmpty {
-            try self.init(
-                triggers: triggers,
-                animations: animations,
-                onAnimationsFinish: container.decodeIfPresentActions(forKey: .onAnimationsFinish) ?? []
-            )
-
-        } else {
+        guard !animations.isEmpty else {
             self.init(
-                triggers: triggers,
+                triggers: [],
                 animations: [],
                 onAnimationsFinish: []
             )
+            return
         }
+
+        try self.init(
+            triggers: triggers,
+            animations: animations,
+            onAnimationsFinish: container.decodeIfPresentActions(forKey: .onAnimationsFinish) ?? []
+        )
     }
 }
 

@@ -10,18 +10,18 @@ import Foundation
 extension Schema {
     struct Button: Sendable {
         let actions: [Schema.Action]
-        let normalState: Schema.Element
-        let selectedState: Schema.Element?
-        let isSelectedState: Schema.Variable?
+        let content: Schema.Element
+        let legacySelectedContent: Schema.Element?
+        let legacyIsSelected: Schema.Variable?
     }
 }
 
 extension Schema.Button: Schema.CompositeElement {
     @inlinable
     func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
-        taskStack.append(.planElement(normalState))
-        if let selectedState {
-            taskStack.append(.planElement(selectedState))
+        taskStack.append(.planElement(content))
+        if let legacySelectedContent {
+            taskStack.append(.planElement(legacySelectedContent))
         }
     }
 
@@ -34,9 +34,9 @@ extension Schema.Button: Schema.CompositeElement {
         try .button(
             .init(
                 actions: actions,
-                normalState: resultStack.popLastElement(),
-                selectedState: resultStack.popLastElement(selectedState != nil),
-                isSelectedState: isSelectedState
+                content: resultStack.popLastElement(),
+                legacySelectedContent: resultStack.popLastElement(legacySelectedContent != nil),
+                legacyIsSelected: legacyIsSelected
             ),
             properties
         )
@@ -46,9 +46,10 @@ extension Schema.Button: Schema.CompositeElement {
 extension Schema.Button: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case actions = "action"
-        case normalState = "normal"
-        case selectedState = "selected"
-        case isSelectedState = "is_selected"
+        case content
+        case legacyNormalContent = "normal"
+        case legacySelectedContent = "selected"
+        case legacyIsSelected = "is_selected"
         case legacySelectedCondition = "selected_condition"
     }
 
@@ -56,11 +57,14 @@ extension Schema.Button: DecodableWithConfiguration {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         guard configuration.isLegacy else {
+            let contentKey: CodingKeys =
+                if container.contains(.content), !container.contains(.legacyNormalContent)
+                { .content } else { .legacyNormalContent }
             try self.init(
                 actions: container.decodeActions(forKey: .actions),
-                normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
-                selectedState: container.decodeIfExist(Schema.Element.self, forKey: .selectedState, configuration: configuration),
-                isSelectedState: container.decodeIfPresent(Schema.Variable.self, forKey: .isSelectedState)
+                content: container.decode(Schema.Element.self, forKey: contentKey, configuration: configuration),
+                legacySelectedContent: container.decodeIfExist(Schema.Element.self, forKey: .legacySelectedContent, configuration: configuration),
+                legacyIsSelected: container.decodeIfPresent(Schema.Variable.self, forKey: .legacyIsSelected)
             )
             return
         }
@@ -92,9 +96,9 @@ extension Schema.Button: DecodableWithConfiguration {
 
         try self.init(
             actions: container.decodeActions(forKey: .actions),
-            normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
-            selectedState: container.decodeIfExist(Schema.Element.self, forKey: .selectedState, configuration: configuration),
-            isSelectedState: isSelectedState
+            content: container.decode(Schema.Element.self, forKey: .legacyNormalContent, configuration: configuration),
+            legacySelectedContent: container.decodeIfExist(Schema.Element.self, forKey: .legacySelectedContent, configuration: configuration),
+            legacyIsSelected: isSelectedState
         )
     }
 }

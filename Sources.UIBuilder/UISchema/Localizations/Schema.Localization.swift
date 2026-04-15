@@ -42,6 +42,11 @@ extension Schema.Localization: Decodable {
 
         assets = try (container.decodeIfPresent(Schema.AssetsCollection.self, forKey: .assets))?.value
 
+        guard container.exist(.strings) else {
+            self.strings = nil
+            return
+        }
+
         var stringsContainer = try container.nestedUnkeyedContainer(forKey: .strings)
         var strings = [Schema.StringIdentifier: Item]()
         if let count = stringsContainer.count {

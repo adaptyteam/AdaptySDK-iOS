@@ -77,7 +77,7 @@ private extension Schema.Element {
                         }
                     }
             } else if let button = element as? Schema.Button {
-                childs = [button.normalState, button.selectedState].compactMap(\.self)
+                childs = [button.content, button.legacySelectedContent].compactMap(\.self)
             } else if let box = element as? Schema.Box {
                 childs = box.content.map { [$0] }
             } else if let row = element as? Schema.Row {
