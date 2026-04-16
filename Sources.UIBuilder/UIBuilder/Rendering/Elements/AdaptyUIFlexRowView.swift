@@ -72,7 +72,51 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
         }
     }
 
+    private var hasWeights: Bool {
+        row.items.contains { if case .weight = $0.length { return true } else { return false } }
+    }
+
+    @State private var contentsSize: CGSize = .zero
+
     var body: some View {
+        if hasWeights {
+            weightedBody
+        } else {
+            fixedBody
+        }
+    }
+
+    private var fixedBody: some View {
+        HStack(spacing: row.spacing) {
+            ForEach(0 ..< row.items.count, id: \.self) { idx in
+                let item = row.items[idx]
+
+                AdaptyUIElementView(
+                    item.content,
+                    screenHolderBuilder: {
+                        if idx == 0 {
+                            screenHolderBuilder()
+                        } else {
+                            EmptyView()
+                        }
+                    }
+                )
+                .frame(
+                    width: itemWidth(
+                        item,
+                        totalWeight: 0,
+                        weightsAvailableLength: 0
+                    ),
+                    alignment: Alignment.from(
+                        horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                        vertical: item.verticalAlignment.swiftuiValue
+                    )
+                )
+            }
+        }
+    }
+
+    private var weightedBody: some View {
         GeometryReader { proxy in
             let (totalWeight, reservedLength) = calculateTotalWeight(for: row.items, in: proxy)
             let weightsAvailableLength = proxy.size.width - reservedLength
@@ -85,7 +129,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
                         item.content,
                         screenHolderBuilder: {
                             if idx == 0 {
-                                screenHolderBuilder() // TODO: x check
+                                screenHolderBuilder()
                             } else {
                                 EmptyView()
                             }
@@ -96,17 +140,21 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
                             item,
                             totalWeight: totalWeight,
                             weightsAvailableLength: weightsAvailableLength
-                        ),
+                        )
+                    )
+                    .frame(
+                        maxHeight: .infinity,
                         alignment: Alignment.from(
                             horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
                             vertical: item.verticalAlignment.swiftuiValue
                         )
                     )
-                    .frame(maxHeight: .infinity)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .onGeometrySizeChange { contentsSize = $0 }
         }
+        .frame(minHeight: contentsSize.height)
     }
 }
 

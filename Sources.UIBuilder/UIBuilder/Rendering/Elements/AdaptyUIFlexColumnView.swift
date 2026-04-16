@@ -72,7 +72,51 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
         }
     }
 
+    private var hasWeights: Bool {
+        column.items.contains { if case .weight = $0.length { return true } else { return false } }
+    }
+
+    @State private var contentsSize: CGSize = .zero
+
     var body: some View {
+        if hasWeights {
+            weightedBody
+        } else {
+            fixedBody
+        }
+    }
+
+    private var fixedBody: some View {
+        VStack(spacing: column.spacing) {
+            ForEach(0 ..< column.items.count, id: \.self) { idx in
+                let item = column.items[idx]
+
+                AdaptyUIElementView(
+                    item.content,
+                    screenHolderBuilder: {
+                        if idx == 0 {
+                            screenHolderBuilder()
+                        } else {
+                            EmptyView()
+                        }
+                    }
+                )
+                .frame(
+                    height: itemHeight(
+                        item,
+                        totalWeight: 0,
+                        weightsAvailableLength: 0
+                    ),
+                    alignment: Alignment.from(
+                        horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                        vertical: item.verticalAlignment.swiftuiValue
+                    )
+                )
+            }
+        }
+    }
+
+    private var weightedBody: some View {
         GeometryReader { proxy in
             let (totalWeight, reservedLength) = calculateTotalWeight(for: column.items, in: proxy)
             let weightsAvailableLength = proxy.size.height - reservedLength
@@ -85,28 +129,32 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
                         item.content,
                         screenHolderBuilder: {
                             if idx == 0 {
-                                screenHolderBuilder() // TODO: x check
+                                screenHolderBuilder()
                             } else {
                                 EmptyView()
                             }
                         }
                     )
                     .frame(
-                        height: itemHeight(
-                            item,
-                            totalWeight: totalWeight,
-                            weightsAvailableLength: weightsAvailableLength
-                        ),
+                        maxWidth: .infinity,
                         alignment: Alignment.from(
                             horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
                             vertical: item.verticalAlignment.swiftuiValue
                         )
                     )
-                    .frame(maxWidth: .infinity)
+                    .frame(
+                        height: itemHeight(
+                            item,
+                            totalWeight: totalWeight,
+                            weightsAvailableLength: weightsAvailableLength
+                        )
+                    )
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .onGeometrySizeChange { contentsSize = $0 }
         }
+        .frame(minWidth: contentsSize.width)
     }
 }
 
