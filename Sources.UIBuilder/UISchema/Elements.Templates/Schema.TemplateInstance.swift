@@ -8,13 +8,13 @@
 import Foundation
 
 extension Schema {
-    struct TemplateInstance: Sendable, Hashable {
+    struct TemplateInstance: Sendable {
         let type: String
 //        let childs: [String: Child]?
     }
 }
 
-extension Schema.TemplateInstance: Encodable, DecodableWithConfiguration {
+extension Schema.TemplateInstance: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case type
     }
@@ -58,8 +58,5 @@ extension Schema.TemplateInstance: Encodable, DecodableWithConfiguration {
 //
 //        return childs.isEmpty ? nil : childs
 //    }
-
-    func encode(to _: any Encoder) throws {
-        // TODO: implement after Element encodable
-    }
 }
+

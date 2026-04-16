@@ -29,7 +29,6 @@ extension StoreKit.Product {
         }
     }
 
-    
     func adaptySubscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {
         guard let offer: SubscriptionOffer = subscriptionOffer(by: offerIdentifier) else { return nil }
 

@@ -43,7 +43,7 @@ final class ProfileStorage {
     }()
 
     private static func createAnonymousUserId() -> AdaptyUserId {
-        let identifier = UUID().uuidString.lowercased()
+        let identifier = UUID().lowercased
         userDefaults.set(identifier, forKey: Constants.profileIdKey)
         log.debug("create anonymous profile (profileId: \(identifier))")
         return AdaptyUserId(
@@ -174,7 +174,9 @@ final class ProfileStorage {
 
 extension ProfileStorage {
     @inlinable
-    var userId: AdaptyUserId { Self.userId }
+    var userId: AdaptyUserId {
+        Self.userId
+    }
 
     var profile: VH<AdaptyProfile>? {
         guard let profile = Self.profile, profile.isEqualProfileId(userId) else {

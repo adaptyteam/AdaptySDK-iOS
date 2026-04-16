@@ -18,14 +18,14 @@ private let log = Log.plugin
 public extension AdaptyPlugin {
     static func getPaywallViewConfiguration(
         withJson jsonString: AdaptyJsonString
-    ) async throws -> AdaptyUI.PaywallConfiguration {
+    ) async throws -> AdaptyUI.FlowConfiguration {
         let request = try AdaptyPlugin.decoder.decode(
             Request.AdaptyUICreatePaywallView.self,
             from: jsonString.asAdaptyJsonData
         )
 
-        return try await AdaptyUI.getPaywallConfiguration(
-            forPaywall: request.paywall,
+        return try await AdaptyUI.getFlowConfiguration(
+            forFlow: request.flow,
             loadTimeout: request.loadTimeout,
             tagResolver: request.customTags,
             timerResolver: request.customTimers,

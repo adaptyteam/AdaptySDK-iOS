@@ -9,7 +9,7 @@ import Foundation
 
 extension Environment {
     enum Application {
-        static let sessionIdentifier = UUID().uuidString.lowercased()
+        static let sessionIdentifier = UUID().lowercased
 
         static let bundleIdentifier: String? = Bundle.main.bundleIdentifier
         static let version: String? = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String

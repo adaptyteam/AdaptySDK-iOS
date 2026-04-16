@@ -7,7 +7,7 @@
 
 import Foundation
 
-private struct FetchPaywallRequest: BackendRequest {
+private struct FetchFlowRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let queryItems: QueryItems
@@ -21,21 +21,19 @@ private struct FetchPaywallRequest: BackendRequest {
         userId: AdaptyUserId,
         placementId: String,
         variationId: String,
-        locale: AdaptyLocale,
         disableServerCache: Bool
     ) {
-        let md5Hash = "{\"builder_version\":\"\(Adapty.uiBuilderVersion)\",\"locale\":\"\(locale.id.lowercased())\",\"store\":\"app_store\"}".md5.hexString
+        let md5Hash = "{\"builder_version\":\"\(Adapty.uiBuilderVersion)\",\"store\":\"app_store\"}".md5.hexString
 
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(md5Hash)/\(variationId)/"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/\(md5Hash)/\(variationId)/"
         )
 
         headers = HTTPHeaders()
-            .setPaywallLocale(locale)
             .setUserProfileId(userId)
-            .setPaywallBuilderVersion(Adapty.uiBuilderVersion)
-            .setPaywallBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
+            .setBuilderVersion(Adapty.uiBuilderVersion)
+            .setBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
 
@@ -43,7 +41,6 @@ private struct FetchPaywallRequest: BackendRequest {
             "api_prefix": apiKeyPrefix,
             "placement_id": placementId,
             "variation_id": variationId,
-            "locale": locale,
             "builder_version": Adapty.uiBuilderVersion,
             "builder_config_format_version": Adapty.uiSchemaVersion,
             "md5": md5Hash,
@@ -79,7 +76,7 @@ private struct FetchOnboardingRequest: BackendRequest {
         headers = HTTPHeaders()
             .setOnboardingLocale(locale)
             .setUserProfileId(userId)
-            .setOnboardingUIVersion(AdaptyOnboarding.ViewConfiguration.uiVersion)
+            .setOnboardingUIVersion(AdaptyOnboarding.viewConfigurationVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
 
@@ -100,28 +97,26 @@ extension Backend.MainExecutor {
         userId: AdaptyUserId,
         placementId: String,
         variationId: String,
-        locale: AdaptyLocale,
+        locale: AdaptyLocale? = nil,
         cached: Content?,
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let request: BackendRequest =
-            if Content.self == AdaptyPaywall.self {
-                FetchPaywallRequest(
+            if Content.self == AdaptyFlow.self {
+                FetchFlowRequest(
                     apiKeyPrefix: apiKeyPrefix,
                     userId: userId,
                     placementId: placementId,
                     variationId: variationId,
-                    locale: locale,
                     disableServerCache: disableServerCache
                 )
-
             } else {
                 FetchOnboardingRequest(
                     apiKeyPrefix: apiKeyPrefix,
                     userId: userId,
                     placementId: placementId,
                     variationId: variationId,
-                    locale: locale,
+                    locale: locale ?? .defaultPlacementLocale,
                     disableServerCache: disableServerCache
                 )
             }

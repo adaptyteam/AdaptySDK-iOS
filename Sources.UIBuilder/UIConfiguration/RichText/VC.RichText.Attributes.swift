@@ -16,6 +16,7 @@ extension VC.RichText {
         let background: VC.AssetIdentifierOrValue?
         let strike: Bool? // default: false
         let underline: Bool? // default: false
+        let letterSpacing: Double?
     }
 }
 
@@ -29,6 +30,7 @@ extension VC.RichText.Attributes {
             && background == nil
             && (strike ?? false) == false
             && (underline ?? false) == false
+            && letterSpacing == nil
     }
 
     @inlinable
@@ -48,7 +50,23 @@ extension VC.RichText.Attributes {
             imageTintColor: imageTintColor ?? other.imageTintColor,
             background: background ?? other.background,
             strike: strike ?? other.strike,
-            underline: underline ?? other.underline
+            underline: underline ?? other.underline,
+            letterSpacing: letterSpacing ?? other.letterSpacing
         )
     }
+
+
+    
+
+//
+//    return .init(
+//        fontAssetId: attr.fontAssetId?.getAssetIdentifier(state: state, screen: screen),
+//        size: attr.size,
+//        txtColor: attr.txtColor?.getAssetId(state: state, screen: screen),
+//        imageTintColor: attr.imageTintColor?.getAssetId(state: state, screen: screen),
+//        background: attr.background?.getAssetId(state: state, screen: screen),
+//        strike: attr.strike,
+//        underline: attr.underline
+//    ).nonEmptyOrNil
 }
+

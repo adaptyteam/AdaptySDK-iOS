@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.Animation.ScaleParameters: Codable {
+extension Schema.Animation.ScaleParameters: Decodable {
     enum CodingKeys: String, CodingKey {
         case scale
         case anchor
@@ -17,13 +17,5 @@ extension Schema.Animation.ScaleParameters: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         scale = try container.decode(Schema.Animation.Range<Schema.Point>.self, forKey: .scale)
         anchor = try container.decodeIfPresent(Schema.Point.self, forKey: .anchor) ?? .center
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(scale, forKey: .scale)
-        if anchor != .center {
-            try container.encode(anchor, forKey: .anchor)
-        }
     }
 }

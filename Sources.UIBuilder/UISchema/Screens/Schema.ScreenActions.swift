@@ -14,27 +14,37 @@ extension Schema {
 extension Schema.ScreenActions {
     static let empty = Self(
         onOutsideTap: nil,
-        onDeviceBack: nil
+        onDeviceBack: nil,
+        onFocusChange: nil,
+        onWillAppear: nil,
+        onWillDisappear: nil,
+        onDidAppear: nil,
+        onDidDisappear: nil
     )
 }
 
-extension Schema.ScreenActions: Codable {
+extension Schema.ScreenActions: Decodable {
     enum CodingKeys: String, CodingKey {
         case onOutsideTap = "on_outside_tap"
         case onDeviceBack = "on_device_back"
+        case onFocusChange = "on_focus_change"
+        case onWillAppear = "on_will_appear"
+        case onWillDisappear = "on_will_disappear"
+        case onDidAppear = "on_did_appear"
+        case onDidDisappear = "on_did_disappear"
     }
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             onOutsideTap: container.decodeIfPresentActions(forKey: .onOutsideTap),
-            onDeviceBack: container.decodeIfPresentActions(forKey: .onDeviceBack)
+            onDeviceBack: container.decodeIfPresentActions(forKey: .onDeviceBack),
+            onFocusChange: container.decodeIfPresentActions(forKey: .onFocusChange),
+            onWillAppear: container.decodeIfPresentActions(forKey: .onWillAppear),
+            onWillDisappear: container.decodeIfPresentActions(forKey: .onWillDisappear),
+            onDidAppear: container.decodeIfPresentActions(forKey: .onDidAppear),
+            onDidDisappear: container.decodeIfPresentActions(forKey: .onDidDisappear)
         )
     }
 
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(onOutsideTap, forKey: .onOutsideTap)
-        try container.encodeIfPresent(onDeviceBack, forKey: .onDeviceBack)
-    }
 }

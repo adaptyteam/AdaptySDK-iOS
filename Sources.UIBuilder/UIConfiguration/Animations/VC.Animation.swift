@@ -17,6 +17,7 @@ extension VC {
         case background(Timeline, Range<AssetReference>)
         case border(Timeline, BorderParameters)
         case shadow(Timeline, ShadowParameters)
+        case blur(Timeline, Range<Double>)
     }
 }
 
@@ -38,6 +39,8 @@ extension VC.Animation {
         case let .border(timeline, _):
             timeline
         case let .shadow(timeline, _):
+            timeline
+        case let .blur(timeline, _):
             timeline
         }
     }

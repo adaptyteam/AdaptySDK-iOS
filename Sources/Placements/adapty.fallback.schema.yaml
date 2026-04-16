@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+$id: "https://adapty.io/fallback/10/schema"
+title: "Adapty SDK Fallback file"
+type: object
+required:
+  - data
+  - meta
+properties:
+  meta: { $ref: "#/FileMeta" }
+  data:
+    type: object
+    ke
+    additionalProperties: { $ref: "#/Placement" }
+  ui_builder:
+    type: object
+    additionalProperties: { $ref: "#/UIBuilderSchema" }
+
+FileMeta:
+  type: object
+  required:
+    - version
+    - developer_id
+    - response_created_at
+  properties:
+    version:
+      type: integer
+      const: 10 
+    developer_id:
+      type: array
+      items:
+        type: string
+    response_created_at:
+      type: integer
+      format: unix-time
+      description: milliseconds since epoch
+
+Placement:
+  type: object
+  required:
+    - data
+    - meta
+  properties:
+    meta:
+      type: object
+      required:
+        - placement
+      properties:
+        placement:
+          type: object
+          required:
+            - developer_id
+            - audience_name
+            - placement_audience_version_id
+            - revision
+            - ab_test_name
+          properties:
+            developer_id: { type: string }
+            audience_name: { type: string }
+            placement_audience_version_id: { type: string }
+            revision: { type: integer }
+            ab_test_name: { type: string }
+            is_tracking_purchases: { type: boolean, default: false }
+    data:
+      oneOf:
+        - $ref: "#/Flow"
+        - $ref: "#/Onboarding"
+
+Flow:
+  title: "Adapty Flow"
+  type: object§
+  required: [flow_id]
+
+Onboarding:
+  title: "Adapty Onboarding"
+  type: object
+  required: [onboarding_id]
+
+UIBuilderSchema:
+  title: "Adapty UI Schema JSON"
+  type: object

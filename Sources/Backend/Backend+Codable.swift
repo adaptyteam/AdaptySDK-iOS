@@ -36,91 +36,6 @@ extension Backend {
     }()
 }
 
-private extension CodingUserInfoKey {
-    static let enableEncodingViewConfiguration = CodingUserInfoKey(rawValue: "adapty_encode_view_configuration")!
-    static let userId = CodingUserInfoKey(rawValue: "adapty_user_id")!
-    static let placementId = CodingUserInfoKey(rawValue: "adapty_placement_id")!
-    static let placementVariationId = CodingUserInfoKey(rawValue: "adapty_placement_variation_id")!
-    static let placement = CodingUserInfoKey(rawValue: "adapty_placement")!
-    static let requestlocale = CodingUserInfoKey(rawValue: "adapty_request_locale")!
-}
-
-extension CodingUserInfo {
-    mutating func setUserId(_ value: AdaptyUserId) {
-        self[.userId] = value
-    }
-
-    mutating func setPlacement(_ value: AdaptyPlacement) {
-        self[.placement] = value
-    }
-
-    mutating func setPlacementId(_ value: String) {
-        self[.placementId] = value
-    }
-
-    mutating func setRequestLocale(_ value: AdaptyLocale) {
-        self[.requestlocale] = value
-    }
-
-    mutating func setPlacementVariationId(_ value: String) {
-        self[.placementVariationId] = value
-    }
-
-    package mutating func enableEncodingViewConfiguration() {
-        self[.enableEncodingViewConfiguration] = true
-    }
-}
-
-extension [CodingUserInfoKey: Any] {
-    var enabledEncodingViewConfiguration: Bool {
-        self[.enableEncodingViewConfiguration] as? Bool ?? false
-    }
-
-    var userId: AdaptyUserId {
-        get throws {
-            if let value = self[.userId] as? AdaptyUserId {
-                return value
-            }
-
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.userId) parameter"))
-        }
-    }
-
-    var placementId: String {
-        get throws {
-            if let value = self[.placementId] as? String {
-                return value
-            }
-            if let value = placementOrNil {
-                return value.id
-            }
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.placementId) parameter"))
-        }
-    }
-
-    var placement: AdaptyPlacement {
-        get throws {
-            if let value = placementOrNil {
-                return value
-            }
-
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the \(CodingUserInfoKey.placement) parameter"))
-        }
-    }
-
-    var placementOrNil: AdaptyPlacement? {
-        self[.placement] as? AdaptyPlacement
-    }
-
-    var requestLocaleOrNil: AdaptyLocale? {
-        self[.requestlocale] as? AdaptyLocale
-    }
-
-    var placementVariationIdOrNil: String? {
-        self[.placementVariationId] as? String
-    }
-}
-
 extension Backend {
     enum CodingKeys: String, CodingKey {
         case data
@@ -132,17 +47,11 @@ extension Backend {
 }
 
 extension Backend.Response {
-    struct Data<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+    struct Data<Value: Sendable>: Sendable {
         let value: Value
-
-        init(from decoder: Decoder) throws {
-            value = try decoder
-                .container(keyedBy: Backend.CodingKeys.self)
-                .decode(Value.self, forKey: .data)
-        }
     }
 
-    struct OptionalData<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+    struct OptionalData<Value: Decodable & Sendable>: Sendable, Decodable {
         let value: Value?
 
         init(from decoder: Decoder) throws {
@@ -152,7 +61,7 @@ extension Backend.Response {
         }
     }
 
-    struct Meta<Value>: Sendable, Decodable where Value: Decodable, Value: Sendable {
+    struct Meta<Value: Decodable & Sendable>: Sendable, Decodable {
         let value: Value
 
         init(from decoder: Decoder) throws {
@@ -162,3 +71,22 @@ extension Backend.Response {
         }
     }
 }
+
+extension Backend.Response.Data: Decodable where Value: Decodable {
+    init(from decoder: Decoder) throws {
+        value = try decoder
+            .container(keyedBy: Backend.CodingKeys.self)
+            .decode(Value.self, forKey: .data)
+    }
+}
+
+extension Backend.Response.Data: DecodableWithConfiguration where Value: DecodableWithConfiguration {
+    typealias DecodingConfiguration = Value.DecodingConfiguration
+
+    init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
+        value = try decoder
+            .container(keyedBy: Backend.CodingKeys.self)
+            .decode(Value.self, forKey: .data, configuration: configuration)
+    }
+}
+

@@ -82,6 +82,10 @@ fastlane/.env
 .history/
 *.vsix
 
+# Tuist
+/Derived/
+/Adapty.xcodeproj
+
 # Other
 builds/
 *.bck

@@ -10,7 +10,7 @@ import Foundation
 
 extension Request {
     struct AdaptyUIDismissPaywallView: AdaptyPluginRequest {
-        static let method = "adapty_ui_dismiss_paywall_view"
+        static let method = "adapty_ui_dismiss_paywall_view" // TODO: x
 
         let viewId: String
         let destroy: Bool
@@ -21,7 +21,7 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try await AdaptyUI.Plugin.dismissPaywallView(
+            try await AdaptyUI.Plugin.dismissFlowView(
                 viewId: viewId,
                 destroy: destroy
             )

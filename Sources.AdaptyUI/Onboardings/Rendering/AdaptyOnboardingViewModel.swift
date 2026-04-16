@@ -44,7 +44,7 @@ final class AdaptyOnboardingViewModel: ObservableObject {
 
     @MainActor
     func configureWebView(_ webView: WKWebView) {
-        Log.onboardings.verbose("\(logId) configureWebView \(onboarding.viewConfiguration.url)")
+        Log.onboardings.verbose("\(logId) configureWebView \(onboarding.viewConfigurationUrl)")
 
         webViewDelegate.onMessage = { [weak self] name, body in
             self?.handleMessage(name, body)
@@ -75,7 +75,7 @@ final class AdaptyOnboardingViewModel: ObservableObject {
         Log.ui.verbose("VM #\(logId)# viewDidAppear")
 
         if !wasAppeared {
-            var request = URLRequest(url: onboarding.viewConfiguration.url)
+            var request = URLRequest(url: onboarding.viewConfigurationUrl)
             request.setValue(onboarding.requestLocaleIdentifier, forHTTPHeaderField: "Accept-Language")
             webView?.load(request)
         }

@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 extension Schema {
-    struct TemplatesCollection: Sendable, Hashable {
+    struct TemplatesCollection: Sendable {
         let values: [String: Template]
     }
 }

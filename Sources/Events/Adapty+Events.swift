@@ -59,14 +59,14 @@ extension Adapty {
             return
         }
         let event: Event
-        if let paywall = draw.content as? AdaptyPaywall {
-            event = .paywallVariationAssigned(.init(
-                variationId: paywall.variationId,
-                viewConfigurationId: paywall.viewConfiguration?.id,
+        if let flow = draw.content as? AdaptyFlow {
+            event = .flowVariationAssigned(.init(
+                variationId: flow.variationId,
+                viewConfigurationId: flow.viewConfigurationId,
                 placementAudienceVersionId: draw.placementAudienceVersionId
             ))
 
-            Log.crossAB.verbose("-> trackEvent paywallVariationAssigned variationId = \(paywall.variationId)")
+            Log.crossAB.verbose("-> trackEvent flowVariationAssigned variationId = \(flow.variationId)")
 
         } else if let onboarding = draw.content as? AdaptyOnboarding {
             event = .onboardingVariationAssigned(.init(
@@ -100,9 +100,9 @@ public extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
     ///
     /// - Parameters:
-    ///   - paywall: A ``AdaptyPaywall`` object.
+    ///   - paywall: A ``AdaptyFlowPaywall`` object.
     ///  - Throws: An ``AdaptyError`` object
-    nonisolated static func logShowPaywall(_ paywall: AdaptyPaywall) async throws(AdaptyError) {
+    nonisolated static func logShowPaywall(_ paywall: AdaptyFlowPaywall) async throws(AdaptyError) {
         let now = Date()
         try await withActivatedSDK(methodName: .logShowPaywall) { _ throws(AdaptyError) in
             try await trackEvent(

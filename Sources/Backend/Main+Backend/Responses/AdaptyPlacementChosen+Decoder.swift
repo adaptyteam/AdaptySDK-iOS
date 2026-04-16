@@ -14,7 +14,7 @@ extension AdaptyPlacementChosen {
     static func createDecoder(
         withUserId userId: AdaptyUserId,
         withPlacementId placementId: String,
-        withRequestLocale requestLocale: AdaptyLocale,
+        withRequestLocale requestLocale: AdaptyLocale? = nil,
         withCached cached: Content?,
         variationIdResolver: VariationIdResolver?
     ) -> HTTPDecoder<AdaptyPlacementChosen> {
@@ -24,7 +24,7 @@ extension AdaptyPlacementChosen {
         func decoder(
             _ response: HTTPDataResponse,
             _ configuration: HTTPCodableConfiguration?,
-            _ request: HTTPRequest
+            _: HTTPRequest
         ) async throws -> HTTPResponse<AdaptyPlacementChosen> {
             let body = response.body ?? Data()
             let jsonDecoder = JSONDecoder()
@@ -39,13 +39,17 @@ extension AdaptyPlacementChosen {
                 return response.replaceBody(AdaptyPlacementChosen.restore(cached))
             }
 
-            jsonDecoder.userInfo.setPlacement(placement)
-            jsonDecoder.userInfo.setUserId(userId)
-            jsonDecoder.userInfo.setRequestLocale(requestLocale)
+            var configuration = AdaptyPlacement.DecodingConfiguration(
+                userId: userId,
+                placement: placement,
+                requestLocale: requestLocale,
+                variationId: nil
+            )
 
             let draw = try jsonDecoder.decode(
                 Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
-                from: body
+                from: body,
+                with: configuration
             ).value
 
             guard let variationId = try await variationIdResolver?(placementId, draw),
@@ -57,11 +61,12 @@ extension AdaptyPlacementChosen {
                 return response.replaceBody(AdaptyPlacementChosen.draw(draw))
             }
 
-            jsonDecoder.userInfo.setPlacementVariationId(variationId)
+            configuration.variationId = variationId
 
             let variation = try jsonDecoder.decode(
                 Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
-                from: body
+                from: body,
+                with: configuration
             ).value
 
             return response.replaceBody(AdaptyPlacementChosen.draw(variation))
@@ -71,7 +76,7 @@ extension AdaptyPlacementChosen {
     @inlinable
     static func createDecoder(
         withUserId userId: AdaptyUserId,
-        withRequestLocale requestLocale: AdaptyLocale,
+        withRequestLocale requestLocale: AdaptyLocale? = nil,
         withCached cached: Content?
     ) -> HTTPDecoder<AdaptyPlacementChosen> {
         return decoder
@@ -80,7 +85,7 @@ extension AdaptyPlacementChosen {
         func decoder(
             _ response: HTTPDataResponse,
             _ configuration: HTTPCodableConfiguration?,
-            _ request: HTTPRequest
+            _: HTTPRequest
         ) async throws -> HTTPResponse<AdaptyPlacementChosen> {
             let body = response.body ?? Data()
             let jsonDecoder = JSONDecoder()
@@ -95,17 +100,22 @@ extension AdaptyPlacementChosen {
                 return response.replaceBody(AdaptyPlacementChosen.restore(cached))
             }
 
-            jsonDecoder.userInfo.setPlacement(placement)
-            jsonDecoder.userInfo.setRequestLocale(requestLocale)
-
             let variation = try jsonDecoder.decode(
                 Backend.Response.Data<AdaptyPlacement.Variation>.self,
                 from: body
             ).value
 
+            let configuration = AdaptyPlacement.DecodingConfiguration(
+                userId: userId,
+                placement: placement,
+                requestLocale: requestLocale,
+                variationId: nil
+            )
+
             let content = try jsonDecoder.decode(
                 Backend.Response.Data<Content>.self,
-                from: body
+                from: body,
+                with: configuration
             ).value
 
             let draw = AdaptyPlacement.Draw<Content>(
@@ -119,3 +129,4 @@ extension AdaptyPlacementChosen {
         }
     }
 }
+

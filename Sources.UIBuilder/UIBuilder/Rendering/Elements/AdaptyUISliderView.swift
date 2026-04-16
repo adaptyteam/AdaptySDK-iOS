@@ -17,7 +17,7 @@ struct AdaptyUISliderView: View {
     private var screen: VS.ScreenInstance
 
     @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
-    @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
+    @EnvironmentObject var flowViewModel: AdaptyUIFlowViewModel
     @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
     @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
     @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
@@ -38,7 +38,7 @@ struct AdaptyUISliderView: View {
                 screen: screen
             ),
             in: slider.minValue ... slider.maxValue,
-            step: slider.stepValue ?? 0.1
+            step: slider.stepValue
         )
     }
 }

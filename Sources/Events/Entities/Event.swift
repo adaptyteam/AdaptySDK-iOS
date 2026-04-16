@@ -10,7 +10,8 @@ import Foundation
 enum Event: Sendable {
     case appOpened
     case paywallShowed(AdaptyPaywallShowedParameters)
-    case paywallVariationAssigned(AdaptyPaywallVariationAssignedParameters)
+    case flowAnalytics(AdaptyFlowAnalyticsParameters)
+    case flowVariationAssigned(AdaptyFlowVariationAssignedParameters)
     case onboardingVariationAssigned(AdaptyOnboardingVariationAssignedParameters)
     case onboardingScreenShowed(AdaptyUIOnboardingScreenShowedParameters)
     case сonsentToCollectingRefundData(AdaptyConsentToCollectingDataParameters)
@@ -35,7 +36,9 @@ extension Event: Encodable {
             break
         case let .paywallShowed(value):
             try value.encode(to: encoder)
-        case let .paywallVariationAssigned(value):
+        case let .flowAnalytics(value):
+            try value.encode(to: encoder)
+        case let .flowVariationAssigned(value):
             try value.encode(to: encoder)
         case let .onboardingVariationAssigned(value):
             try value.encode(to: encoder)

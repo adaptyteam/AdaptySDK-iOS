@@ -11,7 +11,7 @@ extension Schema {
     typealias StringReference = VC.StringReference
 }
 
-extension Schema.StringReference: Codable {
+extension Schema.StringReference: Decodable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
         case variable = "var"
@@ -50,23 +50,5 @@ extension Schema.StringReference: Codable {
 
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "value must be string_id or variable "))
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-
-        switch self {
-        case let .stringId(string, tags):
-            guard let tags, tags.isNotEmpty else {
-                try container.encode(string)
-                return
-            }
-            try container.encode(tags)
-            var objContainer = encoder.container(keyedBy: CodingKeys.self)
-            try objContainer.encode(string, forKey: .stringId)
-        case let .product(product):
-            try container.encode(product)
-        case let .variable(variable):
-            try container.encode(variable)
-        }
-    }
 }
+

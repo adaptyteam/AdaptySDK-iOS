@@ -39,7 +39,7 @@ extension AdaptyServerCluster: LosslessStringConvertible, RawRepresentable {
         case .default: value = .default
         case .eu: value = .eu
         case .cn: value = .cn
-        case .other(let value):
+        case let .other(value):
             return value
         }
         return value.rawValue
@@ -49,7 +49,9 @@ extension AdaptyServerCluster: LosslessStringConvertible, RawRepresentable {
         self.init(rawValue: value)
     }
 
-    public var description: String { rawValue }
+    public var description: String {
+        rawValue
+    }
 }
 
 extension AdaptyServerCluster: Hashable {

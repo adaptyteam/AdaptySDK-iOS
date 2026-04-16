@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Navigator: Sendable, Hashable {
+    struct Navigator: Sendable {
         let id: NavigatorIdentifier
         let background: AssetReference
         let content: Element
@@ -56,7 +56,7 @@ extension Schema.ConfigurationBuilder {
     }
 }
 
-extension Schema.Navigator: Encodable, DecodableWithConfiguration {
+extension Schema.Navigator: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case background
         case content
@@ -78,7 +78,7 @@ extension Schema.Navigator: Encodable, DecodableWithConfiguration {
         try self.init(
             id: navigatorId,
             background: container.decodeIfPresent(Schema.AssetReference.self, forKey: .background) ?? Self.default.background,
-            content: container.decodeIfPresent(Schema.Element.self, forKey: .content, configuration: configuration) ?? Self.default.content,
+            content: container.decodeIfExist(Schema.Element.self, forKey: .content, configuration: configuration) ?? Self.default.content,
             order: container.decode(Int.self, forKey: .order),
             appearances: container.decodeIfPresent([String: AppearanceTransition].self, forKey: .appearances),
             transitions: container.decodeIfPresent([String: ScreenTransition].self, forKey: .transitions),
@@ -86,3 +86,4 @@ extension Schema.Navigator: Encodable, DecodableWithConfiguration {
         )
     }
 }
+

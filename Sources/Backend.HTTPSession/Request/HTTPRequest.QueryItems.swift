@@ -27,7 +27,7 @@ extension URLQueryItem {
             return
         }
 
-        self.init(name: name, value: (array as? [String] ?? array.map { $0.description }).joined(separator: ","))
+        self.init(name: name, value: (array as? [String] ?? array.map(\.description)).joined(separator: ","))
     }
 }
 
@@ -42,6 +42,6 @@ extension [HTTPRequest.QueryItems.Element] {
             return
         }
 
-        self = (array as? [String] ?? array.map { $0.description }).map { Element(name: "\(key)[]", value: $0) }
+        self = (array as? [String] ?? array.map(\.description)).map { Element(name: "\(key)[]", value: $0) }
     }
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Box: Sendable, Hashable {
+    struct Box: Sendable {
         let width: Length?
         let height: Length?
         let horizontalAlignment: HorizontalAlignment
@@ -24,34 +24,44 @@ extension Schema.Box {
     )
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Box: Schema.CompositeElement {
     @inlinable
-    func planBox(
-        _ from: Schema.Box,
-        in taskStack: inout TasksStack
-    ) {
-        if let content = from.content {
+    func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
+        if let content {
             taskStack.append(.planElement(content))
         }
     }
 
     @inlinable
-    func buildBox(
-        _ from: Schema.Box,
-        _ resultStack: inout ResultStack
-    ) throws(Schema.Error) -> VC.Box {
-        let content = try resultStack.popLastElement(from.content != nil)
-        return .init(
-            width: from.width,
-            height: from.height,
-            horizontalAlignment: from.horizontalAlignment,
-            verticalAlignment: from.verticalAlignment,
-            content: content
+    func buildElement(
+        _ builder: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+    ) throws(Schema.Error) -> VC.Element {
+        try .box(
+            builder.buildBox(self, &resultStack),
+            properties
         )
     }
 }
 
-extension Schema.Box: Encodable, DecodableWithConfiguration {
+extension Schema.ConfigurationBuilder {
+    @inlinable
+    func buildBox(
+        _ from: Schema.Box,
+        _ resultStack: inout ResultStack
+    ) throws(Schema.Error) -> VC.Box {
+        try .init(
+            width: from.width,
+            height: from.height,
+            horizontalAlignment: from.horizontalAlignment,
+            verticalAlignment: from.verticalAlignment,
+            content: resultStack.popLastElement(from.content != nil)
+        )
+    }
+}
+
+extension Schema.Box: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case width
         case height
@@ -67,20 +77,7 @@ extension Schema.Box: Encodable, DecodableWithConfiguration {
             height: try? container.decodeIfPresent(Length.self, forKey: .height),
             horizontalAlignment: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? Self.default.horizontalAlignment,
             verticalAlignment: container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment) ?? Self.default.verticalAlignment,
-            content: container.decodeIfPresent(Schema.Element.self, forKey: .content, configuration: configuration)
+            content: container.decodeIfExist(Schema.Element.self, forKey: .content, configuration: configuration)
         )
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(width, forKey: .width)
-        try container.encodeIfPresent(height, forKey: .height)
-        if horizontalAlignment != .center {
-            try container.encode(horizontalAlignment, forKey: .horizontalAlignment)
-        }
-        if verticalAlignment != .center {
-            try container.encode(verticalAlignment, forKey: .verticalAlignment)
-        }
-        try container.encodeIfPresent(content, forKey: .content)
     }
 }

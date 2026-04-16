@@ -11,7 +11,7 @@ extension Schema {
     typealias Animation = VC.Animation
 }
 
-extension Schema.Animation: Codable {
+extension Schema.Animation: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case interpolator
@@ -21,6 +21,7 @@ extension Schema.Animation: Codable {
         case angle
         case anchor
         case color
+        case blurRadius = "blur_radius"
     }
 
     enum Types: String {
@@ -33,6 +34,7 @@ extension Schema.Animation: Codable {
         case background
         case border
         case shadow
+        case blur
     }
 
     init(from decoder: Decoder) throws {
@@ -72,45 +74,12 @@ extension Schema.Animation: Codable {
             self = try .border(.init(from: decoder), .init(from: decoder))
         case .shadow:
             self = try .shadow(.init(from: decoder), .init(from: decoder))
-        }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        switch self {
-        case let .opacity(timeline, value):
-            try container.encode(Types.opacity.rawValue, forKey: .type)
-            try value.encode(to: encoder)
-            try timeline.encode(to: encoder)
-        case let .offset(timeline, value):
-            try container.encode(Types.offset.rawValue, forKey: .type)
-            try value.encode(to: encoder)
-            try timeline.encode(to: encoder)
-        case let .rotation(timeline, value):
-            try container.encode(Types.rotation.rawValue, forKey: .type)
-            try value.encode(to: encoder)
-            try timeline.encode(to: encoder)
-        case let .scale(timeline, value):
-            try container.encode(Types.scale.rawValue, forKey: .type)
-            try value.encode(to: encoder)
-            try timeline.encode(to: encoder)
-        case let .box(timeline, value):
-            try container.encode(Types.box.rawValue, forKey: .type)
-            try value.encode(to: encoder)
-            try timeline.encode(to: encoder)
-        case let .background(timeline, value):
-            try container.encode(Types.background.rawValue, forKey: .type)
-            try value.encode(to: encoder)
-            try timeline.encode(to: encoder)
-        case let .border(timeline, value):
-            try container.encode(Types.border.rawValue, forKey: .type)
-            try value.encode(to: encoder)
-            try timeline.encode(to: encoder)
-        case let .shadow(timeline, value):
-            try container.encode(Types.shadow.rawValue, forKey: .type)
-            try value.encode(to: encoder)
-            try timeline.encode(to: encoder)
+        case .blur:
+            self = try .blur(
+                .init(from: decoder),
+                container.decode(Range<Double>.self, forKey: .blurRadius)
+            )
         }
     }
 }
+

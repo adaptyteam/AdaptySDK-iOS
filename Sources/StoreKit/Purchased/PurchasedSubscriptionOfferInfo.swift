@@ -21,10 +21,10 @@ struct PurchasedSubscriptionOfferInfo: Sendable {
         paymentMode: AdaptySubscriptionOffer.PaymentMode = .unknown,
         price: Decimal? = nil
     ) {
-        self.id = identifier.offerId
+        id = identifier.offerId
         self.period = period
         self.paymentMode = paymentMode
-        self.offerType = identifier.offerType
+        offerType = identifier.offerType
         self.price = price
     }
 }

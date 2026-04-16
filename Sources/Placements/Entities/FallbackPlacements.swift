@@ -5,6 +5,8 @@
 //  Created by Aleksei Valiano on 30.09.2022.
 //
 
+import AdaptyCodable
+import AdaptyUIBuilder
 import Foundation
 
 private let log = Log.fallbackPlacements
@@ -12,8 +14,13 @@ private let log = Log.fallbackPlacements
 struct FallbackPlacements: Sendable {
     private let fileURL: URL
     private let head: Head
-    var formatVersion: Int { head.formatVersion }
-    var version: Int64 { head.version }
+    var formatVersion: Int {
+        head.formatVersion
+    }
+
+    var version: Int64 {
+        head.version
+    }
 
     init(fileURL url: URL) throws(AdaptyError) {
         guard url.isFileURL else {
@@ -22,7 +29,8 @@ struct FallbackPlacements: Sendable {
         let decoder = FallbackPlacements.decoder()
 
         do {
-            head = try decoder.decode(Head.self, from: Data(contentsOf: url))
+            let data = try Data(contentsOf: url).jsonExtract(pointer: "/meta")
+            head = try decoder.decode(Head.self, from: data)
         } catch {
             throw .decodingFallback(error)
         }
@@ -33,64 +41,65 @@ struct FallbackPlacements: Sendable {
         head.placementIds?.contains(id)
     }
 
-    func restorePaywall(
-        _ id: String,
-        withVariationId variationId: String,
-        withInstanceIdentity: String,
-        withPlacementRevision: Int
-    ) -> AdaptyPaywall? {
-        guard let chosen: AdaptyPlacementChosen<AdaptyPaywall> = getPlacement(
-            byPlacementId: id,
-            withVariationId: variationId,
-            userId: AdaptyUserId(profileId: "", customerId: nil),
-            requestLocale: .defaultPlacementLocale
-        )
-        else { return nil }
-
-        let paywall = chosen.content
-
-        guard paywall.instanceIdentity == withInstanceIdentity,
-              paywall.placement.revision == withPlacementRevision
-        else {
-            return nil
-        }
-
-        return paywall
-    }
-
     func getPlacement<Content: PlacementContent>(
         byPlacementId id: String,
-        withVariationId: String?,
+        withVariationId variationId: String?,
         userId: AdaptyUserId,
-        requestLocale: AdaptyLocale
-    ) -> AdaptyPlacementChosen<Content>? {
-        guard contains(placementId: id) ?? true else { return nil }
-
-        let draw: AdaptyPlacement.Draw<Content>?
+        requestLocale: AdaptyLocale?
+    ) throws -> AdaptyPlacementChosen<Content>? {
+        let draw: AdaptyPlacement.Draw<Content>
 
         do {
-            draw = try FallbackPlacements.decodePlacementVariation(
-                Data(contentsOf: fileURL),
+            guard let data = try Data(contentsOf: fileURL).jsonExtractIfPresent(pointer: "/data/\(id)") else {
+                Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: nil")
+
+                return nil
+            }
+            draw = try FallbackPlacements.decodePlacementVariationFromData(
+                data,
                 withUserId: userId,
-                withPlacementId: id,
-                withVariationId: withVariationId,
+                withVariationId: variationId,
                 withRequestLocale: requestLocale,
-                version: version
+                withFallbackVersion: version
             )
         } catch {
             log.error(String(describing: error))
-            draw = nil
+            Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") error: \(error)")
+            throw error
         }
 
-        Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(withVariationId ?? "nil DRAW") response: variationId = \(draw?.content.variationId ?? "nil")")
+        Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: variationId = \(draw.content.variationId)")
 
-        return draw.map { .draw($0) }
+        return .draw(draw)
+    }
+
+    func getUISchema(
+        byViewConfigurationId id: String
+    ) throws -> AdaptyUISchema? {
+        let schema: AdaptyUISchema?
+        do {
+            let file = try Data(contentsOf: fileURL)
+            guard let data = try file.jsonExtractIfPresent(pointer: "/ui_builder/\(id)") else {
+                return nil
+            }
+            schema = try AdaptyUISchema(from: data)
+        } catch {
+            log.error(String(describing: error))
+            throw error
+        }
+        return schema
     }
 }
 
 private extension FallbackPlacements {
+    static func decoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        Backend.configure(jsonDecoder: decoder)
+        return decoder
+    }
+
     struct Head: Sendable, Decodable {
-        let placementIds: Set<String>?
+        var placementIds: Set<String>?
         let version: Int64
         let formatVersion: Int
 
@@ -101,11 +110,11 @@ private extension FallbackPlacements {
         }
 
         init(from decoder: Decoder) throws {
-            let container = try decoder
-                .container(keyedBy: Backend.CodingKeys.self)
-                .nestedContainer(keyedBy: CodingKeys.self, forKey: .meta)
+            let container = try decoder.container(keyedBy: CodingKeys.self)
 
             let formatVersion = try container.decode(Int.self, forKey: .formatVersion)
+
+            print(formatVersion)
 
             guard formatVersion == Adapty.fallbackFormatVersion else {
                 let error = Adapty.fallbackFormatVersion > formatVersion
@@ -127,117 +136,30 @@ private extension FallbackPlacements {
         }
     }
 
-    static func decodePlacementVariation<Content: PlacementContent>(
+    private static func decodePlacementVariationFromData<Content: PlacementContent>(
         _ data: Data,
         withUserId userId: AdaptyUserId,
-        withPlacementId placementId: String,
         withVariationId variationId: String?,
-        withRequestLocale requestLocale: AdaptyLocale,
-        version: Int64
-    ) throws -> AdaptyPlacement.Draw<Content>? {
-        let jsonDecoder = FallbackPlacements.decoder()
-        jsonDecoder.userInfo.setPlacementId(placementId)
-        jsonDecoder.userInfo.setUserId(userId)
-        jsonDecoder.userInfo.setRequestLocale(requestLocale)
-
-        if let variationId {
-            jsonDecoder.userInfo.setPlacementVariationId(variationId)
-        }
-
-        if let string = try? jsonDecoder.decode(Backend.Response.Data<String>.Placement.self, from: data).value {
-            let draw: AdaptyPlacement.Draw<Content> = try decodePlacementVariation(
-                jsonDecoder,
-                string.data(using: .utf8) ?? Data(),
-                version: version
-            )
-            return draw
-        }
-
-        guard let placement = try jsonDecoder
-            .decode(
-                Backend.Response.Data<AdaptyPlacement>.Placement.Meta.self,
-                from: data
-            )
-            .value?.replace(version: version)
-        else { return nil }
-
-        jsonDecoder.userInfo.setPlacement(placement)
-
-        return try jsonDecoder.decode(
-            Backend.Response.Data<AdaptyPlacement.Draw<Content>>.Placement.Data.self,
-            from: data
-        ).value
-    }
-
-    private static func decodePlacementVariation<Content: PlacementContent>(
-        _ jsonDecoder: JSONDecoder,
-        _ data: Data,
-        version: Int64
+        withRequestLocale requestLocale: AdaptyLocale?,
+        withFallbackVersion fallbackVersion: Int64
     ) throws -> AdaptyPlacement.Draw<Content> {
+        let jsonDecoder = FallbackPlacements.decoder()
+
         let placement = try jsonDecoder.decode(
             Backend.Response.Meta<AdaptyPlacement>.self,
             from: data
-        ).value.replace(version: version)
-
-        jsonDecoder.userInfo.setPlacement(placement)
+        ).value.replace(version: fallbackVersion)
 
         return try jsonDecoder.decode(
             Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
-            from: data
+            from: data,
+            with: .init(
+                userId: userId,
+                placement: placement,
+                requestLocale: requestLocale,
+                variationId: variationId
+            )
         ).value
     }
 }
 
-private extension FallbackPlacements {
-    static func decoder() -> JSONDecoder {
-        let decoder = JSONDecoder()
-        Backend.configure(jsonDecoder: decoder)
-        return decoder
-    }
-}
-
-private extension Backend.Response.Data {
-    private static func data(from decoder: Decoder) throws -> KeyedDecodingContainer<AnyCodingKeys> {
-        try decoder
-            .container(keyedBy: Backend.CodingKeys.self)
-            .nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .data)
-    }
-
-    struct Placement: Sendable, Decodable where Value: Decodable, Value: Sendable {
-        let value: Value?
-
-        init(from decoder: Decoder) throws {
-            value = try data(from: decoder)
-                .decodeIfPresent(Value.self, forKey: AnyCodingKeys(stringValue: decoder.userInfo.placementId))
-        }
-
-        private static func placement(from decoder: Decoder) throws -> KeyedDecodingContainer<Backend.CodingKeys>? {
-            let data = try data(from: decoder)
-            let placementId = try AnyCodingKeys(stringValue: decoder.userInfo.placementId)
-
-            guard data.contains(placementId), try !data.decodeNil(forKey: placementId) else {
-                return nil
-            }
-
-            return try data.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: placementId)
-        }
-
-        struct Data: Sendable, Decodable {
-            let value: Value?
-
-            init(from decoder: Decoder) throws {
-                value = try placement(from: decoder)?
-                    .decode(Value.self, forKey: .data)
-            }
-        }
-
-        struct Meta: Sendable, Decodable where Value: Decodable, Value: Sendable {
-            let value: Value?
-
-            init(from decoder: Decoder) throws {
-                value = try placement(from: decoder)?
-                    .decode(Value.self, forKey: .meta)
-            }
-        }
-    }
-}

@@ -17,5 +17,6 @@ extension VC {
         let pageControl: PageControl?
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
+        let pageIndex: Variable?
     }
 }

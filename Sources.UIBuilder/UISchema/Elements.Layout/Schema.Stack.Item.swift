@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema.Stack {
-    enum Item: Sendable, Hashable {
+    enum Item: Sendable {
         case space(Int)
         case element(Schema.Element)
     }

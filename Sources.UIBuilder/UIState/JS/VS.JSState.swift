@@ -89,7 +89,7 @@ extension VS.JSState {
             index += 1
         }
 
-        guard index < path.count - 1 else { return current }
+        guard index < path.count else { return current }
         guard createIfNeeded else {
             throw .jsObjectNotFound(path.joined(separator: "."))
         }
@@ -131,36 +131,18 @@ extension VS.JSState {
 
         log.debug("get variable \(path.joined(separator: ".")) = \(result)")
 
-        guard let convertor = variable.converter else {
+        guard let converter = variable.converter as? VS.ExecutableConvertor else {
             return T.fromJSValue(result)
         }
 
-        let converted = try convert(value: result, convertor: convertor)
-        log.debug("convert to value: \(converted)")
+        do {
+            let converted = try converter.readValue(result, in: context)
+            log.debug("convert to value: \(converted)")
 
-        return T.fromJSValue(converted)
-    }
-
-    private func convert(value: JSValue, convertor: VC.Variable.Converter) throws(VS.Error) -> JSValue {
-        switch convertor {
-        case let .isEqual(a, _):
-            let rhs = a.toJSValue(in: context)
-            let result = value.isEqual(to: rhs)
-            return result.toJSValue(in: context)
-        case let .unknown(name, _):
-            throw .notFoundConvertor(name)
-        }
-    }
-
-    private func backConvert(value: some JSValueConvertable, convertor: VC.Variable.Converter) throws(VS.Error) -> VC.Parameter {
-        switch convertor {
-        case let .isEqual(a, b):
-            let boolValue = value.toJSValue(in: context).toBool()
-            guard !boolValue else { return a }
-            if let b { return b }
-            return .null
-        case let .unknown(name, _):
-            throw .notFoundConvertor(name)
+            return T.fromJSValue(converted)
+        } catch {
+            log.error("convert \(path.joined(separator: ".")) = \(result) error: \(error) with \(converter)")
+            throw error
         }
     }
 
@@ -169,13 +151,14 @@ extension VS.JSState {
         path: [String],
         args functionArguments: [any JSValueConvertable] = []
     ) throws(VS.Error) -> T? {
-        guard let name = path.last, path.count > 0 else { throw .jsPathToObjectIsEmpty }
+        guard let name = path.last else { throw .jsPathToObjectIsEmpty }
 
         let parent = try findObject(path: path.dropLast())
 
         guard parent.hasProperty(name) else {
             throw .jsMethodNotFound(path.joined(separator: "."))
         }
+
         let value: JSValue? = parent.invokeMethod(
             name,
             withArguments: functionArguments.map { $0.toJSValue(in: context) }
@@ -192,17 +175,38 @@ extension VS.JSState {
         }
     }
 
+    private func invokeMethod<T: JSValueRepresentable>(
+        _: T.Type,
+        function: JSValue,
+        args functionArguments: [any JSValueConvertable] = []
+    ) throws(VS.Error) -> T? {
+        let value: JSValue? = function.call(
+            withArguments: functionArguments.map { $0.toJSValue(in: context) }
+        )
+
+        let name = function.forProperty("name")?.toString() ?? ""
+        if let value = T.fromJSValue(value) {
+            log.debug(
+                "callback \(name) -> \(String(describing: value))"
+            )
+            return value
+        } else {
+            log.debug("callback \(name)")
+            return nil
+        }
+    }
+
     func setValue(
         variable: VC.Variable,
         value: some JSValueConvertable,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
-        guard let convertor = variable.converter else {
+        guard let convertor = variable.converter as? VS.ExecutableConvertor else {
             try setValueWithoutConverter(variable: variable, value: value, screenInstance: screenInstance)
             return
         }
 
-        let converted = try backConvert(value: value, convertor: convertor)
+        let converted = try convertor.writeValue(value, in: context)
         log.debug("convert \(value) to: \(converted)")
         try setValueWithoutConverter(variable: variable, value: converted, screenInstance: screenInstance)
     }
@@ -224,9 +228,14 @@ extension VS.JSState {
             objectWillChange.send()
             return
         } catch {
-            guard case .jsMethodNotFound = error else { throw error }
-            if variable.setter != nil {
-                log.warn("not found setter \(setter.joined(separator: "."))")
+            switch error {
+            case .jsMethodNotFound, .jsObjectNotFound:
+                guard variable.setter == nil else {
+                    log.warn("not found setter \(setter.joined(separator: "."))")
+                    throw error
+                }
+            default:
+                throw error
             }
         }
 
@@ -240,14 +249,46 @@ extension VS.JSState {
     }
 
     func execute(
+        action: VS.JSAction,
+        params: (some JSValueConvertable)?,
+        screenInstance: VS.ScreenInstance
+    ) throws(VS.Error) {
+        let object = VS.ActionParameters(
+            screenInstance: screenInstance,
+            params: params
+        )
+
+        _ = try invokeMethod(
+            Bool.self,
+            function: action.callback,
+            args: [object]
+        )
+
+        objectWillChange.send()
+    }
+
+    func execute(
         actions: [VC.Action],
+        params: [String: any VC.Value]?,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
         guard !actions.isEmpty else { return }
 
         for action in actions {
-            guard !actionDispatcher.execute(action, in: context) else { continue }
-            let object = VS.ActionParameters(screenInstance: screenInstance, params: action.params)
+            guard !actionDispatcher.fastExecute(action) else { continue }
+
+            var mergedParams = action.params ?? [:]
+
+            if let params {
+                for (key, value) in params {
+                    mergedParams[key] = VC.AnyValue(value)
+                }
+            }
+
+            let object = VS.ActionParameters(
+                screenInstance: screenInstance,
+                params: mergedParams
+            )
             _ = try invokeMethod(
                 Bool.self,
                 path: action.pathWithScreenContext(screenInstance.contextPath),
@@ -303,3 +344,4 @@ extension VS.JSState {
         return debug(path: path.joined(separator: "."), filter: filter)
     }
 }
+

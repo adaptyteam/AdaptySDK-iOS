@@ -11,20 +11,31 @@ extension Schema {
     typealias WheelItemsPicker = VC.WheelItemsPicker
 }
 
-extension Schema.WheelItemsPicker: Codable {
+extension Schema.WheelItemsPicker: Schema.SimpleElement {
+    @inlinable
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .wheelItemsPicker(
+            self,
+            properties
+        )
+    }
+}
+
+extension Schema.WheelItemsPicker: Decodable {
     enum CodingKeys: String, CodingKey {
         case value
+        case items
     }
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            value: container.decode(Schema.Variable.self, forKey: .value)
+            value: container.decode(Schema.Variable.self, forKey: .value),
+            items: container.decode([Schema.WheelItemsPicker.Item].self, forKey: .items)
         )
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(value, forKey: .value)
-    }
 }
+

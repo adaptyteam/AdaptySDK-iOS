@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Template: Sendable, Hashable {
+    struct Template: Sendable {
         let content: Element
     }
 }
@@ -17,7 +17,7 @@ extension Schema.Template {
     static let keyPrefix: String = "#"
 }
 
-extension Schema.Template: Encodable, DecodableWithConfiguration {
+extension Schema.Template: DecodableWithConfiguration {
     private enum CodingKeys: String, CodingKey {
         case content
     }
@@ -30,3 +30,4 @@ extension Schema.Template: Encodable, DecodableWithConfiguration {
         )
     }
 }
+

@@ -30,7 +30,7 @@ package struct AdaptyUIPaywallView_Internal: View {
     package var body: some View {
         GeometryReader { proxy in
             let safeArea = safeAreaOverride ?? proxy.safeAreaInsets
-            AdaptyUIPaywallRendererView()
+            AdaptyUIFlowRendererView()
                 .withScreenSize(
                     CGSize(
                         width: proxy.size.width + safeArea.leading + safeArea.trailing,

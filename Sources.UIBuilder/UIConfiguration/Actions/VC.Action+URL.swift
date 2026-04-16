@@ -81,17 +81,17 @@ extension VC.Action {
             return
         }
 
-        var params = [String: VC.Parameter]()
+        var params = [String: VC.AnyValue]()
         for item in queryItems {
             let (fullPath, suffix) = item.name.extractSuffix()
             let path = fullPath.split(separator: ".").map(String.init)
 
-            let value: VC.Parameter =
+            let value =
                 if autodetectType {
-                    (try? VC.Parameter(key: fullPath, suffix: suffix, value: item.value))
-                        ?? VC.Parameter(string: item.value)
+                    (try? VC.AnyValue(key: fullPath, suffix: suffix, value: item.value))
+                        ?? VC.AnyValue(string: item.value)
                 } else {
-                    try VC.Parameter(key: fullPath, suffix: suffix, value: item.value)
+                    try VC.AnyValue(key: fullPath, suffix: suffix, value: item.value)
                 }
             params.setParameter(value, for: path)
         }
@@ -102,8 +102,8 @@ extension VC.Action {
 private enum Suffix: String, CaseIterable {
     case string = "_s"
     case bool = "_b"
-    case int32 = "_i32"
-    case uint32 = "_u32"
+    case int = "_i"
+    case uint = "_u"
     case double = "_d"
 }
 
@@ -118,26 +118,33 @@ private extension String {
     }
 }
 
-private extension VC.Parameter {
+private extension VC.AnyValue {
     func asQueryItems(name: String) -> [URLQueryItem] {
-        switch self {
-        case .null:
-            [URLQueryItem(name: name, value: nil)]
-        case let .string(value):
-            [URLQueryItem(name: name + Suffix.string.rawValue, value: value)]
-        case let .bool(value):
-            [URLQueryItem(name: name + Suffix.bool.rawValue, value: value.description)]
-        case let .int32(value):
-            [URLQueryItem(name: name + Suffix.int32.rawValue, value: value.description)]
-        case let .uint32(value):
-            [URLQueryItem(name: name + Suffix.uint32.rawValue, value: value.description)]
-        case let .double(value):
-            [URLQueryItem(name: name + Suffix.double.rawValue, value: value.description)]
-        case let .object(dict):
-            dict
-                .sorted(by: { $0.key < $1.key })
-                .flatMap { $0.value.asQueryItems(name: "\(name).\($0.key)") }
+        if wrapped.isNil {
+            return [URLQueryItem(name: name, value: nil)]
         }
+        if let value = wrapped as? String {
+            return [URLQueryItem(name: name + Suffix.string.rawValue, value: value)]
+        }
+        if let value = wrapped as? Bool {
+            return [URLQueryItem(name: name + Suffix.bool.rawValue, value: value.description)]
+        }
+        if let value = wrapped as? Int {
+            return [URLQueryItem(name: name + Suffix.int.rawValue, value: value.description)]
+        }
+        if let value = wrapped as? UInt {
+            return [URLQueryItem(name: name + Suffix.uint.rawValue, value: value.description)]
+        }
+        if let value = wrapped as? Double {
+            return [URLQueryItem(name: name + Suffix.double.rawValue, value: value.description)]
+        }
+        if let dict = wrapped.asObject {
+            return dict
+                .sorted(by: { $0.key < $1.key })
+                .flatMap { VC.AnyValue($0.value).asQueryItems(name: "\(name).\($0.key)") }
+        }
+
+        return []
     }
 
     init(
@@ -146,7 +153,7 @@ private extension VC.Parameter {
         value: String?
     ) throws {
         guard let value else {
-            self = .null
+            wrapped = String?.none
             return
         }
 
@@ -161,7 +168,7 @@ private extension VC.Parameter {
 
         switch suffix {
         case .string:
-            self = .string(value)
+            wrapped = value
         case .bool:
             guard let v = Bool(value) else {
                 throw DecodingError.dataCorrupted(
@@ -172,8 +179,8 @@ private extension VC.Parameter {
                     )
                 )
             }
-            self = .bool(v)
-        case .int32:
+            wrapped = v
+        case .int:
             guard let v = Int32(value) else {
                 throw DecodingError.dataCorrupted(
                     .init(
@@ -183,8 +190,8 @@ private extension VC.Parameter {
                     )
                 )
             }
-            self = .int32(v)
-        case .uint32:
+            wrapped = v
+        case .uint:
             guard let v = UInt32(value) else {
                 throw DecodingError.dataCorrupted(
                     .init(
@@ -194,7 +201,7 @@ private extension VC.Parameter {
                     )
                 )
             }
-            self = .uint32(v)
+            wrapped = v
         case .double:
             guard let v = Double(value) else {
                 throw DecodingError.dataCorrupted(
@@ -205,45 +212,46 @@ private extension VC.Parameter {
                     )
                 )
             }
-            self = .double(v)
+            wrapped = v
         }
     }
 
     init(string: String?) {
         guard let string else {
-            self = .null
+            wrapped = String?.none
             return
         }
 
         if let boolValue = Bool(string) {
-            self = .bool(boolValue)
-        } else if let intValue = Int32(string) {
-            self = .int32(intValue)
-        } else if let uintValue = UInt32(string) {
-            self = .uint32(uintValue)
+            wrapped = boolValue
+        } else if let intValue = Int(string) {
+            wrapped = intValue
+        } else if let uintValue = UInt(string) {
+            wrapped = uintValue
         } else if let doubleValue = Double(string) {
-            self = .double(doubleValue)
+            wrapped = doubleValue
         } else {
-            self = .string(string)
+            wrapped = string
         }
     }
 }
 
-private extension [String: VC.Parameter] {
-    mutating func setParameter(_ value: VC.Parameter, for path: [String]) {
+private extension [String: VC.AnyValue] {
+    mutating func setParameter(_ value: VC.AnyValue, for path: [String]) {
         guard !path.isEmpty else { return }
         let key = path[0]
         if path.count == 1 {
             self[key] = value
         } else {
-            var subParams: [String: VC.Parameter] =
-                if case let .object(existing) = self[key] {
-                    existing
+            var subParams: [String: VC.AnyValue] =
+                if let existing = self[key]?.asObject {
+                    existing.mapValues(VC.AnyValue.init)
                 } else {
                     [:]
                 }
             subParams.setParameter(value, for: Array(path.dropFirst()))
-            self[key] = .object(subParams)
+            self[key] = VC.AnyValue(subParams)
         }
     }
 }
+

@@ -19,10 +19,10 @@ public protocol AdaptyDelegate: AnyObject, Sendable {
 }
 
 public extension AdaptyDelegate {
-    func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails) {}
-    func onInstallationDetailsFail(error: AdaptyError) {}
+    func onInstallationDetailsSuccess(_: AdaptyInstallationDetails) {}
+    func onInstallationDetailsFail(error _: AdaptyError) {}
 
-    func onUnfinishedTransaction(_ adaptyUnfinishedTransaction: AdaptyUnfinishedTransaction) {}
+    func onUnfinishedTransaction(_: AdaptyUnfinishedTransaction) {}
 }
 
 extension Adapty {

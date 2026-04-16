@@ -10,7 +10,7 @@
 import SwiftUI
 
 struct AdaptyUIOverlayElementsView<ScreenHolderContent: View>: View {
-    var overlays: [VC.Element.Overlay]
+    var overlays: [VC.AlignedElement]
     var screenHolderBuilder: () -> ScreenHolderContent
 
     @Environment(\.layoutDirection)
@@ -36,7 +36,7 @@ struct AdaptyUIOverlayElementsView<ScreenHolderContent: View>: View {
 }
 
 struct ElementOverlayModifier<ScreenHolderContent: View>: ViewModifier {
-    var overlays: [VC.Element.Overlay]?
+    var overlays: [VC.AlignedElement]?
     var screenHolderBuilder: () -> ScreenHolderContent
 
     func body(content: Content) -> some View {

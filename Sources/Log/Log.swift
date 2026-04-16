@@ -17,7 +17,7 @@ enum Log {
         AdaptyLogger.isLevel(level)
     }
 
-    static func Category(name: String) -> AdaptyLogger.Category {
+    static func Category(name _: String) -> AdaptyLogger.Category {
         AdaptyLogger.Category(
             subsystem: "io.adapty",
             version: Adapty.SDKVersion,

@@ -12,5 +12,3 @@ public extension Adapty {
         }
     }
 }
-
-

@@ -11,7 +11,7 @@ extension Schema {
     typealias Action = VC.Action
 }
 
-extension Schema.Action: Codable {
+extension Schema.Action: Decodable {
     private enum CodingKeys: String, CodingKey {
         case function = "func"
         case params
@@ -21,7 +21,7 @@ extension Schema.Action: Codable {
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        if container.contains(.function) {
+        if container.exist(.function) {
             let function = try container.decode(String.self, forKey: .function)
             let path = function.split(separator: ".").map(String.init)
             guard path.isNotEmpty else {
@@ -29,23 +29,11 @@ extension Schema.Action: Codable {
             }
             try self.init(
                 path: path,
-                params: container.decodeIfPresent([String: Schema.Parameter].self, forKey: .params),
+                params: container.decodeIfPresent([String: Schema.AnyValue].self, forKey: .params),
                 scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default
             )
         } else {
             try self.init(fromLegacy: decoder)
-        }
-    }
-
-    package func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        let function = path.joined(separator: ".")
-        try container.encode(function, forKey: .function)
-        if let params, params.isNotEmpty {
-            try container.encode(params, forKey: .params)
-        }
-        if scope != .default {
-            try container.encode(scope, forKey: .scope)
         }
     }
 }
@@ -90,7 +78,7 @@ extension Schema.Action {
         switch try container.decode(String.self, forKey: .type) {
         case "open_url":
             try self.init(path: ["SDK", "openUrl"], params: [
-                "stringId": .string(container.decode(String.self, forKey: .url)),
+                "stringId": VC.AnyValue(container.decode(String.self, forKey: .url)),
             ], scope: .global)
         case "restore":
             self.init(path: ["SDK", "restorePurchases"], params: nil, scope: .global)
@@ -98,55 +86,54 @@ extension Schema.Action {
             self.init(path: ["SDK", "closeAll"], params: nil, scope: .global)
         case "custom":
             try self.init(path: ["SDK", "userCustomAction"], params: [
-                "userCustomId": .string(container.decode(String.self, forKey: .customId)),
+                "userCustomId": VC.AnyValue(container.decode(String.self, forKey: .customId)),
             ], scope: .global)
         case "purchase_product":
             try self.init(path: ["SDK", "purchaseProduct"], params: [
-                "productId": .string(container.decode(String.self, forKey: .productId)),
-                "paywallId": .string("legacy-paywall-id"),
+                "productId": VC.AnyValue(container.decode(String.self, forKey: .productId)),
             ], scope: .global)
         case "web_purchase_product":
             try self.init(path: ["SDK", "webPurchaseProduct"], params: [
-                "productId": .string(container.decode(String.self, forKey: .productId)),
-                "paywallId": .string("legacy-paywall-id"),
-                "openIn": .string(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
+                "productId": VC.AnyValue(container.decode(String.self, forKey: .productId)),
+                "openIn": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
             ], scope: .global)
         case "open_screen":
             try self.init(path: ["SDK", "openScreen"], params: [
-                "type": .string(container.decode(String.self, forKey: .screenType)),
-                "instanceId": .string("legacy-bottom-sheet"),
-                "navigatorId": .string("legacy-bottom-sheet"),
-                "transitionId": .string("on_appear"),
+                "type": VC.AnyValue(container.decode(String.self, forKey: .screenType)),
+                "instanceId": VC.AnyValue("legacy-bottom-sheet"),
+                "navigatorId": VC.AnyValue("legacy-bottom-sheet"),
+                "transitionId": VC.AnyValue("on_appear"),
             ], scope: .global)
         case "close_screen":
             self.init(path: ["SDK", "closeScreen"], params: [
-                "navigatorId": .string("legacy-bottom-sheet"),
+                "navigatorId": VC.AnyValue("legacy-bottom-sheet"),
             ], scope: .global)
         case "select_product":
             try self.init(path: ["Legacy", "selectProduct"], params: [
-                "productId": .string(container.decode(String.self, forKey: .productId)),
-                "groupId": .string(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
+                "productId": VC.AnyValue(container.decode(String.self, forKey: .productId)),
+                "groupId": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
             ], scope: .global)
         case "unselect_product":
             try self.init(path: ["Legacy", "unselectProduct"], params: [
-                "groupId": .string(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
+                "groupId": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
             ], scope: .global)
         case "purchase_selected_product":
             try self.init(path: ["Legacy", "purchaseSelectedProduct"], params: [
-                "groupId": .string(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
+                "groupId": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
             ], scope: .global)
         case "web_purchase_selected_product":
             try self.init(path: ["Legacy", "webPurchaseSelectedProduct"], params: [
-                "groupId": .string(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
-                "openIn": .string(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
+                "groupId": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
+                "openIn": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
             ], scope: .global)
         case "switch":
             try self.init(path: ["Legacy", "switchSection"], params: [
-                "sectionId": .string(container.decode(String.self, forKey: .sectionId)),
-                "index": .int32(container.decode(Int32.self, forKey: .index)),
+                "sectionId": VC.AnyValue(container.decode(String.self, forKey: .sectionId)),
+                "index": VC.AnyValue(container.decode(Int.self, forKey: .index)),
             ], scope: .global)
         default:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath + [LegacyCodingKeys.type], debugDescription: "unknown value"))
         }
     }
 }
+

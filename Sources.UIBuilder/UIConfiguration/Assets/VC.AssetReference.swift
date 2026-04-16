@@ -14,3 +14,15 @@ extension VC {
         case variable(Variable)
     }
 }
+
+extension VC.AssetIdentifierOrValue {
+    var asAssetReference: VC.AssetReference {
+        switch self {
+        case let .assetId(value):
+            .assetId(value)
+        case let .color(value):
+            .color(value)
+        }
+    }
+}
+

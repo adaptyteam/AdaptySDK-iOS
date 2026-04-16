@@ -23,9 +23,11 @@ struct AdaptyUITextField: View {
     private var screen: VS.ScreenInstance
 
     private var textField: VC.TextField
+    private var focusId: String?
 
-    init(_ textField: VC.TextField) {
+    init(_ textField: VC.TextField, focusId: String?) {
         self.textField = textField
+        self.focusId = focusId
     }
 
     @State private var lastConstrainedText: String = ""
@@ -105,6 +107,8 @@ struct AdaptyUITextField: View {
 
     var body: some View {
         coreTextComponent
+            .applyScrollAnchor(focusId)
+            .applyFocusId(focusId)
             .onSubmit {
                 stateViewModel.execute(
                     actions: textField.keyboardSubmitActions,

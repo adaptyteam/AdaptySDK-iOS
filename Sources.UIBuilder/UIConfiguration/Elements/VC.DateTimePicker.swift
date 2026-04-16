@@ -8,13 +8,13 @@
 import Foundation
 
 extension VC {
-    struct DateTimePicker: Hashable {
+    struct DateTimePicker: Sendable, Hashable {
         let kind: Kind
         let value: Variable
         let components: Components
-        let maxDate: Date?
-        let minDate: Date?
+        let maxDate: VC.DateTime?
+        let minDate: VC.DateTime?
         let color: AssetReference?
-        
     }
 }
+

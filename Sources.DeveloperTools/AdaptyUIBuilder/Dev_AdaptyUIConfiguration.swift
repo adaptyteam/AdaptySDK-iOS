@@ -39,10 +39,13 @@ public extension Dev_AdaptyUIConfiguration {
         json: String
     ) throws -> Self {
         let schema = try AdaptyUISchema(from: json)
-        let configuration = try schema.extractUIConfiguration()
+        let configuration = try schema.extractUIConfiguration(
+            id: UUID().uuidString.lowercased()
+        )
         return .init(
             wrapped: configuration,
             json: json
         )
     }
 }
+

@@ -18,7 +18,7 @@ public extension AdaptyUI {
         package let presentationViewModel: AdaptyUIPresentationViewModel
         package let stateViewModel: AdaptyUIStateViewModel
         package let actionHandler: AdaptyUIStateActionHandler
-        package let paywallViewModel: AdaptyUIPaywallViewModel
+        package let flowViewModel: AdaptyUIFlowViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
         package let timerViewModel: AdaptyUITimerViewModel
@@ -39,7 +39,9 @@ public extension AdaptyUI {
             observerModeResolver: AdaptyObserverModeResolver?,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
-            assetsResolver: AdaptyUIAssetsResolver?
+            assetsResolver: AdaptyUIAssetsResolver?,
+            systemRequestsHandler: AdaptyUISystemRequestsHandler?,
+            rtlOverride: Bool?
         ) {
             self.logId = logId
             self.observerModeResolver = observerModeResolver
@@ -55,7 +57,7 @@ public extension AdaptyUI {
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
 
-            paywallViewModel = AdaptyUIPaywallViewModel(
+            flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
                 logic: logic,
                 viewConfiguration: viewConfiguration
@@ -64,12 +66,13 @@ public extension AdaptyUI {
                 logId: logId,
                 logic: logic,
                 presentationViewModel: presentationViewModel,
-                paywallViewModel: paywallViewModel,
+                flowViewModel: flowViewModel,
                 products: nil
             )
             screensViewModel = AdaptyUIScreensViewModel(
                 logId: logId,
-                viewConfiguration: viewConfiguration
+                viewConfiguration: viewConfiguration,
+                rtlOverride: rtlOverride
             )
             actionHandler = AdaptyUIStateActionHandler(
                 productsViewModel: productsViewModel,
@@ -87,14 +90,19 @@ public extension AdaptyUI {
                 logic: logic,
                 stateHolder: stateHolder
             )
-            timerViewModel = AdaptyUITimerViewModel(
+            actionHandler.stateViewModel = stateViewModel
+            actionHandler.systemRequestsHandler = systemRequestsHandler
+            let timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
                 stateViewModel: stateViewModel,
-                paywallViewModel: paywallViewModel,
+                flowViewModel: flowViewModel,
                 productsViewModel: productsViewModel,
                 screensViewModel: screensViewModel
             )
+            self.timerViewModel = timerViewModel
+            actionHandler.timerViewModel = timerViewModel
+            timerViewModel.callbackHandler = actionHandler
             assetsViewModel = AdaptyUIAssetsViewModel(
                 logId: logId,
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
@@ -118,22 +126,29 @@ public struct Dev_AdaptyUIRendererView: View {
     private let didStartPurchase: ((String) -> Void)?
     private let didStartRestore: (() -> Void)?
     private let didFailRendering: ((AdaptyUIBuilderError) -> Void)?
+    private let didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
 
     private let safeAreaOverride: EdgeInsets?
+    private let showDebugOverlay: Bool
 
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
         assetsResolver: AdaptyUIAssetsResolver?,
+        systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
+        showDebugOverlay: Bool = false,
         safeAreaOverride: EdgeInsets? = nil,
+        rtlOverride: Bool? = nil,
         didAppear: (() -> Void)? = nil,
         didDisappear: (() -> Void)? = nil,
         didPerformAction: ((AdaptyUIBuilder.Action) -> Void)? = nil,
         didSelectProduct: ((String) -> Void)? = nil,
         didStartPurchase: ((String) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,
-        didFailRendering: ((AdaptyUIBuilderError) -> Void)? = nil
+        didFailRendering: ((AdaptyUIBuilderError) -> Void)? = nil,
+        didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)? = nil
     ) {
         self.safeAreaOverride = safeAreaOverride
+        self.showDebugOverlay = showDebugOverlay
         self.viewConfiguration = viewConfiguration.wrapped
         galleryConfiguration = .init(
             logId: "test",
@@ -141,7 +156,9 @@ public struct Dev_AdaptyUIRendererView: View {
             observerModeResolver: nil,
             tagResolver: ["TEST_TAG": "Adapty"],
             timerResolver: nil,
-            assetsResolver: assetsResolver
+            assetsResolver: assetsResolver,
+            systemRequestsHandler: systemRequestsHandler,
+            rtlOverride: rtlOverride
         )
 
         self.didAppear = didAppear
@@ -151,6 +168,7 @@ public struct Dev_AdaptyUIRendererView: View {
         self.didStartPurchase = didStartPurchase
         self.didStartRestore = didStartRestore
         self.didFailRendering = didFailRendering
+        self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
     }
 
     public var body: some View {
@@ -165,15 +183,16 @@ public struct Dev_AdaptyUIRendererView: View {
         }
         galleryConfiguration.eventsHandler.didStartRestore = didStartRestore
         galleryConfiguration.eventsHandler.didFailRendering = didFailRendering
+        galleryConfiguration.eventsHandler.didReceiveAnalyticEvent = didReceiveAnalyticEvent
 
         return AdaptyUIPaywallView_Internal(
-            showDebugOverlay: false,
+            showDebugOverlay: showDebugOverlay,
             displayMissingTags: true,
             safeAreaOverride: safeAreaOverride
         )
         .environmentObjects(
             stateViewModel: galleryConfiguration.stateViewModel,
-            paywallViewModel: galleryConfiguration.paywallViewModel,
+            flowViewModel: galleryConfiguration.flowViewModel,
             productsViewModel: galleryConfiguration.productsViewModel,
             tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
             timerViewModel: galleryConfiguration.timerViewModel,

@@ -11,33 +11,47 @@ extension Schema {
     typealias Variable = VC.Variable
 }
 
-extension Schema.Variable: Codable {
-    private enum CodingKeys: String, CodingKey {
+extension Schema.Variable: Decodable {
+    enum CodingKeys: String, CodingKey {
         case path = "var"
         case setter
         case scope
         case converter
+        case converterParameters = "converter_params"
+    }
+
+    private enum ConvertorName: String {
+        case isEqual = "is_equal"
+        case map
+        case dateTime = "date_time"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let path = try container.decode(String.self, forKey: .path)
+
+        var convertor: (any VC.Variable.Converter)? = nil
+
+        if let convertorName = try container.decodeIfPresent(String.self, forKey: .converter) {
+            switch ConvertorName(rawValue: convertorName) {
+            case .isEqual:
+                convertor = try Schema.Variable.IsEqualConvertor(from: decoder)
+            case .map:
+                convertor = try Schema.Variable.MapConvertor(from: decoder)
+            case .dateTime:
+                convertor = try Schema.Variable.DateTimeConvertor(from: decoder)
+            default:
+                convertor = UnknownConverter(name: convertorName)
+            }
+        }
+
         try self.init(
             path: path.split(separator: ".").map(String.init),
             setter: container.decodeIfPresent(String.self, forKey: .setter),
             scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default,
-            converter: container.contains(.converter) ? VC.Variable.Converter(from: decoder) : nil
+            converter: convertor
         )
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(path.joined(separator: "."), forKey: .path)
-        try container.encodeIfPresent(setter, forKey: .setter)
-        try converter?.encode(to: encoder)
-        if scope != .default {
-            try container.encode(scope, forKey: .scope)
-        }
-    }
 }
+

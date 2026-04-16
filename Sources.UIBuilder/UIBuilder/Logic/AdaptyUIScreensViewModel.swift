@@ -20,18 +20,29 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     private let logId: String
     private let viewConfiguration: VC
 
-    var isRightToLeft: Bool { viewConfiguration.isRightToLeft }
+    var isRightToLeft: Bool { rtlOverride ?? viewConfiguration.isRightToLeft }
+    
+    private let rtlOverride: Bool?
 
     @Published
     private(set) var navigatorsViewModels: [AdaptyUINavigatorViewModel]
 
     package init(
         logId: String,
-        viewConfiguration: AdaptyUIConfiguration
+        viewConfiguration: AdaptyUIConfiguration,
+        rtlOverride: Bool? = nil
     ) {
         self.logId = logId
+        self.rtlOverride = rtlOverride
         self.viewConfiguration = viewConfiguration
         navigatorsViewModels = []
+    }
+
+    /// Set by state action handler to enable screen lifecycle action execution
+    var executeActions: ((_ actions: [VC.Action], _ screen: VS.ScreenInstance) -> Void)?
+
+    var topmostScreenInstance: VS.ScreenInstance? {
+        navigatorsViewModels.max(by: { $0.order < $1.order })?.screens.last?.instance
     }
 
     func present(
@@ -63,6 +74,7 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
                 appearTransitionId: transitionId
             )
 
+            navigatorVM.executeActions = executeActions
             navigatorsViewModels.append(navigatorVM)
 
             navigatorVM.startNavigatorTransition(
@@ -87,10 +99,18 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
 
         let navigatorVM = navigatorsViewModels[index]
 
+        navigatorVM.publishDismissEvents()
+
         navigatorVM.startNavigatorTransition(
             transitionId: transitionId,
             completion: { [weak self] in
                 guard let self else { return }
+
+                // Fire onDidDisappear for the navigator's screens
+                if let screen = navigatorVM.screens.last {
+                    navigatorVM.executeScreenActions(.onDidDisappear, screen: screen.instance)
+                }
+
                 self.navigatorsViewModels.remove(at: index)
 
                 Log.ui.verbose("#\(self.logId)# dismiss navigator:\(navigatorId) DONE")

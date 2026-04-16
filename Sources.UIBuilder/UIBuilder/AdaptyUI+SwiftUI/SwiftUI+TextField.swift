@@ -53,12 +53,15 @@ extension View {
             Font(attr?.size.map { fa.font.withSize(CGFloat($0)) } ?? fa.font)
         } ?? attr?.size.map { Font.system(size: CGFloat($0)) }
 
+        let tracking = CGFloat(fontAsset?.defaultLetterSpacing ?? 0)
+
         if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             self
                 .font(resolvedFont)
                 .foregroundColor(colorAsset ?? fontAsset?.defaultColor)
                 .underline(attr?.underline ?? false)
                 .strikethrough(attr?.strike ?? false)
+                .tracking(tracking)
         } else {
             self
                 .font(resolvedFont)
@@ -144,6 +147,81 @@ extension View {
                         )
                     }
             }
+        } else {
+            self
+        }
+    }
+}
+
+
+// MARK: - Focus ID
+
+@MainActor
+private struct FocusIdModifier: ViewModifier {
+    let focusId: String
+    @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
+    @EnvironmentObject var navigatorViewModel: AdaptyUINavigatorViewModel
+    @Environment(\.adaptyScreenInstance) var screen: VS.ScreenInstance
+    @FocusState private var isFocused: Bool
+
+    private var onFocusChangeActions: [VC.Action]? {
+        navigatorViewModel.navigator.defaultScreenActions.onFocusChange
+            ?? navigatorViewModel.screens.last?.configuration.screenActions.onFocusChange
+    }
+
+    private func handleFocusChanged(oldFocusId: String?, newFocusId: String?) {
+        if let actions = onFocusChangeActions, !actions.isEmpty {
+            stateViewModel.fireFocusChangeActions(
+                oldFocusId: oldFocusId,
+                newFocusId: newFocusId,
+                actions: actions,
+                screen: screen
+            )
+        }
+    }
+
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+            content
+                .focused($isFocused)
+                .onChange(of: stateViewModel.focusedId) { oldId, newId in
+                    isFocused = (newId == focusId)
+                }
+                .onChange(of: isFocused) { _, focused in
+                    let oldFocusId = stateViewModel.focusedId
+                    if focused {
+                        stateViewModel.focusedId = focusId
+                        handleFocusChanged(oldFocusId: oldFocusId, newFocusId: focusId)
+                    } else if oldFocusId == focusId {
+                        stateViewModel.focusedId = nil
+                        handleFocusChanged(oldFocusId: oldFocusId, newFocusId: nil)
+                    }
+                }
+        } else {
+            content
+                .focused($isFocused)
+                .onChange(of: stateViewModel.focusedId) { newId in
+                    isFocused = (newId == focusId)
+                }
+                .onChange(of: isFocused) { focused in
+                    let oldFocusId = stateViewModel.focusedId
+                    if focused {
+                        stateViewModel.focusedId = focusId
+                        handleFocusChanged(oldFocusId: oldFocusId, newFocusId: focusId)
+                    } else if oldFocusId == focusId {
+                        stateViewModel.focusedId = nil
+                        handleFocusChanged(oldFocusId: oldFocusId, newFocusId: nil)
+                    }
+                }
+        }
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func applyFocusId(_ focusId: String?) -> some View {
+        if let focusId {
+            modifier(FocusIdModifier(focusId: focusId))
         } else {
             self
         }

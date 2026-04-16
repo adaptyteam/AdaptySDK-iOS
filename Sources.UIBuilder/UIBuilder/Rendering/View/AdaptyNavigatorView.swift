@@ -19,7 +19,7 @@ struct AdaptyScreenView: View {
     var screen: VC.Screen
 
     @EnvironmentObject
-    private var paywallViewModel: AdaptyUIPaywallViewModel
+    private var flowViewModel: AdaptyUIFlowViewModel
     @EnvironmentObject
     private var navigatorViewModel: AdaptyUINavigatorViewModel
     @EnvironmentObject
@@ -32,13 +32,23 @@ struct AdaptyScreenView: View {
     private var playOutgoingTransition: [VC.Animation] = []
 
     var body: some View {
+        let incomingAnimations = screenInstance.playIncomingTransition ?? []
+
         templateResolverView(
             screenInstance.configuration.layoutBehaviour,
             screen: screenInstance.configuration
         )
         .withScreenInstance(screenInstance.instance)
         .animatablePropertiesTransition(
-            play: $playIncomingTransition
+            play: $playIncomingTransition,
+            initialOpacity: incomingAnimations.transitionInitialOpacity ?? 1.0,
+            initialScaleX: incomingAnimations.transitionInitialScale?.x ?? 1.0,
+            initialScaleY: incomingAnimations.transitionInitialScale?.y ?? 1.0,
+            initialScaleAnchor: incomingAnimations.transitionInitialScaleAnchor ?? .center,
+            initialRotation: incomingAnimations.transitionInitialRotation ?? .zero,
+            initialRotationAnchor: incomingAnimations.transitionInitialRotationAnchor ?? .center,
+            initialOffset: incomingAnimations.transitionInitialOffset ?? .zero,
+            initialBlurRadius: incomingAnimations.transitionInitialBlurRadius ?? .zero
         )
         .animatablePropertiesTransition(
             play: $playOutgoingTransition
@@ -64,6 +74,22 @@ struct AdaptyScreenView: View {
                 screen.content,
                 screenHolderBuilder: { EmptyView() } // TODO: x check
             )
+            .background {
+                if let background = screen.background {
+                    AdaptyUIBackgroundElementsView(
+                        backgrounds: background,
+                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                    )
+                }
+            }
+            .overlay {
+                if let overlay = screen.overlay {
+                    AdaptyUIOverlayElementsView(
+                        overlays: overlay,
+                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                    )
+                }
+            }
         }
     }
 }
@@ -114,6 +140,7 @@ struct AdaptyNavigatorView: View {
                             }
                             .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
                             .environmentObject(screenInstance)
+                            .environment(\.adaptyScreenInstanceId, screenInstance.instance.id)
                         }
                     }
                 }
@@ -131,6 +158,7 @@ struct AdaptyNavigatorView: View {
             }
         }
         .environmentObject(navigatorViewModel)
+        .environmentObject(navigatorViewModel.eventBus)
         .zIndex(navigatorViewModel.order * 1000.0)
         .onReceive(navigatorViewModel.$contentAnimations) { contentAnimations = $0 ?? [] }
     }
@@ -142,6 +170,61 @@ extension View {
             \.openURL,
             OpenURLAction(handler: handler)
         )
+    }
+}
+
+// MARK: - Transition Initial Values
+
+private extension [VC.Animation] {
+    var transitionInitialOpacity: Double? {
+        for animation in self {
+            if case let .opacity(_, range) = animation { return range.start }
+        }
+        return nil
+    }
+
+    var transitionInitialOffset: VC.Offset? {
+        for animation in self {
+            if case let .offset(_, range) = animation { return range.start }
+        }
+        return nil
+    }
+
+    var transitionInitialScale: (x: Double, y: Double)? {
+        for animation in self {
+            if case let .scale(_, params) = animation {
+                return (params.scale.start.x, params.scale.start.y)
+            }
+        }
+        return nil
+    }
+
+    var transitionInitialScaleAnchor: UnitPoint? {
+        for animation in self {
+            if case let .scale(_, params) = animation { return params.anchor.unitPoint }
+        }
+        return nil
+    }
+
+    var transitionInitialRotation: Angle? {
+        for animation in self {
+            if case let .rotation(_, params) = animation { return .degrees(params.angle.start) }
+        }
+        return nil
+    }
+
+    var transitionInitialRotationAnchor: UnitPoint? {
+        for animation in self {
+            if case let .rotation(_, params) = animation { return params.anchor.unitPoint }
+        }
+        return nil
+    }
+
+    var transitionInitialBlurRadius: Double? {
+        for animation in self {
+            if case let .blur(_, range) = animation { return range.start }
+        }
+        return nil
     }
 }
 

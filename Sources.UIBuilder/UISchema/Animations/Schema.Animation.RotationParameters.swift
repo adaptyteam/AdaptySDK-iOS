@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.Animation.RotationParameters: Codable {
+extension Schema.Animation.RotationParameters: Decodable {
     enum CodingKeys: String, CodingKey {
         case angle
         case anchor
@@ -18,12 +18,5 @@ extension Schema.Animation.RotationParameters: Codable {
         angle = try container.decode(Schema.Animation.Range<Double>.self, forKey: .angle)
         anchor = try container.decodeIfPresent(Schema.Point.self, forKey: .anchor) ?? .center
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(angle, forKey: .angle)
-        if anchor != .center {
-            try container.encode(anchor, forKey: .anchor)
-        }
-    }
 }
+

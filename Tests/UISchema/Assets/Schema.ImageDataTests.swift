@@ -133,37 +133,5 @@ private extension SchemaTests {
                 try invalid.decode(Value.self)
             }
         }
-
-        // MARK: - Encoding Tests
-
-        @Test("encode produces correct structure", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            let obj = try #require(encoded.deserilized as? [String: Any])
-            #expect(obj["type"] as? String == "image")
-            switch value {
-            case let .raster(customId, rasterData):
-                #expect(obj["custom_id"] as? String == customId)
-                #expect(obj["value"] as? String == rasterData.base64EncodedString())
-                #expect(obj["url"] == nil)
-            case let .url(customId, url, previewRaster):
-                #expect(obj["custom_id"] as? String == customId)
-                #expect(obj["url"] as? String == url.absoluteString)
-                #expect(obj["value"] == nil)
-                if let previewRaster {
-                    #expect(obj["preview_value"] as? String == previewRaster.base64EncodedString())
-                } else {
-                    #expect(obj["preview_value"] == nil)
-                }
-            }
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }

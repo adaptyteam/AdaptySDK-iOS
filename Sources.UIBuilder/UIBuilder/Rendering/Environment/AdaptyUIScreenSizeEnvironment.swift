@@ -21,14 +21,20 @@ struct AdaptyUIScreenInstanceKey: EnvironmentKey {
             id: "fake",
             layoutBehaviour: .default,
             cover: nil,
-            content: .unknown("fake", nil),
+            content: .unknown("fake"),
             footer: nil,
             background: nil,
             overlay: nil,
-            screenActions: .empty
+            screenActions: .empty,
+            contentScrollValue: nil,
+            footerScrollValue: nil
         ),
         contextPath: []
     )
+}
+
+struct AdaptyUIScreenInstanceIdKey: EnvironmentKey {
+    static let defaultValue: String? = nil
 }
 
 struct AdaptyUIDisplayMissingTagsKey: EnvironmentKey {
@@ -46,6 +52,11 @@ extension EnvironmentValues {
         set { self[AdaptyUIScreenInstanceKey.self] = newValue }
     }
 
+    var adaptyScreenInstanceId: String? {
+        get { self[AdaptyUIScreenInstanceIdKey.self] }
+        set { self[AdaptyUIScreenInstanceIdKey.self] = newValue }
+    }
+
     var adaptyDisplayMissingTags: Bool {
         get { self[AdaptyUIDisplayMissingTagsKey.self] }
         set { self[AdaptyUIDisplayMissingTagsKey.self] = newValue }
@@ -53,7 +64,7 @@ extension EnvironmentValues {
 }
 
 extension View {
-   package func withScreenSize(_ value: CGSize) -> some View {
+    package func withScreenSize(_ value: CGSize) -> some View {
         environment(\.adaptyScreenSize, value)
     }
 

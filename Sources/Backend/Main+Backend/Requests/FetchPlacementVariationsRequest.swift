@@ -7,7 +7,7 @@
 
 import Foundation
 
-private struct FetchPaywallVariationsRequest: BackendRequest {
+private struct FetchFlowVariationsRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let queryItems: QueryItems
@@ -20,23 +20,21 @@ private struct FetchPaywallVariationsRequest: BackendRequest {
         apiKeyPrefix: String,
         userId: AdaptyUserId,
         placementId: String,
-        locale: AdaptyLocale,
         segmentId: String,
         crossPlacementEligible: Bool,
         disableServerCache: Bool
     ) {
-        let md5Hash = "{\"builder_version\":\"\(Adapty.uiBuilderVersion)\",\(crossPlacementEligible ? "\"cross_placement_eligibility\":true," : "")\"locale\":\"\(locale.id.lowercased())\",\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
+        let md5Hash = "{\"builder_version\":\"\(Adapty.uiBuilderVersion)\",\(crossPlacementEligible ? "\"cross_placement_eligibility\":true," : "")\"segment_hash\":\"\(segmentId)\",\"store\":\"app_store\"}".md5.hexString
 
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall/variations/\(placementId)/\(md5Hash)/"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/\(md5Hash)/"
         )
 
         headers = HTTPHeaders()
-            .setPaywallLocale(locale)
             .setUserProfileId(userId)
-            .setPaywallBuilderVersion(Adapty.uiBuilderVersion)
-            .setPaywallBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
+            .setBuilderVersion(Adapty.uiBuilderVersion)
+            .setBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
             .setCrossPlacementEligibility(crossPlacementEligible)
             .setSegmentId(segmentId)
 
@@ -45,7 +43,6 @@ private struct FetchPaywallVariationsRequest: BackendRequest {
         logParams = [
             "api_prefix": apiKeyPrefix,
             "placement_id": placementId,
-            "locale": locale,
             "segment_id": segmentId,
             "builder_version": Adapty.uiBuilderVersion,
             "builder_config_format_version": Adapty.uiSchemaVersion,
@@ -84,7 +81,7 @@ private struct FetchOnboardingVariationsRequest: BackendRequest {
         headers = HTTPHeaders()
             .setOnboardingLocale(locale)
             .setUserProfileId(userId)
-            .setOnboardingUIVersion(AdaptyOnboarding.ViewConfiguration.uiVersion)
+            .setOnboardingUIVersion(AdaptyOnboarding.viewConfigurationVersion)
             .setCrossPlacementEligibility(crossPlacementEligible)
             .setSegmentId(segmentId)
 
@@ -108,7 +105,7 @@ extension Backend.MainExecutor {
         apiKeyPrefix: String,
         userId: AdaptyUserId,
         placementId: String,
-        locale: AdaptyLocale,
+        locale: AdaptyLocale? = nil,
         segmentId: String,
         cached: Content?,
         crossPlacementEligible: Bool,
@@ -116,12 +113,11 @@ extension Backend.MainExecutor {
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let request: BackendRequest =
-            if Content.self == AdaptyPaywall.self {
-                FetchPaywallVariationsRequest(
+            if Content.self == AdaptyFlow.self {
+                FetchFlowVariationsRequest(
                     apiKeyPrefix: apiKeyPrefix,
                     userId: userId,
                     placementId: placementId,
-                    locale: locale,
                     segmentId: segmentId,
                     crossPlacementEligible: crossPlacementEligible,
                     disableServerCache: disableServerCache
@@ -132,7 +128,7 @@ extension Backend.MainExecutor {
                     apiKeyPrefix: apiKeyPrefix,
                     userId: userId,
                     placementId: placementId,
-                    locale: locale,
+                    locale: locale ?? .defaultPlacementLocale,
                     segmentId: segmentId,
                     crossPlacementEligible: crossPlacementEligible,
                     disableServerCache: disableServerCache

@@ -14,7 +14,7 @@ actor StoreKitPurchaser {
     private let subscriptionOfferSigner: StoreKitSubscriptionOfferSigner
     private let storage: PurchasePayloadStorage
     private let productManager: ProductsManager
-    
+
     private init(
         transactionSynchronizer: StoreKitTransactionSynchronizer,
         subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
@@ -26,10 +26,10 @@ actor StoreKitPurchaser {
         self.storage = storage
         self.productManager = productManager
     }
-    
+
     @AdaptyActor
     private static var isObservingStarted = false
-    
+
     @AdaptyActor
     static func startObserving(
         transactionSynchronizer: StoreKitTransactionSynchronizer,
@@ -56,20 +56,20 @@ actor StoreKitPurchaser {
 
                     Task.detached {
                         await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(signedTransaction: signedTransaction)) }
-                        
+
                         guard !transaction.isXcodeEnvironment else {
                             log.verbose("Skip sending to backend for Xcode environment transaction \(transaction.id)")
                             _ = await transactionSynchronizer.recalculateOfflineAccessLevels()
                             await transactionSynchronizer.attemptToFinish(transaction: transaction, logSource: "updated")
                             return
                         }
-                        
+
                         do {
                             let productOrNil = try? await productsManager.fetchProduct(
                                 id: transaction.productID,
                                 fetchPolicy: .returnCacheDataElseLoad
                             ).asAdaptyProduct
-                                
+
                             try await transactionSynchronizer.report(
                                 .init(
                                     product: productOrNil,
@@ -81,7 +81,7 @@ actor StoreKitPurchaser {
                                 ),
                                 reason: .observing
                             )
-                           
+
                             await transactionSynchronizer.attemptToFinish(transaction: transaction, logSource: "updated")
                         } catch {
                             _ = await transactionSynchronizer.recalculateOfflineAccessLevels()
@@ -92,7 +92,7 @@ actor StoreKitPurchaser {
             }
         }
         isObservingStarted = true
-        
+
         return StoreKitPurchaser(
             transactionSynchronizer: transactionSynchronizer,
             subscriptionOfferSigner: subscriptionOfferSigner,
@@ -100,24 +100,20 @@ actor StoreKitPurchaser {
             productManager: productsManager
         )
     }
-    
+
     func makePurchase(
         userId: AdaptyUserId,
         appAccountToken: UUID?,
         product: AdaptyPaywallProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        guard let product = product as? PaywallProduct else {
-            throw .cantMakePayments()
-        }
-        
         var options = Set<Product.PurchaseOption>()
-        
+
         // options.insert(.simulatesAskToBuyInSandbox(true))
-        
+
         if let uuid = appAccountToken {
             options.insert(.appAccountToken(uuid))
         }
-        
+
         if let offer = product.subscriptionOffer {
             switch offer.offerIdentifier {
             case let .promotional(offerId):
@@ -127,7 +123,7 @@ actor StoreKitPurchaser {
                     for: userId,
                     with: appAccountToken
                 )
-                
+
                 options.insert(
                     .promotionalOffer(
                         offerID: offerId,
@@ -137,7 +133,7 @@ actor StoreKitPurchaser {
                         timestamp: response.timestamp
                     )
                 )
-                
+
             case let .winBack(offerId):
                 if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
                    let winBackOffer = product.skProduct.subscriptionOffer(by: .winBack(offerId))
@@ -146,12 +142,12 @@ actor StoreKitPurchaser {
                 } else {
                     throw StoreKitManagerError.invalidOffer("StoreKit Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
                 }
-                
+
             default:
                 break
             }
         }
-        
+
         await productManager.storeProductInfo(productInfo: [product.productInfo])
         await storage.setPaywallVariationId(product.variationId, productId: product.vendorProductId, userId: userId)
         let payload = await PurchasePayload(
@@ -162,15 +158,15 @@ actor StoreKitPurchaser {
         )
         return try await makePurchase(product.skProduct, options, payload, for: userId)
     }
-    
+
     private func makePurchase(
         _ product: StoreKit.Product,
         _ options: Set<Product.PurchaseOption>,
         _ payload: PurchasePayload,
-        for userId: AdaptyUserId
+        for _: AdaptyUserId
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         let stamp = Log.stamp
-        
+
         Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .productPurchase,
             stamp: stamp,
@@ -178,7 +174,7 @@ actor StoreKitPurchaser {
                 "product_id": product.id,
             ]
         ))
-        
+
         let purchaseResult: Product.PurchaseResult
         do {
             purchaseResult = try await product.unfPurchase(options: options)
@@ -191,7 +187,7 @@ actor StoreKitPurchaser {
             log.error("Failed to purchase product: \(product.id) \(error.localizedDescription)")
             throw StoreKitManagerError.productPurchaseFailed(error).asAdaptyError
         }
-        
+
         let signedTransaction: VerificationResult<StoreKit.Transaction>
         switch purchaseResult {
         case let .success(verificationResult):
@@ -212,9 +208,9 @@ actor StoreKitPurchaser {
                     stamp: stamp,
                     error: error.localizedDescription
                 ))
-                
+
                 await transaction.finish()
-                
+
                 log.error("Finish unverified purchase transaction: \(transaction) of product: \(transaction.productID) error: \(error.localizedDescription)")
                 await storage.removePurchasePayload(forTransaction: transaction)
                 await storage.removeUnfinishedTransaction(transaction.id)
@@ -255,18 +251,18 @@ actor StoreKitPurchaser {
             log.error("Unknown purchase result of product: \(product.id)")
             throw StoreKitManagerError.productPurchaseFailed(nil).asAdaptyError
         }
-        
+
         let transaction = signedTransaction.unsafePayloadValue
-        
+
         await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(signedTransaction: signedTransaction)) }
-        
+
         guard !transaction.isXcodeEnvironment else {
             log.verbose("Skip validation on backend for Xcode environment transaction \(transaction.id)")
             await transactionSynchronizer.attemptToFinish(transaction: transaction, logSource: "purchased")
             let profile = await transactionSynchronizer.recalculateOfflineAccessLevels()
             return .success(profile: profile, transaction: signedTransaction)
         }
-        
+
         do {
             let profile = try await transactionSynchronizer.validate(
                 .init(
@@ -284,3 +280,4 @@ actor StoreKitPurchaser {
         }
     }
 }
+

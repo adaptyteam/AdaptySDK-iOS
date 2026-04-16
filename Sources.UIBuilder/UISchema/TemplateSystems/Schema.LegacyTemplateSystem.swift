@@ -64,10 +64,10 @@ private extension Schema.Screen {
 
 private extension Schema.Element {
     var legacyReferencedElements: [(String, Schema.Element)] {
-        let (legacyElementId, childs): (String?, [Self]?) = switch self {
-        case let .stack(stack, properties): (
-                legacyElementId: properties?.legacyElementId,
-                childs: stack.items
+        var childs: [Self]?
+        if case let .compositeElement(element) = node {
+            if let stack = element as? Schema.Stack {
+                childs = stack.items
                     .compactMap {
                         switch $0 {
                         case .space:
@@ -76,48 +76,24 @@ private extension Schema.Element {
                             element
                         }
                     }
-            )
-        case let .button(button, properties): (
-                legacyElementId: properties?.legacyElementId,
-                childs: [button.normalState, button.selectedState].compactMap(\.self)
-            )
-        case let .box(box, properties): (
-                legacyElementId: properties?.legacyElementId,
-                childs: box.content.map { [$0] }
-            )
-        case let .row(row, properties): (
-                legacyElementId: properties?.legacyElementId,
-                childs: row.items.map(\.content)
-            )
-        case let .column(column, properties): (
-                legacyElementId: properties?.legacyElementId,
-                childs: column.items.map(\.content)
-            )
-        case let .section(section, properties): (
-                legacyElementId: properties?.legacyElementId,
-                childs: section.content
-            )
-        case let .pager(pager, properties): (
-                legacyElementId: properties?.legacyElementId,
-                childs: pager.content
-            )
-        case let .text(_, properties),
-             let .image(_, properties),
-             let .video(_, properties),
-             let .toggle(_, properties),
-             let .timer(_, properties),
-             let .unknown(_, properties): (
-                legacyElementId: properties?.legacyElementId,
-                childs: nil
-            )
-        default: (
-                legacyElementId: nil,
-                childs: nil
-            )
+            } else if let button = element as? Schema.Button {
+                childs = [button.content, button.legacySelectedContent].compactMap(\.self)
+            } else if let box = element as? Schema.Box {
+                childs = box.content.map { [$0] }
+            } else if let row = element as? Schema.Row {
+                childs = row.items.map(\.content)
+            } else if let column = element as? Schema.Column {
+                childs = column.items.map(\.content)
+            } else if let section = element as? Schema.Section {
+                childs = section.content
+            } else if let pager = element as? Schema.Pager {
+                childs = pager.content
+            }
         }
 
         let legacyReferencedElements = childs?.flatMap(\.legacyReferencedElements) ?? []
-        return if let legacyElementId {
+
+        return if let legacyElementId = properties?.legacyElementId {
             [(legacyElementId, self)] + legacyReferencedElements
         } else {
             legacyReferencedElements

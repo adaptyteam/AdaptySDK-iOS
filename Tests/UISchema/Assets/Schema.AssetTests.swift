@@ -48,7 +48,17 @@ private extension SchemaTests {
             ),
             // font
             (
-                .font(Schema.Font(customId: nil, alias: "Helvetica", familyName: "adapty_system", weight: 400, italic: false, defaultSize: 15, defaultColor: defaultFontColor)),
+                .font(Schema.Font(
+                    customId: nil,
+                    alias: "Helvetica",
+                    familyName: "adapty_system",
+                    weight: 400,
+                    italic: false,
+                    defaultSize: 15,
+                    defaultColor: defaultFontColor,
+                    defaultLetterSpacing: nil,
+                    defaultLineHeight: nil
+                )),
                 Json(##"""
                 {
                     "type": "font",
@@ -152,40 +162,6 @@ private extension SchemaTests {
                 try invalid.decode(Value.self)
             }
         }
-
-        // MARK: - Encoding Tests
-
-        @Test("encode produces correct type", arguments: jsonCases.map(\.value))
-        func encode(value: Value) throws {
-            let encoded = try Json.encode(value)
-            let obj = try #require(encoded.deserilized as? [String: Any])
-            switch value {
-            case let .solidColor(color):
-                #expect(obj["type"] as? String == "color")
-                #expect(obj["custom_id"] as? String == color.customId)
-                #expect(obj["value"] as? String == color.rawValue)
-            case let .colorGradient(gradient):
-                #expect(obj["type"] as? String == gradient.kind.rawValue)
-                #expect(obj["custom_id"] as? String == gradient.customId)
-            case .font:
-                #expect(obj["type"] as? String == "font")
-            case let .image(image):
-                #expect(obj["type"] as? String == "image")
-                #expect(obj["custom_id"] as? String == image.customId)
-            case let .video(video):
-                #expect(obj["type"] as? String == "video")
-                #expect(obj["custom_id"] as? String == video.customId)
-            case .unknown:
-                break
-            }
-        }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: Value) throws {
-            let decoded = try Json.encode(value).decode(Value.self)
-            #expect(decoded == value)
-        }
     }
 }
+

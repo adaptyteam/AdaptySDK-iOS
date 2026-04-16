@@ -39,6 +39,16 @@ struct AdaptyUITextView: View {
             productsInfoProvider: productsViewModel
         )
 
+        let defaultFontAsset = assetsViewModel.cache.cachedAsset(
+            text.defaultTextAttributes?.fontAssetId,
+            mode: colorScheme.toVCMode,
+            screen: screen
+        ).asFontAsset
+
+        let lineSpacing: CGFloat? = (text.defaultTextAttributes?.lineHeight ?? defaultFontAsset?.defaultLineHeight).map { lineHeight in
+            CGFloat(lineHeight) - (defaultFontAsset?.font.lineHeight ?? 0)
+        }
+
         switch productInfo {
         case .notApplicable:
             richText
@@ -56,6 +66,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
+                .applyLineSpacing(lineSpacing)
         case .notFound:
             richText
                 .convertToSwiftUIText(
@@ -73,6 +84,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
+                .applyLineSpacing(lineSpacing)
                 .redacted(reason: .placeholder)
         case let .found(productInfoModel):
             richText
@@ -90,6 +102,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
+                .applyLineSpacing(lineSpacing)
         }
     }
 }
@@ -272,6 +285,17 @@ extension VC.RichText {
     }
 }
 
+extension View {
+    @ViewBuilder
+    func applyLineSpacing(_ lineSpacing: CGFloat?) -> some View {
+        if let lineSpacing {
+            self.lineSpacing(lineSpacing)
+        } else {
+            self
+        }
+    }
+}
+
 extension UIImage {
     func imageWith(newSize: CGSize) -> UIImage {
         let image = UIGraphicsImageRenderer(size: newSize).image { _ in
@@ -375,6 +399,10 @@ extension AttributedString {
 
         if attributes?.underline ?? false {
             result.underlineStyle = .single
+        }
+
+        if let letterSpacing = attributes?.letterSpacing ?? fontAsset?.defaultLetterSpacing {
+            result.kern = CGFloat(letterSpacing)
         }
 
         result.link = link

@@ -11,13 +11,26 @@ protocol Emptiable {
 
 extension Emptiable {
     @inlinable
-    var nonEmptyOrNil: Self? { isEmpty ? nil : self }
+    var nonEmptyOrNil: Self? {
+        isEmpty ? nil : self
+    }
+
     @inlinable
-    var isNotEmpty: Bool { !isEmpty }
+    var isNotEmpty: Bool {
+        !isEmpty
+    }
 }
 
 extension Optional where Wrapped: Emptiable {
-    var nonEmptyOrNil: Self { self?.nonEmptyOrNil }
-    var isEmpty: Bool { self?.isEmpty ?? true }
-    var isNotEmpty: Bool { !isEmpty }
+    var nonEmptyOrNil: Self {
+        self?.nonEmptyOrNil
+    }
+
+    var isEmpty: Bool {
+        self?.isEmpty ?? true
+    }
+
+    var isNotEmpty: Bool {
+        !isEmpty
+    }
 }

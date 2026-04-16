@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.Animation.Range: Codable where T: Codable {
+extension Schema.Animation.Range: Decodable where T: Decodable {
     enum CodingKeys: String, CodingKey {
         case start
         case end
@@ -18,10 +18,5 @@ extension Schema.Animation.Range: Codable where T: Codable {
         start = try container.decode(T.self, forKey: .start)
         end = try container.decode(T.self, forKey: .end)
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(start, forKey: .start)
-        try container.encode(end, forKey: .end)
-    }
 }
+

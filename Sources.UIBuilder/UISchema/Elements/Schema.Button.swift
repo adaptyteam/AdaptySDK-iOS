@@ -8,38 +8,37 @@
 import Foundation
 
 extension Schema {
-    struct Button: Sendable, Hashable {
+    struct Button: Sendable {
         let actions: [Schema.Action]
-        let normalState: Schema.Element
-        let selectedState: Schema.Element?
-        let isSelectedState: Schema.Variable?
+        let content: Schema.Element
+        let legacySelectedContent: Schema.Element?
+        let legacyIsSelected: Schema.Variable?
     }
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Button: Schema.CompositeElement {
     @inlinable
-    func planButton(
-        _ from: Schema.Button,
-        in taskStack: inout TasksStack
-    ) {
-        if let sel = from.selectedState {
-            taskStack.append(.planElement(sel))
+    func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
+        taskStack.append(.planElement(content))
+        if let legacySelectedContent {
+            taskStack.append(.planElement(legacySelectedContent))
         }
-        taskStack.append(.planElement(from.normalState))
     }
 
     @inlinable
-    func buildButton(
-        _ from: Schema.Button,
-        _ resultStack: inout ResultStack
-    ) throws(Schema.Error) -> VC.Button {
-        let selectedState = try resultStack.popLastElement(from.selectedState != nil)
-        let normalState = try resultStack.popLastElement()
-        return .init(
-            actions: from.actions,
-            normalState: normalState,
-            selectedState: selectedState,
-            isSelectedState: from.isSelectedState
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+    ) throws(Schema.Error) -> VC.Element {
+        try .button(
+            .init(
+                actions: actions,
+                content: resultStack.popLastElement(),
+                legacySelectedContent: resultStack.popLastElement(legacySelectedContent != nil),
+                legacyIsSelected: legacyIsSelected
+            ),
+            properties
         )
     }
 }
@@ -47,9 +46,10 @@ extension Schema.ConfigurationBuilder {
 extension Schema.Button: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case actions = "action"
-        case normalState = "normal"
-        case selectedState = "selected"
-        case isSelectedState = "is_selected"
+        case content
+        case legacyNormalContent = "normal"
+        case legacySelectedContent = "selected"
+        case legacyIsSelected = "is_selected"
         case legacySelectedCondition = "selected_condition"
     }
 
@@ -57,42 +57,49 @@ extension Schema.Button: DecodableWithConfiguration {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         guard configuration.isLegacy else {
+            let contentKey: CodingKeys =
+                if container.contains(.content), !container.contains(.legacyNormalContent)
+                { .content } else { .legacyNormalContent }
             try self.init(
                 actions: container.decodeActions(forKey: .actions),
-                normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
-                selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState, configuration: configuration),
-                isSelectedState: container.decodeIfPresent(Schema.Variable.self, forKey: .isSelectedState)
+                content: container.decode(Schema.Element.self, forKey: contentKey, configuration: configuration),
+                legacySelectedContent: container.decodeIfExist(Schema.Element.self, forKey: .legacySelectedContent, configuration: configuration),
+                legacyIsSelected: container.decodeIfPresent(Schema.Variable.self, forKey: .legacyIsSelected)
             )
             return
         }
 
-        let isSelectedState: Schema.Variable? = switch try container.decodeIfPresent(
+        let legacySelectedCondition = try container.decodeIfPresent(
             Schema.LegacyStateCondition.self,
             forKey: .legacySelectedCondition
-        ) {
-        case let .selectedProduct(productId, groupId):
-            .init(
-                path: ["Legacy", "productGroup", groupId],
-                setter: nil,
-                scope: .global,
-                converter: .isEqual(.string(productId), falseValue: nil)
-            )
-        case let .selectedSection(sectionId, index):
-            .init(
-                path: ["Legacy", "sections", sectionId],
-                setter: nil,
-                scope: .global,
-                converter: .isEqual(.int32(index), falseValue: nil)
-            )
-        default:
-            nil
-        }
+        )
+
+        let isSelectedState: Schema.Variable? =
+            switch legacySelectedCondition {
+            case let .selectedProduct(productId, groupId):
+                .init(
+                    path: ["Legacy", "productGroup", groupId],
+                    setter: nil,
+                    scope: .global,
+                    converter: Schema.Variable.IsEqualConvertor(value: Schema.AnyValue(productId), falseValue: nil)
+                )
+            case let .selectedSection(sectionId, index):
+                .init(
+                    path: ["Legacy", "sections", sectionId],
+                    setter: nil,
+                    scope: .global,
+                    converter: Schema.Variable.IsEqualConvertor(value: Schema.AnyValue(index), falseValue: nil)
+                )
+            default:
+                nil
+            }
 
         try self.init(
             actions: container.decodeActions(forKey: .actions),
-            normalState: container.decode(Schema.Element.self, forKey: .normalState, configuration: configuration),
-            selectedState: container.decodeIfPresent(Schema.Element.self, forKey: .selectedState, configuration: configuration),
-            isSelectedState: isSelectedState
+            content: container.decode(Schema.Element.self, forKey: .legacyNormalContent, configuration: configuration),
+            legacySelectedContent: container.decodeIfExist(Schema.Element.self, forKey: .legacySelectedContent, configuration: configuration),
+            legacyIsSelected: isSelectedState
         )
     }
 }
+

@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 extension Schema {
-    struct ScreensCollection: Sendable, Hashable {
+    struct ScreensCollection: Sendable {
         let screens: [ScreenType: Screen]
         let legacyGeneratedNavigators: [NavigatorIdentifier: Navigator]?
     }
@@ -152,13 +153,16 @@ private extension Decoder {
         return Schema.Navigator(
             id: navigatorId,
             background: navigatorBackground,
-            content: .box(.init(
-                width: .fillMax,
-                height: .fillMax,
-                horizontalAlignment: .center,
-                verticalAlignment: .bottom,
-                content: .screenHolder
-            ), nil),
+            content: .init(
+                properties: nil,
+                node: .compositeElement(Schema.Box(
+                    width: .fillMax,
+                    height: .fillMax,
+                    horizontalAlignment: .center,
+                    verticalAlignment: .bottom,
+                    content: .screenHolder
+                ))
+            ),
             order: Schema.Navigator.default.order + 100,
             appearances: [
                 VC.Navigator.AppearanceTransition.onAppearKey: onAppear,
@@ -169,13 +173,19 @@ private extension Decoder {
                 onOutsideTap: [.init(
                     path: ["SDK", "closeScreen"],
                     params: [
-                        "navigatorId": .string(navigatorId),
-                        "transitionId": .string(VC.Navigator.AppearanceTransition.onDisappearKey),
+                        "navigatorId": VC.AnyValue(navigatorId),
+                        "transitionId": VC.AnyValue(VC.Navigator.AppearanceTransition.onDisappearKey),
                     ],
                     scope: .global
                 )],
-                onDeviceBack: nil
+                onDeviceBack: nil,
+                onFocusChange: nil,
+                onWillAppear: nil,
+                onWillDisappear: nil,
+                onDidAppear: nil,
+                onDidDisappear: nil
             )
         )
     }
 }
+

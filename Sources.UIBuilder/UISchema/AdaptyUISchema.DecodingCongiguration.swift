@@ -19,6 +19,7 @@ extension AdaptyUISchema {
 
     final class DecodingCollector {
         var legacySectionsState: [String: Int32] = [:]
+        var legacyTimers: [String: String] = [:]
     }
 }
 

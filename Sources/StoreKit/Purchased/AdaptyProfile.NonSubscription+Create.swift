@@ -5,9 +5,9 @@
 //  Created by Aleksei Valiano on 01.08.2025.
 //
 
-//import StoreKit
+// import StoreKit
 //
-//extension AdaptyProfile.NonSubscription {
+// extension AdaptyProfile.NonSubscription {
 //    init(
 //        transaction: StoreKit.Transaction
 //    ) {
@@ -22,4 +22,4 @@
 //            isConsumable: transaction.productType == .consumable
 //        )
 //    }
-//}
+// }

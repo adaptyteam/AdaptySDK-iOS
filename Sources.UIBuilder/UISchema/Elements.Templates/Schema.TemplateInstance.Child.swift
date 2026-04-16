@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema.TemplateInstance {
-    enum Child: Sendable, Hashable {
+    enum Child: Sendable {
         case element(Schema.Element)
         case array([Self])
 
@@ -82,9 +82,6 @@ extension Schema.TemplateInstance {
 //        return nil
 //    }
 //
-//    func encode(to encoder: any Encoder) throws {
-//        // TODO: implement after Element encodable
-//    }
 // }
 //
 // private extension SingleValueDecodingContainer {

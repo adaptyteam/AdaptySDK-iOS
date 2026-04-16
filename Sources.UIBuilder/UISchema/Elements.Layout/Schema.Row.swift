@@ -8,32 +8,32 @@
 import Foundation
 
 extension Schema {
-    struct Row: Sendable, Hashable {
+    struct Row: Sendable {
         let spacing: Double
         let items: [GridItem]
     }
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Row: Schema.CompositeElement {
     @inlinable
-    func planRow(
-        _ from: Schema.Row,
-        in taskStack: inout TasksStack
-    ) {
-        for item in from.items.reversed() {
+    func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
+        for item in items.reversed() {
             taskStack.append(.planElement(item.content))
         }
     }
 
     @inlinable
-    func buildRow(
-        _ from: Schema.Row,
-        _ resultStack: inout ResultStack
-    ) throws(Schema.Error) -> VC.Row {
-        let elements = try resultStack.popLastElements(from.items.count)
-        return .init(
-            spacing: from.spacing,
-            items: convertGridItems(from.items, elements)
+    func buildElement(
+        _ builder: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+    ) throws(Schema.Error) -> VC.Element {
+        try .row(
+            .init(
+                spacing: spacing,
+                items: builder.convertGridItems(items, resultStack.popLastElements(items.count))
+            ),
+            properties
         )
     }
 }

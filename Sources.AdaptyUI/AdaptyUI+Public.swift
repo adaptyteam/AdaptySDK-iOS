@@ -1,5 +1,5 @@
 //
-//  AdaptyPaywallControllerDelegate.swift
+//  AdaptyFlowControllerDelegate.swift
 //
 //
 //  Created by Alexey Goncharov on 27.1.23..
@@ -47,46 +47,46 @@ import UIKit
 
 /// Implement this protocol to respond to different events happening inside the purchase screen.
 @MainActor
-public protocol AdaptyPaywallControllerDelegate: AnyObject {
+public protocol AdaptyFlowControllerDelegate: AnyObject {
     /// This method is invoked when the paywall view was presented.
     ///
     /// - Parameters:
-    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
-    func paywallControllerDidAppear(_ controller: AdaptyPaywallController)
+    ///     - controller: an ``AdaptyFlowController`` within which the event occurred.
+    func flowControllerDidAppear(_ controller: AdaptyFlowController)
 
     /// This method is invoked when the paywall view was dismissed.
     ///
     /// - Parameters:
-    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
-    func paywallControllerDidDisappear(_ controller: AdaptyPaywallController)
+    ///     - controller: an ``AdaptyFlowController`` within which the event occurred.
+    func flowControllerDidDisappear(_ controller: AdaptyFlowController)
 
     /// If user performs an action process, this method will be invoked.
     ///
     /// - Parameters:
-    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///     - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///     - action: an ``AdaptyUI.Action`` value.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didPerform action: AdaptyUI.Action
     )
 
     /// If product was selected for purchase (by user or by system), this method will be invoked.
     ///
     /// - Parameters:
-    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///     - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///     - product: an ``AdaptyPaywallProduct`` which was selected.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
-        didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
+    func flowController(
+        _ controller: AdaptyFlowController,
+        didSelectProduct product: AdaptyPaywallProduct
     )
 
     /// If user initiates the purchase process, this method will be invoked.
     ///
     /// - Parameters:
-    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///     - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///     - product: an ``AdaptyPaywallProduct`` of the purchase.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didStartPurchase product: AdaptyPaywallProduct
     )
 
@@ -97,22 +97,22 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     /// controller.dismiss(animated: true)
     /// ```
     /// - Parameters:
-    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
     ///   - purchaseResult: an ``AdaptyPurchaseResult`` object containing up to date information about successful purchase.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFinishPurchase product: AdaptyPaywallProduct,
         purchaseResult: AdaptyPurchaseResult
     )
 
     /// This method is invoked when the purchase process fails.
     /// - Parameters:
-    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
     ///   - error: an ``AdaptyError`` object representing the error.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailPurchase product: AdaptyPaywallProduct,
         error: AdaptyError
     )
@@ -120,8 +120,8 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     /// If user initiates the restore process, this method will be invoked.
     ///
     /// - Parameters:
-    ///     - controller: an ``AdaptyPaywallController`` within which the event occurred.
-    func paywallControllerDidStartRestore(_ controller: AdaptyPaywallController)
+    ///     - controller: an ``AdaptyFlowController`` within which the event occurred.
+    func flowControllerDidStartRestore(_ controller: AdaptyFlowController)
 
     /// This method is invoked when a successful restore is made.
     ///
@@ -131,63 +131,77 @@ public protocol AdaptyPaywallControllerDelegate: AnyObject {
     /// ```
     ///
     /// - Parameters:
-    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - profile: an ``AdaptyProfile`` object containing up to date information about the user.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFinishRestoreWith profile: AdaptyProfile
     )
 
     /// This method is invoked when the restore process fails.
     /// - Parameters:
-    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - error: an ``AdaptyError`` object representing the error.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailRestoreWith error: AdaptyError
     )
 
     /// This method will be invoked in case of errors during the screen rendering process.
     /// - Parameters:
-    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - error: an ``AdaptyError`` object representing the error.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailRenderingWith error: AdaptyUIError
     )
 
     /// This method is invoked in case of errors during the products loading process.
     /// - Parameters:
-    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - error: an ``AdaptyError`` object representing the error.
     /// - Returns: Return `true`, if you want to retry products fetching.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailLoadingProductsWith error: AdaptyError
     ) -> Bool
 
     /// This method is invoked if there was a propblem with loading a subset of paywall's products.
     /// - Parameters:
-    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - failedIds: an array with product ids which was failed to load.
     /// - Returns: Return `true`, if you want to retry products fetching.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didPartiallyLoadProducts failedIds: [String]
     )
 
     /// This method is invoked when the web payment navigation is finished.
     /// - Parameters:
-    ///   - controller: an ``AdaptyPaywallController`` within which the event occurred.
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
     ///   - error: an ``AdaptyError`` object representing the error.
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
         error: AdaptyError?
     )
-}
 
+    /// This method is invoked when a custom analytic event is fired from the flow's script.
+    ///
+    /// Use this to forward flow-level analytics to your own analytics provider (e.g. Amplitude, Mixpanel).
+    /// Only events explicitly marked as customer-facing by the flow configuration are delivered here.
+    ///
+    /// - Parameters:
+    ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
+    ///   - name: the event name (e.g. `"paywall_opened"`, `"cta_tapped"`).
+    ///   - params: an arbitrary dictionary of event parameters. The contents depend on the flow configuration and may include internal keys.
+    func flowController(
+        _ controller: AdaptyFlowController,
+        didReceiveAnalyticEvent name: String,
+        params: [String: any Sendable]
+    )
+}
 
 public typealias AdaptyTimerResolver = AdaptyUITimerResolver
 
@@ -197,18 +211,24 @@ public typealias AdaptyAssetsResolver = AdaptyUIAssetsResolver
 
 public typealias AdaptyCustomAsset = AdaptyUICustomAsset
 
+public typealias AdaptySystemRequestsHandler = AdaptyUISystemRequestsHandler
+
+public typealias AdaptyPermission = AdaptyUIPermission
+
+public typealias AdaptyPermissionResult = AdaptyUIPermissionResult
+
 #endif
 
 public protocol AdaptyObserverModeResolver: Sendable {
     func observerMode(
         didInitiatePurchase product: AdaptyPaywallProduct,
-        onStartPurchase: @MainActor @escaping () -> Void,
-        onFinishPurchase: @MainActor @escaping () -> Void
+        onStartPurchase: @MainActor @Sendable @escaping () -> Void,
+        onFinishPurchase: @MainActor @Sendable @escaping () -> Void
     )
-    
+
     func observerModeDidInitiateRestorePurchases(
-        onStartRestore: @MainActor @escaping () -> Void,
-        onFinishRestore: @MainActor @escaping () -> Void
+        onStartRestore: @MainActor @Sendable @escaping () -> Void,
+        onFinishRestore: @MainActor @Sendable @escaping () -> Void
     )
 }
 
@@ -230,7 +250,7 @@ public extension AdaptyUI {
 
         Log.ui.verbose("Calling AdaptyUI activate [\(stamp)] with params: \(logParams)")
 
-#if canImport(UIKit)
+        #if canImport(UIKit)
         let sdk: Adapty
 
         do {
@@ -254,11 +274,11 @@ public extension AdaptyUI {
         AdaptyUIBuilder.ImageUrlPrefetcher.shared.initialize()
 
         Log.ui.info("AdaptyUI activated successfully. [\(stamp)]")
-#else
+        #else
         let err = AdaptyUIError.platformNotSupported
         Log.ui.error("AdaptyUI activate [\(stamp)] encountered an error: \(err).")
         throw err
-#endif
+        #endif
     }
 }
 
@@ -276,15 +296,16 @@ public extension AdaptyUI {
     ///   - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
     ///   - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
     /// - Returns: an ``AdaptyPaywallConfiguration`` object.
-    static func getPaywallConfiguration(
-        forPaywall paywall: AdaptyPaywall,
+    static func getFlowConfiguration(
+        forFlow flow: AdaptyFlow,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
-        assetsResolver: AdaptyUIAssetsResolver? = nil
-    ) async throws -> PaywallConfiguration {
+        assetsResolver: AdaptyUIAssetsResolver? = nil,
+        systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
+    ) async throws -> FlowConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyUINotActivated
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
@@ -293,41 +314,43 @@ public extension AdaptyUI {
         }
 
         let viewConfiguration = try await Adapty.getUIConfiguration(
-            paywall: paywall,
+            flow: flow,
+            locale: nil, // TODO: x ??
             loadTimeout: loadTimeout
         )
 
-        return PaywallConfiguration(
+        return FlowConfiguration(
             logId: Log.stamp,
-            paywall: paywall,
+            flow: flow,
             viewConfiguration: viewConfiguration,
             products: products,
             observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
             timerResolver: timerResolver,
-            assetsResolver: assetsResolver
+            assetsResolver: assetsResolver,
+            systemRequestsHandler: systemRequestsHandler
         )
     }
 
-    /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyPaywallController`` to present it afterwards.
+    /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyFlowController`` to present it afterwards.
     ///
     /// - Parameters:
     ///   - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
-    ///   - delegate: the object that implements the ``AdaptyPaywallControllerDelegate`` protocol. Use it to respond to different events happening inside the purchase screen.
-    /// - Returns: an ``AdaptyPaywallController`` object, representing the requested paywall screen.
-    static func paywallController(
-        with paywallConfiguration: PaywallConfiguration,
-        delegate: AdaptyPaywallControllerDelegate,
+    ///   - delegate: the object that implements the ``AdaptyFlowControllerDelegate`` protocol. Use it to respond to different events happening inside the purchase screen.
+    /// - Returns: an ``AdaptyFlowController`` object, representing the requested paywall screen.
+    static func flowController(
+        with flowConfiguration: FlowConfiguration,
+        delegate: AdaptyFlowControllerDelegate,
         showDebugOverlay: Bool = false
-    ) throws -> AdaptyPaywallController {
+    ) throws -> AdaptyFlowController {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyUINotActivated
-            Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
+            Log.ui.error("AdaptyUI flowController(for:) error: \(err)")
             throw err
         }
 
-        return AdaptyPaywallController(
-            paywallConfiguration: paywallConfiguration,
+        return AdaptyFlowController(
+            paywallConfiguration: flowConfiguration,
             delegate: delegate,
             showDebugOverlay: showDebugOverlay
         )

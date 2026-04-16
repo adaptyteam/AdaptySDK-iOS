@@ -50,12 +50,28 @@ package final class AdaptyUIStateHolder {
 }
 
 @MainActor
-package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
+package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUITimerCallbackHandler {
     private let productsViewModel: AdaptyUIProductsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
 
     private let logic: AdaptyUIBuilderLogic
     private weak var state: AdaptyUIState?
+
+    package weak var stateViewModel: AdaptyUIStateViewModel? {
+        didSet {
+            stateViewModel?.onAlertDialogResponse = { [weak self] actionId, screenInstance in
+                self?.handleAlertDialogResponse(actionId: actionId, screenInstance: screenInstance)
+            }
+        }
+    }
+
+    package weak var timerViewModel: AdaptyUITimerViewModel?
+
+    package var systemRequestsHandler: AdaptyUISystemRequestsHandler?
+
+    private nonisolated(unsafe) var pendingAlertDialogCallback: VS.JSAction?
+    private nonisolated(unsafe) var pendingPermissionCallback: VS.JSAction?
+    private nonisolated(unsafe) var pendingTimerCallbacks: [String: VS.JSAction] = [:]
 
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
@@ -70,6 +86,9 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     package nonisolated func registerState(_ state: AdaptyUIState) {
         Task { @MainActor [weak self] in
             self?.state = state
+            self?.screensViewModel.executeActions = { [weak state] actions, screen in
+                try? state?.execute(actions: actions, screenInstance: screen)
+            }
         }
     }
 
@@ -112,7 +131,6 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
 
     package nonisolated func purchaseProduct(
         productId: String,
-        paywallId _: String,
         service: VC.Action.PaymentService
     ) {
         Task { @MainActor [weak self] in
@@ -142,15 +160,14 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
     }
 
     package nonisolated func selectProduct(
-        productId: String,
-        paywallId: String
+        productId: String
     ) {
         Task { @MainActor [weak self] in
             // TODO: move animation out of here
             withAnimation(.linear(duration: 0.0)) {
                 self?.productsViewModel.selectProduct(
                     id: productId,
-                    forGroupId: paywallId // TODO: x check
+                    forGroupId: "paywallId deprecated" // TODO: x check
                 )
             }
         }
@@ -164,10 +181,9 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             self?.screensViewModel.present(
                 screen: instance,
                 transitionId: transitionId,
-                completion: {
-                    // TODO: x report completion to Script
-                }
+                completion: nil
             )
+            self?.logic.logScreenShowed(screenInstanceId: instance.id)
         }
     }
 
@@ -179,10 +195,168 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler {
             self?.screensViewModel.dismiss(
                 navigatorId: navigatorId,
                 transitionId: transitionId,
-                completion: {
-                    // TODO: x report completion to Script
-                }
+                completion: nil
             )
+        }
+    }
+
+    package nonisolated func changeFocus(
+        id: String?
+    ) {
+        Task { @MainActor [weak self] in
+            self?.stateViewModel?.focusedId = id
+        }
+    }
+
+    package nonisolated func setTimer(
+        id: String,
+        endAt: Date,
+        callback: VS.JSAction?
+    ) {
+        if let callback { pendingTimerCallbacks[id] = callback }
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let cb = self.pendingTimerCallbacks.removeValue(forKey: id)
+            self.timerViewModel?.setEndDate(id: id, date: endAt, callback: cb)
+        }
+    }
+
+    package nonisolated func setTimer(
+        id: String,
+        duration: TimeInterval,
+        behavior: VS.SetTimerBehavior,
+        callback: VS.JSAction?
+    ) {
+        if let callback { pendingTimerCallbacks[id] = callback }
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let cb = self.pendingTimerCallbacks.removeValue(forKey: id)
+            self.timerViewModel?.setDuration(id: id, duration: duration, behavior: behavior, callback: cb)
+        }
+    }
+
+    package nonisolated func moveScroll(
+        instanceId: String,
+        kind: VS.ScrollKind,
+        value: VS.ScrollValue
+    ) {
+        Task { @MainActor [weak self] in
+            self?.stateViewModel?.scrollCommand = .init(instanceId: instanceId, kind: kind, value: value)
+        }
+    }
+
+    package nonisolated func showAlertDialog(
+        params: VS.ShowAlertDialogParameters,
+        callback: VS.JSAction?
+    ) {
+        pendingAlertDialogCallback = callback
+        Task { @MainActor [weak self] in
+            self?.stateViewModel?.showAlertDialog(params: params)
+        }
+    }
+
+    package func handleAlertDialogResponse(actionId: String?, screenInstance: VS.ScreenInstance?) {
+        let callback = pendingAlertDialogCallback
+        pendingAlertDialogCallback = nil
+
+        guard let callback, let screenInstance else { return }
+        let response = VS.ShowAlertDialogParametersResponse(actionId: actionId)
+        do {
+            try state?.execute(action: callback, params: response, screenInstance: screenInstance)
+        } catch {
+            Log.ui.error("alertDialog callback error: \(error)")
+        }
+    }
+
+    package func handleTimerCallback(timerId: String, callback: VS.JSAction) {
+        guard let screenInstance = screensViewModel.topmostScreenInstance else { return }
+        let response = VS.TimerResponse(timerId: timerId)
+        do {
+            try state?.execute(action: callback, params: response, screenInstance: screenInstance)
+        } catch {
+            Log.ui.error("timer callback error: \(error)")
+        }
+    }
+
+    package nonisolated func showAppRate() {
+        Task { @MainActor [weak self] in
+            await self?.systemRequestsHandler?.handleAppReviewRequest()
+        }
+    }
+
+    package nonisolated func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction?) {
+        pendingPermissionCallback = callback
+        Task { @MainActor [weak self] in
+            guard let self, let handler = self.systemRequestsHandler else { return }
+
+            let permission = AdaptyUIPermission(jsString: params.permission ?? "custom")
+            let result = await handler.handlePermission(permission, withCustomArgs: params.customArgs)
+
+            let callback = self.pendingPermissionCallback
+            self.pendingPermissionCallback = nil
+
+            guard let callback, let screenInstance = self.screensViewModel.topmostScreenInstance else { return }
+
+            let response = VS.ShowRequestPermissionParametersResponse(
+                request: params,
+                result: result.isGranted,
+                detailResult: result.detail
+            )
+
+            do {
+                try self.state?.execute(
+                    action: callback,
+                    params: response,
+                    screenInstance: screenInstance
+                )
+            } catch {
+                Log.ui.error("showRequestPermission callback error: \(error)")
+            }
+        }
+    }
+
+    package nonisolated func sendEvents(instanceId: String?, eventIds: [String]) {
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+
+            for eventIdStr in eventIds {
+                let eventId = VC.EventHandler.EventId.custom(eventIdStr)
+
+                if let instanceId {
+                    for navigatorVM in self.screensViewModel.navigatorsViewModels {
+                        if navigatorVM.currentScreenInstanceIfSingle?.id == instanceId {
+                            navigatorVM.eventBus.publish(
+                                eventId: eventId,
+                                transitionId: nil,
+                                screenInstanceId: instanceId
+                            )
+                        }
+                    }
+                } else {
+                    for navigatorVM in self.screensViewModel.navigatorsViewModels {
+                        navigatorVM.eventBus.publish(
+                            eventId: eventId,
+                            transitionId: nil,
+                            screenInstanceId: nil
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    package nonisolated func sendAnalyticEvent(_ event: VS.AnalyticEvent) {
+        Task { @MainActor [weak self] in
+            if event.isBackend {
+                self?.logic.reportBackendAnalyticEvent(event)
+            }
+
+            if event.isCustomer {
+                self?.logic.reportCustomerAnalyticEvent(
+                    name: event.name,
+                    params: event.params
+                )
+            }
         }
     }
 }

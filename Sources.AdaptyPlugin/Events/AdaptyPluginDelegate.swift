@@ -45,10 +45,10 @@ import UIKit
 
 extension AdaptyPlugin {
     static let xibName = "AdaptyOnboardingPlaceholderView"
-    
+
     static func instantiateOnboardingPlaceholderView() -> UIView? {
         guard Bundle.main.path(forResource: xibName, ofType: "nib") != nil else { return nil }
-        
+
         return Bundle.main.loadNibNamed(
             xibName,
             owner: nil,
@@ -57,120 +57,120 @@ extension AdaptyPlugin {
     }
 }
 
-extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
-    func paywallControllerDidAppear(
-        _ controller: AdaptyPaywallController
+extension AdaptyPluginDelegate: AdaptyFlowControllerDelegate {
+    func flowControllerDidAppear(
+        _ controller: AdaptyFlowController
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidAppear(
+        eventHandler.handle(event: FlowViewEvent.DidAppear(
             view: controller.toAdaptyUIView()
         ))
     }
 
-    func paywallControllerDidDisappear(
-        _ controller: AdaptyPaywallController
+    func flowControllerDidDisappear(
+        _ controller: AdaptyFlowController
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidDisappear(
+        eventHandler.handle(event: FlowViewEvent.DidDisappear(
             view: controller.toAdaptyUIView()
         ))
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didPerform action: AdaptyUI.Action
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidUserAction(
+        eventHandler.handle(event: FlowViewEvent.DidUserAction(
             view: controller.toAdaptyUIView(),
             action: action
         ))
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
-        didSelectProduct product: AdaptyPaywallProductWithoutDeterminingOffer
+    func flowController(
+        _ controller: AdaptyFlowController,
+        didSelectProduct product: AdaptyPaywallProduct
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidSelectProduct(
+        eventHandler.handle(event: FlowViewEvent.DidSelectProduct(
             view: controller.toAdaptyUIView(),
             productVendorId: product.vendorProductId
         ))
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didStartPurchase product: AdaptyPaywallProduct
     ) {
-        eventHandler.handle(event: PaywallViewEvent.WillPurchase(
+        eventHandler.handle(event: FlowViewEvent.WillPurchase(
             view: controller.toAdaptyUIView(),
             product: Response.AdaptyPluginPaywallProduct(product)
         ))
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFinishPurchase product: AdaptyPaywallProduct,
         purchaseResult: AdaptyPurchaseResult
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidPurchase(
+        eventHandler.handle(event: FlowViewEvent.DidPurchase(
             view: controller.toAdaptyUIView(),
             product: Response.AdaptyPluginPaywallProduct(product),
             purchasedResult: purchaseResult
         ))
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailPurchase product: AdaptyPaywallProduct,
         error: AdaptyError
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidFailPurchase(
+        eventHandler.handle(event: FlowViewEvent.DidFailPurchase(
             view: controller.toAdaptyUIView(),
             product: Response.AdaptyPluginPaywallProduct(product),
             error: error
         ))
     }
 
-    func paywallControllerDidStartRestore(
-        _ controller: AdaptyPaywallController
+    func flowControllerDidStartRestore(
+        _ controller: AdaptyFlowController
     ) {
-        eventHandler.handle(event: PaywallViewEvent.WillRestorePurchases(
+        eventHandler.handle(event: FlowViewEvent.WillRestorePurchases(
             view: controller.toAdaptyUIView()
         ))
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFinishRestoreWith profile: AdaptyProfile
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidRestorePurchases(
+        eventHandler.handle(event: FlowViewEvent.DidRestorePurchases(
             view: controller.toAdaptyUIView(),
             profile: profile
         ))
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailRestoreWith error: AdaptyError
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidFailRestorePurchases(
+        eventHandler.handle(event: FlowViewEvent.DidFailRestorePurchases(
             view: controller.toAdaptyUIView(),
             error: error
         ))
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailRenderingWith error: AdaptyUIError
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidFailRendering(
+        eventHandler.handle(event: FlowViewEvent.DidFailRendering(
             view: controller.toAdaptyUIView(),
             error: error
         ))
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFailLoadingProductsWith error: AdaptyError
     ) -> Bool {
-        eventHandler.handle(event: PaywallViewEvent.DidFailLoadingProducts(
+        eventHandler.handle(event: FlowViewEvent.DidFailLoadingProducts(
             view: controller.toAdaptyUIView(),
             error: error
         ))
@@ -178,12 +178,17 @@ extension AdaptyPluginDelegate: AdaptyPaywallControllerDelegate {
         return true
     }
 
-    func paywallController(
-        _ controller: AdaptyPaywallController,
+    func flowController(
+        _ controller: AdaptyFlowController,
+        didPartiallyLoadProducts failedIds: [String]
+    ) {}
+
+    func flowController(
+        _ controller: AdaptyFlowController,
         didFinishWebPaymentNavigation product: AdaptyPaywallProduct?,
         error: AdaptyError?
     ) {
-        eventHandler.handle(event: PaywallViewEvent.DidFinishWebPaymentNavigation(
+        eventHandler.handle(event: FlowViewEvent.DidFinishWebPaymentNavigation(
             view: controller.toAdaptyUIView(),
             product: product.map(Response.AdaptyPluginPaywallProduct.init),
             error: error

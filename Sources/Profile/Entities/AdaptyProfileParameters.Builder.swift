@@ -16,10 +16,12 @@ public extension AdaptyProfileParameters {
         }
 
         init(_ values: AdaptyProfileParameters) {
-            self.parameters = values
+            parameters = values
         }
 
-        public func build() -> AdaptyProfileParameters { parameters }
+        public func build() -> AdaptyProfileParameters {
+            parameters
+        }
     }
 }
 

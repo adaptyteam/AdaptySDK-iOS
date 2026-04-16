@@ -10,11 +10,9 @@ import Foundation
 extension Backend.Request {
     fileprivate static let authorizationHeaderKey = "Authorization"
     fileprivate static let hashHeaderKey = "adapty-sdk-previous-response-hash"
-    fileprivate static let paywallLocaleHeaderKey = "adapty-paywall-locale"
     fileprivate static let onboardingLocaleHeaderKey = "adapty-onboarding-locale"
-    fileprivate static let paywallBuilderLocaleHeaderKey = "adapty-paywall-builder-locale"
-    fileprivate static let paywallBuilderVersionHeaderKey = "adapty-paywall-builder-version"
-    fileprivate static let paywallBuilderConfigurationFormatVersionHeaderKey = "adapty-paywall-builder-config-format-version"
+    fileprivate static let builderVersionHeaderKey = "adapty-builder-version"
+    fileprivate static let builderConfigurationFormatVersionHeaderKey = "adapty-builder-schema-version"
     fileprivate static let onboardingUIVersionHeaderKey = "adapty-onboarding-ui-version"
     fileprivate static let crossPlacementEligibilityHeaderKey = "adapty-cross-placement-eligibility"
     fileprivate static let segmentIdHeaderKey = "adapty-profile-segment-hash"
@@ -70,24 +68,16 @@ private extension Backend.Response {
 }
 
 extension HTTPHeaders {
-    func setPaywallLocale(_ locale: AdaptyLocale?) -> Self {
-        updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallLocaleHeaderKey)
-    }
-
     func setOnboardingLocale(_ locale: AdaptyLocale?) -> Self {
         updateOrRemoveValue(locale?.id, forKey: Backend.Request.onboardingLocaleHeaderKey)
     }
 
-    func setPaywallBuilderLocale(_ locale: AdaptyLocale?) -> Self {
-        updateOrRemoveValue(locale?.id, forKey: Backend.Request.paywallBuilderLocaleHeaderKey)
+    func setBuilderVersion(_ version: String?) -> Self {
+        updateOrRemoveValue(version, forKey: Backend.Request.builderVersionHeaderKey)
     }
 
-    func setPaywallBuilderVersion(_ version: String?) -> Self {
-        updateOrRemoveValue(version, forKey: Backend.Request.paywallBuilderVersionHeaderKey)
-    }
-
-    func setPaywallBuilderConfigurationFormatVersion(_ version: String?) -> Self {
-        updateOrRemoveValue(version, forKey: Backend.Request.paywallBuilderConfigurationFormatVersionHeaderKey)
+    func setBuilderConfigurationFormatVersion(_ version: String?) -> Self {
+        updateOrRemoveValue(version, forKey: Backend.Request.builderConfigurationFormatVersionHeaderKey)
     }
 
     func setOnboardingUIVersion(_ version: String?) -> Self {

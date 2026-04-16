@@ -43,7 +43,7 @@ extension AdaptyUICachedAsset {
         customValue?.asColorOrGradientOrImageAsset ?? stateValue?.asColorOrGradientOrImageAsset
     }
 
-    var asFontAsset: (font: AdaptyUIResolvedFontAsset, defaultColor: AdaptyUIResolvedColorAsset)? {
+    var asFontAsset: AdaptyUIResolvedFontAsset? {
         customValue?.asFontAsset ?? stateValue?.asFontAsset
     }
 
@@ -79,7 +79,8 @@ final class AdaptyUIAssetsCache {
             imageTintColor: attr.imageTintColor?.getAssetId(state: state, screen: screen),
             background: attr.background?.getAssetId(state: state, screen: screen),
             strike: attr.strike,
-            underline: attr.underline
+            underline: attr.underline,
+            letterSpacing: attr.letterSpacing
         ).nonEmptyOrNil
     }
 

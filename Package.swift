@@ -17,6 +17,10 @@ let package = Package(
             targets: ["AdaptyLogger"]
         ),
         .library(
+            name: "AdaptyCodable",
+            targets: ["AdaptyCodable"]
+        ),
+        .library(
             name: "Adapty",
             targets: ["Adapty"]
         ),
@@ -45,44 +49,89 @@ let package = Package(
         .target(
             name: "AdaptyLogger",
             dependencies: [],
-            path: "Sources.Logger"
+            path: "Sources.Logger",
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
+        ),
+        .target(
+            name: "CSimdjson",
+            path: "Sources.Codable/CSimdjson",
+            sources: [
+                "simdjson.cpp",
+                "SimdjsonBridge.cpp",
+            ],
+            publicHeadersPath: "include",
+            cxxSettings: [
+                .headerSearchPath("."),
+                .define("SIMDJSON_EXCEPTIONS", to: "0"),
+                .unsafeFlags(["-std=c++17", "-O2", "-DNDEBUG"]),
+            ],
+            linkerSettings: [
+                .linkedLibrary("c++"),
+            ]
+        ),
+        .target(
+            name: "AdaptyCodable",
+            dependencies: ["CSimdjson"],
+            path: "Sources.Codable",
+            exclude: [
+                "CSimdjson",
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
         ),
         .target(
             name: "AdaptyUIBuilder",
-            dependencies: ["AdaptyLogger"],
+            dependencies: ["AdaptyLogger", "AdaptyCodable"],
             path: "Sources.UIBuilder",
             exclude: [
                 "adapty.uibuilder.schema.yaml",
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
             ]
         ),
         .target(
             name: "Adapty",
-            dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "AdaptyLogger", "AdaptyCodable"],
             path: "Sources",
             exclude: [
                 "Events/adapty.events.schema.yaml",
+                "Placements/adapty.fallback.schema.yaml",
             ],
-            resources: [.copy("PrivacyInfo.xcprivacy")]
+            resources: [.copy("PrivacyInfo.xcprivacy")],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
         ),
         .target(
             name: "Adapty_KidsMode",
-            dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "AdaptyLogger", "AdaptyCodable"],
             path: "Sources.KidsMode",
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
                 .define("ADAPTY_KIDS_MODE"),
+                .swiftLanguageMode(.v6),
             ]
         ),
         .target(
             name: "AdaptyUI",
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
             path: "Sources.AdaptyUI",
-            resources: [.copy("PrivacyInfo.xcprivacy")]
+            resources: [.copy("PrivacyInfo.xcprivacy")],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
         ),
         .target(
             name: "AdaptyDeveloperTools",
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
-            path: "Sources.DeveloperTools"
+            path: "Sources.DeveloperTools",
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
         ),
         .target(
             name: "AdaptyPlugin",
@@ -90,16 +139,22 @@ let package = Package(
             path: "Sources.AdaptyPlugin",
             exclude: [
                 "cross_platform.yaml",
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
             ]
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger", "AdaptyCodable"],
             path: "Tests",
             resources: [
                 .process("Placements/fallback.json"),
-                .process("Placements/fallback_large.json"),
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
             ]
         ),
     ]
 )
+

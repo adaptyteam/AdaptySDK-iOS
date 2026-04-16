@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    struct Pager: Sendable, Hashable {
+    struct Pager: Sendable {
         let pageWidth: Length
         let pageHeight: Length
         let pagePadding: EdgeInsets
@@ -17,6 +17,7 @@ extension Schema {
         let pageControl: PageControl?
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
+        let pageIndex: Schema.Variable?
     }
 }
 
@@ -29,36 +30,38 @@ extension Schema.Pager {
         content: [],
         pageControl: nil,
         animation: nil,
-        interactionBehavior: .default
+        interactionBehavior: .default,
+        pageIndex: nil
     )
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Pager: Schema.CompositeElement {
     @inlinable
-    func planPager(
-        _ from: Schema.Pager,
-        in taskStack: inout TasksStack
-    ) {
-        for item in from.content.reversed() {
+    func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
+        for item in content.reversed() {
             taskStack.append(.planElement(item))
         }
     }
 
     @inlinable
-    func buildPager(
-        _ from: Schema.Pager,
-        _ resultStack: inout ResultStack
-    ) throws(Schema.Error) -> VC.Pager {
-        let content = try resultStack.popLastElements(from.content.count)
-        return .init(
-            pageWidth: from.pageWidth,
-            pageHeight: from.pageHeight,
-            pagePadding: from.pagePadding,
-            spacing: from.spacing,
-            content: content,
-            pageControl: from.pageControl,
-            animation: from.animation,
-            interactionBehavior: from.interactionBehavior
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+    ) throws(Schema.Error) -> VC.Element {
+        try .pager(
+            .init(
+                pageWidth: pageWidth,
+                pageHeight: pageHeight,
+                pagePadding: pagePadding,
+                spacing: spacing,
+                content: resultStack.popLastElements(content.count),
+                pageControl: pageControl,
+                animation: animation,
+                interactionBehavior: interactionBehavior,
+                pageIndex: pageIndex
+            ),
+            properties
         )
     }
 }
@@ -73,6 +76,7 @@ extension Schema.Pager: DecodableWithConfiguration {
         case pageControl = "page_control"
         case animation
         case interactionBehavior = "interaction"
+        case pageIndex = "page_index"
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -93,7 +97,8 @@ extension Schema.Pager: DecodableWithConfiguration {
             animation: container.decodeIfPresent(Animation.self, forKey: .animation),
 
             interactionBehavior: container.decodeIfPresent(InteractionBehavior.self, forKey: .interactionBehavior)
-                ?? Self.default.interactionBehavior
+                ?? Self.default.interactionBehavior,
+            pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex)
         )
     }
 }

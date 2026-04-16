@@ -1,4 +1,4 @@
-$schema: "https://json-schema.org/draft/2020-12/schema"
+# yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
 $id: "https://adapty.io/events/4_0_0/schema"
 title: "Adapty SDK Event"
 type: object
@@ -47,47 +47,61 @@ properties:
   counter:
     type: integer
 
-  oneOf:
-    - $ref: "#/$events/FlowSDKEvent"
-    - $ref: "#/$events/FlowVariationAssignedSDKEvent"
-    - $ref: "#/$events/AppOpenedEvent"
-    - $ref: "#/$events/PaywallVariationAssignedEvent"
-    - $ref: "#/$events/PaywallShowedEvent"
-    - $ref: "#/$events/OnboardingVariationAssignedEvent"
-    - $ref: "#/$events/AdaptyUIOnboardingScreenShowedParameters"
-    - $ref: "#/$events/ConsentToCollectingDataEvent"
-    - $ref: "#/$events/RefundPreferenceEvent"
-    # - $ref: "#/$events/SystemLogEvent"
+oneOf:
+  - $ref: "#/$events/FlowAnalyticsEvent"
+  - $ref: "#/$events/FlowVariationAssignedSDKEvent"
+  - $ref: "#/$events/AppOpenedEvent"
+  - $ref: "#/$events/PaywallVariationAssignedEvent"
+  - $ref: "#/$events/PaywallShowedEvent"
+  - $ref: "#/$events/OnboardingVariationAssignedEvent"
+  - $ref: "#/$events/AdaptyUIOnboardingScreenShowedParameters"
+  - $ref: "#/$events/ConsentToCollectingDataEvent"
+  - $ref: "#/$events/RefundPreferenceEvent"
+  # - $ref: "#/$events/SystemLogEvent"
 
 $events:
 
-  FlowSDKEvent:
+  FlowAnalyticsEvent:
     type: object
     required:
       - event_name
+      - variation_id 
+      - flow_version_id 
+      - event_properties 
     properties: 
       event_name: 
         const: flow_event
       variation_id:
         type: string
         format: uuid
-      event_type:
+      flow_version_id:
         type: string
-        enum:
-          - flow_screen_showed
-      screen_id:
-        type: string
-      screen_order:
-        type: integer
-      screens_total:
-        type: integer
-      is_last_screen:
-        type: boolean
+        format: uuid
+      event_properties: # new
+        oneOf:
+          - $ref: "#/$events/FlowSDKEvent/ScreenShowedProperties"
+    
+    ScreenShowedProperties:
+      type: object
+      required:
+        - event_type
+        - screen_id
+      properties:
+        event_type:
+          const: flow_screen_showed
+        screen_id:
+          type: string
+        screen_order:
+          type: integer
+        is_last_screen:
+          type: boolean
   
   FlowVariationAssignedSDKEvent:
     type: object
     required:
       - event_name
+      - variation_id 
+      - placement_audience_version_id
     properties: 
       event_name: 
         const: flow_variation_assigned

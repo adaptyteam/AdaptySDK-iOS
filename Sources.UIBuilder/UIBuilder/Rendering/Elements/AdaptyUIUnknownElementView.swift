@@ -67,11 +67,11 @@ struct AdaptyUIUnknownElementView: View {
 
 extension VC.Element {
     var testCircle: Self {
-        .unknown("circle", nil)
+        .unknown("circle")
     }
 
     var testRectangle: Self {
-        .unknown("rectangle", nil)
+        .unknown("rectangle")
     }
 }
 

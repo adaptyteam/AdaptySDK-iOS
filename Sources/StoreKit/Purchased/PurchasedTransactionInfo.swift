@@ -22,13 +22,13 @@ struct PurchasedTransactionInfo: Sendable {
         product: AdaptyProduct?,
         transaction: StoreKit.Transaction
     ) {
-        self.transactionId = transaction.id
-        self.originalTransactionId = transaction.originalID
-        self.vendorProductId = transaction.productID
-        self.price = product?.price
-        self.priceLocale = product?.priceLocale.unfCurrencyCode
-        self.storeCountry = product?.priceLocale.unfRegionCode
-        self.subscriptionOffer = .init(transaction: transaction, product: product)
-        self.environment = transaction.unfEnvironment
+        transactionId = transaction.id
+        originalTransactionId = transaction.originalID
+        vendorProductId = transaction.productID
+        price = product?.price
+        priceLocale = product?.priceLocale.unfCurrencyCode
+        storeCountry = product?.priceLocale.unfRegionCode
+        subscriptionOffer = .init(transaction: transaction, product: product)
+        environment = transaction.unfEnvironment
     }
 }

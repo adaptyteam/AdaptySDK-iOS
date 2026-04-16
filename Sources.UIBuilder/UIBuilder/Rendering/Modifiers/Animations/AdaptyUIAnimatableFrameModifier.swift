@@ -21,7 +21,7 @@ typealias FrameAnimationRange = (
 
 struct AdaptyUIAnimatableFrameModifier: ViewModifier {
     private let box: VC.Box
-    private let animations: [VC.Animation]?
+    private var play: Binding<[VC.Animation]>
 
     @State private var animatedWidth: CGFloat?
     @State private var animatedHeight: CGFloat?
@@ -37,10 +37,10 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
 
     init(
         box: VC.Box,
-        animations: [VC.Animation]?
+        play: Binding<[VC.Animation]>
     ) {
         self.box = box
-        self.animations = animations
+        self.play = play
     }
 
     private func resolveDimensions() -> (width: CGFloat?, height: CGFloat?) {
@@ -80,14 +80,14 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
                     height: height,
                     alignment: alignment
                 )
-                .onAppear { startAnimations() }
+                .onChange(of: play.wrappedValue) { startAnimations($0) }
                 .onDisappear {
                     animationTokens.forEach { $0.invalidate() }
                     animationTokens.removeAll()
                 }
         } else {
             content
-                .onAppear { startAnimations() }
+                .onChange(of: play.wrappedValue) { startAnimations($0) }
                 .onDisappear {
                     animationTokens.forEach { $0.invalidate() }
                     animationTokens.removeAll()
@@ -95,8 +95,8 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
         }
     }
 
-    private func startAnimations() {
-        guard let animations, !animations.isEmpty else { return }
+    private func startAnimations(_ animations: [VC.Animation]) {
+        guard !animations.isEmpty else { return }
 
         var tokens = Set<AdaptyUIAnimationToken>()
 
@@ -132,7 +132,7 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
                 }
 
                 if let startHeight = range.start.height {
-                    animatedWidth = startHeight.points(.horizontal, screenSize, safeArea)
+                    animatedHeight = startHeight.points(.vertical, screenSize, safeArea)
                 }
 
                 tokens.insert(
@@ -145,7 +145,7 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
                             }
 
                             if let currentHeight = v.height {
-                                animatedHeight = currentHeight.points(.horizontal, screenSize, safeArea)
+                                animatedHeight = currentHeight.points(.vertical, screenSize, safeArea)
                             }
                         }
                     )
@@ -164,12 +164,12 @@ extension View {
     @ViewBuilder
     func animatableFrame(
         box: VC.Box,
-        animations: [VC.Animation]?
+        play: Binding<[VC.Animation]>
     ) -> some View {
         modifier(
             AdaptyUIAnimatableFrameModifier(
                 box: box,
-                animations: animations
+                play: play
             )
         )
     }

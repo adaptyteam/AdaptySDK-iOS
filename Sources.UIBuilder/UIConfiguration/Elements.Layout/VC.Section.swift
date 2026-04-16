@@ -11,5 +11,8 @@ extension VC {
     struct Section: Sendable, Hashable {
         let index: Variable
         let content: [Element]
+        let transition: Transition?
     }
 }
+
+

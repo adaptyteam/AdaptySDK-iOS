@@ -7,30 +7,39 @@
 
 import StoreKit
 
-public protocol AdaptyPaywallProduct: AdaptyPaywallProductWithoutDeterminingOffer {
-    var subscriptionOffer: AdaptySubscriptionOffer? { get }
+public struct AdaptyPaywallProduct: AdaptyProduct, WebPaywallURLProviding {
+    public let skProduct: StoreKit.Product
+
+    package let flowProductId: String?
+
+    public let adaptyProductId: String
+
+    let productInfo: BackendProductInfo
+
+    public var accessLevelId: String {
+        productInfo.accessLevelId
+    }
+
+    public var adaptyProductType: String {
+        productInfo.period.rawValue
+    }
+
+    public let paywallProductIndex: Int
+
+    public let subscriptionOffer: AdaptySubscriptionOffer?
+
+    /// Same as `variationId` property of the parent AdaptyFlowPaywall.
+    public let variationId: String
+
+    /// Same as `abTestName` property of the parent AdaptyFlowPaywall.
+    public let paywallABTestName: String
+
+    /// Same as `name` property of the parent AdaptyFlowPaywall.
+    public let paywallName: String
+
+    package let webPaywallBaseUrl: URL?
+
+    public var description: String {
+        "(adaptyProductId: \(adaptyProductId), info: \(productInfo), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map(\.description) ?? "nil") , skProduct:\(skProduct)"
+    }
 }
-
-public protocol AdaptyPaywallProductWithoutDeterminingOffer: AdaptyProduct {
-    /// An internal Adapty Product Identifier
-    var adaptyProductId: String { get }
-
-    /// An access level id which was selected in Adapty Dashboard for this product, e.g. `premium`
-    var accessLevelId: String { get }
-
-    /// A product type which was selected in Adapty Dashboard for this product, e.g. `weekly`, `monthly`,  `annual`, etc.
-    var adaptyProductType: String { get }
-
-    var paywallProductIndex: Int { get }
-
-    /// Same as `variationId` property of the parent AdaptyPaywall.
-    var variationId: String { get }
-
-    /// Same as `abTestName` property of the parent AdaptyPaywall.
-    var paywallABTestName: String { get }
-
-    /// Same as `name` property of the parent AdaptyPaywall.
-    var paywallName: String { get }
-}
-
-

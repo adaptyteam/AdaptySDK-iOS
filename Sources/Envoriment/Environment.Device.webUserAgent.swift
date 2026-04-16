@@ -23,7 +23,7 @@ extension Environment.Device {
             if let result = _userAgent {
                 return result
             }
-            
+
             #if canImport(WebKit)
             let result = await WKWebView().value(forKey: "userAgent").flatMap { $0 as? String }
             #else

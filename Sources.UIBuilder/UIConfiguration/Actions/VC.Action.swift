@@ -10,7 +10,7 @@ import Foundation
 package extension VC {
     struct Action: Sendable, Hashable {
         let path: [String]
-        let params: [String: Parameter]?
+        let params: [String: VC.AnyValue]?
         let scope: Scope
     }
 }
@@ -23,4 +23,13 @@ extension VC.Action {
             path
         }
     }
+
+    var isSDK: Bool {
+        scope == .global && path.first == "SDK"
+    }
+
+    func paramsAsDictionary() -> [AnyHashable: Any]? {
+        params?.asObject
+    }
 }
+

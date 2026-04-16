@@ -64,7 +64,7 @@ extension Adapty {
 
 private extension URLError {
     var shouldRetry: Bool {
-        switch self.code {
+        switch code {
         case .timedOut,
              .cannotFindHost,
              .cannotConnectToHost,
@@ -73,9 +73,9 @@ private extension URLError {
              .notConnectedToInternet,
              .resourceUnavailable,
              .backgroundSessionWasDisconnected:
-            return true
+            true
         default:
-            return false
+            false
         }
     }
 }

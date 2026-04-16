@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct TextField: Hashable {
+    struct TextField: Sendable, Hashable {
         let kind: Kind
         let value: Variable
         let placeholder: Placeholder?

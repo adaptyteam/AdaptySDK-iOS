@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension Schema.StringReference.Product: Codable {
+extension Schema.StringReference.Product: Decodable {
     enum CodingKeys: String, CodingKey {
         case product
         case suffix
@@ -33,25 +33,13 @@ extension Schema.StringReference.Product: Codable {
             )
         }
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        switch self {
-        case let .id(productId, suffix):
-            try container.encode(productId, forKey: .product)
-            try container.encodeIfPresent(suffix, forKey: .suffix)
-        case let .variable(variable, suffix):
-            try container.encode(variable, forKey: .product)
-            try container.encodeIfPresent(suffix, forKey: .suffix)
-        }
-    }
 }
 
 private extension Schema.StringReference.Product {
     enum LegacyCodingKeys: String, CodingKey {
         case type
         case productGroupId = "group_id"
-        case adaptyProductId = "id"
+        case productId = "id"
         case suffix
     }
 
@@ -60,25 +48,23 @@ private extension Schema.StringReference.Product {
 
         let suffix = try container.decodeIfPresent(String.self, forKey: .suffix)
 
-        guard !container.contains(.adaptyProductId) else {
+        if let productId = try container.decodeIfPresent(String.self, forKey: .productId) {
             return try .id(
-                container.decode(String.self, forKey: .adaptyProductId),
+                productId,
                 sufix: suffix
             )
         }
 
-        guard !container.contains(.productGroupId) else {
-            return try .variable(
-                .init(
-                    path: ["Legacy", "productGroup", container.decode(String.self, forKey: .productGroupId)],
-                    setter: nil,
-                    scope: .global,
-                    converter: nil
-                ),
-                sufix: suffix
-            )
-        }
-
-        throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "not found id or group_id "))
+        let productGroupId = try container.decodeIfPresent(String.self, forKey: .productGroupId) ?? "group_A"
+        return try .variable(
+            .init(
+                path: ["Legacy", "productGroup", productGroupId],
+                setter: nil,
+                scope: .global,
+                converter: nil
+            ),
+            sufix: suffix
+        )
     }
 }
+

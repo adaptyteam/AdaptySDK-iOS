@@ -8,15 +8,18 @@
 import Foundation
 
 extension Schema {
-    struct Screen: Sendable, Hashable {
+    struct Screen: Sendable {
         let id: String
         let layoutBehaviour: LayoutBehaviour
         let cover: Box?
         let content: Element
         let footer: Element?
-        let background: [Element.Overlay]?
-        let overlay: [Element.Overlay]?
+        let background: [AlignedElement]?
+        let overlay: [AlignedElement]?
         let screenActions: ScreenActions
+
+        let contentScrollValue: Variable?
+        let footerScrollValue: Variable?
     }
 }
 
@@ -58,9 +61,9 @@ extension Schema.ConfigurationBuilder {
         let content = try resultStack.popLastElement()
         let footer = try resultStack.popLastElement(from.footer != nil)
 
-        var background: [VC.Element.Overlay]?
+        var background: [VC.AlignedElement]?
         if let from = from.background, from.isNotEmpty {
-            background = try convertElementOverlays(
+            background = try convertAlignedElement(
                 from,
                 resultStack.popLastElements(from.count)
             )
@@ -69,9 +72,9 @@ extension Schema.ConfigurationBuilder {
             }
         }
 
-        var overlay: [VC.Element.Overlay]?
+        var overlay: [VC.AlignedElement]?
         if let from = from.overlay, from.isNotEmpty {
-            overlay = try convertElementOverlays(
+            overlay = try convertAlignedElement(
                 from,
                 resultStack.popLastElements(from.count)
             )
@@ -88,7 +91,9 @@ extension Schema.ConfigurationBuilder {
             footer: footer,
             background: background,
             overlay: overlay,
-            screenActions: from.screenActions
+            screenActions: from.screenActions,
+            contentScrollValue: from.contentScrollValue,
+            footerScrollValue: from.footerScrollValue
         )
     }
 }
@@ -101,6 +106,9 @@ extension Schema.Screen: DecodableWithConfiguration {
         case footer
         case background
         case overlay
+
+        case contentScrollValue = "content_scroll_value"
+        case footerScrollValue = "footer_scroll_value"
     }
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -120,37 +128,40 @@ extension Schema.Screen: DecodableWithConfiguration {
                 throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown screen id"))
             }
 
-        let background: [Schema.Element.Overlay]? =
+        let background: [Schema.AlignedElement]? =
             if configuration.isLegacy {
                 nil
             } else {
-                try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .background, configuration: configuration)
+                try container.decodeIfExist([Schema.AlignedElement].self, forKey: .background, configuration: configuration)
             }
 
-        let overlay: [Schema.Element.Overlay]? =
+        let overlay: [Schema.AlignedElement]? =
             if configuration.isLegacy {
-                if let one = try container.decodeIfPresent(Schema.Element.self, forKey: .overlay, configuration: configuration) {
-                    [Schema.Element.Overlay(
-                        horizontalAlignment: Schema.Element.Overlay.default.horizontalAlignment,
-                        verticalAlignment: Schema.Element.Overlay.default.verticalAlignment,
+                if let one = try container.decodeIfExist(Schema.Element.self, forKey: .overlay, configuration: configuration) {
+                    [Schema.AlignedElement(
+                        horizontalAlignment: Schema.AlignedElement.default.horizontalAlignment,
+                        verticalAlignment: Schema.AlignedElement.default.verticalAlignment,
                         content: one
                     )]
                 } else {
                     nil
                 }
             } else {
-                try container.decodeIfPresent([Schema.Element.Overlay].self, forKey: .overlay, configuration: configuration)
+                try container.decodeIfExist([Schema.AlignedElement].self, forKey: .overlay, configuration: configuration)
             }
 
         try self.init(
             id: screenId,
             layoutBehaviour: layoutBehaviour,
-            cover: layoutBehaviour == .hero ? container.decodeIfPresent(Schema.Box.self, forKey: .cover, configuration: configuration) : nil,
+            cover: layoutBehaviour == .hero ? container.decodeIfExist(Schema.Box.self, forKey: .cover, configuration: configuration) : nil,
             content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
-            footer: layoutBehaviour != .default ? container.decodeIfPresent(Schema.Element.self, forKey: .footer, configuration: configuration) : nil,
+            footer: layoutBehaviour != .default ? container.decodeIfExist(Schema.Element.self, forKey: .footer, configuration: configuration) : nil,
             background: background,
             overlay: overlay,
-            screenActions: Schema.ScreenActions(from: decoder)
+            screenActions: Schema.ScreenActions(from: decoder),
+            contentScrollValue: container.decodeIfPresent(Schema.Variable.self, forKey: .contentScrollValue),
+            footerScrollValue: container.decodeIfPresent(Schema.Variable.self, forKey: .footerScrollValue)
         )
     }
 }
+

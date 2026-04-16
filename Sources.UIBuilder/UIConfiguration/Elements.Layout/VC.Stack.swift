@@ -16,17 +16,3 @@ extension VC {
         let items: [Item]
     }
 }
-
-extension VC.Stack {
-    @inlinable
-    var content: [VC.Element] {
-        items.map {
-            switch $0 {
-            case let .space(value):
-                .space(value)
-            case let .element(element):
-                element
-            }
-        }
-    }
-}

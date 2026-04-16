@@ -24,33 +24,15 @@ extension VS {
     }
 }
 
-@objc protocol JSActionBridge: JSExport {
-    func log(_ params: JSValue)
-    func openUrl(_ params: JSValue)
-    func userCustomAction(_ params: JSValue)
-    func purchaseProduct(_ params: JSValue)
-    func webPurchaseProduct(_ params: JSValue)
-    func restorePurchases()
-    func closeAll()
-    func onSelectProduct(_ params: JSValue)
-    func openScreen(_ params: JSValue)
-    func closeScreen(_ params: JSValue)
-}
-
 extension VS.JSActionDispatcher {
-    func execute(_: VC.Action, in _: JSContext) -> Bool {
-        false
-    }
-}
-
-extension VS.JSActionDispatcher: JSActionBridge {
-    func log(_ params: JSValue) {
-        var message = params.toString() ?? "null"
+    @inlinable
+    func log(_ params: [AnyHashable: Any]?) {
+        var message = "null"
         var level = AdaptyLogger.Level.debug
 
-        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            if let msg = dict["message"] as? String { message = msg }
-            if let lvl = dict["level"] as? String {
+        if let params {
+            if let msg = params["message"] as? String { message = msg }
+            if let lvl = params["level"] as? String {
                 level = switch lvl {
                 case "error": .error
                 case "warn": .warn
@@ -64,23 +46,21 @@ extension VS.JSActionDispatcher: JSActionBridge {
         Log.js.message(message, withLevel: level)
     }
 
-    func openUrl(_ params: JSValue) {
-        var stringId: String?
-        var url: URL?
-        var openIn = VC.Action.WebOpenInParameter.browserOutApp
-
-        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            stringId = dict["stringId"] as? String
-            url = (dict["url"] as? String).flatMap(URL.init)
-            openIn = (dict["openIn"] as? String).flatMap(VC.Action.WebOpenInParameter.init) ?? openIn
+    @inlinable
+    func openUrl(_ params: [AnyHashable: Any]?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.openUrl: corupted params"#)
+            return
         }
 
-        if let url {
+        let openIn = (params["openIn"] as? String).flatMap(VC.Action.WebOpenInParameter.init) ?? .browserOutApp
+
+        if let url = (params["url"] as? String).flatMap(URL.init) {
             handler?.openUrl(url: url, openIn: openIn)
             return
         }
 
-        if let stringId {
+        if let stringId = params["stringId"] as? String {
             handler?.openUrl(stringId: stringId, openIn: openIn)
             return
         }
@@ -88,64 +68,41 @@ extension VS.JSActionDispatcher: JSActionBridge {
         Log.viewState.error(#"SDK.openUrl: required parameter "url" or "stringId" is missing or not is URL"#)
     }
 
-    func userCustomAction(_ params: JSValue) {
-        var userCustomId: String?
-
-        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            userCustomId = dict["userCustomId"] as? String
-        }
-
-        guard let userCustomId else {
-            Log.viewState.error("SDK.userCustomAction: required parameter \"userCustomId\" is missing")
+    @inlinable
+    func userCustomAction(_ params: [AnyHashable: Any]?) {
+        guard let userCustomId = params?["userCustomId"] as? String else {
+            Log.viewState.error(#"SDK.userCustomAction: required parameter "userCustomId" is missing"#)
             return
         }
+
         handler?.userCustomAction(id: userCustomId)
     }
 
-    func purchaseProduct(_ params: JSValue) {
-        var productId: String?
-        var paywallId: String?
-
-        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            productId = dict["productId"] as? String
-            paywallId = dict["paywallId"] as? String
-        }
-
-        guard let productId else {
-            Log.viewState.error("SDK.purchaseProduct: required parameter \"productId\" is missing")
+    @inlinable
+    func purchaseProduct(_ params: [AnyHashable: Any]?) {
+        guard let productId = params?["productId"] as? String else {
+            Log.viewState.error(#"SDK.purchaseProduct: required parameter "productId" is missing"#)
             return
         }
 
-        guard let paywallId else {
-            Log.viewState.error("SDK.purchaseProduct: required parameter \"paywallId\" is missing")
-            return
-        }
-
-        handler?.purchaseProduct(productId: productId, paywallId: paywallId, service: .storeKit)
+        handler?.purchaseProduct(productId: productId, service: .storeKit)
     }
 
-    func webPurchaseProduct(_ params: JSValue) {
-        var productId: String?
-        var paywallId: String?
-        var openIn = VC.Action.WebOpenInParameter.browserOutApp
-
-        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            productId = dict["productId"] as? String
-            paywallId = dict["paywallId"] as? String
-            openIn = (dict["openIn"] as? String).flatMap(VC.Action.WebOpenInParameter.init) ?? openIn
-        }
-
-        guard let productId else {
-            Log.viewState.error("SDK.webPurchaseProduct: required parameter \"productId\" is missing")
+    @inlinable
+    func webPurchaseProduct(_ params: [AnyHashable: Any]?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.webPurchaseProduct: corupted params"#)
             return
         }
 
-        guard let paywallId else {
-            Log.viewState.error("SDK.purchaseProduct: required parameter \"paywallId\" is missing")
+        let openIn = (params["openIn"] as? String).flatMap(VC.Action.WebOpenInParameter.init) ?? .browserOutApp
+
+        guard let productId = params["productId"] as? String else {
+            Log.viewState.error(#"SDK.webPurchaseProduct: required parameter "productId" is missing"#)
             return
         }
 
-        handler?.purchaseProduct(productId: productId, paywallId: paywallId, service: .openWebPaywall(openIn: openIn))
+        handler?.purchaseProduct(productId: productId, service: .openWebPaywall(openIn: openIn))
     }
 
     func restorePurchases() {
@@ -156,66 +113,52 @@ extension VS.JSActionDispatcher: JSActionBridge {
         handler?.closeAll()
     }
 
-    func onSelectProduct(_ params: JSValue) {
-        var productId: String?
-        var paywallId: String?
-
-        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            productId = dict["productId"] as? String
-            paywallId = dict["paywallId"] as? String
-        }
-
-        guard let productId else {
-            Log.viewState.error("SDK.onSelectProduct: required parameter \"productId\" is missing")
-            return
-        }
-        guard let paywallId else {
-            Log.viewState.error("SDK.purchaseProduct: required parameter \"paywallId\" is missing")
+    @inlinable
+    func onSelectProduct(_ params: [AnyHashable: Any]?) {
+        guard let productId = params?["productId"] as? String else {
+            Log.viewState.error(#"SDK.onSelectProduct: required parameter "productId" is missing"#)
             return
         }
 
-        handler?.selectProduct(productId: productId, paywallId: paywallId)
+        handler?.selectProduct(productId: productId)
     }
 
-    func openScreen(_ params: JSValue) {
-        var instanceId: String?
-        var screenType: VC.ScreenType?
-        var contextPath: [String]?
-        var navigatorId: String?
-        var transitionId: String?
-
-        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            instanceId = dict["instanceId"] as? String
-            navigatorId = dict["navigatorId"].flatMap { $0 as? String }
-            transitionId = dict["transitionId"] as? String
-            screenType = dict["type"] as? String
-            if let path = dict["contextPath"] as? String {
-                contextPath = path.split(separator: ".").map(String.init)
-            }
+    @inlinable
+    func openScreen(_ params: [AnyHashable: Any]?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.openScreen: corupted params"#)
+            return
         }
 
-        guard let screenType else {
-            Log.viewState.error("SDK.openScreen: required parameter \"type\" is missing")
+        let contextPath: [String]? =
+            if let path = params["contextPath"] as? String {
+                path.split(separator: ".").map(String.init)
+            } else {
+                nil
+            }
+
+        guard let screenType = params["type"] as? String else {
+            Log.viewState.error(#"SDK.openScreen: required parameter "type" is missing"#)
             return
         }
         guard let configuration = configuration.screens[screenType] else {
-            Log.viewState.error("SDK.openScreen: not found screen type: \(screenType)")
+            Log.viewState.error(#"SDK.openScreen: not found screen type: \#(screenType)"#)
             return
         }
-        guard let instanceId else {
-            Log.viewState.error("SDK.openScreen: required parameter \"instanceId\" is missing")
+        guard let instanceId = params["instanceId"] as? String else {
+            Log.viewState.error(#"SDK.openScreen: required parameter "instanceId" is missing"#)
             return
         }
 
-        guard let transitionId else {
-            Log.viewState.error("SDK.openScreen: required parameter \"transitionId\" is missing")
+        guard let transitionId = params["transitionId"] as? String else {
+            Log.viewState.error(#"SDK.openScreen: required parameter "transitionId" is missing"#)
             return
         }
 
         handler?.openScreen(
             instance: .init(
                 id: instanceId,
-                navigatorId: navigatorId ?? "default",
+                navigatorId: params["navigatorId"].flatMap { $0 as? String } ?? "default",
                 configuration: configuration,
                 contextPath: contextPath ?? []
             ),
@@ -223,18 +166,152 @@ extension VS.JSActionDispatcher: JSActionBridge {
         )
     }
 
-    func closeScreen(_ params: JSValue) {
-        var navigatorId: String?
-        var transitionId: String?
-
-        if params.isObject, let dict = params.toDictionary() as? [String: Any] {
-            navigatorId = dict["navigatorId"] as? String
-            transitionId = dict["transitionId"] as? String
+    @inlinable
+    func closeScreen(_ params: [AnyHashable: Any]?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.closeScreen: corupted params"#)
+            return
         }
 
         handler?.closeScreen(
-            navigatorId: navigatorId ?? "default",
-            transitionId: transitionId ?? VC.Navigator.AppearanceTransition.onDisappearKey
+            navigatorId: params["navigatorId"] as? String ?? "default",
+            transitionId: params["transitionId"] as? String ?? VC.Navigator.AppearanceTransition.onDisappearKey
         )
     }
+
+    @inlinable
+    func changeFocus(_ params: [AnyHashable: Any]?) {
+        handler?.changeFocus(
+            id: params?["id"] as? String
+        )
+    }
+
+    @inlinable
+    func setTimer(_ params: [AnyHashable: Any]?, callback: VS.JSAction?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.setTimer: corupted params"#)
+            return
+        }
+
+        let behavior: VS.SetTimerBehavior? =
+            if let value = params["behavior"] as? String {
+                .init(rawValue: value)
+            } else {
+                nil
+            }
+
+        guard let timerId = params["id"] as? String else {
+            Log.viewState.error(#"SDK.setTimer: required parameter "timerId" is missing"#)
+            return
+        }
+
+        if let endAt = params["endAt"] as? Double {
+            handler?.setTimer(id: timerId, endAt: Date(timeIntervalSince1970: endAt / 1000), callback: callback)
+            return
+        }
+
+        if let duration = params["duration"] as? Double {
+            handler?.setTimer(id: timerId, duration: duration, behavior: behavior ?? .continue, callback: callback)
+            return
+        }
+    }
+
+    @inlinable
+    func moveScroll(_ params: [AnyHashable: Any]?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.moveScroll: corupted params"#)
+            return
+        }
+
+        guard let instanceId = params["instanceId"] as? String else {
+            Log.viewState.error(#"SDK.moveScroll: required parameter "instanceId" is missing"#)
+            return
+        }
+
+        guard let v = params["kind"] as? String,
+              let kind = VS.ScrollKind(rawValue: v)
+        else {
+            Log.viewState.error(#"SDK.moveScroll: required parameter "kind" is missing or corupted"#)
+            return
+        }
+
+        guard let v = params["value"] as? String,
+              let value = VS.ScrollValue(rawValue: v)
+        else {
+            Log.viewState.error(#"SDK.moveScroll: required parameter "value" is missing or corupted"#)
+            return
+        }
+
+        handler?.moveScroll(
+            instanceId: instanceId,
+            kind: kind,
+            value: value
+        )
+    }
+
+    func showAppRate() {
+        handler?.showAppRate()
+    }
+
+    @inlinable
+    func showAlertDialog(_ params: [AnyHashable: Any]?, callback: VS.JSAction?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.showAlertDialog: corupted params"#)
+            return
+        }
+
+        handler?.showAlertDialog(
+            params: VS.ShowAlertDialogParameters.fromDictionary(params),
+            callback: callback
+        )
+    }
+
+    @inlinable
+    func showRequestPermission(_ params: [AnyHashable: Any]?, callback: VS.JSAction?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.showRequestPermission: corupted params"#)
+            return
+        }
+
+        handler?.showRequestPermission(
+            params: VS.ShowRequestPermissionParameters.fromDictionary(params),
+            callback: callback
+        )
+    }
+
+    @inlinable
+    func sendEvents(_ params: [AnyHashable: Any]?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.sendEvents: corupted params"#)
+            return
+        }
+
+        let instanceId = params["instanceId"] as? String
+
+        guard let events = params["events"] as? [String], events.isNotEmpty else {
+            Log.viewState.error(#"SDK.sendEvents: required parameter "events" is missing or corupted"#)
+            return
+        }
+
+        handler?.sendEvents(instanceId: instanceId, eventIds: events)
+    }
+
+    @inlinable
+    func sendAnalyticEvent(_ params: [String: any Sendable]?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.sendAnalyticEvent: corupted params"#)
+            return
+        }
+
+        guard let name = (params[VS.AnalyticEvent.CodingKeys.name.rawValue] ?? params["name"]) as? String else {
+            Log.viewState.error(#"SDK.sendAnalyticEvent: required parameter "name" is missing or corupted"#)
+            return
+        }
+
+        handler?.sendAnalyticEvent(.init(
+            name: name,
+            params: params
+        ))
+    }
 }
+

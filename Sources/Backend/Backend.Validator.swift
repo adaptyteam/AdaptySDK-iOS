@@ -36,12 +36,12 @@ extension Backend {
         init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             if let code = try container.decodeIfPresent(String.self, forKey: .code) {
-                self.codes = [code]
+                codes = [code]
             } else if let details = try container.decodeIfPresent([Detail].self, forKey: .details).nonEmptyOrNil {
-                self.codes = details.map(\.value)
+                codes = details.map(\.value)
             } else {
                 let array = try container.decodeIfPresent([Code].self, forKey: .array)
-                self.codes = array.map { $0.compactMap(\.value) }
+                codes = array.map { $0.compactMap(\.value) }
             }
         }
     }

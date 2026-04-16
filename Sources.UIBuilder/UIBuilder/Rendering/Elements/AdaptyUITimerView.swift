@@ -157,8 +157,6 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
         self.timer = timer
     }
 
-    let startTime: Date = .init()
-
     @State var timeLeft: TimeInterval = 0.0
     @State var text: VC.RichText?
 
@@ -196,59 +194,20 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
         timerOrEmpty
             .onAppear {
                 updateTime()
-                startTimer()
             }
-            .onDisappear {
-                stopTimer()
-            }
-    }
-
-    @State private var timeCounter: Timer?
-    @State private var currentTimerUpdatesPerSecond = 1 {
-        didSet {
-            startTimer()
-        }
-    }
-
-    private func startTimer() {
-        stopTimer()
-
-        let timeInterval = 1.0 / Double(currentTimerUpdatesPerSecond)
-
-        let timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
-            Task { @MainActor in
+            .onReceive(viewModel.objectWillChange) { _ in
                 updateTime()
             }
-        }
-        RunLoop.current.add(timer, forMode: .common)
-        timeCounter = timer
-    }
-
-    private func stopTimer() {
-        timeCounter?.invalidate()
-        timeCounter = nil
     }
 
     private func updateTime() {
-        var timeLeft = viewModel.timeLeft(
+        let timeLeft = max(0.0, viewModel.timeLeft(
             for: timer,
             at: Date(),
             screen: screen
-        )
-
-        guard timeLeft > 0 else {
-            timeLeft = 0
-
-            stopTimer()
-
-            text = timer.format.item(byValue: timeLeft)
-            self.timeLeft = timeLeft
-            return
-        }
+        ))
 
         text = timer.format.item(byValue: timeLeft)
-        currentTimerUpdatesPerSecond = text?.timerUpdatesPerSecond ?? 1
-
         self.timeLeft = timeLeft
     }
 }

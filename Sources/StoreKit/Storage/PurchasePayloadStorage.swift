@@ -240,7 +240,9 @@ extension PurchasePayloadStorage {
         removePurchasePayload(forProductId: transaction.productID)
     }
 
-    func onboardingVariationId() -> String? { Self.persistentOnboardingVariationsId }
+    func onboardingVariationId() -> String? {
+        Self.persistentOnboardingVariationsId
+    }
 
     func setOnboardingVariationId(_ variationId: String) {
         if Self.setPersistentOnboardingVariationId(variationId) {

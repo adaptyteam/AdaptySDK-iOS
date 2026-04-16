@@ -8,39 +8,48 @@
 import Foundation
 
 public extension Adapty {
-    /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
+    /// Once you have a ``AdaptyFlow``, fetch corresponding products array using this method.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
     ///
     /// - Parameters:
-    ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
+    ///   - flow: the ``AdaptyFlow`` for which you want to get a products
     /// - Returns: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
     /// - Throws: An ``AdaptyError`` object
-    nonisolated static func getPaywallProducts(paywall: AdaptyPaywall) async throws(AdaptyError) -> [AdaptyPaywallProduct] {
+    nonisolated static func getPaywallProducts(flow: AdaptyFlow) async throws(AdaptyError) -> [AdaptyPaywallProduct] {
         try await withActivatedSDK(
             methodName: .getPaywallProducts,
-            logParams: ["placement_id": paywall.placement.id]
+            logParams: ["placement_id": flow.placement.id]
         ) { sdk throws(AdaptyError) in
             try await sdk.getPaywallProducts(
-                paywall: paywall,
+                paywalls: flow.paywalls,
                 productsManager: sdk.productsManager
             )
         }
     }
 
-    nonisolated static func getPaywallProductsWithoutDeterminingOffer(paywall: AdaptyPaywall) async throws(AdaptyError) -> [AdaptyPaywallProductWithoutDeterminingOffer] {
+    /// Once you have a ``AdaptyFlowPaywall``, fetch corresponding products array using this method.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/displaying-products)
+    ///
+    /// - Parameters:
+    ///   - paywall: the ``AdaptyFlowPaywall`` for which you want to get a products
+    /// - Returns: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
+    /// - Throws: An ``AdaptyError`` object
+    nonisolated static func getPaywallProducts(paywall: AdaptyFlowPaywall) async throws(AdaptyError) -> [AdaptyPaywallProduct] {
         try await withActivatedSDK(
-            methodName: .getPaywallProductsWithoutDeterminingOffer,
+            methodName: .getPaywallProducts,
             logParams: ["placement_id": paywall.placement.id]
         ) { sdk throws(AdaptyError) in
-            try await sdk.getPaywallProductsWithoutOffers(
-                paywall: paywall,
+            try await sdk.getPaywallProducts(
+                paywalls: [paywall],
                 productsManager: sdk.productsManager
             )
         }
     }
 
     package nonisolated static func getPaywallProduct(
+        flowProductId: String?,
         adaptyProductId: String,
         productInfo: BackendProductInfo,
         paywallProductIndex: Int,
@@ -52,6 +61,7 @@ public extension Adapty {
     ) async throws(AdaptyError) -> AdaptyPaywallProduct {
         let sdk = try await Adapty.activatedSDK
         return try await sdk.getPaywallProduct(
+            flowProductId: flowProductId,
             adaptyProductId: adaptyProductId,
             productInfo: productInfo,
             paywallProductIndex: paywallProductIndex,
@@ -70,3 +80,4 @@ public extension Adapty {
         await Adapty.optionalSDK?.purchasePayloadStorage.setOnboardingVariationId(variationId)
     }
 }
+

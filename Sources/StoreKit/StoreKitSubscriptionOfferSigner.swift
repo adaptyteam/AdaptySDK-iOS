@@ -24,13 +24,12 @@ extension Adapty: StoreKitSubscriptionOfferSigner {
         with appAccountToken: UUID?
     ) async throws(AdaptyError) -> AdaptySubscriptionOffer.Signature {
         do {
-            let response = try await httpSession.signSubscriptionOffer(
+            return try await httpSession.signSubscriptionOffer(
                 userId: userId,
                 vendorProductId: subscriptionVendorId,
                 offerId: offerId,
                 appAccountToken: appAccountToken
             )
-            return response
         } catch {
             throw error.asAdaptyError
         }

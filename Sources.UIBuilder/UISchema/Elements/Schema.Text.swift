@@ -11,7 +11,17 @@ extension Schema {
     typealias Text = VC.Text
 }
 
-extension Schema.Text: Codable {
+extension Schema.Text: Schema.SimpleElement {
+    @inlinable
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?
+    ) -> VC.Element {
+        try .text(self, properties)
+    }
+}
+
+extension Schema.Text: Decodable {
     enum CodingKeys: String, CodingKey {
         case stringId = "string_id"
         case horizontalAlign = "align"
@@ -39,23 +49,5 @@ extension Schema.Text: Codable {
             defaultTextAttributes: textAttributes.nonEmptyOrNil
         )
     }
-
-    func encode(to encoder: any Encoder) throws {
-        if let defaultTextAttributes = defaultTextAttributes.nonEmptyOrNil {
-            try defaultTextAttributes.encode(to: encoder)
-        }
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(value, forKey: .stringId)
-        if horizontalAlign != .leading {
-            try container.encode(horizontalAlign, forKey: .horizontalAlign)
-        }
-        try container.encodeIfPresent(maxRows, forKey: .maxRows)
-        if let first = overflowMode.first {
-            if overflowMode.count == 1 {
-                try container.encode(first, forKey: .overflowMode)
-            } else {
-                try container.encode(overflowMode, forKey: .overflowMode)
-            }
-        }
-    }
 }
+

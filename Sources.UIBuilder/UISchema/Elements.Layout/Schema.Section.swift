@@ -8,32 +8,34 @@
 import Foundation
 
 extension Schema {
-    struct Section: Sendable, Hashable {
+    struct Section: Sendable {
         let index: Variable
         let content: [Schema.Element]
+        let transition: Transition?
     }
 }
 
-extension Schema.ConfigurationBuilder {
+extension Schema.Section: Schema.CompositeElement {
     @inlinable
-    func planSection(
-        _ from: Schema.Section,
-        in taskStack: inout TasksStack
-    ) {
-        for item in from.content.reversed() {
+    func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
+        for item in content.reversed() {
             taskStack.append(.planElement(item))
         }
     }
 
     @inlinable
-    func buildSection(
-        _ from: Schema.Section,
-        _ resultStack: inout ResultStack
-    ) throws(Schema.Error) -> VC.Section {
-        let content = try resultStack.popLastElements(from.content.count)
-        return .init(
-            index: from.index,
-            content: content
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _ properties: VC.Element.Properties?,
+        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+    ) throws(Schema.Error) -> VC.Element {
+        try .section(
+            .init(
+                index: index,
+                content: resultStack.popLastElements(content.count),
+                transition: transition
+            ),
+            properties
         )
     }
 }
@@ -43,14 +45,28 @@ extension Schema.Section: DecodableWithConfiguration {
         case legacySectionId = "id"
         case index
         case content
+        case duration
+        case interpolator
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         guard configuration.isLegacy else {
+            let transition: Schema.Transition? =
+                if container.exist(.duration) {
+                    try .init(
+                        startDelay: 0,
+                        duration: container.decode(Double.self, forKey: .duration) / 1000.0,
+                        interpolator: container.decodeIfPresent(VC.Animation.Interpolator.self, forKey: .interpolator) ?? .default
+                    )
+                } else {
+                    nil
+                }
+
             try self.init(
                 index: container.decode(Schema.Variable.self, forKey: .index),
-                content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
+                content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
+                transition: transition
             )
             return
         }
@@ -66,7 +82,9 @@ extension Schema.Section: DecodableWithConfiguration {
                 scope: .global,
                 converter: nil
             ),
-            content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration)
+            content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
+            transition: nil
         )
     }
 }
+

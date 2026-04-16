@@ -28,15 +28,7 @@ extension AdaptyPlacement {
         }
 
         init(from decoder: Decoder) throws {
-            let superContainer = try decoder.container(keyedBy: Backend.CodingKeys.self)
-
-            let container =
-                if superContainer.contains(.attributes) {
-                    try superContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
-                } else {
-                    try decoder.container(keyedBy: CodingKeys.self)
-                }
-
+            let container = try decoder.container(keyedBy: CodingKeys.self)
             variationId = try container.decode(String.self, forKey: .variationId)
             weight = try container.decode(Int.self, forKey: .weight)
 
@@ -76,9 +68,10 @@ extension [AdaptyPlacement.Variation] {
 
         let index = sortedItems.firstIndex { item in
             weight -= item.element.weight
-            return weight <= 0
+            return weight < 0
         } ?? (countVariations - 1)
 
         return sortedItems[index].offset
     }
 }
+

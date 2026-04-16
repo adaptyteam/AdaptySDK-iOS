@@ -22,7 +22,7 @@ extension Schema.TextField.KeyboardOptions {
     }
 }
 
-extension Schema.TextField.KeyboardOptions: Codable {
+extension Schema.TextField.KeyboardOptions: Decodable {
     enum CodingKeys: String, CodingKey {
         case keyboardType = "keyboard"
         case contentType = "content_type"
@@ -40,13 +40,5 @@ extension Schema.TextField.KeyboardOptions: Codable {
             submitButton: container.decodeIfPresent(String.self, forKey: .submitButton)
         )
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try container.encodeIfPresent(keyboardType, forKey: .keyboardType)
-        try container.encodeIfPresent(contentType, forKey: .contentType)
-        try container.encodeIfPresent(autocapitalizationType, forKey: .autocapitalizationType)
-        try container.encodeIfPresent(submitButton, forKey: .submitButton)
-    }
 }
+

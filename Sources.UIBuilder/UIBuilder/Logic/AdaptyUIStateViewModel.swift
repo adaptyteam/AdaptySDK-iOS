@@ -21,6 +21,22 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    @Published var focusedId: String?
+    var isAutoScrollingToFocus = false
+    @Published var scrollCommand: ScrollCommand?
+    @Published var alertDialog: AlertDialogState?
+
+    struct AlertDialogState {
+        let params: VS.ShowAlertDialogParameters
+    }
+
+    struct ScrollCommand: Equatable {
+        let id = UUID()
+        let instanceId: String
+        let kind: VS.ScrollKind
+        let value: VS.ScrollValue
+    }
+
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,
@@ -53,11 +69,64 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         }
     }
 
-    func execute(actions: [VC.Action], screen: VS.ScreenInstance) {
+    func execute(actions: [VC.Action], params: [String: any VC.Value]? = nil, screen: VS.ScreenInstance) {
         do {
-            try stateHolder.state.execute(actions: actions, screenInstance: screen)
+            try stateHolder.state.execute(actions: actions, params: params, screenInstance: screen)
         } catch {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
+        }
+    }
+
+    func fireFocusChangeActions(
+        oldFocusId: String?,
+        newFocusId: String?,
+        actions: [VC.Action],
+        screen: VS.ScreenInstance
+    ) {
+        var additionalParams: [String: any VC.Value] = [:]
+        if let newFocusId {
+            additionalParams["focusId"] = newFocusId
+        }
+        if let oldFocusId {
+            additionalParams["oldFocusId"] = oldFocusId
+        }
+
+        execute(
+            actions: actions,
+            params: additionalParams.isEmpty ? nil : additionalParams,
+            screen: screen
+        )
+    }
+
+    func setScrollProgress(
+        _ progress: Double,
+        variable: VC.Variable,
+        screen: VS.ScreenInstance
+    ) {
+        do {
+            try stateHolder.state.setValue(
+                variable: variable,
+                value: progress,
+                screenInstance: screen
+            )
+        } catch {
+            Log.ui.error("#\(logId)# setScrollProgress error: \(error)")
+        }
+    }
+
+    func setPageIndex(
+        _ index: Int,
+        variable: VC.Variable,
+        screen: VS.ScreenInstance
+    ) {
+        do {
+            try stateHolder.state.setValue(
+                variable: variable,
+                value: Int32(index),
+                screenInstance: screen
+            )
+        } catch {
+            Log.ui.error("#\(logId)# setPageIndex error: \(error)")
         }
     }
 
@@ -77,6 +146,16 @@ package final class AdaptyUIStateViewModel: ObservableObject {
             Log.ui.error("#\(logId)# getValue error: \(error)")
             return defaultValue
         }
+    }
+
+    var onAlertDialogResponse: ((String?, VS.ScreenInstance?) -> Void)?
+
+    func showAlertDialog(params: VS.ShowAlertDialogParameters) {
+        guard alertDialog == nil else {
+            Log.ui.error("#\(logId)# showAlertDialog ignored: alert already presenting")
+            return
+        }
+        alertDialog = AlertDialogState(params: params)
     }
 
     func createBinding<T: JSValueRepresentable & JSValueConvertable>(

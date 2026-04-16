@@ -17,41 +17,30 @@ extension Adapty {
     ///
     /// - Parameters:
     ///   - placementId: The identifier of the desired paywall. This is the value you specified when you created the paywall in the Adapty Dashboard.
-    ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
-    ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
-    ///             Example: "en" means English, "en-US" represents US English.
-    ///             If the parameter is omitted, the paywall will be returned in the default locale.
     ///   - fetchPolicy: by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
-    /// - Returns: The ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    /// - Returns: The ``AdaptyFlow`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
     /// - Throws: An ``AdaptyError`` object
-    public nonisolated static func getPaywall(
+    public nonisolated static func getFlow(
         placementId: String,
-        locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         loadTimeout: TimeInterval? = nil
-    ) async throws(AdaptyError) -> AdaptyPaywall {
+    ) async throws(AdaptyError) -> AdaptyFlow {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
-        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
 
         let logParams: EventParameters = [
             "placement_id": placementId,
-            "locale": locale,
             "fetch_policy": fetchPolicy,
             "load_timeout": loadTimeout.asMilliseconds,
         ]
 
-        return try await withActivatedSDK(methodName: .getPaywall, logParams: logParams) { sdk throws(AdaptyError) in
-            let paywall: AdaptyPaywall = try await sdk.getPlacement(
+        return try await withActivatedSDK(methodName: .getFlow, logParams: logParams) { sdk throws(AdaptyError) in
+            try await sdk.getPlacement(
                 placementId: placementId,
-                locale: locale,
                 fetchPolicy: fetchPolicy,
                 loadTimeout: loadTimeout
             )
-            AdaptyUIBuilder.sendImageUrlsToObserver(paywall)
-
-            return paywall
         }
     }
 
@@ -87,7 +76,7 @@ extension Adapty {
 
     private func getPlacement<Content: PlacementContent>(
         placementId: String,
-        locale: AdaptyLocale,
+        locale: AdaptyLocale? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy,
         loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> Content {
@@ -116,7 +105,7 @@ extension Adapty {
 
     private func fetchPlacementOrFallbackPlacement<Content: PlacementContent>(
         _ placementId: String,
-        _ locale: AdaptyLocale,
+        _ locale: AdaptyLocale?,
         _ fetchPolicy: AdaptyPlacementFetchPolicy,
         _ loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> Content {
@@ -155,7 +144,7 @@ extension Adapty {
 
     private func fetchPlacement<Content: PlacementContent>(
         _ placementId: String,
-        _ locale: AdaptyLocale,
+        _ locale: AdaptyLocale?,
         withPolicy fetchPolicy: AdaptyPlacementFetchPolicy,
         forUserId userId: AdaptyUserId
     ) async throws(AdaptyError) -> Content {
@@ -190,7 +179,7 @@ extension Adapty {
 
     private func fetchPlacement<Content: PlacementContent>(
         _ placementId: String,
-        _ locale: AdaptyLocale,
+        _ locale: AdaptyLocale?,
         forUserId userId: AdaptyUserId
     ) async throws(AdaptyError) -> Content {
         while !Task.isCancelled {
@@ -218,10 +207,8 @@ extension Adapty {
             let requestWithSpecialVariation = variationId != nil
 
             do throws(HTTPError) {
-                var chosen: AdaptyPlacementChosen<Content>
-
-                if let variationId {
-                    chosen = try await httpSession.fetchPlacement(
+                var chosen: AdaptyPlacementChosen<Content> = if let variationId {
+                    try await httpSession.fetchPlacement(
                         apiKeyPrefix: apiKeyPrefix,
                         userId: userId,
                         placementId: placementId,
@@ -231,7 +218,7 @@ extension Adapty {
                         disableServerCache: isTestUser
                     )
                 } else if let crossPlacementState, crossPlacementState.canParticipateInABTest {
-                    chosen = try await httpSession.fetchPlacementVariations(
+                    try await httpSession.fetchPlacementVariations(
                         apiKeyPrefix: apiKeyPrefix,
                         userId: userId,
                         placementId: placementId,
@@ -289,7 +276,7 @@ extension Adapty {
                         disableServerCache: isTestUser
                     )
                 } else {
-                    chosen = try await httpSession.fetchPlacementVariations(
+                    try await httpSession.fetchPlacementVariations(
                         apiKeyPrefix: apiKeyPrefix,
                         userId: userId,
                         placementId: placementId,
@@ -336,25 +323,25 @@ extension Adapty {
     func getCacheOrFallbackFilePlacement<Content: PlacementContent>(
         _ userId: AdaptyUserId,
         _ placementId: String,
-        _ locale: AdaptyLocale,
+        _ locale: AdaptyLocale?,
         withCrossPlacmentABTest: Bool
     ) -> Content? {
-        let chosen: AdaptyPlacementChosen<Content>?
-        if let manager = try? profileManager(withProfileId: userId) {
-            chosen = manager.placementStorage.getPlacementWithFallback(
-                byPlacementId: placementId,
-                withVariationId: withCrossPlacmentABTest ? manager.crossPlacmentStorage.state?.variationId(placementId: placementId) : nil,
-                userId: userId,
-                locale: locale
-            )
-        } else {
-            chosen = Adapty.fallbackPlacements?.getPlacement(
-                byPlacementId: placementId,
-                withVariationId: nil,
-                userId: userId,
-                requestLocale: locale
-            )
-        }
+        let chosen: AdaptyPlacementChosen<Content>? =
+            if let manager = try? profileManager(withProfileId: userId) {
+                manager.placementStorage.getPlacementWithFallback(
+                    byPlacementId: placementId,
+                    withVariationId: withCrossPlacmentABTest ? manager.crossPlacmentStorage.state?.variationId(placementId: placementId) : nil,
+                    userId: userId,
+                    locale: locale
+                )
+            } else {
+                try? Adapty.fallbackPlacements?.getPlacement(
+                    byPlacementId: placementId,
+                    withVariationId: nil,
+                    userId: userId,
+                    requestLocale: locale
+                )
+            }
 
         guard let chosen else { return nil }
 
@@ -364,7 +351,7 @@ extension Adapty {
 
     private func fetchFallbackPlacement<Content: PlacementContent>(
         _ placementId: String,
-        _ locale: AdaptyLocale,
+        _ locale: AdaptyLocale?,
         forUserId userId: AdaptyUserId,
         withTimeout timeoutInterval: TimeInterval?
     ) async throws(AdaptyError) -> Content {
@@ -390,26 +377,24 @@ extension Adapty {
             }
 
             do throws(HTTPError) {
-                var chosen: AdaptyPlacementChosen<Content>
-                if let variationId = params?.variationId {
-                    chosen = try await httpFallbackSession.fetchFallbackPlacement(
+                var chosen: AdaptyPlacementChosen<Content> = if let variationId = params?.variationId {
+                    try await httpFallbackSession.fetchFallbackPlacement(
                         apiKeyPrefix: apiKeyPrefix,
                         userId: userId,
                         placementId: placementId,
-                        paywallVariationId: variationId,
+                        variationId: variationId,
                         locale: locale,
                         cached: nil,
                         disableServerCache: params?.isTestUser ?? false,
                         timeoutInterval: timeoutInterval
                     )
                 } else {
-                    chosen = try await httpFallbackSession.fetchFallbackPlacementVariations(
+                    try await httpFallbackSession.fetchFallbackPlacementVariations(
                         apiKeyPrefix: apiKeyPrefix,
                         userId: userId,
                         placementId: placementId,
                         locale: locale,
                         cached: params?.cached,
-                        crossPlacementEligible: false,
                         variationIdResolver: nil,
                         disableServerCache: params?.isTestUser ?? false,
                         timeoutInterval: timeoutInterval
@@ -447,8 +432,6 @@ extension TimeInterval {
     }
 }
 
-private extension Error {}
-
 private extension AdaptyError {
     var canUseFallbackServer: Bool {
         if let error = wrapped as? HTTPError,
@@ -480,3 +463,4 @@ private extension HTTPError {
         return decodingError.contains(value)
     }
 }
+

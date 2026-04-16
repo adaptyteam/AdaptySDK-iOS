@@ -26,17 +26,18 @@ extension HTTPDataResponse {
         let jsonDecoder = JSONDecoder()
         configuration?.configure(jsonDecoder: jsonDecoder)
         guard let data = body else { throw URLError(.cannotDecodeRawData) }
-        let body = try jsonDecoder.decode(type, from: data)
-        return body
+        return try jsonDecoder.decode(type, from: data)
     }
 }
 
 extension HTTPDataResponse {
     static func dataDecoder(
         _ response: HTTPDataResponse,
-        _ configuration: HTTPCodableConfiguration?,
-        _ request: HTTPRequest
-    ) async throws -> HTTPDataResponse { response }
+        _: HTTPCodableConfiguration?,
+        _: HTTPRequest
+    ) async throws -> HTTPDataResponse {
+        response
+    }
 }
 
 extension HTTPSession {

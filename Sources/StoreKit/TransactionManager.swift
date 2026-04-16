@@ -113,7 +113,7 @@ private extension Adapty {
         }
     }
 
-    func sendUnfinishedTransactions(manager: TransactionManager) async -> AdaptyResult<Void> {
+    func sendUnfinishedTransactions(manager _: TransactionManager) async -> AdaptyResult<Void> {
         guard !observerMode else { return .success(()) }
         let unfinishedTranasactions = await TransactionManager.fetchUnfinishedTransactions()
         guard !unfinishedTranasactions.isEmpty else { return .success(()) }

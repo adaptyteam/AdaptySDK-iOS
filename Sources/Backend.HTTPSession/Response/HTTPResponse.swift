@@ -45,5 +45,3 @@ extension HTTPResponse {
         ))
     }
 }
-
-

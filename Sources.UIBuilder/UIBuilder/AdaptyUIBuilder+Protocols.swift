@@ -8,6 +8,8 @@
 #if canImport(UIKit)
 
 import Foundation
+import StoreKit
+import UIKit
 
 @MainActor
 public protocol AdaptyUITagResolver: Sendable {
@@ -29,8 +31,8 @@ extension [String: String]: AdaptyUITagResolver {
 package protocol AdaptyUIBuilderObserverModeResolver: Sendable {
     func observerMode(
         didInitiatePurchase product: ProductResolver,
-        onStartPurchase: @escaping () -> Void,
-        onFinishPurchase: @escaping () -> Void
+        onStartPurchase: @Sendable @escaping () -> Void,
+        onFinishPurchase: @Sendable @escaping () -> Void
     )
 }
 
@@ -56,18 +58,41 @@ package protocol AdaptyUIBuilderLogic {
 
     func makePurchase(
         product: ProductResolver,
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     )
 
     func openWebPaywall(for product: ProductResolver, in openIn: VC.Action.WebOpenInParameter) async
 
     func restorePurchases(
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     )
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError)
+
+    func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable])
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent)
+    func logScreenShowed(screenInstanceId: String)
+}
+
+@MainActor
+public protocol AdaptyUISystemRequestsHandler: Sendable {
+    func handlePermission(
+        _ permission: AdaptyUIPermission,
+        withCustomArgs customArgs: [String: String]?
+    ) async -> AdaptyUIPermissionResult
+
+    func handleAppReviewRequest() async
+}
+
+extension AdaptyUISystemRequestsHandler {
+    public func handleAppReviewRequest() async {
+        if let windowScene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: windowScene)
+        }
+    }
 }
 
 #endif

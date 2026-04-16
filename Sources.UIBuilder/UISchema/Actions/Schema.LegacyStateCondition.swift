@@ -14,7 +14,7 @@ extension Schema {
     }
 }
 
-extension Schema.LegacyStateCondition: Codable {
+extension Schema.LegacyStateCondition: Decodable {
     enum CodingKeys: String, CodingKey {
         case type
         case productId = "product_id"
@@ -43,22 +43,6 @@ extension Schema.LegacyStateCondition: Codable {
                 id: container.decode(String.self, forKey: .productId),
                 groupId: container.decodeIfPresent(String.self, forKey: .groupId) ?? "group_A"
             )
-        }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        switch self {
-        case let .selectedSection(sectionId, index):
-            try container.encode(Types.selectedSection.rawValue, forKey: .type)
-            try container.encode(sectionId, forKey: .sectionId)
-            try container.encode(index, forKey: .index)
-        case let .selectedProduct(productId, groupId):
-            try container.encode(Types.selectedProduct.rawValue, forKey: .type)
-            try container.encode(productId, forKey: .productId)
-            if groupId != "group_A" {
-                try container.encode(groupId, forKey: .groupId)
-            }
         }
     }
 }

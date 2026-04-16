@@ -142,6 +142,24 @@ Entities:
                   x: { $ref: "#/Entities/Unit", default: 0 }
               additionalProperties: false
 
+    Rotation:
+        title: Rotation
+        type: object
+        required: [angle]
+        properties:
+            angle: { type: number, default: 0 }
+            anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
+        additionalProperties: false
+
+    Scale:
+        title: Scale
+        type: object
+        required: [scale]
+        properties:
+            scale: { $ref: "#/Entities/Point" }
+            anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
+        additionalProperties: false
+
     Unit:
         title: Unit
         oneOf:
@@ -215,6 +233,7 @@ Animation:
               - $ref: "#/Animation/Background"
               - $ref: "#/Animation/Border"
               - $ref: "#/Animation/Shadow"
+              - $ref: "#/Animation/Blur"
     additionalProperties: false
 
     Interpolator:
@@ -398,15 +417,18 @@ Animation:
                       additionalProperties: false
         additionalProperties: false
 
-    Transition.Slide:
+    Blur:
         type: object
-        required: [type]
+        required: [type, blur_radius]
         properties:
-            type: { const: slide }
-            start_delay: { type: number, default: 0 }
-            duration: { type: number, default: 300 }
-            interpolator:
-                { $ref: "#/Animation/Interpolator", default: ease_in_out }
+            type: { const: blur }
+            blur_radius:
+                type: object
+                required: [start, end]
+                properties:
+                    start: { type: number }
+                    end: { type: number }
+                additionalProperties: false
         additionalProperties: false
 
 ###### Navigators ######
@@ -425,6 +447,11 @@ Navigator:
             properties:
                 on_outside_tap: { $ref: "#/Script/ActionOrArray" }
                 on_device_back: { $ref: "#/Script/ActionOrArray" }
+                on_focus_change: { $ref: "#/Script/ActionOrArray" }
+                on_will_appear: { $ref: "#/Script/ActionOrArray" }
+                on_will_disappear: { $ref: "#/Script/ActionOrArray" }
+                on_did_appear: { $ref: "#/Script/ActionOrArray" }
+                on_did_disappear: { $ref: "#/Script/ActionOrArray" }
             additionalProperties: false
         appearances:
             type: object
@@ -478,20 +505,27 @@ Screen:
         footer: { $ref: "#/UI/Element" }
         background:
             type: array
-            items: { $ref: "#/UI/Element/Overlay" }
+            items: { $ref: "#/UI/Element/AlignedElement" }
             uniqueItems: true
             minItems: 1
         overlay:
             type: array
-            items: { $ref: "#/UI/Element/Overlay" }
+            items: { $ref: "#/UI/Element/AlignedElement" }
             uniqueItems: true
             minItems: 1
         layout_behaviour:
             type: string
             enum: [default, flat, hero, transparent]
             default: default
+        content_scroll_value: { $ref: "#/Script/DataBinding" }
+        footer_scroll_value: { $ref: "#/Script/DataBinding" }
         on_outside_tap: { $ref: "#/Script/ActionOrArray" }
         on_device_back: { $ref: "#/Script/ActionOrArray" }
+        on_focus_change: { $ref: "#/Script/ActionOrArray" }
+        on_will_appear: { $ref: "#/Script/ActionOrArray" }
+        on_will_disappear: { $ref: "#/Script/ActionOrArray" }
+        on_did_appear: { $ref: "#/Script/ActionOrArray" }
+        on_did_disappear: { $ref: "#/Script/ActionOrArray" }
     additionalProperties: false
 
     Holder:
@@ -564,26 +598,72 @@ UI:
                   - properties:
                         decorator: { $ref: "#/UI/Element/Decorator" }
                         padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
-                        offset: { $ref: "#/Entities/Offset", default: 0 }
+                        offset: { $ref: "#/Entities/Offset" }
+                        rotation: { $ref: "#/Entities/Rotation" }
+                        scale: { $ref: "#/Entities/Scale" }
                         opacity: { type: number, default: 1.0 }
                         background:
                             type: array
-                            items: { $ref: "#/UI/Element/Overlay" }
+                            items: { $ref: "#/UI/Element/AlignedElement" }
                             uniqueItems: true
                             minItems: 1
                         overlay:
                             type: array
-                            items: { $ref: "#/UI/Element/Overlay" }
+                            items: { $ref: "#/UI/Element/AlignedElement" }
                             uniqueItems: true
                             minItems: 1
-                        on_appear:
+                        event_handlers:
                             type: array
-                            items: { $ref: "#/Animation" }
+                            items:
+                                type: object
+                                required: [triggers, animations]
+                                properties:
+                                    triggers:
+                                        type: array
+                                        items:
+                                            type: object
+                                            required: [events]
+                                            properties:
+                                                events:
+                                                    type: array
+                                                    items:
+                                                        oneOf:
+                                                            - const: "on_will_appear"
+                                                            - const: "on_will_disappear"
+                                                            - const: "on_did_appear"
+                                                            - const: "on_did_disappear"
+                                                            - type: string
+                                                    uniqueItems: true
+                                                    minItems: 1
+                                                filter:
+                                                    enum:
+                                                        - first
+                                                        - not_first
+                                                transitions:
+                                                    type: array
+                                                    items: { type: string }
+                                            additionalProperties: false
+                                        uniqueItems: true
+                                        minItems: 1
+                                    animations:
+                                        type: array
+                                        items: { $ref: "#/Animation" }
+                                        uniqueItems: true
+                                        minItems: 1
+                                    on_animations_finish:
+                                        { $ref: "#/Script/ActionOrArray" }
+                                additionalProperties: false
                             uniqueItems: true
                             minItems: 1
+                        focus_id:
+                            type: string
+                            description: "Identifier for focus management"
+                        ui_enabled:
+                            $ref: "#/Script/DataBinding"
+                            title: One-way data binding to boolean
               additionalProperties: false
 
-        Overlay:
+        AlignedElement:
             type: object
             required: [content]
             properties:
@@ -604,6 +684,7 @@ UI:
                     { $ref: "#/UI/Element/Decorator/ShapeType", default: rect }
                 border: { $ref: "#/AssetIdOrColor/Binding" }
                 shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
+                blur_radius: { type: number }
             dependentSchemas:
                 border:
                     properties:
@@ -778,6 +859,8 @@ UI:
                 tint:
                     title: Tint color of image
                     $ref: "#/AssetIdOrColor/Binding"
+                letter_spacing: { type: number }
+                line_height: { type: number }
             additionalProperties: false
 
     TextField:
@@ -903,17 +986,19 @@ UI:
 
     Button:
         type: object
-        required: [type, action, normal]
+        # required: [type, action, normal]
+        required: [type, action, content]
         properties:
             type: { const: button }
             action: { $ref: "#/Script/ActionOrArray" }
-            normal: { $ref: "#/UI/Element" }
-            selected: { $ref: "#/UI/Element" }
-            is_selected:
-                {
-                    $ref: "#/Script/DataBinding",
-                    title: "One-way data binding to boolean",
-                }
+            content: { $ref: "#/UI/Element" }
+            # normal: { $ref: "#/UI/Element" }
+            # selected: { $ref: "#/UI/Element" }
+            # is_selected:
+            #     {
+            #         $ref: "#/Script/DataBinding",
+            #         title: "One-way data binding to boolean",
+            #     }
 
     Stack:
         type: object
@@ -950,6 +1035,11 @@ UI:
                     $ref: "#/Script/DataBinding",
                     title: "One-way data binding to integer",
                 }
+            duration:
+                title: "Animation duration in milliseconds. If absent, no animation."
+                type: number
+            interpolator:
+                { $ref: "#/Animation/Interpolator", default: ease_in_out }
             content:
                 type: array
                 minItems: 1
@@ -1014,23 +1104,6 @@ UI:
                           default: leading,
                       }
                   action: { $ref: "#/Script/ActionOrArray" }
-            - oneOf:
-                  - required: [end_time, behaviour]
-                    properties:
-                        end_time: { $ref: "#/Entities/DateTime" }
-                        behaviour:
-                            type: string
-                            const: end_at_time
-                  - required: [duration, behaviour]
-                    properties:
-                        duration: { type: number, description: seconds }
-                        behaviour:
-                            enum:
-                                - start_at_every_appear
-                                - start_at_first_appear
-                                - start_at_first_appear_persisted
-                                - custom
-                            default: start_at_first_appear
             - $ref: "#/UI/Text/Attributes"
 
         Format:
@@ -1062,6 +1135,7 @@ UI:
                 type: array
                 minItems: 1
                 items: { $ref: "#/UI/Element" }
+            page_index: { $ref: "#/Script/DataBinding" }
             page_control:
                 type: object
                 properties:
@@ -1082,9 +1156,9 @@ UI:
                 properties:
                     start_delay: { type: number, default: 0 }
                     page_transition:
-                        $ref: "#/Animation/Transition.Slide"
+                        $ref: "#/UI/Pager/Transition"
                         default: { type: slide }
-                    repeat_transition: { $ref: "#/Animation/Transition.Slide" }
+                    repeat_transition: { $ref: "#/UI/Pager/Transition" }
                     after_interaction_delay: { type: number, default: 3000 }
                 additionalProperties: false
             interaction:
@@ -1104,6 +1178,15 @@ UI:
                   additionalProperties: false
                   properties:
                       parent: { type: number }
+
+        Transition:
+            type: object
+            properties:
+                start_delay: { type: number, default: 0 }
+                duration: { type: number, default: 300 }
+                interpolator:
+                    { $ref: "#/Animation/Interpolator", default: ease_in_out }
+            additionalProperties: false
 
     DateTimePicker:
         type: object
@@ -1151,10 +1234,24 @@ UI:
 
     WheelItemsPicker:
         type: object
-        required: [type, value]
+        required: [type, value, items]
         properties:
             type: { const: "wheel_items_picker" }
             value: { $ref: "#/Script/DataBinding" }
+            items:
+                type: array
+                items:
+                    type: object
+                    required: [value, label]
+                    properties:
+                        string_id: { type: string }
+                        value:
+                            oneOf:
+                                - type: string
+                                - type: number
+                                - type: boolean
+                uniqueItems: true
+                minItems: 1
 
 ###### Rich Text ######
 
@@ -1226,6 +1323,7 @@ RichText:
             tint:
                 title: Tint color of image
                 $ref: "#/AssetIdOrColor"
+            letter_spacing: { type: number }
         additionalProperties: false
 
 ###### Localization ######
@@ -1405,6 +1503,8 @@ Assets:
             italic: { type: boolean, default: false }
             size: { type: number, default: 15 }
             color: { $ref: "#/Assets/Color/HexString", default: "#000000FF" }
+            letter_spacing: { type: number }
+            line_height: { type: number }
         additionalProperties: false
 
     Image:
@@ -1489,6 +1589,7 @@ Script:
                 type: string
                 enum: [global, screen]
                 default: screen
+
         additionalProperties: false
 
     ActionOrArray:
@@ -1515,12 +1616,18 @@ Script:
                 type: string
                 enum: [global, screen]
                 default: screen
-            converter: { enum: [is_equal] }
+            converter: { enum: [is_equal, map, date_time] }
             converter_params:
                 oneOf:
                     - type: string
                     - type: boolean
                     - type: number
+                    - type: array
+                      items:
+                          oneOf:
+                              - type: string
+                              - type: boolean
+                              - type: number
                     - type: object
                       additionalProperties:
                           oneOf:
@@ -1564,7 +1671,6 @@ DateTime:
                   default: null
                   $ref: "#/DateTime/TimeZone"
                   description: >
-                      Time zone. См. TimeZoneIdentifier для форматов.
                       When null: используется часовой пояс из настроек
                       устройства пользователя.
 
@@ -1637,7 +1743,7 @@ DateTime:
               "offset": { "hour": 9 },
           }
         # Текущий момент
-        - { "anchor": "now" }
+        - { "anchor": "start" }
         # Unix timestamp в миллисекундах
         - 1742054400000
 
@@ -1701,21 +1807,21 @@ DateTime:
                 type: string
                 description: >
                     Опорная точка для вычислений.
-                    - now: текущий момент UTC. anchor_time_zone не требуется.
+                    - start: текущий момент - старта flow в UTC. anchor_time_zone не требуется.
                     - start_of_day: полночь (00:00:00) текущего дня. anchor_time_zone обязателен.
                     - start_of_week: полночь понедельника текущей недели (ISO 8601).
                       anchor_time_zone обязателен.
                     - start_of_month: полночь 1-го числа текущего месяца. anchor_time_zone обязателен.
                     - start_of_year: полночь 1 января текущего года. anchor_time_zone обязателен.
                 enum:
-                    - now
+                    - start
                     - start_of_day
                     - start_of_week
                     - start_of_month
                     - start_of_year
 
             anchor_time_zone:
-                $ref: "#/TimeZoneIdentifier"
+                $ref: "#/DateTime/TimeZone"
                 description: >
                     Time zone для определения опорной точки.
                     Обязателен для startOfDay, startOfWeek, startOfMonth, startOfYear.
@@ -1734,15 +1840,18 @@ DateTime:
         examples:
             # --- now ---
             # Текущий момент
-            - { "anchor": "now" }
+            - { "anchor": "start" }
             # Через 30 минут от сейчас
-            - { "anchor": "now", "offset": { "minute": 30 } }
+            - { "anchor": "start", "offset": { "minute": 30 } }
             # 2 часа назад
-            - { "anchor": "now", "offset": { "hour": -2 } }
+            - { "anchor": "start", "offset": { "hour": -2 } }
 
             # --- startOfDay ---
             # Начало сегодняшнего дня
-            - { "anchor": "start_of_day", "anchor_time_zone": "Europe/Podgorica" }
+            - {
+                  "anchor": "start_of_day",
+                  "anchor_time_zone": "Europe/Podgorica",
+              }
             # Сегодня в 14:30
             - {
                   "anchor": "start_of_day",
@@ -1776,7 +1885,10 @@ DateTime:
 
             # --- startOfWeek (понедельник, ISO 8601) ---
             # Начало текущей недели (понедельник 00:00)
-            - { "anchor": "start_of_week", "anchor_time_zone": "Europe/Podgorica" }
+            - {
+                  "anchor": "start_of_week",
+                  "anchor_time_zone": "Europe/Podgorica",
+              }
             # Пятница этой недели в 18:00
             - {
                   "anchor": "start_of_week",
@@ -1792,7 +1904,10 @@ DateTime:
 
             # --- startOfMonth ---
             # Начало текущего месяца
-            - { "anchor": "start_of_month", "anchor_time_zone": "Europe/Podgorica" }
+            - {
+                  "anchor": "start_of_month",
+                  "anchor_time_zone": "Europe/Podgorica",
+              }
             # 15-е число этого месяца в 10:00
             - {
                   "anchor": "start_of_month",
@@ -1808,7 +1923,10 @@ DateTime:
 
             # --- startOfYear ---
             # Начало текущего года
-            - { "anchor": "start_of_year", "anchor_time_zone": "Europe/Podgorica" }
+            - {
+                  "anchor": "start_of_year",
+                  "anchor_time_zone": "Europe/Podgorica",
+              }
             # 1 марта текущего года
             - {
                   "anchor": "start_of_year",

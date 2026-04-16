@@ -21,17 +21,7 @@ public struct AdaptyUISchema: Sendable {
     let scripts: [String]
 }
 
-public extension AdaptyUISchema {
-    init(from jsonData: Data) throws {
-        self = try JSONDecoder().decode(AdaptyUISchema.self, from: jsonData)
-    }
-
-    init(from jsonData: String) throws {
-        try self.init(from: jsonData.data(using: .utf8) ?? Data())
-    }
-}
-
-extension AdaptyUISchema: Codable {
+extension AdaptyUISchema: Decodable {
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
         case legacyTemplateId = "template_id"
@@ -86,7 +76,7 @@ extension AdaptyUISchema: Codable {
 
         if configuration.isLegacy {
             navigators = screensCollection.legacyGeneratedNavigators ?? [:]
-        } else if let navigatorCollection = try container.decodeIfPresent(
+        } else if let navigatorCollection = try container.decodeIfExist(
             NavigatorsCollection.self,
             forKey: .navigators,
             configuration: configuration
@@ -97,7 +87,7 @@ extension AdaptyUISchema: Codable {
             navigators = navigatorCollection.navigators
         }
 
-        let templatesCollection = try container.decodeIfPresent(
+        let templatesCollection = try container.decodeIfExist(
             TemplatesCollection.self,
             forKey: .templates,
             configuration: configuration
@@ -117,24 +107,6 @@ extension AdaptyUISchema: Codable {
                 try decoder.decodeScript(configuration: configuration)
             }
     }
-
-    public func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(formatVersion, forKey: .formatVersion)
-        try container.encode(AssetsCollection(value: assets), forKey: .assets)
-        try container.encode(Array(localizations.values), forKey: .localizations)
-        try container.encodeIfPresent(defaultLocalization?.id, forKey: .defaultLocalId)
-//        try container.encode(screens, forKey: .screens)
-//        try container.encode(screens, forKey: .templates)
-//        try container.encode(screens, forKey: .navigators)
-
-        if scripts.isNotEmpty {
-            var container = container.nestedUnkeyedContainer(forKey: .scripts)
-            var script = container.nestedContainer(keyedBy: ScriptCodingKeys.self)
-            try script.encode("js", forKey: .type)
-            try script.encode(scripts.joined(), forKey: .content)
-        }
-    }
 }
 
 private enum ScriptCodingKeys: String, CodingKey {
@@ -153,11 +125,11 @@ private extension Decoder {
         var scripts = try container.nestedUnkeyedContainer(forKey: .scripts)
 
         while !scripts.isAtEnd {
-            let script = try scripts.nestedContainer(keyedBy: ScriptCodingKeys.self)
-            if script.contains(.type) {
-                guard try script.decode(String.self, forKey: .type) == "js" else { continue }
+            let itemContainer = try scripts.nestedContainer(keyedBy: ScriptCodingKeys.self)
+            if let value = try itemContainer.decodeIfPresent(String.self, forKey: .type) {
+                guard value == "js" else { continue }
             }
-            let content = try script.decode(String.self, forKey: .content)
+            let content = try itemContainer.decode(String.self, forKey: .content)
             return [content]
         }
 
@@ -176,7 +148,7 @@ private extension Decoder {
 
         var scripts = [String]()
 
-        if container.contains(.products) {
+        if container.exist(.products) {
             let container = try container.nestedContainer(keyedBy: LegacyCodingKeys.self, forKey: .products)
             if let selected = try? container.decodeIfPresent(String.self, forKey: .selected) {
                 scripts += [Schema.LegacyScripts.legacySelectProductScript(productId: selected)]
@@ -192,6 +164,9 @@ private extension Decoder {
             scripts += [Schema.LegacyScripts.legacySelectSectionScript(sectionId: section.key, index: section.value)]
         }
 
+        scripts.append(contentsOf: collector.legacyTimers.values)
+
         return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
     }
 }
+

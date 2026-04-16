@@ -50,7 +50,9 @@ private extension SchemaTests {
                         weight: 400,
                         italic: false,
                         defaultSize: 15,
-                        defaultColor: defaultFontColor
+                        defaultColor: defaultFontColor,
+                        defaultLetterSpacing: nil,
+                        defaultLineHeight: nil
                     )),
                 ],
                 Json(##"""
@@ -119,14 +121,6 @@ private extension SchemaTests {
                 try invalid.decode(Value.self)
             }
         }
-
-        // MARK: - Roundtrip Tests
-
-        @Test("encode → decode roundtrip", arguments: jsonCases.map(\.value))
-        func roundtrip(value: [String: Schema.Asset]) throws {
-            let original = Value(value: value)
-            let decoded = try Json.encode(original).decode(Value.self)
-            #expect(decoded.value == original.value)
-        }
     }
 }
+

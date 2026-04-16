@@ -11,7 +11,7 @@ extension Schema.Navigator {
     typealias AppearanceTransition = VC.Navigator.AppearanceTransition
 }
 
-extension Schema.Navigator.AppearanceTransition: Codable {
+extension Schema.Navigator.AppearanceTransition: Decodable {
     enum CodingKeys: String, CodingKey {
         case background
         case content
@@ -23,11 +23,5 @@ extension Schema.Navigator.AppearanceTransition: Codable {
             background: container.decodeIfPresent(Schema.Animation.Background.self, forKey: .background),
             content: container.decodeIfPresent([Schema.Animation].self, forKey: .content)
         )
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if let background { try container.encode(background, forKey: .background) }
-        if let content, content.isNotEmpty { try container.encode(content, forKey: .content) }
     }
 }

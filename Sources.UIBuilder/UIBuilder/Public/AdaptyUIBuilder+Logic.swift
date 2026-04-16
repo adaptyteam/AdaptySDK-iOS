@@ -52,15 +52,15 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
 
     func makePurchase(
         product: ProductResolver,
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     ) {
         events.event_didStartPurchase(product: product)
     }
 
     func restorePurchases(
-        onStart: @MainActor @escaping () -> Void,
-        onFinish: @MainActor @escaping () -> Void
+        onStart: @MainActor @Sendable @escaping () -> Void,
+        onFinish: @MainActor @Sendable @escaping () -> Void
     ) {
         events.event_didStartRestore()
     }
@@ -73,6 +73,12 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {
         events.event_didFailRendering(with: error)
     }
+
+    func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable]) {}
+
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
+
+    func logScreenShowed(screenInstanceId: String) {}
 }
 
 #endif

@@ -69,12 +69,12 @@ extension StoreKitReceiptManager {
         if let syncing, userId.isEqualProfileId(syncing.userId) {
             task = syncing.task
         } else {
-            task = Task.detachedAsResultTask { () async throws(AdaptyError) in
+            task = Task.detachedWithThrowsTyped { () async throws(AdaptyError) in
                 try await self.syncReceipt(for: userId)
             }
             syncing = (task, userId)
         }
-        try await task.value.get()
+        try await task.valueWithThrowsTyped()
     }
 
     private func syncReceipt(for userId: AdaptyUserId) async throws(AdaptyError) {
@@ -115,13 +115,13 @@ private final class ReceiptRefresher: NSObject, @unchecked Sendable {
                 return
             }
 
-            if let handlers = self.refreshCompletionHandlers {
-                self.refreshCompletionHandlers = handlers + [completion]
-                log.debug("Add handler to refreshCompletionHandlers.count = \(self.refreshCompletionHandlers?.count ?? 0)")
+            if let handlers = refreshCompletionHandlers {
+                refreshCompletionHandlers = handlers + [completion]
+                log.debug("Add handler to refreshCompletionHandlers.count = \(refreshCompletionHandlers?.count ?? 0)")
                 return
             }
 
-            self.refreshCompletionHandlers = [completion]
+            refreshCompletionHandlers = [completion]
 
             log.verbose("Start refresh receipt")
             let request = SKReceiptRefreshRequest()
@@ -141,11 +141,11 @@ private final class ReceiptRefresher: NSObject, @unchecked Sendable {
         queue.async { [weak self] in
             guard let self else { return }
 
-            guard let handlers = self.refreshCompletionHandlers.nonEmptyOrNil else {
+            guard let handlers = refreshCompletionHandlers.nonEmptyOrNil else {
                 log.error("Not found refreshCompletionHandlers")
                 return
             }
-            self.refreshCompletionHandlers = nil
+            refreshCompletionHandlers = nil
 
             if let error {
                 log.error("Refresh receipt failed. \(error)")

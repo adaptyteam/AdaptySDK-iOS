@@ -28,7 +28,7 @@ extension VC.Pager.Length {
     }
 }
 
-extension VC.TransitionSlide {
+extension VC.Transition {
     var swiftUIAnimation: Animation {
         interpolator.createAnimation(duration: duration)
     }
@@ -69,9 +69,16 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
+    @EnvironmentObject
+    var stateViewModel: AdaptyUIStateViewModel
 
     private let pager: VC.Pager
     private let screenHolderBuilder: () -> ScreenHolderContent
+
+    private var pageIndexFromBinding: Int {
+        guard let variable = pager.pageIndex else { return currentPage }
+        return Int(stateViewModel.getValue(variable, defaultValue: Int32(0), screen: screen))
+    }
 
     // We had to introduce this additional State variable to workaround weird SwiftUI crash caused animated currentPage change
     // PageControl now relies on currentPageSelectedIndex variable which is updating outside of withAnimation block
@@ -134,6 +141,16 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
         }
         .onDisappear {
             stopAutoScroll()
+        }
+        .onChange(of: currentPage) { newPage in
+            handlePageChanged(to: newPage)
+        }
+        .onChange(of: pageIndexFromBinding) { newTarget in
+            let clamped = max(0, min(newTarget, pager.content.count - 1))
+            guard clamped != currentPage else { return }
+            withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
+                currentPage = clamped
+            }
         }
     }
 
@@ -327,6 +344,16 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
     private func stopAutoScroll() {
         timer?.invalidate()
         timer = nil
+    }
+
+    private func handlePageChanged(to newPage: Int) {
+        if let pageIndexVariable = pager.pageIndex {
+            stateViewModel.setPageIndex(
+                newPage,
+                variable: pageIndexVariable,
+                screen: screen
+            )
+        }
     }
 }
 

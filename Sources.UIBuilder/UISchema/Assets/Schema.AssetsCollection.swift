@@ -7,7 +7,7 @@
 import Foundation
 
 extension Schema {
-    struct AssetsCollection: Codable {
+    struct AssetsCollection: Decodable {
         let value: [AssetIdentifier: Asset]
 
         init(value: [AssetIdentifier: Asset]) {
@@ -21,12 +21,7 @@ extension Schema {
             })
         }
 
-        func encode(to encoder: any Encoder) throws {
-            var container = encoder.singleValueContainer()
-            try container.encode(value.map(Item.init))
-        }
-
-        private struct Item: Codable {
+        private struct Item: Decodable {
             let id: AssetIdentifier
             let value: Asset
 
@@ -40,12 +35,7 @@ extension Schema {
                 id = try container.decode(String.self, forKey: .id)
                 value = try Asset(from: decoder)
             }
-
-            func encode(to encoder: any Encoder) throws {
-                try value.encode(to: encoder)
-                var container = encoder.container(keyedBy: Asset.CodingKeys.self)
-                try container.encode(id, forKey: .id)
-            }
         }
     }
 }
+

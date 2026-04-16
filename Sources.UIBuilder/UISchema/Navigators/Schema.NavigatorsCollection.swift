@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 extension Schema {
-    struct NavigatorsCollection: Sendable, Hashable {
+    struct NavigatorsCollection: Sendable {
         let navigators: [NavigatorIdentifier: Navigator]
 
         init(values: [Schema.NavigatorIdentifier: Schema.Navigator]? = nil) {

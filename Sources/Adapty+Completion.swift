@@ -11,7 +11,6 @@ public typealias AdaptyResult<Success> = Swift.Result<Success, AdaptyError>
 
 public typealias AdaptyErrorCompletion = @Sendable (AdaptyError?) -> Void
 public typealias AdaptyResultCompletion<Success> = @Sendable (AdaptyResult<Success>) -> Void
-package typealias AdaptyResultTask<Success> = Task<AdaptyResult<Success>, Never>
 
 public extension Result where Failure == AdaptyError {
     var error: AdaptyError? {
@@ -167,24 +166,18 @@ public extension Adapty {
     ///
     /// - Parameters:
     ///   - placementId: The identifier of the desired placement. This is the value you specified when you created the placement in the Adapty Dashboard.
-    ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
-    ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
-    ///             Example: "en" means English, "en-US" represents US English.
-    ///             If the parameter is omitted, the paywall will be returned in the default locale.
     ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
     ///   - loadTimeout: This value limits the timeout for this method. If the timeout is reached, cached data or local fallback will be returned.
-    ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-    nonisolated static func getPaywall(
+    ///   - completion: A result containing the ``AdaptyFlow`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    nonisolated static func getFlow(
         placementId: String,
-        locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         loadTimeout: TimeInterval? = nil,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyFlow>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await getPaywall(
+            try await getFlow(
                 placementId: placementId,
-                locale: locale,
                 fetchPolicy: fetchPolicy,
                 loadTimeout: loadTimeout
             )
@@ -212,22 +205,16 @@ public extension Adapty {
     ///
     /// - Parameters:
     ///   - placementId: The identifier of the desired placement. This is the value you specified when you created the placement in the Adapty Dashboard.
-    ///   - locale: The identifier of the paywall [localization](https://docs.adapty.io/docs/paywall#localizations).
-    ///             This parameter is expected to be a language code composed of one or more subtags separated by the "-" character. The first subtag is for the language, the second one is for the region (The support for regions will be added later).
-    ///             Example: "en" means English, "en-US" represents US English.
-    ///             If the parameter is omitted, the paywall will be returned in the default locale.
     ///   - fetchPolicy:by default SDK will try to load data from server and will return cached data in case of failure. Otherwise use `.returnCacheDataElseLoad` to return cached data if it exists.
-    ///   - completion: A result containing the ``AdaptyPaywall`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
-    nonisolated static func getPaywallForDefaultAudience(
+    ///   - completion: A result containing the ``AdaptyFlow`` object. This model contains the list of the products ids, paywall's identifier, custom payload, and several other properties.
+    nonisolated static func getFlowForDefaultAudience(
         placementId: String,
-        locale: String? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy = .default,
-        _ completion: @escaping AdaptyResultCompletion<AdaptyPaywall>
+        _ completion: @escaping AdaptyResultCompletion<AdaptyFlow>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await getPaywallForDefaultAudience(
+            try await getFlowForDefaultAudience(
                 placementId: placementId,
-                locale: locale,
                 fetchPolicy: fetchPolicy
             )
         }
@@ -266,15 +253,15 @@ public extension Adapty {
         }
     }
 
-    /// Once you have a ``AdaptyPaywall``, fetch corresponding products array using this method.
+    /// Once you have a ``AdaptyFlowPaywall``, fetch corresponding products array using this method.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products)
     ///
     /// - Parameters:
-    ///   - paywall: the ``AdaptyPaywall`` for which you want to get a products
+    ///   - paywall: the ``AdaptyFlowPaywall`` for which you want to get a products
     ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
     nonisolated static func getPaywallProducts(
-        paywall: AdaptyPaywall,
+        paywall: AdaptyFlowPaywall,
         _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
@@ -282,12 +269,19 @@ public extension Adapty {
         }
     }
 
-    nonisolated static func getPaywallProductsWithoutDeterminingOffer(
-        paywall: AdaptyPaywall,
-        _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProductWithoutDeterminingOffer]>
+    /// Once you have a ``AdaptyFlow``, fetch corresponding products array using this method.
+    ///
+    /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/displaying-products)
+    ///
+    /// - Parameters:
+    ///   - flow: the ``AdaptyFlow`` for which you want to get a products
+    ///   - completion: A result containing the ``AdaptyPaywallProduct`` objects array. The order will be the same as in the paywalls object. You can present them in your UI
+    nonisolated static func getPaywallProducts(
+        flow: AdaptyFlow,
+        _ completion: @escaping AdaptyResultCompletion<[AdaptyPaywallProduct]>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await getPaywallProductsWithoutDeterminingOffer(paywall: paywall)
+            try await getPaywallProducts(flow: flow)
         }
     }
 
@@ -318,7 +312,7 @@ public extension Adapty {
     }
 
     nonisolated static func openWebPaywall(
-        for paywall: AdaptyPaywall,
+        for paywall: AdaptyFlowPaywall,
         in presentation: AdaptyWebPresentation = .externalBrowser,
         _ completion: AdaptyErrorCompletion?
     ) {
@@ -337,7 +331,7 @@ public extension Adapty {
     }
 
     nonisolated static func createWebPaywallUrl(
-        for paywall: AdaptyPaywall,
+        for paywall: AdaptyFlowPaywall,
         _ completion: @escaping AdaptyResultCompletion<URL>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
@@ -385,26 +379,7 @@ public extension Adapty {
     /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
     ///
     /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
-    ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
-    ///   - completion: A result containing an optional error.
-    @available(*, deprecated, renamed: "reportTransaction")
-    nonisolated static func setVariationId(
-        _ variationId: String,
-        forPurchasedTransaction transaction: StoreKit.Transaction,
-        _ completion: AdaptyErrorCompletion? = nil
-    ) {
-        withCompletion(completion) { () async throws(AdaptyError) in
-            try await reportTransaction(transaction, withVariationId: variationId)
-        }
-    }
-
-    /// Link purchased transaction with paywall's variationId.
-    ///
-    /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
-    ///
-    /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
+    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyFlowPaywall`.
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
     ///   - completion: A result containing an optional error.
     nonisolated static func reportTransaction(
@@ -422,7 +397,7 @@ public extension Adapty {
     /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
     ///
     /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
+    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyFlowPaywall`.
     ///   - transaction: A purchased verification result of transaction (note, that this method is suitable only for Store Kit version 2) [VerificationResult](https://developer.apple.com/documentation/storekit/verificationresult).
     ///   - completion: A result containing an optional error.
     nonisolated static func reportTransaction(
@@ -440,7 +415,7 @@ public extension Adapty {
     /// In [Observer mode](https://docs.adapty.io/docs/ios-observer-mode), Adapty SDK doesn't know, where the purchase was made from. If you display products using our [Paywalls](https://docs.adapty.io/docs/paywall) or [A/B Tests](https://docs.adapty.io/docs/ab-test), you can manually assign variation to the purchase. After doing this, you'll be able to see metrics in Adapty Dashboard.
     ///
     /// - Parameters:
-    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyPaywall`.
+    ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyFlowPaywall`.
     ///   - purchaseResult: A product purchase result  (note, that this method is suitable only for Store Kit version 2) [Product.PurchaseResult](https://developer.apple.com/documentation/storekit/product/purchaseresult).
     ///   - completion: A result containing an optional error.
     nonisolated static func reportPurchaseResult(
@@ -461,10 +436,10 @@ public extension Adapty {
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
     ///
     /// - Parameters:
-    ///   - paywall: A `AdaptyPaywall` object.
+    ///   - paywall: A `AdaptyFlowPaywall` object.
     ///   - completion: Result callback.
     nonisolated static func logShowPaywall(
-        _ paywall: AdaptyPaywall,
+        _ paywall: AdaptyFlowPaywall,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
@@ -564,3 +539,4 @@ private func withCompletion<T: Sendable>(
         }
     }
 }
+
