@@ -47,9 +47,9 @@ extension VC.ColorGradient {
             .radial(
                 RadialGradient(
                     gradient: .init(stops: stops),
-                    center: .center,
-                    startRadius: 0.0,
-                    endRadius: 1.0
+                    center: start.unitPoint,
+                    startRadius: end.x,
+                    endRadius: end.y
                 )
             )
         }
