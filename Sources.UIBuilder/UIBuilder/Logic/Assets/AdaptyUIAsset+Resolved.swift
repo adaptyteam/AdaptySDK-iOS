@@ -39,7 +39,7 @@ extension VC.ColorGradient {
             .angular(
                 AngularGradient(
                     gradient: .init(stops: stops),
-                    center: .center,
+                    center: start.unitPoint,
                     angle: .degrees(360)
                 )
             )
