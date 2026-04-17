@@ -27,7 +27,7 @@ import JavaScriptCore
     func showAlertDialog(_ params: JSValue)
     func showRequestPermission(_ params: JSValue)
     func sendEvents(_ params: JSValue)
-    func sendAnalyticEvent(_ params: JSValue)
+    func sendAnalyticsEvent(_ params: JSValue)
 }
 
 extension VS.JSActionDispatcher: JSActionBridge {
@@ -114,8 +114,8 @@ extension VS.JSActionDispatcher: JSActionBridge {
         sendEvents(params.isObject ? params.toDictionary() : nil)
     }
 
-    func sendAnalyticEvent(_ params: JSValue) {
-        sendAnalyticEvent(params.isObject ? (params.toDictionary() as? [String: any Sendable]) : nil)
+    func sendAnalyticsEvent(_ params: JSValue) {
+        sendAnalyticsEvent(params.isObject ? (params.toDictionary() as? [String: any Sendable]) : nil)
     }
 }
 

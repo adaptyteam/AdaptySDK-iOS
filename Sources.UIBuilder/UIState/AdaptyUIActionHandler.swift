@@ -25,7 +25,7 @@ package protocol AdaptyUIActionHandler: AnyObject {
     func setTimer(id: String, duration: TimeInterval, behavior: VS.SetTimerBehavior, callback: VS.JSAction?)
     func moveScroll(instanceId: String, kind: VS.ScrollKind, value: VS.ScrollValue)
 
-    func sendAnalyticEvent(_: VS.AnalyticEvent)
+    func sendAnalyticsEvent(_: VS.AnalyticEvent)
     func sendEvents(instanceId: String?, eventIds: [String])
     func showAppRate()
     func showAlertDialog(params: VS.ShowAlertDialogParameters, callback: VS.JSAction?)

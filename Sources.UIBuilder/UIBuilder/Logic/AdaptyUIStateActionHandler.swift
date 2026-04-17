@@ -344,7 +344,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func sendAnalyticEvent(_ event: VS.AnalyticEvent) {
+    package nonisolated func sendAnalyticsEvent(_ event: VS.AnalyticEvent) {
         Task { @MainActor [weak self] in
             if event.isBackend {
                 self?.logic.reportBackendAnalyticEvent(event)
