@@ -44,24 +44,17 @@ extension Schema.Timer: DecodableWithConfiguration {
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(String.self, forKey: .id)
 
-        id = try container.decode(String.self, forKey: .id)
-
-        let formatItems =
-            if let stringId = try? container.decode(String.self, forKey: .format) {
-                [Schema.RangeTextFormat.Item(from: 0, stringId: stringId)]
-            } else {
-                try container.decode([Schema.RangeTextFormat.Item].self, forKey: .format)
-            }
-
-        format = try Schema.RangeTextFormat(
-            items: formatItems,
-            textAttributes: Schema.TextAttributes(from: decoder)
+        try self.init(
+            id: id,
+            format: container.decodeRangeTextFormat(
+                textAttributes: .init(from: decoder),
+                forKey: .format
+            ),
+            actions: container.decodeIfPresentActions(forKey: .actions) ?? [],
+            horizontalAlign: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
         )
-
-        actions = try container.decodeIfPresentActions(forKey: .actions) ?? []
-
-        horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
 
         if configuration.isLegacy {
             configuration.collector.legacyTimers[id] = try Schema.decodeLegacySetTimer(id: id, from: decoder)

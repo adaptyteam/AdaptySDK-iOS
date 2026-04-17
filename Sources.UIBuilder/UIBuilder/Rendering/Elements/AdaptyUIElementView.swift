@@ -83,6 +83,12 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             AdaptyUIWheelItemsPickerView(wheelItemsPicker)
         case let .wheelRangePicker(wheelRangePicker, _):
             AdaptyUIWheelRangePickerView(wheelRangePicker)
+        case .textProgress:
+            AdaptyUIUnknownElementView(value: "VC.TextProgress")
+        case .linearProgress:
+            AdaptyUIUnknownElementView(value: "VC.LinearProgress")
+        case .radialProgress:
+            AdaptyUIUnknownElementView(value: "VC.RadialProgress")
         case let .unknown(value):
             AdaptyUIUnknownElementView(value: value)
         }
@@ -235,12 +241,13 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
                 guard let loop = tl.loop, let loopCount = tl.loopCount else {
                     return baseDuration
                 }
-                let loopDuration: TimeInterval = switch loop {
-                case .normal:
-                    tl.duration + tl.loopDelay
-                case .pingPong:
-                    tl.duration * 2 + tl.pingPongDelay
-                }
+                let loopDuration: TimeInterval =
+                    switch loop {
+                    case .normal:
+                        tl.duration + tl.loopDelay
+                    case .pingPong:
+                        tl.duration * 2 + tl.pingPongDelay
+                    }
                 return baseDuration + loopDuration * Double(loopCount)
             }
             .max() ?? 0
@@ -259,3 +266,4 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
 }
 
 #endif
+

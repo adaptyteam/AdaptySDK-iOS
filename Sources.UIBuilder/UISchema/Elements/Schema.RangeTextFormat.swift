@@ -30,3 +30,26 @@ extension Schema.ConfigurationBuilder {
         )
     }
 }
+
+extension KeyedDecodingContainer {
+    func decodeRangeTextFormat(textAttributes: Schema.TextAttributes, forKey key: Key) throws -> Schema.RangeTextFormat {
+        let formatItems =
+        if let stringId = try? decode(String.self, forKey: key) {
+            [Schema.RangeTextFormat.Item(from: 0, stringId: stringId)]
+        } else {
+            try decode([Schema.RangeTextFormat.Item].self, forKey: key)
+        }
+
+        guard !formatItems.isEmpty else {
+            throw DecodingError
+                .dataCorruptedError(forKey: key, in: self, debugDescription: "Must be at least one format item")
+        }
+
+        return .init(
+            items: formatItems,
+            textAttributes: textAttributes
+        )
+    }
+
+
+}
