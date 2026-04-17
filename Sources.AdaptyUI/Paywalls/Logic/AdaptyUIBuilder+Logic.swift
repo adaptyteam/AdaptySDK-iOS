@@ -87,7 +87,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     private func getProductsInternal() async throws -> ([ProductResolver], [String]) {
         let products = try await Adapty.getPaywallProducts(flow: flow)
         let returnedIds = Set(products.map(\.vendorProductId))
-        let failedProductIds = flow.vendorProductIds.filter { !returnedIds.contains($0) }
+        let failedProductIds = flow.paywallsUniqueVendorProductIds.filter { !returnedIds.contains($0) }
         return (products, failedProductIds)
     }
 
