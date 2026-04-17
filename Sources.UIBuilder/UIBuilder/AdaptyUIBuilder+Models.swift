@@ -18,7 +18,7 @@ public extension AdaptyUIBuilder {
 }
 
 public protocol ProductResolver: Sendable {
-    var adaptyProductId: String { get }
+    var flowId: String { get }
     var paymentMode: PaymentModeValue { get }
 
     func value(byTag tag: TextProductTag) -> TextTagValue?

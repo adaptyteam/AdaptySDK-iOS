@@ -50,7 +50,7 @@ package final class AdaptyUIEventsHandler {
 
     // TODO: x check automatic behaviour
     package func event_didSelectProduct(_ product: ProductResolver, automatic: Bool) {
-        Log.app.verbose("#\(logId)# event_didSelectProduct: \(product.adaptyProductId) automatic: \(automatic)")
+        Log.app.verbose("#\(logId)# event_didSelectProduct: \(product.flowId) automatic: \(automatic)")
         didSelectProduct?(product)
     }
 

@@ -21,6 +21,13 @@ public struct AdaptyFlow: PlacementContent, Identifiable {
     let viewConfigurationId: String?
 
     let paywalls: [AdaptyFlowPaywall]
+
+    /// Array of related products ids, aggregated across all paywalls in the
+    /// flow, preserving order and de-duplicated.
+    public var vendorProductIds: [String] {
+        var seen = Set<String>()
+        return paywalls.flatMap(\.vendorProductIds).filter { seen.insert($0).inserted }
+    }
 }
 
 extension AdaptyFlow: CustomStringConvertible {

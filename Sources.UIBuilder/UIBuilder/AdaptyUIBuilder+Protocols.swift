@@ -52,9 +52,7 @@ package protocol AdaptyUIBuilderLogic {
         viewConfiguration: AdaptyUIConfiguration
     ) async throws
 
-    func getProducts(
-        determineOffers: Bool
-    ) async throws -> [ProductResolver]
+    func getProducts() async throws -> [ProductResolver]
 
     func makePurchase(
         product: ProductResolver,
@@ -86,10 +84,11 @@ public protocol AdaptyUISystemRequestsHandler: Sendable {
     func handleAppReviewRequest() async
 }
 
-extension AdaptyUISystemRequestsHandler {
-    public func handleAppReviewRequest() async {
+public extension AdaptyUISystemRequestsHandler {
+    func handleAppReviewRequest() async {
         if let windowScene = UIApplication.shared.connectedScenes
-            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
+        {
             SKStoreReviewController.requestReview(in: windowScene)
         }
     }
