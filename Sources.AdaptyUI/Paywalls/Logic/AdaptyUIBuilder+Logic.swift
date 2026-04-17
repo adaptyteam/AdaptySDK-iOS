@@ -211,20 +211,6 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
             )
         }
     }
-
-    func logScreenShowed(screenInstanceId: String) {
-        Task {
-            try? await Adapty.logFlowAnalyticsViaAdaptyUI(
-                variationId: flow.variationId,
-                viewConfigurationId: viewConfigurationId,
-                params: AdaptyUIFlowScreenShowedParameters(
-                    screenInstanceId: screenInstanceId,
-                    screenOrder: 0, // TODO: x
-                    isLatestScreen: false // TODO: x
-                )
-            )
-        }
-    }
 }
 
 private extension VC.Action.WebOpenInParameter {

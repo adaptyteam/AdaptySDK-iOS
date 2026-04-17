@@ -183,7 +183,6 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 transitionId: transitionId,
                 completion: nil
             )
-            self?.logic.logScreenShowed(screenInstanceId: instance.id)
         }
     }
 

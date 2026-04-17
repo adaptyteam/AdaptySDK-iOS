@@ -92,8 +92,6 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     }
 
     func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
-
-    func logScreenShowed(screenInstanceId: String) {}
 }
 
 #endif

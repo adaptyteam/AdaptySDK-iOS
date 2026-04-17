@@ -71,7 +71,6 @@ package protocol AdaptyUIBuilderLogic {
 
     func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable])
     func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent)
-    func logScreenShowed(screenInstanceId: String)
 }
 
 @MainActor
