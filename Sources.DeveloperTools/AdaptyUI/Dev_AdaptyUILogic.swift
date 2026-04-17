@@ -44,9 +44,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         viewConfiguration: AdaptyUIConfiguration
     ) async {}
 
-    package func getProducts(
-        determineOffers: Bool
-    ) async throws -> [ProductResolver] {
+    package func getProducts() async throws -> [ProductResolver] {
         [
             Dev_MockProduct(id: "premium-free_trial-0-usd"),
             Dev_MockProduct(id: "premium-pay_as_you_go-1.99-usd"),

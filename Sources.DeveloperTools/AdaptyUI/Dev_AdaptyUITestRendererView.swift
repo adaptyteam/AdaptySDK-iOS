@@ -176,10 +176,10 @@ public struct Dev_AdaptyUIRendererView: View {
         galleryConfiguration.eventsHandler.didDisappear = didDisappear
         galleryConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { _ in }
         galleryConfiguration.eventsHandler.didSelectProduct = didSelectProduct.map { callback in
-            { product in callback(product.adaptyProductId) }
+            { product in callback(product.flowId) }
         }
         galleryConfiguration.eventsHandler.didStartPurchase = didStartPurchase.map { callback in
-            { product in callback(product.adaptyProductId) }
+            { product in callback(product.flowId) }
         }
         galleryConfiguration.eventsHandler.didStartRestore = didStartRestore
         galleryConfiguration.eventsHandler.didFailRendering = didFailRendering

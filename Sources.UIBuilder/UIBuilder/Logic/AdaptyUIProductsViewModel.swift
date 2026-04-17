@@ -21,8 +21,8 @@ extension AdaptyUIProductsViewModel: ProductsInfoProvider {
         return productInfo(by: selectedProductId)
     }
 
-    func productInfo(by productId: String) -> ProductResolver? {
-        products.first(where: { $0.adaptyProductId == productId })
+    func productInfo(by flowProductId: String) -> ProductResolver? {
+        flowProducts?[flowProductId]
     }
 }
 
@@ -35,12 +35,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     private let flowViewModel: AdaptyUIFlowViewModel
     private let presentationViewModel: AdaptyUIPresentationViewModel
 
-    @Published private var paywallProductsWithoutOffer: [ProductResolver]?
-    @Published private var paywallProducts: [ProductResolver]?
-
-    var products: [ProductResolver] {
-        paywallProducts ?? paywallProductsWithoutOffer ?? []
-    }
+    @Published fileprivate var flowProducts: [String: ProductResolver]?
 
     @Published var selectedProductsIds: [String: String]
     @Published var productsLoadingInProgress: Bool = false
@@ -59,7 +54,10 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         self.presentationViewModel = presentationViewModel
         self.flowViewModel = flowViewModel
 
-        paywallProducts = products
+        if let products {
+            flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+        }
+
         selectedProductsIds = [:] // TODO: use JS
     }
 
@@ -73,8 +71,9 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     }
 
     package func loadProductsIfNeeded() {
-        guard !productsLoadingInProgress, paywallProducts == nil else { return }
-        loadProducts(determineOffers: paywallProductsWithoutOffer != nil)
+        guard !productsLoadingInProgress, flowProducts == nil else { return }
+
+        loadProducts()
     }
 
     func selectedProductId(by groupId: String) -> String? {
@@ -83,7 +82,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         }
 
         if !groupIdsForAutoNotification.contains(groupId),
-           let selectedProduct = products.first(where: { $0.adaptyProductId == productId })
+           let selectedProduct = flowProducts?[productId]
         {
             logic.reportDidSelectProduct(selectedProduct, automatic: true)
             groupIdsForAutoNotification.insert(groupId)
@@ -95,7 +94,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     func selectProduct(id: String, forGroupId groupId: String) {
         selectedProductsIds[groupId] = id
 
-        if let selectedProduct = products.first(where: { $0.adaptyProductId == id }) {
+        if let selectedProduct = flowProducts?[id] {
             logic.reportDidSelectProduct(selectedProduct, automatic: false)
         }
     }
@@ -104,26 +103,19 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         selectedProductsIds.removeValue(forKey: groupId)
     }
 
-    private func loadProducts(determineOffers: Bool) {
+    private func loadProducts() {
         productsLoadingInProgress = true
         let logId = logId
-        Log.ui.verbose("#\(logId)# loadProducts determineOffers: \(determineOffers) begin")
+        Log.ui.verbose("#\(logId)# loadProducts begin")
 
         Task { @MainActor [weak self] in
             guard let self else { return }
 
             do {
-                let productsResult = try await logic.getProducts(
-                    determineOffers: determineOffers
-                )
-                if determineOffers {
-                    paywallProducts = productsResult
-                } else {
-                    paywallProductsWithoutOffer = productsResult
-                    loadProducts(determineOffers: true)
-                }
+                let products = try await logic.getProducts()
+                flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
             } catch {
-                Log.ui.error("#\(logId)# loadProducts determineOffers: \(determineOffers) fail: \(error)")
+                Log.ui.error("#\(logId)# loadProducts fail: \(error)")
                 productsLoadingInProgress = false
                 retryLoadingProductsIfNeeded(error: error)
             }
@@ -154,9 +146,9 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         purchaseProduct(id: productId, service: service)
     }
 
-    func purchaseProduct(id productId: String, service: VC.Action.PaymentService) {
-        guard let product = paywallProducts?.first(where: { $0.adaptyProductId == productId }) else {
-            Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(productId)")
+    func purchaseProduct(id flowProductId: String, service: VC.Action.PaymentService) {
+        guard let product = flowProducts?[flowProductId] else {
+            Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(flowProductId)")
             return
         }
 

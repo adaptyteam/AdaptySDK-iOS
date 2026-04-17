@@ -46,7 +46,7 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
 
     func logShowPaywall(viewConfiguration: AdaptyUIConfiguration) async {}
 
-    func getProducts(determineOffers: Bool) async throws -> [ProductResolver] {
+    func getProducts() async throws -> [ProductResolver] {
         products
     }
 
