@@ -61,6 +61,16 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                 column,
                 screenHolderBuilder: screenHolderBuilder
             )
+        case let .flexRow(row, _):
+            AdaptyUIFlexRowView(
+                row,
+                screenHolderBuilder: screenHolderBuilder
+            )
+        case let .flexColumn(column, _):
+            AdaptyUIFlexColumnView(
+                column,
+                screenHolderBuilder: screenHolderBuilder
+            )
         case let .section(section, _):
             AdaptyUISectionView(
                 section,
