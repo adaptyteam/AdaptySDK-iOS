@@ -8,9 +8,10 @@
 import Foundation
 
 package extension AdaptyUISchema {
-    func extractUIConfiguration(id: String, withLocaleId localeId: LocaleId? = nil) throws -> AdaptyUIConfiguration {
+    func extractUIConfiguration(id: String, withLocaleId localeId: LocaleId? = nil, envoriment: VC.EnvironmentConstants) throws -> AdaptyUIConfiguration {
         let id = id
         let localeId = localeId ?? defaultLocalization?.id ?? AdaptyUISchema.defaultLocaleId
-        return try ConfigurationBuilder(id: id, source: self, withLocaleId: localeId).localize()
+        return try ConfigurationBuilder(id: id, source: self, withLocaleId: localeId).localize(envoriment: envoriment)
     }
 }
+

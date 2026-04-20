@@ -13,6 +13,7 @@ package struct AdaptyUIConfiguration: Sendable, Hashable {
     package let id: String
     package let locale: String
     package let isRightToLeft: Bool
+    package let environment: VC.EnvironmentConstants
 
     let assets: [AssetIdentifier: Asset]
     let strings: [StringIdentifier: RichText]

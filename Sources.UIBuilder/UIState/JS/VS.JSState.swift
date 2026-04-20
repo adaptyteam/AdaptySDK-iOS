@@ -47,11 +47,26 @@ extension VS {
 }
 
 extension VS.JSState {
-    func setConstants(_ constants: [String: any JSValueConvertable]) {
-        guard !constants.isEmpty, let global = context.globalObject else { return }
-        for (key, value) in constants {
-            global.setObject(value.toJSValue(in: context), forKeyedSubscript: key as NSString)
+    func setEnvironmentConstants(_ config: AdaptyUIConfiguration) {
+        guard
+            let global = context.globalObject,
+            let env = config.environmentObject(in: context)
+        else { return }
+
+        let objectClass = context.objectForKeyedSubscript("Object")
+        objectClass?.invokeMethod("freeze", withArguments: [env])
+
+        #if DEBUG
+        global.setObject(env, forKeyedSubscript: "SDKEnv" as NSString)
+        #else
+        if let objectClass, let descriptor = JSValue(newObjectIn: context) {
+            descriptor.setObject(env, forKeyedSubscript: "value" as NSString)
+            descriptor.setObject(false, forKeyedSubscript: "writable" as NSString)
+            descriptor.setObject(false, forKeyedSubscript: "configurable" as NSString)
+            descriptor.setObject(false, forKeyedSubscript: "enumerable" as NSString)
+            objectClass.invokeMethod("defineProperty", withArguments: [global, "SDKEnv", descriptor])
         }
+        #endif
     }
 
     func evaluateScripts(

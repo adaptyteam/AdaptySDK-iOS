@@ -45,7 +45,7 @@ package final class AdaptyUIStateHolder {
 //            }
 //            .store(in: &cancellables)
 
-        state.startOnce(constants: nil)
+        state.startOnce()
     }
 }
 

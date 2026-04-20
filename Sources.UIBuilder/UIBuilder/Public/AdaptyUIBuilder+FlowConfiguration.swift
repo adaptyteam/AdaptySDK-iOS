@@ -21,7 +21,19 @@ public extension AdaptyUIBuilder {
     ) async throws -> FlowConfiguration {
         let viewConfiguration = try schema.extractUIConfiguration(
             id: UUID().uuidString,
-            withLocaleId: localeId
+            withLocaleId: localeId,
+            envoriment: .init(
+                sdkVersion: "",
+                osName: "",
+                osVersion: "",
+                deviceModel: "",
+                appBundleId: nil,
+                appVersion: nil,
+                appBuild: nil,
+                appCurrentLocale: nil,
+                userLocales: [],
+                userUses24HourClock: true
+            )
         )
 
         return FlowConfiguration(

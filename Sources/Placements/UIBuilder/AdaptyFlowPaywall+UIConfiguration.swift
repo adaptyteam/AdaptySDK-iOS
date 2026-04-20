@@ -40,11 +40,14 @@ extension Adapty {
 
         AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: locale.id)
 
+        let envoriment = await Environment.fetchUIBuilderEnvironment()
+
         let extractLocaleTask = Task.detachedWithThrowsTyped(priority: .userInitiated) { () async throws(AdaptyError) -> AdaptyUIConfiguration in
             do {
                 return try schema.extractUIConfiguration(
                     id: viewConfigurationId,
-                    withLocaleId: locale.id
+                    withLocaleId: locale.id,
+                    envoriment: envoriment
                 )
             } catch {
                 throw .decodingViewConfiguration(error)
