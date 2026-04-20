@@ -39,7 +39,7 @@ extension Schema.RadialProgress: Decodable {
         try self.init(
             thickness: container.decodeIfPresent(Double.self, forKey: .thickness),
             sweepAngle: container.decodeIfPresent(Double.self, forKey: .sweepAngle) ?? 360,
-            startAngle: container.decodeIfPresent(Double.self, forKey: .clockwise) ?? -90,
+            startAngle: container.decodeIfPresent(Double.self, forKey: .startAngle) ?? -90,
             clockwise: container.decodeIfPresent(Bool.self, forKey: .clockwise) ?? true,
             asset: container.decode(Schema.AssetReference.self, forKey: .assetId),
             clip: container.decodeIfPresent(Bool.self, forKey: .clip) ?? true,
