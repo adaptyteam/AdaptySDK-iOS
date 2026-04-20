@@ -47,6 +47,13 @@ extension VS {
 }
 
 extension VS.JSState {
+    func setConstants(_ constants: [String: any JSValueConvertable]) {
+        guard !constants.isEmpty, let global = context.globalObject else { return }
+        for (key, value) in constants {
+            global.setObject(value.toJSValue(in: context), forKeyedSubscript: key as NSString)
+        }
+    }
+
     func evaluateScripts(
         _ scripts: [String]
     ) {

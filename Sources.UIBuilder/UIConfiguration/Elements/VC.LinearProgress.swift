@@ -9,11 +9,11 @@ import Foundation
 
 extension VC {
     struct LinearProgress: Sendable, Hashable {
-        let orientation: Orientation // align
-        let cornerRadius: CornerRadius // corner_radius
-        let asset: AssetReference // asset_id
-        let imageAspect: AspectRatio // image_aspect
-        let clip: Bool // clip
+        let orientation: Orientation 
+        let cornerRadius: CornerRadius
+        let asset: AssetReference
+        let imageAspect: AspectRatio
+        let clip: Bool
         let value: Variable
         let transition: Transition
         let actions: [Action]
