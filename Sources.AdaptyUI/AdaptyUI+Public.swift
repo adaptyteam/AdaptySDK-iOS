@@ -298,6 +298,7 @@ public extension AdaptyUI {
     /// - Returns: an ``AdaptyPaywallConfiguration`` object.
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
+        locale: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
@@ -315,7 +316,7 @@ public extension AdaptyUI {
 
         let viewConfiguration = try await Adapty.getUIConfiguration(
             flow: flow,
-            locale: nil, // TODO: x ??
+            locale: locale,
             loadTimeout: loadTimeout
         )
 
