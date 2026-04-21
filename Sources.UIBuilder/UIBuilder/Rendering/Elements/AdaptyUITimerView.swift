@@ -178,6 +178,7 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
                     assetsCache: assetsViewModel.cache,
                     stateViewModel: stateViewModel,
                     tagValues: nil, // TODO: x check
+                    internalTagResolver: nil,
                     customTagResolver: self,
                     productInfo: nil,
                     colorScheme: colorScheme,

@@ -39,6 +39,7 @@ struct AdaptyUIWheelItemsPickerView: View {
             assetsCache: assetsViewModel.cache,
             stateViewModel: stateViewModel,
             tagValues: nil,
+            internalTagResolver: nil,
             customTagResolver: customTagResolverViewModel,
             productInfo: nil,
             colorScheme: colorScheme,

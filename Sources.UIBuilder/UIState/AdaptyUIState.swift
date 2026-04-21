@@ -59,6 +59,7 @@ package final class AdaptyUIState: ObservableObject {
         jsState.debug(variable: variable, screenInstance: screenInstance, filter: filter)
     }
 
+    // TODO: add accept converter to define value type
     func getValue<T: JSValueRepresentable>(_ type: T.Type, variable: VC.Variable, screenInstance: VS.ScreenInstance) throws(VS.Error) -> T? {
         try jsState.getValue(type, variable: variable, screenInstance: screenInstance)
     }

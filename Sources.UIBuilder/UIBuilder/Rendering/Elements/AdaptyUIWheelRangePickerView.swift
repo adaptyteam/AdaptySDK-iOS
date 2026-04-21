@@ -48,6 +48,7 @@ struct AdaptyUIWheelRangePickerView: View {
             assetsCache: assetsViewModel.cache,
             stateViewModel: stateViewModel,
             tagValues: nil,
+            internalTagResolver: nil,
             customTagResolver: resolver,
             productInfo: nil,
             colorScheme: colorScheme,

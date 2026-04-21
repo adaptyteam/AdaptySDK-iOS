@@ -45,6 +45,14 @@ struct AdaptyUITextProgressView: View {
                 assetsCache: assetsViewModel.cache,
                 stateViewModel: stateViewModel,
                 tagValues: nil,
+                internalTagResolver: { value in
+                    switch value {
+                    case "PERCENT":
+                        return targetValue
+                    default:
+                        return nil
+                    }
+                },
                 customTagResolver: customTagResolverViewModel,
                 productInfo: nil,
                 colorScheme: colorScheme,
@@ -78,6 +86,26 @@ struct AdaptyUITextProgressView: View {
         } else {
             stateViewModel.execute(actions: actions, screen: screen)
         }
+    }
+}
+
+private struct TextProgressTagResolver: AdaptyUITagResolver {
+    let value: Double
+    let fallback: AdaptyUITagResolver
+
+    private var formattedValue: String {
+        if value == value.rounded() {
+            String(format: "%.0f", value)
+        } else {
+            String(value)
+        }
+    }
+
+    func replacement(for tag: String) -> String? {
+        if let result = fallback.replacement(for: tag) {
+            return result
+        }
+        return formattedValue
     }
 }
 

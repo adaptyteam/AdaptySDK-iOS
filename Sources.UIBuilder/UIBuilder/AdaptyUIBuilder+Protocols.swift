@@ -11,6 +11,8 @@ import Foundation
 import StoreKit
 import UIKit
 
+typealias AdaptyUIInternalTagResolver = (String) -> Any?
+
 @MainActor
 public protocol AdaptyUITagResolver: Sendable {
     func replacement(for tag: String) -> String?

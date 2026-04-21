@@ -57,6 +57,7 @@ struct AdaptyUITextView: View {
                     assetsCache: assetsViewModel.cache,
                     stateViewModel: stateViewModel,
                     tagValues: tagValues,
+                    internalTagResolver: nil,
                     customTagResolver: customTagResolverViewModel,
                     productInfo: nil,
                     colorScheme: colorScheme,
@@ -74,6 +75,7 @@ struct AdaptyUITextView: View {
                     assetsCache: assetsViewModel.cache,
                     stateViewModel: stateViewModel,
                     tagValues: tagValues,
+                    internalTagResolver: nil,
                     customTagResolver: customTagResolverViewModel,
                     productInfo: nil,
                     colorScheme: colorScheme,
@@ -93,6 +95,7 @@ struct AdaptyUITextView: View {
                     assetsCache: assetsViewModel.cache,
                     stateViewModel: stateViewModel,
                     tagValues: tagValues,
+                    internalTagResolver: nil,
                     customTagResolver: customTagResolverViewModel,
                     productInfo: productInfoModel,
                     colorScheme: colorScheme,
@@ -119,6 +122,7 @@ extension [VC.RichText.Item] {
         assetsCache: AdaptyUIAssetsCache,
         stateViewModel: AdaptyUIStateViewModel,
         tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
+        internalTagResolver: AdaptyUIInternalTagResolver?,
         customTagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
@@ -142,13 +146,16 @@ extension [VC.RichText.Item] {
                     )
                 )
             case let .tag(value, attr, converter, action):
-                let converter = converter?.asTagConverter
                 let tagReplacementResult: String
 
-                if let customTagResult = customTagResolver.replacement(for: value) {
+                if let anyValue = internalTagResolver?(value),
+                   let convertedValue = converter?.asTagConverter?.toString(anyValue)
+                {
+                    tagReplacementResult = convertedValue
+                } else if let customTagResult = customTagResolver.replacement(for: value) {
                     tagReplacementResult = customTagResult
                 } else if let tagValue = tagValues?[value] {
-                    tagReplacementResult = switch tagValue {
+                    let tmpValue = switch tagValue {
                     case let .value(value):
                         value
                     case let .variable(variable):
@@ -157,6 +164,12 @@ extension [VC.RichText.Item] {
                             defaultValue: displayMissingTags ? "<var:\(variable.path.joined(separator: "."))}>" : "",
                             screen: screen
                         )
+                    }
+                    
+                    if let convertedValue = converter?.asTagConverter?.toString(tmpValue) {
+                        tagReplacementResult = convertedValue
+                    } else {
+                        tagReplacementResult = tmpValue
                     }
                 } else if let productTag = TextProductTag(rawValue: value),
                           let productTagResult = productInfo?.value(byTag: productTag)
@@ -185,7 +198,7 @@ extension [VC.RichText.Item] {
                         colorScheme: colorScheme
                     )
                 )
-            case let .image(value, attr): 
+            case let .image(value, attr):
                 let imageResolvedAsset = assetsCache.cachedAsset(
                     value,
                     mode: colorScheme.toVCMode,
@@ -226,6 +239,7 @@ extension VC.RichText {
         assetsCache: AdaptyUIAssetsCache,
         stateViewModel: AdaptyUIStateViewModel,
         tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
+        internalTagResolver: AdaptyUIInternalTagResolver?,
         customTagResolver: AdaptyUITagResolver,
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
@@ -239,7 +253,7 @@ extension VC.RichText {
                 case let .text(value, _, _):
                     partialResult + value
                 case let .tag(value, _, converter, _):
-                    //let converter = converter?.asTagConverter
+                    // let converter = converter?.asTagConverter
                     partialResult + value
                 default:
                     partialResult
@@ -258,6 +272,7 @@ extension VC.RichText {
                         assetsCache: assetsCache,
                         stateViewModel: stateViewModel,
                         tagValues: tagValues,
+                        internalTagResolver: internalTagResolver,
                         customTagResolver: customTagResolver,
                         productInfo: productInfo,
                         colorScheme: colorScheme,
@@ -271,6 +286,7 @@ extension VC.RichText {
                         assetsCache: assetsCache,
                         stateViewModel: stateViewModel,
                         tagValues: tagValues,
+                        internalTagResolver: internalTagResolver,
                         customTagResolver: customTagResolver,
                         productInfo: productInfo,
                         colorScheme: colorScheme,
