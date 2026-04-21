@@ -141,7 +141,7 @@ extension [VC.RichText.Item] {
                         colorScheme: colorScheme
                     )
                 )
-            case let .tag(value, attr, action):
+            case let .tag(value, attr, converter, action):
                 let tagReplacementResult: String
 
                 if let customTagResult = customTagResolver.replacement(for: value) {
@@ -235,7 +235,7 @@ extension VC.RichText {
         if placeholder {
             let reducedString = items.reduce("") { partialResult, item in
                 switch item {
-                case let .text(value, _, _), let .tag(value, _, _):
+                case let .text(value, _, _), let .tag(value, _, _, _):
                     partialResult + value
                 default:
                     partialResult

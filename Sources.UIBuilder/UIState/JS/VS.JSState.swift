@@ -153,7 +153,7 @@ extension VS.JSState {
 
         log.debug("get variable \(path.joined(separator: ".")) = \(result)")
 
-        guard let converter = variable.converter as? VS.ExecutableConvertor else {
+        guard let converter = variable.converter?.asDataBindingConverter else {
             return T.fromJSValue(result)
         }
 
@@ -223,7 +223,7 @@ extension VS.JSState {
         value: some JSValueConvertable,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
-        guard let convertor = variable.converter as? VS.ExecutableConvertor else {
+        guard let convertor = variable.converter?.asDataBindingConverter else {
             try setValueWithoutConverter(variable: variable, value: value, screenInstance: screenInstance)
             return
         }

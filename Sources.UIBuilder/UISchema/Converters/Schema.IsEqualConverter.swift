@@ -1,5 +1,5 @@
 //
-//  Schema.Variable.IsEqualConvertor.swift
+//  Schema.IsEqualConverter.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 13.04.2026.
@@ -7,14 +7,18 @@
 
 import Foundation
 
-extension Schema.Variable.IsEqualConvertor: Decodable {
+extension Schema {
+    typealias IsEqualConverter = VC.IsEqualConverter
+}
+
+extension Schema.IsEqualConverter: Decodable {
     private enum CodingKeys: String, CodingKey {
         case value
         case falseValue = "false_value"
     }
 
     init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: Schema.Variable.CodingKeys.self)
+        let container = try decoder.container(keyedBy: Schema.AnyConverter.CodingKeys.self)
 
         if let value = try? container.decode(Schema.AnyValue.self, forKeys: .converterParameters), !value.isObject {
             self.init(value: value, falseValue: nil)
