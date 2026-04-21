@@ -157,8 +157,8 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         do {
             let value = try stateHolder.state.getTagValue(
                 variable: variable,
-                converter: converter,
-                screenInstance: screen
+                screenInstance: screen,
+                converter: converter
             )
             return value ?? defaultValue
         } catch {

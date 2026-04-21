@@ -59,17 +59,15 @@ package final class AdaptyUIState: ObservableObject {
         jsState.debug(variable: variable, screenInstance: screenInstance, filter: filter)
     }
 
-    // TODO: add accept converter to define value type
-    func getValue<T: JSValueRepresentable>(_ type: T.Type, variable: VC.Variable, screenInstance: VS.ScreenInstance) throws(VS.Error) -> T? {
-        try jsState.getValue(type, variable: variable, screenInstance: screenInstance)
+    func getValue<T: JSValueRepresentable>(_: T.Type, variable: VC.Variable, screenInstance: VS.ScreenInstance) throws(VS.Error) -> T? {
+        let jsValue = try jsState.getValue(variable: variable, screenInstance: screenInstance)
+        return T.fromJSValue(jsValue)
     }
 
-    func getTagValue(
-        variable: VC.Variable,
-        converter: VC.TagConverter?,
-        screenInstance: VS.ScreenInstance
-    ) throws(VS.Error) -> String? {
-        "unimplemented"
+    func getTagValue(variable: VC.Variable, screenInstance: VS.ScreenInstance, converter: VC.TagConverter?) throws(VS.Error) -> String? {
+        let jsValue = try jsState.getValue(variable: variable, screenInstance: screenInstance)
+        guard let converter, !jsValue.isString else { return String.fromJSValue(jsValue) }
+        return converter.toString(jsValue)
     }
 
     func setValue(variable: VC.Variable, value: any JSValueConvertable, screenInstance: VS.ScreenInstance) throws(VS.Error) {
@@ -84,3 +82,4 @@ package final class AdaptyUIState: ObservableObject {
         try jsState.execute(action: action, params: params, screenInstance: screenInstance)
     }
 }
+

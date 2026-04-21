@@ -131,11 +131,10 @@ extension VS.JSState {
         return current
     }
 
-    func getValue<T: JSValueRepresentable>(
-        _: T.Type,
+    func getValue(
         variable: VC.Variable,
         screenInstance: VS.ScreenInstance
-    ) throws(VS.Error) -> T? {
+    ) throws(VS.Error) -> JSValue {
         let path = variable.pathWithScreenContext(screenInstance.contextPath)
         let name = path.last
         let parent = try findObject(path: path.dropLast())
@@ -154,14 +153,14 @@ extension VS.JSState {
         log.debug("get variable \(path.joined(separator: ".")) = \(result)")
 
         guard let converter = variable.converter?.asDataBindingConverter else {
-            return T.fromJSValue(result)
+            return result
         }
 
         do {
             let converted = try converter.readValue(result, in: context)
             log.debug("convert to value: \(converted)")
 
-            return T.fromJSValue(converted)
+            return converted
         } catch {
             log.error("convert \(path.joined(separator: ".")) = \(result) error: \(error) with \(converter)")
             throw error
