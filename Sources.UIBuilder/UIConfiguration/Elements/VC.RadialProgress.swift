@@ -13,6 +13,7 @@ extension VC {
         let sweepAngle: Double
         let startAngle: Double
         let clockwise: Bool
+        let roundedCaps: Bool
         let asset: AssetReference
         let clip: Bool
         let value: Variable
