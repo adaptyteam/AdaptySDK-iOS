@@ -23,6 +23,17 @@ extension Environment {
             AdaptyLocale(Locale.preferredLanguages.first ?? Locale.current.identifier)
         }
 
+        static var preferredLanguages: [String] {  Locale.preferredLanguages }
+
+        static var uses24HourClock: Bool {
+            if #available(iOS 16.0, macOS 13.0, *) {
+                let cycle = Locale.current.hourCycle
+                return cycle == .zeroToTwentyThree || cycle == .oneToTwentyFour
+            }
+            let format = DateFormatter.dateFormat(fromTemplate: "j", options: 0, locale: .current) ?? ""
+            return format.contains("H")
+        }
+
         @AdaptyActor
         private static var _version: String?
 

@@ -43,12 +43,13 @@ extension Schema {
 }
 
 extension Schema.ConfigurationBuilder {
-    func localize() throws -> AdaptyUIConfiguration {
+    func localize(envoriment: VC.EnvironmentConstants) throws -> AdaptyUIConfiguration {
         templateIds.removeAll()
         return try .init(
             id: configuarationId,
             locale: localeId,
             isRightToLeft: isRightToLeft,
+            environment: envoriment,
             assets: assets,
             strings: strings,
             navigators: source.navigators.mapValues(convertNavigator),

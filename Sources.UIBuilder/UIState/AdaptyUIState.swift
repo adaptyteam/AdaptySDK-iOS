@@ -40,12 +40,10 @@ package final class AdaptyUIState: ObservableObject {
             .store(in: &cancellables)
     }
 
-    func startOnce(constants: (any VS.EnvironmentConstants)?) {
+    func startOnce() {
         guard !started else { return }
         started = true
-        if let constants {
-            jsState.setConstants(constants.export(configuration))
-        }
+        jsState.setEnvironmentConstants(configuration)
         jsState.evaluateScripts(configuration.scripts)
     }
 
