@@ -83,12 +83,12 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             AdaptyUIWheelItemsPickerView(wheelItemsPicker)
         case let .wheelRangePicker(wheelRangePicker, _):
             AdaptyUIWheelRangePickerView(wheelRangePicker)
-        case .textProgress:
-            AdaptyUIUnknownElementView(value: "VC.TextProgress")
-        case .linearProgress:
-            AdaptyUIUnknownElementView(value: "VC.LinearProgress")
-        case .radialProgress:
-            AdaptyUIUnknownElementView(value: "VC.RadialProgress")
+        case let .textProgress(textProgress, _):
+            AdaptyUITextProgressView(textProgress)
+        case let .linearProgress(linearProgress, _):
+            AdaptyUILinearProgressView(linearProgress)
+        case let .radialProgress(radialProgress, _):
+            AdaptyUIRadialProgressView(radialProgress)
         case let .unknown(value):
             AdaptyUIUnknownElementView(value: value)
         }

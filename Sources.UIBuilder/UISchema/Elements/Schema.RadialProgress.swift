@@ -25,6 +25,7 @@ extension Schema.RadialProgress: Decodable {
         case sweepAngle = "sweep_angle"
         case startAngle = "start_angle"
         case clockwise
+        case roundedCaps = "rounded_caps"
         case assetId = "asset_id"
         case clip
         case value
@@ -41,6 +42,7 @@ extension Schema.RadialProgress: Decodable {
             sweepAngle: container.decodeIfPresent(Double.self, forKey: .sweepAngle) ?? 360,
             startAngle: container.decodeIfPresent(Double.self, forKey: .startAngle) ?? -90,
             clockwise: container.decodeIfPresent(Bool.self, forKey: .clockwise) ?? true,
+            roundedCaps: container.decodeIfPresent(Bool.self, forKey: .roundedCaps) ?? false,
             asset: container.decode(Schema.AssetReference.self, forKey: .assetId),
             clip: container.decodeIfPresent(Bool.self, forKey: .clip) ?? true,
             value: container.decode(Schema.Variable.self, forKey: .value),
