@@ -126,6 +126,7 @@ extension VC.RichText {
             if case let .tag(tagValue, _, converter, _) = item,
                let timerTag = VC.TimerTag.createFromString(tagValue)
             {
+                let converter = converter?.asTagConverter
                 result = max(timerTag.updatesPerSecond, result)
             }
         }
