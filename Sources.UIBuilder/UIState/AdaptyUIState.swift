@@ -64,6 +64,14 @@ package final class AdaptyUIState: ObservableObject {
         try jsState.getValue(type, variable: variable, screenInstance: screenInstance)
     }
 
+    func getTagValue(
+        variable: VC.Variable,
+        converter: VC.TagConverter?,
+        screenInstance: VS.ScreenInstance
+    ) throws(VS.Error) -> String? {
+        "unimplemented"
+    }
+
     func setValue(variable: VC.Variable, value: any JSValueConvertable, screenInstance: VS.ScreenInstance) throws(VS.Error) {
         try jsState.setValue(variable: variable, value: value, screenInstance: screenInstance)
     }
@@ -76,4 +84,3 @@ package final class AdaptyUIState: ObservableObject {
         try jsState.execute(action: action, params: params, screenInstance: screenInstance)
     }
 }
-

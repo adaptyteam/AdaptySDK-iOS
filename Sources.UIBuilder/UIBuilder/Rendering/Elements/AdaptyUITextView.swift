@@ -155,21 +155,16 @@ extension [VC.RichText.Item] {
                 } else if let customTagResult = customTagResolver.replacement(for: value) {
                     tagReplacementResult = customTagResult
                 } else if let tagValue = tagValues?[value] {
-                    let tmpValue = switch tagValue {
+                    tagReplacementResult = switch tagValue {
                     case let .value(value):
-                        value
+                        value // TODO: x
                     case let .variable(variable):
-                        stateViewModel.getValue(
+                        stateViewModel.getTagValue(
                             variable,
+                            converter: converter?.asTagConverter,
                             defaultValue: displayMissingTags ? "<var:\(variable.path.joined(separator: "."))}>" : "",
                             screen: screen
                         )
-                    }
-                    
-                    if let convertedValue = converter?.asTagConverter?.toString(tmpValue) {
-                        tagReplacementResult = convertedValue
-                    } else {
-                        tagReplacementResult = tmpValue
                     }
                 } else if let productTag = TextProductTag(rawValue: value),
                           let productTagResult = productInfo?.value(byTag: productTag)

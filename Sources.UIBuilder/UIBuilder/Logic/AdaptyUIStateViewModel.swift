@@ -147,6 +147,25 @@ package final class AdaptyUIStateViewModel: ObservableObject {
             return defaultValue
         }
     }
+    
+    func getTagValue(
+        _ variable: VC.Variable,
+        converter: VC.TagConverter?,
+        defaultValue: String,
+        screen: VS.ScreenInstance
+    ) -> String {
+        do {
+            let value = try stateHolder.state.getTagValue(
+                variable: variable,
+                converter: converter,
+                screenInstance: screen
+            )
+            return value ?? defaultValue
+        } catch {
+            Log.ui.error("#\(logId)# getValue error: \(error)")
+            return defaultValue
+        }
+    }
 
     var onAlertDialogResponse: ((String?, VS.ScreenInstance?) -> Void)?
 
