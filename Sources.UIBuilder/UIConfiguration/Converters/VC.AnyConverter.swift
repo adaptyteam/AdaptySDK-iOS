@@ -9,7 +9,7 @@ import Foundation
 
 extension VC {
     protocol Converter: Sendable, Hashable {}
-
+    
     struct AnyConverter: Converter {
         let wrapped: any Converter
 
@@ -41,4 +41,3 @@ extension VC.Converter {
         .init(self)
     }
 }
-

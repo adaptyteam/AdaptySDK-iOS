@@ -13,16 +13,23 @@ extension VC {
     }
 }
 
-extension VC.PercentConverter {
+extension VC.PercentConverter: VC.TagConverter {
     func toString(_ value: Any) -> String? {
         switch value {
-        case is Bool:
-            nil
+        case let value as Double:
+            toString(percent: value)
         case let value as NSNumber:
-            toString(percent: value.doubleValue)
+            toString(percent: value)
         default:
             nil
         }
+    }
+}
+
+extension VC.PercentConverter {
+    @inlinable
+    func toString(percent: NSNumber) -> String {
+        toString(percent: percent.doubleValue)
     }
 
     @inlinable

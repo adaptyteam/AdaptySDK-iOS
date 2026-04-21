@@ -25,7 +25,7 @@ extension VC {
     }
 }
 
-extension VC.TimerConverter {
+extension VC.TimerConverter: VC.TagConverter {
     func toString(_ value: Any) -> String? {
         switch value {
         case is Bool:
@@ -36,7 +36,9 @@ extension VC.TimerConverter {
             nil
         }
     }
+}
 
+extension VC.TimerConverter {
     @inlinable
     func toString(timeinterval: TimeInterval) -> String {
         let timeinterval = max(0, timeinterval)
@@ -69,7 +71,6 @@ extension VC.TimerConverter {
     }
 
     var updatesPerSecond: Int {
-        let x: Int
         switch self {
         case .deciseconds: return 10
         case .centiseconds: return 100

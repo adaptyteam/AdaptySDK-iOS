@@ -24,7 +24,7 @@ extension Schema.TimerConverter: Decodable {
         let format = try container.decodeIfPresent(String.self, forKeys: .format)
 
         if let format {
-            guard format.isValidFormat else {
+            guard format.isValidIntegerFormat else {
                 throw DecodingError.dataCorruptedError(forKey: .format, in: container, debugDescription: "wrong format: \(format)")
             }
         }
@@ -60,10 +60,4 @@ extension Schema.TimerConverter: Decodable {
     }
 }
 
-private extension String {
-    var isValidFormat: Bool {
-        let pattern = #"^%[+\-0 ]*(\d+)?(\.\d+)?d$"#
-        return range(of: pattern, options: .regularExpression) != nil
-    }
-}
 

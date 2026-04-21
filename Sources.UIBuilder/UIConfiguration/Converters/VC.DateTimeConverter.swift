@@ -14,6 +14,21 @@ extension VC {
     }
 }
 
+extension VC.DateTimeConverter: VC.TagConverter {
+    func toString(_ value: Any) -> String? {
+        switch value {
+        case let value as Date:
+            formatter.string(from: value)
+        case is Bool:
+            nil
+        case let value as NSNumber:
+            toString(unixtimestamp: value.doubleValue)
+        default:
+            nil
+        }
+    }
+}
+
 extension VC.DateTimeConverter {
     private nonisolated(unsafe) static let cache = NSCache<NSString, DateFormatter>()
 
@@ -39,19 +54,6 @@ extension VC.DateTimeConverter {
     @inlinable
     func toString(unixtimestamp: Double) -> String {
         formatter.string(from: Date(timeIntervalSince1970: unixtimestamp / 1000.0))
-    }
-
-    func toString(_ value: Any) -> String? {
-        switch value {
-        case let value as Date:
-            formatter.string(from: value)
-        case is Bool:
-            nil
-        case let value as NSNumber:
-            toString(unixtimestamp: value.doubleValue)
-        default:
-            nil
-        }
     }
 }
 

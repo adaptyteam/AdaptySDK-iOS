@@ -1,17 +1,17 @@
 //
-//  Schema.PercentConverter.swift
+//  Schema.NumberConverter.swift
 //  AdaptyUIBuilder
 //
-//  Created by Aleksei Valiano on 20.04.2026.
+//  Created by Aleksei Valiano on 21.04.2026.
 //
 
 import Foundation
 
 extension Schema {
-    typealias PercentConverter = VC.PercentConverter
+    typealias NumberConverter = VC.NumberConverter
 }
 
-extension Schema.PercentConverter: Decodable {
+extension Schema.NumberConverter: Decodable {
     private enum CodingKeys: String, CodingKey {
         case format
     }
@@ -30,5 +30,15 @@ extension Schema.PercentConverter: Decodable {
     }
 }
 
+extension String {
+    var isValidNumberFormat: Bool {
+        let pattern = #"^%[+\-0 ]*(\d+)?(\.\d+)?[df]$"#
+        return range(of: pattern, options: .regularExpression) != nil
+    }
 
+    var isValidIntegerFormat: Bool {
+        let pattern = #"^%[+\-0 ]*(\d+)?(\.\d+)?d$"#
+        return range(of: pattern, options: .regularExpression) != nil
+    }
+}
 

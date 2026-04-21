@@ -25,6 +25,7 @@ extension Schema.AnyConverter {
     private enum TagConvertorName: String {
         case dateTime = "date_time"
         case percent
+        case number
     }
 
     static func forDataBinding(from decoder: any Decoder) throws -> Schema.AnyConverter {
@@ -47,6 +48,8 @@ extension Schema.AnyConverter {
         return switch TagConvertorName(rawValue: name) {
         case .dateTime:
             try Schema.DateTimeConverter(from: decoder).asAnyConverter
+        case .number:
+            try Schema.NumberConverter(from: decoder).asAnyConverter
         case .percent:
             try Schema.PercentConverter(from: decoder).asAnyConverter
         default:
