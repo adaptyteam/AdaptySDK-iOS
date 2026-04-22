@@ -24,10 +24,35 @@ struct AdaptyUIWheelItemsPickerView: View {
 
     private var picker: VC.WheelItemsPicker
 
-    @State private var selectedIndex: Int = 0
-
     init(_ picker: VC.WheelItemsPicker) {
         self.picker = picker
+    }
+
+    private var currentSelectedIndex: Int {
+        guard let firstItem = picker.items.first else { return 0 }
+
+        switch firstItem.value.wrapped {
+        case is Bool:
+            let current = stateViewModel.getValue(picker.value, defaultValue: false, screen: screen)
+            return picker.items.firstIndex { ($0.value.wrapped as? Bool) == current } ?? 0
+        case is String:
+            let sentinel = "\u{0}__adapty_no_value__"
+            let current = stateViewModel.getValue(picker.value, defaultValue: sentinel, screen: screen)
+            return picker.items.firstIndex { ($0.value.wrapped as? String) == current } ?? 0
+        default:
+            let current = stateViewModel.getValue(picker.value, defaultValue: Double.nan, screen: screen)
+            guard !current.isNaN else { return 0 }
+            return picker.items.firstIndex { item in
+                switch item.value.wrapped {
+                case let v as Double: v == current
+                case let v as Int: Double(v) == current
+                case let v as UInt: Double(v) == current
+                case let v as Int32: Double(v) == current
+                case let v as UInt32: Double(v) == current
+                default: false
+                }
+            } ?? 0
+        }
     }
 
     private func itemText(for item: VC.WheelItemsPicker.Item) -> Text {
@@ -66,11 +91,8 @@ struct AdaptyUIWheelItemsPickerView: View {
         Picker(
             "",
             selection: Binding(
-                get: { selectedIndex },
-                set: { newIndex in
-                    selectedIndex = newIndex
-                    writeSelectedValue(newIndex)
-                }
+                get: { currentSelectedIndex },
+                set: { newIndex in writeSelectedValue(newIndex) }
             )
         ) {
             ForEach(picker.items.indices, id: \.self) { index in
