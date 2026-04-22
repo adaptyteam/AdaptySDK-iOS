@@ -34,6 +34,7 @@ extension Schema.Animation: Decodable {
         case background
         case border
         case shadow
+        case innerShadow = "inner_shadow"
         case blur
     }
 
@@ -74,6 +75,8 @@ extension Schema.Animation: Decodable {
             self = try .border(.init(from: decoder), .init(from: decoder))
         case .shadow:
             self = try .shadow(.init(from: decoder), .init(from: decoder))
+        case .innerShadow:
+            self = try .innerShadow(.init(from: decoder), .init(from: decoder))
         case .blur:
             self = try .blur(
                 .init(from: decoder),
