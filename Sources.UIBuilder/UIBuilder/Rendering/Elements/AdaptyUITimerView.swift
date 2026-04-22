@@ -123,11 +123,14 @@ extension VC.RichText {
         var result = 1
 
         for item in items {
-            if case let .tag(tagValue, _, converter, _) = item,
-               let timerTag = VC.TimerTag.createFromString(tagValue)
-            {
-                let converter = converter?.asTagConverter
+            guard case let .tag(tagValue, _, converter, _) = item else { continue }
+
+            if let timerTag = VC.TimerTag.createFromString(tagValue) {
                 result = max(timerTag.updatesPerSecond, result)
+            } else if tagValue == "TIMER",
+                      let timerConverter = converter?.wrapped as? VC.TimerConverter
+            {
+                result = max(timerConverter.updatesPerSecond, result)
             }
         }
 
@@ -178,7 +181,9 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
                     assetsCache: assetsViewModel.cache,
                     stateViewModel: stateViewModel,
                     tagValues: nil, // TODO: x check
-                    internalTagResolver: nil,
+                    internalTagResolver: { [timeLeft] tag in
+                        tag == "TIMER" ? timeLeft : nil
+                    },
                     customTagResolver: self,
                     productInfo: nil,
                     colorScheme: colorScheme,
