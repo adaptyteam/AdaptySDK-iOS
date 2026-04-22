@@ -1113,6 +1113,8 @@ UI:
                           $ref: "#/Entities/HorizontalAlignment",
                           default: leading,
                       }
+                  max_rows: { type: integer, minimum: 1 }
+                  on_overflow: { $ref: "#/UI/Text/OverflowMode" }
                   action: { $ref: "#/Script/ActionOrArray" }
             - $ref: "#/UI/Text/Attributes"
 

@@ -13,5 +13,7 @@ extension VC {
         let format: VC.RangeTextFormat
         let actions: [Action]
         let horizontalAlign: VC.HorizontalAlignment
+        let maxRows: Int?
+        let overflowMode: Set<VC.Text.OverflowMode>
     }
 }

@@ -32,20 +32,13 @@ extension Schema.Text: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let overflowMode =
-            if let value = try? container.decode(OverflowMode.self, forKey: .overflowMode) {
-                Set([value])
-            } else {
-                try Set(container.decodeIfPresent([OverflowMode].self, forKey: .overflowMode) ?? [])
-            }
-
         let textAttributes = try Schema.TextAttributes(from: decoder)
 
         try self.init(
             value: container.decode(Schema.StringReference.self, forKey: .stringId),
             horizontalAlign: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading,
             maxRows: container.decodeIfPresent(Int.self, forKey: .maxRows),
-            overflowMode: overflowMode,
+            overflowMode: container.decodeIfPresentTextOverflowMode(forKey: .overflowMode),
             defaultTextAttributes: textAttributes.nonEmptyOrNil
         )
     }
