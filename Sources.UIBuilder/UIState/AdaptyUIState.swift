@@ -67,7 +67,8 @@ package final class AdaptyUIState: ObservableObject {
     func getTagValue(variable: VC.Variable, screenInstance: VS.ScreenInstance, converter: VC.TagConverter?) throws(VS.Error) -> String? {
         let jsValue = try jsState.getValue(variable: variable, screenInstance: screenInstance)
         guard let converter, !jsValue.isString else { return String.fromJSValue(jsValue) }
-        return converter.toString(jsValue)
+        guard let object = jsValue.toObject() else { return nil }
+        return converter.toString(object)
     }
 
     func setValue(variable: VC.Variable, value: any JSValueConvertable, screenInstance: VS.ScreenInstance) throws(VS.Error) {
