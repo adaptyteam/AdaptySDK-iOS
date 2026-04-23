@@ -116,7 +116,7 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
     private var weightedBody: some View {
         GeometryReader { proxy in
             let (totalWeight, reservedLength) = calculateTotalWeight(for: column.items, in: proxy)
-            let weightsAvailableLength = proxy.size.height - reservedLength
+            let weightsAvailableLength = max(0, proxy.size.height - reservedLength)
 
             VStack(spacing: column.spacing) {
                 ForEach(0 ..< column.items.count, id: \.self) { idx in

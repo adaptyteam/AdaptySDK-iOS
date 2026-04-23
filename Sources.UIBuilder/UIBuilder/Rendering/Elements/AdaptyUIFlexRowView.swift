@@ -116,7 +116,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     private var weightedBody: some View {
         GeometryReader { proxy in
             let (totalWeight, reservedLength) = calculateTotalWeight(for: row.items, in: proxy)
-            let weightsAvailableLength = proxy.size.width - reservedLength
+            let weightsAvailableLength = max(0, proxy.size.width - reservedLength)
 
             HStack(spacing: row.spacing) {
                 ForEach(0 ..< row.items.count, id: \.self) { idx in
