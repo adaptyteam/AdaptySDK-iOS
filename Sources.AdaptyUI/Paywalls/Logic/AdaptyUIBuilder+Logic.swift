@@ -71,50 +71,24 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         )
     }
 
-    package func getProducts(
-        determineOffers: Bool
-    ) async throws -> [ProductResolver] {
-        let productsResult = try await getProductsInternal(
-            determineOffers: determineOffers
-        )
+    package func getProducts() async throws -> [ProductResolver] {
+        let productsResult = try await getProductsInternal()
 
-        Log.ui.verbose("#\(logId)# loadProducts determineOffers: \(determineOffers) success")
+        Log.ui.verbose("#\(logId)# loadProducts success")
         let failedIds = productsResult.1
         if !failedIds.isEmpty {
-            Log.ui.warn("#\(logId)# loadProducts determineOffers: \(determineOffers) partial!")
+            Log.ui.warn("#\(logId)# loadProducts partial!")
             events.event_didPartiallyLoadProducts(failedProductIds: failedIds)
         }
 
         return productsResult.0
     }
 
-    private func getProductsInternal(
-        determineOffers: Bool
-    ) async throws -> ([ProductResolver], [String]) {
-        ([], [])
-//        let wrappedProducts: [AdaptyPaywallProductWrapper]
-//        let failedProductIds: [String]
-//
-//        if determineOffers {
-//            for paywall in flow.paywalls {
-//                Adapty.getPaywallProducts(paywall: paywall)
-//            }
-//            
-//            let products = try await Adapty.getPaywallProducts(paywall: paywall)
-//            wrappedProducts = products.map {
-//                AdaptyPaywallProductWrapper.full($0)
-//            }
-//            failedProductIds = paywall.absentVendorProductIds(in: products)
-//
-//        } else {
-//            let products = try await Adapty.getPaywallProductsWithoutDeterminingOffer(paywall: paywall)
-//            wrappedProducts = products.map {
-//                AdaptyPaywallProductWrapper.withoutOffer($0)
-//            }
-//            failedProductIds = paywall.absentVendorProductIds(in: products)
-//        }
-//
-//        return (wrappedProducts, failedProductIds)
+    private func getProductsInternal() async throws -> ([ProductResolver], [String]) {
+        let products = try await Adapty.getPaywallProducts(flow: flow)
+        let returnedIds = Set(products.map(\.vendorProductId))
+        let failedProductIds = flow.paywallsUniqueVendorProductIds.filter { !returnedIds.contains($0) }
+        return (products, failedProductIds)
     }
 
     func makePurchase(
@@ -234,34 +208,6 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
                 variationId: flow.variationId,
                 viewConfigurationId: viewConfigurationId,
                 params: event
-            )
-        }
-    }
-
-    func logScreenShowed(screenInstanceId: String) {
-        Task {
-            try? await Adapty.logFlowAnalyticsViaAdaptyUI(
-                variationId: flow.variationId,
-                viewConfigurationId: viewConfigurationId,
-                params: AdaptyUIFlowScreenShowedParameters(
-                    screenInstanceId: screenInstanceId,
-                    screenOrder: 0, // TODO: x
-                    isLatestScreen: false // TODO: x
-                )
-            )
-        }
-    }
-}
-
-private extension AdaptyFlowPaywall {
-    func absentVendorProductIds(
-        in responseProducts: [AdaptyProduct]
-    ) -> [String] {
-        vendorProductIds.filter { vendorProductId in
-            !responseProducts.contains(
-                where: {
-                    $0.vendorProductId == vendorProductId
-                }
             )
         }
     }

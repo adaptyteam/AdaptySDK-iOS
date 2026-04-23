@@ -47,6 +47,28 @@ extension VS {
 }
 
 extension VS.JSState {
+    func setEnvironmentConstants(_ config: AdaptyUIConfiguration) {
+        guard
+            let global = context.globalObject,
+            let env = config.environmentObject(in: context)
+        else { return }
+
+        let objectClass = context.objectForKeyedSubscript("Object")
+        objectClass?.invokeMethod("freeze", withArguments: [env])
+
+        #if DEBUG
+        global.setObject(env, forKeyedSubscript: "SDKEnv" as NSString)
+        #else
+        if let objectClass, let descriptor = JSValue(newObjectIn: context) {
+            descriptor.setObject(env, forKeyedSubscript: "value" as NSString)
+            descriptor.setObject(false, forKeyedSubscript: "writable" as NSString)
+            descriptor.setObject(false, forKeyedSubscript: "configurable" as NSString)
+            descriptor.setObject(false, forKeyedSubscript: "enumerable" as NSString)
+            objectClass.invokeMethod("defineProperty", withArguments: [global, "SDKEnv", descriptor])
+        }
+        #endif
+    }
+
     func evaluateScripts(
         _ scripts: [String]
     ) {
@@ -109,11 +131,10 @@ extension VS.JSState {
         return current
     }
 
-    func getValue<T: JSValueRepresentable>(
-        _: T.Type,
+    func getValue(
         variable: VC.Variable,
         screenInstance: VS.ScreenInstance
-    ) throws(VS.Error) -> T? {
+    ) throws(VS.Error) -> JSValue {
         let path = variable.pathWithScreenContext(screenInstance.contextPath)
         let name = path.last
         let parent = try findObject(path: path.dropLast())
@@ -131,15 +152,15 @@ extension VS.JSState {
 
         log.debug("get variable \(path.joined(separator: ".")) = \(result)")
 
-        guard let converter = variable.converter as? VS.ExecutableConvertor else {
-            return T.fromJSValue(result)
+        guard let converter = variable.converter?.asDataBindingConverter else {
+            return result
         }
 
         do {
             let converted = try converter.readValue(result, in: context)
             log.debug("convert to value: \(converted)")
 
-            return T.fromJSValue(converted)
+            return converted
         } catch {
             log.error("convert \(path.joined(separator: ".")) = \(result) error: \(error) with \(converter)")
             throw error
@@ -201,7 +222,7 @@ extension VS.JSState {
         value: some JSValueConvertable,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
-        guard let convertor = variable.converter as? VS.ExecutableConvertor else {
+        guard let convertor = variable.converter?.asDataBindingConverter else {
             try setValueWithoutConverter(variable: variable, value: value, screenInstance: screenInstance)
             return
         }

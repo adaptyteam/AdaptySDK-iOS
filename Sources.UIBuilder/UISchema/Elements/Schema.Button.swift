@@ -81,14 +81,14 @@ extension Schema.Button: DecodableWithConfiguration {
                     path: ["Legacy", "productGroup", groupId],
                     setter: nil,
                     scope: .global,
-                    converter: Schema.Variable.IsEqualConvertor(value: Schema.AnyValue(productId), falseValue: nil)
+                    converter: Schema.IsEqualConverter(value: Schema.AnyValue(productId), falseValue: nil).asAnyConverter
                 )
             case let .selectedSection(sectionId, index):
                 .init(
                     path: ["Legacy", "sections", sectionId],
                     setter: nil,
                     scope: .global,
-                    converter: Schema.Variable.IsEqualConvertor(value: Schema.AnyValue(index), falseValue: nil)
+                    converter: Schema.IsEqualConverter(value: Schema.AnyValue(index), falseValue: nil).asAnyConverter
                 )
             default:
                 nil

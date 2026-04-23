@@ -48,8 +48,8 @@ extension VS.JSActionDispatcher {
             showRequestPermission(action.paramsAsDictionary(), callback: nil)
         case "sendEvents":
             sendEvents(action.paramsAsDictionary())
-        case "sendAnalyticEvent":
-            sendAnalyticEvent(action.paramsAsDictionary() as? [String: any Sendable])
+        case "sendAnalyticsEvent":
+            sendAnalyticsEvent(action.paramsAsDictionary() as? [String: any Sendable])
         default: return false
         }
         return true

@@ -12,34 +12,7 @@ extension VC {
         let path: [String]
         let setter: String?
         let scope: Scope
-        let converter: (any Converter)?
-
-        static func == (lhs: Self, rhs: Self) -> Bool {
-            lhs.path == rhs.path
-                && lhs.setter == rhs.setter
-                && lhs.scope == rhs.scope
-                && {
-                    switch (lhs.converter, rhs.converter) {
-                    case (nil, nil):
-                        true
-                    case let (lhs?, rhs?):
-                        lhs.isEqual(to: rhs)
-                    default:
-                        false
-                    }
-                }()
-        }
-
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(path)
-            hasher.combine(setter)
-            hasher.combine(scope)
-            hasher.combine(converter == nil)
-            if let converter {
-                hasher.combine(ObjectIdentifier(type(of: converter)))
-                converter.hash(into: &hasher)
-            }
-        }
+        let converter: AnyConverter?
     }
 }
 
@@ -52,3 +25,4 @@ extension VC.Variable {
         }
     }
 }
+

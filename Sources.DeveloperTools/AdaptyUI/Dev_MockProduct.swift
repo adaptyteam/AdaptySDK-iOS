@@ -9,6 +9,8 @@ import AdaptyUIBuilder
 import Foundation
 
 struct Dev_MockProduct: ProductResolver, Sendable {
+    var flowId: String { adaptyProductId }
+
     let adaptyProductId: String
     let paymentMode: PaymentModeValue
 

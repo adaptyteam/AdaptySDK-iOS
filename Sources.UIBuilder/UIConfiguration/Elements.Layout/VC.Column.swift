@@ -9,7 +9,9 @@ import Foundation
 
 extension VC {
     struct Column: Sendable, Hashable {
+        let height: AutoSizeMode
         let spacing: Double
         let items: [GridItem]
     }
 }
+

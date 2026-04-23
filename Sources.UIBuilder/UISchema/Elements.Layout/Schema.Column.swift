@@ -9,6 +9,7 @@ import Foundation
 
 extension Schema {
     struct Column: Sendable {
+        let height: AutoSizeMode
         let spacing: Double
         let items: [GridItem]
     }
@@ -30,6 +31,7 @@ extension Schema.Column: Schema.CompositeElement {
     ) throws(Schema.Error) -> VC.Element {
         try .column(
             .init(
+                height: height,
                 spacing: spacing,
                 items: builder.convertGridItems(items, resultStack.popLastElements(items.count))
             ),
@@ -40,15 +42,26 @@ extension Schema.Column: Schema.CompositeElement {
 
 extension Schema.Column: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
+        case height
         case spacing
         case items
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        let size: Schema.AutoSizeMode =
+            if configuration.isLegacy {
+                .legacy
+            } else {
+                try container.decodeIfPresent(Schema.AutoSizeMode.self, forKey: .height) ?? .default
+            }
+
         try self.init(
+            height: size,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
             items: container.decode([Schema.GridItem].self, forKey: .items, configuration: configuration)
         )
     }
 }
+

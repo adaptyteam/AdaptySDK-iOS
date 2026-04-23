@@ -47,26 +47,17 @@ extension Schema.WheelRangePicker: Decodable {
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        try self.init(
+            value: container.decode(Schema.Variable.self, forKey: .value),
+            maxValue: container.decode(Double.self, forKey: .maxValue),
+            minValue: container.decode(Double.self, forKey: .minValue),
+            stepValue: container.decodeIfPresent(Double.self, forKey: .stepValue) ?? 1.0,
 
-        value = try container.decode(Schema.Variable.self, forKey: .value)
-        maxValue = try container.decode(Double.self, forKey: .maxValue)
-        minValue = try container.decode(Double.self, forKey: .minValue)
-        stepValue = try container.decodeIfPresent(Double.self, forKey: .stepValue) ?? 1.0
-
-        let formatItems =
-            if let stringId = try? container.decode(String.self, forKey: .format) {
-                [Schema.RangeTextFormat.Item(from: 0, stringId: stringId)]
-            } else {
-                try container.decode([Schema.RangeTextFormat.Item].self, forKey: .format)
-            }
-
-        guard !formatItems.isEmpty else {
-            throw DecodingError
-                .dataCorruptedError(forKey: .format, in: container, debugDescription: "Must be at least one format item")
-        }
-        format = try .init(
-            items: formatItems,
-            textAttributes: Schema.TextAttributes(from: decoder)
+            format: container.decodeRangeTextFormat(
+                textAttributes: .init(from: decoder),
+                forKey: .format
+            )
         )
     }
 }
+

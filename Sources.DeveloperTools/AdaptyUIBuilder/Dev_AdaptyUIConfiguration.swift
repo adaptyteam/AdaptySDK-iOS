@@ -40,7 +40,19 @@ public extension Dev_AdaptyUIConfiguration {
     ) throws -> Self {
         let schema = try AdaptyUISchema(from: json)
         let configuration = try schema.extractUIConfiguration(
-            id: UUID().uuidString.lowercased()
+            id: UUID().uuidString.lowercased(),
+            envoriment: .init(
+                sdkVersion: "",
+                osName: "",
+                osVersion: "",
+                deviceModel: "",
+                appBundleId: nil,
+                appVersion: nil,
+                appBuild: nil,
+                appCurrentLocale: nil,
+                userLocales: [],
+                userUses24HourClock: true
+            )
         )
         return .init(
             wrapped: configuration,

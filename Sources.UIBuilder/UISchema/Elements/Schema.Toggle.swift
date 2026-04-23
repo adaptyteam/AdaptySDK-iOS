@@ -55,10 +55,10 @@ extension Schema.Toggle: DecodableWithConfiguration {
                 path: ["Legacy", "sections", sectionId],
                 setter: nil,
                 scope: .global,
-                converter: Schema.Variable.IsEqualConvertor(
+                converter: Schema.IsEqualConverter(
                     value: Schema.AnyValue(onIndex),
                     falseValue: Schema.AnyValue(offIndex)
-                )
+                ).asAnyConverter
 
             ),
             color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)

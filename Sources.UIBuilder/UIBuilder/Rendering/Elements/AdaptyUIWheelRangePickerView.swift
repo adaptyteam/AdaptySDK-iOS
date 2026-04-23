@@ -39,16 +39,15 @@ struct AdaptyUIWheelRangePickerView: View {
 
     private func formattedText(for value: Double) -> Text {
         let richText = picker.format.item(byValue: value)
-        let resolver = WheelRangeTagResolver(
-            value: value,
-            fallback: customTagResolverViewModel
-        )
         return richText.convertToSwiftUIText(
             defaultAttributes: picker.format.textAttributes,
             assetsCache: assetsViewModel.cache,
             stateViewModel: stateViewModel,
             tagValues: nil,
-            customTagResolver: resolver,
+            internalTagResolver: { tag in
+                tag == "VALUE" ? value : nil
+            },
+            customTagResolver: customTagResolverViewModel,
             productInfo: nil,
             colorScheme: colorScheme,
             screen: screen
@@ -72,26 +71,6 @@ struct AdaptyUIWheelRangePickerView: View {
         }
         .pickerStyle(.wheel)
         .labelsHidden()
-    }
-}
-
-private struct WheelRangeTagResolver: AdaptyUITagResolver {
-    let value: Double
-    let fallback: AdaptyUITagResolver
-
-    private var formattedValue: String {
-        if value == value.rounded() {
-            String(format: "%.0f", value)
-        } else {
-            String(value)
-        }
-    }
-
-    func replacement(for tag: String) -> String? {
-        if let result = fallback.replacement(for: tag) {
-            return result
-        }
-        return formattedValue
     }
 }
 

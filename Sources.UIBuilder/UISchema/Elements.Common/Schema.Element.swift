@@ -129,6 +129,10 @@ extension Schema.Element: DecodableWithConfiguration {
         case graphicalDateTimePicker = "graphical_datetime_picker"
         case wheelItemsPicker = "wheel_items_picker"
         case wheelRangePicker = "wheel_range_picker"
+        case textProgress = "text_progress"
+        case horizontalProgress = "horizontal_progress"
+        case verticalProgress = "vertical_progress"
+        case radialProgress = "radial_progress"
     }
 
     init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
@@ -262,6 +266,21 @@ extension Schema.Element: DecodableWithConfiguration {
             try self.init(
                 properties: propertyOrNil(),
                 node: .simpleElement(Schema.WheelItemsPicker(from: decoder))
+            )
+        case .textProgress:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .simpleElement(Schema.TextProgress(from: decoder))
+            )
+        case .horizontalProgress, .verticalProgress:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .simpleElement(Schema.LinearProgress(from: decoder))
+            )
+        case .radialProgress:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .simpleElement(Schema.RadialProgress(from: decoder))
             )
         }
 

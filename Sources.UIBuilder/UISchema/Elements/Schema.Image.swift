@@ -40,7 +40,7 @@ extension Schema.Image: Decodable {
         }
         try self.init(
             asset: asset,
-            aspect: container.decodeIfPresent(Schema.AspectRatio.self, forKey: .aspect) ?? Schema.AspectRatio.default,
+            aspect: container.decodeIfPresent(Schema.AspectRatio.self, forKey: .aspect) ?? .default,
             tint: container.decodeIfPresent(Schema.AssetReference.self, forKey: .tintAssetId)
         )
     }

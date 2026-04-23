@@ -13,6 +13,8 @@ extension Schema {
         let format: Schema.RangeTextFormat
         let actions: [Schema.Action]
         let horizontalAlign: HorizontalAlignment
+        let maxRows: Int?
+        let overflowMode: Set<Schema.Text.OverflowMode>
     }
 }
 
@@ -27,7 +29,9 @@ extension Schema.Timer: Schema.SimpleElement {
                 id: id,
                 format: builder.convertRangeTextFormat(format),
                 actions: actions,
-                horizontalAlign: horizontalAlign
+                horizontalAlign: horizontalAlign,
+                maxRows: maxRows,
+                overflowMode: overflowMode
             ),
             properties
         )
@@ -40,28 +44,35 @@ extension Schema.Timer: DecodableWithConfiguration {
         case format
         case actions = "action"
         case horizontalAlign = "align"
+        case maxRows = "max_rows"
+        case overflowMode = "on_overflow"
     }
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(String.self, forKey: .id)
 
-        id = try container.decode(String.self, forKey: .id)
-
-        let formatItems =
-            if let stringId = try? container.decode(String.self, forKey: .format) {
-                [Schema.RangeTextFormat.Item(from: 0, stringId: stringId)]
+        let (maxRows, overflowMode): (Int?, Set<Schema.Text.OverflowMode>) =
+            if configuration.isLegacy {
+                (1, [.scale])
             } else {
-                try container.decode([Schema.RangeTextFormat.Item].self, forKey: .format)
+                try (
+                    container.decodeIfPresent(Int.self, forKey: .maxRows),
+                    container.decodeIfPresentTextOverflowMode(forKey: .overflowMode)
+                )
             }
 
-        format = try Schema.RangeTextFormat(
-            items: formatItems,
-            textAttributes: Schema.TextAttributes(from: decoder)
+        try self.init(
+            id: id,
+            format: container.decodeRangeTextFormat(
+                textAttributes: .init(from: decoder),
+                forKey: .format
+            ),
+            actions: container.decodeIfPresentActions(forKey: .actions) ?? [],
+            horizontalAlign: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading,
+            maxRows: maxRows,
+            overflowMode: overflowMode
         )
-
-        actions = try container.decodeIfPresentActions(forKey: .actions) ?? []
-
-        horizontalAlign = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlign) ?? .leading
 
         if configuration.isLegacy {
             configuration.collector.legacyTimers[id] = try Schema.decodeLegacySetTimer(id: id, from: decoder)

@@ -74,6 +74,12 @@ Entities:
             - fill
             - stretch
 
+    AutoSizeMode:
+        type: string
+        enum:
+            - hug
+            - fill
+
     CornerRadius:
         title: "Corner radius"
         oneOf:
@@ -188,14 +194,18 @@ Entities:
                   unit: { enum: [point, screen], default: point }
               additionalProperties: false
 
-    DateTime:
-        description: "Date/time value"
+    Format:
         oneOf:
-            - type: number
-              description: "Unix timestamp in milliseconds"
             - type: string
-              pattern: "^[0-9]{4}-((0[1-9])|(1[012]))-(([0-2][1-9])|(3[01])) (([01][0-9])|(2[0123])):([0-5][0-9]):([0-5][0-9])$"
-              description: "Date string: 6 numeric components (year, month, day, hour, minute, second) separated by any of: space, dash, colon, dot, comma, semicolon, slash, backslash"
+              title: Localization string id
+            - type: array
+              minItems: 1
+              items:
+                  type: object
+                  required: [from, string_id]
+                  properties:
+                      from: { type: number }
+                      string_id: { type: string, title: Localization string id }
 
 ###### Animations ######
 
@@ -386,7 +396,7 @@ Animation:
         type: object
         required: [type]
         properties:
-            type: { const: shadow }
+            type: { enum: [shadow, inner_shadow] }
         anyOf:
             - required: [color]
               properties:
@@ -595,6 +605,10 @@ UI:
                         - $ref: "#/UI/DateTimePicker"
                         - $ref: "#/UI/WheelRangePicker"
                         - $ref: "#/UI/WheelItemsPicker"
+                        - $ref: "#/UI/HorizontalProgress"
+                        - $ref: "#/UI/VerticalProgress"
+                        - $ref: "#/UI/RadialProgress"
+                        - $ref: "#/UI/TextProgress"
                   - properties:
                         decorator: { $ref: "#/UI/Element/Decorator" }
                         padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
@@ -684,6 +698,7 @@ UI:
                     { $ref: "#/UI/Element/Decorator/ShapeType", default: rect }
                 border: { $ref: "#/AssetIdOrColor/Binding" }
                 shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
+                inner_shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
                 blur_radius: { type: number }
             dependentSchemas:
                 border:
@@ -895,6 +910,7 @@ UI:
                       additionalProperties: false
                   validation: { $ref: "#/Script/DataBinding" }
                   invalid_attributes: { $ref: "#/UI/Text/Attributes" }
+                  submit_action: { $ref: "#/Script/ActionOrArray" }
                   keyboard_options:
                       type: object
                       properties:
@@ -1050,6 +1066,7 @@ UI:
         required: [type, items]
         properties:
             type: { const: row }
+            width: { $ref: "#/Entities/AutoSizeMode", default: fill }
             spacing: { type: number, default: 0 }
             items:
                 type: array
@@ -1061,6 +1078,7 @@ UI:
         required: [type, items]
         properties:
             type: { const: column }
+            height: { $ref: "#/Entities/AutoSizeMode", default: fill }
             spacing: { type: number, default: 0 }
             items:
                 type: array
@@ -1097,26 +1115,16 @@ UI:
               properties:
                   type: { const: timer }
                   id: { type: string }
-                  format: { $ref: "#/UI/Timer/Format" }
+                  format: { $ref: "#/Entities/Format" }
                   align:
                       {
                           $ref: "#/Entities/HorizontalAlignment",
                           default: leading,
                       }
+                  max_rows: { type: integer, minimum: 1 }
+                  on_overflow: { $ref: "#/UI/Text/OverflowMode" }
                   action: { $ref: "#/Script/ActionOrArray" }
             - $ref: "#/UI/Text/Attributes"
-
-        Format:
-            oneOf:
-                - type: string
-                - type: array
-                  minItems: 1
-                  items:
-                      type: object
-                      required: [from, string_id]
-                      properties:
-                          from: { type: number }
-                          string_id: { type: string }
 
     Pager:
         type: object
@@ -1210,9 +1218,9 @@ UI:
                 uniqueItems: true
                 minItems: 1
             min:
-                $ref: "#/Entities/DateTime"
+                $ref: "#/DateTime"
             max:
-                $ref: "#/Entities/DateTime"
+                $ref: "#/DateTime"
             color: { $ref: "#/AssetIdOrColor/Binding" }
             string_in_local_time:
                 type: boolean
@@ -1230,7 +1238,7 @@ UI:
                   min: { type: number }
                   max: { type: number }
                   step: { type: number, default: 1.0 }
-                  format: { $ref: "#/UI/Timer/Format" }
+                  format: { $ref: "#/Entities/Format" }
 
     WheelItemsPicker:
         type: object
@@ -1242,7 +1250,7 @@ UI:
                 type: array
                 items:
                     type: object
-                    required: [value, label]
+                    required: [value, string_id]
                     properties:
                         string_id: { type: string }
                         value:
@@ -1253,6 +1261,67 @@ UI:
                 uniqueItems: true
                 minItems: 1
 
+    HorizontalProgress:
+        type: object
+        required: [type, align, asset_id, value, duration]
+        properties:
+            type: { const: "horizontal_progress" }
+            align: { $ref: "#/Entities/HorizontalAlignment" }
+            corner_radius: { $ref: "#/Entities/CornerRadius", default: 0 }
+            asset_id: { $ref: "#/AssetIdOrColor/Binding" }
+            image_aspect: { $ref: "#/Entities/AspectRatio", default: "fit" }
+            clip: { type: boolean, default: true }
+            value: { $ref: "#/Script/DataBinding" }
+            duration: { type: number , description: "milliseconds to change value"}
+            interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
+            action: { $ref: "#/Script/ActionOrArray" }
+            
+    VerticalProgress:
+        type: object
+        required: [type, align, asset_id, value, duration]
+        properties:
+            type: { const: "vertical_progress" }
+            align: { $ref: "#/Entities/VerticalAlignment" }
+            corner_radius: { $ref: "#/Entities/CornerRadius", default: 0 }
+            asset_id: { $ref: "#/AssetIdOrColor/Binding" }
+            image_aspect: { $ref: "#/Entities/AspectRatio", default: "fit" }
+            clip: { type: boolean, default: true }
+            value: { $ref: "#/Script/DataBinding" }
+            duration: { type: number , description: "milliseconds to change value"}
+            interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
+            action: { $ref: "#/Script/ActionOrArray" }
+
+    RadialProgress:
+        type: object
+        required: [type, asset_id, value, duration]
+        properties:
+            type: { const: "radial_progress" }
+            thickness: { type: number }
+            sweep_angle: { type: number , default: 360 }
+            start_angle: { type: number , default: -90 }
+            clockwise: { type: boolean , default: true }
+            rounded_caps: { type: boolean , default: false }
+            asset_id: { $ref: "#/AssetIdOrColor/Binding" }
+            clip: { type: boolean, default: true }
+            value: { $ref: "#/Script/DataBinding" }
+            duration: { type: number , description: "milliseconds to change value"}
+            interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
+            action: { $ref: "#/Script/ActionOrArray" }
+
+    TextProgress:
+        type: object
+        allOf:
+            - required: [type, format, value, duration]
+              properties:
+                  type: { const: "text_progress" }
+                  format: { $ref: "#/Entities/Format" }
+                  value: { $ref: "#/Script/DataBinding" }
+                  duration: { type: number , description: "milliseconds to change value"}
+                  interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
+                  action: { $ref: "#/Script/ActionOrArray" }
+            - $ref: "#/UI/Text/Attributes"
+    
+            
 ###### Rich Text ######
 
 RichText:

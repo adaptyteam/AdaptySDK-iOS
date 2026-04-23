@@ -13,6 +13,7 @@ extension VC {
         let background: AssetReference?
         let border: Border?
         let shadow: Shadow?
+        let innerShadow: Shadow?
         let blurRadius: Double?
     }
 }

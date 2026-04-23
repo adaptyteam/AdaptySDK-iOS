@@ -46,7 +46,7 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
 
     func logShowPaywall(viewConfiguration: AdaptyUIConfiguration) async {}
 
-    func getProducts(determineOffers: Bool) async throws -> [ProductResolver] {
+    func getProducts() async throws -> [ProductResolver] {
         products
     }
 
@@ -77,8 +77,6 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
     func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable]) {}
 
     func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
-
-    func logScreenShowed(screenInstanceId: String) {}
 }
 
 #endif

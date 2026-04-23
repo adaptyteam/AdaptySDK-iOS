@@ -66,6 +66,7 @@ struct AdaptyUITextField: View {
             assetsCache: assetsViewModel.cache,
             stateViewModel: stateViewModel,
             tagValues: tagValues,
+            internalTagResolver: nil,
             customTagResolver: customTagResolverViewModel,
             productInfo: nil,
             colorScheme: colorScheme,

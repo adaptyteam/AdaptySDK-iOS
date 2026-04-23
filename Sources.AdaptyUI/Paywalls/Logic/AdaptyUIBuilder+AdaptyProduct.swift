@@ -12,6 +12,8 @@ import AdaptyUIBuilder
 import Foundation
 
 extension AdaptyPaywallProduct: ProductResolver {
+    public var flowId: String { flowProductId ?? adaptyProductId } // TODO: x check?
+    
     public var paymentMode: PaymentModeValue {
         subscriptionOffer?.paymentMode.encodedValue
     }

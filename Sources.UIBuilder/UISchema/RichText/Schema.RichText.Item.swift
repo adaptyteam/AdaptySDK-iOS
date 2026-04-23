@@ -18,6 +18,8 @@ extension Schema.RichText.Item: Decodable {
         case image
         case attributes
         case action
+        case converter
+        case format
     }
 
     init(from decoder: Decoder) throws {
@@ -27,27 +29,39 @@ extension Schema.RichText.Item: Decodable {
         }
 
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self =
-            if container.contains(.text) {
-                try .text(
-                    container.decode(String.self, forKey: .text),
-                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes),
-                    container.decodeIfPresent(Schema.Action.self, forKey: .action)
-                )
-            } else if container.contains(.tag) {
-                try .tag(
-                    container.decode(String.self, forKey: .tag),
-                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes),
-                    container.decodeIfPresent(Schema.Action.self, forKey: .action)
-                )
-            } else if container.contains(.image) {
-                try .image(
-                    container.decode(Schema.AssetReference.self, forKey: .image),
-                    container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes)
-                )
-            } else {
-                .unknown
-            }
+
+        if container.contains(.text) {
+            self = try .text(
+                container.decode(String.self, forKey: .text),
+                container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes),
+                container.decodeIfPresent(Schema.Action.self, forKey: .action)
+            )
+        } else if container.contains(.tag) {
+            let tag = try container.decode(String.self, forKey: .tag)
+
+            let converter: Schema.AnyConverter? =
+                if container.exist(.converter) {
+                    try Schema.AnyConverter.forTag(from: decoder)
+                } else if tag == "PERCENT", container.exist(.format)  {
+                    try? Schema.PercentConverter(from: decoder).asAnyConverter
+                } else {
+                    nil
+                }
+
+            self = try .tag(
+                tag,
+                container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes),
+                converter,
+                container.decodeIfPresent(Schema.Action.self, forKey: .action)
+            )
+        } else if container.contains(.image) {
+            self = try .image(
+                container.decode(Schema.AssetReference.self, forKey: .image),
+                container.decodeIfPresent(Schema.RichText.Attributes.self, forKey: .attributes)
+            )
+        } else {
+            self = .unknown
+        }
     }
 }
 

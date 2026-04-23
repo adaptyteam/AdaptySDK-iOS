@@ -297,18 +297,18 @@ extension VS.JSActionDispatcher {
     }
 
     @inlinable
-    func sendAnalyticEvent(_ params: [String: any Sendable]?) {
+    func sendAnalyticsEvent(_ params: [String: any Sendable]?) {
         guard let params else {
-            Log.viewState.error(#"SDK.sendAnalyticEvent: corupted params"#)
+            Log.viewState.error(#"SDK.sendAnalyticsEvent: corupted params"#)
             return
         }
 
         guard let name = (params[VS.AnalyticEvent.CodingKeys.name.rawValue] ?? params["name"]) as? String else {
-            Log.viewState.error(#"SDK.sendAnalyticEvent: required parameter "name" is missing or corupted"#)
+            Log.viewState.error(#"SDK.sendAnalyticsEvent: required parameter "name" is missing or corupted"#)
             return
         }
 
-        handler?.sendAnalyticEvent(.init(
+        handler?.sendAnalyticsEvent(.init(
             name: name,
             params: params
         ))

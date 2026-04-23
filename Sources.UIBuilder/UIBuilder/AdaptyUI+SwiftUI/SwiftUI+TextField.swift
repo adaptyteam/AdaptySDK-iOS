@@ -19,11 +19,21 @@ extension View {
         minRows: Int?,
         maxRows: Int?
     ) -> some View {
+        // Invalid config: Swift ranges require lowerBound <= upperBound.
+        // Clamp min_rows to max_rows so the field still renders.
+        let (resolvedMin, resolvedMax): (Int?, Int?) = {
+            if let lo = minRows, let hi = maxRows, lo > hi {
+                Log.ui.warn("text_field: clamping min_rows=\(lo) to max_rows=\(hi)")
+                return (hi, hi)
+            }
+            return (minRows, maxRows)
+        }()
+
         switch kind {
         case .singleLine:
             lineLimit(1)
         case .multiLine:
-            switch (minRows, maxRows) {
+            switch (resolvedMin, resolvedMax) {
             case (.none, .none):
                 lineLimit(nil)
             case (.some(let minRows), .none):

@@ -28,6 +28,9 @@ extension VC {
         indirect case dateTimePicker(DateTimePicker, Properties?)
         indirect case wheelItemsPicker(WheelItemsPicker, Properties?)
         indirect case wheelRangePicker(WheelRangePicker, Properties?)
+        indirect case linearProgress(LinearProgress, Properties?)
+        indirect case radialProgress(RadialProgress, Properties?)
+        indirect case textProgress(TextProgress, Properties?)
 
         case screenHolder
         indirect case unknown(String)
@@ -57,8 +60,13 @@ extension VC.Element {
              let .video(_, properties),
              let .dateTimePicker(_, properties),
              let .wheelItemsPicker(_, properties),
-             let .wheelRangePicker(_, properties):
+             let .wheelRangePicker(_, properties),
+             let .linearProgress(_, properties),
+             let .radialProgress(_, properties),
+             let .textProgress(_, properties)
+             :
             properties
         }
     }
 }
+

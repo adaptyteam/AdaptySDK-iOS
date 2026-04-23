@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 08.02.2026.
 //
 
-import Foundation
 import AdaptyCodable
+import Foundation
 
 public struct AdaptyFlow: PlacementContent, Identifiable {
     public let placement: AdaptyPlacement
@@ -18,6 +18,7 @@ public struct AdaptyFlow: PlacementContent, Identifiable {
     public var hasViewConfiguration: Bool {
         viewConfigurationId != nil
     }
+
     let viewConfigurationId: String?
 
     let paywalls: [AdaptyFlowPaywall]
@@ -29,8 +30,16 @@ extension AdaptyFlow: CustomStringConvertible {
     }
 }
 
-extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
+package extension AdaptyFlow {
+    /// Array of related products ids, aggregated across all paywalls in the
+    /// flow, preserving order and de-duplicated.
+    var paywallsUniqueVendorProductIds: [String] {
+        var seen = Set<String>()
+        return paywalls.flatMap(\.vendorProductIds).filter { seen.insert($0).inserted }
+    }
+}
 
+extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
     public typealias DecodingConfiguration = AdaptyPlacement.DecodingConfiguration
 
     enum CodingKeys: String, CodingKey {
@@ -80,4 +89,3 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
         try placement.encode(to: encoder)
     }
 }
-

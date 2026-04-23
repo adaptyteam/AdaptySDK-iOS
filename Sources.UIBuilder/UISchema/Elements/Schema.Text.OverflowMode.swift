@@ -30,3 +30,14 @@ extension Schema.Text.OverflowMode: RawRepresentable {
 }
 
 extension Schema.Text.OverflowMode: Codable {}
+
+extension KeyedDecodingContainer {
+    func decodeIfPresentTextOverflowMode(forKey key: Key) throws -> Set<Schema.Text.OverflowMode> {
+        if let value = try? decode(Schema.Text.OverflowMode.self, forKey: key) {
+            Set([value])
+        } else {
+            try Set(decodeIfPresent([Schema.Text.OverflowMode].self, forKey: key) ?? [])
+        }
+    }
+}
+
