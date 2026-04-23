@@ -114,8 +114,6 @@ extension Schema.Element: DecodableWithConfiguration {
         case zStack = "z_stack"
         case row
         case column
-        case flexRow = "flex_row"
-        case flexColumn = "flex_column"
         case section
         case toggle
         case slider
@@ -216,16 +214,6 @@ extension Schema.Element: DecodableWithConfiguration {
             try self.init(
                 properties: propertyOrNil(),
                 node: .compositeElement(Schema.Column(from: decoder, configuration: configuration))
-            )
-        case .flexRow:
-            try self.init(
-                properties: propertyOrNil(),
-                node: .compositeElement(Schema.FlexRow(from: decoder, configuration: configuration))
-            )
-        case .flexColumn:
-            try self.init(
-                properties: propertyOrNil(),
-                node: .compositeElement(Schema.FlexColumn(from: decoder, configuration: configuration))
             )
         case .section:
             try self.init(

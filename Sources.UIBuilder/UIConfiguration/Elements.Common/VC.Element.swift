@@ -19,8 +19,6 @@ extension VC {
         indirect case box(Box, Properties?)
         indirect case row(Row, Properties?)
         indirect case column(Column, Properties?)
-        indirect case flexRow(Row, Properties?)
-        indirect case flexColumn(Column, Properties?)
         indirect case section(Section, Properties?)
         indirect case toggle(Toggle, Properties?)
         indirect case timer(Timer, Properties?)
@@ -50,8 +48,6 @@ extension VC.Element {
              let .button(_, properties),
              let .row(_, properties),
              let .column(_, properties),
-             let .flexRow(_, properties),
-             let .flexColumn(_, properties),
              let .section(_, properties),
              let .toggle(_, properties),
              let .timer(_, properties),

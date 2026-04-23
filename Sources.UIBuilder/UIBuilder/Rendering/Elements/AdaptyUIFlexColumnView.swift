@@ -72,17 +72,14 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
         }
     }
 
-    private var hasWeights: Bool {
-        column.items.contains { if case .weight = $0.length { return true } else { return false } }
-    }
-
     @State private var contentsSize: CGSize = .zero
 
     var body: some View {
-        if hasWeights {
-            weightedBody
-        } else {
+        switch column.height {
+        case .hug:
             fixedBody
+        case .fill, .legacy:
+            weightedBody
         }
     }
 

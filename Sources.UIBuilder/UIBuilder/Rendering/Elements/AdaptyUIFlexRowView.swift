@@ -72,17 +72,14 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
         }
     }
 
-    private var hasWeights: Bool {
-        row.items.contains { if case .weight = $0.length { return true } else { return false } }
-    }
-
     @State private var contentsSize: CGSize = .zero
 
     var body: some View {
-        if hasWeights {
-            weightedBody
-        } else {
+        switch row.width {
+        case .hug:
             fixedBody
+        case .fill, .legacy:
+            weightedBody
         }
     }
 

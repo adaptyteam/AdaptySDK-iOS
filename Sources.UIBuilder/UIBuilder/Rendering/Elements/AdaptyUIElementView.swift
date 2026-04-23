@@ -52,25 +52,31 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
         case let .button(button, _):
             AdaptyUIButtonView(button)
         case let .row(row, _):
-            AdaptyUIRowView(
-                row,
-                screenHolderBuilder: screenHolderBuilder
-            )
+            switch row.width {
+            case .legacy:
+                AdaptyUIRowView(
+                    row,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            case .hug, .fill:
+                AdaptyUIFlexRowView(
+                    row,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            }
         case let .column(column, _):
-            AdaptyUIColumnView(
-                column,
-                screenHolderBuilder: screenHolderBuilder
-            )
-        case let .flexRow(row, _):
-            AdaptyUIFlexRowView(
-                row,
-                screenHolderBuilder: screenHolderBuilder
-            )
-        case let .flexColumn(column, _):
-            AdaptyUIFlexColumnView(
-                column,
-                screenHolderBuilder: screenHolderBuilder
-            )
+            switch column.height {
+            case .legacy:
+                AdaptyUIColumnView(
+                    column,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            case .hug, .fill:
+                AdaptyUIFlexColumnView(
+                    column,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            }
         case let .section(section, _):
             AdaptyUISectionView(
                 section,
