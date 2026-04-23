@@ -15,10 +15,3 @@ extension VC {
     }
 }
 
-extension VC {
-    struct LegacyColumn: Sendable, Hashable {
-        let spacing: Double
-        let items: [GridItem]
-    }
-}
-

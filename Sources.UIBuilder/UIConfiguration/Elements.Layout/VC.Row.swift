@@ -14,10 +14,3 @@ extension VC {
         let items: [GridItem]
     }
 }
-
-extension VC {
-    struct LegacyRow: Sendable, Hashable {
-        let spacing: Double
-        let items: [GridItem]
-    }
-}

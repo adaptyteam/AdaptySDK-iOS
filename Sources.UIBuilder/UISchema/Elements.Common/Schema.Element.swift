@@ -206,29 +206,15 @@ extension Schema.Element: DecodableWithConfiguration {
                 node: .simpleElement(Schema.VideoPlayer(from: decoder))
             )
         case .row:
-            if configuration.isLegacy {
-                try self.init(
-                    properties: propertyOrNil(),
-                    node: .compositeElement(Schema.LegacyRow(from: decoder, configuration: configuration))
-                )
-            } else {
-                try self.init(
-                    properties: propertyOrNil(),
-                    node: .compositeElement(Schema.Row(from: decoder, configuration: configuration))
-                )
-            }
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.Row(from: decoder, configuration: configuration))
+            )
         case .column:
-            if configuration.isLegacy {
-                try self.init(
-                    properties: propertyOrNil(),
-                    node: .compositeElement(Schema.Column(from: decoder, configuration: configuration))
-                )
-            } else {
-                try self.init(
-                    properties: propertyOrNil(),
-                    node: .compositeElement(Schema.LegacyColumn(from: decoder, configuration: configuration))
-                )
-            }
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.Column(from: decoder, configuration: configuration))
+            )
         case .section:
             try self.init(
                 properties: propertyOrNil(),
@@ -285,7 +271,6 @@ extension Schema.Element: DecodableWithConfiguration {
                 node: .simpleElement(Schema.RadialProgress(from: decoder))
             )
         }
-
 
         func propertyOrNil() -> Schema.ElementProperties? {
             guard let properties = try? Schema.ElementProperties(from: decoder, configuration: configuration) else { return nil }

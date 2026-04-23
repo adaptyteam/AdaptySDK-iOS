@@ -19,6 +19,7 @@ extension Schema.AutoSizeMode: RawRepresentable {
     private enum Key {
         static let hug = "hug"
         static let fill = "fill"
+        static let legacy = "legacy"
     }
 
     init?(rawValue value: String) {
@@ -33,6 +34,7 @@ extension Schema.AutoSizeMode: RawRepresentable {
         switch self {
         case .hug: Key.hug
         case .fill: Key.fill
+        case .legacy: Key.legacy
         }
     }
 }

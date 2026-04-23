@@ -51,24 +51,14 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             AdaptyUIVideoView(video: video)
         case let .button(button, _):
             AdaptyUIButtonView(button)
-        case let .legacyRow(row, _):
+        case let .row(row, _):
             AdaptyUIRowView(
                 row,
                 screenHolderBuilder: screenHolderBuilder
             )
-        case let .legacyColumn(column, _):
-            AdaptyUIColumnView(
-                column,
-                screenHolderBuilder: screenHolderBuilder
-            )
-        case let .row(row, _):
-            AdaptyUIRowView(
-                .init(spacing: row.spacing, items: row.items), // TODO: use new row
-                screenHolderBuilder: screenHolderBuilder
-            )
         case let .column(column, _):
             AdaptyUIColumnView(
-                .init(spacing: column.spacing, items: column.items), // TODO: use new column
+                column,
                 screenHolderBuilder: screenHolderBuilder
             )
         case let .section(section, _):

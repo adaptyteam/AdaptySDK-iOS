@@ -17,11 +17,11 @@ struct AdaptyUIRowView<ScreenHolderContent: View>: View {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    private let row: VC.LegacyRow
+    private let row: VC.Row
     private let screenHolderBuilder: () -> ScreenHolderContent
 
     init(
-        _ row: VC.LegacyRow,
+        _ row: VC.Row,
         @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
     ) {
         self.row = row

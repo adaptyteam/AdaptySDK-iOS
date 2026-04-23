@@ -11,6 +11,7 @@ extension VC {
     enum AutoSizeMode: Sendable, Hashable {
         case hug
         case fill
+        case legacy
     }
 }
 

@@ -49,8 +49,16 @@ extension Schema.Column: DecodableWithConfiguration {
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        let size: Schema.AutoSizeMode =
+            if configuration.isLegacy {
+                .legacy
+            } else {
+                try container.decodeIfPresent(Schema.AutoSizeMode.self, forKey: .height) ?? .default
+            }
+
         try self.init(
-            height: container.decodeIfPresent(Schema.AutoSizeMode.self, forKey: .height) ?? .default,
+            height: size,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
             items: container.decode([Schema.GridItem].self, forKey: .items, configuration: configuration)
         )
