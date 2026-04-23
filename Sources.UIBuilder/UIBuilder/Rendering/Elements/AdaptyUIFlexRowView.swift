@@ -68,7 +68,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
                 safeAreaEnd: safeArea.trailing
             )
         case let .weight(weight):
-            (Double(weight) / Double(totalWeight)) * weightsAvailableLength
+            totalWeight > 0 ? (Double(weight) / Double(totalWeight)) * weightsAvailableLength : 0
         }
     }
 

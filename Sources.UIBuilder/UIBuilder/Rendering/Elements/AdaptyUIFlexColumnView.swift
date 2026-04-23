@@ -68,7 +68,7 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
                 safeAreaEnd: safeArea.bottom
             )
         case let .weight(weight):
-            (Double(weight) / Double(totalWeight)) * weightsAvailableLength
+            totalWeight > 0 ? (Double(weight) / Double(totalWeight)) * weightsAvailableLength : 0
         }
     }
 
