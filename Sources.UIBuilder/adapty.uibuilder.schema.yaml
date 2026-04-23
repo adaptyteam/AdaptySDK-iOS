@@ -74,6 +74,12 @@ Entities:
             - fill
             - stretch
 
+    AutoSizeMode:
+        type: string
+        enum:
+            - hug
+            - fill
+
     CornerRadius:
         title: "Corner radius"
         oneOf:
@@ -1060,6 +1066,7 @@ UI:
         required: [type, items]
         properties:
             type: { const: row }
+            width: { $ref: "#/Entities/AutoSizeMode", default: fill }
             spacing: { type: number, default: 0 }
             items:
                 type: array
@@ -1071,6 +1078,7 @@ UI:
         required: [type, items]
         properties:
             type: { const: column }
+            height: { $ref: "#/Entities/AutoSizeMode", default: fill }
             spacing: { type: number, default: 0 }
             items:
                 type: array
@@ -1292,6 +1300,7 @@ UI:
             sweep_angle: { type: number , default: 360 }
             start_angle: { type: number , default: -90 }
             clockwise: { type: boolean , default: true }
+            rounded_caps: { type: boolean , default: false }
             asset_id: { $ref: "#/AssetIdOrColor/Binding" }
             clip: { type: boolean, default: true }
             value: { $ref: "#/Script/DataBinding" }
@@ -1301,14 +1310,16 @@ UI:
 
     TextProgress:
         type: object
-        required: [type, format, value, duration]
-        properties:
-            type: { const: "text_progress" }
-            format: { $ref: "#/Entities/Format" }
-            value: { $ref: "#/Script/DataBinding" }
-            duration: { type: number , description: "milliseconds to change value"}
-            interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
-            action: { $ref: "#/Script/ActionOrArray" }
+        allOf:
+            - required: [type, format, value, duration]
+              properties:
+                  type: { const: "text_progress" }
+                  format: { $ref: "#/Entities/Format" }
+                  value: { $ref: "#/Script/DataBinding" }
+                  duration: { type: number , description: "milliseconds to change value"}
+                  interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
+                  action: { $ref: "#/Script/ActionOrArray" }
+            - $ref: "#/UI/Text/Attributes"
     
             
 ###### Rich Text ######
