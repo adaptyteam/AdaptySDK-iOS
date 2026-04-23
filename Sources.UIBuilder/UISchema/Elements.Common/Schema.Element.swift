@@ -206,15 +206,29 @@ extension Schema.Element: DecodableWithConfiguration {
                 node: .simpleElement(Schema.VideoPlayer(from: decoder))
             )
         case .row:
-            try self.init(
-                properties: propertyOrNil(),
-                node: .compositeElement(Schema.Row(from: decoder, configuration: configuration))
-            )
+            if configuration.isLegacy {
+                try self.init(
+                    properties: propertyOrNil(),
+                    node: .compositeElement(Schema.LegacyRow(from: decoder, configuration: configuration))
+                )
+            } else {
+                try self.init(
+                    properties: propertyOrNil(),
+                    node: .compositeElement(Schema.Row(from: decoder, configuration: configuration))
+                )
+            }
         case .column:
-            try self.init(
-                properties: propertyOrNil(),
-                node: .compositeElement(Schema.Column(from: decoder, configuration: configuration))
-            )
+            if configuration.isLegacy {
+                try self.init(
+                    properties: propertyOrNil(),
+                    node: .compositeElement(Schema.Column(from: decoder, configuration: configuration))
+                )
+            } else {
+                try self.init(
+                    properties: propertyOrNil(),
+                    node: .compositeElement(Schema.LegacyColumn(from: decoder, configuration: configuration))
+                )
+            }
         case .section:
             try self.init(
                 properties: propertyOrNil(),

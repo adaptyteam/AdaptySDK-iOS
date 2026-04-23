@@ -9,6 +9,14 @@ import Foundation
 
 extension VC {
     struct Row: Sendable, Hashable {
+        let width: AutoSizeMode
+        let spacing: Double
+        let items: [GridItem]
+    }
+}
+
+extension VC {
+    struct LegacyRow: Sendable, Hashable {
         let spacing: Double
         let items: [GridItem]
     }

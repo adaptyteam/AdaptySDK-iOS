@@ -17,11 +17,11 @@ struct AdaptyUIColumnView<ScreenHolderContent: View>: View {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    private let column: VC.Column
+    private let column: VC.LegacyColumn
     private let screenHolderBuilder: () -> ScreenHolderContent
 
     init(
-        _ column: VC.Column,
+        _ column: VC.LegacyColumn,
         @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
     ) {
         self.column = column

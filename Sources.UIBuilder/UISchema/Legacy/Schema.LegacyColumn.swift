@@ -1,21 +1,20 @@
 //
-//  Schema.Column.swift
+//  Schema.LegacyColumn.swift
 //  AdaptyUIBuilder
 //
-//  Created by Aleksei Valiano on 28.03.2024
+//  Created by Aleksei Valiano on 23.04.2026.
 //
 
 import Foundation
 
 extension Schema {
-    struct Column: Sendable {
-        let height: AutoSizeMode
+    struct LegacyColumn: Sendable {
         let spacing: Double
         let items: [GridItem]
     }
 }
 
-extension Schema.Column: Schema.CompositeElement {
+extension Schema.LegacyColumn: Schema.CompositeElement {
     @inlinable
     func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
         for item in items.reversed() {
@@ -29,9 +28,8 @@ extension Schema.Column: Schema.CompositeElement {
         _ properties: VC.Element.Properties?,
         _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
     ) throws(Schema.Error) -> VC.Element {
-        try .column(
+        try .legacyColumn(
             .init(
-                height: height,
                 spacing: spacing,
                 items: builder.convertGridItems(items, resultStack.popLastElements(items.count))
             ),
@@ -40,9 +38,8 @@ extension Schema.Column: Schema.CompositeElement {
     }
 }
 
-extension Schema.Column: DecodableWithConfiguration {
+extension Schema.LegacyColumn: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
-        case height
         case spacing
         case items
     }
@@ -50,7 +47,6 @@ extension Schema.Column: DecodableWithConfiguration {
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            height: container.decodeIfPresent(Schema.AutoSizeMode.self, forKey: .height) ?? .default,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
             items: container.decode([Schema.GridItem].self, forKey: .items, configuration: configuration)
         )
