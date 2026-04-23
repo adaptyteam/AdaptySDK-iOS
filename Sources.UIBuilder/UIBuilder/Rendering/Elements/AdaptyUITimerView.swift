@@ -190,8 +190,8 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
                     screen: screen
                 )
                 .multilineTextAlignment(timer.horizontalAlign)
-                .lineLimit(1)
-                .minimumScaleFactor(0.1)
+                .lineLimit(timer.maxRows)
+                .minimumScaleFactor(timer.overflowMode.contains(.scale) ? 0.1 : 1.0)
         } else {
             Text("")
         }
