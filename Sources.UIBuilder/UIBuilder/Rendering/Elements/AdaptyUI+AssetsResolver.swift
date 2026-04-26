@@ -66,7 +66,13 @@ extension VC.ImageData {
 extension VC.Font {
     typealias Resolved = UIFont
 
+    @MainActor
     func resolve(with resolver: AdaptyUIAssetsResolver, withSize size: Double) -> Resolved {
+        if let customId,
+           let customFont = AdaptyUICustomFontsStorage.font(for: customId) {
+            return customFont.withSize(size)
+        }
+
         guard let customId,
               case let .font(value) = resolver.asset(for: customId)
         else { return resolved(withSize: size) }
