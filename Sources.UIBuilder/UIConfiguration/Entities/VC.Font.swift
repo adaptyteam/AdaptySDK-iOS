@@ -57,6 +57,7 @@ extension VC.Font: Codable {
     static let assetType = "font"
 
     enum CodingKeys: String, CodingKey {
+        case id
         case type
         case customId = "custom_id"
         case alias = "value"
@@ -69,7 +70,8 @@ extension VC.Font: Codable {
 
     package init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        customId = try container.decodeIfPresent(String.self, forKey: .customId)
+        let assetId = try container.decodeIfPresent(String.self, forKey: .id)
+        customId = try container.decodeIfPresent(String.self, forKey: .customId) ?? assetId
         if let v = (try? container.decode([String].self, forKey: .alias))?.first {
             alias = v
         } else {

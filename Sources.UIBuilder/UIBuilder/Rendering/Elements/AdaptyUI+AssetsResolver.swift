@@ -68,8 +68,10 @@ extension VC.Font {
 
     @MainActor
     func resolve(with resolver: AdaptyUIAssetsResolver, withSize size: Double) -> Resolved {
-        if let customId,
-           let customFont = AdaptyUICustomFontsStorage.font(for: customId) {
+        if let customFont = customFontIdentifiers.lazy
+            .compactMap({ $0 })
+            .compactMap(AdaptyUICustomFontsStorage.font(for:))
+            .first {
             return customFont.withSize(size)
         }
 
@@ -81,6 +83,14 @@ extension VC.Font {
 
     private func resolved(withSize size: Double) -> Resolved {
         UIFont.create(self, withSize: size)
+    }
+
+    private var customFontIdentifiers: [String?] {
+        [
+            customId,
+            alias,
+            familyName
+        ]
     }
 }
 
