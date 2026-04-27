@@ -182,6 +182,56 @@ extension VC.ShapeType {
 }
 
 @MainActor
+@available(iOS 16.0, *)
+extension InsettableShape {
+    @ViewBuilder
+    fileprivate func fill(
+        asset: AdaptyUIResolvedColorOrGradientOrImageAsset?,
+        innerShadow: ShadowStyle
+    ) -> some View {
+        switch asset {
+        case let .color(color):
+            self.fill(color.shadow(innerShadow))
+        case let .colorGradient(gradient):
+            switch gradient {
+            case let .linear(g):
+                self.fill(g.shadow(innerShadow))
+            case let .angular(g):
+                self.fill(g.shadow(innerShadow))
+            case let .radial(g):
+                self.fill(g.shadow(innerShadow))
+            }
+        case .image, .none:
+            // Inner shadow on image backgrounds is not supported via ShapeStyle;
+            // fall back to the regular fill so the image still renders.
+            self.fill(asset: asset)
+        }
+    }
+}
+
+@MainActor
+@available(iOS 16.0, *)
+extension VC.ShapeType {
+    @ViewBuilder
+    func swiftUIShapeFill(
+        asset: AdaptyUIResolvedColorOrGradientOrImageAsset?,
+        innerShadow: ShadowStyle
+    ) -> some View {
+        switch self {
+        case let .rectangle(radii):
+            UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
+                .fill(asset: asset, innerShadow: innerShadow)
+        case .circle:
+            Circle().fill(asset: asset, innerShadow: innerShadow)
+        case .curveUp:
+            CurveUpShape().fill(asset: asset, innerShadow: innerShadow)
+        case .curveDown:
+            CurveDownShape().fill(asset: asset, innerShadow: innerShadow)
+        }
+    }
+}
+
+@MainActor
 struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private let decorator: VC.Decorator
     private let includeBackground: Bool
@@ -205,6 +255,33 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         self.animatedBorderThickness ?? self.initialBorderThickness
     }
 
+    private let initialInnerShadowFilling: VC.AssetReference?
+    private let initialInnerShadowBlurRadius: Double
+    private let initialInnerShadowOffset: VC.Offset
+
+    @State private var animatedInnerShadowFilling: VC.AssetReference?
+    @State private var animatedInnerShadowBlurRadius: Double?
+    @State private var animatedInnerShadowOffset: CGSize?
+
+    private var resolvedInnerShadowFilling: VC.AssetReference? {
+        animatedInnerShadowFilling ?? initialInnerShadowFilling
+    }
+
+    private var resolvedInnerShadowBlurRadius: Double {
+        animatedInnerShadowBlurRadius ?? initialInnerShadowBlurRadius
+    }
+
+    private var resolvedInnerShadowOffset: CGSize {
+        if let animatedInnerShadowOffset {
+            animatedInnerShadowOffset
+        } else {
+            CGSize(
+                width: initialInnerShadowOffset.x.points(.horizontal, screenSize, safeArea),
+                height: initialInnerShadowOffset.y.points(.vertical, screenSize, safeArea)
+            )
+        }
+    }
+
     init(
         decorator: VC.Decorator,
         play: Binding<[VC.Animation]>,
@@ -216,6 +293,10 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
 
         self.initialBorderFilling = decorator.border?.filling
         self.initialBorderThickness = decorator.border?.thickness
+
+        self.initialInnerShadowFilling   = decorator.innerShadow?.filling
+        self.initialInnerShadowBlurRadius = decorator.innerShadow?.blurRadius ?? .zero
+        self.initialInnerShadowOffset     = decorator.innerShadow?.offset ?? .zero
     }
 
     @EnvironmentObject
@@ -224,6 +305,10 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
+    @Environment(\.adaptyScreenSize)
+    private var screenSize: CGSize
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
 
     func body(content: Content) -> some View {
         self.bodyWithBackground(
@@ -255,31 +340,50 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         if let animatedBackgroundFilling {
             content
                 .background {
-                    self.decorator.shapeType
-                        .swiftUIShapeFill(
-                            asset: self.assetsViewModel.resolvedAsset(
-                                animatedBackgroundFilling,
-                                mode: self.colorScheme.toVCMode,
-                                screen: screen
-                            ).asColorOrGradientOrImageAsset
-                        )
+                    self.backgroundFill(for: animatedBackgroundFilling)
                         .opacity(includeBackground ? 1.0 : 0.0)
                 }
         } else if let background = self.decorator.background {
             content
                 .background {
-                    self.decorator.shapeType
-                        .swiftUIShapeFill(
-                            asset: self.assetsViewModel.resolvedAsset(
-                                background,
-                                mode: self.colorScheme.toVCMode,
-                                screen: screen
-                            ).asColorOrGradientOrImageAsset
-                        )
+                    self.backgroundFill(for: background)
                 }
         } else {
             content
         }
+    }
+
+    @ViewBuilder
+    private func backgroundFill(for filling: VC.AssetReference) -> some View {
+        let asset = self.assetsViewModel.resolvedAsset(
+            filling,
+            mode: self.colorScheme.toVCMode,
+            screen: screen
+        ).asColorOrGradientOrImageAsset
+
+        if #available(iOS 16.0, *), let innerShadow = resolvedInnerShadowStyle {
+            self.decorator.shapeType
+                .swiftUIShapeFill(asset: asset, innerShadow: innerShadow)
+        } else {
+            self.decorator.shapeType
+                .swiftUIShapeFill(asset: asset)
+        }
+    }
+
+    @available(iOS 16.0, *)
+    private var resolvedInnerShadowStyle: ShadowStyle? {
+        guard let filling = resolvedInnerShadowFilling else { return nil }
+        let color = self.assetsViewModel.resolvedAsset(
+            filling,
+            mode: self.colorScheme.toVCMode,
+            screen: screen
+        ).asColorAsset
+        return .inner(
+            color: color ?? .clear,
+            radius: resolvedInnerShadowBlurRadius,
+            x: resolvedInnerShadowOffset.width,
+            y: resolvedInnerShadowOffset.height
+        )
     }
 
     private func startAnimations(_ animations: [VC.Animation]) {
@@ -325,6 +429,38 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                         )
                     )
                 }
+            case let .innerShadow(timeline, value):
+                guard #available(iOS 16.0, *) else { break }
+
+                if let colorValue = value.color {
+                    animatedInnerShadowFilling = colorValue.start
+                }
+                if let blurValue = value.blurRadius {
+                    animatedInnerShadowBlurRadius = blurValue.start
+                }
+                if let offsetValue = value.offset {
+                    animatedInnerShadowOffset = CGSize(
+                        width: offsetValue.start.x.points(.horizontal, screenSize, safeArea),
+                        height: offsetValue.start.y.points(.vertical, screenSize, safeArea)
+                    )
+                }
+
+                tokens.insert(
+                    timeline.animate(
+                        from: (value.color?.start, value.blurRadius?.start, value.offset?.start),
+                        to: (value.color?.end, value.blurRadius?.end, value.offset?.end),
+                        updateBlock: { tuple in
+                            if let colorValue = tuple.0 { animatedInnerShadowFilling = colorValue }
+                            if let blurValue  = tuple.1 { animatedInnerShadowBlurRadius = blurValue }
+                            if let offsetVal  = tuple.2 {
+                                animatedInnerShadowOffset = CGSize(
+                                    width:  offsetVal.x.points(.horizontal, screenSize, safeArea),
+                                    height: offsetVal.y.points(.vertical,   screenSize, safeArea)
+                                )
+                            }
+                        }
+                    )
+                )
             default:
                 break
             }
