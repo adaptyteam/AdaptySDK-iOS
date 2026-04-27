@@ -1355,10 +1355,19 @@ RichText:
         type: object
         required: [tag]
         properties:
-            tag: { type: string, title: "Tag value" }
+            tag:        { type: string }
             attributes: { $ref: "#/RichText/Attributes" }
-            action: { $ref: "#/Script/Action" }
-        additionalProperties: false
+            action:     { $ref: "#/Script/Action" }
+        oneOf:
+            - not: { required: [converter] }
+              if:   { properties: { tag: { const: PERCENT } } }
+              then:
+                  properties:
+                      format: { $ref: "#/Converters/NumberFormat", default: "%d" }
+            - $ref: "#/Converters/NumberConverter"
+            - $ref: "#/Converters/PercentConverter"
+            - $ref: "#/Converters/DateTimeConverter"
+            - $ref: "#/Converters/TimerConverter"
 
     Image:
         title: Image item in RichText
@@ -1673,36 +1682,23 @@ Script:
     DataBinding:
         title: "Binding to a Script variable"
         type: object
-        required: [var]
-        properties:
-            var:
-                type: string
-                description: "Path to Script property (dot-separated)"
-            setter:
-                type: string
-                description: "Alternative setter method name for two-way binding"
-            scope:
-                type: string
-                enum: [global, screen]
-                default: screen
-            converter: { enum: [is_equal, map, date_time] }
-            converter_params:
-                oneOf:
-                    - type: string
-                    - type: boolean
-                    - type: number
-                    - type: array
-                      items:
-                          oneOf:
-                              - type: string
-                              - type: boolean
-                              - type: number
-                    - type: object
-                      additionalProperties:
-                          oneOf:
-                              - type: string
-                              - type: boolean
-                              - type: number
+        allOf:
+            - required: [var]
+              properties:
+                var:
+                    type: string
+                    description: "Path to Script property (dot-separated)"
+                setter:
+                    type: string
+                    description: "Alternative setter method name for two-way binding"
+                scope:
+                    type: string
+                    enum: [global, screen]
+                    default: screen
+            - oneOf:
+                - not: { required: [converter] }
+                - $ref: "#/Converters/MapConverter"
+                - $ref: "#/Converters/IsEqualConverter"
         additionalProperties: false
 
 ###### DateTime ######
@@ -2089,3 +2085,91 @@ DateTime:
             - -86400000
             # Добавить 30 минут и 500 мс
             - 1800500
+
+
+Converters:
+
+    NumberFormat:
+        type: string
+        # pattern: ^%[+\-0 ]*(\d+)?(\.\d+)?[df]$
+        example: "%f"
+
+    IntegerFormat:
+        type: string
+        # pattern: ^%[+\-0 ]*(\d+)?(\.\d+)?d$
+        example: "%d"
+    
+    DateTimeFormat:
+        type: string
+        example: "YYYY-MM-DD HH:mm:ss"
+
+    MapConverter:
+        title: Map converter 
+        description: return some value from array if input value equals index
+        type: object
+        required: [converter, converter_params]
+        properties:
+            converter: { const: map }
+            converter_params: 
+                type: array
+                items:
+                    type: [string, number, boolean]
+                description: "Array of values to map"
+        
+    IsEqualConverter:
+        title: Is equal converter 
+        description: return boolean value if input value equal to converter_param
+        type: object
+        required: [converter, converter_params]
+        properties:
+            converter: { const: is_equal }
+            converter_params: 
+                type: [string, number, boolean]
+
+    NumberConverter:
+        title: Number converter
+        description: return string from number value with format
+        type: object
+        required: [converter]
+        properties:
+            converter: { const: number }
+            format: { $ref: "#/Converters/NumberFormat", default: "%d"}
+
+    PercentConverter:
+        title: Percent converter for value in range 0..1 
+        description: convert number from range 0..1 to percentage string
+        type: object
+        required: [converter]
+        properties:
+            converter: { const: percent }
+            format: { $ref: "#/Converters/NumberFormat", default: "%d"}
+
+    DateTimeConverter:
+        type: object
+        description: convert date and time to string
+        oneOf:
+            - required: [converter, format]
+              properties:
+                  converter: { const: date_time }
+                  format: { $ref: "#/Converters/DateTimeFormat" }
+            - required: [converter]
+              properties:
+                  converter: { const: date_time }
+                  date_style: { enum: ["none", "short", "medium", "long", "full"] , default: "none"}
+                  time_style: { enum: ["none", "short", "medium", "long", "full"] , default: "none"}
+
+    TimerConverter:
+        title: Timer converter
+        description: convert timeinterval to string with format
+        type: object
+        required: [converter]
+        oneOf:
+            - properties:
+                    converter: { enum: [days,hours,minutes,seconds] }
+                    format: { $ref: "#/Converters/IntegerFormat", default: "%01d"}
+            - properties:
+                    converter: { enum: [deciseconds,centiseconds,milliseconds] }
+            - properties:
+                    converter: { enum: [total_days, total_hours, total_minutes, total_seconds, total_milliseconds] }
+                    format: { $ref: "#/Converters/IntegerFormat", default: "%d"}
+        

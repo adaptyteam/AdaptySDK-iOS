@@ -42,8 +42,10 @@ extension Schema.RichText.Item: Decodable {
             let converter: Schema.AnyConverter? =
                 if container.exist(.converter) {
                     try Schema.AnyConverter.forTag(from: decoder)
-                } else if tag == "PERCENT", container.exist(.format)  {
+                } else if tag == "PERCENT", container.exist(.format) {
                     try? Schema.PercentConverter(from: decoder).asAnyConverter
+                } else if tag.hasPrefix("TIMER_") {
+                    Self.legacyConverterFromTimer(tag: tag)?.asAnyConverter
                 } else {
                     nil
                 }
@@ -61,6 +63,39 @@ extension Schema.RichText.Item: Decodable {
             )
         } else {
             self = .unknown
+        }
+    }
+}
+
+extension Schema.RichText.Item {
+    static func legacyConverterFromTimer(tag value: String) -> Schema.TimerConverter? {
+        return switch value {
+        case "TIMER_h": .hours("%.1d")
+        case "TIMER_hh": .hours("%.2d")
+        case "TIMER_m": .minutes("%.1d")
+        case "TIMER_mm": .minutes("%.2d")
+        case "TIMER_s": .seconds("%.1d")
+        case "TIMER_ss": .seconds("%.2d")
+        case "TIMER_S": .deciseconds
+        case "TIMER_SS": .centiseconds
+        case "TIMER_SSS": .milliseconds
+        default:
+            totalToConverter(tag: value, prefix: "TIMER_Total_Days_", makeConverter: Schema.TimerConverter.totalDays)
+                ?? totalToConverter(tag: value, prefix: "TIMER_Total_Hours_", makeConverter: Schema.TimerConverter.totalHours)
+                ?? totalToConverter(tag: value, prefix: "TIMER_Total_Minutes_", makeConverter: Schema.TimerConverter.totalMinutes)
+                ?? totalToConverter(tag: value, prefix: "TIMER_Total_Seconds_", makeConverter: Schema.TimerConverter.totalSeconds)
+                ?? totalToConverter(tag: value, prefix: "TIMER_Total_Milliseconds_", makeConverter: Schema.TimerConverter.totalMilliseconds)
+        }
+
+        func totalToConverter(
+            tag value: String,
+            prefix: String,
+            makeConverter: (String) -> Schema.TimerConverter
+        ) -> Schema.TimerConverter? {
+            guard value.hasPrefix(prefix) else { return nil }
+
+            let precision = Int(value.dropFirst(prefix.count)) ?? 0
+            return makeConverter("%.\(precision)d")
         }
     }
 }
