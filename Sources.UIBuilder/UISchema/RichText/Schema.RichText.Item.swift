@@ -37,18 +37,22 @@ extension Schema.RichText.Item: Decodable {
                 container.decodeIfPresent(Schema.Action.self, forKey: .action)
             )
         } else if container.contains(.tag) {
-            let tag = try container.decode(String.self, forKey: .tag)
+            var tag = try container.decode(String.self, forKey: .tag)
 
-            let converter: Schema.AnyConverter? =
-                if container.exist(.converter) {
-                    try Schema.AnyConverter.forTag(from: decoder)
-                } else if tag == "PERCENT", container.exist(.format) {
-                    try? Schema.PercentConverter(from: decoder).asAnyConverter
-                } else if tag.hasPrefix("TIMER_") {
-                    Self.legacyConverterFromTimer(tag: tag)?.asAnyConverter
-                } else {
-                    nil
+            let converter: Schema.AnyConverter?
+
+            if container.exist(.converter) {
+                converter = try Schema.AnyConverter.forTag(from: decoder)
+            } else if tag == "PERCENT", container.exist(.format) {
+                converter = try? Schema.PercentConverter(from: decoder).asAnyConverter
+            } else if tag.hasPrefix("TIMER_") {
+                converter = Self.legacyConverterFromTimer(tag: tag)?.asAnyConverter
+                if let converter {
+                    tag = "TIMER"
                 }
+            } else {
+                converter = nil
+            }
 
             self = try .tag(
                 tag,
