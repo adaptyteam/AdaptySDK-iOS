@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 
   s.ios.deployment_target = '15.0'
 
-  s.swift_version = '6.0'
+  s.swift_version = '6.2'
 
   s.source_files = 'Sources.AdaptyPlugin/**/*.{h,m,mm,swift}'
 

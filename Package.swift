@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
@@ -9,7 +9,7 @@ let package = Package(
         .macOS(.v12),
         //        .tvOS(.v15),
         //        .watchOS(.v8),
-        .visionOS(.v1),
+        .visionOS(.v2),
     ],
     products: [
         .library(
@@ -65,7 +65,7 @@ let package = Package(
             cxxSettings: [
                 .headerSearchPath("."),
                 .define("SIMDJSON_EXCEPTIONS", to: "0"),
-                .unsafeFlags(["-std=c++17", "-O2", "-DNDEBUG"]),
+                .define("NDEBUG", .when(configuration: .release)),
             ],
             linkerSettings: [
                 .linkedLibrary("c++"),
@@ -155,6 +155,7 @@ let package = Package(
                 .swiftLanguageMode(.v6),
             ]
         ),
-    ]
+    ],
+    cxxLanguageStandard: .cxx20
 )
 

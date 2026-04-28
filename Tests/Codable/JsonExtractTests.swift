@@ -407,6 +407,51 @@ struct JsonExtractTests {
         #expect(value == #""значение""#)
     }
 
+    @Test func rangeKeyWithSlashEscape() throws {
+        let jsonStr = #"{"path/to/key":"value"}"#
+        let JSON = try #require(jsonStr.data(using: .utf8))
+
+        let result = try JSON.jsonExtractRange(pointer: "/path~1to~1key")
+
+        #expect(result.key != nil)
+
+        let key = try #require(result.key(from: jsonStr))
+        #expect(key == "path/to/key")
+
+        let value = try #require(result.value(from: jsonStr))
+        #expect(value == #""value""#)
+    }
+
+    @Test func rangeKeyWithTildeEscape() throws {
+        let jsonStr = #"{"a~b":"value"}"#
+        let JSON = try #require(jsonStr.data(using: .utf8))
+
+        let result = try JSON.jsonExtractRange(pointer: "/a~0b")
+
+        #expect(result.key != nil)
+
+        let key = try #require(result.key(from: jsonStr))
+        #expect(key == "a~b")
+
+        let value = try #require(result.value(from: jsonStr))
+        #expect(value == #""value""#)
+    }
+
+    @Test func rangeEmojiKey() throws {
+        let jsonStr = #"{"🎉🚀":"value"}"#
+        let JSON = try #require(jsonStr.data(using: .utf8))
+
+        let result = try JSON.jsonExtractRange(pointer: "/🎉🚀")
+
+        #expect(result.key != nil)
+
+        let key = try #require(result.key(from: jsonStr))
+        #expect(key == "🎉🚀")
+
+        let value = try #require(result.value(from: jsonStr))
+        #expect(value == #""value""#)
+    }
+
     @Test func rangePathNotFound() throws {
         let JSON = try #require(simpleJSON.data(using: .utf8))
 

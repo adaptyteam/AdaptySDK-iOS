@@ -2,6 +2,7 @@
 #include "simdjson.h"
 #include <cstring>
 #include <cstdlib>
+#include <new>
 #include <string>
 #include <vector>
 
@@ -145,12 +146,21 @@ SDJsonResult sdjson_extract(const char* json_data,
     result.length = 0;
     result.error = SDJSON_OK;
 
-    padded_string padded(json_data, json_length);
-    ondemand::parser parser;
-    ondemand::document doc;
+    try {
+        padded_string padded(json_data, json_length);
+        if (!padded.data()) { result.error = SDJSON_ERR_ALLOC; return result; }
 
-    if (!iterate_doc(parser, padded, doc, &result.error)) return result;
-    return extract_at_pointer(doc, pointer);
+        ondemand::parser parser;
+        ondemand::document doc;
+
+        if (!iterate_doc(parser, padded, doc, &result.error)) return result;
+        return extract_at_pointer(doc, pointer);
+    } catch (const std::bad_alloc&) {
+        result.error = SDJSON_ERR_ALLOC;
+    } catch (...) {
+        result.error = SDJSON_ERR_PARSE;
+    }
+    return result;
 }
 
 void sdjson_extract_many(const char* json_data,
@@ -158,22 +168,43 @@ void sdjson_extract_many(const char* json_data,
                          const char** pointers,
                          size_t count,
                          SDJsonResult* out_results) {
-    padded_string padded(json_data, json_length);
-    ondemand::parser parser;
-
     for (size_t i = 0; i < count; i++) {
         out_results[i].data = nullptr;
         out_results[i].length = 0;
         out_results[i].error = SDJSON_OK;
+    }
 
-        ondemand::document doc;
-        auto err = parser.iterate(padded).get(doc);
-        if (err) {
-            out_results[i].error = SDJSON_ERR_PARSE;
-            continue;
+    try {
+        padded_string padded(json_data, json_length);
+        if (!padded.data()) {
+            for (size_t i = 0; i < count; i++) out_results[i].error = SDJSON_ERR_ALLOC;
+            return;
         }
 
-        out_results[i] = extract_at_pointer(doc, pointers[i]);
+        ondemand::parser parser;
+
+        for (size_t i = 0; i < count; i++) {
+            ondemand::document doc;
+            auto err = parser.iterate(padded).get(doc);
+            if (err) {
+                out_results[i].error = SDJSON_ERR_PARSE;
+                continue;
+            }
+
+            out_results[i] = extract_at_pointer(doc, pointers[i]);
+        }
+    } catch (...) {
+        SDJsonError err_code = SDJSON_ERR_PARSE;
+        try { throw; } catch (const std::bad_alloc&) { err_code = SDJSON_ERR_ALLOC; } catch (...) {}
+
+        for (size_t j = 0; j < count; j++) {
+            if (out_results[j].data) {
+                free((void*)out_results[j].data);
+                out_results[j].data = nullptr;
+                out_results[j].length = 0;
+            }
+            out_results[j].error = err_code;
+        }
     }
 }
 
@@ -185,14 +216,23 @@ bool sdjson_exists(const char* json_data,
                    SDJsonError* out_error) {
     *out_error = SDJSON_OK;
 
-    padded_string padded(json_data, json_length);
-    ondemand::parser parser;
-    ondemand::document doc;
+    try {
+        padded_string padded(json_data, json_length);
+        if (!padded.data()) { *out_error = SDJSON_ERR_ALLOC; return false; }
 
-    if (!iterate_doc(parser, padded, doc, out_error)) return false;
+        ondemand::parser parser;
+        ondemand::document doc;
 
-    ondemand::value val;
-    return !doc.at_pointer(pointer).get(val);
+        if (!iterate_doc(parser, padded, doc, out_error)) return false;
+
+        ondemand::value val;
+        return !doc.at_pointer(pointer).get(val);
+    } catch (const std::bad_alloc&) {
+        *out_error = SDJSON_ERR_ALLOC;
+    } catch (...) {
+        *out_error = SDJSON_ERR_PARSE;
+    }
+    return false;
 }
 
 // ---- type (fast) ----
@@ -204,19 +244,27 @@ SDJsonTypeResult sdjson_type(const char* json_data,
     result.type = SDJSON_TYPE_NULL;
     result.error = SDJSON_OK;
 
-    padded_string padded(json_data, json_length);
-    ondemand::parser parser;
-    ondemand::document doc;
+    try {
+        padded_string padded(json_data, json_length);
+        if (!padded.data()) { result.error = SDJSON_ERR_ALLOC; return result; }
 
-    if (!iterate_doc(parser, padded, doc, &result.error)) return result;
+        ondemand::parser parser;
+        ondemand::document doc;
 
-    ondemand::value val;
-    if (!navigate(doc, pointer, val, &result.error)) return result;
+        if (!iterate_doc(parser, padded, doc, &result.error)) return result;
 
-    ondemand::json_type jtype;
-    if (!get_type(val, jtype, &result.error)) return result;
+        ondemand::value val;
+        if (!navigate(doc, pointer, val, &result.error)) return result;
 
-    result.type = map_type(jtype);
+        ondemand::json_type jtype;
+        if (!get_type(val, jtype, &result.error)) return result;
+
+        result.type = map_type(jtype);
+    } catch (const std::bad_alloc&) {
+        result.error = SDJSON_ERR_ALLOC;
+    } catch (...) {
+        result.error = SDJSON_ERR_PARSE;
+    }
     return result;
 }
 
@@ -232,65 +280,76 @@ SDJsonInspectResult sdjson_inspect(const char* json_data,
     result.keys_length = 0;
     result.error = SDJSON_OK;
 
-    padded_string padded(json_data, json_length);
-    ondemand::parser parser;
-    ondemand::document doc;
+    try {
+        padded_string padded(json_data, json_length);
+        if (!padded.data()) { result.error = SDJSON_ERR_ALLOC; return result; }
 
-    if (!iterate_doc(parser, padded, doc, &result.error)) return result;
+        ondemand::parser parser;
+        ondemand::document doc;
 
-    ondemand::value val;
-    if (!navigate(doc, pointer, val, &result.error)) return result;
+        if (!iterate_doc(parser, padded, doc, &result.error)) return result;
 
-    ondemand::json_type jtype;
-    if (!get_type(val, jtype, &result.error)) return result;
+        ondemand::value val;
+        if (!navigate(doc, pointer, val, &result.error)) return result;
 
-    result.type = map_type(jtype);
+        ondemand::json_type jtype;
+        if (!get_type(val, jtype, &result.error)) return result;
 
-    if (jtype == ondemand::json_type::array) {
-        ondemand::array arr;
-        auto err = val.get_array().get(arr);
-        if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
+        result.type = map_type(jtype);
 
-        size_t cnt;
-        err = arr.count_elements().get(cnt);
-        if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
-        result.count = cnt;
-
-    } else if (jtype == ondemand::json_type::object) {
-        ondemand::object obj;
-        auto err = val.get_object().get(obj);
-        if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
-
-        std::vector<std::string_view> key_views;
-        size_t total_len = 0;
-
-        for (auto field : obj) {
-            std::string_view key;
-            err = field.unescaped_key().get(key);
+        if (jtype == ondemand::json_type::array) {
+            ondemand::array arr;
+            auto err = val.get_array().get(arr);
             if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
-            key_views.push_back(key);
-            total_len += key.size() + 1;
-        }
 
-        result.count = key_views.size();
+            size_t cnt;
+            err = arr.count_elements().get(cnt);
+            if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
+            result.count = cnt;
 
-        if (result.count > 0) {
-            char* buf = (char*)malloc(total_len);
-            if (!buf) { result.error = SDJSON_ERR_ALLOC; return result; }
+        } else if (jtype == ondemand::json_type::object) {
+            ondemand::object obj;
+            auto err = val.get_object().get(obj);
+            if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
 
-            size_t offset = 0;
-            for (auto& kv : key_views) {
-                memcpy(buf + offset, kv.data(), kv.size());
-                offset += kv.size();
-                buf[offset] = '\0';
-                offset++;
+            std::vector<std::string_view> key_views;
+            size_t total_len = 0;
+
+            for (auto field : obj) {
+                std::string_view key;
+                err = field.unescaped_key().get(key);
+                if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
+                key_views.push_back(key);
+                total_len += key.size() + 1;
             }
 
-            result.keys = buf;
-            result.keys_length = total_len;
-        }
-    }
+            result.count = key_views.size();
 
+            if (result.count > 0) {
+                char* buf = (char*)malloc(total_len);
+                if (!buf) { result.error = SDJSON_ERR_ALLOC; return result; }
+
+                size_t offset = 0;
+                for (auto& kv : key_views) {
+                    memcpy(buf + offset, kv.data(), kv.size());
+                    offset += kv.size();
+                    buf[offset] = '\0';
+                    offset++;
+                }
+
+                result.keys = buf;
+                result.keys_length = total_len;
+            }
+        }
+    } catch (const std::bad_alloc&) {
+        if (result.keys) { free((void*)result.keys); result.keys = nullptr; result.keys_length = 0; }
+        result.count = 0;
+        result.error = SDJSON_ERR_ALLOC;
+    } catch (...) {
+        if (result.keys) { free((void*)result.keys); result.keys = nullptr; result.keys_length = 0; }
+        result.count = 0;
+        result.error = SDJSON_ERR_PARSE;
+    }
     return result;
 }
 
@@ -306,7 +365,10 @@ SDJsonRangeResult sdjson_range(const char* json_data,
     result.value_length = 0;
     result.error = SDJSON_OK;
 
+    try {
     padded_string padded(json_data, json_length);
+    if (!padded.data()) { result.error = SDJSON_ERR_ALLOC; return result; }
+
     ondemand::parser parser;
     ondemand::document doc;
 
@@ -383,12 +445,18 @@ SDJsonRangeResult sdjson_range(const char* json_data,
             // Found! raw() points right AFTER the opening quote.
             const char* key_raw_ptr = raw_key.raw();
 
-            // Find the closing quote of the key, respecting escape sequences
+            // Find the closing quote of the key, respecting escape sequences.
+            // Bounds-checked against the buffer end to avoid OOB reads on malformed JSON.
+            const char* buf_end = buf_start + padded.size();
             const char* p = key_raw_ptr;
-            while (*p != '"') {
-                if (*p == '\\') p++; // skip escaped character
+            while (p < buf_end && *p != '"') {
+                if (*p == '\\') {
+                    p++;
+                    if (p >= buf_end) break;
+                }
                 p++;
             }
+            if (p >= buf_end) { result.error = SDJSON_ERR_PARSE; return result; }
             size_t raw_key_len = p - key_raw_ptr;
 
             result.key_offset = key_raw_ptr - buf_start;
@@ -422,7 +490,11 @@ SDJsonRangeResult sdjson_range(const char* json_data,
             result.error = SDJSON_ERR_PATH_NOT_FOUND;
         }
     }
-
+    } catch (const std::bad_alloc&) {
+        result.error = SDJSON_ERR_ALLOC;
+    } catch (...) {
+        result.error = SDJSON_ERR_PARSE;
+    }
     return result;
 }
 

@@ -13,7 +13,7 @@ public enum AdaptyPurchaseResult: Sendable {
     /// The purchase is pending some user action.
     case pending
     /// The purchase succeeded with a `AdaptyProfile`.
-    case success(profile: AdaptyProfile, transaction: any Sendable)
+    case success(profile: AdaptyProfile, transaction: VerificationResult<Transaction>)
 
     @inlinable
     public var isPurchaseCancelled: Bool {
@@ -52,12 +52,11 @@ public enum AdaptyPurchaseResult: Sendable {
     }
 
     public var signedTransaction: VerificationResult<Transaction>? {
-        guard case let .success(_, transaction) = self,
-              let result = transaction as? VerificationResult<Transaction>
+        guard case let .success(_, transaction) = self
         else {
             return nil
         }
-        return result
+        return transaction
     }
 
     /// A transaction object, which represents the payment.
@@ -69,3 +68,4 @@ public enum AdaptyPurchaseResult: Sendable {
         signedTransaction?.jwsRepresentation
     }
 }
+
