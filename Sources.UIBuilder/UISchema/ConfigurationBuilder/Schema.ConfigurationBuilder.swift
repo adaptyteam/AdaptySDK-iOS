@@ -11,7 +11,8 @@ extension Schema {
     final class ConfigurationBuilder: @unchecked Sendable {
         let id = UUID()
         let configuarationId: String
-        let localeId: LocaleId
+        let localizationId: LocaleId
+        let locale: Locale
         let isRightToLeft: Bool
         let assets: [String: Asset]
         let strings: [String: VC.RichText]
@@ -19,8 +20,8 @@ extension Schema {
         let source: AdaptyUISchema
         var templateIds = Set<String>()
 
-        init(id: String, source: AdaptyUISchema, withLocaleId localeId: LocaleId) {
-            let localization = source.localization(by: localeId)
+        init(id: String, source: AdaptyUISchema, withLocaleId localizationId: LocaleId) {
+            let localization = source.localization(by: localizationId)
 
             var assets = source.assets
             if let other = localization?.assets {
@@ -29,7 +30,6 @@ extension Schema {
 
             configuarationId = id
             self.source = source
-            self.localeId = localization?.id ?? localeId
             isRightToLeft = localization?.isRightToLeft ?? false
             self.assets = assets
             strings = localization?.strings?.mapValues {
@@ -38,6 +38,13 @@ extension Schema {
                     fallback: $0.fallback?.items
                 )
             } ?? [:]
+
+            self.localizationId = localization?.id ?? localizationId
+            locale = if let identifier = localization?.localeIdentificator {
+                Locale(identifier: identifier)
+            } else {
+                Locale.current
+            }
         }
     }
 }
@@ -47,7 +54,8 @@ extension Schema.ConfigurationBuilder {
         templateIds.removeAll()
         return try .init(
             id: configuarationId,
-            locale: localeId,
+            localizationId: localizationId,
+            locale: locale,
             isRightToLeft: isRightToLeft,
             environment: envoriment,
             assets: assets,
@@ -58,3 +66,4 @@ extension Schema.ConfigurationBuilder {
         )
     }
 }
+

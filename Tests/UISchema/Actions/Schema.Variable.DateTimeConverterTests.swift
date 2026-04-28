@@ -11,42 +11,37 @@ import Testing
 
 private extension SchemaTests.VariableTests {
     struct DateTimeConvertorTests {
-        typealias Value = Schema.Variable.DateTimeConvertor
+        typealias Value = Schema.DateTimeConverter
 
         // MARK: - Test Data
 
         static let jsonCases: [(value: Value, json: Json)] = [
             (
                 .format("YYYY-mm-dd"),
-                Json(##"{"converter": "date_time", "converter_params": "YYYY-mm-dd"}"##)
-            ),
-            (
-                .format("YYYY-mm-dd"),
-                Json(##"{"converter": "date_time", "converter_params": { "format": "YYYY-mm-dd" } }"##)
+                Json(##"{"converter": "date_time", "format": "YYYY-mm-dd"}"##)
             ),
             (
                 .styles(date: .full, time: .full),
-                Json(##"{"converter":"date_time", "converter_params": { "date": "full", "time": "full" }}"##)
+                Json(##"{"converter":"date_time", "date_style": "full", "time_style": "full" }"##)
             ),
             (
                 .styles(date: .none, time: .full),
-                Json(##"{"converter":"date_time", "converter_params": { "time": "full" }}"##)
+                Json(##"{"converter":"date_time", "time_style": "full" }"##)
             ),
             (
                 .styles(date: .full, time: .none),
-                Json(##"{"converter":"date_time", "converter_params": { "date": "full" }}"##)
+                Json(##"{"converter":"date_time", "date_style": "full" }"##)
             ),
             (
                 .styles(date: .none, time: .none),
-                Json(##"{"converter":"date_time", "converter_params": { "date": "none", "time": "none" }}"##)
+                Json(##"{"converter":"date_time", "date_style": "none", "time_style": "none" }"##)
             ),
         ]
 
         static let invalidJsons: [Json] = [
-            Json(##"{"converter_params": 123 }"##),
-            Json(##"{"converter_params": { "format": 123 }}"##),
-            Json(##"{"converter_params": { "date": 123 }}"##),
-            Json(##"{"converter_params": { "time": 123 }}"##),
+            Json(##"{"format": 123 }"##),
+            Json(##"{"date_style": 123 }"##),
+            Json(##"{"time_style": 123 }"##),
         ]
 
         // MARK: - Decoding Tests
@@ -65,4 +60,3 @@ private extension SchemaTests.VariableTests {
         }
     }
 }
-

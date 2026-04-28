@@ -11,6 +11,7 @@ extension Schema {
     struct Localization: Sendable, Hashable {
         let id: LocaleId
         let isRightToLeft: Bool?
+        let localeIdentificator: String?
         let strings: [StringIdentifier: Item]?
         let assets: [AssetIdentifier: Asset]?
 
@@ -27,6 +28,7 @@ extension Schema.Localization: Decodable {
         case strings
         case assets
         case isRightToLeft = "is_right_to_left"
+        case localeIdentificator = "ios_locale_id"
     }
 
     enum ItemCodingKeys: String, CodingKey {
@@ -39,7 +41,7 @@ extension Schema.Localization: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(LocaleId.self, forKey: .id)
         isRightToLeft = try container.decodeIfPresent(Bool.self, forKey: .isRightToLeft)
-
+        localeIdentificator = try container.decodeIfPresent(String.self, forKey: .localeIdentificator)
         assets = try (container.decodeIfPresent(Schema.AssetsCollection.self, forKey: .assets))?.value
 
         guard container.exist(.strings) else {

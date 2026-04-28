@@ -15,14 +15,14 @@ extension VC {
 }
 
 extension VC.DateTimeConverter: VC.TagConverter {
-    func toString(_ value: Any) -> String? {
+    func toString(_ value: Any, locale: Locale) -> String? {
         switch value {
         case let value as Date:
-            formatter.string(from: value)
+            formatter(locale: locale).string(from: value)
         case is Bool:
             nil
         case let value as NSNumber:
-            toString(unixtimestamp: value.doubleValue)
+            toString(unixtimestamp: value.doubleValue, locale: locale)
         default:
             nil
         }
@@ -30,30 +30,31 @@ extension VC.DateTimeConverter: VC.TagConverter {
 }
 
 extension VC.DateTimeConverter {
-    private nonisolated(unsafe) static let cache = NSCache<NSString, DateFormatter>()
+//    private nonisolated(unsafe) static let cache = NSCache<NSString, DateFormatter>()
 
-    var formatter: DateFormatter {
-        let key: NSString =
-            switch self {
-            case let .format(f): "f:\(f)" as NSString
-            case let .styles(d, t): "s:\(d.rawValue)-\(t.rawValue)" as NSString
-            }
+    func formatter(locale: Locale) -> DateFormatter {
+//        let key: NSString =
+//            switch self {
+//            case let .format(f): "f:\(f)" as NSString
+//            case let .styles(d, t): "s:\(d.rawValue)-\(t.rawValue)" as NSString
+//            }
 
-        if let cached = Self.cache.object(forKey: key) { return cached }
+//        if let cached = Self.cache.object(forKey: key) { return cached }
         let formatter = DateFormatter()
+        formatter.locale = locale
         switch self {
         case let .format(f): formatter.dateFormat = f
         case let .styles(d, t):
             formatter.dateStyle = d
             formatter.timeStyle = t
         }
-        Self.cache.setObject(formatter, forKey: key)
+//        Self.cache.setObject(formatter, forKey: key)
         return formatter
     }
 
     @inlinable
-    func toString(unixtimestamp: Double) -> String {
-        formatter.string(from: Date(timeIntervalSince1970: unixtimestamp / 1000.0))
+    func toString(unixtimestamp: Double, locale: Locale) -> String {
+        formatter(locale: locale).string(from: Date(timeIntervalSince1970: unixtimestamp / 1000.0))
     }
 }
 

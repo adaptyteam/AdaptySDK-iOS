@@ -4,10 +4,11 @@
 //
 //  Created by Aleksei Valiano on 21.04.2026.
 //
+import Foundation
 
 extension VC {
     protocol TagConverter {
-        func toString(_: Any) -> String?
+        func toString(_: Any, locale: Locale) -> String?
     }
 }
 

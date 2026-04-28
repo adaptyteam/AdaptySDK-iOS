@@ -26,7 +26,7 @@ extension VC {
 }
 
 extension VC.TimerConverter: VC.TagConverter {
-    func toString(_ value: Any) -> String? {
+    func toString(_ value: Any,locale: Locale) -> String? {
         switch value {
         case is Bool:
             nil

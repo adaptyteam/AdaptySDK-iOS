@@ -11,7 +11,7 @@ import Testing
 
 private extension SchemaTests.VariableTests {
     struct IsEqualConvertorTests {
-        typealias Value = Schema.Variable.IsEqualConvertor
+        typealias Value = Schema.IsEqualConverter
 
         // MARK: - Test Data
 
@@ -57,4 +57,3 @@ private extension SchemaTests.VariableTests {
         }
     }
 }
-

@@ -11,7 +11,7 @@ import Testing
 
 private extension SchemaTests.VariableTests {
     struct MapConvertorTests {
-        typealias Value = Schema.Variable.MapConvertor
+        typealias Value = Schema.MapConverter
 
         // MARK: - Test Data
 
@@ -67,4 +67,3 @@ private extension SchemaTests.VariableTests {
         }
     }
 }
-

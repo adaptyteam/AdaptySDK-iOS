@@ -11,7 +11,8 @@ package typealias VC = AdaptyUIConfiguration
 
 package struct AdaptyUIConfiguration: Sendable, Hashable {
     package let id: String
-    package let locale: String
+    package let localizationId: LocaleId
+    package let locale: Locale
     package let isRightToLeft: Bool
     package let environment: VC.EnvironmentConstants
 
@@ -25,6 +26,6 @@ package struct AdaptyUIConfiguration: Sendable, Hashable {
 
 extension AdaptyUIConfiguration: CustomStringConvertible {
     public var description: String {
-        "(id: \(id), locale: \(locale), isRightToLeft: \(isRightToLeft))"
+        "(id: \(id), localizationId: \(localizationId), isRightToLeft: \(isRightToLeft))"
     }
 }

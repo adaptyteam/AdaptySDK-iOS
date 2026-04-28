@@ -131,7 +131,7 @@ extension [VC.RichText.Item] {
     ) throws -> Text {
         try reduce(Text("")) {
             partialResult,
-                item in
+            item in
             switch item {
             case .unknown:
                 return partialResult
@@ -149,26 +149,25 @@ extension [VC.RichText.Item] {
                 let tagReplacementResult: String
 
                 if let anyValue = internalTagResolver?(value),
-                   let convertedValue = converter?.asTagConverter?.toString(anyValue)
-                {
+                   let convertedValue = converter?.asTagConverter?.toString(anyValue, locale: stateViewModel.viewConfiguration.locale) {
                     tagReplacementResult = convertedValue
                 } else if let customTagResult = customTagResolver.replacement(for: value) {
                     tagReplacementResult = customTagResult
                 } else if let tagValue = tagValues?[value] {
-                    tagReplacementResult = switch tagValue {
-                    case let .value(value):
-                        value // TODO: x
-                    case let .variable(variable):
-                        stateViewModel.getTagValue(
-                            variable,
-                            converter: converter?.asTagConverter,
-                            defaultValue: displayMissingTags ? "<var:\(variable.path.joined(separator: "."))}>" : "",
-                            screen: screen
-                        )
-                    }
+                    tagReplacementResult =
+                        switch tagValue {
+                        case let .value(value):
+                            value // TODO: x
+                        case let .variable(variable):
+                            stateViewModel.getTagValue(
+                                variable,
+                                converter: converter?.asTagConverter,
+                                defaultValue: displayMissingTags ? "<var:\(variable.path.joined(separator: "."))}>" : "",
+                                screen: screen
+                            )
+                        }
                 } else if let productTag = TextProductTag(rawValue: value),
-                          let productTagResult = productInfo?.value(byTag: productTag)
-                {
+                          let productTagResult = productInfo?.value(byTag: productTag) {
                     switch productTagResult {
                     case .notApplicable:
                         tagReplacementResult = ""
@@ -287,8 +286,7 @@ extension VC.RichText {
                         colorScheme: colorScheme,
                         screen: screen,
                         displayMissingTags: displayMissingTags
-                    )
-                {
+                    ) {
                     result = fallbackText
                 } else {
                     result = Text("")
@@ -442,8 +440,10 @@ extension AdaptyUIResolvedImageAsset {
     ) -> UIImage? {
         guard var image = uiImage else { return nil }
 
-        let size = CGSize(width: image.size.width * font.capHeight / image.size.height,
-                          height: font.capHeight)
+        let size = CGSize(
+            width: image.size.width * font.capHeight / image.size.height,
+            height: font.capHeight
+        )
 
         image = image.imageWith(newSize: size)
 
@@ -458,3 +458,4 @@ extension AdaptyUIResolvedImageAsset {
 }
 
 #endif
+

@@ -16,7 +16,7 @@ public extension AdaptyUI {
     @MainActor
     final class FlowConfiguration {
         public var id: String { flowViewModel.viewConfiguration.id }
-        public var locale: String { flowViewModel.viewConfiguration.locale }
+        public var locale: String { flowViewModel.viewConfiguration.localizationId }
         public var isRightToLeft: Bool { flowViewModel.viewConfiguration.isRightToLeft }
 
         package let eventsHandler: AdaptyEventsHandler

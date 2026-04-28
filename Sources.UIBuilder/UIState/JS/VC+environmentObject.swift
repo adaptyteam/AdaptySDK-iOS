@@ -44,7 +44,7 @@ extension VC {
         switch key {
         case .platform: "ios"
         case .schemaVersion: AdaptyUISchema.formatVersion
-        case .localizationId: locale
+        case .localizationId: localizationId
         case .localizationDirection: isRightToLeft ? "rtl" : "ltr"
         case .sdkVersion: environment.sdkVersion
         case .osName: environment.osName

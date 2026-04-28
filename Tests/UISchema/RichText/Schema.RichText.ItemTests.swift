@@ -75,7 +75,7 @@ private extension SchemaTests.RichTextTests {
             ),
             // Tag — without attributes
             (
-                .tag("price", nil, nil),
+                .tag("price", nil, nil, nil),
                 Json(##"""
                 {
                     "tag": "price"
@@ -84,7 +84,7 @@ private extension SchemaTests.RichTextTests {
             ),
             // Tag — with attributes
             (
-                .tag("product_name", attrsWithSize, nil),
+                .tag("product_name", attrsWithSize, nil, nil),
                 Json(##"""
                 {
                     "tag": "product_name",

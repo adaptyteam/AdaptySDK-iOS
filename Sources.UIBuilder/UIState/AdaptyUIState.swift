@@ -68,7 +68,7 @@ package final class AdaptyUIState: ObservableObject {
         let jsValue = try jsState.getValue(variable: variable, screenInstance: screenInstance)
         guard let converter, !jsValue.isString else { return String.fromJSValue(jsValue) }
         guard let object = jsValue.toObject() else { return nil }
-        return converter.toString(object)
+        return converter.toString(object, locale: configuration.locale)
     }
 
     func setValue(variable: VC.Variable, value: any JSValueConvertable, screenInstance: VS.ScreenInstance) throws(VS.Error) {

@@ -1222,10 +1222,6 @@ UI:
             max:
                 $ref: "#/DateTime"
             color: { $ref: "#/AssetIdOrColor/Binding" }
-            string_in_local_time:
-                type: boolean
-                default: false
-                description: "If true, min/max date strings are interpreted in local time zone; otherwise UTC"
 
     WheelRangePicker:
         type: object
