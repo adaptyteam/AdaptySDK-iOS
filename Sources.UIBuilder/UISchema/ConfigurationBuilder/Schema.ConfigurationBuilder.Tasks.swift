@@ -50,6 +50,7 @@ extension Schema.ConfigurationBuilder {
 extension [VC.ElementIndex] {
     @inlinable
     mutating func pop(_ n: Int) throws(Schema.Error) -> Self {
+        precondition(n >= 0, "pop count must be non-negative, got \(n)")
         guard count >= n else {
             throw .unsupportedElement("empty element tree")
         }
