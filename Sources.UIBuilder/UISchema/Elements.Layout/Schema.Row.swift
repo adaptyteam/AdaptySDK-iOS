@@ -27,13 +27,13 @@ extension Schema.Row: Schema.CompositeElement {
     func buildElement(
         _ builder: Schema.ConfigurationBuilder,
         _ properties: VC.Element.Properties?,
-        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+        _ elementIndices: inout [VC.ElementIndex]
     ) throws(Schema.Error) -> VC.Element {
         try .row(
             .init(
                 width: width,
                 spacing: spacing,
-                items: builder.convertGridItems(items, resultStack.popLastElements(items.count))
+                items: builder.convertGridItems(items, elementIndices.pop(items.count))
             ),
             properties
         )

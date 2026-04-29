@@ -10,7 +10,7 @@ import Foundation
 extension VC {
     struct Section: Sendable, Hashable {
         let index: Variable
-        let content: [Element]
+        let content: [ElementIndex]
         let transition: Transition?
     }
 }

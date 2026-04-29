@@ -30,7 +30,7 @@ struct AdaptyUIFlatContainerView: View {
 
     @ViewBuilder
     private func footerView(
-        _ element: VC.Element,
+        _ element: VC.ElementIndex,
         globalProxy: GeometryProxy,
         scrollProxy: ScrollViewProxy
     ) -> some View {

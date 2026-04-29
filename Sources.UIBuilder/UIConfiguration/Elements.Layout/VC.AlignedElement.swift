@@ -11,6 +11,6 @@ extension VC {
     struct AlignedElement: Hashable {
         let horizontalAlignment: VC.HorizontalAlignment
         let verticalAlignment: VC.VerticalAlignment
-        let content: VC.Element
+        let content: ElementIndex
     }
 }

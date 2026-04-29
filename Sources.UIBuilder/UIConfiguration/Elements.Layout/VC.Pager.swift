@@ -13,7 +13,7 @@ extension VC {
         let pageHeight: Length
         let pagePadding: EdgeInsets
         let spacing: Double
-        let content: [Element]
+        let content: [ElementIndex]
         let pageControl: PageControl?
         let animation: Animation?
         let interactionBehavior: InteractionBehavior

@@ -29,13 +29,13 @@ extension Schema.Button: Schema.CompositeElement {
     func buildElement(
         _: Schema.ConfigurationBuilder,
         _ properties: VC.Element.Properties?,
-        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+        _ elementIndices: inout [VC.ElementIndex]
     ) throws(Schema.Error) -> VC.Element {
         try .button(
             .init(
                 actions: actions,
-                content: resultStack.popLastElement(),
-                legacySelectedContent: resultStack.popLastElement(legacySelectedContent != nil),
+                content: elementIndices.pop(),
+                legacySelectedContent: elementIndices.pop(legacySelectedContent != nil),
                 legacyIsSelected: legacyIsSelected
             ),
             properties

@@ -20,7 +20,7 @@ extension Schema {
         func buildElement(
             _: Schema.ConfigurationBuilder,
             _: VC.Element.Properties?,
-            _: inout Schema.ConfigurationBuilder.ResultStack
+            _: inout [VC.ElementIndex]
         ) throws(Schema.Error) -> VC.Element
     }
 
@@ -69,7 +69,7 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func buildElement(
         _ from: Schema.Element,
-        _ resultStack: inout ResultStack
+        _ elementIndices: inout [VC.ElementIndex]
     ) throws(Schema.Error) -> VC.Element? {
         switch from.node {
         case .legacyReference,
@@ -82,13 +82,13 @@ extension Schema.ConfigurationBuilder {
         case let .simpleElement(simple):
             try simple.buildElement(
                 self,
-                buildElementProperties(from.properties, &resultStack)
+                buildElementProperties(from.properties, &elementIndices)
             )
         case let .compositeElement(composite):
             try composite.buildElement(
                 self,
-                buildElementProperties(from.properties, &resultStack),
-                &resultStack
+                buildElementProperties(from.properties, &elementIndices),
+                &elementIndices
             )
         }
     }

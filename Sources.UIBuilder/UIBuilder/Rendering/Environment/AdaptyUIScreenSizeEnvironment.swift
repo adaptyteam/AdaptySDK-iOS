@@ -19,9 +19,10 @@ struct AdaptyUIScreenInstanceKey: EnvironmentKey {
         navigatorId: "fake",
         configuration: .init(
             id: "fake",
+            poolElements: [.unknown("fake")],
             layoutBehaviour: .default,
             cover: nil,
-            content: .unknown("fake"),
+            content: 0,
             footer: nil,
             background: nil,
             overlay: nil,
@@ -78,4 +79,3 @@ extension View {
 }
 
 #endif
-

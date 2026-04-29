@@ -10,8 +10,8 @@ import Foundation
 extension VC {
     struct Button: Sendable, Hashable {
         let actions: [Action]
-        let content: Element
-        let legacySelectedContent: Element?
+        let content: ElementIndex
+        let legacySelectedContent: ElementIndex?
         let legacyIsSelected: Variable?
     }
 }

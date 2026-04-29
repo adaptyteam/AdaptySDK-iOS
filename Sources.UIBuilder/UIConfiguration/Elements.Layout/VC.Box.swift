@@ -13,6 +13,6 @@ extension VC {
         let height: Length?
         let horizontalAlignment: HorizontalAlignment
         let verticalAlignment: VerticalAlignment
-        let content: Element?
+        let content: ElementIndex?
     }
 }

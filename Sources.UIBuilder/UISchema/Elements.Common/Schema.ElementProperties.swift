@@ -55,15 +55,15 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func buildElementProperties(
         _ from: Schema.ElementProperties?,
-        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+        _ elementIndices: inout [VC.ElementIndex]
     ) throws(Schema.Error) -> VC.Element.Properties? {
         guard let from else { return nil }
 
         var background: [VC.AlignedElement]?
         if let array = from.background, array.isNotEmpty {
-            background = try convertAlignedElement(
+            background = try convertAlignedElements(
                 array,
-                resultStack.popLastElements(array.count)
+                elementIndices.pop(array.count)
             )
             if background.isEmpty {
                 background = nil
@@ -72,9 +72,9 @@ extension Schema.ConfigurationBuilder {
 
         var overlay: [VC.AlignedElement]?
         if let array = from.overlay, array.isNotEmpty {
-            overlay = try convertAlignedElement(
+            overlay = try convertAlignedElements(
                 array,
-                resultStack.popLastElements(array.count)
+                elementIndices.pop(array.count)
             )
             if overlay.isEmpty {
                 overlay = nil

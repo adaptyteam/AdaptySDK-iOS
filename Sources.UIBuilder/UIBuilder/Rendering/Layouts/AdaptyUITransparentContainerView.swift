@@ -25,7 +25,7 @@ struct AdaptyUITransparentContainerView: View {
 
     @ViewBuilder
     private func scrollableFooterView(
-        _ element: VC.Element,
+        _ element: VC.ElementIndex,
         globalProxy: GeometryProxy,
         scrollProxy: ScrollViewProxy
     ) -> some View {

@@ -46,26 +46,28 @@ extension Schema.ConfigurationBuilder {
                 taskStack.append(.planElement(overlay.content))
             }
         }
-        var resultStack = try startTasks(&taskStack)
-        return try buildScreen(from, &resultStack)
+        var result = try startTasks(&taskStack)
+        return try buildScreen(from, &result)
     }
 
     private func buildScreen(
         _ from: Schema.Screen,
-        _ resultStack: inout ResultStack
+        _ result: inout BuildResult
     ) throws(Schema.Error) -> VC.Screen {
+        var elementIndices = result.elementIndices
+
         var cover: VC.Box?
         if let box = from.cover {
-            cover = try buildBox(box, &resultStack)
+            cover = try buildBox(box, &elementIndices)
         }
-        let content = try resultStack.popLastElement()
-        let footer = try resultStack.popLastElement(from.footer != nil)
+        let content = try elementIndices.pop()
+        let footer = try elementIndices.pop(from.footer != nil)
 
         var background: [VC.AlignedElement]?
         if let from = from.background, from.isNotEmpty {
-            background = try convertAlignedElement(
+            background = try convertAlignedElements(
                 from,
-                resultStack.popLastElements(from.count)
+                elementIndices.pop(from.count)
             )
             if background.isEmpty {
                 background = nil
@@ -74,9 +76,9 @@ extension Schema.ConfigurationBuilder {
 
         var overlay: [VC.AlignedElement]?
         if let from = from.overlay, from.isNotEmpty {
-            overlay = try convertAlignedElement(
+            overlay = try convertAlignedElements(
                 from,
-                resultStack.popLastElements(from.count)
+                elementIndices.pop(from.count)
             )
             if overlay.isEmpty {
                 overlay = nil
@@ -85,6 +87,7 @@ extension Schema.ConfigurationBuilder {
 
         return .init(
             id: from.id,
+            poolElements: result.poolElements,
             layoutBehaviour: from.layoutBehaviour,
             cover: cover,
             content: content,
@@ -164,4 +167,3 @@ extension Schema.Screen: DecodableWithConfiguration {
         )
     }
 }
-

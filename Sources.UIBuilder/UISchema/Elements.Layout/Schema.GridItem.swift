@@ -27,7 +27,7 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func convertGridItems(
         _ items: [Schema.GridItem],
-        _ elements: [VC.Element]
+        _ elements: [VC.ElementIndex]
     ) -> [VC.GridItem] {
         var gridItems = [VC.GridItem]()
         gridItems.reserveCapacity(elements.count)

@@ -29,3 +29,7 @@ extension AdaptyUIConfiguration: CustomStringConvertible {
         "(id: \(id), localizationId: \(localizationId), isRightToLeft: \(isRightToLeft))"
     }
 }
+
+extension VC {
+    typealias ElementIndex = Int
+}

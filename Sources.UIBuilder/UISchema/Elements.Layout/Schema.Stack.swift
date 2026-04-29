@@ -41,7 +41,7 @@ extension Schema.Stack: Schema.CompositeElement {
     func buildElement(
         _ builder: Schema.ConfigurationBuilder,
         _ properties: VC.Element.Properties?,
-        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+        _ elementIndices: inout [VC.ElementIndex]
     ) throws(Schema.Error) -> VC.Element {
         let itemsCount = items.count { item in
             if case .element = item { true } else { false }
@@ -52,7 +52,7 @@ extension Schema.Stack: Schema.CompositeElement {
                 horizontalAlignment: horizontalAlignment,
                 verticalAlignment: verticalAlignment,
                 spacing: spacing,
-                items: builder.convertStackItems(items, resultStack.popLastElements(itemsCount))
+                items: builder.convertStackItems(items, elementIndices.pop(itemsCount))
             ),
             properties
         )
@@ -62,7 +62,7 @@ extension Schema.Stack: Schema.CompositeElement {
 extension Schema.ConfigurationBuilder {
     func convertStackItems(
         _ items: [Schema.Stack.Item],
-        _ elements: [VC.Element]
+        _ elements: [VC.ElementIndex]
     ) -> [VC.Stack.Item] {
         var stackItems = [VC.Stack.Item]()
         stackItems.reserveCapacity(elements.count)

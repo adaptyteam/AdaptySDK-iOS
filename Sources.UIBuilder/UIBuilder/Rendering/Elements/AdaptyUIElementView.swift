@@ -111,7 +111,7 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     }
 
     @ViewBuilder
-    private func elementOrEmpty(_ content: VC.Element?) -> some View {
+    private func elementOrEmpty(_ content: VC.ElementIndex?) -> some View {
         if let content {
             AdaptyUIElementView(
                 content,
@@ -125,20 +125,21 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
 }
 
 struct AdaptyUIElementView<ScreenHolderContent: View>: View {
-    private let element: VC.Element
+    private let elementIndex: VC.ElementIndex
     private let drawDecoratorBackground: Bool
     private let screenHolderBuilder: () -> ScreenHolderContent
 
     init(
-        _ element: VC.Element,
+        _ elementIndex: VC.ElementIndex,
         @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent,
         drawDecoratorBackground: Bool = true
     ) {
-        self.element = element
+        self.elementIndex = elementIndex
         self.screenHolderBuilder = screenHolderBuilder
         self.drawDecoratorBackground = drawDecoratorBackground
     }
 
+    @Environment(\.adaptyElementPool) private var elementPool
     @EnvironmentObject private var eventBus: AdaptyUIEventBus
     @EnvironmentObject private var navigatorViewModel: AdaptyUINavigatorViewModel
     @EnvironmentObject private var stateViewModel: AdaptyUIStateViewModel
@@ -148,38 +149,42 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
     @State private var lastProcessedSequence: UInt = 0
 
     var body: some View {
-        AdaptyUIElementWithoutPropertiesView(
-            element,
-            playAnimations: $playAnimations,
-            screenHolderBuilder: screenHolderBuilder
-        )
-        .animatableDecorator(
-            element.properties?.decorator,
-            play: $playAnimations,
-            includeBackground: drawDecoratorBackground
-        )
-        .modifier(ElementBackgroundModifier(
-            backgrounds: element.properties?.background,
-            screenHolderBuilder: screenHolderBuilder
-        ))
-        .modifier(ElementOverlayModifier(
-            overlays: element.properties?.overlay,
-            screenHolderBuilder: screenHolderBuilder
-        ))
-        .animatableProperties(element.properties, play: $playAnimations)
-        .padding(element.properties?.padding)
-        .modifier(ElementInteractionEnabledModifier(element.properties?.interactionEnabled))
-        .modifier(DebugOverlayModifier())
-        .onAppear {
-            consumeAndProcessPendingEvents()
-        }
-        .onChange(of: eventBus.revision) { _ in
-            consumeAndProcessPendingEvents()
+        if let element = elementPool[safe: elementIndex] {
+            AdaptyUIElementWithoutPropertiesView(
+                element,
+                playAnimations: $playAnimations,
+                screenHolderBuilder: screenHolderBuilder
+            )
+            .animatableDecorator(
+                element.properties?.decorator,
+                play: $playAnimations,
+                includeBackground: drawDecoratorBackground
+            )
+            .modifier(ElementBackgroundModifier(
+                backgrounds: element.properties?.background,
+                screenHolderBuilder: screenHolderBuilder
+            ))
+            .modifier(ElementOverlayModifier(
+                overlays: element.properties?.overlay,
+                screenHolderBuilder: screenHolderBuilder
+            ))
+            .animatableProperties(element.properties, play: $playAnimations)
+            .padding(element.properties?.padding)
+            .modifier(ElementInteractionEnabledModifier(element.properties?.interactionEnabled))
+            .modifier(DebugOverlayModifier())
+            .onAppear {
+                consumeAndProcessPendingEvents(properties: element.properties)
+            }
+            .onChange(of: eventBus.revision) { _ in
+                consumeAndProcessPendingEvents(properties: element.properties)
+            }
+        } else {
+            AdaptyUIUnknownElementView(value: "missing_element_\(elementIndex)")
         }
     }
 
-    private func consumeAndProcessPendingEvents() {
-        guard let properties = element.properties,
+    private func consumeAndProcessPendingEvents(properties: VC.Element.Properties?) {
+        guard let properties,
               properties.eventHandlers.isNotEmpty else { return }
 
         let pending = eventBus.consumePending(
@@ -282,4 +287,3 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
 }
 
 #endif
-

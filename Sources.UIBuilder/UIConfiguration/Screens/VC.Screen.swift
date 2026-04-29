@@ -10,10 +10,11 @@ import Foundation
 extension VC {
     struct Screen: Sendable, Hashable {
         let id: String
+        let poolElements: [VC.Element]
         let layoutBehaviour: LayoutBehaviour
         let cover: Box?
-        let content: Element
-        let footer: Element?
+        let content: ElementIndex
+        let footer: ElementIndex?
         let background: [AlignedElement]?
         let overlay: [AlignedElement]?
         let screenActions: ScreenActions

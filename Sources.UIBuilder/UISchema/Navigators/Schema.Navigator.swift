@@ -35,17 +35,18 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func convertNavigator(_ from: Schema.Navigator) throws(Schema.Error) -> VC.Navigator {
         var taskStack: TasksStack = [.planElement(from.content)]
-        var resultStack = try startTasks(&taskStack)
-        return try buildNavigator(from, &resultStack)
+        var result = try startTasks(&taskStack)
+        return try buildNavigator(from, &result)
     }
 
     private func buildNavigator(
         _ from: Schema.Navigator,
-        _ resultStack: inout ResultStack
+        _ result: inout BuildResult
     ) throws(Schema.Error) -> VC.Navigator {
-        let content = try resultStack.popLastElement()
+        let content = try result.elementIndices.pop()
         return .init(
             id: from.id,
+            poolElements: result.poolElements,
             background: from.background,
             content: content,
             order: from.order,
@@ -86,4 +87,3 @@ extension Schema.Navigator: DecodableWithConfiguration {
         )
     }
 }
-

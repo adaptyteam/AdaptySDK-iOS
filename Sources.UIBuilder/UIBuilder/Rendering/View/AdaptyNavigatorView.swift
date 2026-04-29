@@ -39,6 +39,7 @@ struct AdaptyScreenView: View {
             screen: screenInstance.configuration
         )
         .withScreenInstance(screenInstance.instance)
+        .withElementPool(screenInstance.configuration.poolElements)
         .animatablePropertiesTransition(
             play: $playIncomingTransition,
             initialOpacity: incomingAnimations.transitionInitialOpacity ?? 1.0,
@@ -145,6 +146,7 @@ struct AdaptyNavigatorView: View {
                     }
                 }
             )
+            .withElementPool(navigatorViewModel.navigator.poolElements)
             .animatablePropertiesTransition(
                 play: $contentAnimations,
                 initialOpacity: navigatorViewModel.appearTransition?.initialContentOpacity ?? 1.0,
@@ -229,4 +231,3 @@ private extension [VC.Animation] {
 }
 
 #endif
-

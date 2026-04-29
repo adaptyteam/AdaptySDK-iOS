@@ -47,7 +47,7 @@ extension Schema.Pager: Schema.CompositeElement {
     func buildElement(
         _: Schema.ConfigurationBuilder,
         _ properties: VC.Element.Properties?,
-        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+        _ elementIndices: inout [VC.ElementIndex]
     ) throws(Schema.Error) -> VC.Element {
         try .pager(
             .init(
@@ -55,7 +55,7 @@ extension Schema.Pager: Schema.CompositeElement {
                 pageHeight: pageHeight,
                 pagePadding: pagePadding,
                 spacing: spacing,
-                content: resultStack.popLastElements(content.count),
+                content: elementIndices.pop(content.count),
                 pageControl: pageControl,
                 animation: animation,
                 interactionBehavior: interactionBehavior,

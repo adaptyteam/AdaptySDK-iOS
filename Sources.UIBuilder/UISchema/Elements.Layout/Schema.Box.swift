@@ -36,10 +36,10 @@ extension Schema.Box: Schema.CompositeElement {
     func buildElement(
         _ builder: Schema.ConfigurationBuilder,
         _ properties: VC.Element.Properties?,
-        _ resultStack: inout Schema.ConfigurationBuilder.ResultStack
+        _ elementIndices: inout [VC.ElementIndex]
     ) throws(Schema.Error) -> VC.Element {
         try .box(
-            builder.buildBox(self, &resultStack),
+            builder.buildBox(self, &elementIndices),
             properties
         )
     }
@@ -49,14 +49,14 @@ extension Schema.ConfigurationBuilder {
     @inlinable
     func buildBox(
         _ from: Schema.Box,
-        _ resultStack: inout ResultStack
+        _ elementIndices: inout [VC.ElementIndex]
     ) throws(Schema.Error) -> VC.Box {
         try .init(
             width: from.width,
             height: from.height,
             horizontalAlignment: from.horizontalAlignment,
             verticalAlignment: from.verticalAlignment,
-            content: resultStack.popLastElement(from.content != nil)
+            content: elementIndices.pop(from.content != nil)
         )
     }
 }

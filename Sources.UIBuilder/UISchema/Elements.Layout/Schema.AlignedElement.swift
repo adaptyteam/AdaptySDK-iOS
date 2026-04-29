@@ -24,17 +24,17 @@ extension Schema.AlignedElement {
 
 extension Schema.ConfigurationBuilder {
     @inlinable
-    func convertAlignedElement(
+    func convertAlignedElements(
         _ items: [Schema.AlignedElement],
-        _ elements: [VC.Element]
+        _ indices: [VC.ElementIndex]
     ) -> [VC.AlignedElement] {
         var overlays = [VC.AlignedElement]()
-        overlays.reserveCapacity(elements.count)
+        overlays.reserveCapacity(indices.count)
         for (i, item) in items.enumerated() {
             overlays.append(.init(
                 horizontalAlignment: item.horizontalAlignment,
                 verticalAlignment: item.verticalAlignment,
-                content: elements[i]
+                content: indices[i]
             ))
         }
         return overlays

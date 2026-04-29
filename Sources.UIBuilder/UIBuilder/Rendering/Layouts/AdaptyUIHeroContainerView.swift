@@ -36,6 +36,8 @@ struct AdaptyUIHeroContainerView: View {
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
     private var safeArea: EdgeInsets
+    @Environment(\.adaptyElementPool)
+    private var elementPool: [VC.Element]
     @State
     private var footerSize: CGSize = .zero
     @State
@@ -126,7 +128,7 @@ struct AdaptyUIHeroContainerView: View {
     @ViewBuilder
     func coverView(
         _ box: VC.Box,
-        _ content: VC.Element,
+        _ content: VC.ElementIndex,
         _ properties: VC.Element.Properties?
     ) -> some View {
         let height: CGFloat = {
@@ -186,45 +188,49 @@ struct AdaptyUIHeroContainerView: View {
 
     @ViewBuilder
     func contentView(
-        content: VC.Element,
+        content: VC.ElementIndex,
         coverBox: VC.Box,
         globalProxy: GeometryProxy
     ) -> some View {
-        let bottomOverscrollHeight = screenSize.height
-        let properties = content.properties
-        let offsetY = properties?.offset?.y.points(
-            screenSize: screenSize.width,
-            safeAreaStart: safeArea.leading,
-            safeAreaEnd: safeArea.trailing
-        ) ?? 0.0
+        if let element = elementPool[safe: content] {
+            let bottomOverscrollHeight = screenSize.height
+            let properties = element.properties
+            let offsetY = properties?.offset?.y.points(
+                screenSize: screenSize.width,
+                safeAreaStart: safeArea.leading,
+                safeAreaEnd: safeArea.trailing
+            ) ?? 0.0
 
-        VStack(spacing: 0) {
-            AdaptyUIElementWithoutPropertiesView(
-                content,
-                playAnimations: $playOnAppearAnimations,
-                screenHolderBuilder: { EmptyView() } // TODO: x check
-            )
+            VStack(spacing: 0) {
+                AdaptyUIElementWithoutPropertiesView(
+                    element,
+                    playAnimations: $playOnAppearAnimations,
+                    screenHolderBuilder: { EmptyView() } // TODO: x check
+                )
 
-            FooterVerticalFillerView(height: footerSize.height) { frame in
-                withAnimation {
-                    drawFooterBackground = frame.maxY > globalProxy.size.height + globalProxy.safeAreaInsets.bottom
+                FooterVerticalFillerView(height: footerSize.height) { frame in
+                    withAnimation {
+                        drawFooterBackground = frame.maxY > globalProxy.size.height + globalProxy.safeAreaInsets.bottom
+                    }
                 }
             }
-        }
-        .padding(.bottom, bottomOverscrollHeight - offsetY)
-        .animatableDecorator(
-            properties?.decorator,
-            play: $playOnAppearAnimations,
-            includeBackground: true
-        )
-        .animatableProperties(properties, play: $playOnAppearAnimations)
-        .padding(properties?.padding)
-        .padding(.bottom, offsetY - bottomOverscrollHeight)
-        .onAppear {
-            consumeAndProcessPendingEvents(properties: properties)
-        }
-        .onChange(of: eventBus.revision) { _ in
-            consumeAndProcessPendingEvents(properties: properties)
+            .padding(.bottom, bottomOverscrollHeight - offsetY)
+            .animatableDecorator(
+                properties?.decorator,
+                play: $playOnAppearAnimations,
+                includeBackground: true
+            )
+            .animatableProperties(properties, play: $playOnAppearAnimations)
+            .padding(properties?.padding)
+            .padding(.bottom, offsetY - bottomOverscrollHeight)
+            .onAppear {
+                consumeAndProcessPendingEvents(properties: properties)
+            }
+            .onChange(of: eventBus.revision) { _ in
+                consumeAndProcessPendingEvents(properties: properties)
+            }
+        } else {
+            AdaptyUIUnknownElementView(value: "missing_element_\(content)")
         }
     }
 
@@ -259,7 +265,7 @@ struct AdaptyUIHeroContainerView: View {
 
     @ViewBuilder
     private func footerView(
-        _ element: VC.Element,
+        _ element: VC.ElementIndex,
         globalProxy: GeometryProxy,
         scrollProxy: ScrollViewProxy
     ) -> some View {

@@ -22,7 +22,7 @@ struct AdaptyUIButtonView: View {
         self.button = button
     }
 
-    private var currentStateView: VC.Element {
+    private var currentStateView: VC.ElementIndex {
         guard let isSelectedVariable = button.legacyIsSelected,
               stateViewModel.getValue(
                   isSelectedVariable,

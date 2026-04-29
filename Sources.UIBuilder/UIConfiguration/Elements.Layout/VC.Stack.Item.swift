@@ -10,6 +10,6 @@ import Foundation
 extension VC.Stack {
     enum Item: Sendable, Hashable {
         case space(Int)
-        case element(VC.Element)
+        case element(VC.ElementIndex)
     }
 }
