@@ -99,14 +99,17 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
                     }
                 )
                 .frame(
+                    maxWidth: .infinity,
+                    alignment: Alignment.from(
+                        horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                        vertical: item.verticalAlignment.swiftuiValue
+                    )
+                )
+                .frame(
                     height: itemHeight(
                         item,
                         totalWeight: 0,
                         weightsAvailableLength: 0
-                    ),
-                    alignment: Alignment.from(
-                        horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
-                        vertical: item.verticalAlignment.swiftuiValue
                     )
                 )
             }
