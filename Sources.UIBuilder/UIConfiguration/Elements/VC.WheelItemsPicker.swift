@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct WheelItemsPicker: Sendable, Hashable {
+    struct WheelItemsPicker: Sendable {
         let value: Variable
         let items: [Item]
     }

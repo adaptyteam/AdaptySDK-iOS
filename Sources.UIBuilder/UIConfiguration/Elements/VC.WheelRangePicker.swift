@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct WheelRangePicker: Hashable {
+    struct WheelRangePicker: Sendable {
         let value: Variable
         let maxValue: Double
         let minValue: Double

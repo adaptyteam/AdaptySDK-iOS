@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Toggle: Sendable, Hashable {
+    struct Toggle: Sendable {
         let value: Variable
         let color: AssetReference?
     }

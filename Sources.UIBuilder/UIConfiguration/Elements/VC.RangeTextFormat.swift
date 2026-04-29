@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct RangeTextFormat: Sendable, Hashable {
+    struct RangeTextFormat: Sendable {
         let items: [Item]
         let textAttributes: VC.TextAttributes?
 

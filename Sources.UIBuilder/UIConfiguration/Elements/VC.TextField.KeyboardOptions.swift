@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.TextField {
-    struct KeyboardOptions: Hashable {
+    struct KeyboardOptions: Sendable {
         let keyboardType: String?
         let contentType: String?
         let autocapitalizationType: String?

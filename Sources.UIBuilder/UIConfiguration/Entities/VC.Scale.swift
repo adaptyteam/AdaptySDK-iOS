@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Scale: Sendable, Hashable {
+    struct Scale: Sendable, Equatable {
         let scale: VC.Point
         let anchor: VC.Point
     }

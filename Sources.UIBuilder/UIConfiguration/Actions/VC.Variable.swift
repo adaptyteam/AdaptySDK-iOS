@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Variable: Sendable, Hashable {
+    struct Variable: Sendable, Equatable {
         let path: [String]
         let setter: String?
         let scope: Scope

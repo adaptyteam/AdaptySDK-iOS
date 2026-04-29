@@ -6,7 +6,7 @@
 //
 
 extension VC.EventHandler {
-    struct Trigger: Sendable, Hashable {
+    struct Trigger: Sendable {
         let events: [EventId]
         let filter: Filter?
         let screenTransitions: [String]?

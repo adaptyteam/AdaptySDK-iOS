@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Pager: Sendable, Hashable {
+    struct Pager: Sendable {
         let pageWidth: Length
         let pageHeight: Length
         let pagePadding: EdgeInsets

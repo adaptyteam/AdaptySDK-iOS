@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.DateTimePicker {
-    struct Components: OptionSet, Hashable {
+    struct Components: OptionSet {
         let rawValue: Int
 
         static let date = Self(rawValue: 1 << 0)

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct AlignedElement: Hashable {
+    struct AlignedElement: Sendable {
         let horizontalAlignment: VC.HorizontalAlignment
         let verticalAlignment: VC.VerticalAlignment
         let content: ElementIndex

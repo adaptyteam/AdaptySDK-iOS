@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum HorizontalAlignment: Sendable, Hashable {
+    enum HorizontalAlignment: Sendable {
         case leading
         case trailing
         case left

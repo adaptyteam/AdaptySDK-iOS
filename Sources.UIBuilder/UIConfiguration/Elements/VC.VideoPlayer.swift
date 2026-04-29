@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct VideoPlayer: Hashable, Sendable {
+    struct VideoPlayer: Sendable {
         let asset: AssetReference
         let aspect: AspectRatio
         let loop: Bool

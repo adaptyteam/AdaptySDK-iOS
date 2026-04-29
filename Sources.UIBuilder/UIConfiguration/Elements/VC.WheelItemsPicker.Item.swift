@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.WheelItemsPicker {
-    struct Item: Sendable, Hashable {
+    struct Item: Sendable {
         let stringId: VC.StringIdentifier
         let value: VC.AnyValue
     }

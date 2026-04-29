@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Box: Sendable, Hashable {
+    struct Box: Sendable {
         let width: Length?
         let height: Length?
         let horizontalAlignment: HorizontalAlignment

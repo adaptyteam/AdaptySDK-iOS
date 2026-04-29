@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Navigator {
-    struct AppearanceTransition: Sendable, Hashable {
+    struct AppearanceTransition: Sendable {
         let background: VC.Animation.Background?
         let content: [VC.Animation]?
     }

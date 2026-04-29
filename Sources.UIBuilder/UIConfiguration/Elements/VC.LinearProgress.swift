@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct LinearProgress: Sendable, Hashable {
+    struct LinearProgress: Sendable {
         let orientation: Orientation 
         let cornerRadius: CornerRadius
         let asset: AssetReference
@@ -21,7 +21,7 @@ extension VC {
 }
 
 extension VC.LinearProgress {
-    enum Orientation: Sendable, Hashable {
+    enum Orientation: Sendable {
         case horizontal(VC.HorizontalAlignment)
         case vertical(VC.VerticalAlignment)
     }

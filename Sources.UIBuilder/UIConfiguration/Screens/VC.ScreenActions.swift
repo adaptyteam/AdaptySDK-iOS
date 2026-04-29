@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct ScreenActions: Sendable, Hashable {
+    struct ScreenActions: Sendable {
         let onOutsideTap: [Action]?
         let onDeviceBack: [Action]?
         let onFocusChange: [Action]?

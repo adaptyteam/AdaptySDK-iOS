@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Font: Sendable, Hashable {
+    struct Font: Sendable, Equatable {
         let customId: String?
         let alias: String
         let familyName: String

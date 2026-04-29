@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Pager {
-    struct Animation: Sendable, Hashable {
+    struct Animation: Sendable {
         let startDelay: TimeInterval
         let pageTransition: VC.Transition
         let repeatTransition: VC.Transition?

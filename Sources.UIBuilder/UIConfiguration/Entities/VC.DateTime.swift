@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum DateTime: Sendable, Hashable {
+    enum DateTime: Sendable {
         case date(Date)
         case fromStart(TimeInterval)
     }

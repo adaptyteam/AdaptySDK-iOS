@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Stack {
-    enum Kind: Sendable, Hashable {
+    enum Kind: Sendable {
         case vertical
         case horizontal
         case z

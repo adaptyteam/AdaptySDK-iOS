@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum Animation: Sendable, Hashable {
+    enum Animation: Sendable, Equatable {
         case opacity(Timeline, Range<Double>)
         case offset(Timeline, Range<Offset>)
         case rotation(Timeline, RotationParameters)

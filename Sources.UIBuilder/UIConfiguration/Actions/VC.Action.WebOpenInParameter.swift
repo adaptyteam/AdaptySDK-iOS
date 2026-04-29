@@ -6,7 +6,7 @@
 //
 
 package extension VC.Action {
-    enum WebOpenInParameter: Sendable, Hashable {
+    enum WebOpenInParameter: Sendable {
         case browserOutApp
         case browserInApp
     }

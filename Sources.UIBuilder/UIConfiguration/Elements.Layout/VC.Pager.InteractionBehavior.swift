@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Pager {
-    enum InteractionBehavior: Sendable, Hashable {
+    enum InteractionBehavior: Sendable {
         case none
         case cancelAnimation
         case pauseAnimation

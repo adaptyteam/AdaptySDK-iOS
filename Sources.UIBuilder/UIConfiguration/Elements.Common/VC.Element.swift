@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum Element: Sendable, Hashable {
+    enum Element: Sendable {
         indirect case stack(Stack, Properties?)
         indirect case text(Text, Properties?)
         indirect case textField(TextField, Properties?)

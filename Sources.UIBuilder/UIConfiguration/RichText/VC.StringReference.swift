@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum StringReference: Sendable, Hashable {
+    enum StringReference: Sendable {
         case stringId(StringIdentifier, [String: TagValue]?)
         case variable(Variable)
         case product(Product)

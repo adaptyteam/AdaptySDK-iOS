@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Pager.PageControl {
-    enum Layout: Sendable, Hashable {
+    enum Layout: Sendable {
         case overlaid
         case stacked
     }

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Timer: Sendable, Hashable {
+    struct Timer: Sendable {
         let id: String
         let format: VC.RangeTextFormat
         let actions: [Action]

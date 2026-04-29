@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct RichText: Hashable {
+    struct RichText: Sendable {
         let items: [Item]
         let fallback: [Item]?
     }

@@ -9,7 +9,7 @@ import Foundation
 
 @available(*, deprecated, renamed: "test", message: "test")
 extension VC {
-    enum Filling: Sendable, Hashable {
+    enum Filling: Sendable {
         case solidColor(Color)
         case colorGradient(ColorGradient)
 

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum Scope: Sendable, Hashable {
+    enum Scope: Sendable, Equatable {
         case screen
         case global
     }

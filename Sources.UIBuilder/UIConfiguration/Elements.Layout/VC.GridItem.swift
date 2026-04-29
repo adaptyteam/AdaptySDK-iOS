@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct GridItem: Sendable, Hashable {
+    struct GridItem: Sendable {
         let length: Length
         let horizontalAlignment: VC.HorizontalAlignment
         let verticalAlignment: VC.VerticalAlignment

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct RadialProgress: Sendable, Hashable {
+    struct RadialProgress: Sendable {
         let thickness: Double?
         let sweepAngle: Double
         let startAngle: Double

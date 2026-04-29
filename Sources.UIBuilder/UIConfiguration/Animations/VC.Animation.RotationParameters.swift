@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Animation {
-    struct RotationParameters: Sendable, Hashable {
+    struct RotationParameters: Sendable, Equatable {
         let angle: Range<Double>
         let anchor: VC.Point
     }

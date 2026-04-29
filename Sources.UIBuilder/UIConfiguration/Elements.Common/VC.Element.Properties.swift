@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Element {
-    struct Properties: Sendable, Hashable {
+    struct Properties: Sendable {
         let decorator: VC.Decorator?
         let padding: VC.EdgeInsets
         let offset: VC.Offset?

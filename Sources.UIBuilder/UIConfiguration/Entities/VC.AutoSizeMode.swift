@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum AutoSizeMode: Sendable, Hashable {
+    enum AutoSizeMode: Sendable {
         case hug
         case fill
         case legacy

@@ -6,7 +6,7 @@
 //
 
 extension VC {
-    struct EventHandler: Sendable, Hashable {
+    struct EventHandler: Sendable {
         let triggers: [Trigger]
         let animations: [Animation]
         let onAnimationsFinish: [Action]

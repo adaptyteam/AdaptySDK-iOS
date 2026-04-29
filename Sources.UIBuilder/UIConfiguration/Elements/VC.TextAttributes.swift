@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct TextAttributes: Sendable, Hashable {
+    struct TextAttributes: Sendable {
         let fontAssetId: VC.AssetReference? // default?
         let size: Double? // default?
         let txtColor: VC.AssetReference? // default?

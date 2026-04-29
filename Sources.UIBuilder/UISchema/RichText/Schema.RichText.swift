@@ -9,7 +9,7 @@
 import Foundation
 
 extension Schema {
-    struct RichText: Sendable, Hashable {
+    struct RichText: Sendable {
         let items: [RichText.Item]
     }
 }

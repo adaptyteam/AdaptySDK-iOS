@@ -8,7 +8,7 @@
 import Foundation
 
 package extension VC.Action {
-    enum PaymentService: Sendable, Hashable {
+    enum PaymentService: Sendable {
         case storeKit
         case openWebPaywall(openIn: WebOpenInParameter)
     }

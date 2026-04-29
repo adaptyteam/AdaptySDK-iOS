@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Pager {
-    struct PageControl: Sendable, Hashable {
+    struct PageControl: Sendable {
         let layout: Layout
         let verticalAlignment: VC.VerticalAlignment
         let padding: VC.EdgeInsets

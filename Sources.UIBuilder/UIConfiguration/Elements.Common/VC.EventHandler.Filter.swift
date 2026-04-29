@@ -6,7 +6,7 @@
 //
 
 extension VC.EventHandler {
-    enum Filter: Sendable, Hashable {
+    enum Filter: Sendable {
         case first
         case notFirst
     }

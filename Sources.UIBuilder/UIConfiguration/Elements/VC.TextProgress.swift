@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct TextProgress: Sendable, Hashable {
+    struct TextProgress: Sendable {
         let format: VC.RangeTextFormat
         let value: Variable
         let transition: Transition

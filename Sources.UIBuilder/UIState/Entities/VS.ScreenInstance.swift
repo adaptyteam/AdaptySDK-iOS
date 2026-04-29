@@ -9,7 +9,7 @@ import Foundation
 import JavaScriptCore
 
 package extension VS {
-    struct ScreenInstance: Hashable {
+    struct ScreenInstance {
         let id: String
         let navigatorId: String
         let configuration: VC.Screen

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum AspectRatio: Sendable, Hashable {
+    enum AspectRatio: Sendable {
         case fit
         case fill
         case stretch

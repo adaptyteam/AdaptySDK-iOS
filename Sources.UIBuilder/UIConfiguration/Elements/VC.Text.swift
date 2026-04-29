@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Text: Sendable, Hashable {
+    struct Text: Sendable {
         let value: StringReference
         let horizontalAlign: HorizontalAlignment
         let maxRows: Int?

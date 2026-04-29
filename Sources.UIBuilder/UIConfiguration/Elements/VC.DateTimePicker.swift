@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct DateTimePicker: Sendable, Hashable {
+    struct DateTimePicker: Sendable {
         let kind: Kind
         let value: Variable
         let components: Components

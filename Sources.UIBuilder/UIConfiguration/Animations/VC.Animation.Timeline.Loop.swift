@@ -6,7 +6,7 @@
 //
 
 extension VC.Animation.Timeline {
-    enum Loop: Sendable, Hashable {
+    enum Loop: Sendable, Equatable {
         case normal
         case pingPong
     }

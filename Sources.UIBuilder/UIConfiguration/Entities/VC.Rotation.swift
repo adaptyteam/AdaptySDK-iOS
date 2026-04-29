@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Rotation: Sendable, Hashable {
+    struct Rotation: Sendable, Equatable {
         let angle: Double
         let anchor: VC.Point
     }

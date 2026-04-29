@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.RichText {
-    struct Attributes: Sendable, Hashable {
+    struct Attributes: Sendable {
         let fontAssetId: VC.AssetIdentifier? // default?
         let size: Double? // default?
         let txtColor: VC.AssetIdentifierOrValue? // default?

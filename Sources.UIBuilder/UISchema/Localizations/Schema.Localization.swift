@@ -8,14 +8,14 @@
 import Foundation
 
 extension Schema {
-    struct Localization: Sendable, Hashable {
+    struct Localization: Sendable {
         let id: LocaleId
         let isRightToLeft: Bool?
         let localeIdentificator: String?
         let strings: [StringIdentifier: Item]?
         let assets: [AssetIdentifier: Asset]?
 
-        struct Item: Sendable, Hashable {
+        struct Item: Sendable {
             let value: RichText
             let fallback: RichText?
         }

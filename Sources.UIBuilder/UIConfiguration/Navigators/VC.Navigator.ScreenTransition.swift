@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Navigator {
-    struct ScreenTransition: Sendable, Hashable {
+    struct ScreenTransition: Sendable {
         let outgoing: [VC.Animation]?
         let incoming: [VC.Animation]?
         let isIncomingOnTop: Bool

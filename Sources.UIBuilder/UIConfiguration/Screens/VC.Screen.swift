@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Screen: Sendable, Hashable {
+    struct Screen: Sendable {
         let id: String
         let poolElements: [VC.Element]
         let layoutBehaviour: LayoutBehaviour

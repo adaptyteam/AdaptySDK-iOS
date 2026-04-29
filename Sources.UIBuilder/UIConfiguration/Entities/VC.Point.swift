@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Point: Sendable, Hashable {
+    struct Point: Sendable, Equatable {
         let x: Double
         let y: Double
     }

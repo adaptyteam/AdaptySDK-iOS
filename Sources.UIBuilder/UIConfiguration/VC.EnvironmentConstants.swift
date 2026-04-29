@@ -7,7 +7,7 @@
 import Foundation
 
 package extension VC {
-    struct EnvironmentConstants: Sendable, Hashable {
+    struct EnvironmentConstants: Sendable {
         let sdkVersion: String
         let osName: String
         let osVersion: String

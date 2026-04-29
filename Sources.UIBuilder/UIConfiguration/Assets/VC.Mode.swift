@@ -9,7 +9,7 @@
 import Foundation
 
 extension VC {
-    enum Mode: Sendable, Hashable {
+    enum Mode: Sendable, Equatable {
         case light
         case dark
     }

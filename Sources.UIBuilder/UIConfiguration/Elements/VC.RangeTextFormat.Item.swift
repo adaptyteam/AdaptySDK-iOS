@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.RangeTextFormat {
-    struct Item: Sendable, Hashable {
+    struct Item: Sendable {
         let from: Double
         let value: VC.RichText
     }

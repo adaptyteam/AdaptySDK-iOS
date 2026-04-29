@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Button: Sendable, Hashable {
+    struct Button: Sendable {
         let actions: [Action]
         let content: ElementIndex
         let legacySelectedContent: ElementIndex?

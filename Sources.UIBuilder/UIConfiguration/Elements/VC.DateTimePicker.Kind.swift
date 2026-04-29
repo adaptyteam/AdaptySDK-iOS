@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.DateTimePicker {
-    enum Kind: Hashable {
+    enum Kind: Sendable {
         case compact
         case wheel
         case graphical

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Navigator: Sendable, Hashable {
+    struct Navigator: Sendable {
         let id: NavigatorIdentifier
         let poolElements: [VC.Element]
         let background: AssetReference?

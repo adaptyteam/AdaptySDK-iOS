@@ -9,7 +9,7 @@
 import Foundation
 
 extension VC.TextField {
-    struct InputConstraints: Hashable {
+    struct InputConstraints: Sendable {
         let regex: String?
         let maxLength: Int?
     }

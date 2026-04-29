@@ -8,7 +8,7 @@
 import Foundation
 
 package extension VC {
-    struct Action: Sendable, Hashable {
+    struct Action: Sendable {
         let path: [String]
         let params: [String: VC.AnyValue]?
         let scope: Scope

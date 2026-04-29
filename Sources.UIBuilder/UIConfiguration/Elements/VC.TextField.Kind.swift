@@ -6,7 +6,7 @@
 //
 
 extension VC.TextField {
-    enum Kind: Hashable {
+    enum Kind: Sendable {
         case singleLine
         case multiLine
     }

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Animation {
-    struct Range<T: Sendable & Hashable>: Sendable, Hashable {
+    struct Range<T: Sendable & Equatable>: Sendable, Equatable {
         let start: T
         let end: T
     }

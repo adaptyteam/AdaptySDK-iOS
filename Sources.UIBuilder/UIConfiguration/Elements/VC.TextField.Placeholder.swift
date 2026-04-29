@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.TextField {
-    struct Placeholder: Hashable {
+    struct Placeholder: Sendable {
         let value: VC.StringReference
         let overflowMode: Set<VC.Text.OverflowMode>
         let defaultTextAttributes: VC.TextAttributes?

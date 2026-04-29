@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Slider: Sendable, Hashable {
+    struct Slider: Sendable {
         let value: Variable
         let maxValue: Double
         let minValue: Double

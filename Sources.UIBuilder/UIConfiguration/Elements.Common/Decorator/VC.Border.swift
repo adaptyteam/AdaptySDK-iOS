@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Border: Sendable, Hashable {
+    struct Border: Sendable, Equatable {
         let filling: AssetReference
         let thickness: Double
     }

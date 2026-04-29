@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Image: Sendable, Hashable {
+    struct Image: Sendable {
         let asset: AssetReference
         let aspect: AspectRatio
         let tint: AssetReference?

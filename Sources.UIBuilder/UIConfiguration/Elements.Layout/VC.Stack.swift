@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Stack: Sendable, Hashable {
+    struct Stack: Sendable {
         let type: Kind
         let horizontalAlignment: HorizontalAlignment
         let verticalAlignment: VerticalAlignment
