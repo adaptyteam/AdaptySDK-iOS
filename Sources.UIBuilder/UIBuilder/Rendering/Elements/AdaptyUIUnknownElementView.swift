@@ -61,6 +61,9 @@ struct AdaptyUIUnknownElementView: View {
             debugElement
         } else {
             Text("Unknown View \(value)")
+                .onAppear {
+                    Log.ui.error("AdaptyUIUnknownElementView: \(value)")
+                }
         }
     }
 }

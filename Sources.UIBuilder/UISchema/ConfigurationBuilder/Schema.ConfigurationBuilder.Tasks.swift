@@ -22,17 +22,6 @@ extension Schema.ConfigurationBuilder {
     typealias TasksStack = [Task]
 
     @inlinable
-    func build_element(_ root: Schema.Element) throws(Schema.Error) -> VC.Element {
-        var taskStack: TasksStack = [.planElement(root)]
-        var result = try startTasks(&taskStack)
-        let index = try result.elementIndices.pop()
-        guard let element = result.poolElements[safe: index] else {
-            throw .unsupportedElement("empty element tree")
-        }
-        return element
-    }
-
-    @inlinable
     func startTasks(
         _ taskStack: inout TasksStack
     ) throws(Schema.Error) -> BuildResult {
