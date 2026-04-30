@@ -52,13 +52,24 @@ struct AdaptyUIDateTimePickerView: View {
         return components
     }
 
+    private func resolvedClosedRange(min: VC.DateTime, max: VC.DateTime) -> ClosedRange<Date> {
+        let now = Date() // TODO: date of start flow
+        let resolvedMin = min.asDate(startAt: now)
+        let resolvedMax = max.asDate(startAt: now)
+        guard resolvedMin <= resolvedMax else {
+            Log.ui.warn("DateTimePicker: min (\(resolvedMin)) is later than max (\(resolvedMax)); clamping min to max")
+            return resolvedMax ... resolvedMax
+        }
+        return resolvedMin ... resolvedMax
+    }
+
     @ViewBuilder
     private var datePickerView: some View {
         if let minDate = picker.minDate, let maxDate = picker.maxDate {
             DatePicker(
                 "",
                 selection: dateBinding,
-                in: minDate.asDate(startAt: Date()) ... maxDate.asDate(startAt: Date()), // TODO: date of start flow
+                in: resolvedClosedRange(min: minDate, max: maxDate),
                 displayedComponents: displayedComponents
             )
             .labelsHidden()
