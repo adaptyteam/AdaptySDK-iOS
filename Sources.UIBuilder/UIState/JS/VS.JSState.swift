@@ -48,25 +48,12 @@ extension VS {
 
 extension VS.JSState {
     func setEnvironmentConstants(_ config: AdaptyUIConfiguration) {
-        guard
-            let global = context.globalObject,
-            let env = config.environmentObject(in: context)
-        else { return }
+        Self.setEnvironmentConstants(config, in: context)
+        Self.setProductConstants(config.environment.flow.products, in: context)
+    }
 
-        let objectClass = context.objectForKeyedSubscript("Object")
-        objectClass?.invokeMethod("freeze", withArguments: [env])
-
-        #if DEBUG
-        global.setObject(env, forKeyedSubscript: "SDKEnv" as NSString)
-        #else
-        if let objectClass, let descriptor = JSValue(newObjectIn: context) {
-            descriptor.setObject(env, forKeyedSubscript: "value" as NSString)
-            descriptor.setObject(false, forKeyedSubscript: "writable" as NSString)
-            descriptor.setObject(false, forKeyedSubscript: "configurable" as NSString)
-            descriptor.setObject(false, forKeyedSubscript: "enumerable" as NSString)
-            objectClass.invokeMethod("defineProperty", withArguments: [global, "SDKEnv", descriptor])
-        }
-        #endif
+    func setProductConstants(_ products: [VC.FlowConstants.ProductConstants]) {
+        Self.setProductConstants(products, in: context)
     }
 
     func evaluateScripts(

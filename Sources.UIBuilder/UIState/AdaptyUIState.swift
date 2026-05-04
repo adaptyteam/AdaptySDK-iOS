@@ -47,6 +47,12 @@ package final class AdaptyUIState: ObservableObject {
         jsState.evaluateScripts(configuration.scripts)
     }
 
+    func setProductsConstants(_ products: [VC.FlowConstants.ProductConstants]) {
+        jsState.setProductConstants(products)
+
+        // TODO:
+    }
+
     func debug(path: String, filter: VS.DebugFilter = .withoutFunction) -> String {
         jsState.debug(path: path, filter: filter)
     }

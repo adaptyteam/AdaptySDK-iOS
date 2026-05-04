@@ -6,47 +6,36 @@
 //
 
 import Foundation
+import JavaScriptCore
 
 package extension VC {
     struct FlowConstants: Sendable {
         let placementId: String
         let variationId: String
-        let placementABTestName: String
+        let abTestName: String
         let name: String
-        let products: [String: ProductConstants]
+        let products: [ProductConstants]
 
         package init(
             placementId: String,
             variationId: String,
-            placementABTestName: String,
+            abTestName: String,
             name: String,
             products: [ProductConstants]
         ) {
             self.placementId = placementId
             self.variationId = variationId
-            self.placementABTestName = placementABTestName
+            self.abTestName = abTestName
             self.name = name
-            self.products = Dictionary(products.map { ($0.flowProductId, $0) }, uniquingKeysWith: { first, _ in first })
+            self.products = products
         }
     }
 }
 
 package extension VC.FlowConstants {
     struct ProductConstants: Sendable {
-        let flowProductId: String
-        let adaptyProductId: String
-        let adaptyAccessLevelId: String
-        let adaptyProductType: String
-        let paywallVariationId: String
-        let paywallName: String
-        // vendors
-        let localizedDescription: String?
-        let localizedTitle: String?
-        let isFamilyShareable: Bool?
-        let regionCode: String?
-        let price: PriceConstants?
-        let subscription: ProductSubscriptionConstants?
-
+        let values: [String: VC.AnyValue]
+        let id: String
         package init(
             flowProductId: String,
             adaptyProductId: String,
@@ -61,83 +50,74 @@ package extension VC.FlowConstants {
             price: PriceConstants? = nil,
             subscription: ProductSubscriptionConstants? = nil
         ) {
-            self.flowProductId = flowProductId
-            self.adaptyProductId = adaptyProductId
-            self.adaptyAccessLevelId = adaptyAccessLevelId
-            self.adaptyProductType = adaptyProductType
-            self.paywallVariationId = paywallVariationId
-            self.paywallName = paywallName
-            self.localizedDescription = localizedDescription
-            self.localizedTitle = localizedTitle
-            self.isFamilyShareable = isFamilyShareable
-            self.regionCode = regionCode
-            self.price = price
-            self.subscription = subscription
+            id = flowProductId
+            values = [
+                "flowProductId": VC.AnyValue(flowProductId),
+                "adaptyProductId": VC.AnyValue(adaptyProductId),
+                "adaptyAccessLevelId": VC.AnyValue(adaptyAccessLevelId),
+                "adaptyProductType": VC.AnyValue(adaptyProductType),
+                "paywallVariationId": VC.AnyValue(paywallVariationId),
+                "paywallName": VC.AnyValue(paywallName),
+                // vendors
+                "localizedDescription": VC.AnyValue(localizedDescription),
+                "localizedTitle": VC.AnyValue(localizedTitle),
+                "isFamilyShareable": VC.AnyValue(isFamilyShareable),
+                "regionCode": VC.AnyValue(regionCode),
+                "price": VC.AnyValue(price?.values),
+                "subscription": VC.AnyValue(subscription?.values),
+            ]
         }
     }
 
     struct PriceConstants: Sendable {
-        let amount: Decimal
-        let currencyCode: String?
-        let currencySymbol: String?
-        let localizedString: String?
-
+        let values: [String: VC.AnyValue]
         package init(
-            amount: Decimal,
+            amount: Double,
             currencyCode: String?,
             currencySymbol: String?,
             localizedString: String?
         ) {
-            self.amount = amount
-            self.currencyCode = currencyCode
-            self.currencySymbol = currencySymbol
-            self.localizedString = localizedString
+            values = [
+                "amount": VC.AnyValue(amount),
+                "currencyCode": VC.AnyValue(currencyCode),
+                "currencySymbol": VC.AnyValue(currencySymbol),
+                "localizedString": VC.AnyValue(localizedString),
+            ]
         }
     }
 
     struct ProductSubscriptionConstants: Sendable {
-        let groupIdentifier: String
-        let period: SubscriptionPeriodConstants
-        let localizedPeriod: String?
-        let offer: SubscriptionOfferConstants?
-
+        let values: [String: VC.AnyValue]
         package init(
             groupIdentifier: String,
             period: SubscriptionPeriodConstants,
             localizedPeriod: String?,
             offer: SubscriptionOfferConstants?
         ) {
-            self.groupIdentifier = groupIdentifier
-            self.period = period
-            self.localizedPeriod = localizedPeriod
-            self.offer = offer
+            values = [
+                "groupIdentifier": VC.AnyValue(groupIdentifier),
+                "period": VC.AnyValue(period.values),
+                "localizedPeriod": VC.AnyValue(localizedPeriod),
+                "offer": VC.AnyValue(offer?.values),
+            ]
         }
     }
 
     struct SubscriptionPeriodConstants: Sendable {
-        let unit: String
-        let numberOfUnits: Int
-
+        let values: [String: VC.AnyValue]
         package init(
             unit: String,
             numberOfUnits: Int
         ) {
-            self.unit = unit
-            self.numberOfUnits = numberOfUnits
+            values = [
+                "unit": VC.AnyValue(unit),
+                "numberOfUnits": VC.AnyValue(numberOfUnits),
+            ]
         }
     }
 
     struct SubscriptionOfferConstants: Sendable {
-        let id: String?
-        let type: String
-        // phase
-        let price: PriceConstants?
-        let paymentMode: String
-        let period: SubscriptionPeriodConstants
-        let numberOfPeriods: Int
-        let localizedPeriod: String?
-        let localizedNumberOfPeriods: String?
-
+        let values: [String: VC.AnyValue]
         package init(
             id: String?,
             type: String,
@@ -148,14 +128,16 @@ package extension VC.FlowConstants {
             localizedPeriod: String?,
             localizedNumberOfPeriods: String?
         ) {
-            self.id = id
-            self.type = type
-            self.price = price
-            self.paymentMode = paymentMode
-            self.period = period
-            self.numberOfPeriods = numberOfPeriods
-            self.localizedPeriod = localizedPeriod
-            self.localizedNumberOfPeriods = localizedNumberOfPeriods
+            values = [
+                "id": VC.AnyValue(id),
+                "type": VC.AnyValue(type),
+                "price": VC.AnyValue(price?.values),
+                "paymentMode": VC.AnyValue(paymentMode),
+                "period": VC.AnyValue(period.values),
+                "numberOfPeriods": VC.AnyValue(numberOfPeriods),
+                "localizedPeriod": VC.AnyValue(localizedPeriod),
+                "localizedNumberOfPeriods": VC.AnyValue(localizedNumberOfPeriods),
+            ]
         }
     }
 }

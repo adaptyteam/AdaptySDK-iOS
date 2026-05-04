@@ -18,6 +18,7 @@ package extension VC {
         let appCurrentLocale: String?
         let userLocales: [String]
         let userUses24HourClock: Bool
+        let flow: FlowConstants
 
         package init(
             sdkVersion: String,
@@ -29,7 +30,8 @@ package extension VC {
             appBuild: String?,
             appCurrentLocale: String?,
             userLocales: [String],
-            userUses24HourClock: Bool
+            userUses24HourClock: Bool,
+            flow: FlowConstants
         ) {
             self.sdkVersion = sdkVersion
             self.osName = osName
@@ -41,6 +43,7 @@ package extension VC {
             self.appCurrentLocale = appCurrentLocale
             self.userLocales = userLocales
             self.userUses24HourClock = userUses24HourClock
+            self.flow = flow
         }
     }
 }

@@ -9,7 +9,7 @@ import AdaptyUIBuilder
 import Foundation
 
 extension Environment {
-    static func fetchUIBuilderEnvironment() async -> VC.EnvironmentConstants {
+    static func fetchUIBuilderEnvironment(flow: AdaptyFlow) async -> VC.EnvironmentConstants {
         await .init(
             sdkVersion: Adapty.SDKVersion,
             osName: Environment.System.name,
@@ -20,7 +20,8 @@ extension Environment {
             appBuild: Environment.Application.build,
             appCurrentLocale: Environment.Application.localization,
             userLocales: Environment.System.preferredLanguages,
-            userUses24HourClock: Environment.System.uses24HourClock
+            userUses24HourClock: Environment.System.uses24HourClock,
+            flow: flow.asUIBuilderFlow()
         )
     }
 }
