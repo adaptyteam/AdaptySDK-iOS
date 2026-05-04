@@ -30,7 +30,7 @@ private extension AdaptyPaywallProduct {
             isFamilyShareable: isFamilyShareable,
             regionCode: regionCode,
             price: .init(
-                amount: price,
+                amount: NSDecimalNumber(decimal: price).doubleValue,
                 currencyCode: currencyCode,
                 currencySymbol: currencySymbol,
                 localizedString: localizedPrice
@@ -61,9 +61,8 @@ private extension AdaptySubscriptionOffer {
         .init(
             id: identifier,
             type: offerType.rawValue,
-
             price: .init(
-                amount: price,
+                amount: NSDecimalNumber(decimal: price).doubleValue,
                 currencyCode: currencyCode,
                 currencySymbol: nil,
                 localizedString: localizedPrice
@@ -79,4 +78,3 @@ private extension AdaptySubscriptionOffer {
         )
     }
 }
-

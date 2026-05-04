@@ -38,9 +38,10 @@ public extension Dev_AdaptyUIConfiguration {
     static func create(
         json: String
     ) throws -> Self {
+        let uuid = UUID().uuidString.lowercased()
         let schema = try AdaptyUISchema(from: json)
         let configuration = try schema.extractUIConfiguration(
-            id: UUID().uuidString.lowercased(),
+            id: uuid,
             envoriment: .init(
                 sdkVersion: "",
                 osName: "",
@@ -51,7 +52,14 @@ public extension Dev_AdaptyUIConfiguration {
                 appBuild: nil,
                 appCurrentLocale: nil,
                 userLocales: [],
-                userUses24HourClock: true
+                userUses24HourClock: true,
+                flow: .init(
+                    placementId: "",
+                    variationId: "",
+                    abTestName: "",
+                    name: "",
+                    products: []
+                )
             )
         )
         return .init(

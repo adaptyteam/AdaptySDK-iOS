@@ -32,7 +32,14 @@ public extension AdaptyUIBuilder {
                 appBuild: nil,
                 appCurrentLocale: nil,
                 userLocales: [],
-                userUses24HourClock: true
+                userUses24HourClock: true,
+                flow: .init(
+                    placementId: "",
+                    variationId: "",
+                    abTestName: "",
+                    name: "",
+                    products: []
+                )
             )
         )
 

@@ -13,7 +13,7 @@ extension AdaptyFlow {
         .init(
             placementId: placement.id,
             variationId: variationId,
-            placementABTestName: placement.abTestName,
+            abTestName: placement.abTestName,
             name: name,
             products: paywalls.flatMap { $0.asUIBuilderFlowProducts() }
         )

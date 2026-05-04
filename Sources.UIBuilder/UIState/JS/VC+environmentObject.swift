@@ -25,6 +25,11 @@ extension VS {
         case appCurrentLocale
         case userLocales
         case userUses24HourClock
+
+        case placementId
+        case placementVariationId
+        case placementName
+        case placementABTestName
     }
 }
 
@@ -57,6 +62,10 @@ extension VC {
         case .appCurrentLocale: environment.appCurrentLocale
         case .userLocales: environment.userLocales
         case .userUses24HourClock: environment.userUses24HourClock
+        case .placementId: environment.flow.placementId
+        case .placementVariationId: environment.flow.variationId
+        case .placementABTestName: environment.flow.abTestName
+        case .placementName: environment.flow.name
         }
     }
 }
