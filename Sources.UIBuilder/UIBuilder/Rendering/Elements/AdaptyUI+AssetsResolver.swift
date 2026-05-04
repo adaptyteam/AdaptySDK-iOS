@@ -13,7 +13,7 @@ import SwiftUI
 @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.VideoData {
     struct Resolved {
-        let player: AVQueuePlayer
+        let player: AVPlayer
         let item: AVPlayerItem
         let image: VC.ImageData.Resolved?
     }
@@ -27,7 +27,7 @@ extension VC.VideoData {
 
     private var resolved: Resolved {
         let item = AVPlayerItem(url: url)
-        let player = AVQueuePlayer(items: [item])
+        let player = AVPlayer(playerItem: item)
         player.isMuted = true
 
         return Resolved(
@@ -184,9 +184,9 @@ private extension AdaptyUICustomVideoAsset {
         case let .file(url, preview),
              let .remote(url, preview):
             let playerItem = AVPlayerItem(url: url)
-            let queuePlayer = AVQueuePlayer(items: [playerItem])
-            queuePlayer.isMuted = true
-            return .init(player: queuePlayer, item: playerItem, image: preview.flatMap { $0.resolved })
+            let player = AVPlayer(playerItem: playerItem)
+            player.isMuted = true
+            return .init(player: player, item: playerItem, image: preview.flatMap { $0.resolved })
         case let .player(item, player, preview):
             return .init(player: player, item: item, image: preview.flatMap { $0.resolved })
         }

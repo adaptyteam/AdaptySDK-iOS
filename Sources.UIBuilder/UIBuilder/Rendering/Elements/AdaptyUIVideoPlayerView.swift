@@ -56,7 +56,7 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
 #else
             playerStatusObservation = playerViewController.observe(
                 \.isReadyForDisplay,
-                options: [.old, .new, .initial, .prior],
+                options: [.new, .initial],
                 changeHandler: { playerVC, _ in
                     DispatchQueue.main.async {
                         if playerVC.isReadyForDisplay {

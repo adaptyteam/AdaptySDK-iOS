@@ -191,14 +191,16 @@ extension KingfisherWrapper where Base: NSTextAttachment {
         if let block = progressBlock {
             options.onDataReceived = (options.onDataReceived ?? []) + [ImageLoadingProgressSideEffect(block)]
         }
+        let resolvedOptions = options
 
         let task = KingfisherManager.shared.retrieveImage(
             with: source,
-            options: options,
+            options: resolvedOptions,
             progressiveImageSetter: { self.base.image = $0 },
             referenceTaskIdentifierChecker: { issuedIdentifier == self.taskIdentifier },
             completionHandler: { result in
                 CallbackQueueMain.currentOrAsync {
+                    var mutatingSelf = self
                     guard issuedIdentifier == self.taskIdentifier else {
                         let reason: KingfisherError.ImageSettingErrorReason
                         do {
@@ -225,7 +227,7 @@ extension KingfisherWrapper where Base: NSTextAttachment {
                         view.setNeedsDisplay(view.bounds)
                         #endif
                     case .failure:
-                        if let image = options.onFailureImage {
+                        if let image = resolvedOptions.onFailureImage {
                             self.base.image = image
                         }
                     }
