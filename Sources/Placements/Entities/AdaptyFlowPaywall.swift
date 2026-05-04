@@ -18,7 +18,7 @@ public struct AdaptyFlowPaywall: Sendable, WebPaywallURLProviding, Identifiable 
     /// A paywall name.
     public let name: String
 
-    let products: [AdaptyFlowPaywall.ProductReference]
+    let products: [ProductReference]
 
     package var webPaywallBaseUrl: URL?
 

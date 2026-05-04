@@ -1,5 +1,5 @@
 //
-//  Envoriment+ UIBuilder.swift
+//  Envoriment+UIBuilder.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 20.04.2026.
