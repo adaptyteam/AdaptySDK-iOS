@@ -5,73 +5,85 @@
 //  Created by Aleksei Valiano on 08.04.2025.
 //
 
-protocol PlacementContent: Sendable, Codable {
+import Foundation
+
+protocol PlacementContent: Sendable, Encodable, DecodableWithConfiguration where DecodingConfiguration == AdaptyPlacement.DecodingConfiguration {
     var placement: AdaptyPlacement { get }
-    var instanceIdentity: String { get }
+    var id: String { get }
     var variationId: String { get }
     var name: String { get }
-    var remoteConfig: AdaptyRemoteConfig? { get }
-
-    var requestLocale: AdaptyLocale { get set }
 }
 
 extension PlacementContent {
-    var viewConfigurationLocale: AdaptyLocale? {
-        guard let paywall = self as? AdaptyPaywall else { return nil }
-        return paywall.viewConfiguration?.locale
-    }
-
-    var locale: AdaptyLocale? {
-        var remoteConfigLocale = remoteConfig?.adaptyLocale
-        if remoteConfigLocale?.equalLanguageCode(.defaultPlacementLocale) ?? false {
-            remoteConfigLocale = nil
-        }
-        var viewConfigurationLocale = viewConfigurationLocale
-
-        if viewConfigurationLocale?.equalLanguageCode(.defaultPlacementLocale) ?? false {
-            viewConfigurationLocale = nil
-        }
-
-        return switch (remoteConfigLocale, viewConfigurationLocale) {
-        case (nil, nil): nil
-        case let (locale?, _),
-             let (_, locale?): locale
+    func equalAllLocales(_ other: some PlacementContent) -> Bool {
+        if let onbording = self as? AdaptyOnboarding, let other = other as? AdaptyOnboarding {
+            onbording.remoteConfig?.adaptyLocale == other.remoteConfig?.adaptyLocale
+        } else if let flow = self as? AdaptyFlow, let other = other as? AdaptyFlow {
+            Set(flow.remoteConfigs.map(\.adaptyLocale)) == Set(other.remoteConfigs.map(\.adaptyLocale))
+        } else {
+            false
         }
     }
 
-
-    
-    func has(languageCode otherLocale: AdaptyLocale, orDefault: Bool = false) -> Bool {
-        let locale = locale ?? .defaultPlacementLocale
-        if locale.equalLanguageCode(otherLocale) { return true }
-        else if orDefault, locale.equalLanguageCode(.defaultPlacementLocale) { return true }
-        else { return false }
+    @inlinable
+    func has(languageCode otherLocale: AdaptyLocale?, orDefault: Bool = false) -> Bool {
+        if let onbording = self as? AdaptyOnboarding {
+            onbording.onbordingHas(languageCode: otherLocale, orDefault: orDefault)
+        } else if self is AdaptyFlow {
+            true
+        } else {
+            false
+        }
     }
 
+    @inlinable
     func has(variationId: String?) -> Bool {
         guard let variationId else { return true }
         return self.variationId == variationId
     }
 }
 
-extension VH where Value: PlacementContent {
-    var requestLocale: AdaptyLocale {
-        get { value.requestLocale }
-        mutating set {
-            guard newValue != value.requestLocale else { return }
-            self = mapValue {
-                var content = $0
-                content.requestLocale = newValue
-                return content
+extension AdaptyOnboarding {
+    func onbordingHas(languageCode otherLocale: AdaptyLocale?, orDefault: Bool = false) -> Bool {
+        let otherLocale = otherLocale ?? .defaultPlacementLocale
+        let orDefault = otherLocale.equalLanguageCode(.defaultPlacementLocale) ? false : orDefault
+
+        return switch remoteConfig?.adaptyLocale {
+        case .none:
+            if orDefault {
+                true
+            } else {
+                otherLocale.equalLanguageCode(.defaultPlacementLocale)
+            }
+
+        case let .some(locale):
+            if locale.equalLanguageCode(otherLocale) {
+                true
+            } else if orDefault {
+                locale.equalLanguageCode(.defaultPlacementLocale)
+            } else {
+                false
             }
         }
     }
+}
 
-    func has(languageCode locale: AdaptyLocale, orDefault: Bool = false) -> Bool {
+extension VH where Value: PlacementContent {
+    @inlinable
+    func has(languageCode locale: AdaptyLocale?, orDefault: Bool = false) -> Bool {
         value.has(languageCode: locale, orDefault: orDefault)
     }
 
+    @inlinable
     func has(variationId: String?) -> Bool {
         value.has(variationId: variationId)
+    }
+}
+
+extension Sequence {
+    func asContentByPlacementId<T: PlacementContent>() -> [String: VH<T>] where Element == VH<T> {
+        Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
+            first.value.placement.isNewerThan(second.value.placement) ? first : second
+        })
     }
 }

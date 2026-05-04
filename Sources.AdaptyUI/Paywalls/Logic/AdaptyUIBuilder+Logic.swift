@@ -11,21 +11,23 @@ import Adapty
 import AdaptyUIBuilder
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUILogic: AdaptyUIBuilderLogic {
     let logId: String
-    let paywall: AdaptyPaywall
+    let flow: AdaptyFlow
+    let viewConfigurationId: String
     let events: AdaptyEventsHandler
     let observerModeResolver: AdaptyObserverModeResolver?
 
     package init(
         logId: String,
-        paywall: AdaptyPaywall,
+        flow: AdaptyFlow,
+        viewConfigurationId: String,
         events: AdaptyEventsHandler,
         observerModeResolver: AdaptyObserverModeResolver?
     ) {
         self.logId = logId
-        self.paywall = paywall
+        self.flow = flow
+        self.viewConfigurationId = viewConfigurationId
         self.events = events
         self.observerModeResolver = observerModeResolver
     }
@@ -43,17 +45,12 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     }
 
     func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {
-        guard let productWrapper = product as? AdaptyPaywallProductWrapper else {
-            Log.ui.error("#\(logId)# reportDidSelectProduct error: product is not AdaptyPaywallProductWrapper")
+        guard let product = product as? AdaptyPaywallProduct else {
+            Log.ui.error("#\(logId)# reportDidSelectProduct error: product is not AdaptyPaywallProduc")
             return
         }
 
-        switch productWrapper {
-        case .withoutOffer(let product):
-            events.event_didSelectProduct(product, automatic: automatic)
-        case .full(let product):
-            events.event_didSelectProduct(product, automatic: automatic)
-        }
+        events.event_didSelectProduct(product, automatic: automatic)
     }
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool {
@@ -63,49 +60,35 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     package func logShowPaywall(
         viewConfiguration: AdaptyUIConfiguration
     ) async {
-        try? await Adapty.logShowPaywallViaAdaptyUI(paywall)
+        try? await Adapty.logFlowAnalyticsViaAdaptyUI(
+            variationId: flow.variationId,
+            viewConfigurationId: viewConfiguration.id,
+            params: AdaptyUIFlowScreenShowedParameters( // TODO: log show screen
+                screenInstanceId: "unknown_screen",
+                screenOrder: 0,
+                isLatestScreen: false
+            )
+        )
     }
 
-    package func getProducts(
-        determineOffers: Bool
-    ) async throws -> [ProductResolver] {
-        let paywallProducts: [ProductResolver]
-        let productsResult = try await getProductsInternal(
-            determineOffers: determineOffers
-        )
+    package func getProducts() async throws -> [ProductResolver] {
+        let productsResult = try await getProductsInternal()
 
-        Log.ui.verbose("#\(logId)# loadProducts determineOffers: \(determineOffers) success")
+        Log.ui.verbose("#\(logId)# loadProducts success")
         let failedIds = productsResult.1
         if !failedIds.isEmpty {
-            Log.ui.warn("#\(logId)# loadProducts determineOffers: \(determineOffers) partial!")
+            Log.ui.warn("#\(logId)# loadProducts partial!")
             events.event_didPartiallyLoadProducts(failedProductIds: failedIds)
         }
 
         return productsResult.0
     }
 
-    private func getProductsInternal(
-        determineOffers: Bool
-    ) async throws -> ([ProductResolver], [String]) {
-        let wrappedProducts: [AdaptyPaywallProductWrapper]
-        let failedProductIds: [String]
-
-        if determineOffers {
-            let products = try await Adapty.getPaywallProducts(paywall: paywall)
-            wrappedProducts = products.map {
-                AdaptyPaywallProductWrapper.full($0)
-            }
-            failedProductIds = paywall.absentVendorProductIds(in: products)
-
-        } else {
-            let products = try await Adapty.getPaywallProductsWithoutDeterminingOffer(paywall: paywall)
-            wrappedProducts = products.map {
-                AdaptyPaywallProductWrapper.withoutOffer($0)
-            }
-            failedProductIds = paywall.absentVendorProductIds(in: products)
-        }
-
-        return (wrappedProducts, failedProductIds)
+    private func getProductsInternal() async throws -> ([ProductResolver], [String]) {
+        let products = try await Adapty.getPaywallProducts(flow: flow)
+        let returnedIds = Set(products.map(\.vendorProductId))
+        let failedProductIds = flow.paywallsUniqueVendorProductIds.filter { !returnedIds.contains($0) }
+        return (products, failedProductIds)
     }
 
     func makePurchase(
@@ -113,8 +96,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         onStart: @MainActor @Sendable @escaping () -> Void,
         onFinish: @MainActor @Sendable @escaping () -> Void
     ) {
-        guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
-              case .full(let adaptyProduct) = adaptyProductWrapper
+        guard let adaptyProduct = product as? AdaptyPaywallProduct
         else {
             Log.ui.error("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
             return
@@ -162,9 +144,8 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         }
     }
 
-    func openWebPaywall(for product: ProductResolver, in openIn: VC.WebOpenInParameter) async {
-        guard let adaptyProductWrapper = product as? AdaptyPaywallProductWrapper,
-              case .full(let adaptyProduct) = adaptyProductWrapper
+    func openWebPaywall(for product: ProductResolver, in openIn: VC.Action.WebOpenInParameter) async {
+        guard let adaptyProduct = product as? AdaptyPaywallProduct
         else {
             Log.ui.error("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
             return
@@ -216,23 +197,23 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {
         events.event_didFailRendering(with: error)
     }
-}
 
-private extension AdaptyPaywall {
-    func absentVendorProductIds(
-        in responseProducts: [AdaptyProduct]
-    ) -> [String] {
-        vendorProductIds.filter { vendorProductId in
-            !responseProducts.contains(
-                where: {
-                    $0.vendorProductId == vendorProductId
-                }
+    func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable]) {
+        events.event_didReceiveAnalyticEvent(name: name, params: params)
+    }
+
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {
+        Task {
+            try? await Adapty.logFlowAnalyticsViaAdaptyUI(
+                variationId: flow.variationId,
+                viewConfigurationId: viewConfigurationId,
+                params: event
             )
         }
     }
 }
 
-private extension VC.WebOpenInParameter {
+private extension VC.Action.WebOpenInParameter {
     var toURLOpenMode: AdaptyWebPresentation {
         switch self {
         case .browserInApp: .inAppBrowser

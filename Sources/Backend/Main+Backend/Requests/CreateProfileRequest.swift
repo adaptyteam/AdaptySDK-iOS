@@ -40,7 +40,7 @@ private struct CreateProfileRequest: BackendEncodableRequest {
 
         logParams = [
             "customer_user_id": userId.customerId,
-            "app_account_token": appAccountToken?.uuidString
+            "app_account_token": appAccountToken?.uuidString,
         ]
     }
 
@@ -65,7 +65,7 @@ private struct CreateProfileRequest: BackendEncodableRequest {
         var attributesObject = dataObject.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
 
         try attributesObject.encodeIfPresent(userId.customerId, forKey: .customerUserId)
-        try attributesObject.encodeIfPresent(appAccountToken?.uuidString.lowercased(), forKey: .appAccountToken)
+        try attributesObject.encodeIfPresent(appAccountToken?.lowercased, forKey: .appAccountToken)
         try attributesObject.encode(environmentMeta, forKey: .environmentMeta)
         if parameters?.storeCountry == nil {
             try attributesObject.encodeIfPresent(environmentMeta.storefront?.countryCode, forKey: .storeCountry)

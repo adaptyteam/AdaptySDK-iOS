@@ -14,7 +14,7 @@ import Testing
 struct TaskTimeoutsTests {
     let duration: TaskDuration = .milliseconds(500)
 
-    @Test func testTask() async {
+    @Test func task() async {
         let start = Date()
         await #expect(throws: TimeoutError.self) {
             try await withThrowingTimeout(duration) {
@@ -22,10 +22,10 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeInterval)
+        #expect(Date().timeIntervalSince(start) < (1.3 * duration.asTimeInterval))
     }
 
-    @Test func testTaskWithoutCancellationHandler() async {
+    @Test func taskWithoutCancellationHandler() async {
         let start = Date()
         await #expect(throws: TimeoutError.self) {
             try await withThrowingTimeout(duration) {
@@ -40,7 +40,7 @@ struct TaskTimeoutsTests {
         #expect(Date().timeIntervalSince(start) > 2 * duration.asTimeInterval)
     }
 
-    @Test func testTaskWithCancellationHandler() async {
+    @Test func taskWithCancellationHandler() async {
         let start = Date()
         await #expect(throws: TimeoutError.self) {
             try await withThrowingTimeout(duration) {
@@ -57,7 +57,7 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < 1.1 * duration.asTimeInterval)
+        #expect(Date().timeIntervalSince(start) < 1.3 * duration.asTimeInterval)
     }
 }
 

@@ -16,10 +16,12 @@ public extension AdaptyProfileParameters {
         }
 
         init(_ values: AdaptyProfileParameters) {
-            self.parameters = values
+            parameters = values
         }
 
-        public func build() -> AdaptyProfileParameters { parameters }
+        public func build() -> AdaptyProfileParameters {
+            parameters
+        }
     }
 }
 
@@ -130,7 +132,6 @@ extension AdaptyProfileParameters.Builder: Decodable {
 import AppTrackingTransparency
 
 public extension AdaptyProfileParameters.Builder {
-    @available(iOS 14, macOS 11.0, visionOS 1.0, *)
     @discardableResult
     func with(appTrackingTransparencyStatus value: ATTrackingManager.AuthorizationStatus?) -> Self {
         guard let value else {

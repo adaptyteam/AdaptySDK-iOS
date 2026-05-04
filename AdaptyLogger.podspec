@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'AdaptyLogger'
-  s.version      = '3.16.0-SNAPSHOT'
+  s.version      = '4.0.0-SNAPSHOT'
   s.summary      = 'Adapty Logger for iOS.'
   
   s.description  = <<-DESC
@@ -14,10 +14,10 @@ Pod::Spec.new do |s|
   s.source            = { :git => 'https://github.com/adaptyteam/AdaptySDK-iOS.git', :tag => s.version.to_s }
   s.documentation_url = "https://docs.adapty.io"
   
-  s.ios.deployment_target = '13.0'
-  s.osx.deployment_target = '11.0'
+  s.ios.deployment_target = '15.0'
+  s.osx.deployment_target = '12.0'
   
-  s.swift_version = '6.0'
+  s.swift_version = '6.2'
   
   s.source_files = 'Sources.Logger/**/*.swift'
   

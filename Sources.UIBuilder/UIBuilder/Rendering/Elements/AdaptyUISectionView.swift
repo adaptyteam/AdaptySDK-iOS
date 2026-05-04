@@ -9,23 +9,65 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyUISectionView: View {
-    @EnvironmentObject var viewModel: AdaptyUISectionsViewModel
+struct AdaptyUISectionView<ScreenHolderContent: View>: View {
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
 
-    var section: VC.Section
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
-    init(_ section: VC.Section) {
+    private let section: VC.Section
+    private let screenHolderBuilder: () -> ScreenHolderContent
+
+    init(
+        _ section: VC.Section,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
+    ) {
         self.section = section
+        self.screenHolderBuilder = screenHolderBuilder
     }
 
-    var body: some View {
-        let index = viewModel.selectedIndex(for: section)
+    @State private var currentIndex: Int = 0
 
-        if let content = section.content[safe: index] {
-            AdaptyUIElementView(content)
+    var body: some View {
+        let selectedIndexVariable = section.index
+
+        let selectedIndex = stateViewModel.getValue(
+            selectedIndexVariable,
+            defaultValue: 0.0,
+            screen: screen
+        )
+
+        let selectedIndexInt = Int(selectedIndex)
+
+        Group {
+            if let content = section.content[safe: currentIndex] {
+                AdaptyUIElementView(
+                    content,
+                    screenHolderBuilder: {
+                        if currentIndex == 0 {
+                            screenHolderBuilder() // TODO: x check
+                        } else {
+                            EmptyView()
+                        }
+                    }
+                )
+            }
+        }
+        .onAppear {
+            currentIndex = selectedIndexInt
+        }
+        .onChange(of: selectedIndexInt) { newIndex in
+            if let transition = section.transition {
+                withAnimation(transition.swiftUIAnimation) {
+                    currentIndex = newIndex
+                }
+            } else {
+                currentIndex = newIndex
+            }
         }
     }
 }
 
 #endif
+

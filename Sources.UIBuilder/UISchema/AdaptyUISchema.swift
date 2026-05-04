@@ -7,58 +7,46 @@
 
 import Foundation
 
+@usableFromInline
+typealias Schema = AdaptyUISchema
+
 public struct AdaptyUISchema: Sendable {
-    let formatVersion: String
-    let templateId: String
-    let templateRevision: Int64
-    let assets: [String: Asset]
+    let formatVersion: Version
+    let assets: [AssetIdentifier: Asset]
     let localizations: [LocaleId: Localization]
     let defaultLocalization: Localization?
-    let defaultScreen: Screen
-    let screens: [String: Screen]
-    let referencedElements: [String: Element]
-    let selectedProducts: [String: String]
+    let navigators: [NavigatorIdentifier: Navigator]
+    let screens: [ScreenType: Screen]
+    let templates: any AdaptyUISchemaTemplateSystem
+    let scripts: [String]
 }
 
-extension AdaptyUISchema: CustomStringConvertible {
-    public var description: String {
-        "(formatVersion: \(formatVersion), templateId: \(templateId), templateRevision: \(templateRevision))"
-    }
-}
-
-extension AdaptyUISchema: Codable {
+extension AdaptyUISchema: Decodable {
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
-        case templateId = "template_id"
-        case templateRevision = "template_revision"
+        case legacyTemplateId = "template_id"
+
         case assets
         case localizations
         case defaultLocalId = "default_localization"
-        case screens = "styles"
-        case defaultScreen = "default"
-        case products
-        case selected
+        case templates
+        case legacyScreens = "styles"
+        case screens
+        case navigators
+        case scripts
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        formatVersion = try container.decode(Version.self, forKey: .formatVersion)
 
-        templateId = try container.decode(String.self, forKey: .templateId)
-        templateRevision = try container.decode(Int64.self, forKey: .templateRevision)
-        formatVersion = try container.decode(String.self, forKey: .formatVersion)
+        var configuration = DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion)
 
-        if container.contains(.products) {
-            let products = try container.nestedContainer(keyedBy: CodingKeys.self, forKey: .products)
-            if let selected = try? products.decodeIfPresent(String.self, forKey: .selected) {
-                selectedProducts = [Schema.StringId.Product.defaultProductGroupId: selected]
-            } else {
-                selectedProducts = try products.decode([String: String].self, forKey: .selected)
-            }
-        } else {
-            selectedProducts = [:]
+        if configuration.isLegacy {
+            configuration.legacyTemplateId = try container.decode(String.self, forKey: .legacyTemplateId)
         }
 
-        assets = try (container.decodeIfPresent(AssetsContainer.self, forKey: .assets))?.value ?? [:]
+        assets = try (container.decodeIfPresent(AssetsCollection.self, forKey: .assets))?.value ?? [:]
 
         let localizationsArray = try container.decodeIfPresent([Localization].self, forKey: .localizations) ?? []
         let localizations = try [LocaleId: Localization](localizationsArray.map { ($0.id, $0) }, uniquingKeysWith: { _, _ in
@@ -71,35 +59,114 @@ extension AdaptyUISchema: Codable {
             defaultLocalization = nil
         }
 
-        let screens = try container.decode([String: Screen].self, forKey: .screens)
-        guard let defaultScreen = screens[CodingKeys.defaultScreen.rawValue] else {
-            throw DecodingError.valueNotFound(Screen.self, DecodingError.Context(codingPath: container.codingPath + [CodingKeys.screens, CodingKeys.defaultScreen], debugDescription: "Expected Screen value but do not found"))
+        let screenKey: CodingKeys =
+            if !container.contains(.screens), configuration.isLegacy {
+                .legacyScreens
+            } else {
+                .screens
+            }
+
+        let screensCollection = try container.decode(
+            ScreensCollection.self,
+            forKey: screenKey,
+            configuration: configuration
+        )
+
+        screens = screensCollection.screens
+
+        if configuration.isLegacy {
+            navigators = screensCollection.legacyGeneratedNavigators ?? [:]
+        } else if let navigatorCollection = try container.decodeIfExist(
+            NavigatorsCollection.self,
+            forKey: .navigators,
+            configuration: configuration
+        ) {
+            navigators = navigatorCollection.navigators
+        } else {
+            let navigatorCollection = NavigatorsCollection()
+            navigators = navigatorCollection.navigators
         }
-        self.defaultScreen = defaultScreen
-        self.screens = screens.filter { $0.key != CodingKeys.defaultScreen.rawValue }
-        referencedElements = try [String: Element](screens.flatMap { $0.value.referencedElements }, uniquingKeysWith: { _, _ in
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.localizations], debugDescription: "Duplicate element_id"))
-        })
-    }
 
-    public func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(templateId, forKey: .templateId)
-        try container.encode(templateRevision, forKey: .templateRevision)
-        try container.encode(formatVersion, forKey: .formatVersion)
+        let templatesCollection = try container.decodeIfExist(
+            TemplatesCollection.self,
+            forKey: .templates,
+            configuration: configuration
+        )
 
-        if !selectedProducts.isEmpty {
-            var products = container.nestedContainer(keyedBy: CodingKeys.self, forKey: .products)
-            try products.encode(selectedProducts, forKey: .selected)
-        }
+        templates = try Schema.createTemplateSystem(
+            formatVersion: formatVersion,
+            templatesCollection: templatesCollection,
+            navigators: navigators,
+            screens: screens
+        )
 
-        try container.encode(AssetsContainer(value: assets), forKey: .assets)
-
-        try container.encode(Array(localizations.values), forKey: .localizations)
-        try container.encodeIfPresent(defaultLocalization?.id, forKey: .defaultLocalId)
-
-        var screens = screens
-        screens[CodingKeys.defaultScreen.rawValue] = defaultScreen
-        try container.encode(screens, forKey: .screens)
+        scripts =
+            if configuration.isLegacy {
+                try decoder.legacyGenerateScript(collector: configuration.collector)
+            } else {
+                try decoder.decodeScript(configuration: configuration)
+            }
     }
 }
+
+private enum ScriptCodingKeys: String, CodingKey {
+    case scripts
+    case type
+    case content
+    case format
+}
+
+private extension Decoder {
+    func decodeScript(configuration _: AdaptyUISchema.DecodingConfiguration) throws -> [String] {
+        let container = try container(keyedBy: ScriptCodingKeys.self)
+        guard container.contains(.scripts) else {
+            return []
+        }
+        var scripts = try container.nestedUnkeyedContainer(forKey: .scripts)
+
+        while !scripts.isAtEnd {
+            let itemContainer = try scripts.nestedContainer(keyedBy: ScriptCodingKeys.self)
+            if let value = try itemContainer.decodeIfPresent(String.self, forKey: .type) {
+                guard value == "js" else { continue }
+            }
+            let content = try itemContainer.decode(String.self, forKey: .content)
+            return [content]
+        }
+
+        return []
+    }
+}
+
+private enum LegacyCodingKeys: String, CodingKey {
+    case products
+    case selected
+}
+
+private extension Decoder {
+    func legacyGenerateScript(collector: AdaptyUISchema.DecodingCollector) throws -> [String] {
+        let container = try container(keyedBy: LegacyCodingKeys.self)
+
+        var scripts = [String]()
+
+        if container.exist(.products) {
+            let container = try container.nestedContainer(keyedBy: LegacyCodingKeys.self, forKey: .products)
+            if let selected = try? container.decodeIfPresent(String.self, forKey: .selected) {
+                scripts += [Schema.LegacyScripts.legacySelectProductScript(productId: selected)]
+            } else {
+                let selectedProducts = try container.decode([String: String].self, forKey: .selected)
+                scripts += selectedProducts.map { groupId, productId in
+                    Schema.LegacyScripts.legacySelectProductScript(groupId: groupId, productId: productId)
+                }
+            }
+        }
+
+        for section in collector.legacySectionsState {
+            scripts += [Schema.LegacyScripts.legacySelectSectionScript(sectionId: section.key, index: section.value)]
+        }
+
+        scripts.append(contentsOf: collector.legacyTimers.values)
+
+        return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
+    }
+}
+

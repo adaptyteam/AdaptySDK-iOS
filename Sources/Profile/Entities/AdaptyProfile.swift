@@ -11,10 +11,14 @@ public struct AdaptyProfile: Sendable {
     let userId: AdaptyUserId
 
     /// An identifier of a user in Adapty.
-    public var profileId: String { userId.profileId }
+    public var profileId: String {
+        userId.profileId
+    }
 
     /// An identifier of a user in your system.
-    public var customerUserId: String? { userId.customerId }
+    public var customerUserId: String? {
+        userId.customerId
+    }
 
     package let segmentId: String
     package let isTestUser: Bool

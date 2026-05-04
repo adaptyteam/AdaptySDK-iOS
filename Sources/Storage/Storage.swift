@@ -9,7 +9,7 @@ import Foundation
 
 private let log = Log.storage
 
-final class Storage {
+enum Storage {
     private enum Constants {
         static let appKeyHash = "AdaptySDK_Application_Key_Hash"
         static let appInstallationIdentifier = "AdaptySDK_Application_Install_Identifier"
@@ -18,7 +18,9 @@ final class Storage {
         static let persistedInstallationIdentifierToAppSupportStorage = "AdaptySDK_AppSupport_Install_Identifier"
     }
 
-    static var userDefaults: UserDefaults { .standard }
+    static var userDefaults: UserDefaults {
+        .standard
+    }
 
     @AdaptyActor
     fileprivate static var appInstallation: (identifier: String, time: Date?, appLaunchCount: Int?) =
@@ -43,7 +45,7 @@ final class Storage {
 
     @AdaptyActor
     private static func createAppInstallation() -> (identifier: String, time: Date?, appLaunchCount: Int?) {
-        let identifier = UUID().uuidString.lowercased()
+        let identifier = UUID().lowercased
         let time = Date()
         let appLaunchCount = 1
         log.debug("appInstallation identifier = \(identifier), time = \(time), appLaunchCount: \(appLaunchCount)")

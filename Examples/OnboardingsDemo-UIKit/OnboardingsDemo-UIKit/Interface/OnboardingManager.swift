@@ -104,7 +104,6 @@ final class OnboardingManager: NSObject {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension OnboardingManager: AdaptyOnboardingControllerDelegate {
     func onboardingController(
         _ controller: AdaptyOnboardingController,
@@ -165,7 +164,6 @@ extension OnboardingManager: AdaptyOnboardingControllerDelegate {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension OnboardingManager: AdaptyPaywallControllerDelegate {
     func paywallController(
         _ controller: AdaptyPaywallController,

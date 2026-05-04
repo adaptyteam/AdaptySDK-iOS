@@ -20,8 +20,8 @@ package struct TimeoutError: LocalizedError {
         function: String = #function,
         line: UInt = #line
     ) {
-        self.errorDescription = "Task timed out before completion. Timeout: \(seconds) seconds."
-        self.source = Source(
+        errorDescription = "Task timed out before completion. Timeout: \(seconds) seconds."
+        source = Source(
             file: file,
             function: function,
             line: line

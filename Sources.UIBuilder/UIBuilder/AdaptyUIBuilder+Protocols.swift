@@ -8,20 +8,21 @@
 #if canImport(UIKit)
 
 import Foundation
+import StoreKit
+import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+typealias AdaptyUIInternalTagResolver = (String) -> Any?
+
 @MainActor
 public protocol AdaptyUITagResolver: Sendable {
     func replacement(for tag: String) -> String?
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public protocol AdaptyUITimerResolver: Sendable {
     func timerEndAtDate(for timerId: String) -> Date
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension [String: String]: AdaptyUITagResolver {
     public func replacement(for tag: String) -> String? {
         self[tag]
@@ -53,9 +54,7 @@ package protocol AdaptyUIBuilderLogic {
         viewConfiguration: AdaptyUIConfiguration
     ) async throws
 
-    func getProducts(
-        determineOffers: Bool
-    ) async throws -> [ProductResolver]
+    func getProducts() async throws -> [ProductResolver]
 
     func makePurchase(
         product: ProductResolver,
@@ -63,7 +62,7 @@ package protocol AdaptyUIBuilderLogic {
         onFinish: @MainActor @Sendable @escaping () -> Void
     )
 
-    func openWebPaywall(for product: ProductResolver, in openIn: VC.WebOpenInParameter) async
+    func openWebPaywall(for product: ProductResolver, in openIn: VC.Action.WebOpenInParameter) async
 
     func restorePurchases(
         onStart: @MainActor @Sendable @escaping () -> Void,
@@ -71,6 +70,29 @@ package protocol AdaptyUIBuilderLogic {
     )
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError)
+
+    func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable])
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent)
+}
+
+@MainActor
+public protocol AdaptyUISystemRequestsHandler: Sendable {
+    func handlePermission(
+        _ permission: AdaptyUIPermission,
+        withCustomArgs customArgs: [String: String]?
+    ) async -> AdaptyUIPermissionResult
+
+    func handleAppReviewRequest() async
+}
+
+public extension AdaptyUISystemRequestsHandler {
+    func handleAppReviewRequest() async {
+        if let windowScene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
+        {
+            SKStoreReviewController.requestReview(in: windowScene)
+        }
+    }
 }
 
 #endif

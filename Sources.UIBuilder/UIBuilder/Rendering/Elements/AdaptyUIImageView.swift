@@ -10,7 +10,6 @@
 import SwiftUI
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func aspectRatio(_ aspect: VC.AspectRatio, limitWidth: Bool) -> some View {
@@ -33,40 +32,40 @@ extension View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUIImageView: View {
     enum InitializationMode {
-        case image(VC.Image)
-        case raw(VC.ImageData, VC.AspectRatio, VC.Filling?)
+        case unresolvedAsset(VC.Image)
+        case resolvedAsset(AdaptyUIResolvedAsset)
+        case resolvedImageAsset(
+            asset: AdaptyUIResolvedImageAsset,
+            aspect: VC.AspectRatio,
+            tint: AdaptyUIResolvedColorAsset?
+        )
     }
 
-    private var data: InitializationMode
+    private var initializtion: InitializationMode
 
     init(
-        asset: VC.ImageData,
-        aspect: VC.AspectRatio,
-        tint: VC.Filling? = nil
+        _ initializtion: InitializationMode
     ) {
-        data = .raw(asset, aspect, tint)
-    }
-
-    init(
-        _ image: VC.Image
-    ) {
-        data = .image(image)
+        self.initializtion = initializtion
     }
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var flowViewModel: AdaptyUIFlowViewModel
 
     @ViewBuilder
     private func rasterImage(
         _ uiImage: UIImage?,
         aspect: VC.AspectRatio,
-        tint: VC.Color.Resolved?,
+        tint: AdaptyUIResolvedColorAsset?,
         limitWidth: Bool
     ) -> some View {
         if let uiImage {
@@ -88,20 +87,20 @@ struct AdaptyUIImageView: View {
     }
 
     @ViewBuilder
-    private func resolvedSchemeBody(
-        asset: VC.ImageData.Resolved,
+    private func resolvedImageAssetBody(
+        asset: AdaptyUIResolvedImageAsset,
         aspect: VC.AspectRatio,
-        tint: VC.Color.Resolved?
+        tint: AdaptyUIResolvedColorAsset?
     ) -> some View {
         switch asset {
-        case let .image(image):
+        case .image(let image):
             rasterImage(
                 image,
                 aspect: aspect,
                 tint: tint,
                 limitWidth: true
             )
-        case let .remote(url, preview):
+        case .remote(let url, let preview):
             KFImage
                 .url(url)
                 .targetCache(AdaptyUIBuilder.imageCache)
@@ -128,19 +127,59 @@ struct AdaptyUIImageView: View {
         }
     }
 
-    var body: some View {
-        switch data {
-        case let .image(image):
-            resolvedSchemeBody(
-                asset: image.asset.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme),
-                aspect: image.aspect,
-                tint: image.tint?.asSolidColor?.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme)
-            )
-        case let .raw(asset, aspect, tint):
-            resolvedSchemeBody(
-                asset: asset.resolve(with: assetsViewModel.assetsResolver),
+    @ViewBuilder
+    private func resolvedAssetBody(
+        imageAsset: AdaptyUIResolvedImageAsset?,
+        aspect: VC.AspectRatio,
+        tintAsset: AdaptyUIResolvedColorAsset?
+    ) -> some View {
+        if let imageAsset {
+            resolvedImageAssetBody(
+                asset: imageAsset,
                 aspect: aspect,
-                tint: tint?.asSolidColor?.resolve(with: assetsViewModel.assetsResolver)
+                tint: tintAsset
+            )
+        } else {
+            Rectangle()
+                .onAppear {
+                    flowViewModel.reportDidFailRendering(
+                        with: .wrongAssetType("Expected image")
+                    )
+                }
+        }
+    }
+
+    var body: some View {
+        switch initializtion {
+        case .unresolvedAsset(let image):
+            let imageAsset = assetsViewModel.resolvedAsset(
+                image.asset,
+                mode: colorScheme.toVCMode,
+                screen: screen
+            ).asImageAsset
+
+            let tintAsset = assetsViewModel.resolvedAsset(
+                image.tint,
+                mode: colorScheme.toVCMode,
+                screen: screen
+            ).asColorAsset
+
+            resolvedAssetBody(
+                imageAsset: imageAsset,
+                aspect: image.aspect,
+                tintAsset: tintAsset
+            )
+        case .resolvedAsset(let imageAsset):
+            resolvedAssetBody(
+                imageAsset: imageAsset.asImageAsset,
+                aspect: .fill,
+                tintAsset: nil
+            )
+        case .resolvedImageAsset(let asset, let aspect, let tint):
+            resolvedImageAssetBody(
+                asset: asset,
+                aspect: aspect,
+                tint: tint
             )
         }
     }

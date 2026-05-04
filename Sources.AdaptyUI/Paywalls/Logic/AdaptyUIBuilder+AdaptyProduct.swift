@@ -11,70 +11,50 @@ import Adapty
 import AdaptyUIBuilder
 import Foundation
 
-enum AdaptyPaywallProductWrapper {
-    case withoutOffer(AdaptyPaywallProductWithoutDeterminingOffer)
-    case full(AdaptyPaywallProduct)
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension AdaptyPaywallProductWrapper: ProductResolver {
-    private var anyProduct: AdaptyPaywallProductWithoutDeterminingOffer {
-        switch self {
-        case .withoutOffer(let v): v
-        case .full(let v): v
-        }
-    }
-
-    var paymentMode: String? {
-        adaptyProduct?.subscriptionOffer?.paymentMode.encodedValue
-    }
-
-    var adaptyProductId: String { anyProduct.adaptyProductId }
-
-    private var adaptyProduct: AdaptyPaywallProduct? {
-        switch self {
-        case .withoutOffer: nil
-        case .full(let v): v
-        }
+extension AdaptyPaywallProduct: ProductResolver {
+    public var flowId: String { flowProductId ?? adaptyProductId } // TODO: x check?
+    
+    public var paymentMode: PaymentModeValue {
+        subscriptionOffer?.paymentMode.encodedValue
     }
 
     private func isApplicableForTag(_ tag: TextProductTag) -> Bool {
         switch tag {
         case .title, .price:
-            return true
+            true
         case .pricePerDay, .pricePerWeek, .pricePerMonth, .pricePerYear:
-            return anyProduct.subscriptionPeriod != nil
+            subscriptionPeriod != nil
         case .offerPrice, .offerPeriods, .offerNumberOfPeriods:
-            return adaptyProduct?.subscriptionOffer != nil
+            subscriptionOffer != nil
         }
     }
 
-    func value(byTag tag: TextProductTag) -> TextTagValue? {
+    public func value(byTag tag: TextProductTag) -> TextTagValue? {
         guard isApplicableForTag(tag) else { return .notApplicable }
 
-        let result: String?
-        switch tag {
-        case .title:
-            result = anyProduct.localizedTitle
-        case .price:
-            result = anyProduct.localizedPrice
-        case .pricePerDay:
-            result = anyProduct.pricePer(period: .day)
-        case .pricePerWeek:
-            result = anyProduct.pricePer(period: .week)
-        case .pricePerMonth:
-            result = anyProduct.pricePer(period: .month)
-        case .pricePerYear:
-            result = anyProduct.pricePer(period: .year)
-        case .offerPrice:
-            result = adaptyProduct?.subscriptionOffer?.localizedPrice
-        case .offerPeriods:
-            result = adaptyProduct?.subscriptionOffer?.localizedSubscriptionPeriod
-        case .offerNumberOfPeriods:
-            result = adaptyProduct?.subscriptionOffer?.localizedNumberOfPeriods
-        }
+        let result: String? =
+            switch tag {
+            case .title:
+                localizedTitle
+            case .price:
+                localizedPrice
+            case .pricePerDay:
+                pricePer(period: .day)
+            case .pricePerWeek:
+                pricePer(period: .week)
+            case .pricePerMonth:
+                pricePer(period: .month)
+            case .pricePerYear:
+                pricePer(period: .year)
+            case .offerPrice:
+                subscriptionOffer?.localizedPrice
+            case .offerPeriods:
+                subscriptionOffer?.localizedSubscriptionPeriod
+            case .offerNumberOfPeriods:
+                subscriptionOffer?.localizedNumberOfPeriods
+            }
 
-        if let result = result {
+        if let result {
             return .value(result)
         } else {
             return nil
@@ -82,11 +62,9 @@ extension AdaptyPaywallProductWrapper: ProductResolver {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyProduct {
     func pricePer(period: AdaptySubscriptionPeriod.Unit) -> String? {
-        guard let skProduct = sk2Product else { return nil }
-        guard let subscriptionPeriod = subscriptionPeriod else { return nil }
+        guard let subscriptionPeriod else { return nil }
 
         let numberOfPeriods = subscriptionPeriod.numberOfPeriods(period)
         guard numberOfPeriods > 0.0 else { return nil }
@@ -105,3 +83,4 @@ extension AdaptyProduct {
 }
 
 #endif
+

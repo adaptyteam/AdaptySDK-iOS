@@ -11,7 +11,6 @@ import Adapty
 import AdaptyUI
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public final class AdaptyOnboardingPlatformViewWrapper: UIView {
     private let eventHandler: EventHandler
     private let onboardingView: AdaptyOnboardingUIView
@@ -46,7 +45,6 @@ public final class AdaptyOnboardingPlatformViewWrapper: UIView {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyOnboardingPlatformViewWrapper: AdaptyOnboardingViewDelegate {
     package func onboardingView(

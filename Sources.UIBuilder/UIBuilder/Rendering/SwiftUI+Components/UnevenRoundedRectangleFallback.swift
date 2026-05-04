@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.CornerRadius {
     func normalized(width: Double, height: Double) -> VC.CornerRadius {
         var normalizedRadii = self
@@ -66,7 +65,6 @@ extension VC.CornerRadius {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct UnevenRoundedRectangleFallback: InsettableShape {
     var cornerRadii: VC.CornerRadius
     var insetAmount: CGFloat = 0

@@ -13,7 +13,7 @@ public enum AdaptyPurchaseResult: Sendable {
     /// The purchase is pending some user action.
     case pending
     /// The purchase succeeded with a `AdaptyProfile`.
-    case success(profile: AdaptyProfile, transaction: any Sendable)
+    case success(profile: AdaptyProfile, transaction: VerificationResult<Transaction>)
 
     @inlinable
     public var isPurchaseCancelled: Bool {
@@ -51,34 +51,21 @@ public enum AdaptyPurchaseResult: Sendable {
         return profile
     }
 
-    /// A transaction object, which represents the payment.
-    public var sk1Transaction: SKPaymentTransaction? {
-        guard case let .success(_, transaction) = self,
-              let sk1Transaction = transaction as? SK1Transaction
+    public var signedTransaction: VerificationResult<Transaction>? {
+        guard case let .success(_, transaction) = self
         else {
             return nil
         }
-        return sk1Transaction
-    }
-
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    public var sk2SignedTransaction: VerificationResult<Transaction>? {
-        guard case let .success(_, transaction) = self,
-              let result = transaction as? VerificationResult<Transaction>
-        else {
-            return nil
-        }
-        return result
+        return transaction
     }
 
     /// A transaction object, which represents the payment.
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-    public var sk2Transaction: Transaction? {
-        sk2SignedTransaction?.unsafePayloadValue
+    public var transaction: Transaction? {
+        signedTransaction?.unsafePayloadValue
     }
-    
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+
     public var jwsTransaction: String? {
-        sk2SignedTransaction?.jwsRepresentation
+        signedTransaction?.jwsRepresentation
     }
 }
+

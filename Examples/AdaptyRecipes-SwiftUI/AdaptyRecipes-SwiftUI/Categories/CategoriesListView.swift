@@ -25,7 +25,7 @@ struct CategoriesListView: View {
     @EnvironmentObject private var viewModel: MainViewModel
 
     @State private var presentPaywallModally: Bool = false
-    @State private var paywallConfig: AdaptyUI.PaywallConfiguration?
+    @State private var flowConfig: AdaptyUI.FlowConfiguration?
     @State private var alertError: IdentifiableErrorWrapper?
     @State private var alertPaywallError: IdentifiableErrorWrapper?
 
@@ -54,7 +54,7 @@ struct CategoriesListView: View {
                                 self.recipeRow(for: category)
                             }
                         case .navigation:
-                            PaywallNavigationLink(paywallConfiguration: paywallConfig) {
+                            FlowNavigationLink(flowConfiguration: flowConfig) {
                                 self.recipeRow(for: category)
                             }
                         }
@@ -63,9 +63,9 @@ struct CategoriesListView: View {
             }
         }
         .navigationTitle("Adapty Recipes")
-        .paywall(
+        .flow(
             isPresented: $presentPaywallModally,
-            paywallConfiguration: paywallConfig,
+            flowConfiguration: flowConfig,
             // ⚠️ Pass AdaptyObserverModeResolver object to work in ObserverMode
             // observerModeResolver: ObserverModeResolver(),
             didFailPurchase: { _, error in
@@ -91,13 +91,14 @@ struct CategoriesListView: View {
             }
         )
         .task {
-            guard paywallConfig == nil else { return }
+            guard flowConfig == nil else { return }
+            
             do {
-                let paywall = try await Adapty.getPaywall(placementId: AppConstants.placementId)
-                paywallConfig = try await AdaptyUI.getPaywallConfiguration(forPaywall: paywall)
+                let flow = try await Adapty.getFlow(placementId: AppConstants.placementId)
+                flowConfig = try await AdaptyUI.getFlowConfiguration(forFlow: flow)
             } catch {
-                Logger.log(.error, "getPaywallAndConfig: \(error)")
-                alertError = .init(title: "getPaywallAndConfig error!", error: error)
+                Logger.log(.error, "getFlowAndConfig: \(error)")
+                alertError = .init(title: "getFlowAndConfig error!", error: error)
             }
         }
         .alert(item: $alertError) { errorWrapper in

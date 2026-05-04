@@ -8,7 +8,6 @@
 import AdaptyUI
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Request {
     struct AdaptyUIPresentOnboardingView: AdaptyPluginRequest {
         static let method = "adapty_ui_present_onboarding_view"

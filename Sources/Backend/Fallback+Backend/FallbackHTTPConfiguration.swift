@@ -10,8 +10,13 @@ import Foundation
 struct FallbackHTTPConfiguration: HTTPCodableConfiguration {
     let sessionConfiguration: URLSessionConfiguration
 
-    func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
-    func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
+    func configure(jsonDecoder: JSONDecoder) {
+        Backend.configure(jsonDecoder: jsonDecoder)
+    }
+
+    func configure(jsonEncoder: JSONEncoder) {
+        Backend.configure(jsonEncoder: jsonEncoder)
+    }
 
     init(with configuration: AdaptyConfiguration) {
         let backend = configuration.backend

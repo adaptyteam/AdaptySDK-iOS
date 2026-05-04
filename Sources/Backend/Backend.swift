@@ -13,7 +13,9 @@ package struct Backend {
     let defaultHTTPConfiguration: HTTPCodableConfiguration
     let uaHTTPConfiguration: HTTPCodableConfiguration
     let fallbackHTTPConfiguration: HTTPCodableConfiguration
-    var configsHTTPConfiguration: HTTPCodableConfiguration { fallbackHTTPConfiguration }
+    var configsHTTPConfiguration: HTTPCodableConfiguration {
+        fallbackHTTPConfiguration
+    }
 
     init(
         with configuration: AdaptyConfiguration,

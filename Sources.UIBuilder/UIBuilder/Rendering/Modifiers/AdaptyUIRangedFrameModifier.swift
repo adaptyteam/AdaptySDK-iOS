@@ -13,7 +13,6 @@ extension Double {
     var cgFloatValue: CGFloat { CGFloat(self) }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIRangedFrameModifier: ViewModifier {
     typealias Constraints = (min: Double?, max: Double?, shrink: Bool)
 
@@ -112,7 +111,6 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     func rangedFrame(box: VC.Box) -> some View {
         modifier(AdaptyUIRangedFrameModifier(box: box))

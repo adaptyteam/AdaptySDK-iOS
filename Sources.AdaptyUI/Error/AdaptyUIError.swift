@@ -18,6 +18,7 @@ public enum AdaptyUIError: Error {
 
     case unsupportedTemplate(String)
     case wrongComponentType(String)
+    case wrongAssetType(String)
 }
 
 public extension AdaptyUIError {
@@ -34,7 +35,8 @@ public extension AdaptyUIError {
 
         case unsupportedTemplate = 4100
         case wrongComponentType = 4103
-        
+        case wrongAssetType = 4104
+
         case platformView = 4300
     }
 }
@@ -51,6 +53,7 @@ extension AdaptyUIError: CustomNSError {
         case .webKit: Code.webKit.rawValue
         case .unsupportedTemplate: Code.unsupportedTemplate.rawValue
         case .wrongComponentType: Code.wrongComponentType.rawValue
+        case .wrongAssetType: Code.wrongAssetType.rawValue
         }
     }
 }
@@ -92,6 +95,8 @@ extension AdaptyUIBuilderError {
             .unsupportedTemplate(v)
         case .wrongComponentType(let v):
             .wrongComponentType(v)
+        case .wrongAssetType(let v):
+            .wrongAssetType(v)
         }
     }
 }

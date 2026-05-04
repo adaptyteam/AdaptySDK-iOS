@@ -18,7 +18,7 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            let fileURL = if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
+            let fileURL = if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
                 URL(filePath: path)
             } else {
                 URL(fileURLWithPath: path)

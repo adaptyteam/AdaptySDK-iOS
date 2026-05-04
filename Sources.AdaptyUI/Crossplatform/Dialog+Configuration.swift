@@ -7,7 +7,6 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension AdaptyUI.DialogConfiguration {
     struct Action {
         package let title: String
@@ -17,7 +16,6 @@ package extension AdaptyUI.DialogConfiguration {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension AdaptyUI {
     struct DialogConfiguration {
         package let title: String?

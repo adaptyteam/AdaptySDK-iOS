@@ -17,6 +17,6 @@ extension CustomerIdentityParameters: Decodable {
 
     package init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.appAccountToken = try container.decodeIfPresent(UUID.self, forKey: .appAccountToken)
+        appAccountToken = try container.decodeIfPresent(UUID.self, forKey: .appAccountToken)
     }
 }

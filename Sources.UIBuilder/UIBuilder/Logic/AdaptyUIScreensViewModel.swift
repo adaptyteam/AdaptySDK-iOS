@@ -9,78 +9,114 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-package final class AdaptyUIBottomSheetViewModel: ObservableObject {
-    @Published var isPresented: Bool = false
-
-    var id: String
-    var bottomSheet: VC.BottomSheet
-
-    init(id: String, bottomSheet: VC.BottomSheet) {
-        self.id = id
-        self.bottomSheet = bottomSheet
+extension VC {
+    func navigator(id: String) -> Navigator? {
+        navigators[id] ?? navigators["default"]
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyUIScreensViewModel: ObservableObject {
     private let logId: String
-    private let viewConfiguration: AdaptyUIConfiguration
-    let bottomSheetsViewModels: [AdaptyUIBottomSheetViewModel]
+    private let viewConfiguration: VC
 
-    @Published var presentedScreensStack = [String]()
+    var isRightToLeft: Bool { rtlOverride ?? viewConfiguration.isRightToLeft }
+    
+    private let rtlOverride: Bool?
+
+    @Published
+    private(set) var navigatorsViewModels: [AdaptyUINavigatorViewModel]
 
     package init(
         logId: String,
-        viewConfiguration: AdaptyUIConfiguration
+        viewConfiguration: AdaptyUIConfiguration,
+        rtlOverride: Bool? = nil
     ) {
         self.logId = logId
+        self.rtlOverride = rtlOverride
         self.viewConfiguration = viewConfiguration
+        navigatorsViewModels = []
+    }
 
-        bottomSheetsViewModels = viewConfiguration.bottomSheets.map {
-            .init(id: $0.key, bottomSheet: $0.value)
+    /// Set by state action handler to enable screen lifecycle action execution
+    var executeActions: ((_ actions: [VC.Action], _ screen: VS.ScreenInstance) -> Void)?
+
+    var topmostScreenInstance: VS.ScreenInstance? {
+        navigatorsViewModels.max(by: { $0.order < $1.order })?.screens.last?.instance
+    }
+
+    func present(
+        screen: VS.ScreenInstance,
+        transitionId: String,
+        completion: (() -> Void)?
+    ) {
+        Log.ui.verbose("#\(logId)# present screen:\(screen.id) in navigator:\(screen.navigatorId)")
+
+        guard let navigatorConfig = viewConfiguration.navigator(id: screen.navigatorId) else {
+            Log.ui.warn("#\(logId)# failed to present screen:\(screen.id) in navigator:\(screen.navigatorId) (navigator not found)")
+            return // TODO: x error?
+        }
+
+        let screen = AdaptyUIScreenViewModel(instance: screen)
+
+        if let navigatorVM = navigatorsViewModels.first(where: { $0.id == navigatorConfig.id }) {
+            navigatorVM.startScreenTransition(
+                screen,
+                transitionId: transitionId,
+                completion: completion
+            )
+        } else {
+            // Create new Navigator
+            let navigatorVM = AdaptyUINavigatorViewModel(
+                logId: logId,
+                navigator: navigatorConfig,
+                screen: screen,
+                appearTransitionId: transitionId
+            )
+
+            navigatorVM.executeActions = executeActions
+            navigatorsViewModels.append(navigatorVM)
+
+            navigatorVM.startNavigatorTransition(
+                transitionId: transitionId,
+                completion: completion
+            )
         }
     }
 
-    func presentScreen(id: String) {
-        Log.ui.verbose("#\(logId)# presentScreen \(id)")
+    func dismiss(
+        navigatorId: String,
+        transitionId: String,
+        completion: (() -> Void)?
+    ) {
+        Log.ui.verbose("#\(logId)# dismiss navigator:\(navigatorId)")
 
-        if presentedScreensStack.contains(where: { $0 == id }) {
-            Log.ui.warn("#\(logId)# presentScreen \(id) Already Presented!")
+        guard let index = navigatorsViewModels.firstIndex(where: { $0.id == navigatorId }) else {
+            Log.ui.error("#\(logId)# failed to dismiss navigator:\(navigatorId) (navigator not found)")
+
             return
         }
 
-        for bottomSheetVM in bottomSheetsViewModels {
-            if bottomSheetVM.id == id {
-                bottomSheetVM.isPresented = true
-                presentedScreensStack.append(id)
+        let navigatorVM = navigatorsViewModels[index]
+
+        navigatorVM.publishDismissEvents()
+
+        navigatorVM.startNavigatorTransition(
+            transitionId: transitionId,
+            completion: { [weak self] in
+                guard let self else { return }
+
+                // Fire onDidDisappear for the navigator's screens
+                if let screen = navigatorVM.screens.last {
+                    navigatorVM.executeScreenActions(.onDidDisappear, screen: screen.instance)
+                }
+
+                self.navigatorsViewModels.remove(at: index)
+
+                Log.ui.verbose("#\(self.logId)# dismiss navigator:\(navigatorId) DONE")
+                completion?()
             }
-        }
-    }
-
-    func dismissScreen(id: String) {
-        Log.ui.verbose("#\(logId)# dismissScreen \(id)")
-        presentedScreensStack.removeAll(where: { $0 == id })
-
-        for bottomSheetVM in bottomSheetsViewModels {
-            if bottomSheetVM.id == id {
-                bottomSheetVM.isPresented = false
-            }
-        }
-    }
-
-    func dismissTopScreen() {
-        guard let topScreenId = presentedScreensStack.last else { return }
-
-        dismissScreen(id: topScreenId)
-    }
-
-    package func resetScreensStack() {
-        Log.ui.verbose("#\(logId)# resetScreensStack")
-        presentedScreensStack.removeAll()
-        bottomSheetsViewModels.forEach { $0.isPresented = false }
+        )
     }
 }
 

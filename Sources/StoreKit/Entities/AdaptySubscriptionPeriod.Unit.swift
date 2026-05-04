@@ -18,7 +18,9 @@ public extension AdaptySubscriptionPeriod {
 }
 
 extension AdaptySubscriptionPeriod.Unit: CustomStringConvertible {
-    public var description: String { encodedValue }
+    public var description: String {
+        encodedValue
+    }
 }
 
 extension AdaptySubscriptionPeriod.Unit: Codable {

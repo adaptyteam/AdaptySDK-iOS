@@ -28,7 +28,7 @@ extension AdaptyPlacement {
         placement.version = version
         return placement
     }
-    
+
     func isNewerThan(_ other: AdaptyPlacement) -> Bool {
         version > other.version
     }
@@ -41,6 +41,22 @@ extension AdaptyPlacement: CustomStringConvertible {
 }
 
 extension AdaptyPlacement: Codable {
+    public struct DecodingConfiguration: Sendable {
+        let userId: AdaptyUserId?
+        let placement: AdaptyPlacement
+        let requestLocale: AdaptyLocale?
+        var variationId: String?
+        
+        var userIdOrThrow: AdaptyUserId {
+            get throws {
+                if let userId {
+                    return userId
+                }
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the userId value in configuration"))
+            }
+        }
+    }
+
     enum CodingKeys: String, CodingKey {
         case placement
         case id = "developer_id"
@@ -80,3 +96,4 @@ extension AdaptyPlacement: Codable {
         try container.encode(version, forKey: .version)
     }
 }
+

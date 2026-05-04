@@ -6,10 +6,11 @@
 //
 
 import Foundation
+import StoreKit
 
 struct PurchasedTransactionInfo: Sendable {
-    let transactionId: String
-    let originalTransactionId: String
+    let transactionId: UInt64
+    let originalTransactionId: UInt64
     let vendorProductId: String
     let price: Decimal?
     let priceLocale: String?
@@ -19,17 +20,15 @@ struct PurchasedTransactionInfo: Sendable {
 
     init(
         product: AdaptyProduct?,
-        transaction: SKTransaction
+        transaction: StoreKit.Transaction
     ) {
-        self.transactionId = transaction.unfIdentifier
-        self.originalTransactionId = transaction.unfOriginalIdentifier
-        self.vendorProductId = transaction.unfProductId
-        self.price = product?.price
-        self.priceLocale = product?.priceLocale.unfCurrencyCode
-        self.storeCountry = product?.priceLocale.unfRegionCode
-        self.subscriptionOffer = .init(transaction: transaction, product: product)
-        self.environment = transaction.unfEnvironment
+        transactionId = transaction.id
+        originalTransactionId = transaction.originalID
+        vendorProductId = transaction.productID
+        price = product?.price
+        priceLocale = product?.priceLocale.unfCurrencyCode
+        storeCountry = product?.priceLocale.unfRegionCode
+        subscriptionOffer = .init(transaction: transaction, product: product)
+        environment = transaction.unfEnvironment
     }
 }
-
-

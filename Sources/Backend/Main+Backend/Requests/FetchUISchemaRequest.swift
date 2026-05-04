@@ -2,7 +2,7 @@
 //  FetchUISchemaRequest.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 19.01.2023
+//  Created by Aleksei Valiano on 02.04.2026.
 //
 
 import AdaptyUIBuilder
@@ -13,26 +13,25 @@ struct FetchUISchemaRequest: BackendRequest {
     let headers: HTTPHeaders
     let queryItems: QueryItems
     let stamp = Log.stamp
-    let requestName = BackendRequestName.fetchUISchema
+    let requestName = BackendRequestName.fetchFallBackUISchema
     let logParams: EventParameters?
 
     init(
         apiKeyPrefix: String,
-        paywallVariationId: String,
-        locale: AdaptyLocale,
-        md5Hash: String,
+        flowId: String,
+        viewConfigurationId: String,
         disableServerCache: Bool,
         logParams: EventParameters?
     ) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallVariationId)/\(md5Hash)/"
+            path:
+            "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(viewConfigurationId)/config/"
         )
 
         headers = HTTPHeaders()
-            .setPaywallBuilderLocale(locale)
-            .setPaywallBuilderVersion(Adapty.uiBuilderVersion)
-            .setPaywallBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
+            .setBuilderVersion(Adapty.uiBuilderVersion)
+            .setBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
 
@@ -43,40 +42,33 @@ struct FetchUISchemaRequest: BackendRequest {
 extension AdaptyUISchema {
     static func decoder(
         _ response: HTTPDataResponse,
-        _ configuration: HTTPCodableConfiguration?,
-        _ request: HTTPRequest
+        _: HTTPCodableConfiguration?,
+        _: HTTPRequest
     ) async throws -> HTTPResponse<AdaptyUISchema> {
-        let viewConfiguration = try response.decodeBody(Backend.Response.Data<AdaptyPaywall.ViewConfiguration>.self, with: configuration).value
-        guard case let .unpacked(schema) = viewConfiguration.schemaOrJson else {
-            let key = AdaptyPaywall.ViewConfiguration.CodingKeys.value
-            throw DecodingError.keyNotFound(key, DecodingError.Context(codingPath: [Backend.CodingKeys.data], debugDescription: "No value associated with key \(key)"))
-        }
+        guard let data = response.body else { throw URLError(.cannotDecodeRawData) }
+        let schema = try AdaptyUISchema(from: data)
         return response.replaceBody(schema)
     }
 }
 
 extension Backend.MainExecutor {
-    func fetchUISchema(
+    func fetchFallbackUISchema(
         apiKeyPrefix: String,
-        paywallVariationId: String,
-        locale: AdaptyLocale,
+        flowId: String,
+        viewConfigurationId: String,
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyUISchema {
-        let md5Hash = "{\"builder_version\":\"\(Adapty.uiBuilderVersion)\",\"locale\":\"\(locale.id.lowercased())\"}".md5.hexString
-
         let request = FetchUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
-            paywallVariationId: paywallVariationId,
-            locale: locale,
-            md5Hash: md5Hash,
+            flowId: flowId,
+            viewConfigurationId: viewConfigurationId,
             disableServerCache: disableServerCache,
             logParams: [
                 "api_prefix": apiKeyPrefix,
-                "variation_id": paywallVariationId,
-                "locale": locale,
+                "flow_id": flowId,
+                "flow_version_id": viewConfigurationId,
                 "builder_version": Adapty.uiBuilderVersion,
                 "builder_config_format_version": Adapty.uiSchemaVersion,
-                "md5": md5Hash,
                 "disable_server_cache": disableServerCache,
             ]
         )
@@ -85,3 +77,4 @@ extension Backend.MainExecutor {
         return response.body
     }
 }
+

@@ -9,11 +9,14 @@ import Foundation
 
 @AdaptyActor
 final class OfflineProfileManager {
-    var userId: AdaptyUserId { currentProfile.userId }
+    var userId: AdaptyUserId {
+        currentProfile.userId
+    }
+
     var currentProfile: AdaptyProfile
 
     init(profile: AdaptyProfile) {
-        self.currentProfile = profile
+        currentProfile = profile
     }
 
     convenience init(userId: AdaptyUserId) {

@@ -8,7 +8,7 @@
 import Adapty
 import Foundation
 
-public extension AdaptyPaywall {
+public extension AdaptyFlow {
     @inlinable
     var asAdaptyJsonData: AdaptyJsonData {
         get throws {

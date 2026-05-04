@@ -37,24 +37,23 @@ enum Request {
             SetFallback.self,
             UpdateCollectingRefundDataConsent.self,
             UpdateRefundPreference.self,
-            GetCurrentInstallationStatus.self
+            GetCurrentInstallationStatus.self,
         ]
 
 #if canImport(UIKit)
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
-                AdaptyUICreatePaywallView.self,
-                AdaptyUIDismissPaywallView.self,
-                AdaptyUIPresentPaywallView.self,
+        let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
+            AdaptyUICreatePaywallView.self,
+            AdaptyUIDismissPaywallView.self,
+            AdaptyUIPresentPaywallView.self,
 
-                AdaptyUICreateOnboardingView.self,
-                AdaptyUIDismissOnboardingView.self,
-                AdaptyUIPresentOnboardingView.self,
+            AdaptyUICreateOnboardingView.self,
+            AdaptyUIDismissOnboardingView.self,
+            AdaptyUIPresentOnboardingView.self,
 
-                AdaptyUIShowDialog.self,
-            ]
-            allRequests.append(contentsOf: adaptyUiRequests)
-        }
+            AdaptyUIShowDialog.self,
+        ]
+        allRequests.append(contentsOf: adaptyUiRequests)
+
 #endif
 
         return Dictionary(allRequests.map { ($0.method, $0) }) { _, last in last }

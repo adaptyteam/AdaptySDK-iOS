@@ -9,12 +9,10 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct DebugOverlayEnvironmentKey: EnvironmentKey {
     static let defaultValue: Bool = false
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension EnvironmentValues {
     var debugOverlayEnabled: Bool {
         get { self[DebugOverlayEnvironmentKey.self] }
@@ -22,14 +20,12 @@ extension EnvironmentValues {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension View {
     func withDebugOverlayEnabled(_ value: Bool) -> some View {
         environment(\.debugOverlayEnabled, value)
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct DebugOverlayModifier: ViewModifier {
     private static let debugOverlayColors: [Color] = [.red, .green, .blue, .brown, .teal, .purple, .pink, .orange]
 

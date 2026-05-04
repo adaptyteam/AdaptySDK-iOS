@@ -10,6 +10,7 @@ import Foundation
 
 extension Request {
     struct AdaptyPluginPaywallProduct: Decodable {
+        let flowProductId: String?
         let adaptyProductId: String
         let productInfo: BackendProductInfo
         let paywallProductIndex: Int
@@ -21,6 +22,7 @@ extension Request {
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            flowProductId = try container.decodeIfPresent(String.self, forKey: .adaptyProductId)
             adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
             productInfo = try BackendProductInfo(
                 vendorId: container.decode(String.self, forKey: .vendorProductId),
@@ -39,6 +41,7 @@ extension Request {
 
 private enum CodingKeys: String, CodingKey {
     case vendorProductId = "vendor_product_id"
+    case flowProductId = "flow_product_id"
     case adaptyProductId = "adapty_product_id"
     case accessLevelId = "access_level_id"
     case adaptyProductType = "product_type"
@@ -67,6 +70,7 @@ extension Response {
         public func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(wrapped.vendorProductId, forKey: .vendorProductId)
+            try container.encodeIfPresent(wrapped.flowProductId, forKey: .flowProductId)
             try container.encode(wrapped.adaptyProductId, forKey: .adaptyProductId)
             try container.encode(wrapped.accessLevelId, forKey: .accessLevelId)
             try container.encode(wrapped.adaptyProductType, forKey: .adaptyProductType)

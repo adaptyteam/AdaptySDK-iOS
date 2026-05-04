@@ -1,0 +1,86 @@
+//
+//  AdaptyUIState.swift
+//  AdaptyUIBuilder
+//
+//  Created by Aleksei Valiano on 12.12.2025.
+//
+
+import Combine
+import Foundation
+
+package typealias VS = AdaptyUIState
+
+@MainActor
+package final class AdaptyUIState: ObservableObject {
+    let configuration: AdaptyUIConfiguration
+    private let jsState: VS.JSState
+
+    private(set) var started: Bool = false
+
+    private var cancellables = Set<AnyCancellable>()
+
+    init(
+        name: String = "AdaptyJSState",
+        configuration: AdaptyUIConfiguration,
+        actionHandler: AdaptyUIActionHandler? = nil,
+        isInspectable: Bool = false
+    ) {
+        self.configuration = configuration
+        jsState = .init(
+            name: name,
+            configuration: configuration,
+            actionHandler: actionHandler,
+            isInspectable: isInspectable
+        )
+
+        jsState.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+    }
+
+    func startOnce() {
+        guard !started else { return }
+        started = true
+        jsState.setEnvironmentConstants(configuration)
+        jsState.evaluateScripts(configuration.scripts)
+    }
+
+    func debug(path: String, filter: VS.DebugFilter = .withoutFunction) -> String {
+        jsState.debug(path: path, filter: filter)
+    }
+
+    func debug(path: [String] = [], filter: VS.DebugFilter = .withoutFunction) -> String {
+        jsState.debug(path: path.joined(separator: "."), filter: filter)
+    }
+
+    func debug(variable: VC.Variable, screenInstance: VS.ScreenInstance? = nil, filter: VS.DebugFilter = .withoutFunction) -> String {
+        jsState.debug(variable: variable, screenInstance: screenInstance, filter: filter)
+    }
+
+    func getValue<T: JSValueRepresentable>(_: T.Type, variable: VC.Variable, screenInstance: VS.ScreenInstance) throws(VS.Error) -> T? {
+        let jsValue = try jsState.getValue(variable: variable, screenInstance: screenInstance)
+        return T.fromJSValue(jsValue)
+    }
+
+    func getTagValue(variable: VC.Variable, screenInstance: VS.ScreenInstance, converter: VC.TagConverter?) throws(VS.Error) -> String? {
+        let jsValue = try jsState.getValue(variable: variable, screenInstance: screenInstance)
+        guard let converter, !jsValue.isString else { return String.fromJSValue(jsValue) }
+        guard let object = jsValue.toObject() else { return nil }
+        return converter.toString(object, locale: configuration.locale)
+    }
+
+    func setValue(variable: VC.Variable, value: any JSValueConvertable, screenInstance: VS.ScreenInstance) throws(VS.Error) {
+        try jsState.setValue(variable: variable, value: value, screenInstance: screenInstance)
+    }
+
+    func execute(actions: [VC.Action], params: [String: any VC.Value]? = nil, screenInstance: VS.ScreenInstance) throws(VS.Error) {
+        try jsState.execute(actions: actions, params: params, screenInstance: screenInstance)
+    }
+
+    func execute(action: VS.JSAction, params: (some JSValueConvertable)?, screenInstance: VS.ScreenInstance) throws(VS.Error) {
+        try jsState.execute(action: action, params: params, screenInstance: screenInstance)
+    }
+}
+

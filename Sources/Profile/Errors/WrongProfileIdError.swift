@@ -14,7 +14,7 @@ struct WrongProfileIdError: Error {
         function: String = #function,
         line: UInt = #line
     ) {
-        self.source = AdaptyError.Source(file: file, function: function, line: line)
+        source = AdaptyError.Source(file: file, function: function, line: line)
     }
 }
 

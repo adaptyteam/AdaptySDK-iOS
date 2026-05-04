@@ -12,7 +12,6 @@ import AdaptyUI
 import AdaptyUIBuilder
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUICustomAsset {
     struct Identifiable {
         let id: String
@@ -26,7 +25,20 @@ extension AdaptyUICustomAsset {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension VC.Color {
+    var asCustomAsset: AdaptyUICustomAsset {
+        // TODO: x implement
+        .color(.swiftUIColor(.clear))
+    }
+}
+
+extension VC.ColorGradient {
+    var asCustomAsset: AdaptyUICustomAsset {
+        // TODO: x implement
+        .gradient(.angular(gradient: .init(colors: []), center: .center, angle: .zero))
+    }
+}
+
 extension AdaptyUICustomAsset.Identifiable: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
@@ -86,7 +98,7 @@ extension AdaptyUICustomAsset.Identifiable: Decodable {
 
 private extension String {
     var asFileURL: URL {
-        if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             URL(filePath: self)
         } else {
             URL(fileURLWithPath: self)

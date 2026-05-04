@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC {
     enum TimerTag {
         case TIMER_h
@@ -30,7 +29,6 @@ extension VC {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.TimerTag {
     static func createFromString(_ value: String) -> VC.TimerTag? {
         switch value {
@@ -120,16 +118,19 @@ extension VC.TimerTag {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.RichText {
     var timerUpdatesPerSecond: Int {
         var result = 1
 
         for item in items {
-            if case let .tag(tagValue, _) = item,
-               let timerTag = VC.TimerTag.createFromString(tagValue)
-            {
+            guard case let .tag(tagValue, _, converter, _) = item else { continue }
+
+            if let timerTag = VC.TimerTag.createFromString(tagValue) {
                 result = max(timerTag.updatesPerSecond, result)
+            } else if tagValue == "TIMER",
+                      let timerConverter = converter?.wrapped as? VC.TimerConverter
+            {
+                result = max(timerConverter.updatesPerSecond, result)
             }
         }
 
@@ -137,15 +138,19 @@ extension VC.RichText {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 struct AdaptyUITimerView: View, AdaptyUITagResolver {
-    @Environment(\.adaptyScreenId)
-    private var screenId: String
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
-    @EnvironmentObject var viewModel: AdaptyUITimerViewModel
-    @EnvironmentObject var customTagResolverViewModel: AdaptyUITagResolverViewModel
-    @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var viewModel: AdaptyUITimerViewModel
+    @EnvironmentObject
+    private var customTagResolverViewModel: AdaptyUITagResolverViewModel
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
 
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
@@ -155,8 +160,6 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
     init(_ timer: VC.Timer) {
         self.timer = timer
     }
-
-    let startTime: Date = .init()
 
     @State var timeLeft: TimeInterval = 0.0
     @State var text: VC.RichText?
@@ -174,14 +177,21 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
         if let text {
             text
                 .convertToSwiftUIText(
-                    assetsResolver: assetsViewModel.assetsResolver,
-                    tagResolver: self,
+                    defaultAttributes: timer.format.textAttributes,
+                    assetsCache: assetsViewModel.cache,
+                    stateViewModel: stateViewModel,
+                    tagValues: nil, // TODO: x check
+                    internalTagResolver: { [timeLeft] tag in
+                        tag == "TIMER" ? timeLeft : nil
+                    },
+                    customTagResolver: self,
                     productInfo: nil,
-                    colorScheme: colorScheme
+                    colorScheme: colorScheme,
+                    screen: screen
                 )
                 .multilineTextAlignment(timer.horizontalAlign)
-                .lineLimit(1)
-                .minimumScaleFactor(0.1)
+                .lineLimit(timer.maxRows)
+                .minimumScaleFactor(timer.overflowMode.contains(.scale) ? 0.1 : 1.0)
         } else {
             Text("")
         }
@@ -191,57 +201,20 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
         timerOrEmpty
             .onAppear {
                 updateTime()
-                startTimer()
             }
-            .onDisappear {
-                stopTimer()
-            }
-    }
-
-    @State private var timeCounter: Timer?
-    @State private var currentTimerUpdatesPerSecond = 1 {
-        didSet {
-            startTimer()
-        }
-    }
-
-    private func startTimer() {
-        stopTimer()
-
-        let timeInterval = 1.0 / Double(currentTimerUpdatesPerSecond)
-
-        let timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
-            Task { @MainActor in
+            .onReceive(viewModel.objectWillChange) { _ in
                 updateTime()
             }
-        }
-        RunLoop.current.add(timer, forMode: .common)
-        timeCounter = timer
-    }
-
-    private func stopTimer() {
-        timeCounter?.invalidate()
-        timeCounter = nil
     }
 
     private func updateTime() {
-        var timeLeft = viewModel.timeLeft(for: timer,
-                                          at: Date(),
-                                          screenId: screenId)
+        let timeLeft = max(0.0, viewModel.timeLeft(
+            for: timer,
+            at: Date(),
+            screen: screen
+        ))
 
-        guard timeLeft > 0 else {
-            timeLeft = 0
-
-            stopTimer()
-
-            text = timer.format(byValue: timeLeft)
-            self.timeLeft = timeLeft
-            return
-        }
-
-        text = timer.format(byValue: timeLeft)
-        currentTimerUpdatesPerSecond = text?.timerUpdatesPerSecond ?? 1
-
+        text = timer.format.item(byValue: timeLeft)
         self.timeLeft = timeLeft
     }
 }

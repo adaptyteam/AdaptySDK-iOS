@@ -10,16 +10,15 @@
 import Adapty
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-package final class AdaptyEventsHandler: ObservableObject {
+package final class AdaptyEventsHandler {
     let logId: String
 
     var didAppear: (() -> Void)?
     var didDisappear: (() -> Void)?
 
     var didPerformAction: ((AdaptyUI.Action) -> Void)?
-    var didSelectProduct: ((AdaptyPaywallProductWithoutDeterminingOffer) -> Void)?
+    var didSelectProduct: ((AdaptyPaywallProduct) -> Void)?
     var didStartPurchase: ((AdaptyPaywallProduct) -> Void)?
     var didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)?
     var didFailPurchase: ((AdaptyPaywallProduct, AdaptyError) -> Void)?
@@ -30,6 +29,7 @@ package final class AdaptyEventsHandler: ObservableObject {
     var didFailRendering: ((AdaptyUIError) -> Void)?
     var didFailLoadingProducts: ((AdaptyError) -> Bool)?
     var didPartiallyLoadProducts: (([String]) -> Void)?
+    var didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
 
     package init(logId: String) {
         self.logId = logId
@@ -45,6 +45,7 @@ package final class AdaptyEventsHandler: ObservableObject {
         self.didFailRendering = nil
         self.didFailLoadingProducts = nil
         self.didPartiallyLoadProducts = nil
+        self.didReceiveAnalyticEvent = nil
     }
 
     func event_viewDidAppear() {
@@ -62,7 +63,7 @@ package final class AdaptyEventsHandler: ObservableObject {
         didPerformAction?(action)
     }
 
-    func event_didSelectProduct(_ product: AdaptyPaywallProductWithoutDeterminingOffer, automatic: Bool) {
+    func event_didSelectProduct(_ product: AdaptyPaywallProduct, automatic: Bool) {
         Log.ui.verbose("#\(logId)# event_didSelectProduct: \(product.vendorProductId) automatic: \(automatic)")
         didSelectProduct?(product)
     }
@@ -90,7 +91,7 @@ package final class AdaptyEventsHandler: ObservableObject {
             Log.ui.verbose("#\(logId)# event_didFinishWebPaymentNavigation: \(product?.vendorProductId ?? "null")")
         }
 
-        guard let product = product as? AdaptyPaywallProduct else {
+        guard let product else {
             Log.ui.error("#\(logId)# event_didFinishWebPaymentNavigation: WRONG INJECTION")
             return
         }
@@ -135,11 +136,15 @@ package final class AdaptyEventsHandler: ObservableObject {
         Log.ui.error("#\(logId)# event_didPartiallyLoadProducts: \(failedProductIds)")
         didPartiallyLoadProducts?(failedProductIds)
     }
+
+    func event_didReceiveAnalyticEvent(name: String, params: [String: any Sendable]) {
+        Log.ui.verbose("#\(logId)# event_didReceiveAnalyticEvent: \(name)")
+        didReceiveAnalyticEvent?(name, params)
+    }
 }
 
 import AdaptyUIBuilder
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUIBuilder.Action {
     var adaptyUIAction: AdaptyUI.Action {
         switch self {

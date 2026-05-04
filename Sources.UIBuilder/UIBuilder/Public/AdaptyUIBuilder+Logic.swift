@@ -9,7 +9,6 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
     let logId: String
     let events: AdaptyUIEventsHandler
@@ -47,7 +46,7 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
 
     func logShowPaywall(viewConfiguration: AdaptyUIConfiguration) async {}
 
-    func getProducts(determineOffers: Bool) async throws -> [ProductResolver] {
+    func getProducts() async throws -> [ProductResolver] {
         products
     }
 
@@ -68,12 +67,16 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
 
     func openWebPaywall(
         for product: ProductResolver,
-        in openIn: VC.WebOpenInParameter
+        in openIn: VC.Action.WebOpenInParameter
     ) async {}
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {
         events.event_didFailRendering(with: error)
     }
+
+    func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable]) {}
+
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
 }
 
 #endif

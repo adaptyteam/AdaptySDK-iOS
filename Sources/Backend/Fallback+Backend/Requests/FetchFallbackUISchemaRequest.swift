@@ -10,67 +10,46 @@ import Foundation
 
 private struct FetchFallbackUISchemaRequest: BackendRequest {
     let endpoint: HTTPEndpoint
-    let queryItems: QueryItems
     let stamp = Log.stamp
-    let requestName = BackendRequestName.fetchFallbackUISchema
+    let requestName = BackendRequestName.fetchUISchema
     let logParams: EventParameters?
 
     init(
         apiKeyPrefix: String,
-        paywallInstanceIdentity: String,
-        locale: AdaptyLocale,
-        disableServerCache: Bool,
+        flowId: String,
+        viewConfigurationId: String,
         logParams: EventParameters
-
     ) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/paywall-builder/\(paywallInstanceIdentity)/\(Adapty.uiBuilderVersion)/\(locale.languageCode)/fallback.json"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(viewConfigurationId)/\(Adapty.uiBuilderVersion)/config.json"
         )
-
-        queryItems = QueryItems().setDisableServerCache(disableServerCache)
 
         self.logParams = logParams
     }
 }
 
 extension Backend.FallbackExecutor {
-    func fetchFallbackUISchema(
+    func fetchUISchema(
         apiKeyPrefix: String,
-        paywallInstanceIdentity: String,
-        locale: AdaptyLocale,
-        disableServerCache: Bool
+        flowId: String,
+        viewConfigurationId: String,
+        disableServerCache _: Bool
     ) async throws(HTTPError) -> AdaptyUISchema {
         let request = FetchFallbackUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
-            paywallInstanceIdentity: paywallInstanceIdentity,
-            locale: locale,
-            disableServerCache: disableServerCache,
+            flowId: flowId,
+            viewConfigurationId: viewConfigurationId,
             logParams: [
                 "api_prefix": apiKeyPrefix,
-                "paywall_instance_id": paywallInstanceIdentity,
+                "flow_id": flowId,
+                "flow_version_id": viewConfigurationId,
                 "builder_version": Adapty.uiBuilderVersion,
-                "builder_config_format_version": Adapty.uiSchemaVersion,
-                "language_code": locale.languageCode,
-                "disable_server_cache": disableServerCache,
+                "builder_schema_version": Adapty.uiSchemaVersion,
             ]
         )
 
-        do {
-            let response: HTTPResponse<AdaptyUISchema> = try await perform(request, withDecoder: AdaptyUISchema.decoder)
-            return response.body
-        } catch {
-            guard error.statusCode == 404,
-                  !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
-            else {
-                throw error
-            }
-            return try await fetchFallbackUISchema(
-                apiKeyPrefix: apiKeyPrefix,
-                paywallInstanceIdentity: paywallInstanceIdentity,
-                locale: .defaultPlacementLocale,
-                disableServerCache: disableServerCache
-            )
-        }
+        let response: HTTPResponse<AdaptyUISchema> = try await perform(request, withDecoder: AdaptyUISchema.decoder)
+        return response.body
     }
 }
