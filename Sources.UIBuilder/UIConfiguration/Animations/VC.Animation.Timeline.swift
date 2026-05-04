@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Animation {
-    struct Timeline: Sendable, Equatable {
+    struct Timeline: Sendable, Hashable {
         let duration: TimeInterval
         let interpolator: Interpolator
         let startDelay: TimeInterval

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct EdgeInsets: Sendable, Equatable {
+    struct EdgeInsets: Sendable, Hashable {
         let leading: Unit
         let top: Unit
         let trailing: Unit

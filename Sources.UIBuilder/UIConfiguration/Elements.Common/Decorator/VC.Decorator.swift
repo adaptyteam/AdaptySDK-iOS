@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Decorator: Sendable, Equatable {
+    struct Decorator: Sendable, Hashable {
         let shapeType: ShapeType
         let background: AssetReference?
         let border: Border?

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum Unit: Sendable, Equatable {
+    enum Unit: Sendable, Hashable {
         case point(Double)
         case screen(Double)
         case safeArea(SafeArea)

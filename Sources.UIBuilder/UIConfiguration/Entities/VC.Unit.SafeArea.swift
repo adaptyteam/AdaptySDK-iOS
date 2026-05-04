@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Unit {
-    enum SafeArea: Sendable, Equatable {
+    enum SafeArea: Sendable, Hashable {
         case start
         case end
     }

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum Asset: Sendable, Equatable {
+    enum Asset: Sendable, Hashable {
         case solidColor(Color)
         case colorGradient(ColorGradient)
         case image(ImageData)

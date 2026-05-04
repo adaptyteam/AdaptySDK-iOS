@@ -22,6 +22,17 @@ extension Schema.ConfigurationBuilder {
     typealias TasksStack = [Task]
 
     @inlinable
+    func build_element(_ root: Schema.Element) throws(Schema.Error) -> VC.Element {
+        var taskStack: TasksStack = [.planElement(root)]
+        var result = try startTasks(&taskStack)
+        let index = try result.elementIndices.pop()
+        guard result.poolElements.indices.contains(index) else {
+            throw .unsupportedElement("empty element tree")
+        }
+        return result.poolElements[index]
+    }
+
+    @inlinable
     func startTasks(
         _ taskStack: inout TasksStack
     ) throws(Schema.Error) -> BuildResult {
@@ -50,7 +61,6 @@ extension Schema.ConfigurationBuilder {
 extension [VC.ElementIndex] {
     @inlinable
     mutating func pop(_ n: Int) throws(Schema.Error) -> Self {
-        precondition(n >= 0, "pop count must be non-negative, got \(n)")
         guard count >= n else {
             throw .unsupportedElement("empty element tree")
         }
@@ -76,3 +86,4 @@ extension [VC.ElementIndex] {
         }
     }
 }
+

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum AssetReference: Sendable, Equatable {
+    enum AssetReference: Sendable, Hashable {
         case assetId(AssetIdentifier)
         case color(Color)
         case variable(Variable)

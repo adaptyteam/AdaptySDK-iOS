@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct CornerRadius: Sendable, Equatable {
+    struct CornerRadius: Sendable, Hashable {
         let topLeading: Double
         let topTrailing: Double
         let bottomTrailing: Double

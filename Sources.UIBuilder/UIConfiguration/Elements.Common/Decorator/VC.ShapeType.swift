@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum ShapeType: Sendable, Equatable {
+    enum ShapeType: Sendable, Hashable {
         case rectangle(cornerRadius: CornerRadius)
         case circle
         case curveUp

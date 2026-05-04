@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Animation {
-    struct ScaleParameters: Sendable, Equatable {
+    struct ScaleParameters: Sendable, Hashable {
         let scale: Range<VC.Point>
         let anchor: VC.Point
     }

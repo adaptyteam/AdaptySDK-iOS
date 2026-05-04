@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Offset: Sendable, Equatable {
+    struct Offset: Sendable, Hashable {
         let x: Unit
         let y: Unit
     }

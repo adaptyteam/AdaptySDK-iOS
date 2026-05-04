@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Animation {
-    struct Background: Sendable, Equatable {
+    struct Background: Sendable, Hashable {
         let timeline: Timeline
         let range: Range<VC.AssetReference>
     }
