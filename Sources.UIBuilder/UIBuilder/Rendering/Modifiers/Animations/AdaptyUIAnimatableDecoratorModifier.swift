@@ -16,7 +16,9 @@ extension InsettableShape {
         _ image: AdaptyUIResolvedImageAsset,
         tint: AdaptyUIResolvedColorAsset?
     ) -> some View {
-        self.background {
+        // Fill the shape with .clear so an unfilled Shape does not render
+        // on top of the image with the foreground color.
+        self.fill(.clear).background {
             AdaptyUIImageView(
                 .resolvedImageAsset(
                     asset: image,
