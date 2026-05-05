@@ -63,6 +63,7 @@ extension VC.ImageData {
     }
 }
 
+@MainActor
 extension VC.Font {
     typealias Resolved = UIFont
 
@@ -145,11 +146,9 @@ extension VC.ColorGradient {
     }
 
     private var stops: [Gradient.Stop] {
-        let result = items
+        return items
             .map { Gradient.Stop(color: $0.color.resolved, location: $0.p) }
             .sorted(by: { $0.location < $1.location })
-
-        return result
     }
 
     package var asCustomAsset: AdaptyUICustomAsset {
