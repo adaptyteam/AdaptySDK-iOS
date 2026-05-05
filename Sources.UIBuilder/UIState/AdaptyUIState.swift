@@ -49,8 +49,11 @@ package final class AdaptyUIState: ObservableObject {
 
     func setProductsConstants(_ products: [VC.FlowConstants.ProductConstants]) {
         jsState.setProductConstants(products)
+        jsState.sendSDKEvent(.productLoaded)
+    }
 
-        // TODO:
+    func sendSDKEvent(_ event: VS.SDKEvent) {
+        jsState.sendSDKEvent(event)
     }
 
     func debug(path: String, filter: VS.DebugFilter = .withoutFunction) -> String {

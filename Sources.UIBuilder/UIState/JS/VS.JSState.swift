@@ -56,6 +56,43 @@ extension VS.JSState {
         Self.setProductConstants(products, in: context)
     }
 
+    func sendSDKEvent(_ event: VS.SDKEvent) {
+        let name = "handleSDKEvent"
+
+        guard let parent = context.globalObject else {
+            log.warn("fail send event (\(event.rawValue)), not found global object")
+            return
+        }
+
+        guard let handler = parent.objectForKeyedSubscript(name), !handler.isUndefined else {
+            log.warn("fail send event (\(event.rawValue)), not found JS method: \(name)")
+            return
+        }
+
+        guard
+            let functionType = context.objectForKeyedSubscript("Function"),
+            handler.isInstance(of: functionType)
+        else {
+            log.warn("fail send event (\(event.rawValue)), JS property is not method: \(name)")
+            return
+        }
+
+        let jsEvent = VC.AnyValue(["name": event]).toJSValue(in: context)
+
+        context.exception = nil
+        _ = handler.call(withArguments: [jsEvent as Any])
+
+        if let exception = context.exception {
+            log.warn("fail send event (\(event.rawValue)), JS exception: \(exception)")
+            context.exception = nil
+            return
+        }
+
+        log.debug("did send sdk event \(event.rawValue)")
+
+        objectWillChange.send()
+    }
+
     func evaluateScripts(
         _ scripts: [String]
     ) {
@@ -352,4 +389,3 @@ extension VS.JSState {
         return debug(path: path.joined(separator: "."), filter: filter)
     }
 }
-

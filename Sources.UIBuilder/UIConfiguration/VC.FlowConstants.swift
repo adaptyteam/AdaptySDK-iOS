@@ -42,13 +42,32 @@ package extension VC.FlowConstants {
             adaptyAccessLevelId: String,
             adaptyProductType: String,
             paywallVariationId: String,
+            paywallName: String
+        ) {
+            id = flowProductId
+            values = [
+                "flowProductId": VC.AnyValue(flowProductId),
+                "adaptyProductId": VC.AnyValue(adaptyProductId),
+                "adaptyAccessLevelId": VC.AnyValue(adaptyAccessLevelId),
+                "adaptyProductType": VC.AnyValue(adaptyProductType),
+                "paywallVariationId": VC.AnyValue(paywallVariationId),
+                "paywallName": VC.AnyValue(paywallName),
+            ]
+        }
+
+        package init(
+            flowProductId: String,
+            adaptyProductId: String,
+            adaptyAccessLevelId: String,
+            adaptyProductType: String,
+            paywallVariationId: String,
             paywallName: String,
-            localizedDescription: String? = nil,
-            localizedTitle: String? = nil,
-            isFamilyShareable: Bool? = nil,
-            regionCode: String? = nil,
-            price: PriceConstants? = nil,
-            subscription: ProductSubscriptionConstants? = nil
+            localizedDescription: String,
+            localizedTitle: String,
+            isFamilyShareable: Bool,
+            regionCode: String?,
+            price: PriceConstants,
+            subscription: ProductSubscriptionConstants?
         ) {
             id = flowProductId
             values = [
@@ -63,7 +82,7 @@ package extension VC.FlowConstants {
                 "localizedTitle": VC.AnyValue(localizedTitle),
                 "isFamilyShareable": VC.AnyValue(isFamilyShareable),
                 "regionCode": VC.AnyValue(regionCode),
-                "price": VC.AnyValue(price?.values),
+                "price": VC.AnyValue(price.values),
                 "subscription": VC.AnyValue(subscription?.values),
             ]
         }
