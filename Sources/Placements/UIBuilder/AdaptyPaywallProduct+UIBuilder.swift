@@ -8,7 +8,7 @@
 import AdaptyUIBuilder
 import Foundation
 
-extension [AdaptyPaywallProduct] {
+package extension [AdaptyPaywallProduct] {
     func asUIBuilderFlowProducts() -> [VC.FlowConstants.ProductConstants] {
         compactMap { $0.asUIBuilderFlowProduct() }
     }

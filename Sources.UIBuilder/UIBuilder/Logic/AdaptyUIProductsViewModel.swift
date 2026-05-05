@@ -42,6 +42,8 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     @Published var purchaseInProgress: Bool = false
     @Published var restoreInProgress: Bool = false
 
+    package var onProductsLoaded: (([ProductResolver]) -> Void)?
+
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,
@@ -114,6 +116,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
             do {
                 let products = try await logic.getProducts()
                 flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+                onProductsLoaded?(products)
             } catch {
                 Log.ui.error("#\(logId)# loadProducts fail: \(error)")
                 productsLoadingInProgress = false

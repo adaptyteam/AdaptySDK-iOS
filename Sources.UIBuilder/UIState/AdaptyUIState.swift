@@ -47,7 +47,7 @@ package final class AdaptyUIState: ObservableObject {
         jsState.evaluateScripts(configuration.scripts)
     }
 
-    func setProductsConstants(_ products: [VC.FlowConstants.ProductConstants]) {
+    package func setProductsConstants(_ products: [VC.FlowConstants.ProductConstants]) {
         jsState.setProductConstants(products)
         jsState.sendSDKEvent(.productLoaded)
     }
