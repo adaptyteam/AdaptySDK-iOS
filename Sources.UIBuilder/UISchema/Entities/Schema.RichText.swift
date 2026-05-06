@@ -28,13 +28,17 @@ extension Schema {
                 && (underline ?? false) == false
         }
 
-        var nonEmptyOrNil: Self? { isEmpty ? nil : self }
+        var nonEmptyOrNil: Self? {
+            isEmpty ? nil : self
+        }
     }
 
     struct RichText: Sendable, Hashable {
         let items: [RichText.Item]
 
-        var isEmpty: Bool { items.isEmpty }
+        var isEmpty: Bool {
+            items.isEmpty
+        }
 
         enum Item: Sendable {
             case text(String, TextAttributes?)
@@ -46,12 +50,17 @@ extension Schema {
 }
 
 extension Schema.TextAttributes? {
-    var nonEmptyOrNil: Self { self?.nonEmptyOrNil }
+    var nonEmptyOrNil: Self {
+        self?.nonEmptyOrNil
+    }
 }
 
 extension Schema.Localizer {
-    func urlIfPresent(_ stringId: String?) -> String? {
-        guard let stringId, let item = localization?.strings?[stringId] else { return nil }
+    func urlIfPresent(_ value: String) -> String? {
+        guard let item = localization?.strings?[value] else {
+            if let _ = URL(string: value) { return value }
+            return nil
+        }
         return item.value.asString ?? item.fallback?.asString
     }
 
@@ -264,3 +273,4 @@ extension Schema.TextAttributes: Codable {
         case underline
     }
 }
+
