@@ -1455,9 +1455,14 @@ $defs:
       - required: [type]
         properties:
           type: { type: string, const: ["close", "system_back"] }
+      - required: [type, value, open_in]
+        properties:
+          type: { type: string, const: "open_url" }
+          value: { type: string }
+          open_in: { $ref: "#/$defs/AdaptyWebPresentation" }
       - required: [type, value]
         properties:
-          type: { type: string, enum: ["open_url", "custom"] }
+          type: { type: string, const: "custom" }
           value: { type: string }
 
   AdaptyUI.CustomTagsValues: #request
