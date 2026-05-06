@@ -40,6 +40,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
+                .handleRichTextActionURL()
         case .notFound:
             richText
                 .convertToSwiftUIText(
@@ -53,6 +54,7 @@ struct AdaptyUITextView: View {
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
                 .redacted(reason: .placeholder)
+                .handleRichTextActionURL()
         case let .found(productInfoModel):
             richText
                 .convertToSwiftUIText(
@@ -64,6 +66,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
+                .handleRichTextActionURL()
         }
     }
 }
@@ -90,6 +93,7 @@ extension Array where Element == VC.RichText.Item {
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: value,
+                        link: action?.asURL,
                         attributes: attr,
                         assetsResolver: assetsResolver,
                         colorScheme: colorScheme
@@ -117,6 +121,7 @@ extension Array where Element == VC.RichText.Item {
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: tagReplacementResult,
+                        link: action?.asURL,
                         attributes: attr,
                         assetsResolver: assetsResolver,
                         colorScheme: colorScheme
@@ -275,6 +280,7 @@ extension VC.Text {
 extension AttributedString {
     static func createFrom(
         value: String,
+        link: URL? = nil,
         attributes: VC.RichText.TextAttributes?,
         assetsResolver: AdaptyUIAssetsResolver,
         colorScheme: ColorScheme
@@ -302,6 +308,8 @@ extension AttributedString {
         if attributes?.underline ?? false {
             result.underlineStyle = .single
         }
+
+        result.link = link
 
         return result
     }

@@ -189,6 +189,7 @@ struct AdaptyUITimerView: View, AdaptyUITagResolver {
 
     var body: some View {
         timerOrEmpty
+            .handleRichTextActionURL()
             .onAppear {
                 updateTime()
                 startTimer()
