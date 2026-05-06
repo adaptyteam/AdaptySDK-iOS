@@ -9,7 +9,7 @@ import Foundation
 
 extension Schema {
     enum Action: Sendable {
-        case openUrl(String)
+        case openUrl(String, openIn: WebOpenInParameter)
         case action(VC.Action)
     }
 }
@@ -17,8 +17,8 @@ extension Schema {
 extension Schema.Localizer {
     func action(_ from: Schema.Action) -> VC.Action {
         switch from {
-        case let .openUrl(stringId):
-            .openUrl(urlIfPresent(stringId))
+        case let .openUrl(stringId, openIn):
+            .openUrl(urlIfPresent(stringId), openIn: openIn)
         case let .action(action):
             action
         }
@@ -28,9 +28,10 @@ extension Schema.Localizer {
 extension Schema.Action: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
-        case let .openUrl(value):
+        case let .openUrl(value, openIn):
             hasher.combine(1)
             hasher.combine(value)
+            hasher.combine(openIn)
         case let .action(value):
             hasher.combine(2)
             hasher.combine(value)
@@ -74,7 +75,10 @@ extension Schema.Action: Decodable {
         case nil:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [CodingKeys.type], debugDescription: "unknown value"))
         case .openUrl:
-            self = try .openUrl(container.decode(String.self, forKey: .url))
+            self = try .openUrl(
+                container.decode(String.self, forKey: .url),
+                openIn: container.decodeIfPresent(Schema.WebOpenInParameter.self, forKey: .openIn) ?? .browserOutApp
+            )
         case .restore:
             self = .action(.restore)
         case .close:
@@ -121,3 +125,4 @@ extension Schema.Action: Decodable {
         }
     }
 }
+
