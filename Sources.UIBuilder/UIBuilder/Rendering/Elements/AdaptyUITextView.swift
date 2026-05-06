@@ -86,7 +86,7 @@ extension Array where Element == VC.RichText.Item {
     ) throws -> Text {
         try reduce(Text("")) { partialResult, item in
             switch item {
-            case let .text(value, attr):
+            case let .text(value, attr, action):
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: value,
@@ -95,7 +95,7 @@ extension Array where Element == VC.RichText.Item {
                         colorScheme: colorScheme
                     )
                 )
-            case let .tag(value, attr):
+            case let .tag(value, attr, action):
                 let tagReplacementResult: String
 
                 if let customTagResult = tagResolver.replacement(for: value) {
@@ -156,7 +156,7 @@ extension VC.RichText {
         if placeholder {
             let reducedString = items.reduce("") { partialResult, item in
                 switch item {
-                case let .text(value, _), let .tag(value, _):
+                case let .text(value, _, action), let .tag(value, _, action):
                     return partialResult + value
                 default:
                     return partialResult

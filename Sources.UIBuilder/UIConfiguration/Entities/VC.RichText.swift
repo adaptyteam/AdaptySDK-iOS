@@ -17,8 +17,8 @@ package extension VC {
         package var isEmpty: Bool { items.isEmpty }
 
         package enum Item: Sendable {
-            case text(String, TextAttributes)
-            case tag(String, TextAttributes)
+            case text(String, TextAttributes, Action?)
+            case tag(String, TextAttributes, Action?)
             case image(VC.Mode<VC.ImageData>?, TextAttributes)
         }
 
@@ -37,14 +37,16 @@ package extension VC {
 extension VC.RichText.Item: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
-        case let .text(value, attributes):
+        case let .text(value, attributes, action):
             hasher.combine(1)
             hasher.combine(value)
             hasher.combine(attributes)
-        case let .tag(value, attributes):
+            hasher.combine(action)
+        case let .tag(value, attributes, action):
             hasher.combine(2)
             hasher.combine(value)
             hasher.combine(attributes)
+            hasher.combine(action)
         case let .image(value, attributes):
             hasher.combine(3)
             hasher.combine(value)
