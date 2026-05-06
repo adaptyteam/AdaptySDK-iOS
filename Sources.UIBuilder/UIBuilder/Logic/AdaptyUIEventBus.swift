@@ -38,6 +38,18 @@ final class AdaptyUIEventBus: ObservableObject {
         pendingEvents.append(event)
         incrementFireCount(screenInstanceId: screenInstanceId, eventId: eventId)
         revision &+= 1
+
+        // Custom events are transient signals: deliver to currently-mounted listeners
+        // via the revision change above, then drop. Lifecycle events
+        // (onWillAppear/etc.) stay in the buffer so a late-mounting element can
+        // pick them up on first appear, but custom events shouldn't be replayed
+        // for elements that mount after publication.
+        if case .custom = eventId {
+            let evictSequence = event.sequence
+            DispatchQueue.main.async { [weak self] in
+                self?.pendingEvents.removeAll { $0.sequence == evictSequence }
+            }
+        }
     }
 
     /// Returns pending events matching the given context, newer than afterSequence.
