@@ -15,6 +15,11 @@ extension Schema {
 }
 
 extension Schema.Localizer {
+    func optionalAction(_ from: Schema.Action?) -> VC.Action? {
+        guard let from else { return nil }
+        return action(from)
+    }
+
     func action(_ from: Schema.Action) -> VC.Action {
         switch from {
         case let .openUrl(value, openIn):

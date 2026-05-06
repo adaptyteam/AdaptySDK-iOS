@@ -62,9 +62,9 @@ package extension AdaptyUIConfiguration {
                     .init(value: .init(items: items.map {
                         var v = $0
                         return if v.remove(at: v.startIndex) == "#" {
-                            .tag(v, nil)
+                            .tag(v, nil, nil)
                         } else {
-                            .text($0, nil)
+                            .text($0, nil, nil)
                         }
                     }), fallback: nil)
                 },
