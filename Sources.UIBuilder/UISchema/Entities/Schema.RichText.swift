@@ -57,7 +57,7 @@ extension Schema.TextAttributes? {
 
 extension Schema.Localizer {
     func urlIfPresent(_ value: String) -> String? {
-        if let _ = URL(string: value) { return value }
+        if let url = URL(string: value), url.scheme != nil { return value }
         guard let item = localization?.strings?[value] else {
             return nil
         }
