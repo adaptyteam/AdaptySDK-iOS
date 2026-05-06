@@ -129,7 +129,7 @@ extension VC.Action {
         case .close:
             actionsViewModel.closeActionOccurred()
         case let .openUrl(url, openIn):
-            actionsViewModel.openUrlActionOccurred(url: url)
+            actionsViewModel.openUrlActionOccurred(url: url, openIn: openIn)
         case let .custom(id):
             actionsViewModel.customActionOccurred(id: id)
         }

@@ -176,8 +176,8 @@ public struct AdaptyUIPaywallView: View {
             switch action {
             case .close:
                 presentationMode.wrappedValue.dismiss()
-            case let .openURL(url):
-                UIApplication.shared.open(url, options: [:])
+            case let .openURL(url, openIn):
+                url.open(in: openIn)
             case .custom:
                 break
             }

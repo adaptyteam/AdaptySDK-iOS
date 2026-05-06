@@ -24,8 +24,8 @@ public extension AdaptyPaywallControllerDelegate {
         switch action {
         case .close:
             controller.dismiss(animated: true)
-        case let .openURL(url):
-            UIApplication.shared.open(url, options: [:])
+        case let .openURL(url, openIn):
+            url.open(in: openIn.toBuilderWebPresentation)
         case .custom:
             break
         }

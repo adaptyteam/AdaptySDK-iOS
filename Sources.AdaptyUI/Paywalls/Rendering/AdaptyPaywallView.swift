@@ -81,8 +81,8 @@ public struct AdaptyPaywallView<AlertItem>: View where AlertItem: Identifiable {
             switch action {
             case .close:
                 presentationMode.wrappedValue.dismiss()
-            case let .openURL(url):
-                UIApplication.shared.open(url, options: [:])
+            case let .openURL(url, openIn):
+                url.open(in: openIn.toBuilderWebPresentation)
             case .custom:
                 break
             }
