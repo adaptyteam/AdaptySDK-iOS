@@ -299,6 +299,7 @@ struct AdaptyUIHeroContainerView: View {
                 screenHolderBuilder: { EmptyView() }, // TODO: x check
                 drawDecoratorBackground: drawFooterBackground
             )
+            .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

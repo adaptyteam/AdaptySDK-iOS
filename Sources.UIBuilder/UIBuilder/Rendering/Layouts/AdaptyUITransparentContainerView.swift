@@ -39,6 +39,7 @@ struct AdaptyUITransparentContainerView: View {
                 element,
                 screenHolderBuilder: { EmptyView() } // TODO: x check
             )
+            .fixedSize(horizontal: false, vertical: true)
             .id(ScrollAnchor.footerTop)
             .onGeometrySizeChange { footerSize = $0 }
             .padding(.top, additionalTopPadding > 0.0 ? additionalTopPadding : nil)

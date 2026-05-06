@@ -64,6 +64,7 @@ struct AdaptyUIFlatContainerView: View {
                 screenHolderBuilder: { EmptyView() }, // TODO: x check
                 drawDecoratorBackground: drawFooterBackground
             )
+            .fixedSize(horizontal: false, vertical: true)
         }
     }
 
