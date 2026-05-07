@@ -59,14 +59,18 @@ package protocol AdaptyUIBuilderLogic {
     func makePurchase(
         product: ProductResolver,
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     )
 
-    func openWebPaywall(for product: ProductResolver, in openIn: VC.Action.WebOpenInParameter) async
+    func openWebPaywall(
+        for product: ProductResolver,
+        in openIn: VC.Action.WebOpenInParameter,
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
+    ) async
 
     func restorePurchases(
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.RestorePurchasesResult) -> Void
     )
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError)

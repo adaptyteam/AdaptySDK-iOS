@@ -19,7 +19,9 @@ package final class AdaptyUIEventsHandler {
     package var didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
     package var didSelectProduct: ((ProductResolver) -> Void)?
     package var didStartPurchase: ((ProductResolver) -> Void)?
+    package var didFinishPurchase: ((ProductResolver, VS.PurchaseResult) -> Void)?
     package var didStartRestore: (() -> Void)?
+    package var didFinishRestore: ((VS.RestorePurchasesResult) -> Void)?
     package var didFailRendering: ((AdaptyUIBuilderError) -> Void)?
     package var didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
 
@@ -28,7 +30,9 @@ package final class AdaptyUIEventsHandler {
         self.didPerformAction = nil
         self.didSelectProduct = nil
         self.didStartPurchase = nil
+        self.didFinishPurchase = nil
         self.didStartRestore = nil
+        self.didFinishRestore = nil
         self.didFailRendering = nil
         self.didReceiveAnalyticEvent = nil
     }
@@ -59,9 +63,19 @@ package final class AdaptyUIEventsHandler {
         didStartPurchase?(product)
     }
 
+    package func event_didFinishPurchase(product: ProductResolver, result: VS.PurchaseResult) {
+        Log.app.verbose("#\(logId)# event_didFinishPurchase: \(result.rawValue)")
+        didFinishPurchase?(product, result)
+    }
+
     package func event_didStartRestore() {
         Log.app.verbose("#\(logId)# event_didStartRestore")
         didStartRestore?()
+    }
+
+    package func event_didFinishRestore(result: VS.RestorePurchasesResult) {
+        Log.app.verbose("#\(logId)# event_didFinishRestore: \(result.rawValue)")
+        didFinishRestore?(result)
     }
 
     package func event_didFailRendering(with error: AdaptyUIBuilderError) {

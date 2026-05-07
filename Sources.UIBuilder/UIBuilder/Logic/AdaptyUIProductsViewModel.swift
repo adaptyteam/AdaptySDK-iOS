@@ -143,16 +143,31 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
     func purchaseSelectedProduct(
         fromGroupId groupId: String,
-        service: VC.Action.PaymentService
+        service: VC.Action.PaymentService,
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     ) {
         guard let productId = selectedProductId(by: groupId) else { return }
-        purchaseProduct(id: productId, service: service)
+        purchaseProduct(
+            id: productId,
+            service: service,
+            onFinish: onFinish
+        )
     }
 
-    func purchaseProduct(id flowProductId: String, service: VC.Action.PaymentService) {
+    func purchaseProduct(
+        id flowProductId: String,
+        service: VC.Action.PaymentService,
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
+    ) {
         guard let product = flowProducts?[flowProductId] else {
             Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(flowProductId)")
+            Task { @MainActor in onFinish(.fail) }
             return
+        }
+
+        let finish: @MainActor @Sendable (VS.PurchaseResult) -> Void = { [weak self] value in
+            self?.purchaseInProgress = false
+            onFinish(value)
         }
 
         switch service {
@@ -160,19 +175,28 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
             logic.makePurchase(
                 product: product,
                 onStart: { [weak self] in self?.purchaseInProgress = true },
-                onFinish: { [weak self] in self?.purchaseInProgress = false }
+                onFinish: finish
             )
         case .openWebPaywall(let openIn):
             Task { @MainActor [weak self] in
-                await self?.logic.openWebPaywall(for: product, in: openIn)
+                await self?.logic.openWebPaywall(
+                    for: product,
+                    in: openIn,
+                    onFinish: finish
+                )
             }
         }
     }
 
-    func restorePurchases() {
+    func restorePurchases(
+        onFinish: @MainActor @Sendable @escaping (VS.RestorePurchasesResult) -> Void
+    ) {
         logic.restorePurchases(
             onStart: { [weak self] in self?.restoreInProgress = true },
-            onFinish: { [weak self] in self?.restoreInProgress = false }
+            onFinish: { [weak self] value in
+                self?.restoreInProgress = false
+                onFinish(value)
+            }
         )
     }
 }

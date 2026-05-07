@@ -53,21 +53,22 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
     func makePurchase(
         product: ProductResolver,
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     ) {
         events.event_didStartPurchase(product: product)
     }
 
     func restorePurchases(
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.RestorePurchasesResult) -> Void
     ) {
         events.event_didStartRestore()
     }
 
     func openWebPaywall(
         for product: ProductResolver,
-        in openIn: VC.Action.WebOpenInParameter
+        in openIn: VC.Action.WebOpenInParameter,
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     ) async {}
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {

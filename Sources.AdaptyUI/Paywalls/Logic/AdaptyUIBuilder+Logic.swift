@@ -94,11 +94,12 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     func makePurchase(
         product: ProductResolver,
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     ) {
         guard let adaptyProduct = product as? AdaptyPaywallProduct
         else {
             Log.ui.error("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
+            Task { @MainActor in onFinish(.fail) }
             return
         }
 
@@ -106,18 +107,18 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
             observerModeResolver.observerMode(
                 didInitiatePurchase: adaptyProduct,
                 onStartPurchase: onStart,
-                onFinishPurchase: onFinish
+                onFinishPurchase: { Task { @MainActor in onFinish(.pending) } }
             )
         } else {
             Task { @MainActor in
                 onStart()
-                await makePurchaseWithAdapty(product: adaptyProduct)
-                onFinish()
+                let result = await makePurchaseWithAdapty(product: adaptyProduct)
+                onFinish(result)
             }
         }
     }
 
-    private func makePurchaseWithAdapty(product: AdaptyPaywallProduct) async {
+    private func makePurchaseWithAdapty(product: AdaptyPaywallProduct) async -> VS.PurchaseResult {
         events.event_didStartPurchase(product: product)
 
         do {
@@ -127,6 +128,12 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
                 product: product,
                 purchaseResult: purchaseResult
             )
+
+            switch purchaseResult {
+            case .success:      return .success
+            case .pending:      return .pending
+            case .userCancelled: return .userCanceled
+            }
         } catch {
             let adaptyError = error.asAdaptyError
 
@@ -135,19 +142,26 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
                     product: product,
                     purchaseResult: .userCancelled
                 )
+                return .userCanceled
             } else {
                 events.event_didFailPurchase(
                     product: product,
                     error: adaptyError
                 )
+                return .fail
             }
         }
     }
 
-    func openWebPaywall(for product: ProductResolver, in openIn: VC.Action.WebOpenInParameter) async {
+    func openWebPaywall(
+        for product: ProductResolver,
+        in openIn: VC.Action.WebOpenInParameter,
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
+    ) async {
         guard let adaptyProduct = product as? AdaptyPaywallProduct
         else {
             Log.ui.error("#\(logId)# makePurchase error: product is not AdaptyPaywallProduct")
+            await MainActor.run { onFinish(.fail) }
             return
         }
 
@@ -161,35 +175,40 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
                 product: adaptyProduct,
                 error: nil
             )
+            await MainActor.run { onFinish(.pending) }
         } catch {
             events.event_didFinishWebPaymentNavigation(
                 product: adaptyProduct,
                 error: error
             )
+            await MainActor.run { onFinish(.fail) }
         }
     }
 
     func restorePurchases(
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.RestorePurchasesResult) -> Void
     ) {
         if let observerModeResolver {
             observerModeResolver.observerModeDidInitiateRestorePurchases(
                 onStartRestore: onStart,
-                onFinishRestore: onFinish
+                onFinishRestore: { Task { @MainActor in onFinish(.success) } }
             )
         } else {
             Task { @MainActor in
                 events.event_didStartRestore()
 
                 onStart()
+                let result: VS.RestorePurchasesResult
                 do {
                     let profile = try await Adapty.restorePurchases()
                     events.event_didFinishRestore(with: profile)
+                    result = .success
                 } catch {
                     events.event_didFailRestore(with: error.asAdaptyError)
+                    result = .fail
                 }
-                onFinish()
+                onFinish(result)
             }
         }
     }

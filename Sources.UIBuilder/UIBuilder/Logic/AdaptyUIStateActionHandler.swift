@@ -76,6 +76,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     private nonisolated(unsafe) var pendingAlertDialogCallback: VS.JSAction?
     private nonisolated(unsafe) var pendingPermissionCallback: VS.JSAction?
     private nonisolated(unsafe) var pendingTimerCallbacks: [String: VS.JSAction] = [:]
+    private nonisolated(unsafe) var pendingPurchaseCallbacks: [String: VS.JSAction] = [:]
+    private nonisolated(unsafe) var pendingRestoreCallbacks: [String: VS.JSAction] = [:]
 
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
@@ -138,10 +140,35 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         service: VC.Action.PaymentService,
         callback: VS.JSAction?
     ) {
+        let token = UUID().uuidString
+
+        if let callback {
+            pendingPurchaseCallbacks[token] = callback
+        }
+
         Task { @MainActor [weak self] in
-            self?.productsViewModel.purchaseProduct(
+            guard let self else { return }
+            self.state?.sendSDKEvent(.willPurchase(productId: productId))
+
+            self.productsViewModel.purchaseProduct(
                 id: productId,
-                service: service
+                service: service,
+                onFinish: { [weak self] result in
+                    guard let self else { return }
+
+                    self.state?.sendSDKEvent(.didPurchase(productId: productId, result: result))
+
+                    guard let callback = self.pendingPurchaseCallbacks.removeValue(forKey: token) else { return }
+
+                    do {
+                        try self.state?.execute(
+                            action: callback,
+                            response: VS.PurchaseResponse(productId: productId, result: result)
+                        )
+                    } catch {
+                        Log.ui.error("purchase callback error: \(error)")
+                    }
+                }
             )
         }
     }
@@ -153,8 +180,32 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     }
 
     package nonisolated func restorePurchases(callback: VS.JSAction?) {
+        let token = UUID().uuidString
+
+        if let callback { pendingRestoreCallbacks[token] = callback }
+
         Task { @MainActor [weak self] in
-            self?.productsViewModel.restorePurchases()
+            guard let self else { return }
+            self.state?.sendSDKEvent(.willRestorePurchases)
+
+            self.productsViewModel.restorePurchases(
+                onFinish: { [weak self] result in
+                    guard let self else { return }
+
+                    self.state?.sendSDKEvent(.didRestorePurchases(result: result))
+
+                    guard let callback = self.pendingRestoreCallbacks.removeValue(forKey: token) else { return }
+
+                    do {
+                        try self.state?.execute(
+                            action: callback,
+                            response: VS.RestorePurchasesResponse(result: result)
+                        )
+                    } catch {
+                        Log.ui.error("restore callback error: \(error)")
+                    }
+                }
+            )
         }
     }
 
