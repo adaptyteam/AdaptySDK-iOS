@@ -51,4 +51,3 @@ extension Schema.StringReference: Decodable {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath, debugDescription: "value must be string_id or variable "))
     }
 }
-

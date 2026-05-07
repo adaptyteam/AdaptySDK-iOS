@@ -57,5 +57,4 @@ extension Schema.DateTimePicker: Decodable {
         minDate = try container.decodeDateTimeIfPresent(forKey: .minDate)
         color = try container.decodeIfPresent(Schema.AssetReference.self, forKey: .color)
     }
-
 }

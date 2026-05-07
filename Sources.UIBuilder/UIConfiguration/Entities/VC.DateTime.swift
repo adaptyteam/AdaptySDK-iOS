@@ -24,4 +24,3 @@ extension VC.DateTime {
         }
     }
 }
-

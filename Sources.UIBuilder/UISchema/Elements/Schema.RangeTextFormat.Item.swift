@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema.RangeTextFormat {
-    struct Item: Sendable, Hashable {
+    struct Item: Sendable {
         let from: Double
         let stringId: String
     }

@@ -79,4 +79,3 @@ extension Schema.Timer: DecodableWithConfiguration {
         }
     }
 }
-

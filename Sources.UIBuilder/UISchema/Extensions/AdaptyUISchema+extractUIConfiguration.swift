@@ -14,4 +14,3 @@ package extension AdaptyUISchema {
         return try ConfigurationBuilder(id: id, source: self, withLocaleId: localeId).localize(envoriment: envoriment)
     }
 }
-

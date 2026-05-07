@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Animation {
-    struct BoxParameters: Sendable, Hashable {
+    struct BoxParameters: Sendable {
         let width: Range<VC.Unit>?
         let height: Range<VC.Unit>?
     }

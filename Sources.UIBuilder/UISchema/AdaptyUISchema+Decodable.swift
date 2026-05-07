@@ -47,4 +47,3 @@ extension AdaptyUISchema {
         return try resultBox.value!.get()
     }
 }
-

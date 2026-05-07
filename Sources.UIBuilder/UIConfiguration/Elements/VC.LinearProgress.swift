@@ -9,7 +9,7 @@ import Foundation
 
 extension VC {
     struct LinearProgress: Sendable {
-        let orientation: Orientation 
+        let orientation: Orientation
         let cornerRadius: CornerRadius
         let asset: AssetReference
         let imageAspect: AspectRatio
@@ -26,4 +26,3 @@ extension VC.LinearProgress {
         case vertical(VC.VerticalAlignment)
     }
 }
-

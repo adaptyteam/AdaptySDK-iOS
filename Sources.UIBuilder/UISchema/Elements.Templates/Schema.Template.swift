@@ -30,4 +30,3 @@ extension Schema.Template: DecodableWithConfiguration {
         )
     }
 }
-

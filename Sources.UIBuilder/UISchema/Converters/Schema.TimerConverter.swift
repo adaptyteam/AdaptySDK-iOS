@@ -59,5 +59,3 @@ extension Schema.TimerConverter: Decodable {
         }
     }
 }
-
-

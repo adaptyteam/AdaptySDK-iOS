@@ -27,5 +27,4 @@ extension Schema.TextField.Placeholder: Decodable {
         let textAttributes = try Schema.TextAttributes(from: decoder)
         defaultTextAttributes = textAttributes.nonEmptyOrNil
     }
-
 }

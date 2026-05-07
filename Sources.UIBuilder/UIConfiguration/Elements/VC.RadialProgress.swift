@@ -21,4 +21,3 @@ extension VC {
         let actions: [Action]
     }
 }
-

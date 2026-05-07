@@ -65,4 +65,3 @@ extension Schema.Toggle: DecodableWithConfiguration {
         )
     }
 }
-

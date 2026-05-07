@@ -18,6 +18,6 @@ extension VC.IsEqualConverter: VS.DataBindingConverter {
         let boolValue = newValue.toJSValue(in: context).toBool()
         guard !boolValue else { return value }
         if let falseValue { return falseValue }
-        return Optional<VC.AnyValue>.none
+        return VC.AnyValue?.none
     }
 }

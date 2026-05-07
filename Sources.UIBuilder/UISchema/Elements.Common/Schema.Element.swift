@@ -278,4 +278,3 @@ extension Schema.Element: DecodableWithConfiguration {
         }
     }
 }
-

@@ -168,7 +168,7 @@ private extension SchemaTests.WheelItemsPickerTests {
     @Test("decode valid wheel items picker", arguments: jsonCases)
     func decodeValid(value: Value, json: Json) throws {
         let decoded = try json.decode(Value.self)
-//        #expect(decoded == value) //  TODO: 
+        #expect(decoded == value)
     }
 
     @Test("decode invalid JSON throws error", arguments: invalidJsons)

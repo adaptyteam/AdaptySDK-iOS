@@ -83,4 +83,3 @@ extension VC.AssetIdentifierOrValue: JSValueRepresentable {
         }
     }
 }
-

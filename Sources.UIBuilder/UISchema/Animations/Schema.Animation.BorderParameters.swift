@@ -23,4 +23,3 @@ extension Schema.Animation.BorderParameters: Decodable {
         }
     }
 }
-

@@ -11,7 +11,7 @@ extension Schema.Animation.Interpolator {
     static let `default` = Self.easeInOut
 }
 
-extension Schema.Animation.Interpolator: Codable {
+extension Schema.Animation.Interpolator: Decodable {
     enum Values: String {
         case easeInOut = "ease_in_out"
         case easeIn = "ease_in"
@@ -59,34 +59,6 @@ extension Schema.Animation.Interpolator: Codable {
             self = .easeOutBounce
         case .easeInOutBounce:
             self = .easeInOutBounce
-        }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .easeInOut:
-            try container.encode(Values.easeInOut.rawValue)
-        case .easeIn:
-            try container.encode(Values.easeIn.rawValue)
-        case .easeOut:
-            try container.encode(Values.easeOut.rawValue)
-        case .linear:
-            try container.encode(Values.linear.rawValue)
-        case .easeInElastic:
-            try container.encode(Values.easeInElastic.rawValue)
-        case .easeOutElastic:
-            try container.encode(Values.easeOutElastic.rawValue)
-        case .easeInOutElastic:
-            try container.encode(Values.easeInOutElastic.rawValue)
-        case .easeInBounce:
-            try container.encode(Values.easeInBounce.rawValue)
-        case .easeOutBounce:
-            try container.encode(Values.easeOutBounce.rawValue)
-        case .easeInOutBounce:
-            try container.encode(Values.easeInOutBounce.rawValue)
-        case let .cubicBezier(x1, x2, x3, x4):
-            try container.encode([x1, x2, x3, x4])
         }
     }
 }

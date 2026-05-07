@@ -169,4 +169,3 @@ private extension Decoder {
         return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
     }
 }
-

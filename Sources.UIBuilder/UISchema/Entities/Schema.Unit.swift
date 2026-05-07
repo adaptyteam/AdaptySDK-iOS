@@ -13,7 +13,7 @@ extension Schema.Unit {
     static let zero = Self.point(0.0)
 }
 
-extension Schema.Unit: Codable {
+extension Schema.Unit: Decodable {
     enum CodingKeys: String, CodingKey {
         case value
         case unit
@@ -45,19 +45,6 @@ extension Schema.Unit: Codable {
                     throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.unit], debugDescription: "usupport value: \(unit ?? "nil")"))
                 }
             }
-        }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        switch self {
-        case let .point(value):
-            try value.encode(to: encoder)
-        case let .screen(value):
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(value, forKey: .screen)
-        case let .safeArea(value):
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(value, forKey: .safeArea)
         }
     }
 }

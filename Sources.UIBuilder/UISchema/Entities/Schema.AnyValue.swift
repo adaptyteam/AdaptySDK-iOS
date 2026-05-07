@@ -56,4 +56,3 @@ extension Schema.AnyValue: Decodable {
         )
     }
 }
-

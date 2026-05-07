@@ -102,4 +102,3 @@ extension Schema.Button: DecodableWithConfiguration {
         )
     }
 }
-

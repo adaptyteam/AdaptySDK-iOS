@@ -19,4 +19,3 @@ extension Schema.Animation.RotationParameters: Decodable {
         anchor = try container.decodeIfPresent(Schema.Point.self, forKey: .anchor) ?? .center
     }
 }
-

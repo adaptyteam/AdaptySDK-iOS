@@ -5,11 +5,11 @@
 //  Created by Aleksei Valiano on 13.04.2026.
 //
 
-import Foundation
 import AdaptyCodable
+import Foundation
 
 extension VC {
-    protocol Value: Sendable, Hashable, JSValueConvertable {}
+    protocol Value: Sendable, JSValueConvertable {}
 
     struct AnyValue: Value {
         let wrapped: any Value
@@ -20,14 +20,6 @@ extension VC {
             } else {
                 wrapped = value
             }
-        }
-
-        static func == (lhs: Self, rhs: Self) -> Bool {
-            AnyHashable(lhs.wrapped) == AnyHashable(rhs.wrapped)
-        }
-
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(AnyHashable(wrapped))
         }
     }
 }
@@ -43,8 +35,6 @@ extension Optional: VC.Value where Wrapped: VC.Value {}
 
 extension Array: VC.Value where Element: VC.Value {}
 extension Dictionary: VC.Value where Key == String, Value: VC.Value {}
-
-
 
 extension VC.Value {
     var isNil: Bool {
@@ -84,4 +74,3 @@ extension VC.Value {
         return value
     }
 }
-

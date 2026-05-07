@@ -295,7 +295,7 @@ extension VS.JSState {
 
     func execute(
         action: VS.JSAction,
-        response: (some JSValueConvertable)
+        response: some JSValueConvertable
     ) throws(VS.Error) {
         _ = try invokeMethod(
             Bool.self,
@@ -383,4 +383,3 @@ extension VS.JSState {
         return debug(path: path.joined(separator: "."), filter: filter)
     }
 }
-

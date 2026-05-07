@@ -12,5 +12,3 @@ extension VC {
         let onAnimationsFinish: [Action]
     }
 }
-
-

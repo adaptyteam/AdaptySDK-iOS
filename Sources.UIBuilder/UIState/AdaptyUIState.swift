@@ -92,4 +92,3 @@ package final class AdaptyUIState: ObservableObject {
         try jsState.execute(action: action, response: response)
     }
 }
-

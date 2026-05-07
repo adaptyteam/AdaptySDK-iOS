@@ -180,21 +180,21 @@ extension View {
 private extension [VC.Animation] {
     var transitionInitialOpacity: Double? {
         for animation in self {
-            if case let .opacity(_, range) = animation { return range.start }
+            if case let .opacity(range) = animation.kind { return range.start }
         }
         return nil
     }
 
     var transitionInitialOffset: VC.Offset? {
         for animation in self {
-            if case let .offset(_, range) = animation { return range.start }
+            if case let .offset(range) = animation.kind { return range.start }
         }
         return nil
     }
 
     var transitionInitialScale: (x: Double, y: Double)? {
         for animation in self {
-            if case let .scale(_, params) = animation {
+            if case let .scale(params) = animation.kind {
                 return (params.scale.start.x, params.scale.start.y)
             }
         }
@@ -203,28 +203,28 @@ private extension [VC.Animation] {
 
     var transitionInitialScaleAnchor: UnitPoint? {
         for animation in self {
-            if case let .scale(_, params) = animation { return params.anchor.unitPoint }
+            if case let .scale(params) = animation.kind { return params.anchor.unitPoint }
         }
         return nil
     }
 
     var transitionInitialRotation: Angle? {
         for animation in self {
-            if case let .rotation(_, params) = animation { return .degrees(params.angle.start) }
+            if case let .rotation(params) = animation.kind { return .degrees(params.angle.start) }
         }
         return nil
     }
 
     var transitionInitialRotationAnchor: UnitPoint? {
         for animation in self {
-            if case let .rotation(_, params) = animation { return params.anchor.unitPoint }
+            if case let .rotation(params) = animation.kind { return params.anchor.unitPoint }
         }
         return nil
     }
 
     var transitionInitialBlurRadius: Double? {
         for animation in self {
-            if case let .blur(_, range) = animation { return range.start }
+            if case let .blur(range) = animation.kind { return range.start }
         }
         return nil
     }

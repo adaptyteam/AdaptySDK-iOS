@@ -27,4 +27,3 @@ extension Schema.Animation.Background: Decodable {
         )
     }
 }
-

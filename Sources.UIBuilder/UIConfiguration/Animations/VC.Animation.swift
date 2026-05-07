@@ -8,43 +8,28 @@
 import Foundation
 
 extension VC {
-    enum Animation: Sendable, Hashable {
-        case opacity(Timeline, Range<Double>)
-        case offset(Timeline, Range<Offset>)
-        case rotation(Timeline, RotationParameters)
-        case scale(Timeline, ScaleParameters)
-        case box(Timeline, BoxParameters)
-        case background(Timeline, Range<AssetReference>)
-        case border(Timeline, BorderParameters)
-        case shadow(Timeline, ShadowParameters)
-        case innerShadow(Timeline, ShadowParameters)
-        case blur(Timeline, Range<Double>)
+    struct Animation: Sendable, Identifiable {
+        let id = UUID()
+        let timeline: Timeline
+        let kind: Kind
     }
 }
 
+extension VC.Animation: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
+}
+
 extension VC.Animation {
-    var timeline: Timeline {
-        switch self {
-        case let .opacity(timeline, _):
-            timeline
-        case let .offset(timeline, _):
-            timeline
-        case let .rotation(timeline, _):
-            timeline
-        case let .scale(timeline, _):
-            timeline
-        case let .box(timeline, _):
-            timeline
-        case let .background(timeline, _):
-            timeline
-        case let .border(timeline, _):
-            timeline
-        case let .shadow(timeline, _):
-            timeline
-        case let .innerShadow(timeline, _):
-            timeline
-        case let .blur(timeline, _):
-            timeline
-        }
+    enum Kind: Sendable {
+        case opacity(Range<Double>)
+        case offset(Range<VC.Offset>)
+        case rotation(RotationParameters)
+        case scale(ScaleParameters)
+        case box(BoxParameters)
+        case background(Range<VC.AssetReference>)
+        case border(BorderParameters)
+        case shadow(ShadowParameters)
+        case innerShadow(ShadowParameters)
+        case blur(Range<Double>)
     }
 }

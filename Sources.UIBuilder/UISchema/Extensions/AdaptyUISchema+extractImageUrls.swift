@@ -28,4 +28,3 @@ package extension AdaptyUISchema {
         })
     }
 }
-

@@ -71,7 +71,8 @@ struct AdaptyUIFlowRendererView: View {
             isPresented: alertIsPresented,
             actions: {
                 if let buttons = stateViewModel.alertDialog?.params.buttons, !buttons.isEmpty {
-                    ForEach(buttons, id: \.self) { button in
+                    ForEach(buttons.indices, id: \.self) { idx in
+                        let button = buttons[idx]
                         Button(button.title ?? "", role: button.style.buttonRole) {
                             stateViewModel.onAlertDialogResponse?(
                                 button.actionId,

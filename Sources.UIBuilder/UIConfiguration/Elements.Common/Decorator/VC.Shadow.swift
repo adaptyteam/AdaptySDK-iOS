@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Shadow: Sendable, Hashable {
+    struct Shadow: Sendable {
         let filling: AssetReference
         let blurRadius: Double
         let offset: Offset

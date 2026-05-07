@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.ColorGradient {
-    struct Item: Sendable, Hashable {
+    struct Item: Sendable {
         let color: VC.Color
         let p: Double
     }

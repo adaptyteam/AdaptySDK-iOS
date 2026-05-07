@@ -394,8 +394,9 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         var tokens = Set<AdaptyUIAnimationToken>()
 
         for animation in animations {
-            switch animation {
-            case let .background(timeline, value):
+            let timeline = animation.timeline
+            switch animation.kind {
+            case let .background(value):
                 self.animatedBackgroundFilling = value.start
 
                 tokens.insert(
@@ -405,7 +406,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                         updateBlock: { self.animatedBackgroundFilling = $0 }
                     )
                 )
-            case let .border(timeline, value):
+            case let .border(value):
                 self.animatedBorderThickness = value.thickness?.start
 
                 if let color = value.color {
@@ -431,7 +432,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                         )
                     )
                 }
-            case let .innerShadow(timeline, value):
+            case let .innerShadow(value):
                 guard #available(iOS 16.0, *) else { break }
 
                 if let colorValue = value.color {

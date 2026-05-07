@@ -144,4 +144,3 @@ extension Schema.Action {
         }
     }
 }
-

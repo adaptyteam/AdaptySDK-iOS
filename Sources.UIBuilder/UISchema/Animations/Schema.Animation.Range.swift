@@ -19,4 +19,3 @@ extension Schema.Animation.Range: Decodable where T: Decodable {
         end = try container.decode(T.self, forKey: .end)
     }
 }
-

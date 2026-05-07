@@ -55,9 +55,6 @@ extension VC.RichText.Attributes {
         )
     }
 
-
-    
-
 //
 //    return .init(
 //        fontAssetId: attr.fontAssetId?.getAssetIdentifier(state: state, screen: screen),
@@ -69,4 +66,3 @@ extension VC.RichText.Attributes {
 //        underline: attr.underline
 //    ).nonEmptyOrNil
 }
-

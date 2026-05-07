@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum ImageData: Sendable, Hashable {
+    enum ImageData: Sendable {
         case raster(customId: String?, Data)
         case url(customId: String?, URL, previewRaster: Data?)
     }

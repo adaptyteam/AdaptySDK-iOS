@@ -67,4 +67,3 @@ private extension Schema.StringReference.Product {
         )
     }
 }
-

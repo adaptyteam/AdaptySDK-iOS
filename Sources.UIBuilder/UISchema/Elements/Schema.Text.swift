@@ -43,4 +43,3 @@ extension Schema.Text: Decodable {
         )
     }
 }
-

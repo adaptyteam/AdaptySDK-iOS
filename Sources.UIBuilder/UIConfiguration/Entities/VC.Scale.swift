@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Scale: Sendable, Hashable {
+    struct Scale: Sendable {
         let scale: VC.Point
         let anchor: VC.Point
     }
@@ -18,7 +18,6 @@ extension VC.Scale {
     @inlinable
     var isEmpty: Bool {
         scale.x == 1
-        && scale.y == 1
+            && scale.y == 1
     }
 }
-

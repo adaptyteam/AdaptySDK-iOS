@@ -7,7 +7,7 @@
 
 import Foundation
 
-package protocol AdaptyUIActionHandler: AnyObject {
+protocol AdaptyUIActionHandler: AnyObject {
     func openUrl(url: URL, openIn: VC.Action.WebOpenInParameter)
     func openUrl(stringId: String, openIn: VC.Action.WebOpenInParameter)
     func userCustomAction(id: String)
@@ -32,8 +32,8 @@ package protocol AdaptyUIActionHandler: AnyObject {
     func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction?)
 }
 
-package extension VS {
-    enum SetTimerBehavior: String, Sendable, Hashable {
+extension VS {
+    enum SetTimerBehavior: String, Sendable {
         case restart
         case `continue`
         case persisted
@@ -41,13 +41,13 @@ package extension VS {
     }
 }
 
-package extension VS {
-    enum ScrollKind: String, Sendable, Hashable {
+extension VS {
+    enum ScrollKind: String, Sendable {
         case content
         case footer
     }
 
-    enum ScrollValue: String, Sendable, Hashable {
+    enum ScrollValue: String, Sendable {
         case start
         case end
     }
@@ -76,4 +76,3 @@ package extension VS {
         }
     }
 }
-

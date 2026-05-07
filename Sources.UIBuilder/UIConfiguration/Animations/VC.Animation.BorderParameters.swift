@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Animation {
-    struct BorderParameters: Sendable, Hashable {
+    struct BorderParameters: Sendable {
         let color: Range<VC.AssetReference>?
         let thickness: Range<Double>?
     }

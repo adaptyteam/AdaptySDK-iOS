@@ -13,7 +13,7 @@ extension Schema.Rotation {
     static let zero = Self(angle: 0, anchor: .center)
 }
 
-extension Schema.Rotation: Codable {
+extension Schema.Rotation: Decodable {
     enum CodingKeys: String, CodingKey {
         case angle
         case anchor
@@ -27,13 +27,4 @@ extension Schema.Rotation: Codable {
             anchor: container.decodeIfPresent(Schema.Point.self, forKey: .anchor) ?? .center
         )
     }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(angle, forKey: .angle)
-        if anchor != .center {
-            try container.encode(anchor, forKey: .anchor)
-        }
-    }
 }
-

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Text {
-    enum OverflowMode: Sendable, Hashable {
+    enum OverflowMode: Sendable {
         case scale
         case unknown
     }

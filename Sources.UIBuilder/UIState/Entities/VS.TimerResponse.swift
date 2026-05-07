@@ -8,8 +8,8 @@
 import Foundation
 import JavaScriptCore
 
-package extension VS {
-    struct TimerResponse: Sendable, Hashable {
+extension VS {
+    struct TimerResponse: Sendable {
         let timerId: String?
     }
 }
@@ -21,4 +21,3 @@ extension VS.TimerResponse: JSValueConvertable {
         return object
     }
 }
-

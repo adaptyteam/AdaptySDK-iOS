@@ -27,4 +27,3 @@ extension VS.ActionParameters: JSValueConvertable {
         return object
     }
 }
-

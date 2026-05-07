@@ -22,4 +22,3 @@ extension VC {
         let footerScrollValue: Variable?
     }
 }
-

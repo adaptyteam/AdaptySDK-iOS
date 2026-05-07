@@ -101,8 +101,9 @@ struct AdaptyUIAnimatableFrameModifier: ViewModifier {
         var tokens = Set<AdaptyUIAnimationToken>()
 
         for animation in animations {
-            switch animation {
-            case .box(let timeline, let value):
+            let timeline = animation.timeline
+            switch animation.kind {
+            case .box(let value):
                 let frameAnimationRange: FrameAnimationRange?
 
                 switch (value.width, value.height) {

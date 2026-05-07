@@ -8,20 +8,20 @@
 import Foundation
 import JavaScriptCore
 
-package extension VS {
-    struct ShowAlertDialogParameters: Sendable, Hashable {
+extension VS {
+    struct ShowAlertDialogParameters: Sendable {
         let title: String?
         let message: String?
         let buttons: [Button]
     }
 
-    struct ShowAlertDialogParametersResponse: Sendable, Hashable {
+    struct ShowAlertDialogParametersResponse: Sendable {
         let actionId: String?
     }
 }
 
 extension VS.ShowAlertDialogParameters {
-    struct Button: Sendable, Hashable {
+    struct Button: Sendable {
         let title: String?
         let style: ActionStyle
         let actionId: String?
@@ -29,7 +29,7 @@ extension VS.ShowAlertDialogParameters {
 }
 
 extension VS.ShowAlertDialogParameters {
-    enum ActionStyle: String {
+    enum ActionStyle: String, Hashable {
         case `default`
         case cancel
         case destructive
@@ -83,4 +83,3 @@ extension VS.ShowAlertDialogParameters.Button {
         )
     }
 }
-

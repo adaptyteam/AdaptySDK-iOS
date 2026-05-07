@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum AssetReference: Sendable, Hashable {
+    enum AssetReference: Sendable {
         case assetId(AssetIdentifier)
         case color(Color)
         case variable(Variable)
@@ -25,4 +25,3 @@ extension VC.AssetIdentifierOrValue {
         }
     }
 }
-

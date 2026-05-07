@@ -17,7 +17,7 @@ extension Schema.Point {
     static let center = Self(x: 0.5, y: 0.5)
 }
 
-extension Schema.Point: Codable {
+extension Schema.Point: Decodable {
     enum CodingKeys: String, CodingKey {
         case x
         case y
@@ -38,10 +38,5 @@ extension Schema.Point: Codable {
                 y: container.decodeIfPresent(Double.self, forKey: .y) ?? 0.0
             )
         }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode([y, x])
     }
 }

@@ -29,6 +29,3 @@ extension Schema.PercentConverter: Decodable {
         }
     }
 }
-
-
-

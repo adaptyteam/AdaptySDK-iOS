@@ -42,8 +42,6 @@ extension VS.JSState {
         let products = VC.AnyValue(Dictionary(products.map { ($0.id, VC.AnyValue($0.values)) }, uniquingKeysWith: { first, _ in first }))
             .toJSValue(in: context)
 
-         
-
         let objectClass = context.objectForKeyedSubscript("Object")
         objectClass?.invokeMethod("freeze", withArguments: [products])
         #if DEBUG
@@ -59,4 +57,3 @@ extension VS.JSState {
         #endif
     }
 }
-

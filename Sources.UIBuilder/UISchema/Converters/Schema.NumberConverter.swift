@@ -41,4 +41,3 @@ extension String {
         return range(of: pattern, options: .regularExpression) != nil
     }
 }
-
