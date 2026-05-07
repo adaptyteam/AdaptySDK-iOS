@@ -127,7 +127,17 @@ public extension AdaptyUI {
                 stateHolder: stateHolder
             )
 
+            productsViewModel.onProductsLoaded = { [weak stateHolder] resolvers in
+                let constants = resolvers.compactMap { $0 as? AdaptyPaywallProduct }.asUIBuilderFlowProducts()
+                stateHolder?.setProducts(constants)
+            }
+
             stateHolder.start()
+
+            if let products, !products.isEmpty {
+                stateHolder.setProducts(products.asUIBuilderFlowProducts())
+            }
+
             productsViewModel.loadProductsIfNeeded()
         }
 

@@ -47,6 +47,10 @@ package final class AdaptyUIStateHolder {
 
         state.startOnce()
     }
+
+    package func setProducts(_ products: [VC.FlowConstants.ProductConstants]) {
+        state.setProductsConstants(products)
+    }
 }
 
 @MainActor
@@ -361,4 +365,3 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 }
 
 #endif
-
