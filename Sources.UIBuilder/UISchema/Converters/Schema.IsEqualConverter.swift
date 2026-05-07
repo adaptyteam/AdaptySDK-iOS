@@ -33,4 +33,3 @@ extension Schema.IsEqualConverter: Decodable {
         )
     }
 }
-

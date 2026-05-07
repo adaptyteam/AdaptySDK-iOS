@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 05.12.2025.
 //
 
-import Foundation
 import AdaptyCodable
+import Foundation
 
 extension Schema {
     struct ScreensCollection: Sendable {
@@ -101,8 +101,8 @@ private extension Decoder {
                     end: navigatorBackground
                 )
             ),
-            content: [.offset(
-                .init(
+            content: [.init(
+                timeline: .init(
                     duration: 0.35,
                     interpolator: .easeIn,
                     startDelay: 0,
@@ -111,10 +111,10 @@ private extension Decoder {
                     pingPongDelay: 0,
                     loopCount: nil
                 ),
-                .init(
+                kind: .offset(.init(
                     start: .init(x: .zero, y: .screen(1)),
                     end: .zero
-                )
+                ))
             )]
         )
         let onDisappear = Schema.Navigator.AppearanceTransition(
@@ -133,8 +133,8 @@ private extension Decoder {
                     end: clearBackground
                 )
             ),
-            content: [.offset(
-                .init(
+            content: [.init(
+                timeline: .init(
                     duration: 0.35,
                     interpolator: .linear,
                     startDelay: 0,
@@ -143,10 +143,10 @@ private extension Decoder {
                     pingPongDelay: 0,
                     loopCount: nil
                 ),
-                .init(
+                kind: .offset(.init(
                     start: .zero,
                     end: .init(x: .zero, y: .screen(1))
-                )
+                ))
             )]
         )
 
@@ -188,4 +188,3 @@ private extension Decoder {
         )
     }
 }
-

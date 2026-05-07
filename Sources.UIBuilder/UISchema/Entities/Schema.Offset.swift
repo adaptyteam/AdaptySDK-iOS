@@ -14,7 +14,7 @@ extension Schema.Offset {
 //    static let one = Self(x: .point(1.0), y: .point(1.0))
 }
 
-extension Schema.Offset: Codable {
+extension Schema.Offset: Decodable {
     enum CodingKeys: String, CodingKey {
         case x
         case y
@@ -36,15 +36,6 @@ extension Schema.Offset: Codable {
                 x: container.decodeIfPresent(Schema.Unit.self, forKey: .x) ?? .zero,
                 y: container.decodeIfPresent(Schema.Unit.self, forKey: .y) ?? .zero
             )
-        }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        if case .point(0) = x {
-            try container.encode(y)
-        } else {
-            try container.encode([y, x])
         }
     }
 }

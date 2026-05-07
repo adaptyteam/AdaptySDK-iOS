@@ -11,7 +11,7 @@ extension Schema {
     typealias AssetIdentifierOrValue = VC.AssetIdentifierOrValue
 }
 
-extension Schema.AssetIdentifierOrValue: Codable {
+extension Schema.AssetIdentifierOrValue: Decodable {
     init(from decoder: Decoder) throws {
         let value = try decoder.singleValueContainer().decode(String.self)
 
@@ -21,16 +21,5 @@ extension Schema.AssetIdentifierOrValue: Codable {
             } else {
                 .assetId(value)
             }
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-
-        switch self {
-        case let .assetId(value):
-            try container.encode(value)
-        case let .color(color):
-            try container.encode(color)
-        }
     }
 }

@@ -38,4 +38,3 @@ extension Schema.Box.Length: Decodable {
         }
     }
 }
-

@@ -55,4 +55,3 @@ extension Schema.Decorator: Decodable {
         )
     }
 }
-

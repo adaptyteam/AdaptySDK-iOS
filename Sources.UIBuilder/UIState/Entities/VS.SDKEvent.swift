@@ -18,7 +18,7 @@ extension VS {
 }
 
 extension VS.SDKEvent {
-    enum Name: String, VC.Value {
+    enum Name: String, Hashable, VC.Value {
         case productLoaded
         case willPurchase
         case didPurchase
@@ -71,4 +71,3 @@ extension VS.SDKEvent: JSValueConvertable {
         return object
     }
 }
-

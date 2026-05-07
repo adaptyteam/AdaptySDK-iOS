@@ -8,8 +8,8 @@
 import Foundation
 import JavaScriptCore
 
-package extension VS {
-    struct ScreenInstance {
+extension VS {
+    struct ScreenInstance: Identifiable {
         let id: String
         let navigatorId: String
         let configuration: VC.Screen

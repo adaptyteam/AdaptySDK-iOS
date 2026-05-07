@@ -11,4 +11,3 @@ extension VC.EventHandler {
         case notFirst
     }
 }
-

@@ -46,5 +46,4 @@ extension Schema.ScreenActions: Decodable {
             onDidDisappear: container.decodeIfPresentActions(forKey: .onDidDisappear)
         )
     }
-
 }

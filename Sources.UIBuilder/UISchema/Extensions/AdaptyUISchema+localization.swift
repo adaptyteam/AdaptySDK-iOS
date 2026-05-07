@@ -40,4 +40,3 @@ private extension Schema.Localization {
         )
     }
 }
-

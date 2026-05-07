@@ -25,4 +25,3 @@ extension Schema.Animation.ShadowParameters: Decodable {
         }
     }
 }
-

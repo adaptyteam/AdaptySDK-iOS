@@ -17,7 +17,7 @@ extension Schema.RichText.Attributes? {
     }
 }
 
-extension Schema.RichText.Attributes: Codable {
+extension Schema.RichText.Attributes: Decodable {
     enum CodingKeys: String, CodingKey {
         case size
         case fontAssetId = "font"
@@ -41,18 +41,5 @@ extension Schema.RichText.Attributes: Codable {
             underline: container.decodeIfPresent(Bool.self, forKeys: .underline),
             letterSpacing: container.decodeIfPresent(Double.self, forKey: .letterSpacing)
         )
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(fontAssetId, forKey: .fontAssetId)
-        try container.encodeIfPresent(size, forKey: .size)
-        try container.encodeIfPresent(txtColor, forKey: .txtColor)
-        try container.encodeIfPresent(imageTintColor, forKey: .imageTintColor)
-        try container.encodeIfPresent(background, forKey: .background)
-        try container.encodeIfPresent(strike, forKey: .strike)
-        try container.encodeIfPresent(underline, forKey: .underline)
-        try container.encodeIfPresent(letterSpacing, forKey: .letterSpacing)
-
     }
 }

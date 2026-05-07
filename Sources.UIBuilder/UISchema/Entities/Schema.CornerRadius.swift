@@ -15,7 +15,7 @@ extension Schema.CornerRadius {
     static let zero = Self(same: .zero)
 }
 
-extension Schema.CornerRadius: Codable {
+extension Schema.CornerRadius: Decodable {
     enum CodingKeys: String, CodingKey {
         case topLeading = "top_leading"
         case topTrailing = "top_trailing"
@@ -45,13 +45,5 @@ extension Schema.CornerRadius: Codable {
                 bottomLeading: container.decodeIfPresent(Double.self, forKey: .bottomLeading) ?? .zero
             )
         }
-    }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if !topLeading.isZero { try container.encode(topLeading, forKey: .topLeading) }
-        if !topTrailing.isZero { try container.encode(topTrailing, forKey: .topTrailing) }
-        if !bottomTrailing.isZero { try container.encode(bottomTrailing, forKey: .bottomTrailing) }
-        if !bottomLeading.isZero { try container.encode(bottomLeading, forKey: .bottomLeading) }
     }
 }

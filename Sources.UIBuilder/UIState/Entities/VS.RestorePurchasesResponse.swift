@@ -7,8 +7,8 @@
 
 import JavaScriptCore
 
-package extension VS {
-    struct RestorePurchasesResponse: Sendable, Hashable {
+extension VS {
+    struct RestorePurchasesResponse: Sendable {
         let result: RestorePurchasesResult
     }
 

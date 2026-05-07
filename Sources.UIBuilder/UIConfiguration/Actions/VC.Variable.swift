@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Variable: Sendable, Hashable {
+    struct Variable: Sendable {
         let path: [String]
         let setter: String?
         let scope: Scope
@@ -25,4 +25,3 @@ extension VC.Variable {
         }
     }
 }
-

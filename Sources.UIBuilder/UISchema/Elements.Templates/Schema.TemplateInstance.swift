@@ -59,4 +59,3 @@ extension Schema.TemplateInstance: DecodableWithConfiguration {
 //        return childs.isEmpty ? nil : childs
 //    }
 }
-

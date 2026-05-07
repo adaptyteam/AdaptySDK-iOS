@@ -141,7 +141,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
 
         let eventHandlers: [Schema.EventHandler]
         if let array = try container.decodeIfPresent([Schema.EventHandler].self, forKey: .eventHandlers) {
-            eventHandlers = array.filter{ !$0.isEmpty }
+            eventHandlers = array.filter { !$0.isEmpty }
         } else {
             let animations: [Schema.Animation] =
 
@@ -207,4 +207,3 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         )
     }
 }
-

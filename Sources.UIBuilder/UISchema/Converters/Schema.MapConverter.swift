@@ -17,4 +17,3 @@ extension Schema.MapConverter: Decodable {
         try self.init(values: container.decode([Schema.AnyValue].self, forKey: .converterParameters))
     }
 }
-

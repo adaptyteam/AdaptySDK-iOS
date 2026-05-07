@@ -14,4 +14,3 @@ extension VC {
         case legacy
     }
 }
-

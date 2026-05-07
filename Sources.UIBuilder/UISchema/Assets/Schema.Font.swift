@@ -71,4 +71,3 @@ extension Schema.Font: Decodable {
         defaultLineHeight = try container.decodeIfPresent(Double.self, forKey: .defaultLineHeight)
     }
 }
-

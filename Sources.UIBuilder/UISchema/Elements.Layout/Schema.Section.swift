@@ -87,4 +87,3 @@ extension Schema.Section: DecodableWithConfiguration {
         )
     }
 }
-

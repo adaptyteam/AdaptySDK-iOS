@@ -320,8 +320,8 @@ extension VC.Navigator.AppearanceTransition {
     var initialContentOpacity: Double {
         content?
             .compactMap {
-                if case let .opacity(timeline, range) = $0 {
-                    return (timeline: timeline, range: range)
+                if case let .opacity(range) = $0.kind {
+                    return (timeline: $0.timeline, range: range)
                 } else {
                     return nil
                 }
@@ -333,8 +333,8 @@ extension VC.Navigator.AppearanceTransition {
     var initialContentOffset: VC.Offset {
         content?
             .compactMap {
-                if case let .offset(timeline, range) = $0 {
-                    return (timeline: timeline, range: range)
+                if case let .offset(range) = $0.kind {
+                    return (timeline: $0.timeline, range: range)
                 } else {
                     return nil
                 }

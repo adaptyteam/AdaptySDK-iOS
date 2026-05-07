@@ -22,5 +22,4 @@ extension Schema.StringReference.TagValue: Decodable {
 
         throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "must be string, or variable"))
     }
-
 }

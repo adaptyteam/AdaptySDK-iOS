@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 05.12.2025.
 //
 
-import Foundation
 import AdaptyCodable
+import Foundation
 
 extension KeyedDecodingContainer {
     private func findKey(_ key: Key, _ fallback: [Key]) -> Key {

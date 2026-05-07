@@ -64,4 +64,3 @@ extension Schema.Row: DecodableWithConfiguration {
         )
     }
 }
-

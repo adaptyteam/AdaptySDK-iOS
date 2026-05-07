@@ -30,4 +30,3 @@ extension Schema.EventHandler.Filter: RawRepresentable {
 }
 
 extension Schema.EventHandler.Filter: Codable {}
-

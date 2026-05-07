@@ -40,4 +40,3 @@ extension Schema.AutoSizeMode: RawRepresentable {
 }
 
 extension Schema.AutoSizeMode: Codable {}
-

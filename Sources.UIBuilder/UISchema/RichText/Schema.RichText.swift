@@ -29,5 +29,4 @@ extension Schema.RichText: Decodable {
                 try [Item](from: decoder)
             }
     }
-
 }

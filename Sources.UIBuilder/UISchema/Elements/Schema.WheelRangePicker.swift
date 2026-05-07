@@ -60,4 +60,3 @@ extension Schema.WheelRangePicker: Decodable {
         )
     }
 }
-

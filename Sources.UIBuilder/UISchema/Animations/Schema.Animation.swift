@@ -41,48 +41,46 @@ extension Schema.Animation: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let typeName = try container.decode(String.self, forKey: .type)
-        switch Types(rawValue: typeName) {
-        case nil:
-            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Unknown animation type with name \(typeName)'"))
-        case .fade:
-            self = try .opacity(.init(from: decoder), .init(start: 0.0, end: 1.0))
-        case .opacity:
-            self = try .opacity(
-                .init(from: decoder),
-                container.decodeIfPresent(Range<Double>.self, forKey: .opacity)
-                    ?? .init(start: 0.0, end: 1.0)
-            )
-        case .offset:
-            self = try .offset(
-                .init(from: decoder),
-                container.decode(Range<Schema.Offset>.self, forKey: .offset)
-            )
-        case .rotation:
-            self = try .rotation(
-                .init(from: decoder),
-                .init(from: decoder)
-            )
-        case .scale:
-            self = try .scale(.init(from: decoder), .init(from: decoder))
-        case .box:
-            self = try .box(.init(from: decoder), .init(from: decoder))
-        case .background:
-            self = try .background(
-                .init(from: decoder),
-                container.decode(Range<Schema.AssetReference>.self, forKey: .color)
-            )
-        case .border:
-            self = try .border(.init(from: decoder), .init(from: decoder))
-        case .shadow:
-            self = try .shadow(.init(from: decoder), .init(from: decoder))
-        case .innerShadow:
-            self = try .innerShadow(.init(from: decoder), .init(from: decoder))
-        case .blur:
-            self = try .blur(
-                .init(from: decoder),
-                container.decode(Range<Double>.self, forKey: .blurRadius)
-            )
-        }
+        let kind: Schema.Animation.Kind =
+            switch Types(rawValue: typeName) {
+            case nil:
+                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "Unknown animation type with name \(typeName)'"))
+            case .fade:
+                .opacity(.init(start: 0.0, end: 1.0))
+            case .opacity:
+                try .opacity(
+                    container.decodeIfPresent(Range<Double>.self, forKey: .opacity) ?? .init(start: 0.0, end: 1.0)
+                )
+            case .offset:
+                try .offset(
+                    container.decode(Range<Schema.Offset>.self, forKey: .offset)
+                )
+            case .rotation:
+                try .rotation(.init(from: decoder))
+            case .scale:
+                try .scale(.init(from: decoder))
+            case .box:
+                try .box(.init(from: decoder))
+            case .background:
+                try .background(
+                    container.decode(Range<Schema.AssetReference>.self, forKey: .color)
+                )
+            case .border:
+                try .border(.init(from: decoder))
+            case .shadow:
+                try .shadow(.init(from: decoder))
+            case .innerShadow:
+                try .innerShadow(.init(from: decoder))
+            case .blur:
+                try .blur(
+                    container.decode(Range<Double>.self, forKey: .blurRadius)
+                )
+            }
+
+        try self.init(
+            timeline: .init(from: decoder),
+            kind: kind
+        )
     }
 }
 

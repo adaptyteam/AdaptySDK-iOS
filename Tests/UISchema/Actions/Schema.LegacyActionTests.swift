@@ -212,7 +212,7 @@ extension SchemaTests {
         @Test("decode valid action (legacy format)", arguments: jsonCases)
         func decode(value: Value, json: Json) throws {
             let decoded = try json.decode(Value.self)
-//            #expect(decoded == value) // TODO:
+            #expect(decoded == value) 
         }
     }
 }

@@ -20,7 +20,7 @@ package final class AdaptyUIStateHolder {
 
     package init(
         logId: String,
-        actionHandler: AdaptyUIActionHandler,
+        actionHandler: AdaptyUIStateActionHandler,
         viewConfiguration: VC,
         isInspectable: Bool
     ) {
@@ -89,7 +89,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         self.logic = logic
     }
 
-    package nonisolated func registerState(_ state: AdaptyUIState) {
+    nonisolated func registerState(_ state: AdaptyUIState) {
         Task { @MainActor [weak self] in
             self?.state = state
             self?.screensViewModel.executeActions = { [weak state] actions, screen in
@@ -98,7 +98,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func openUrl(
+    nonisolated func openUrl(
         url: URL,
         openIn _: VC.Action.WebOpenInParameter
     ) {
@@ -111,7 +111,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         try? state?.richText(stringId)
     }
 
-    package nonisolated func openUrl(
+    nonisolated func openUrl(
         stringId: String,
         openIn _: VC.Action.WebOpenInParameter
     ) {
@@ -129,13 +129,13 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func userCustomAction(id: String) {
+    nonisolated func userCustomAction(id: String) {
         Task { @MainActor [weak self] in
             self?.logic.reportDidPerformAction(.custom(id: id))
         }
     }
 
-    package nonisolated func purchaseProduct(
+    nonisolated func purchaseProduct(
         productId: String,
         service: VC.Action.PaymentService,
         callback: VS.JSAction?
@@ -173,13 +173,13 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func openWebPaywall(
+    nonisolated func openWebPaywall(
         openIn _: VC.Action.WebOpenInParameter
     ) {
         // TODO: Deperecated
     }
 
-    package nonisolated func restorePurchases(callback: VS.JSAction?) {
+    nonisolated func restorePurchases(callback: VS.JSAction?) {
         let token = UUID().uuidString
 
         if let callback { pendingRestoreCallbacks[token] = callback }
@@ -209,13 +209,13 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func closeAll() {
+    nonisolated func closeAll() {
         Task { @MainActor [weak self] in
             self?.logic.reportDidPerformAction(.close)
         }
     }
 
-    package nonisolated func selectProduct(
+    nonisolated func selectProduct(
         productId: String
     ) {
         Task { @MainActor [weak self] in
@@ -229,7 +229,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func openScreen(
+    nonisolated func openScreen(
         instance: VS.ScreenInstance,
         transitionId: String
     ) {
@@ -242,7 +242,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func closeScreen(
+    nonisolated func closeScreen(
         navigatorId: String,
         transitionId: String
     ) {
@@ -255,7 +255,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func changeFocus(
+    nonisolated func changeFocus(
         id: String?
     ) {
         Task { @MainActor [weak self] in
@@ -263,7 +263,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func setTimer(
+    nonisolated func setTimer(
         id: String,
         endAt: Date,
         callback: VS.JSAction?
@@ -276,7 +276,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func setTimer(
+    nonisolated func setTimer(
         id: String,
         duration: TimeInterval,
         behavior: VS.SetTimerBehavior,
@@ -290,7 +290,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func moveScroll(
+    nonisolated func moveScroll(
         instanceId: String,
         kind: VS.ScrollKind,
         value: VS.ScrollValue
@@ -300,7 +300,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func showAlertDialog(
+    nonisolated func showAlertDialog(
         params: VS.ShowAlertDialogParameters,
         callback: VS.JSAction?
     ) {
@@ -310,7 +310,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package func handleAlertDialogResponse(actionId: String?, screenInstance: VS.ScreenInstance?) {
+    func handleAlertDialogResponse(actionId: String?, screenInstance: VS.ScreenInstance?) {
         let callback = pendingAlertDialogCallback
         pendingAlertDialogCallback = nil
 
@@ -323,7 +323,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package func handleTimerCallback(timerId: String, callback: VS.JSAction) {
+    func handleTimerCallback(timerId: String, callback: VS.JSAction) {
         guard let screenInstance = screensViewModel.topmostScreenInstance else { return }
         let response = VS.TimerResponse(timerId: timerId)
         do {
@@ -333,13 +333,13 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func showAppRate() {
+    nonisolated func showAppRate() {
         Task { @MainActor [weak self] in
             await self?.systemRequestsHandler?.handleAppReviewRequest()
         }
     }
 
-    package nonisolated func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction?) {
+    nonisolated func showRequestPermission(params: VS.ShowRequestPermissionParameters, callback: VS.JSAction?) {
         pendingPermissionCallback = callback
         Task { @MainActor [weak self] in
             guard let self, let handler = self.systemRequestsHandler else { return }
@@ -369,7 +369,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func sendEvents(instanceId: String?, eventIds: [String]) {
+    nonisolated func sendEvents(instanceId: String?, eventIds: [String]) {
         Task { @MainActor [weak self] in
             guard let self else { return }
 
@@ -399,7 +399,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    package nonisolated func sendAnalyticsEvent(_ event: VS.AnalyticEvent) {
+    nonisolated func sendAnalyticsEvent(_ event: VS.AnalyticEvent) {
         Task { @MainActor [weak self] in
             if event.isBackend {
                 self?.logic.reportBackendAnalyticEvent(event)

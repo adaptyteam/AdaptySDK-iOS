@@ -34,11 +34,11 @@ extension Schema.ConfigurationBuilder {
 extension KeyedDecodingContainer {
     func decodeRangeTextFormat(textAttributes: Schema.TextAttributes, forKey key: Key) throws -> Schema.RangeTextFormat {
         let formatItems =
-        if let stringId = try? decode(String.self, forKey: key) {
-            [Schema.RangeTextFormat.Item(from: 0, stringId: stringId)]
-        } else {
-            try decode([Schema.RangeTextFormat.Item].self, forKey: key)
-        }
+            if let stringId = try? decode(String.self, forKey: key) {
+                [Schema.RangeTextFormat.Item(from: 0, stringId: stringId)]
+            } else {
+                try decode([Schema.RangeTextFormat.Item].self, forKey: key)
+            }
 
         guard !formatItems.isEmpty else {
             throw DecodingError
@@ -50,6 +50,4 @@ extension KeyedDecodingContainer {
             textAttributes: textAttributes
         )
     }
-
-
 }

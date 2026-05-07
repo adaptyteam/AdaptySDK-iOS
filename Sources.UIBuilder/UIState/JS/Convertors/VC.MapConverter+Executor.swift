@@ -27,4 +27,3 @@ extension VC.MapConverter: VS.DataBindingConverter {
         throw .convertorError("MapConvertor: ")
     }
 }
-

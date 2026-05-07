@@ -8,7 +8,7 @@
 import Foundation
 
 extension Schema {
-    enum LegacyStateCondition: Sendable, Hashable {
+    enum LegacyStateCondition: Sendable {
         case selectedSection(id: String, index: Int32)
         case selectedProduct(id: String, groupId: String)
     }

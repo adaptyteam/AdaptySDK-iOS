@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct EdgeInsets: Sendable, Hashable {
+    struct EdgeInsets: Sendable {
         let leading: Unit
         let top: Unit
         let trailing: Unit
@@ -34,10 +34,10 @@ extension VC.EdgeInsets {
             && bottom.isZero
     }
 
-    @inlinable
-    var isSame: Bool {
-        (bottom == top)
-            && (leading == trailing)
-            && (top == trailing)
-    }
+//    @inlinable
+//    var isSame: Bool {
+//        (bottom == top)
+//            && (leading == trailing)
+//            && (top == trailing)
+//    }
 }

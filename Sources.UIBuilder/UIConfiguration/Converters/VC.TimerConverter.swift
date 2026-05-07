@@ -26,7 +26,7 @@ extension VC {
 }
 
 extension VC.TimerConverter: VC.TagConverter {
-    func toString(_ value: Any,locale: Locale) -> String? {
+    func toString(_ value: Any, locale: Locale) -> String? {
         switch value {
         case is Bool:
             nil
@@ -72,11 +72,10 @@ extension VC.TimerConverter {
 
     var updatesPerSecond: Int {
         switch self {
-        case .deciseconds: return 10
-        case .centiseconds: return 100
-        case .milliseconds, .totalMilliseconds: return 120
-        default: return 1
+        case .deciseconds: 10
+        case .centiseconds: 100
+        case .milliseconds, .totalMilliseconds: 120
+        default: 1
         }
     }
 }
-

@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct Offset: Sendable, Hashable {
+    struct Offset: Sendable {
         let x: Unit
         let y: Unit
     }
@@ -20,4 +20,3 @@ extension VC.Offset {
         x.isZero && y.isZero
     }
 }
-

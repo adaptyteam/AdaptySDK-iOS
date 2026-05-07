@@ -31,8 +31,6 @@ import JavaScriptCore
 }
 
 extension VS.JSActionDispatcher: JSActionBridge {
-
-    
     func log(_ params: JSValue) {
         if params.isObject, let dict = params.toDictionary() {
             log(dict)
@@ -144,4 +142,3 @@ extension VS.JSActionDispatcher: JSActionBridge {
         sendAnalyticsEvent(params.isObject ? (params.toDictionary() as? [String: any Sendable]) : nil)
     }
 }
-

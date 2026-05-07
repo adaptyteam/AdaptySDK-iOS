@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 30.01.2026.
 //
 
-import Foundation
 import AdaptyCodable
+import Foundation
 
 extension Schema {
     struct NavigatorsCollection: Sendable {

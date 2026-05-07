@@ -8,7 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-package extension VS {
+extension VS {
     struct JSAction {
         let callback: JSValue
     }
@@ -22,4 +22,3 @@ extension VS.JSAction {
         self.callback = callback
     }
 }
-

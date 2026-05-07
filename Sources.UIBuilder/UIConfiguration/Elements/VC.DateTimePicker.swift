@@ -17,4 +17,3 @@ extension VC {
         let color: AssetReference?
     }
 }
-

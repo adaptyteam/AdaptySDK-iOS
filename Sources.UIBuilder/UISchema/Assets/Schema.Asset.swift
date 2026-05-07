@@ -44,4 +44,3 @@ extension Schema.Asset: Decodable {
         }
     }
 }
-

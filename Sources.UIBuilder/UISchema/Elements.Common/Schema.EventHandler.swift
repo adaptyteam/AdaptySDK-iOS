@@ -58,4 +58,3 @@ extension Schema.EventHandler: Decodable {
         )
     }
 }
-

@@ -16,7 +16,6 @@ package struct AdaptyUIConfiguration: Sendable {
     package let isRightToLeft: Bool
     package let environment: VC.EnvironmentConstants
 
-
     let assets: [AssetIdentifier: Asset]
     let strings: [StringIdentifier: RichText]
 

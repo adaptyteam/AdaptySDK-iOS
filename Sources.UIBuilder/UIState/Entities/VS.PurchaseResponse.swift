@@ -8,8 +8,8 @@
 import Foundation
 import JavaScriptCore
 
-package extension VS {
-    struct PurchaseResponse: Sendable, Hashable {
+extension VS {
+    struct PurchaseResponse: Sendable {
         let productId: String
         let result: PurchaseResult
     }

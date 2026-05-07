@@ -124,4 +124,3 @@ extension Dictionary: JSValueConvertable where Key == String, Value: JSValueConv
         return object
     }
 }
-

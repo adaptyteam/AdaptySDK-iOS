@@ -103,4 +103,3 @@ extension Schema.RichText.Item {
         }
     }
 }
-

@@ -8,8 +8,8 @@
 import Foundation
 
 extension VC {
-    protocol Converter: Sendable, Hashable {}
-    
+    protocol Converter: Sendable {}
+
     struct AnyConverter: Converter {
         let wrapped: any Converter
 
@@ -19,14 +19,6 @@ extension VC {
             } else {
                 wrapped = value
             }
-        }
-
-        static func == (lhs: Self, rhs: Self) -> Bool {
-            AnyHashable(lhs.wrapped) == AnyHashable(rhs.wrapped)
-        }
-
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(AnyHashable(wrapped))
         }
     }
 

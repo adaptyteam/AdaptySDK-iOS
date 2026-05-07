@@ -169,8 +169,9 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         var tokens = Set<AdaptyUIAnimationToken>()
 
         for animation in animations {
-            switch animation {
-            case let .opacity(timeline, value):
+            let timeline = animation.timeline
+            switch animation.kind {
+            case let .opacity(value):
                 opacity = value.start
                 tokens.insert(
                     timeline.animate(
@@ -181,7 +182,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
-            case let .offset(timeline, value):
+            case let .offset(value):
                 animatedOffsetX = value.start.x.points(.horizontal, screenSize, safeArea)
                 animatedOffsetY = value.start.y.points(.vertical, screenSize, safeArea)
                 tokens.insert(
@@ -194,7 +195,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
-            case let .rotation(timeline, value):
+            case let .rotation(value):
                 rotation = .degrees(value.angle.start)
                 rotationAnchor = value.anchor.unitPoint
                 tokens.insert(
@@ -206,7 +207,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
-            case let .scale(timeline, value):
+            case let .scale(value):
                 scaleX = value.scale.start.x
                 scaleY = value.scale.start.y
                 scaleAnchor = value.anchor.unitPoint
@@ -221,7 +222,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
-            case let .shadow(timeline, value):
+            case let .shadow(value):
                 if let colorValue = value.color {
                     animatedShadowFilling = colorValue.start
                 }
@@ -259,7 +260,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
-            case let .blur(timeline, value):
+            case let .blur(value):
                 animatedBlurRadius = value.start
                 tokens.insert(
                     timeline.animate(

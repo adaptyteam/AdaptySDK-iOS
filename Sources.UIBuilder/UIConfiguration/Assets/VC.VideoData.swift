@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct VideoData: Sendable, Hashable {
+    struct VideoData: Sendable {
         let customId: String?
         let url: URL
         let image: ImageData

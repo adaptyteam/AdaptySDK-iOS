@@ -8,7 +8,7 @@
 import Foundation
 
 private extension Schema {
-    struct LegacyEndTimeString: RawRepresentable, Codable {
+    struct LegacyEndTimeString: RawRepresentable, Decodable {
         let rawValue: String
         let components: DateComponents
 

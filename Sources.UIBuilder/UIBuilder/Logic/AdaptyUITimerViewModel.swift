@@ -25,7 +25,7 @@ extension [String: Date]: AdaptyUITimerResolver {
 }
 
 @MainActor
-package protocol AdaptyUITimerCallbackHandler: AnyObject {
+protocol AdaptyUITimerCallbackHandler: AnyObject {
     func handleTimerCallback(timerId: String, callback: VS.JSAction)
 }
 
@@ -45,7 +45,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
 
     private var timerCallbacks: [String: VS.JSAction] = [:]
     private var centralTimer: Timer?
-    package weak var callbackHandler: AdaptyUITimerCallbackHandler?
+    package weak var callbackHandler: AdaptyUIStateActionHandler?
 
     package init(
         logId: String,

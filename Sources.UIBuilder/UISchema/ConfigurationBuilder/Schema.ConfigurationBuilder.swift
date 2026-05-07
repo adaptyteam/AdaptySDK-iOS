@@ -66,4 +66,3 @@ extension Schema.ConfigurationBuilder {
         )
     }
 }
-

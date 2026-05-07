@@ -39,4 +39,3 @@ extension [VC.RichText.Item] {
         return self.map { $0.apply(defaultAttributes: defaultAttributes) }
     }
 }
-

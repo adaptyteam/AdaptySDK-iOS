@@ -38,7 +38,7 @@ private enum RelativeDateTimeCodingKeys: String, CodingKey {
     case offset
 }
 
-private enum DateTimeAnchor: String, Codable {
+private enum DateTimeAnchor: String, Decodable {
     case now = "start"
     case startOfDay = "start_of_day"
     case startOfWeek = "start_of_week"
@@ -212,4 +212,3 @@ private extension KeyedDecodingContainer {
         return try decodeTimeZone(forKey: key)
     }
 }
-

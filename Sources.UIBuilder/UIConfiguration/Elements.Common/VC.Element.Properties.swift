@@ -29,7 +29,7 @@ extension VC.Element {
 extension VC.Element.Properties {
     @inlinable
     var isEmpty: Bool {
-        decorator == .none
+        decorator == nil
             && padding.isZero
             && offset?.isZero ?? true
             && rotation?.isZero ?? true
@@ -39,7 +39,6 @@ extension VC.Element.Properties {
             && overlay?.isEmpty ?? true
             && eventHandlers.isEmpty
             && focusId == .none
-            && interactionEnabled == .none
+            && interactionEnabled == nil
     }
 }
-

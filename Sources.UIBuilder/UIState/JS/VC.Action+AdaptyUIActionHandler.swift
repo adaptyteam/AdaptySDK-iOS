@@ -55,4 +55,3 @@ extension VS.JSActionDispatcher {
         return true
     }
 }
-

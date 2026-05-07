@@ -9,7 +9,7 @@ import Foundation
 import JavaScriptCore
 
 extension VS {
-    enum EnvironmentConstantsKey: String, CaseIterable {
+    enum EnvironmentConstantsKey: String, Hashable, CaseIterable {
         case platform
         case schemaVersion
         case localizationId
@@ -69,4 +69,3 @@ extension VC {
         }
     }
 }
-

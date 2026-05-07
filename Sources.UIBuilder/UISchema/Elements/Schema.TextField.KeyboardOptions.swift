@@ -41,4 +41,3 @@ extension Schema.TextField.KeyboardOptions: Decodable {
         )
     }
 }
-

@@ -14,5 +14,3 @@ extension VC {
         let transition: Transition?
     }
 }
-
-

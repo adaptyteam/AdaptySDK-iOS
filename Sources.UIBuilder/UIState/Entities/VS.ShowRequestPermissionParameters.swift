@@ -8,7 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-package extension VS {
+extension VS {
     struct ShowRequestPermissionParameters {
         let permission: String?
         let customArgs: [String: String]?
@@ -40,7 +40,7 @@ extension VS.ShowRequestPermissionParameters {
 
         let customArgs: [String: String]? =
             if let raw = dict["customArgs"] as? [String: Any] {
-                raw.compactMapValues{ $0 as? String}
+                raw.compactMapValues { $0 as? String }
             } else {
                 nil
             }
@@ -51,4 +51,3 @@ extension VS.ShowRequestPermissionParameters {
         )
     }
 }
-
