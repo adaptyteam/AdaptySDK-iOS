@@ -110,6 +110,10 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
                         item,
                         totalWeight: 0,
                         weightsAvailableLength: 0
+                    ),
+                    alignment: Alignment.from(
+                        horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                        vertical: item.verticalAlignment.swiftuiValue
                     )
                 )
             }
@@ -147,6 +151,10 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
                             item,
                             totalWeight: totalWeight,
                             weightsAvailableLength: weightsAvailableLength
+                        ),
+                        alignment: Alignment.from(
+                            horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                            vertical: item.verticalAlignment.swiftuiValue
                         )
                     )
                 }
