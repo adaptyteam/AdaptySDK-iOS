@@ -21,11 +21,11 @@ extension VS.JSActionDispatcher {
         case "userCustomAction":
             userCustomAction(action.paramsAsDictionary())
         case "purchaseProduct":
-            purchaseProduct(action.paramsAsDictionary())
+            purchaseProduct(action.paramsAsDictionary(), callback: nil)
         case "webPurchaseProduct":
-            webPurchaseProduct(action.paramsAsDictionary())
+            webPurchaseProduct(action.paramsAsDictionary(), callback: nil)
         case "restorePurchases":
-            restorePurchases()
+            restorePurchases(callback: nil)
         case "closeAll":
             closeAll()
         case "onSelectProduct":

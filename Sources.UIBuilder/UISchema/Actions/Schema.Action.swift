@@ -77,9 +77,17 @@ extension Schema.Action {
 
         switch try container.decode(String.self, forKey: .type) {
         case "open_url":
-            try self.init(path: ["SDK", "openUrl"], params: [
-                "stringId": VC.AnyValue(container.decode(String.self, forKey: .url)),
-            ], scope: .global)
+            if let url = try? container.decode(URL.self, forKey: .url), url.scheme != nil {
+                try self.init(path: ["SDK", "openUrl"], params: [
+                    "url": VC.AnyValue(url.absoluteString),
+                    "openIn": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
+                ], scope: .global)
+            } else {
+                try self.init(path: ["SDK", "openUrl"], params: [
+                    "stringId": VC.AnyValue(container.decode(String.self, forKey: .url)),
+                    "openIn": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
+                ], scope: .global)
+            }
         case "restore":
             self.init(path: ["SDK", "restorePurchases"], params: nil, scope: .global)
         case "close":

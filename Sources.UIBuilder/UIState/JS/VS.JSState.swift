@@ -60,12 +60,12 @@ extension VS.JSState {
         let name = "handleSDKEvent"
 
         guard let parent = context.globalObject else {
-            log.warn("fail send event (\(event.rawValue)), not found global object")
+            log.warn("fail send event (\(event.debugString)), not found global object")
             return
         }
 
         guard let handler = parent.objectForKeyedSubscript(name), !handler.isUndefined else {
-            log.warn("fail send event (\(event.rawValue)), not found JS method: \(name)")
+            log.warn("fail send event (\(event.debugString)), not found JS method: \(name)")
             return
         }
 
@@ -73,22 +73,22 @@ extension VS.JSState {
             let functionType = context.objectForKeyedSubscript("Function"),
             handler.isInstance(of: functionType)
         else {
-            log.warn("fail send event (\(event.rawValue)), JS property is not method: \(name)")
+            log.warn("fail send event (\(event.debugString)), JS property is not method: \(name)")
             return
         }
 
-        let jsEvent = VC.AnyValue(["name": event]).toJSValue(in: context)
+        let jsEvent = event.toJSValue(in: context)
 
         context.exception = nil
         _ = handler.call(withArguments: [jsEvent as Any])
 
         if let exception = context.exception {
-            log.warn("fail send event (\(event.rawValue)), JS exception: \(exception)")
+            log.warn("fail send event (\(event.debugString)), JS exception: \(exception)")
             context.exception = nil
             return
         }
 
-        log.debug("did send sdk event \(event.rawValue)")
+        log.debug("did send sdk event \(event.debugString)")
 
         objectWillChange.send()
     }
@@ -295,18 +295,12 @@ extension VS.JSState {
 
     func execute(
         action: VS.JSAction,
-        params: (some JSValueConvertable)?,
-        screenInstance: VS.ScreenInstance
+        response: (some JSValueConvertable)
     ) throws(VS.Error) {
-        let object = VS.ActionParameters(
-            screenInstance: screenInstance,
-            params: params
-        )
-
         _ = try invokeMethod(
             Bool.self,
             function: action.callback,
-            args: [object]
+            args: [response]
         )
 
         objectWillChange.send()
@@ -389,3 +383,4 @@ extension VS.JSState {
         return debug(path: path.joined(separator: "."), filter: filter)
     }
 }
+

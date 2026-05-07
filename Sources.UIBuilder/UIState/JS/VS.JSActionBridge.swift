@@ -15,7 +15,7 @@ import JavaScriptCore
     func userCustomAction(_ params: JSValue)
     func purchaseProduct(_ params: JSValue)
     func webPurchaseProduct(_ params: JSValue)
-    func restorePurchases()
+    func restorePurchases(_ params: JSValue)
     func closeAll()
     func onSelectProduct(_ params: JSValue)
     func openScreen(_ params: JSValue)
@@ -31,6 +31,8 @@ import JavaScriptCore
 }
 
 extension VS.JSActionDispatcher: JSActionBridge {
+
+    
     func log(_ params: JSValue) {
         if params.isObject, let dict = params.toDictionary() {
             log(dict)
@@ -50,11 +52,35 @@ extension VS.JSActionDispatcher: JSActionBridge {
     }
 
     func purchaseProduct(_ params: JSValue) {
-        purchaseProduct(params.isObject ? params.toDictionary() : nil)
+        guard params.isObject else {
+            Log.viewState.error(#"SDK.purchaseProduct: parameter must be object"#)
+            return
+        }
+        purchaseProduct(
+            params.toDictionary(),
+            callback: VS.JSAction(from: params.forProperty("callback"))
+        )
     }
 
     func webPurchaseProduct(_ params: JSValue) {
-        webPurchaseProduct(params.isObject ? params.toDictionary() : nil)
+        guard params.isObject else {
+            Log.viewState.error(#"SDK.webPurchaseProduct: parameter must be object"#)
+            return
+        }
+        webPurchaseProduct(
+            params.toDictionary(),
+            callback: VS.JSAction(from: params.forProperty("callback"))
+        )
+    }
+
+    func restorePurchases(_ params: JSValue) {
+        guard params.isObject else {
+            Log.viewState.error(#"SDK.restorePurchases: parameter must be object"#)
+            return
+        }
+        restorePurchases(
+            callback: VS.JSAction(from: params.forProperty("callback"))
+        )
     }
 
     func onSelectProduct(_ params: JSValue) {

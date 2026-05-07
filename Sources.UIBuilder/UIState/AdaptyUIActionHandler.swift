@@ -11,8 +11,8 @@ package protocol AdaptyUIActionHandler: AnyObject {
     func openUrl(url: URL, openIn: VC.Action.WebOpenInParameter)
     func openUrl(stringId: String, openIn: VC.Action.WebOpenInParameter)
     func userCustomAction(id: String)
-    func purchaseProduct(productId: String, service: VC.Action.PaymentService)
-    func restorePurchases()
+    func purchaseProduct(productId: String, service: VC.Action.PaymentService, callback: VS.JSAction?)
+    func restorePurchases(callback: VS.JSAction?)
     func closeAll()
     func selectProduct(productId: String)
 

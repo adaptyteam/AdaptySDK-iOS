@@ -79,17 +79,17 @@ extension VS.JSActionDispatcher {
     }
 
     @inlinable
-    func purchaseProduct(_ params: [AnyHashable: Any]?) {
+    func purchaseProduct(_ params: [AnyHashable: Any]?, callback: VS.JSAction?) {
         guard let productId = params?["productId"] as? String else {
             Log.viewState.error(#"SDK.purchaseProduct: required parameter "productId" is missing"#)
             return
         }
 
-        handler?.purchaseProduct(productId: productId, service: .storeKit)
+        handler?.purchaseProduct(productId: productId, service: .storeKit, callback: callback)
     }
 
     @inlinable
-    func webPurchaseProduct(_ params: [AnyHashable: Any]?) {
+    func webPurchaseProduct(_ params: [AnyHashable: Any]?, callback: VS.JSAction?) {
         guard let params else {
             Log.viewState.error(#"SDK.webPurchaseProduct: corupted params"#)
             return
@@ -102,11 +102,11 @@ extension VS.JSActionDispatcher {
             return
         }
 
-        handler?.purchaseProduct(productId: productId, service: .openWebPaywall(openIn: openIn))
+        handler?.purchaseProduct(productId: productId, service: .openWebPaywall(openIn: openIn), callback: callback)
     }
 
-    func restorePurchases() {
-        handler?.restorePurchases()
+    func restorePurchases(callback: VS.JSAction?) {
+        handler?.restorePurchases(callback: callback)
     }
 
     func closeAll() {

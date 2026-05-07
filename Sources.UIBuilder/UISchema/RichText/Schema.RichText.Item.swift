@@ -47,7 +47,7 @@ extension Schema.RichText.Item: Decodable {
                 converter = try? Schema.PercentConverter(from: decoder).asAnyConverter
             } else if tag.hasPrefix("TIMER_") {
                 converter = Self.legacyConverterFromTimer(tag: tag)?.asAnyConverter
-                if let converter {
+                if converter != nil {
                     tag = "TIMER"
                 }
             } else {

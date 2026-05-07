@@ -131,7 +131,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
     package nonisolated func purchaseProduct(
         productId: String,
-        service: VC.Action.PaymentService
+        service: VC.Action.PaymentService,
+        callback: VS.JSAction?
     ) {
         Task { @MainActor [weak self] in
             self?.productsViewModel.purchaseProduct(
@@ -147,7 +148,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         // TODO: Deperecated
     }
 
-    package nonisolated func restorePurchases() {
+    package nonisolated func restorePurchases(callback: VS.JSAction?) {
         Task { @MainActor [weak self] in
             self?.productsViewModel.restorePurchases()
         }
@@ -261,7 +262,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         guard let callback, let screenInstance else { return }
         let response = VS.ShowAlertDialogParametersResponse(actionId: actionId)
         do {
-            try state?.execute(action: callback, params: response, screenInstance: screenInstance)
+            try state?.execute(action: callback, response: response)
         } catch {
             Log.ui.error("alertDialog callback error: \(error)")
         }
@@ -271,7 +272,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         guard let screenInstance = screensViewModel.topmostScreenInstance else { return }
         let response = VS.TimerResponse(timerId: timerId)
         do {
-            try state?.execute(action: callback, params: response, screenInstance: screenInstance)
+            try state?.execute(action: callback, response: response)
         } catch {
             Log.ui.error("timer callback error: \(error)")
         }
@@ -305,8 +306,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
             do {
                 try self.state?.execute(
                     action: callback,
-                    params: response,
-                    screenInstance: screenInstance
+                    response: response
                 )
             } catch {
                 Log.ui.error("showRequestPermission callback error: \(error)")
