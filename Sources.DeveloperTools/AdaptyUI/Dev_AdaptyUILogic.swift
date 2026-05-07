@@ -13,13 +13,16 @@ import Foundation
 struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     let logId: String
     let events: AdaptyUIEventsHandler
+    let products: [Dev_MockProduct]
 
     init(
         logId: String,
-        events: AdaptyUIEventsHandler
+        events: AdaptyUIEventsHandler,
+        products: [Dev_MockProduct]
     ) {
         self.logId = logId
         self.events = events
+        self.products = products
     }
 
     func reportViewDidAppear() {
@@ -45,39 +48,46 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     ) async {}
 
     package func getProducts() async throws -> [ProductResolver] {
-        [
-            Dev_MockProduct(id: "premium-free_trial-0-usd"),
-            Dev_MockProduct(id: "premium-pay_as_you_go-1.99-usd"),
-            Dev_MockProduct(id: "premium-pay_up_front-9.99-usd"),
-            Dev_MockProduct(id: "basic-default-4.99-usd"),
-        ]
+        products
     }
 
     func makePurchase(
         product: ProductResolver,
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     ) {
         onStart()
         events.event_didStartPurchase(product: product)
 
         Task { @MainActor in
-            try await Task.sleep(nanoseconds: 3 * 1_000_000_000)
-
-            onFinish()
+            try await Task.sleep(nanoseconds: 1_500_000_000)
+            events.event_didFinishPurchase(product: product, result: .success)
+            onFinish(.success)
         }
     }
 
     func openWebPaywall(
         for product: ProductResolver,
-        in openIn: VC.Action.WebOpenInParameter
-    ) async {}
+        in openIn: VC.Action.WebOpenInParameter,
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
+    ) async {
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        events.event_didFinishPurchase(product: product, result: .success)
+        onFinish(.success)
+    }
 
     func restorePurchases(
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.RestorePurchasesResult) -> Void
     ) {
+        onStart()
         events.event_didStartRestore()
+
+        Task { @MainActor in
+            try await Task.sleep(nanoseconds: 1_500_000_000)
+            events.event_didFinishRestore(result: .success)
+            onFinish(.success)
+        }
     }
 
     func reportDidFailRendering(with error: AdaptyUIBuilderError) {

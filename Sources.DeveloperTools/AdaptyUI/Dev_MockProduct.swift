@@ -9,118 +9,60 @@ import AdaptyUIBuilder
 import Foundation
 
 struct Dev_MockProduct: ProductResolver, Sendable {
-    var flowId: String { adaptyProductId }
-
+    let flowId: String
     let adaptyProductId: String
     let paymentMode: PaymentModeValue
 
-    private let name: String
-    private let price: String
-    private let currency: String
-
-    init(id: String) {
-        self.adaptyProductId = id
-
-        let knownModes = ["free_trial", "pay_as_you_go", "pay_up_front"]
-
-        var parsedName = id
-        var parsedMode: String? = nil
-        var parsedPrice = "0"
-        var parsedCurrency = "usd"
-
-        for mode in knownModes {
-            if let range = id.range(of: "-\(mode)-") {
-                parsedName = String(id[id.startIndex..<range.lowerBound])
-                let afterMode = id[range.upperBound...]
-                let parts = afterMode.split(separator: "-", maxSplits: 1)
-                if let pricePart = parts.first {
-                    parsedPrice = String(pricePart)
-                }
-                if parts.count > 1 {
-                    parsedCurrency = String(parts[1])
-                }
-                parsedMode = mode
-                break
-            }
-        }
-
-        if parsedMode == nil, let range = id.range(of: "-default-") {
-            parsedName = String(id[id.startIndex..<range.lowerBound])
-            let afterMode = id[range.upperBound...]
-            let parts = afterMode.split(separator: "-", maxSplits: 1)
-            if let pricePart = parts.first {
-                parsedPrice = String(pricePart)
-            }
-            if parts.count > 1 {
-                parsedCurrency = String(parts[1])
-            }
-        }
-
-        self.name = parsedName
-        self.paymentMode = parsedMode
-        self.price = parsedPrice
-        self.currency = parsedCurrency
-    }
-
-    private var currencySymbol: String {
-        switch currency.lowercased() {
-        case "usd": return "$"
-        case "eur": return "€"
-        case "gbp": return "£"
-        default: return currency.uppercased() + " "
-        }
-    }
-
-    private var formattedPrice: String {
-        "\(currencySymbol)\(price)"
-    }
+    let title: String?
+    let price: String?
+    let pricePerDay: String?
+    let pricePerWeek: String?
+    let pricePerMonth: String?
+    let pricePerYear: String?
+    let offerPrice: String?
+    let offerPeriods: String?
+    let offerNumberOfPeriods: String?
 
     func value(byTag tag: TextProductTag) -> TextTagValue? {
-        switch tag {
-        case .title:
-            return .value(name.capitalized)
-        case .price:
-            return .value(formattedPrice)
-        case .pricePerDay:
-            return .value("\(formattedPrice)/day")
-        case .pricePerWeek:
-            return .value("\(formattedPrice)/week")
-        case .pricePerMonth:
-            return .value("\(formattedPrice)/month")
-        case .pricePerYear:
-            return .value("\(formattedPrice)/year")
-        case .offerPrice:
-            switch paymentMode {
-            case "free_trial":
-                return .value("\(currencySymbol)0.00")
-            case "pay_as_you_go", "pay_up_front":
-                return .value(formattedPrice)
-            default:
-                return .notApplicable
-            }
-        case .offerPeriods:
-            switch paymentMode {
-            case "free_trial":
-                return .value("1 week")
-            case "pay_as_you_go":
-                return .value("3 months")
-            case "pay_up_front":
-                return .value("1 year")
-            default:
-                return .notApplicable
-            }
-        case .offerNumberOfPeriods:
-            switch paymentMode {
-            case "free_trial":
-                return .value("1")
-            case "pay_as_you_go":
-                return .value("3")
-            case "pay_up_front":
-                return .value("1")
-            default:
-                return .notApplicable
-            }
+        let raw: String? = switch tag {
+        case .title: title
+        case .price: price
+        case .pricePerDay: pricePerDay
+        case .pricePerWeek: pricePerWeek
+        case .pricePerMonth: pricePerMonth
+        case .pricePerYear: pricePerYear
+        case .offerPrice: offerPrice
+        case .offerPeriods: offerPeriods
+        case .offerNumberOfPeriods: offerNumberOfPeriods
         }
+        return raw.map(TextTagValue.value) ?? .notApplicable
+    }
+}
+
+extension Dev_MockProduct {
+    init(from preview: Dev_PreviewProduct) {
+        let priceString = preview.price?.localizedString
+        let perPeriod: String? = {
+            guard let priceString, let period = preview.subscription?.localizedPeriod else { return nil }
+            return "\(priceString)/\(period)"
+        }()
+        let unit = preview.subscription?.period.unit
+
+        flowId = preview.flowProductId
+        adaptyProductId = preview.adaptyProductId
+        paymentMode = preview.subscription?.offer?.paymentMode
+
+        title = preview.localizedTitle
+        price = priceString
+        pricePerDay = unit == "day" ? perPeriod : nil
+        pricePerWeek = unit == "week" ? perPeriod : nil
+        pricePerMonth = unit == "month" ? perPeriod : nil
+        pricePerYear = unit == "year" ? perPeriod : nil
+
+        let offer = preview.subscription?.offer
+        offerPrice = offer?.price?.localizedString
+        offerPeriods = offer?.localizedPeriod
+        offerNumberOfPeriods = offer?.localizedNumberOfPeriods
     }
 }
 

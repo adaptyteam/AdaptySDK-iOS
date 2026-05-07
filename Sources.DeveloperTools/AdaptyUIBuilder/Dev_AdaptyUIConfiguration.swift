@@ -11,6 +11,7 @@ import Foundation
 public struct Dev_AdaptyUIConfiguration {
     typealias Wrapped = AdaptyUIConfiguration
     let wrapped: Wrapped
+    let previewProducts: [Dev_PreviewProduct]
     public let json: String
 }
 
@@ -130,6 +131,7 @@ public extension Dev_AdaptyUIConfiguration {
         )
         return .init(
             wrapped: configuration,
+            previewProducts: environment.products,
             json: json
         )
     }

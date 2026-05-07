@@ -36,6 +36,7 @@ public extension AdaptyUI {
         package init(
             logId: String,
             viewConfiguration: AdaptyUIConfiguration,
+            previewProducts: [Dev_PreviewProduct],
             observerModeResolver: AdaptyObserverModeResolver?,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
@@ -52,7 +53,8 @@ public extension AdaptyUI {
             eventsHandler = AdaptyUIEventsHandler(logId: logId)
             logic = Dev_AdaptyUILogic(
                 logId: logId,
-                events: eventsHandler
+                events: eventsHandler,
+                products: previewProducts.map(Dev_MockProduct.init(from:))
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
@@ -119,14 +121,16 @@ public struct Dev_AdaptyUIRendererView: View {
     let viewConfiguration: AdaptyUIConfiguration
     let galleryConfiguration: AdaptyUI.Dev_GalleryPreviewConfiguration
 
-    private let didAppear: (() -> Void)?
-    private let didDisappear: (() -> Void)?
-    private let didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
-    private let didSelectProduct: ((String) -> Void)?
-    private let didStartPurchase: ((String) -> Void)?
-    private let didStartRestore: (() -> Void)?
-    private let didFailRendering: ((AdaptyUIBuilderError) -> Void)?
-    private let didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
+    private let didAppear: () -> Void
+    private let didDisappear: () -> Void
+    private let didPerformAction: (AdaptyUIBuilder.Action) -> Void
+    private let didSelectProduct: (String) -> Void
+    private let didStartPurchase: (String) -> Void
+    private let didFinishPurchase: (String, String) -> Void
+    private let didStartRestore: () -> Void
+    private let didFinishRestore: (String) -> Void
+    private let didFailRendering: (AdaptyUIBuilderError) -> Void
+    private let didReceiveAnalyticEvent: (String, [String: any Sendable]) -> Void
 
     private let safeAreaOverride: EdgeInsets?
     private let showDebugOverlay: Bool
@@ -138,14 +142,16 @@ public struct Dev_AdaptyUIRendererView: View {
         showDebugOverlay: Bool = false,
         safeAreaOverride: EdgeInsets? = nil,
         rtlOverride: Bool? = nil,
-        didAppear: (() -> Void)? = nil,
-        didDisappear: (() -> Void)? = nil,
-        didPerformAction: ((AdaptyUIBuilder.Action) -> Void)? = nil,
-        didSelectProduct: ((String) -> Void)? = nil,
-        didStartPurchase: ((String) -> Void)? = nil,
-        didStartRestore: (() -> Void)? = nil,
-        didFailRendering: ((AdaptyUIBuilderError) -> Void)? = nil,
-        didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)? = nil
+        didAppear: @escaping () -> Void,
+        didDisappear: @escaping () -> Void,
+        didPerformAction: @escaping (AdaptyUIBuilder.Action) -> Void,
+        didSelectProduct: @escaping (String) -> Void,
+        didStartPurchase: @escaping (String) -> Void,
+        didFinishPurchase: @escaping (String, String) -> Void,
+        didStartRestore: @escaping () -> Void,
+        didFinishRestore: @escaping (String) -> Void,
+        didFailRendering: @escaping (AdaptyUIBuilderError) -> Void,
+        didReceiveAnalyticEvent: @escaping (String, [String: any Sendable]) -> Void
     ) {
         self.safeAreaOverride = safeAreaOverride
         self.showDebugOverlay = showDebugOverlay
@@ -153,6 +159,7 @@ public struct Dev_AdaptyUIRendererView: View {
         galleryConfiguration = .init(
             logId: "test",
             viewConfiguration: viewConfiguration.wrapped,
+            previewProducts: viewConfiguration.previewProducts,
             observerModeResolver: nil,
             tagResolver: ["TEST_TAG": "Adapty"],
             timerResolver: nil,
@@ -166,7 +173,9 @@ public struct Dev_AdaptyUIRendererView: View {
         self.didPerformAction = didPerformAction
         self.didSelectProduct = didSelectProduct
         self.didStartPurchase = didStartPurchase
+        self.didFinishPurchase = didFinishPurchase
         self.didStartRestore = didStartRestore
+        self.didFinishRestore = didFinishRestore
         self.didFailRendering = didFailRendering
         self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
     }
@@ -174,14 +183,20 @@ public struct Dev_AdaptyUIRendererView: View {
     public var body: some View {
         galleryConfiguration.eventsHandler.didAppear = didAppear
         galleryConfiguration.eventsHandler.didDisappear = didDisappear
-        galleryConfiguration.eventsHandler.didPerformAction = didPerformAction ?? { _ in }
-        galleryConfiguration.eventsHandler.didSelectProduct = didSelectProduct.map { callback in
-            { product in callback(product.flowId) }
+        galleryConfiguration.eventsHandler.didPerformAction = didPerformAction
+        galleryConfiguration.eventsHandler.didSelectProduct = { [didSelectProduct] product in
+            didSelectProduct(product.flowId)
         }
-        galleryConfiguration.eventsHandler.didStartPurchase = didStartPurchase.map { callback in
-            { product in callback(product.flowId) }
+        galleryConfiguration.eventsHandler.didStartPurchase = { [didStartPurchase] product in
+            didStartPurchase(product.flowId)
+        }
+        galleryConfiguration.eventsHandler.didFinishPurchase = { [didFinishPurchase] product, result in
+            didFinishPurchase(product.flowId, result.rawValue)
         }
         galleryConfiguration.eventsHandler.didStartRestore = didStartRestore
+        galleryConfiguration.eventsHandler.didFinishRestore = { [didFinishRestore] result in
+            didFinishRestore(result.rawValue)
+        }
         galleryConfiguration.eventsHandler.didFailRendering = didFailRendering
         galleryConfiguration.eventsHandler.didReceiveAnalyticEvent = didReceiveAnalyticEvent
 
