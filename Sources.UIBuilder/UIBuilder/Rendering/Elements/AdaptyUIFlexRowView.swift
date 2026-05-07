@@ -29,8 +29,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     }
 
     private func calculateTotalWeight(
-        for items: [VC.GridItem],
-        in _: GeometryProxy
+        for items: [VC.GridItem]
     ) -> (Int, CGFloat) {
         var totalWeight = 0
         var reservedLength: CGFloat = 0.0
@@ -72,7 +71,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
         }
     }
 
-    @State private var contentsSize: CGSize = .zero
+    @State private var measuredSize: CGSize = .zero
 
     var body: some View {
         switch row.width {
@@ -103,6 +102,10 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
                         item,
                         totalWeight: 0,
                         weightsAvailableLength: 0
+                    ),
+                    alignment: Alignment.from(
+                        horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                        vertical: item.verticalAlignment.swiftuiValue
                     )
                 )
                 .frame(
@@ -117,44 +120,45 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     }
 
     private var weightedBody: some View {
-        GeometryReader { proxy in
-            let (totalWeight, reservedLength) = calculateTotalWeight(for: row.items, in: proxy)
-            let weightsAvailableLength = max(0, proxy.size.width - reservedLength)
+        let (totalWeight, reservedLength) = calculateTotalWeight(for: row.items)
+        let weightsAvailableLength = max(0, measuredSize.width - reservedLength)
 
-            HStack(spacing: row.spacing) {
-                ForEach(0 ..< row.items.count, id: \.self) { idx in
-                    let item = row.items[idx]
+        return HStack(spacing: row.spacing) {
+            ForEach(0 ..< row.items.count, id: \.self) { idx in
+                let item = row.items[idx]
 
-                    AdaptyUIElementView(
-                        item.content,
-                        screenHolderBuilder: {
-                            if idx == 0 {
-                                screenHolderBuilder()
-                            } else {
-                                EmptyView()
-                            }
+                AdaptyUIElementView(
+                    item.content,
+                    screenHolderBuilder: {
+                        if idx == 0 {
+                            screenHolderBuilder()
+                        } else {
+                            EmptyView()
                         }
+                    }
+                )
+                .frame(
+                    width: itemWidth(
+                        item,
+                        totalWeight: totalWeight,
+                        weightsAvailableLength: weightsAvailableLength
+                    ),
+                    alignment: Alignment.from(
+                        horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                        vertical: item.verticalAlignment.swiftuiValue
                     )
-                    .frame(
-                        width: itemWidth(
-                            item,
-                            totalWeight: totalWeight,
-                            weightsAvailableLength: weightsAvailableLength
-                        )
+                )
+                .frame(
+                    maxHeight: .infinity,
+                    alignment: Alignment.from(
+                        horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
+                        vertical: item.verticalAlignment.swiftuiValue
                     )
-                    .frame(
-                        maxHeight: .infinity,
-                        alignment: Alignment.from(
-                            horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
-                            vertical: item.verticalAlignment.swiftuiValue
-                        )
-                    )
-                }
+                )
             }
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .onGeometrySizeChange { contentsSize = $0 }
         }
-        .frame(minHeight: contentsSize.height)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .onGeometrySizeChange { measuredSize = $0 }
     }
 }
 
