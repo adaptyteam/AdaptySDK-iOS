@@ -7,7 +7,7 @@
 
 import JavaScriptCore
 
-extension VS {
+package extension VS {
     struct RestorePurchasesResponse: Sendable {
         let result: RestorePurchasesResult
     }
