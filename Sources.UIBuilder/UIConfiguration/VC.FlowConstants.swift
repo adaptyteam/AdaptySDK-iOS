@@ -150,12 +150,16 @@ package extension VC.FlowConstants {
             values = [
                 "id": VC.AnyValue(id),
                 "type": VC.AnyValue(type),
-                "price": VC.AnyValue(price?.values),
-                "paymentMode": VC.AnyValue(paymentMode),
-                "period": VC.AnyValue(period.values),
-                "numberOfPeriods": VC.AnyValue(numberOfPeriods),
-                "localizedPeriod": VC.AnyValue(localizedPeriod),
-                "localizedNumberOfPeriods": VC.AnyValue(localizedNumberOfPeriods),
+                "phases": VC.AnyValue([
+                    VC.AnyValue([
+                        "price": VC.AnyValue(price?.values),
+                        "paymentMode": VC.AnyValue(paymentMode),
+                        "period": VC.AnyValue(period.values),
+                        "numberOfPeriods": VC.AnyValue(numberOfPeriods),
+                        "localizedPeriod": VC.AnyValue(localizedPeriod),
+                        "localizedNumberOfPeriods": VC.AnyValue(localizedNumberOfPeriods),
+                    ]),
+                ]),
             ]
         }
     }
