@@ -9,7 +9,7 @@ import JavaScriptCore
 
 extension VS {
     enum SDKEvent: Sendable, VC.Value {
-        case productLoaded
+        case productsLoaded
         case willPurchase(productId: String)
         case didPurchase(productId: String, result: PurchaseResult)
         case willRestorePurchases
@@ -19,7 +19,7 @@ extension VS {
 
 extension VS.SDKEvent {
     enum Name: String, Hashable, VC.Value {
-        case productLoaded
+        case productsLoaded
         case willPurchase
         case didPurchase
         case willRestorePurchases
@@ -28,8 +28,8 @@ extension VS.SDKEvent {
 
     var debugString: String {
         switch self {
-        case .productLoaded:
-            "{ event: \(Name.productLoaded.rawValue) }"
+        case .productsLoaded:
+            "{ event: \(Name.productsLoaded.rawValue) }"
         case let .willPurchase(productId):
             "{ event: \(Name.willPurchase.rawValue), productId:\(productId) }"
         case let .didPurchase(productId, result):
@@ -53,8 +53,8 @@ extension VS.SDKEvent: JSValueConvertable {
         let object = JSValue(newObjectIn: context)!
 
         switch self {
-        case .productLoaded:
-            object.setObject(Name.productLoaded.toJSValue(in: context), forKeyedSubscript: "name" as NSString)
+        case .productsLoaded:
+            object.setObject(Name.productsLoaded.toJSValue(in: context), forKeyedSubscript: "name" as NSString)
         case let .willPurchase(productId):
             object.setObject(Name.willPurchase.toJSValue(in: context), forKeyedSubscript: "name" as NSString)
             object.setObject(productId.toJSValue(in: context), forKeyedSubscript: "productId" as NSString)
