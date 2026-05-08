@@ -19,9 +19,9 @@ extension VS.JSState {
         let objectClass = context.objectForKeyedSubscript("Object")
         objectClass?.invokeMethod("freeze", withArguments: [env])
 
-        #if DEBUG
-        global.setObject(env, forKeyedSubscript: "SDKEnv" as NSString)
-        #else
+//        #if DEBUG
+//        global.setObject(env, forKeyedSubscript: "SDKEnv" as NSString)
+//        #else
         if let objectClass, let descriptor = JSValue(newObjectIn: context) {
             descriptor.setObject(env, forKeyedSubscript: "value" as NSString)
             descriptor.setObject(false, forKeyedSubscript: "writable" as NSString)
@@ -29,7 +29,7 @@ extension VS.JSState {
             descriptor.setObject(false, forKeyedSubscript: "enumerable" as NSString)
             objectClass.invokeMethod("defineProperty", withArguments: [global, "SDKEnv", descriptor])
         }
-        #endif
+//        #endif
     }
 
     @inlinable
@@ -44,9 +44,9 @@ extension VS.JSState {
 
         let objectClass = context.objectForKeyedSubscript("Object")
         objectClass?.invokeMethod("freeze", withArguments: [products])
-        #if DEBUG
-        global.setObject(products, forKeyedSubscript: "SDKProducts" as NSString)
-        #else
+//        #if DEBUG
+//        global.setObject(products, forKeyedSubscript: "SDKProducts" as NSString)
+//        #else
         if let objectClass, let descriptor = JSValue(newObjectIn: context) {
             descriptor.setObject(products, forKeyedSubscript: "value" as NSString)
             descriptor.setObject(false, forKeyedSubscript: "writable" as NSString)
@@ -54,6 +54,6 @@ extension VS.JSState {
             descriptor.setObject(false, forKeyedSubscript: "enumerable" as NSString)
             objectClass.invokeMethod("defineProperty", withArguments: [global, "SDKProducts", descriptor])
         }
-        #endif
+//        #endif
     }
 }
