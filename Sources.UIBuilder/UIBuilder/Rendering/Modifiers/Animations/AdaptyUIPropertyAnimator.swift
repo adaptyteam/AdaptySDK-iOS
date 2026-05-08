@@ -18,7 +18,7 @@ extension VC.Animation.Timeline {
     ) -> AdaptyUIAnimationToken {
         switch loop {
         case .normal:
-            if loopDelay == 0 {
+            if loopDelay == 0 && !interpolator.usesCustomCurve {
                 // Use native SwiftUI repeat for smooth looping without frame gaps
                 AdaptyUIPropertyAnimator.animateWithNativeRepeat(
                     timeline: self,
@@ -42,7 +42,7 @@ extension VC.Animation.Timeline {
                 )
             }
         case .pingPong:
-            if loopDelay == 0 && pingPongDelay == 0 {
+            if loopDelay == 0 && pingPongDelay == 0 && !interpolator.usesCustomCurve {
                 // Use native SwiftUI repeat for smooth looping without frame gaps
                 AdaptyUIPropertyAnimator.animateWithNativeRepeat(
                     timeline: self,
