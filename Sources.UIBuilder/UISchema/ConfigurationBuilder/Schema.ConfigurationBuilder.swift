@@ -62,7 +62,9 @@ extension Schema.ConfigurationBuilder {
             strings: strings,
             navigators: source.navigators.mapValues(convertNavigator),
             screens: source.screens.mapValues(convertScreen),
-            scripts: source.scripts
+            scripts: source.scripts,
+            showPurchaseLoader: source.showPurchaseLoader,
+            showRestoreLoader: source.showRestoreLoader
         )
     }
 }

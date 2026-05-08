@@ -19,6 +19,19 @@ properties:
     default_localization:
         title: "Default localizations locale identifier"
         $ref: "#/Localization/Identifier"
+    behavior:
+        title: "Global SDK behavior settings"
+        type: object
+        properties:
+            show_purchase_loader:
+                title: "Show default loading indicator during SDK.purchaseProduct / SDK.webPurchaseProduct"
+                type: boolean
+                default: true
+            show_restore_loader:
+                title: "Show default loading indicator during SDK.restorePurchases"
+                type: boolean
+                default: true
+        additionalProperties: false
     templates:
         title: "Templates"
         type: object
@@ -1117,7 +1130,7 @@ UI:
     GridItem:
         type: object
         required:
-            - type,
+            - type
             - content
         allOf:
             - oneOf:

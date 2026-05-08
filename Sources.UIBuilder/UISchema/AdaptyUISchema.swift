@@ -19,6 +19,8 @@ public struct AdaptyUISchema: Sendable {
     let screens: [ScreenType: Screen]
     let templates: any AdaptyUISchemaTemplateSystem
     let scripts: [String]
+    let showPurchaseLoader: Bool
+    let showRestoreLoader: Bool
 }
 
 extension AdaptyUISchema: Decodable {
@@ -34,6 +36,12 @@ extension AdaptyUISchema: Decodable {
         case screens
         case navigators
         case scripts
+        case behavior
+    }
+
+    private enum BehaviorKeys: String, CodingKey {
+        case showPurchaseLoader = "show_purchase_loader"
+        case showRestoreLoader = "show_restore_loader"
     }
 
     public init(from decoder: Decoder) throws {
@@ -106,6 +114,14 @@ extension AdaptyUISchema: Decodable {
             } else {
                 try decoder.decodeScript(configuration: configuration)
             }
+
+        if let behavior = try? container.nestedContainer(keyedBy: BehaviorKeys.self, forKey: .behavior) {
+            showRestoreLoader = try behavior.decodeIfPresent(Bool.self, forKey: .showRestoreLoader) ?? true
+            showPurchaseLoader = try behavior.decodeIfPresent(Bool.self, forKey: .showPurchaseLoader) ?? true
+        } else {
+            showRestoreLoader = true
+            showPurchaseLoader = true
+        }
     }
 }
 
@@ -169,3 +185,4 @@ private extension Decoder {
         return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
     }
 }
+
