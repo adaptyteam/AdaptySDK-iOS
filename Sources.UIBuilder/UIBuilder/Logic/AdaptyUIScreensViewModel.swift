@@ -21,7 +21,10 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     private let viewConfiguration: VC
 
     var isRightToLeft: Bool { rtlOverride ?? viewConfiguration.isRightToLeft }
-    
+
+    var showPurchaseLoader: Bool { viewConfiguration.showPurchaseLoader }
+    var showRestoreLoader: Bool { viewConfiguration.showRestoreLoader }
+
     private let rtlOverride: Bool?
 
     @Published
