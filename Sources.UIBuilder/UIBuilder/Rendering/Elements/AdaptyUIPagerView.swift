@@ -233,7 +233,6 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 - pagePaddingTop
                 - pagePaddingBottom
 
-            let hPadding = (proxy.size.width - width) / 2.0
             let pages = pager.content
             HStack(spacing: pager.spacing) {
                 ForEach(0 ..< pages.count, id: \.self) { idx in
@@ -249,10 +248,11 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                     )
                     .frame(width: max(width, 0), height: max(height, 0))
                     .clipped()
-                    .padding(.leading, idx == 0 ? hPadding : 0)
-                    .padding(.trailing, idx == pages.count - 1 ? hPadding : 0)
+                    .padding(.leading, idx == 0 ? pagePaddingLeading : 0)
+                    .padding(.trailing, idx == pages.count - 1 ? pagePaddingTrailing : 0)
                 }
             }
+            .padding(.top, pagePaddingTop)
             .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)
             .dragGesture(
                 condition: pager.interactionBehavior != .none,
