@@ -16,13 +16,9 @@ extension VC.RangeTextFormat {
 
 extension VC.RangeTextFormat {
     func item(byValue: Double) -> VC.RichText {
-        let index =
-            if let index = items.firstIndex(where: { byValue > $0.from }) {
-                index > 0 ? index - 1 : index
-            } else {
-                items.count - 1
-            }
-        guard items.indices.contains(index) else { return .empty }
-        return items[index].value
+        guard let item = items.first(where: { byValue >= $0.from }) else {
+            return items.last?.value ?? .empty
+        }
+        return item.value
     }
 }
