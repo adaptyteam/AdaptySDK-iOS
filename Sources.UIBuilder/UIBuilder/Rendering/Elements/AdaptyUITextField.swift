@@ -83,7 +83,12 @@ struct AdaptyUITextField: View {
                 label: { EmptyView() }
             )
         } else {
-            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
+            // axis: .vertical is multi-line only. With it, SwiftUI treats the
+            // Return key as a newline-insert and .onSubmit never fires —
+            // single-line fields would silently drop submit_action.
+            if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *),
+               textField.kind == .multiLine
+            {
                 TextField(
                     text: text,
                     prompt: promptText,
