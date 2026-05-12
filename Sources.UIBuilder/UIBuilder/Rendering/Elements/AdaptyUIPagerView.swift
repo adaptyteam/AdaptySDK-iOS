@@ -311,8 +311,26 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
             repeats: false
         ) { _ in
             Task { @MainActor in
+                performNextPageTransition()
                 scheduleAutoScroll()
             }
+        }
+    }
+
+    private func performNextPageTransition() {
+        guard let config = pager.animation else { return }
+        guard !isInteracting else { return }
+
+        if currentPage < pager.content.count - 1 {
+            withAnimation(config.pageTransition.swiftUIAnimation) {
+                currentPage += 1
+            }
+        } else if let repeatTransition = config.repeatTransition {
+            withAnimation(repeatTransition.swiftUIAnimation) {
+                currentPage = 0
+            }
+        } else {
+            stopAutoScroll()
         }
     }
 
@@ -324,19 +342,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
             repeats: true
         ) { _ in
             Task { @MainActor in
-                guard !isInteracting else { return }
-
-                if currentPage < pager.content.count - 1 {
-                    withAnimation(config.pageTransition.swiftUIAnimation) {
-                        currentPage += 1
-                    }
-                } else if let repeatTransition = config.repeatTransition {
-                    withAnimation(repeatTransition.swiftUIAnimation) {
-                        currentPage = 0
-                    }
-                } else {
-                    stopAutoScroll()
-                }
+                performNextPageTransition()
             }
         }
     }
