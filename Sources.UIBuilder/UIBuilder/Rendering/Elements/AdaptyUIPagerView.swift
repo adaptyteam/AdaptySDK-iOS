@@ -178,15 +178,12 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 currentPage = index
             }
             if shouldScheduleAutoscroll {
-                Task {
-                    try await Task.sleep(seconds: pageControllTapAnimationDuration)
-                    scheduleAutoScroll()
-                }
+                resumeAutoScrollAfterInteraction()
             }
         } else {
             currentPage = index
             if shouldScheduleAutoscroll {
-                scheduleAutoScroll()
+                resumeAutoScrollAfterInteraction()
             }
         }
     }
@@ -270,7 +267,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                         isInteracting = false
 
                         if pager.interactionBehavior == .pauseAnimation {
-                            scheduleAutoScroll()
+                            resumeAutoScrollAfterInteraction()
                         }
                     }
                 }
@@ -343,6 +340,21 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
         ) { _ in
             Task { @MainActor in
                 performNextPageTransition()
+            }
+        }
+    }
+
+    private func resumeAutoScrollAfterInteraction() {
+        guard let config = pager.animation else { return }
+
+        stopAutoScroll()
+        timer = Timer.scheduledTimer(
+            withTimeInterval: config.afterInteractionDelay,
+            repeats: false
+        ) { _ in
+            Task { @MainActor in
+                performNextPageTransition()
+                scheduleAutoScroll()
             }
         }
     }
