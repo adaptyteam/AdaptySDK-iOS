@@ -72,12 +72,8 @@ extension VS.JSActionDispatcher: JSActionBridge {
     }
 
     func restorePurchases(_ params: JSValue) {
-        guard params.isObject else {
-            Log.viewState.error(#"SDK.restorePurchases: parameter must be object"#)
-            return
-        }
         restorePurchases(
-            callback: VS.JSAction(from: params.forProperty("callback"))
+            callback: params.isObject ? VS.JSAction(from: params.forProperty("callback")) : nil
         )
     }
 
