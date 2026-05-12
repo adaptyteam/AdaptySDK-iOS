@@ -203,23 +203,29 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
     }
 
     private func processEvent(_ event: AdaptyUIEventBus.Event, properties: VC.Element.Properties) {
+        var combinedAnimations: [VC.Animation] = []
+        var firingHandlers: [VC.EventHandler] = []
+
         for eventHandler in properties.eventHandlers {
             guard shouldFireHandler(eventHandler, for: event) else { continue }
-            if eventHandler.animations.isNotEmpty {
-                if playAnimations == eventHandler.animations {
-                    // Same animations — reset first, defer re-set to next run loop
-                    playAnimations = []
-                    DispatchQueue.main.async {
-                        playAnimations = eventHandler.animations
-                    }
-                } else {
-                    playAnimations = eventHandler.animations
-                }
-            }
+            firingHandlers.append(eventHandler)
+            combinedAnimations.append(contentsOf: eventHandler.animations)
+        }
 
-            if eventHandler.onAnimationsFinish.isNotEmpty {
-                scheduleAnimationsFinish(eventHandler)
+        if !combinedAnimations.isEmpty {
+            if playAnimations == combinedAnimations {
+                // Same animations — reset first, defer re-set to next run loop
+                playAnimations = []
+                DispatchQueue.main.async {
+                    playAnimations = combinedAnimations
+                }
+            } else {
+                playAnimations = combinedAnimations
             }
+        }
+
+        for eventHandler in firingHandlers where eventHandler.onAnimationsFinish.isNotEmpty {
+            scheduleAnimationsFinish(eventHandler)
         }
     }
 

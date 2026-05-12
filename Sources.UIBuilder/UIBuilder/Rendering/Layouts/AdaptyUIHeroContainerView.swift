@@ -245,18 +245,21 @@ struct AdaptyUIHeroContainerView: View {
         guard !pending.isEmpty else { return }
 
         for event in pending {
+            var combinedAnimations: [VC.Animation] = []
             for handler in properties.eventHandlers {
                 guard handler.triggers.contains(where: { $0.events.contains(event.eventId) }) else { continue }
-                if handler.animations.isNotEmpty {
-                    if playOnAppearAnimations == handler.animations {
-                        playOnAppearAnimations = []
-                        DispatchQueue.main.async {
-                            playOnAppearAnimations = handler.animations
-                        }
-                    } else {
-                        playOnAppearAnimations = handler.animations
-                    }
+                combinedAnimations.append(contentsOf: handler.animations)
+            }
+
+            guard !combinedAnimations.isEmpty else { continue }
+
+            if playOnAppearAnimations == combinedAnimations {
+                playOnAppearAnimations = []
+                DispatchQueue.main.async {
+                    playOnAppearAnimations = combinedAnimations
                 }
+            } else {
+                playOnAppearAnimations = combinedAnimations
             }
         }
 
