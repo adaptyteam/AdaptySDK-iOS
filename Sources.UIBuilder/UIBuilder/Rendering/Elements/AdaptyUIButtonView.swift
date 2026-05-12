@@ -49,6 +49,7 @@ struct AdaptyUIButtonView: View {
                     EmptyView() // TODO: x check if is ok
                 }
             )
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
