@@ -61,71 +61,7 @@ public extension Dev_AdaptyUIConfiguration {
                     variationId: environment.variationId,
                     abTestName: environment.abTestName,
                     name: environment.placementName,
-                    products: environment.products.map { product in
-                        if let title = product.localizedTitle,
-                           let description = product.localizedDescription,
-                           let price = product.price {
-                            return .init(
-                                flowProductId: product.flowProductId,
-                                adaptyProductId: product.adaptyProductId,
-                                adaptyAccessLevelId: product.adaptyAccessLevelId,
-                                adaptyProductType: product.adaptyProductType,
-                                paywallVariationId: product.paywallVariationId,
-                                paywallName: product.paywallName,
-                                localizedDescription: description,
-                                localizedTitle: title,
-                                isFamilyShareable: product.isFamilyShareable,
-                                regionCode: product.regionCode,
-                                price: .init(
-                                    amount: price.amount,
-                                    currencyCode: price.currencyCode,
-                                    currencySymbol: price.currencySymbol,
-                                    localizedString: price.localizedString
-                                ),
-                                subscription: product.subscription.map { sub in
-                                    .init(
-                                        groupIdentifier: sub.groupIdentifier,
-                                        period: .init(
-                                            unit: sub.period.unit,
-                                            numberOfUnits: sub.period.numberOfUnits
-                                        ),
-                                        localizedPeriod: sub.localizedPeriod,
-                                        offer: sub.offer.map { offer in
-                                            .init(
-                                                id: offer.id,
-                                                type: offer.type,
-                                                price: offer.price.map { p in
-                                                    .init(
-                                                        amount: p.amount,
-                                                        currencyCode: p.currencyCode,
-                                                        currencySymbol: p.currencySymbol,
-                                                        localizedString: p.localizedString
-                                                    )
-                                                },
-                                                paymentMode: offer.paymentMode,
-                                                period: .init(
-                                                    unit: offer.period.unit,
-                                                    numberOfUnits: offer.period.numberOfUnits
-                                                ),
-                                                numberOfPeriods: offer.numberOfPeriods,
-                                                localizedPeriod: offer.localizedPeriod,
-                                                localizedNumberOfPeriods: offer.localizedNumberOfPeriods
-                                            )
-                                        }
-                                    )
-                                }
-                            )
-                        } else {
-                            return .init(
-                                flowProductId: product.flowProductId,
-                                adaptyProductId: product.adaptyProductId,
-                                adaptyAccessLevelId: product.adaptyAccessLevelId,
-                                adaptyProductType: product.adaptyProductType,
-                                paywallVariationId: product.paywallVariationId,
-                                paywallName: product.paywallName
-                            )
-                        }
-                    }
+                    products: environment.products.asProductConstants()
                 )
             )
         )

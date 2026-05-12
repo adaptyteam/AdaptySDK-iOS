@@ -111,6 +111,10 @@ public extension AdaptyUI {
                 stateHolder: stateHolder
             )
 
+            productsViewModel.onProductsLoaded = { [weak stateHolder, previewProducts] _ in
+                stateHolder?.setProducts(previewProducts.asProductConstants())
+            }
+
             stateHolder.start()
             productsViewModel.loadProductsIfNeeded()
         }
