@@ -30,6 +30,8 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     @Published
     private(set) var navigatorsViewModels: [AdaptyUINavigatorViewModel]
 
+    private var dismissingNavigatorIds: Set<String> = []
+
     package init(
         logId: String,
         viewConfiguration: AdaptyUIConfiguration,
@@ -94,13 +96,18 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     ) {
         Log.ui.verbose("#\(logId)# dismiss navigator:\(navigatorId)")
 
-        guard let index = navigatorsViewModels.firstIndex(where: { $0.id == navigatorId }) else {
+        guard !dismissingNavigatorIds.contains(navigatorId) else {
+            Log.ui.warn("#\(logId)# dismiss navigator:\(navigatorId) ignored (already dismissing)")
+            return
+        }
+
+        guard let navigatorVM = navigatorsViewModels.first(where: { $0.id == navigatorId }) else {
             Log.ui.error("#\(logId)# failed to dismiss navigator:\(navigatorId) (navigator not found)")
 
             return
         }
 
-        let navigatorVM = navigatorsViewModels[index]
+        dismissingNavigatorIds.insert(navigatorId)
 
         navigatorVM.publishDismissEvents()
 
@@ -114,7 +121,11 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
                     navigatorVM.executeScreenActions(.onDidDisappear, screen: screen.instance)
                 }
 
-                self.navigatorsViewModels.remove(at: index)
+                self.dismissingNavigatorIds.remove(navigatorId)
+
+                if let index = self.navigatorsViewModels.firstIndex(where: { $0.id == navigatorId }) {
+                    self.navigatorsViewModels.remove(at: index)
+                }
 
                 Log.ui.verbose("#\(self.logId)# dismiss navigator:\(navigatorId) DONE")
                 completion?()
