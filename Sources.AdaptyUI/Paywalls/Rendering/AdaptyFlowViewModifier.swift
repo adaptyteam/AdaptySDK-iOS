@@ -46,6 +46,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
     private let didFailRendering: (AdaptyUIError) -> Void
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
     private let didPartiallyLoadProducts: (([String]) -> Void)?
+    private let didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
     private let showAlertItem: Binding<AlertItem?>
     private let showAlertBuilder: ((AlertItem) -> Alert)?
     private let placeholderBuilder: (() -> Placeholder)?
@@ -68,6 +69,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
         didFailRendering: @escaping (AdaptyUIError) -> Void,
         didFailLoadingProducts: ((AdaptyError) -> Bool)?,
         didPartiallyLoadProducts: (([String]) -> Void)?,
+        didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?,
         showAlertItem: Binding<AlertItem?>,
         showAlertBuilder: ((AlertItem) -> Alert)?,
         placeholderBuilder: (() -> Placeholder)?
@@ -89,6 +91,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
         self.didFailRendering = didFailRendering
         self.didFailLoadingProducts = didFailLoadingProducts
         self.didPartiallyLoadProducts = didPartiallyLoadProducts
+        self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
         self.showAlertItem = showAlertItem
         self.showAlertBuilder = showAlertBuilder
         self.placeholderBuilder = placeholderBuilder
@@ -113,6 +116,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
                 didFailRendering: didFailRendering,
                 didFailLoadingProducts: didFailLoadingProducts,
                 didPartiallyLoadProducts: didPartiallyLoadProducts,
+                didReceiveAnalyticEvent: didReceiveAnalyticEvent,
                 showAlertItem: showAlertItem,
                 showAlertBuilder: showAlertBuilder
             )
@@ -175,6 +179,7 @@ public extension View {
     ///     - didFailRestore: This callback is invoked when the restore process fails.
     ///     - didFailRendering: This callback will be invoked in case of errors during the screen rendering process.
     ///     - didFailLoadingProducts: This callback is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
+    ///     - didReceiveAnalyticEvent: This callback is invoked when a custom analytic event is fired from the flow's script. Use it to forward flow-level analytics to your own analytics provider (e.g. Amplitude, Mixpanel). `name` is the event name; `params` is an arbitrary dictionary of event parameters whose contents depend on the flow configuration.
     ///     - showAlertItem:
     ///     - showAlertBuilder:
     func flow<Placeholder: View, AlertItem: Identifiable>(
@@ -195,6 +200,7 @@ public extension View {
         didFailRendering: @escaping (AdaptyUIError) -> Void,
         didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
         didPartiallyLoadProducts: (([String]) -> Void)? = nil,
+        didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)? = nil,
         showAlertItem: Binding<AlertItem?> = Binding<AdaptyIdentifiablePlaceholder?>.constant(nil),
         showAlertBuilder: ((AlertItem) -> Alert)? = nil,
         placeholderBuilder: (() -> Placeholder)? = { AdaptyLoadingPlaceholderView() }
@@ -218,6 +224,7 @@ public extension View {
                 didFailRendering: didFailRendering,
                 didFailLoadingProducts: didFailLoadingProducts,
                 didPartiallyLoadProducts: didPartiallyLoadProducts,
+                didReceiveAnalyticEvent: didReceiveAnalyticEvent,
                 showAlertItem: showAlertItem,
                 showAlertBuilder: showAlertBuilder,
                 placeholderBuilder: placeholderBuilder
