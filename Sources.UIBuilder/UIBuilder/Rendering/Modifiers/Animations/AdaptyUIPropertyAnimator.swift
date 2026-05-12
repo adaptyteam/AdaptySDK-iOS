@@ -10,6 +10,20 @@
 import SwiftUI
 
 extension VC.Animation.Timeline {
+    // Native SwiftUI `repeatCount` snaps the property to the target value after the
+    // last segment. For finite ping-pong that produces a visible jump to `end` instead
+    // of resting on `start`, so we only allow native repeat where it lands correctly:
+    // any normal loop without per-iteration gaps, or an infinite ping-pong where the
+    // snap is never observed.
+    fileprivate var canUseNativeRepeat: Bool {
+        guard loopDelay == 0, !interpolator.usesCustomCurve else { return false }
+        switch loop {
+        case .pingPong: return loopCount == nil && pingPongDelay == 0
+        case .normal: return true
+        case .none: return false
+        }
+    }
+
     @MainActor
     func animate<Value>(
         from start: Value,
@@ -18,8 +32,7 @@ extension VC.Animation.Timeline {
     ) -> AdaptyUIAnimationToken {
         switch loop {
         case .normal:
-            if loopDelay == 0 && !interpolator.usesCustomCurve {
-                // Use native SwiftUI repeat for smooth looping without frame gaps
+            if canUseNativeRepeat {
                 AdaptyUIPropertyAnimator.animateWithNativeRepeat(
                     timeline: self,
                     startDelay: startDelay,
@@ -30,7 +43,6 @@ extension VC.Animation.Timeline {
                     updateBlock: updateBlock
                 )
             } else {
-                // Manual loop needed for delay between iterations
                 AdaptyUIPropertyAnimator.animateBasicLoop(
                     token: nil,
                     timeline: self,
@@ -42,19 +54,17 @@ extension VC.Animation.Timeline {
                 )
             }
         case .pingPong:
-            if loopDelay == 0 && pingPongDelay == 0 && !interpolator.usesCustomCurve {
-                // Use native SwiftUI repeat for smooth looping without frame gaps
+            if canUseNativeRepeat {
                 AdaptyUIPropertyAnimator.animateWithNativeRepeat(
                     timeline: self,
                     startDelay: startDelay,
-                    loopCount: loopCount,
+                    loopCount: nil,
                     autoreverses: true,
                     from: start,
                     to: end,
                     updateBlock: updateBlock
                 )
             } else {
-                // Manual loop needed for delays between iterations
                 AdaptyUIPropertyAnimator.animatePingPongLoop(
                     token: nil,
                     timeline: self,
