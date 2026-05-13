@@ -35,6 +35,7 @@ struct AdaptyUIResolvedVideoAsset {
     let id: String
     let asset: AVAsset
     let image: AdaptyUIResolvedImageAsset?
+    let ratio: Double?
 }
 
 enum AdaptyUIResolvedColorOrGradientAsset {

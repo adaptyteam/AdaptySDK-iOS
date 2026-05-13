@@ -6,6 +6,28 @@
 
 **File:** `Sources.UIBuilder/UIBuilder/Logic/Assets/AdaptyUIAssetsResolver.swift`
 
+**Change:** Every case gained a trailing `resolution: CGSize?` parameter so the host can declare the video's pixel size up-front. When provided, the player reserves layout space (aspect ratio = `width / height`) before the video loads.
+
+Before:
+```swift
+case file(url: URL, preview: AdaptyUICustomImageAsset?)
+case remote(url: URL, preview: AdaptyUICustomImageAsset?)
+case player(item: AVPlayerItem, player: AVPlayer, preview: AdaptyUICustomImageAsset?)
+```
+
+After:
+```swift
+case file(url: URL, preview: AdaptyUICustomImageAsset?, resolution: CGSize?)
+case remote(url: URL, preview: AdaptyUICustomImageAsset?, resolution: CGSize?)
+case player(item: AVPlayerItem, player: AVPlayer, preview: AdaptyUICustomImageAsset?, resolution: CGSize?)
+```
+
+**Reason:** Mirrors the schema-side `v_res`/`h_res` properties on `Video` assets. Without resolution the player still expands to fill the available area as before.
+
+**Migration:** Append `resolution: nil` (or pass the real `CGSize`) when constructing any `AdaptyUICustomVideoAsset` case.
+
+---
+
 **Change:** `.player` case now accepts `AVPlayer` instead of `AVQueuePlayer`.
 
 Before:

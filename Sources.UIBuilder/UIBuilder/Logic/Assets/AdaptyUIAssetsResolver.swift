@@ -18,9 +18,9 @@ public enum AdaptyUICustomImageAsset: Sendable {
 }
 
 public enum AdaptyUICustomVideoAsset: Sendable {
-    case file(url: URL, preview: AdaptyUICustomImageAsset?)
-    case remote(url: URL, preview: AdaptyUICustomImageAsset?)
-    case player(item: AVPlayerItem, player: AVPlayer, preview: AdaptyUICustomImageAsset?)
+    case file(url: URL, preview: AdaptyUICustomImageAsset?, resolution: CGSize?)
+    case remote(url: URL, preview: AdaptyUICustomImageAsset?, resolution: CGSize?)
+    case player(item: AVPlayerItem, player: AVPlayer, preview: AdaptyUICustomImageAsset?, resolution: CGSize?)
 }
 
 public enum AdaptyUICustomColorAsset: Sendable {

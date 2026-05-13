@@ -77,7 +77,8 @@ extension VC.VideoData {
         AdaptyUIResolvedVideoAsset(
             id: url.absoluteString,
             asset: AVAsset(url: url),
-            image: image.resolvedImage
+            image: image.resolvedImage,
+            ratio: ratio
         )
     }
 }

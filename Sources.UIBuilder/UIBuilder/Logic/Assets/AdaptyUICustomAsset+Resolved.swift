@@ -72,20 +72,29 @@ import AVKit
 extension AdaptyUICustomVideoAsset {
     func resolvedVideo(id: String) -> AdaptyUIResolvedVideoAsset {
         switch self {
-        case .file(let url, let preview),
-             .remote(let url, let preview):
+        case .file(let url, let preview, let resolution),
+             .remote(let url, let preview, let resolution):
             return .init(
                 id: id,
                 asset: AVAsset(url: url),
-                image: preview.flatMap(\.resolvedImage)
+                image: preview.flatMap(\.resolvedImage),
+                ratio: resolution.flatMap(\.aspectRatio)
             )
-        case .player(let item, let player, let preview):
+        case .player(let item, _, let preview, let resolution):
             return .init(
                 id: id,
                 asset: item.asset,
-                image: preview.flatMap(\.resolvedImage)
+                image: preview.flatMap(\.resolvedImage),
+                ratio: resolution.flatMap(\.aspectRatio)
             )
         }
+    }
+}
+
+private extension CGSize {
+    var aspectRatio: Double? {
+        guard width > 0, height > 0 else { return nil }
+        return Double(width) / Double(height)
     }
 }
 

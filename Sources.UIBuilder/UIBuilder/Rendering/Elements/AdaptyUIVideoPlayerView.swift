@@ -19,6 +19,24 @@ extension VC.AspectRatio {
         case .stretch: .resize
         }
     }
+
+    var swiftUIContentMode: SwiftUI.ContentMode {
+        switch self {
+        case .fit: .fit
+        case .fill, .stretch: .fill
+        }
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func applyAspectLayout(ratio: Double?, aspect: VC.AspectRatio) -> some View {
+        if let ratio {
+            aspectRatio(ratio, contentMode: aspect.swiftUIContentMode)
+        } else {
+            frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
 }
 
 struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
@@ -127,7 +145,7 @@ struct AdaptyUIVideoView: View {
                     )
                 }
 
-                if let placeholder = videoAsset.image {
+                if showPlaceholder, let placeholder = videoAsset.image {
                     AdaptyUIImageView(
                         .resolvedImageAsset(
                             asset: placeholder,
@@ -135,10 +153,10 @@ struct AdaptyUIVideoView: View {
                             tint: nil
                         )
                     )
-                    .opacity(showPlaceholder ? 1 : 0)
                     .allowsHitTesting(false)
                 }
             }
+            .applyAspectLayout(ratio: videoAsset.ratio, aspect: video.aspect)
             .id(videoAsset.id)
         } else {
             Rectangle()
