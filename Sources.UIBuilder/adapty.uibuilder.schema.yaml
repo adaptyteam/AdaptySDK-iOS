@@ -1656,6 +1656,8 @@ Assets:
             type: { const: video }
             url: { type: string }
             image: { $ref: "#/Assets/Image/Data" }
+            v_res: { type: integer }
+            h_res: { type: integer }
         additionalProperties: false
 
 AssetId:

@@ -25,6 +25,8 @@ extension Schema.VideoData: Decodable {
         case url
         case image
         case customId = "custom_id"
+        case verticalResolution = "v_res"
+        case horizontalResolution = "h_res"
     }
 
     init(from decoder: Decoder) throws {
@@ -32,7 +34,10 @@ extension Schema.VideoData: Decodable {
         try self.init(
             customId: container.decodeIfPresent(String.self, forKey: .customId),
             url: container.decode(URL.self, forKey: .url),
-            image: container.decode(Schema.ImageData.self, forKey: .image)
+            image: container.decode(Schema.ImageData.self, forKey: .image),
+            verticalResolution: container.decodeIfPresent(Int.self, forKey: .verticalResolution) ?? 0,
+            horizontalResolution: container.decodeIfPresent(Int.self, forKey: .horizontalResolution) ?? 0
         )
     }
 }
+
