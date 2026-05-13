@@ -59,4 +59,18 @@ package struct AdaptyUIDefaultAssetsResolver: AdaptyUIAssetsResolver {
     }
 }
 
+@MainActor
+public protocol AdaptyUIInternalFontsResolver: Sendable {
+    func internalFont(for id: String, size: Double) -> UIFont?
+}
+
+@MainActor
+extension AdaptyUIBuilder {
+    static var internalFontsResolver: AdaptyUIInternalFontsResolver?
+
+    public static func setInternalFontsResolver(_ resolver: AdaptyUIInternalFontsResolver?) {
+        internalFontsResolver = resolver
+    }
+}
+
 #endif
