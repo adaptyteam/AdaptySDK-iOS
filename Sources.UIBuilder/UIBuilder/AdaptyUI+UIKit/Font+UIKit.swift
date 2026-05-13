@@ -55,10 +55,20 @@ extension UIFont {
     }
 }
 
+@MainActor
 extension UIFont {
     private static let systemFontReservedName = "adapty_system"
 
     static func create(_ font: VC.Font, withSize size: Double) -> UIFont {
+        if !font.alias.isEmpty,
+           let font = AdaptyUIBuilder.internalFontsResolver?.internalFont(
+               for: font.alias,
+               size: size
+           )
+        {
+            return font
+        }
+
         if !font.alias.isEmpty, let font = UIFont(name: font.alias, size: size) {
             return font
         }

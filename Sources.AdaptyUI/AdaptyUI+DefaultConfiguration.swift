@@ -23,8 +23,8 @@ public extension AdaptyFlowControllerDelegate {
         switch action {
         case .close:
             controller.dismiss(animated: true)
-        case let .openURL(url):
-            UIApplication.shared.open(url, options: [:])
+        case let .openURL(url, openIn):
+            Task { _ = await url.open(presentation: openIn) }
         case .custom:
             break
         }
