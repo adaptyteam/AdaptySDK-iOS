@@ -20,9 +20,13 @@ extension AdaptyPaywallProduct: ProductResolver {
 
     private func isApplicableForTag(_ tag: TextProductTag) -> Bool {
         switch tag {
-        case .title, .price:
+        case .title, .description, .price, .priceAmount, .priceAmountInteger,
+             .currencyCode, .currencySymbol:
             true
-        case .pricePerDay, .pricePerWeek, .pricePerMonth, .pricePerYear:
+        case .priceAmountFraction:
+            maximumFractionDigits(for: priceLocale) > 0
+        case .pricePerDay, .pricePerWeek, .pricePerMonth, .pricePerYear,
+             .subscriptionPeriod:
             subscriptionPeriod != nil
         case .offerPrice, .offerPeriods, .offerNumberOfPeriods:
             subscriptionOffer != nil
@@ -36,8 +40,20 @@ extension AdaptyPaywallProduct: ProductResolver {
             switch tag {
             case .title:
                 localizedTitle
+            case .description:
+                localizedDescription
             case .price:
                 localizedPrice
+            case .priceAmount:
+                priceAmount(for: priceLocale)
+            case .priceAmountInteger:
+                priceAmountInteger(for: priceLocale)
+            case .priceAmountFraction:
+                priceAmountFraction(for: priceLocale)
+            case .currencyCode:
+                currencyCode
+            case .currencySymbol:
+                currencySymbol
             case .pricePerDay:
                 pricePer(period: .day)
             case .pricePerWeek:
@@ -46,6 +62,8 @@ extension AdaptyPaywallProduct: ProductResolver {
                 pricePer(period: .month)
             case .pricePerYear:
                 pricePer(period: .year)
+            case .subscriptionPeriod:
+                localizedSubscriptionPeriod
             case .offerPrice:
                 subscriptionOffer?.localizedPrice
             case .offerPeriods:
@@ -79,6 +97,48 @@ extension AdaptyProduct {
         formatter.locale = skProduct.priceFormatStyle.locale
 
         return formatter.string(from: nsDecimalPricePerPeriod)
+    }
+
+    func priceAmount(for locale: Locale) -> String? {
+        let digits = maximumFractionDigits(for: locale)
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.locale = locale
+        formatter.minimumFractionDigits = digits
+        formatter.maximumFractionDigits = digits
+        return formatter.string(from: NSDecimalNumber(decimal: price))
+    }
+
+    func priceAmountInteger(for locale: Locale) -> String? {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.locale = locale
+        formatter.maximumFractionDigits = 0
+        formatter.roundingMode = .down
+        return formatter.string(from: NSDecimalNumber(decimal: price))
+    }
+
+    func priceAmountFraction(for locale: Locale) -> String? {
+        let fractionDigits = maximumFractionDigits(for: locale)
+        guard fractionDigits > 0 else { return nil }
+
+        let multiplier = pow(Decimal(10), fractionDigits)
+        var rounded = Decimal()
+        var unrounded = price * multiplier
+        NSDecimalRound(&rounded, &unrounded, 0, .plain)
+
+        let scaledInteger = NSDecimalNumber(decimal: rounded).int64Value
+        let modulus = NSDecimalNumber(decimal: multiplier).int64Value
+        let fraction = abs(scaledInteger) % modulus
+
+        return String(format: "%0\(fractionDigits)lld", fraction)
+    }
+
+    func maximumFractionDigits(for locale: Locale) -> Int {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = locale
+        return formatter.maximumFractionDigits
     }
 }
 
