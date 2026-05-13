@@ -57,7 +57,10 @@ struct AdaptyUIFlowRendererView: View {
                 screensViewModel.isRightToLeft ? .rightToLeft : .leftToRight
             )
 
-            if productsViewModel.purchaseInProgress || productsViewModel.restoreInProgress {
+            if productsViewModel.purchaseInProgress, screensViewModel.showPurchaseLoader {
+                AdaptyUILoaderView()
+                    .transition(.opacity)
+            } else if productsViewModel.restoreInProgress, screensViewModel.showRestoreLoader {
                 AdaptyUILoaderView()
                     .transition(.opacity)
             }

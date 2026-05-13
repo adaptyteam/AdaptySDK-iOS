@@ -111,6 +111,10 @@ public extension AdaptyUI {
                 stateHolder: stateHolder
             )
 
+            productsViewModel.onProductsLoaded = { [weak stateHolder, previewProducts] _ in
+                stateHolder?.setProducts(previewProducts.asProductConstants())
+            }
+
             stateHolder.start()
             productsViewModel.loadProductsIfNeeded()
         }
@@ -134,12 +138,14 @@ public struct Dev_AdaptyUIRendererView: View {
 
     private let safeAreaOverride: EdgeInsets?
     private let showDebugOverlay: Bool
+    private let displayMissingTags: Bool
 
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
         assetsResolver: AdaptyUIAssetsResolver?,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
         showDebugOverlay: Bool = false,
+        displayMissingTags: Bool = true,
         safeAreaOverride: EdgeInsets? = nil,
         rtlOverride: Bool? = nil,
         didAppear: @escaping () -> Void,
@@ -155,6 +161,7 @@ public struct Dev_AdaptyUIRendererView: View {
     ) {
         self.safeAreaOverride = safeAreaOverride
         self.showDebugOverlay = showDebugOverlay
+        self.displayMissingTags = displayMissingTags
         self.viewConfiguration = viewConfiguration.wrapped
         galleryConfiguration = .init(
             logId: "test",
@@ -202,7 +209,7 @@ public struct Dev_AdaptyUIRendererView: View {
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: showDebugOverlay,
-            displayMissingTags: true,
+            displayMissingTags: displayMissingTags,
             safeAreaOverride: safeAreaOverride
         )
         .environmentObjects(

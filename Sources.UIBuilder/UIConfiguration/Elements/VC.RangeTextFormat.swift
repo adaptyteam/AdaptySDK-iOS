@@ -18,3 +18,12 @@ extension VC {
         }
     }
 }
+
+extension VC.RangeTextFormat {
+    func item(byValue: Double) -> VC.RichText {
+        guard let item = items.first(where: { byValue >= $0.from }) else {
+            return items.last?.value ?? .empty
+        }
+        return item.value
+    }
+}

@@ -36,6 +36,20 @@ extension VC.Animation.Interpolator {
             }
         }
     }
+
+    // SwiftUI's `.repeatForever` / `.repeatCount` don't compose with
+    // `Animation(CustomAnimation)` — the custom curve is dropped and the
+    // animation degrades to default easing. These cases must use the
+    // manual loop path instead of `animateWithNativeRepeat`.
+    var usesCustomCurve: Bool {
+        switch self {
+        case .easeInElastic, .easeOutElastic, .easeInOutElastic,
+             .easeInBounce, .easeOutBounce, .easeInOutBounce:
+            true
+        default:
+            false
+        }
+    }
 }
 
 #endif

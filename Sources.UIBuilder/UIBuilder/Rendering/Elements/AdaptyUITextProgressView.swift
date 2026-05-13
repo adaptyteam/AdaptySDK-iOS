@@ -39,7 +39,7 @@ struct AdaptyUITextProgressView: View {
             screen: screen
         )
 
-        richText
+        let text = richText
             .convertToSwiftUIText(
                 defaultAttributes: progress.format.textAttributes,
                 assetsCache: assetsViewModel.cache,
@@ -48,7 +48,7 @@ struct AdaptyUITextProgressView: View {
                 internalTagResolver: { value in
                     switch value {
                     case "PERCENT":
-                        return targetValue
+                        return animatedValue
                     default:
                         return nil
                     }
@@ -58,6 +58,8 @@ struct AdaptyUITextProgressView: View {
                 colorScheme: colorScheme,
                 screen: screen
             )
+
+        animatedText(text, value: animatedValue)
             .animation(swiftUIAnimation, value: animatedValue)
             .onAppear {
                 animatedValue = targetValue
@@ -66,6 +68,21 @@ struct AdaptyUITextProgressView: View {
                 animatedValue = newValue
                 fireActionsWhenTransitionEnds()
             }
+    }
+
+    @ViewBuilder
+    private func animatedText(_ text: Text, value: Double) -> some View {
+        if #available(iOS 17.0, macOS 14.0, visionOS 1.0, *) {
+            text.contentTransition(.numericText(value: value))
+        } else if #available(iOS 16.0, macOS 13.0, *) {
+            text.contentTransition(.numericText())
+        } else {
+            ZStack {
+                text
+                    .id(value)
+                    .transition(.opacity)
+            }
+        }
     }
 
     private var swiftUIAnimation: Animation {

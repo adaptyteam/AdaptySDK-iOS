@@ -48,7 +48,8 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     ) async {}
 
     package func getProducts() async throws -> [ProductResolver] {
-        products
+        try await Task.sleep(nanoseconds: 1_500_000_000)
+        return products
     }
 
     func makePurchase(

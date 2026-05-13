@@ -37,7 +37,7 @@ extension Schema.Pager.Animation: Decodable {
                 ?? .default,
             repeatTransition: container.decodeIfPresent(Schema.Transition.self, forKey: .repeatTransition),
 
-            afterInteractionDelay: (container.decodeIfPresent(TimeInterval.self, forKey: .startDelay))
+            afterInteractionDelay: (container.decodeIfPresent(TimeInterval.self, forKey: .afterInteractionDelay))
                 .map { $0 / 1000.0 }
                 ?? Self.default.afterInteractionDelay
         )

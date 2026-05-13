@@ -31,6 +31,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
     private let didFailRendering: ((AdaptyUIError) -> Void)?
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
     private let didPartiallyLoadProducts: (([String]) -> Void)?
+    private let didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
     private let showAlertItem: Binding<AlertItem?>
     private let showAlertBuilder: ((AlertItem) -> Alert)?
 
@@ -50,6 +51,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
         didFailRendering: @escaping (AdaptyUIError) -> Void,
         didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
         didPartiallyLoadProducts: (([String]) -> Void)? = nil,
+        didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)? = nil,
         showAlertItem: Binding<AlertItem?> = Binding<AdaptyIdentifiablePlaceholder?>.constant(nil),
         showAlertBuilder: ((AlertItem) -> Alert)? = nil
     ) {
@@ -68,6 +70,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
         self.didFailRendering = didFailRendering
         self.didFailLoadingProducts = didFailLoadingProducts
         self.didPartiallyLoadProducts = didPartiallyLoadProducts
+        self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
         self.showAlertItem = showAlertItem
         self.showAlertBuilder = showAlertBuilder
     }
@@ -101,6 +104,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
         flowConfiguration.eventsHandler.didFailRendering = didFailRendering
         flowConfiguration.eventsHandler.didFailLoadingProducts = didFailLoadingProducts ?? { _ in true }
         flowConfiguration.eventsHandler.didPartiallyLoadProducts = didPartiallyLoadProducts
+        flowConfiguration.eventsHandler.didReceiveAnalyticEvent = didReceiveAnalyticEvent
 
         flowConfiguration.eventsHandler.didFinishWebPaymentNavigation = didFinishWebPaymentNavigation ?? { _, _ in }
 

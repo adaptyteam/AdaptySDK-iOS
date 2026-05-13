@@ -127,7 +127,7 @@ struct AdaptyUIVideoView: View {
                     )
                 }
 
-                if showPlaceholder, let placeholder = videoAsset.image {
+                if let placeholder = videoAsset.image {
                     AdaptyUIImageView(
                         .resolvedImageAsset(
                             asset: placeholder,
@@ -135,6 +135,8 @@ struct AdaptyUIVideoView: View {
                             tint: nil
                         )
                     )
+                    .opacity(showPlaceholder ? 1 : 0)
+                    .allowsHitTesting(false)
                 }
             }
             .id(videoAsset.id)

@@ -178,15 +178,12 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 currentPage = index
             }
             if shouldScheduleAutoscroll {
-                Task {
-                    try await Task.sleep(seconds: pageControllTapAnimationDuration)
-                    scheduleAutoScroll()
-                }
+                resumeAutoScrollAfterInteraction()
             }
         } else {
             currentPage = index
             if shouldScheduleAutoscroll {
-                scheduleAutoScroll()
+                resumeAutoScrollAfterInteraction()
             }
         }
     }
@@ -233,7 +230,6 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 - pagePaddingTop
                 - pagePaddingBottom
 
-            let hPadding = (proxy.size.width - width) / 2.0
             let pages = pager.content
             HStack(spacing: pager.spacing) {
                 ForEach(0 ..< pages.count, id: \.self) { idx in
@@ -249,10 +245,11 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                     )
                     .frame(width: max(width, 0), height: max(height, 0))
                     .clipped()
-                    .padding(.leading, idx == 0 ? hPadding : 0)
-                    .padding(.trailing, idx == pages.count - 1 ? hPadding : 0)
+                    .padding(.leading, idx == 0 ? pagePaddingLeading : 0)
+                    .padding(.trailing, idx == pages.count - 1 ? pagePaddingTrailing : 0)
                 }
             }
+            .padding(.top, pagePaddingTop)
             .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)
             .dragGesture(
                 condition: pager.interactionBehavior != .none,
@@ -270,7 +267,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                         isInteracting = false
 
                         if pager.interactionBehavior == .pauseAnimation {
-                            scheduleAutoScroll()
+                            resumeAutoScrollAfterInteraction()
                         }
                     }
                 }
@@ -311,8 +308,26 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
             repeats: false
         ) { _ in
             Task { @MainActor in
+                performNextPageTransition()
                 scheduleAutoScroll()
             }
+        }
+    }
+
+    private func performNextPageTransition() {
+        guard let config = pager.animation else { return }
+        guard !isInteracting else { return }
+
+        if currentPage < pager.content.count - 1 {
+            withAnimation(config.pageTransition.swiftUIAnimation) {
+                currentPage += 1
+            }
+        } else if let repeatTransition = config.repeatTransition {
+            withAnimation(repeatTransition.swiftUIAnimation) {
+                currentPage = 0
+            }
+        } else {
+            stopAutoScroll()
         }
     }
 
@@ -324,19 +339,22 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
             repeats: true
         ) { _ in
             Task { @MainActor in
-                guard !isInteracting else { return }
+                performNextPageTransition()
+            }
+        }
+    }
 
-                if currentPage < pager.content.count - 1 {
-                    withAnimation(config.pageTransition.swiftUIAnimation) {
-                        currentPage += 1
-                    }
-                } else if let repeatTransition = config.repeatTransition {
-                    withAnimation(repeatTransition.swiftUIAnimation) {
-                        currentPage = 0
-                    }
-                } else {
-                    stopAutoScroll()
-                }
+    private func resumeAutoScrollAfterInteraction() {
+        guard let config = pager.animation else { return }
+
+        stopAutoScroll()
+        timer = Timer.scheduledTimer(
+            withTimeInterval: config.afterInteractionDelay,
+            repeats: false
+        ) { _ in
+            Task { @MainActor in
+                performNextPageTransition()
+                scheduleAutoScroll()
             }
         }
     }

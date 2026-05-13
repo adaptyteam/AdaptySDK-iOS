@@ -149,7 +149,8 @@ extension [VC.RichText.Item] {
                 let tagReplacementResult: String
 
                 if let anyValue = internalTagResolver?(value),
-                   let convertedValue = converter?.asTagConverter?.toString(anyValue, locale: stateViewModel.viewConfiguration.locale) {
+                   let convertedValue = converter?.asTagConverter?.toString(anyValue, locale: stateViewModel.viewConfiguration.locale)
+                {
                     tagReplacementResult = convertedValue
                 } else if let customTagResult = customTagResolver.replacement(for: value) {
                     tagReplacementResult = customTagResult
@@ -167,7 +168,8 @@ extension [VC.RichText.Item] {
                             )
                         }
                 } else if let productTag = TextProductTag(rawValue: value),
-                          let productTagResult = productInfo?.value(byTag: productTag) {
+                          let productTagResult = productInfo?.value(byTag: productTag)
+                {
                     switch productTagResult {
                     case .notApplicable:
                         tagReplacementResult = ""
@@ -210,17 +212,21 @@ extension [VC.RichText.Item] {
                 ).asColorAsset?.uiColor
 
                 guard let uiImage = imageResolvedAsset?.textAttachmentImage(
-                    font: fontResolvedAsset?.font ?? .adaptyDefaultFont,
-                    tint: tintResolvedAsset
+                    font: fontResolvedAsset?.font ?? .adaptyDefaultFont
                 ) else {
                     return partialResult
                 }
 
-                return partialResult + Text(
-                    Image(
-                        uiImage: uiImage
+                if let tint = tintResolvedAsset {
+                    return partialResult + Text(
+                        Image(uiImage: uiImage)
+                            .renderingMode(.template)
+                    ).foregroundColor(Color(tint))
+                } else {
+                    return partialResult + Text(
+                        Image(uiImage: uiImage)
                     )
-                )
+                }
             }
         }
     }
@@ -286,7 +292,8 @@ extension VC.RichText {
                         colorScheme: colorScheme,
                         screen: screen,
                         displayMissingTags: displayMissingTags
-                    ) {
+                    )
+                {
                     result = fallbackText
                 } else {
                     result = Text("")
@@ -435,27 +442,17 @@ extension AdaptyUIResolvedImageAsset {
     }
 
     func textAttachmentImage(
-        font: UIFont,
-        tint: UIColor?
+        font: UIFont
     ) -> UIImage? {
-        guard var image = uiImage else { return nil }
+        guard let image = uiImage else { return nil }
 
         let size = CGSize(
             width: image.size.width * font.capHeight / image.size.height,
             height: font.capHeight
         )
 
-        image = image.imageWith(newSize: size)
-
-        if let tint {
-            image = image
-                .withRenderingMode(.alwaysTemplate)
-                .withTintColor(tint, renderingMode: .alwaysTemplate)
-        }
-
-        return image
+        return image.imageWith(newSize: size)
     }
 }
 
 #endif
-
