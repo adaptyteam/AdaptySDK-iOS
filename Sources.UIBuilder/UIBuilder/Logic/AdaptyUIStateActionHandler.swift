@@ -100,10 +100,10 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
     nonisolated func openUrl(
         url: URL,
-        openIn _: VC.Action.WebOpenInParameter
+        openIn: VC.Action.WebOpenInParameter
     ) {
         Task { @MainActor [weak self] in
-            self?.logic.reportDidPerformAction(.openURL(url: url))
+            self?.logic.reportDidPerformAction(.openURL(url: url, in: openIn.toWebPresentation))
         }
     }
 
@@ -113,7 +113,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
     nonisolated func openUrl(
         stringId: String,
-        openIn _: VC.Action.WebOpenInParameter
+        openIn: VC.Action.WebOpenInParameter
     ) {
         Task { @MainActor [weak self] in
             guard
@@ -125,7 +125,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 return
             }
 
-            self?.logic.reportDidPerformAction(.openURL(url: url))
+            self?.logic.reportDidPerformAction(.openURL(url: url, in: openIn.toWebPresentation))
         }
     }
 

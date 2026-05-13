@@ -149,8 +149,17 @@ extension AdaptyUIBuilder.Action {
     var adaptyUIAction: AdaptyUI.Action {
         switch self {
         case .close: .close
-        case let .openURL(url): .openURL(url: url)
+        case let .openURL(url, openIn): .openURL(url: url, in: openIn.toAdaptyWebPresentation)
         case let .custom(id): .custom(id: id)
+        }
+    }
+}
+
+extension AdaptyUIBuilder.WebPresentation {
+    var toAdaptyWebPresentation: AdaptyWebPresentation {
+        switch self {
+        case .externalBrowser: .externalBrowser
+        case .inAppBrowser: .inAppBrowser
         }
     }
 }

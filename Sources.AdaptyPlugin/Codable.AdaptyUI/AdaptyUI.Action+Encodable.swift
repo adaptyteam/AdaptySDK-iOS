@@ -12,6 +12,7 @@ extension AdaptyUI.Action: Encodable {
     private enum CodingKeys: String, CodingKey {
         case type
         case value
+        case openIn = "open_in"
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -20,9 +21,10 @@ extension AdaptyUI.Action: Encodable {
         switch self {
         case .close:
             try container.encode("close", forKey: .type)
-        case .openURL(let url):
+        case .openURL(let url, let openIn):
             try container.encode("open_url", forKey: .type)
             try container.encode(url.absoluteString, forKey: .value)
+            try container.encode(openIn, forKey: .openIn)
         case .custom(let id):
             try container.encode("custom", forKey: .type)
             try container.encode(id, forKey: .value)

@@ -10,9 +10,14 @@
 import Foundation
 
 public extension AdaptyUIBuilder {
+    enum WebPresentation: String, Sendable {
+        case externalBrowser
+        case inAppBrowser
+    }
+
     enum Action {
         case close
-        case openURL(url: URL)
+        case openURL(url: URL, in: WebPresentation)
         case custom(id: String)
     }
 }

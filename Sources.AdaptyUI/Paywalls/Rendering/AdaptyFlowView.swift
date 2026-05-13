@@ -83,8 +83,8 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
             switch action {
             case .close:
                 presentationMode.wrappedValue.dismiss()
-            case let .openURL(url):
-                UIApplication.shared.open(url, options: [:])
+            case let .openURL(url, openIn):
+                Task { _ = await url.open(presentation: openIn) }
             case .custom:
                 break
             }
