@@ -30,6 +30,7 @@ enum Log {
     static let crossAB = Log.Category(name: "CrossAB")
     static let events = Log.Category(name: "Events")
     static let storage = Log.Category(name: "Storage")
+    static let cache = Log.Category(name: "Cache")
     static let http = Log.Category(name: "API")
 
     static let fallbackPlacements = Log.Category(name: "FallbackPlacements")
