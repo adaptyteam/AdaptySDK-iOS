@@ -32,57 +32,35 @@ struct AdaptyUITextProgressView: View {
     @State private var animatedValue: Double = 0.0
 
     var body: some View {
-        let richText = progress.format.item(byValue: animatedValue)
         let targetValue = stateViewModel.getValue(
             progress.value,
             defaultValue: 0.0,
             screen: screen
         )
 
-        let text = richText
-            .convertToSwiftUIText(
-                defaultAttributes: progress.format.textAttributes,
-                assetsCache: assetsViewModel.cache,
-                stateViewModel: stateViewModel,
-                tagValues: nil,
-                internalTagResolver: { value in
-                    switch value {
-                    case "PERCENT":
-                        return animatedValue
-                    default:
-                        return nil
-                    }
-                },
-                customTagResolver: customTagResolverViewModel,
-                productInfo: nil,
-                colorScheme: colorScheme,
-                screen: screen
+        Color.clear
+            .modifier(
+                AnimatedProgressTextModifier(
+                    value: animatedValue,
+                    progress: progress,
+                    assetsCache: assetsViewModel.cache,
+                    stateViewModel: stateViewModel,
+                    customTagResolver: customTagResolverViewModel,
+                    colorScheme: colorScheme,
+                    screen: screen
+                )
             )
-
-        animatedText(text, value: animatedValue)
-            .animation(swiftUIAnimation, value: animatedValue)
             .onAppear {
-                animatedValue = targetValue
+                withAnimation(swiftUIAnimation) {
+                    animatedValue = targetValue
+                }
             }
             .onChange(of: targetValue) { newValue in
-                animatedValue = newValue
+                withAnimation(swiftUIAnimation) {
+                    animatedValue = newValue
+                }
                 fireActionsWhenTransitionEnds()
             }
-    }
-
-    @ViewBuilder
-    private func animatedText(_ text: Text, value: Double) -> some View {
-        if #available(iOS 17.0, macOS 14.0, visionOS 1.0, *) {
-            text.contentTransition(.numericText(value: value))
-        } else if #available(iOS 16.0, macOS 13.0, *) {
-            text.contentTransition(.numericText())
-        } else {
-            ZStack {
-                text
-                    .id(value)
-                    .transition(.opacity)
-            }
-        }
     }
 
     private var swiftUIAnimation: Animation {
@@ -103,6 +81,41 @@ struct AdaptyUITextProgressView: View {
         } else {
             stateViewModel.execute(actions: actions, screen: screen)
         }
+    }
+}
+
+private struct AnimatedProgressTextModifier: ViewModifier, @preconcurrency Animatable {
+    var value: Double
+
+    let progress: VC.TextProgress
+    let assetsCache: AdaptyUIAssetsCache
+    let stateViewModel: AdaptyUIStateViewModel
+    let customTagResolver: AdaptyUITagResolverViewModel
+    let colorScheme: ColorScheme
+    let screen: VS.ScreenInstance
+
+    var animatableData: Double {
+        get { value }
+        set { value = newValue }
+    }
+
+    @MainActor
+    func body(content: Content) -> some View {
+        let currentValue = value
+        let richText = progress.format.item(byValue: currentValue)
+        return richText.convertToSwiftUIText(
+            defaultAttributes: progress.format.textAttributes,
+            assetsCache: assetsCache,
+            stateViewModel: stateViewModel,
+            tagValues: nil,
+            internalTagResolver: { tag in
+                tag == "PERCENT" ? currentValue : nil
+            },
+            customTagResolver: customTagResolver,
+            productInfo: nil,
+            colorScheme: colorScheme,
+            screen: screen
+        )
     }
 }
 
