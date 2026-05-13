@@ -1200,8 +1200,8 @@ UI:
                     padding: { $ref: "#/Entities/EdgeInsets", default: 6 }
                     dot_size: { type: number, default: 6 }
                     spacing: { type: number, default: 6 }
-                    color: { $ref: "#/AssetIdOrColor/Binding" }
-                    selected_color: { $ref: "#/AssetIdOrColor/Binding" }
+                    color: { $ref: "#/AssetIdOrColor/Binding", default: "#FFFFFFFF" }
+                    selected_color: { $ref: "#/AssetIdOrColor/Binding", default: "#D3D3D3FF" }
                 additionalProperties: false
             animation:
                 type: object

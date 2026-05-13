@@ -18,8 +18,8 @@ extension Schema.Pager.PageControl {
         padding: .init(same: .point(6)),
         dotSize: 6,
         spacing: 6,
-        color: nil,
-        selectedColor: nil
+        color: .color(.white),
+        selectedColor: .color(.lightGray)
     )
 }
 
@@ -30,8 +30,8 @@ extension Schema.Pager.PageControl: Decodable {
         case padding
         case dotSize = "dot_size"
         case spacing
-        case colorAssetId = "color"
-        case selectedColorAssetId = "selected_color"
+        case color = "color"
+        case selectedColor = "selected_color"
     }
 
     init(from decoder: Decoder) throws {
@@ -47,9 +47,8 @@ extension Schema.Pager.PageControl: Decodable {
                 ?? Self.default.dotSize,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing)
                 ?? Self.default.spacing,
-            color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId),
-
-            selectedColor: container.decodeIfPresent(Schema.AssetReference.self, forKey: .selectedColorAssetId)
+            color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .color) ?? Self.default.color,
+            selectedColor: container.decodeIfPresent(Schema.AssetReference.self, forKey: .selectedColor) ?? Self.default.selectedColor
         )
     }
 }

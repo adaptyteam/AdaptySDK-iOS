@@ -14,7 +14,7 @@ extension VC.Pager {
         let padding: VC.EdgeInsets
         let dotSize: Double
         let spacing: Double
-        let color: VC.AssetReference?
-        let selectedColor: VC.AssetReference?
+        let color: VC.AssetReference
+        let selectedColor: VC.AssetReference
     }
 }
