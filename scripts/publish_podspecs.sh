@@ -8,6 +8,12 @@
 
 set -e
 
+# Tee all output to a timestamped log file in the project root.
+# Override path with: LOG_FILE=/path/to/log ./scripts/publish_podspecs.sh
+LOG_FILE="${LOG_FILE:-/tmp/publish_podspecs_$(date +%Y%m%d_%H%M%S).log}"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "📝 Logging to: $LOG_FILE"
+
 # Color codes for terminal output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -18,6 +24,8 @@ NC='\033[0m' # No Color
 # Default configuration
 SKIP_LINT=false
 SKIP_TESTS=false
+SKIP_REPO_UPDATE=false
+VERBOSE=false
 MAX_RETRIES=5
 RETRY_DELAY=10       # Delay between retries in seconds
 
@@ -32,6 +40,14 @@ while [[ $# -gt 0 ]]; do
             SKIP_TESTS=true
             shift
             ;;
+        --skip-repo-update)
+            SKIP_REPO_UPDATE=true
+            shift
+            ;;
+        --verbose)
+            VERBOSE=true
+            shift
+            ;;
         --max-retries)
             MAX_RETRIES="$2"
             shift 2
@@ -42,6 +58,8 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  --skip-lint          Skip pod lib lint before publishing"
             echo "  --skip-tests         Skip building and running tests during validation (faster, less thorough)"
+            echo "  --skip-repo-update   Skip 'pod repo update' calls (if you already ran it manually)"
+            echo "  --verbose            Pass --verbose to pod commands (lint, push, repo update)"
             echo "  --max-retries N      Maximum number of retries for each podspec (default: 5)"
             echo "  --help               Show this help message"
             exit 0
@@ -54,8 +72,14 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Verbose flag to pass through to pod commands when --verbose is set
+VERBOSE_FLAG=""
+if [ "$VERBOSE" = true ]; then
+    VERBOSE_FLAG="--verbose"
+fi
+
 # Podspecs in dependency order (must be published in this order)
-PODSPECS=("Adapty.podspec" "AdaptyUI.podspec" "AdaptyPlugin.podspec")
+PODSPECS=("AdaptyLogger.podspec" "AdaptyUIBuilder.podspec" "Adapty.podspec" "AdaptyUI.podspec" "AdaptyPlugin.podspec")
 
 # Function to extract pod name from podspec
 get_pod_name() {
@@ -94,11 +118,15 @@ publish_podspec() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     
     # Update pod repo before processing to ensure we have latest dependencies
-    echo -e "${BLUE}🔄 Updating pod repo to get latest dependencies...${NC}"
-    if ! pod repo update; then
-        echo -e "${YELLOW}⚠️  Warning: pod repo update failed, but continuing...${NC}"
+    if [ "$SKIP_REPO_UPDATE" = true ]; then
+        echo -e "${YELLOW}⏭️  Skipping pod repo update (--skip-repo-update flag set)${NC}"
     else
-        echo -e "${GREEN}✅ Pod repo updated${NC}"
+        echo -e "${BLUE}🔄 Updating pod repo to get latest dependencies...${NC}"
+        if ! pod repo update $VERBOSE_FLAG; then
+            echo -e "${YELLOW}⚠️  Warning: pod repo update failed, but continuing...${NC}"
+        else
+            echo -e "${GREEN}✅ Pod repo updated${NC}"
+        fi
     fi
     echo ""
     
@@ -109,7 +137,7 @@ publish_podspec() {
         # Step 1: Lint (if not skipped)
         if [ "$SKIP_LINT" = false ]; then
             echo -e "${BLUE}🔍 Linting $podspec...${NC}"
-            LINT_ARGS="--allow-warnings"
+            LINT_ARGS="--allow-warnings $VERBOSE_FLAG"
             # Skip tests if explicitly requested OR if podspec has dependencies
             # (dependencies might not be fully available yet, causing test failures)
             if [ "$SKIP_TESTS" = true ] || has_dependencies "$podspec"; then
@@ -137,7 +165,7 @@ publish_podspec() {
         
         # Step 2: Publish with --synchronous flag to wait for dependencies
         echo -e "${BLUE}🚀 Publishing $podspec to CocoaPods trunk (synchronous)...${NC}"
-        PUSH_ARGS="--allow-warnings --synchronous"
+        PUSH_ARGS="--allow-warnings --synchronous $VERBOSE_FLAG"
         # Skip tests if explicitly requested OR if podspec has dependencies
         if [ "$SKIP_TESTS" = true ] || has_dependencies "$podspec"; then
             PUSH_ARGS="$PUSH_ARGS --skip-tests"
@@ -146,11 +174,15 @@ publish_podspec() {
             echo -e "${GREEN}✅ Successfully published $pod_name ($version)${NC}"
             
             # Step 3: Update pod repo
-            echo -e "${BLUE}🔄 Updating pod repo...${NC}"
-            if pod repo update; then
-                echo -e "${GREEN}✅ Pod repo updated${NC}"
+            if [ "$SKIP_REPO_UPDATE" = true ]; then
+                echo -e "${YELLOW}⏭️  Skipping pod repo update (--skip-repo-update flag set)${NC}"
             else
-                echo -e "${YELLOW}⚠️  Warning: pod repo update failed, but continuing...${NC}"
+                echo -e "${BLUE}🔄 Updating pod repo...${NC}"
+                if pod repo update $VERBOSE_FLAG; then
+                    echo -e "${GREEN}✅ Pod repo updated${NC}"
+                else
+                    echo -e "${YELLOW}⚠️  Warning: pod repo update failed, but continuing...${NC}"
+                fi
             fi
             
             return 0
