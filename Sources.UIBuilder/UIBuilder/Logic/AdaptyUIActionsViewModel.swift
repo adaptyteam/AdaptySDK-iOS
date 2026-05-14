@@ -27,12 +27,12 @@ package final class AdaptyUIActionsViewModel: ObservableObject {
         logic.reportDidPerformAction(.close)
     }
     
-    func openUrlActionOccurred(url urlString: String?) {
+    func openUrlActionOccurred(url urlString: String?, openIn: VC.WebOpenInParameter) {
         guard let urlString, let url = URL(string: urlString) else {
             Log.ui.warn("#\(logId)# can't parse url: \(urlString ?? "null")")
             return
         }
-        logic.reportDidPerformAction(.openURL(url: url))
+        logic.reportDidPerformAction(.openURL(url: url, in: openIn.toWebPresentation))
     }
     
     func customActionOccurred(id: String) {

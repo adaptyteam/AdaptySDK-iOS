@@ -26,10 +26,7 @@ extension Schema.Localizer {
         )
     }
 
-    func buttonAction(_ from: VC.Action) -> VC.Action {
-        guard case let .openUrl(stringId) = from else { return from }
-        return .openUrl(urlIfPresent(stringId))
-    }
+
 }
 
 extension Schema.Button: Decodable {

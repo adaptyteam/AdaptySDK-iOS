@@ -128,8 +128,8 @@ extension VC.Action {
             screensViewModel.dismissScreen(id: screenId)
         case .close:
             actionsViewModel.closeActionOccurred()
-        case let .openUrl(url):
-            actionsViewModel.openUrlActionOccurred(url: url)
+        case let .openUrl(url, openIn):
+            actionsViewModel.openUrlActionOccurred(url: url, openIn: openIn)
         case let .custom(id):
             actionsViewModel.customActionOccurred(id: id)
         }

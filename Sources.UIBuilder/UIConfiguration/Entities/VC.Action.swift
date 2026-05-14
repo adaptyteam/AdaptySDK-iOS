@@ -9,7 +9,7 @@ import Foundation
 
 package extension VC {
     enum Action: Sendable {
-        case openUrl(String?)
+        case openUrl(String?, openIn: WebOpenInParameter)
         case restore
         case custom(id: String)
         case selectProduct(id: String, groupId: String)
@@ -27,9 +27,10 @@ package extension VC {
 extension VC.Action: Hashable {
     package func hash(into hasher: inout Hasher) {
         switch self {
-        case let .openUrl(value):
+        case let .openUrl(value, openIn):
             hasher.combine(1)
             hasher.combine(value)
+            hasher.combine(openIn)
         case let .custom(value):
             hasher.combine(2)
             hasher.combine(value)

@@ -28,17 +28,21 @@ extension Schema {
                 && (underline ?? false) == false
         }
 
-        var nonEmptyOrNil: Self? { isEmpty ? nil : self }
+        var nonEmptyOrNil: Self? {
+            isEmpty ? nil : self
+        }
     }
 
     struct RichText: Sendable, Hashable {
         let items: [RichText.Item]
 
-        var isEmpty: Bool { items.isEmpty }
+        var isEmpty: Bool {
+            items.isEmpty
+        }
 
         enum Item: Sendable {
-            case text(String, TextAttributes?)
-            case tag(String, TextAttributes?)
+            case text(String, TextAttributes?, Action?)
+            case tag(String, TextAttributes?, Action?)
             case image(String, TextAttributes?)
             case unknown
         }
@@ -46,12 +50,17 @@ extension Schema {
 }
 
 extension Schema.TextAttributes? {
-    var nonEmptyOrNil: Self { self?.nonEmptyOrNil }
+    var nonEmptyOrNil: Self {
+        self?.nonEmptyOrNil
+    }
 }
 
 extension Schema.Localizer {
-    func urlIfPresent(_ stringId: String?) -> String? {
-        guard let stringId, let item = localization?.strings?[stringId] else { return nil }
+    func urlIfPresent(_ value: String) -> String? {
+        if let url = URL(string: value), url.scheme != nil { return value }
+        guard let item = localization?.strings?[value] else {
+            return nil
+        }
         return item.value.asString ?? item.fallback?.asString
     }
 
@@ -76,7 +85,7 @@ extension Schema.Localizer {
 private extension Schema.RichText {
     var asString: String? {
         items.first.flatMap {
-            if case let .text(value, attributes) = $0, attributes == nil { value } else { nil }
+            if case let .text(value, attributes, _) = $0, attributes == nil { value } else { nil }
         }
     }
 
@@ -86,10 +95,10 @@ private extension Schema.RichText {
     ) -> [VC.RichText.Item] {
         items.compactMap { item in
             switch item {
-            case let .text(value, attributes):
-                .text(value, attributes.add(defaultTextAttributes).convert(localizer))
-            case let .tag(value, attributes):
-                .tag(value, attributes.add(defaultTextAttributes).convert(localizer))
+            case let .text(value, attributes, action):
+                .text(value, attributes.add(defaultTextAttributes).convert(localizer), localizer.optionalAction(action))
+            case let .tag(value, attributes, action):
+                .tag(value, attributes.add(defaultTextAttributes).convert(localizer), localizer.optionalAction(action))
             case let .image(assetId, attributes):
                 .image(try? localizer.imageData(assetId), attributes.add(defaultTextAttributes).convert(localizer))
             default:
@@ -148,14 +157,16 @@ private extension Schema.TextAttributes? {
 extension Schema.RichText.Item: Hashable {
     func hash(into hasher: inout Hasher) {
         switch self {
-        case let .text(value, attributes):
+        case let .text(value, attributes, action):
             hasher.combine(1)
             hasher.combine(value)
             hasher.combine(attributes)
-        case let .tag(value, attributes):
+            hasher.combine(action)
+        case let .tag(value, attributes, action):
             hasher.combine(2)
             hasher.combine(value)
             hasher.combine(attributes)
+            hasher.combine(action)
         case let .image(value, attributes):
             hasher.combine(3)
             hasher.combine(value)
@@ -194,11 +205,12 @@ extension Schema.RichText.Item: Codable {
         case tag
         case image
         case attributes
+        case action
     }
 
     init(from decoder: Decoder) throws {
         if let value = try? (try? decoder.singleValueContainer())?.decode(String.self) {
-            self = .text(value, nil)
+            self = .text(value, nil, nil)
             return
         }
 
@@ -207,12 +219,14 @@ extension Schema.RichText.Item: Codable {
             if container.contains(.text) {
                 try .text(
                     container.decode(String.self, forKey: .text),
-                    container.decodeIfPresent(Schema.TextAttributes.self, forKey: .attributes)
+                    container.decodeIfPresent(Schema.TextAttributes.self, forKey: .attributes),
+                    container.decodeIfPresent(Schema.Action.self, forKey: .action)
                 )
             } else if container.contains(.tag) {
                 try .tag(
                     container.decode(String.self, forKey: .tag),
-                    container.decodeIfPresent(Schema.TextAttributes.self, forKey: .attributes)
+                    container.decodeIfPresent(Schema.TextAttributes.self, forKey: .attributes),
+                    container.decodeIfPresent(Schema.Action.self, forKey: .action)
                 )
             } else if container.contains(.image) {
                 try .image(
@@ -226,7 +240,7 @@ extension Schema.RichText.Item: Codable {
 
     func encode(to encoder: any Encoder) throws {
         switch self {
-        case let .text(text, attributes):
+        case let .text(text, attributes, _):
             guard let attributes = attributes.nonEmptyOrNil else {
                 var container = encoder.singleValueContainer()
                 try container.encode(text)
@@ -235,7 +249,7 @@ extension Schema.RichText.Item: Codable {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(text, forKey: .text)
             try container.encode(attributes, forKey: .attributes)
-        case let .tag(tag, attributes):
+        case let .tag(tag, attributes, _):
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(tag, forKey: .tag)
             if let attributes = attributes.nonEmptyOrNil {
@@ -264,3 +278,4 @@ extension Schema.TextAttributes: Codable {
         case underline
     }
 }
+

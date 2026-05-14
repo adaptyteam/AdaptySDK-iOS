@@ -7,7 +7,7 @@
 
 import Adapty
 
-extension AdaptyWebPresentation: Decodable {
+extension AdaptyWebPresentation: Codable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let stringValue = try container.decode(String.self)
@@ -18,6 +18,16 @@ extension AdaptyWebPresentation: Decodable {
             self = .inAppBrowser
         default:
             self = .externalBrowser
+        }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .externalBrowser:
+            try container.encode("browser_out_app")
+        case .inAppBrowser:
+            try container.encode("browser_in_app")
         }
     }
 }

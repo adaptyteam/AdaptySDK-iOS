@@ -144,8 +144,28 @@ extension AdaptyUIBuilder.Action {
     var adaptyUIAction: AdaptyUI.Action {
         switch self {
         case .close: .close
-        case let .openURL(url): .openURL(url: url)
+        case let .openURL(url, openIn): .openURL(url: url, in: openIn.toAdaptyWebPresentation)
         case let .custom(id): .custom(id: id)
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyUIBuilder.WebPresentation {
+    var toAdaptyWebPresentation: AdaptyWebPresentation {
+        switch self {
+        case .externalBrowser: .externalBrowser
+        case .inAppBrowser: .inAppBrowser
+        }
+    }
+}
+
+@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension AdaptyWebPresentation {
+    var toBuilderWebPresentation: AdaptyUIBuilder.WebPresentation {
+        switch self {
+        case .externalBrowser: .externalBrowser
+        case .inAppBrowser: .inAppBrowser
         }
     }
 }

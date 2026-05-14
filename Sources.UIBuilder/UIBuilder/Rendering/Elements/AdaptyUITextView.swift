@@ -40,6 +40,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
+                .handleRichTextActionURL()
         case .notFound:
             richText
                 .convertToSwiftUIText(
@@ -53,6 +54,7 @@ struct AdaptyUITextView: View {
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
                 .redacted(reason: .placeholder)
+                .handleRichTextActionURL()
         case let .found(productInfoModel):
             richText
                 .convertToSwiftUIText(
@@ -64,6 +66,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
+                .handleRichTextActionURL()
         }
     }
 }
@@ -86,16 +89,17 @@ extension Array where Element == VC.RichText.Item {
     ) throws -> Text {
         try reduce(Text("")) { partialResult, item in
             switch item {
-            case let .text(value, attr):
+            case let .text(value, attr, action):
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: value,
+                        link: action?.asURL,
                         attributes: attr,
                         assetsResolver: assetsResolver,
                         colorScheme: colorScheme
                     )
                 )
-            case let .tag(value, attr):
+            case let .tag(value, attr, action):
                 let tagReplacementResult: String
 
                 if let customTagResult = tagResolver.replacement(for: value) {
@@ -117,6 +121,7 @@ extension Array where Element == VC.RichText.Item {
                 return partialResult + Text(
                     AttributedString.createFrom(
                         value: tagReplacementResult,
+                        link: action?.asURL,
                         attributes: attr,
                         assetsResolver: assetsResolver,
                         colorScheme: colorScheme
@@ -156,7 +161,7 @@ extension VC.RichText {
         if placeholder {
             let reducedString = items.reduce("") { partialResult, item in
                 switch item {
-                case let .text(value, _), let .tag(value, _):
+                case let .text(value, _, action), let .tag(value, _, action):
                     return partialResult + value
                 default:
                     return partialResult
@@ -275,6 +280,7 @@ extension VC.Text {
 extension AttributedString {
     static func createFrom(
         value: String,
+        link: URL? = nil,
         attributes: VC.RichText.TextAttributes?,
         assetsResolver: AdaptyUIAssetsResolver,
         colorScheme: ColorScheme
@@ -302,6 +308,8 @@ extension AttributedString {
         if attributes?.underline ?? false {
             result.underlineStyle = .single
         }
+
+        result.link = link
 
         return result
     }
