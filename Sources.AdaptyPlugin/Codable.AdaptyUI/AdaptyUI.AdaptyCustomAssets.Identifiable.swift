@@ -21,7 +21,7 @@ extension AdaptyUICustomAsset {
     enum Value {
         case asset(AdaptyUICustomAsset)
         case imageFlutterAssetId(String)
-        case videoFlutterAssetId(String)
+        case videoFlutterAssetId(String, resolution: CGSize?)
     }
 }
 
@@ -46,6 +46,8 @@ extension AdaptyUICustomAsset.Identifiable: Decodable {
         case value
         case path
         case flutterAssetId = "asset_id"
+        case verticalResolution = "v_res"
+        case horizontalResolution = "h_res"
     }
 
     enum TypeValueConstants: String, Decodable {
@@ -85,10 +87,19 @@ extension AdaptyUICustomAsset.Identifiable: Decodable {
             }
 
         case .video:
+            let resolution: CGSize? = {
+                guard
+                    let h = try? container.decodeIfPresent(Int.self, forKey: .horizontalResolution),
+                    let v = try? container.decodeIfPresent(Int.self, forKey: .verticalResolution),
+                    h > 0, v > 0
+                else { return nil }
+                return CGSize(width: h, height: v)
+            }()
+
             if let path = try container.decodeIfPresent(String.self, forKey: .path) {
-                value = .asset(.video(.file(url: path.asFileURL, preview: nil)))
+                value = .asset(.video(.file(url: path.asFileURL, preview: nil, resolution: resolution)))
             } else if let flutterAssetId = try container.decodeIfPresent(String.self, forKey: .flutterAssetId) {
-                value = .videoFlutterAssetId(flutterAssetId)
+                value = .videoFlutterAssetId(flutterAssetId, resolution: resolution)
             } else {
                 throw DecodingError.keyNotFound(CodingKeys.path, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Corrupted video asset, not found path"))
             }

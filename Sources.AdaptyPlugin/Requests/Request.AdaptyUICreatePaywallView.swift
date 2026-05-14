@@ -26,8 +26,8 @@ public extension [AdaptyCustomAsset.Identifiable] {
                 assetsResolver[asset.id] = value
             case .imageFlutterAssetId(let assetId):
                 assetsResolver[asset.id] = try .image(.file(url: url(assetId)))
-            case .videoFlutterAssetId(let assetId):
-                assetsResolver[asset.id] = try .video(.file(url: url(assetId), preview: nil))
+            case .videoFlutterAssetId(let assetId, let resolution):
+                assetsResolver[asset.id] = try .video(.file(url: url(assetId), preview: nil, resolution: resolution))
             }
         }
 
@@ -97,8 +97,8 @@ extension Request {
                     assetsResolver[asset.id] = value
                 case .imageFlutterAssetId(let assetId):
                     assetsResolver[asset.id] = try .image(.file(url: url(assetId)))
-                case .videoFlutterAssetId(let assetId):
-                    assetsResolver[asset.id] = try .video(.file(url: url(assetId), preview: nil))
+                case .videoFlutterAssetId(let assetId, let resolution):
+                    assetsResolver[asset.id] = try .video(.file(url: url(assetId), preview: nil, resolution: resolution))
                 }
             }
 
