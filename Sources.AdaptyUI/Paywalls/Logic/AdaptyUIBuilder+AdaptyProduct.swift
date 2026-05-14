@@ -28,7 +28,8 @@ extension AdaptyPaywallProduct: ProductResolver {
         case .pricePerDay, .pricePerWeek, .pricePerMonth, .pricePerYear,
              .subscriptionPeriod:
             subscriptionPeriod != nil
-        case .offerPrice, .offerPeriods, .offerNumberOfPeriods:
+        case .offerPrice, .offerPeriods, .offerNumberOfPeriods,
+             .offerPricePerDay, .offerPricePerWeek, .offerPricePerMonth, .offerPricePerYear:
             subscriptionOffer != nil
         }
     }
@@ -70,6 +71,14 @@ extension AdaptyPaywallProduct: ProductResolver {
                 subscriptionOffer?.localizedSubscriptionPeriod
             case .offerNumberOfPeriods:
                 subscriptionOffer?.localizedNumberOfPeriods
+            case .offerPricePerDay:
+                offerPricePer(period: .day)
+            case .offerPricePerWeek:
+                offerPricePer(period: .week)
+            case .offerPricePerMonth:
+                offerPricePer(period: .month)
+            case .offerPricePerYear:
+                offerPricePer(period: .year)
             }
 
         if let result {
@@ -78,25 +87,54 @@ extension AdaptyPaywallProduct: ProductResolver {
             return nil
         }
     }
+
+    func offerPricePer(period unit: AdaptySubscriptionPeriod.Unit) -> String? {
+        guard let offer = subscriptionOffer else { return nil }
+
+        let (effectivePrice, repeatCount): (Decimal, Int) =
+            switch offer.paymentMode {
+            case .payAsYouGo, .unknown:
+                (offer.price, 1)
+            case .payUpFront:
+                (offer.price, offer.numberOfPeriods)
+            case .freeTrial:
+                (0, 1)
+            }
+
+        return formatPrice(
+            effectivePrice,
+            perTargetUnit: unit,
+            billingPeriod: offer.subscriptionPeriod,
+            repeatCount: repeatCount
+        )
+    }
 }
 
 extension AdaptyProduct {
-    func pricePer(period: AdaptySubscriptionPeriod.Unit) -> String? {
-        guard let subscriptionPeriod else { return nil }
+    /// Shared math behind `PRICE_PER_*` and `OFFER_PRICE_PER_*`.
+    /// Contract: `price` is the total paid for `billingPeriod` repeated `repeatCount` times.
+    /// Returns that total normalized to a single `targetUnit`, formatted in the storefront currency.
+    func formatPrice(
+        _ price: Decimal,
+        perTargetUnit targetUnit: AdaptySubscriptionPeriod.Unit,
+        billingPeriod: AdaptySubscriptionPeriod,
+        repeatCount: Int = 1
+    ) -> String? {
+        let durationInTargetUnit = billingPeriod.numberOfPeriods(targetUnit) * Double(repeatCount)
+        guard durationInTargetUnit > 0 else { return nil }
 
-        let numberOfPeriods = subscriptionPeriod.numberOfPeriods(period)
-        guard numberOfPeriods > 0.0 else { return nil }
-
-        let numberOfPeriodsDecimal = Decimal(floatLiteral: numberOfPeriods)
-        let pricePerPeriod = price / numberOfPeriodsDecimal
-        let nsDecimalPricePerPeriod = NSDecimalNumber(decimal: pricePerPeriod)
+        let pricePerPeriod = price / Decimal(floatLiteral: durationInTargetUnit)
 
         let formatter = NumberFormatter()
-
         formatter.numberStyle = .currency
         formatter.locale = skProduct.priceFormatStyle.locale
 
-        return formatter.string(from: nsDecimalPricePerPeriod)
+        return formatter.string(from: NSDecimalNumber(decimal: pricePerPeriod))
+    }
+
+    func pricePer(period unit: AdaptySubscriptionPeriod.Unit) -> String? {
+        guard let subscriptionPeriod else { return nil }
+        return formatPrice(price, perTargetUnit: unit, billingPeriod: subscriptionPeriod)
     }
 
     func priceAmount(for locale: Locale) -> String? {

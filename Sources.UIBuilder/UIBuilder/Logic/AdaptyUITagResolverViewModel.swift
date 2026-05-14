@@ -36,6 +36,11 @@ public enum TextProductTag: String {
     case offerPrice = "OFFER_PRICE"
     case offerPeriods = "OFFER_PERIOD"
     case offerNumberOfPeriods = "OFFER_NUMBER_OF_PERIOD"
+
+    case offerPricePerDay = "OFFER_PRICE_PER_DAY"
+    case offerPricePerWeek = "OFFER_PRICE_PER_WEEK"
+    case offerPricePerMonth = "OFFER_PRICE_PER_MONTH"
+    case offerPricePerYear = "OFFER_PRICE_PER_YEAR"
 }
 
 @MainActor
