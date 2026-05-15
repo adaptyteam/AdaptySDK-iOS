@@ -89,7 +89,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     ) {
         Log.ui.verbose("#\(logId)# startScreenTransition screen:\(screen.id) in navigator:\(navigator.id)")
 
-        guard var currentScreen = screens.firstIfSingle else {
+        guard let currentScreen = screens.firstIfSingle else {
             // TODO: x throw error?
             Log.ui.error("#\(logId)# navigator:\(navigator.id) has animations in progress")
             return // in the process of animation, TODO: x think about force replacement?
@@ -139,7 +139,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
         Log.ui.verbose("#\(logId)# screen:\(screen.id) in navigator:\(navigator.id) - transition found")
 
-        var newScreen = screen
+        let newScreen = screen
         newScreen.transitionId = transitionId
 
         if !transition.isIncomingOnTop {

@@ -27,7 +27,7 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
 
     var body: some View {
         switch element {
-        case let .box(box, props):
+        case let .box(box, _):
             elementOrEmpty(box.content)
                 .animatableFrame(
                     box: box,

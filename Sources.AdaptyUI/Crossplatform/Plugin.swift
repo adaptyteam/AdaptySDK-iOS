@@ -29,12 +29,20 @@ extension UIViewController {
 fileprivate extension UIWindow {
     var topViewController: UIViewController? {
         var topViewController = rootViewController
-    
+
         while let presentedController = topViewController?.presentedViewController {
             topViewController = presentedController
         }
-        
+
         return topViewController
+    }
+}
+
+fileprivate extension UIApplication {
+    var firstKeyWindow: UIWindow? {
+        connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+            .first
     }
 }
 
@@ -68,16 +76,20 @@ package extension AdaptyUI {
             paywallControllers[id]
         }
         
+        @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static var onboardingControllers = [String: AdaptyOnboardingController]()
-        
+
+        @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static func cacheOnboardingController(_ controller: AdaptyOnboardingController, id: String) {
             onboardingControllers[id] = controller
         }
-        
+
+        @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static func deleteCachedOnboardingController(_ id: String) {
             onboardingControllers.removeValue(forKey: id)
         }
-        
+
+        @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static func cachedOnboardingController(_ id: String) -> AdaptyOnboardingController? {
             onboardingControllers[id]
         }
@@ -125,7 +137,7 @@ package extension AdaptyUI {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
             }
             
-            guard let rootVC = UIApplication.shared.windows.first?.topViewController else {
+            guard let rootVC = UIApplication.shared.firstKeyWindow?.topViewController else {
                 throw AdaptyError(AdaptyUI.PluginError.viewPresentationError(viewId))
             }
             
@@ -200,6 +212,7 @@ package extension AdaptyUI {
 }
 
 @MainActor
+@available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
 package extension AdaptyUI.Plugin {
     static func createOnboardingView(
         onboarding: AdaptyOnboarding,
@@ -230,7 +243,7 @@ package extension AdaptyUI.Plugin {
             throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
         }
         
-        guard let rootVC = UIApplication.shared.windows.first?.topViewController else {
+        guard let rootVC = UIApplication.shared.firstKeyWindow?.topViewController else {
             throw AdaptyError(AdaptyUI.PluginError.viewPresentationError(viewId))
         }
         
@@ -276,6 +289,7 @@ package extension AdaptyUI.Plugin {
 
 // TODO: Remove
 @MainActor
+@available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
 package extension AdaptyUI.Plugin {
     static func createOnboardingViewForTest(
         placementId: String,

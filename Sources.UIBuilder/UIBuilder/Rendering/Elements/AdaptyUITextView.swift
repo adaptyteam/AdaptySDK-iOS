@@ -252,8 +252,7 @@ extension VC.RichText {
                 switch item {
                 case let .text(value, _, _):
                     partialResult + value
-                case let .tag(value, _, converter, _):
-                    // let converter = converter?.asTagConverter
+                case let .tag(value, _, _, _):
                     partialResult + value
                 default:
                     partialResult

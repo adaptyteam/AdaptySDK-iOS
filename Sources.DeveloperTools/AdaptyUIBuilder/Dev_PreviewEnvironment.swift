@@ -249,6 +249,7 @@ private extension Dev_PreviewEnvironment {
         #endif
     }
 
+    @MainActor
     static var detectedOSVersion: String {
         #if canImport(UIKit)
         UIDevice.current.systemVersion

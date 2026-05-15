@@ -69,6 +69,7 @@ extension AdaptyUICustomImageAsset {
 
 import AVKit
 
+@MainActor
 extension AdaptyUICustomVideoAsset {
     func resolvedVideo(id: String) -> AdaptyUIResolvedVideoAsset {
         switch self {
@@ -98,6 +99,7 @@ private extension CGSize {
     }
 }
 
+@MainActor
 extension AdaptyUICustomAsset {
     func resolved(id: String) -> AdaptyUIResolvedAsset? {
         switch self {

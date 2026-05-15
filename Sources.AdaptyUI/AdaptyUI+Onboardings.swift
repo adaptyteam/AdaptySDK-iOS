@@ -57,6 +57,7 @@ public extension AdaptyUI {
     }
 
     @MainActor
+    @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
     static func onboardingController(
         with onboardingConfiguration: OnboardingConfiguration,
         delegate: AdaptyOnboardingControllerDelegate,

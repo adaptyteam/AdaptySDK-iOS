@@ -314,7 +314,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         let callback = pendingAlertDialogCallback
         pendingAlertDialogCallback = nil
 
-        guard let callback, let screenInstance else { return }
+        guard let callback, screenInstance != nil else { return }
         let response = VS.ShowAlertDialogParametersResponse(actionId: actionId)
         do {
             try state?.execute(action: callback, response: response)
@@ -324,7 +324,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     }
 
     func handleTimerCallback(timerId: String, callback: VS.JSAction) {
-        guard let screenInstance = screensViewModel.topmostScreenInstance else { return }
+        guard screensViewModel.topmostScreenInstance != nil else { return }
         let response = VS.TimerResponse(timerId: timerId)
         do {
             try state?.execute(action: callback, response: response)
@@ -350,7 +350,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
             let callback = self.pendingPermissionCallback
             self.pendingPermissionCallback = nil
 
-            guard let callback, let screenInstance = self.screensViewModel.topmostScreenInstance else { return }
+            guard let callback, self.screensViewModel.topmostScreenInstance != nil else { return }
 
             let response = VS.ShowRequestPermissionParametersResponse(
                 request: params,

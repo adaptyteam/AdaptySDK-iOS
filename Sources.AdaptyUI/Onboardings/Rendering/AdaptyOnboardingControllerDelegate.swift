@@ -119,6 +119,7 @@ public protocol AdaptyOnboardingControllerDelegate: AnyObject {
     ) -> UIView?
 }
 
+@available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
 public extension AdaptyOnboardingControllerDelegate {
     func onboardingController(
         _ controller: UIViewController,
@@ -169,6 +170,7 @@ public extension AdaptyOnboardingControllerDelegate {
     }
 }
 
+@available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
 extension AdaptyOnboardingControllerDelegate {
     func apply(message: AdaptyOnboardingsMessage, from controller: AdaptyOnboardingController) {
         switch message {
