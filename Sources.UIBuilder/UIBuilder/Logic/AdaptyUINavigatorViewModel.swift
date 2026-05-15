@@ -126,13 +126,20 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
             completion?()
 
-            // Fire onDidAppear immediately (no transition to wait for)
-            executeScreenActions(.onDidAppear, screen: screen.instance)
-            eventBus.publish(
-                eventId: .onDidAppear,
-                transitionId: transitionId,
-                screenInstanceId: screen.instance.id
-            )
+            // Defer onDidAppear to the next runloop so SwiftUI can complete
+            // the initial render of the incoming screen before screen-action
+            // scripts mutate state. Otherwise elements that animate on state
+            // changes (e.g. horizontal_progress) miss the 0 → target
+            // transition because the body first sees the post-script value.
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.executeScreenActions(.onDidAppear, screen: screen.instance)
+                self.eventBus.publish(
+                    eventId: .onDidAppear,
+                    transitionId: transitionId,
+                    screenInstanceId: screen.instance.id
+                )
+            }
 
             return
         }
@@ -217,19 +224,24 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             Log.ui.verbose("#\(logId)# navigator:\(navigator.id) - no transition found")
             completion?()
 
-            // Fire onDidAppear immediately (no transition)
-            eventBus.publish(
-                eventId: .onDidAppear,
-                transitionId: transitionId,
-                screenInstanceId: nil
-            )
-            if let screen = screens.first {
-                executeScreenActions(.onDidAppear, screen: screen.instance)
-                eventBus.publish(
+            // Defer onDidAppear to the next runloop so SwiftUI can complete
+            // the initial render before screen-action scripts mutate state.
+            // See startScreenTransition for the same pattern and rationale.
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.eventBus.publish(
                     eventId: .onDidAppear,
                     transitionId: transitionId,
-                    screenInstanceId: screen.instance.id
+                    screenInstanceId: nil
                 )
+                if let screen = self.screens.first {
+                    self.executeScreenActions(.onDidAppear, screen: screen.instance)
+                    self.eventBus.publish(
+                        eventId: .onDidAppear,
+                        transitionId: transitionId,
+                        screenInstanceId: screen.instance.id
+                    )
+                }
             }
 
             return
