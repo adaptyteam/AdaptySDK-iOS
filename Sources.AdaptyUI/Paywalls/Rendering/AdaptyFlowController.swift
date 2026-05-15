@@ -182,9 +182,9 @@ extension AdaptyFlowController: AdaptyFlowViewDelegate {
 
     package func flowView(
         _ view: AdaptyFlowUIView,
-        didFailRenderingWith error: AdaptyUIError
+        didReceiveError error: AdaptyUIError
     ) {
-        delegate?.flowController(self, didFailRenderingWith: error)
+        delegate?.flowController(self, didReceiveError: error)
     }
 
     package func flowView(

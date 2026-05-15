@@ -28,7 +28,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
     private let didStartRestore: (() -> Void)?
     private let didFinishRestore: ((AdaptyProfile) -> Void)?
     private let didFailRestore: ((AdaptyError) -> Void)?
-    private let didFailRendering: ((AdaptyUIError) -> Void)?
+    private let didReceiveError: ((AdaptyUIError) -> Void)?
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
     private let didPartiallyLoadProducts: (([String]) -> Void)?
     private let didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
@@ -48,7 +48,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
         didStartRestore: (() -> Void)? = nil,
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
-        didFailRendering: @escaping (AdaptyUIError) -> Void,
+        didReceiveError: @escaping (AdaptyUIError) -> Void,
         didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
         didPartiallyLoadProducts: (([String]) -> Void)? = nil,
         didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)? = nil,
@@ -67,7 +67,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
         self.didStartRestore = didStartRestore
         self.didFinishRestore = didFinishRestore
         self.didFailRestore = didFailRestore
-        self.didFailRendering = didFailRendering
+        self.didReceiveError = didReceiveError
         self.didFailLoadingProducts = didFailLoadingProducts
         self.didPartiallyLoadProducts = didPartiallyLoadProducts
         self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
@@ -101,7 +101,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
         flowConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
         flowConfiguration.eventsHandler.didFinishRestore = didFinishRestore
         flowConfiguration.eventsHandler.didFailRestore = didFailRestore
-        flowConfiguration.eventsHandler.didFailRendering = didFailRendering
+        flowConfiguration.eventsHandler.didReceiveError = didReceiveError
         flowConfiguration.eventsHandler.didFailLoadingProducts = didFailLoadingProducts ?? { _ in true }
         flowConfiguration.eventsHandler.didPartiallyLoadProducts = didPartiallyLoadProducts
         flowConfiguration.eventsHandler.didReceiveAnalyticEvent = didReceiveAnalyticEvent

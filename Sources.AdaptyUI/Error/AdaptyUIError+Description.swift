@@ -27,6 +27,8 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "Invalid component type for component with ID '\(componentId)'. Please contact support."
         case let .wrongAssetType(assetType):
             "Invalid asset type '\(assetType)'. Please contact support."
+        case let .jsException(message):
+            "JavaScript runtime exception: \(message). Please contact support."
         }
     }
 
@@ -48,6 +50,8 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "AdaptyUIError.wrongComponentType (Code: 4103): Component with ID '\(componentId)' has an invalid or unsupported type configuration. This typically indicates a template structure issue or version incompatibility. Please contact support."
         case let .wrongAssetType(assetType):
             "AdaptyUIError.wrongAssetType (Code: 4104): Asset with type '\(assetType)' is incompatible with element. This typically indicates a template structure issue or version incompatibility. Please contact support."
+        case let .jsException(message):
+            "AdaptyUIError.jsException (Code: 4105): JavaScript runtime exception thrown from the paywall script: \(message). This typically indicates a bug in the paywall script or a script/runtime mismatch. Please contact support."
         }
     }
 }

@@ -98,10 +98,13 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    nonisolated func jsException( _ message: String) {
-
+    nonisolated func jsException(_ message: String) {
+        Task { @MainActor [weak self] in
+            self?.logic.reportDidReceiveError(.jsException(message))
+        }
     }
-    
+
+
     nonisolated func openUrl(
         url: URL,
         openIn: VC.Action.WebOpenInParameter

@@ -163,10 +163,10 @@
 
         package func flowView(
             _ view: AdaptyFlowUIView,
-            didFailRenderingWith error: AdaptyUIError
+            didReceiveError error: AdaptyUIError
         ) {
             eventHandler.handle(
-                event: FlowViewEvent.DidFailRendering(
+                event: FlowViewEvent.DidReceiveError(
                     view: view.toAdaptyUIView(),
                     error: error
                 )

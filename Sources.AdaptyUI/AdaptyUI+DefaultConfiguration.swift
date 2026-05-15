@@ -54,7 +54,7 @@ public extension AdaptyFlowControllerDelegate {
 
     func flowController(
         _: AdaptyFlowController,
-        didFailRenderingWith _: AdaptyUIError
+        didReceiveError _: AdaptyUIError
     ) {}
 
     func flowController(

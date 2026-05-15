@@ -142,8 +142,8 @@ struct AdaptyUIImageView: View {
         } else {
             Rectangle()
                 .onAppear {
-                    flowViewModel.reportDidFailRendering(
-                        with: .wrongAssetType("Expected image")
+                    flowViewModel.reportDidReceiveError(
+                        .wrongAssetType("Expected image")
                     )
                 }
         }

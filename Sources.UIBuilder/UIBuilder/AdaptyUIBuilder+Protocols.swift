@@ -73,7 +73,7 @@ package protocol AdaptyUIBuilderLogic {
         onFinish: @MainActor @Sendable @escaping (VS.RestorePurchasesResult) -> Void
     )
 
-    func reportDidFailRendering(with error: AdaptyUIBuilderError)
+    func reportDidReceiveError(_ error: AdaptyUIBuilderError)
 
     func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable])
     func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent)

@@ -158,9 +158,9 @@ extension AdaptyPluginDelegate: AdaptyFlowControllerDelegate {
 
     func flowController(
         _ controller: AdaptyFlowController,
-        didFailRenderingWith error: AdaptyUIError
+        didReceiveError error: AdaptyUIError
     ) {
-        eventHandler.handle(event: FlowViewEvent.DidFailRendering(
+        eventHandler.handle(event: FlowViewEvent.DidReceiveError(
             view: controller.toAdaptyUIView(),
             error: error
         ))

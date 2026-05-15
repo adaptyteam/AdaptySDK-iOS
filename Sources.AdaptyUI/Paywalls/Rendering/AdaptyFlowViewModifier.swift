@@ -43,7 +43,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
     private let didStartRestore: (() -> Void)?
     private let didFinishRestore: (AdaptyProfile) -> Void
     private let didFailRestore: (AdaptyError) -> Void
-    private let didFailRendering: (AdaptyUIError) -> Void
+    private let didReceiveError: (AdaptyUIError) -> Void
     private let didFailLoadingProducts: ((AdaptyError) -> Bool)?
     private let didPartiallyLoadProducts: (([String]) -> Void)?
     private let didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
@@ -66,7 +66,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
         didStartRestore: (() -> Void)?,
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
-        didFailRendering: @escaping (AdaptyUIError) -> Void,
+        didReceiveError: @escaping (AdaptyUIError) -> Void,
         didFailLoadingProducts: ((AdaptyError) -> Bool)?,
         didPartiallyLoadProducts: (([String]) -> Void)?,
         didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?,
@@ -88,7 +88,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
         self.didStartRestore = didStartRestore
         self.didFinishRestore = didFinishRestore
         self.didFailRestore = didFailRestore
-        self.didFailRendering = didFailRendering
+        self.didReceiveError = didReceiveError
         self.didFailLoadingProducts = didFailLoadingProducts
         self.didPartiallyLoadProducts = didPartiallyLoadProducts
         self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
@@ -113,7 +113,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
                 didStartRestore: didStartRestore,
                 didFinishRestore: didFinishRestore,
                 didFailRestore: didFailRestore,
-                didFailRendering: didFailRendering,
+                didReceiveError: didReceiveError,
                 didFailLoadingProducts: didFailLoadingProducts,
                 didPartiallyLoadProducts: didPartiallyLoadProducts,
                 didReceiveAnalyticEvent: didReceiveAnalyticEvent,
@@ -177,7 +177,7 @@ public extension View {
     ///     - didFinishRestore: This callback is invoked when a successful restore is made.
     ///     Check if the ``AdaptyProfile`` object contains the desired access level, and if so, the controller can be dismissed.
     ///     - didFailRestore: This callback is invoked when the restore process fails.
-    ///     - didFailRendering: This callback will be invoked in case of errors during the screen rendering process.
+    ///     - didReceiveError: This callback will be invoked in case of errors during the screen rendering process or runtime errors from the flow script (e.g. JavaScript exceptions).
     ///     - didFailLoadingProducts: This callback is invoked in case of errors during the products loading process. Return `true` if you want to retry the loading.
     ///     - didReceiveAnalyticEvent: This callback is invoked when a custom analytic event is fired from the flow's script. Use it to forward flow-level analytics to your own analytics provider (e.g. Amplitude, Mixpanel). `name` is the event name; `params` is an arbitrary dictionary of event parameters whose contents depend on the flow configuration.
     ///     - showAlertItem:
@@ -197,7 +197,7 @@ public extension View {
         didStartRestore: (() -> Void)? = nil,
         didFinishRestore: @escaping (AdaptyProfile) -> Void,
         didFailRestore: @escaping (AdaptyError) -> Void,
-        didFailRendering: @escaping (AdaptyUIError) -> Void,
+        didReceiveError: @escaping (AdaptyUIError) -> Void,
         didFailLoadingProducts: ((AdaptyError) -> Bool)? = nil,
         didPartiallyLoadProducts: (([String]) -> Void)? = nil,
         didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)? = nil,
@@ -221,7 +221,7 @@ public extension View {
                 didStartRestore: didStartRestore,
                 didFinishRestore: didFinishRestore,
                 didFailRestore: didFailRestore,
-                didFailRendering: didFailRendering,
+                didReceiveError: didReceiveError,
                 didFailLoadingProducts: didFailLoadingProducts,
                 didPartiallyLoadProducts: didPartiallyLoadProducts,
                 didReceiveAnalyticEvent: didReceiveAnalyticEvent,

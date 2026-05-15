@@ -41,9 +41,9 @@ struct FlowNavigationLink<Label>: View where Label: View {
                     didFailRestore: { error in
                         alertPaywallError = .init(title: "didFailRestore error!", error: error)
                     },
-                    didFailRendering: { error in
+                    didReceiveError: { error in
                         presentationMode.wrappedValue.dismiss()
-                        alertPaywallError = .init(title: "didFailRendering error!", error: error)
+                        alertPaywallError = .init(title: "didReceiveError error!", error: error)
                     }
                 )
             } else {

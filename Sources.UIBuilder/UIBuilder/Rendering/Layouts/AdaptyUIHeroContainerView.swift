@@ -90,8 +90,8 @@ struct AdaptyUIHeroContainerView: View {
                         Rectangle()
                             .hidden()
                             .onAppear {
-                                flowViewModel.reportDidFailRendering(
-                                    with: .wrongComponentType("screen.cover")
+                                flowViewModel.reportDidReceiveError(
+                                    .wrongComponentType("screen.cover")
                                 )
                             }
                     }
