@@ -245,11 +245,9 @@ struct AdaptyUIHeroContainerView: View {
         guard !pending.isEmpty else { return }
 
         for event in pending {
-            var combinedAnimations: [VC.Animation] = []
-            for handler in properties.eventHandlers {
-                guard handler.triggers.contains(where: { $0.events.contains(event.eventId) }) else { continue }
-                combinedAnimations.append(contentsOf: handler.animations)
-            }
+            let combinedAnimations = properties.eventHandlers
+                .filter { $0.triggers.contains { $0.events.contains(event.eventId) } }
+                .flatMap(\.animations)
 
             guard !combinedAnimations.isEmpty else { continue }
 
