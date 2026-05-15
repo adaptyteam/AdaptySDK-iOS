@@ -29,7 +29,7 @@ struct AdaptyUITextProgressView: View {
         self.progress = progress
     }
 
-    @State private var animatedValue: Double = 0.0
+    @State private var animatedValue: Double?
 
     var body: some View {
         let targetValue = stateViewModel.getValue(
@@ -37,11 +37,12 @@ struct AdaptyUITextProgressView: View {
             defaultValue: 0.0,
             screen: screen
         )
+        let displayValue = animatedValue ?? targetValue
 
         Color.clear
             .modifier(
                 AnimatedProgressTextModifier(
-                    value: animatedValue,
+                    value: displayValue,
                     progress: progress,
                     assetsCache: assetsViewModel.cache,
                     stateViewModel: stateViewModel,
@@ -51,9 +52,7 @@ struct AdaptyUITextProgressView: View {
                 )
             )
             .onAppear {
-                withAnimation(swiftUIAnimation) {
-                    animatedValue = targetValue
-                }
+                animatedValue = targetValue
             }
             .onChange(of: targetValue) { newValue in
                 withAnimation(swiftUIAnimation) {

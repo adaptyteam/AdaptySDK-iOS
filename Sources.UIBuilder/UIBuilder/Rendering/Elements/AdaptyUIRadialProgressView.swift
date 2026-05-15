@@ -127,7 +127,7 @@ struct AdaptyUIRadialProgressView: View {
         self.progress = progress
     }
 
-    @State private var animatedValue: Double = 0.0
+    @State private var animatedValue: Double?
 
     private var resolvedAsset: AdaptyUIResolvedColorOrGradientOrImageAsset? {
         assetsViewModel.resolvedAsset(
@@ -145,7 +145,8 @@ struct AdaptyUIRadialProgressView: View {
 
     var body: some View {
         let targetValue = stateViewModel.getValue(progress.value, defaultValue: 0.0, screen: screen)
-        let clampedValue = min(max(animatedValue, 0), 1)
+        let displayValue = animatedValue ?? targetValue
+        let clampedValue = min(max(displayValue, 0), 1)
 
         let arcShape = AdaptyUIRadialProgressArc(
             startAngleDegrees: progress.startAngle,
