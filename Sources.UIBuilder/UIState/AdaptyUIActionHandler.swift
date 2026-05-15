@@ -8,6 +8,7 @@
 import Foundation
 
 protocol AdaptyUIActionHandler: AnyObject {
+    func jsException(_: String)
     func openUrl(url: URL, openIn: VC.Action.WebOpenInParameter)
     func openUrl(stringId: String, openIn: VC.Action.WebOpenInParameter)
     func userCustomAction(id: String)

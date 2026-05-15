@@ -98,6 +98,10 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
+    nonisolated func jsException( _ message: String) {
+
+    }
+    
     nonisolated func openUrl(
         url: URL,
         openIn: VC.Action.WebOpenInParameter

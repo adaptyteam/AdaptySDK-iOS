@@ -25,6 +25,18 @@ extension VS {
 }
 
 extension VS.JSActionDispatcher {
+    func jsExceptionHandler(_ context: JSContext?, _ value: JSValue?) {
+        let eceptionString =
+            if let value {
+                "JScript exception: \(String(describing: value))"
+            } else {
+                "JScript exception in context: \(String(describing: context))"
+            }
+
+        Log.js.warn(eceptionString)
+        handler?.jsException(eceptionString)
+    }
+
     @inlinable
     func log(_ params: [AnyHashable: Any]?) {
         var message = "null"
@@ -314,3 +326,4 @@ extension VS.JSActionDispatcher {
         ))
     }
 }
+

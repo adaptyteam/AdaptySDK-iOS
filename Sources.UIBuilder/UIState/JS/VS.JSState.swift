@@ -27,19 +27,12 @@ extension VS {
                 context.isInspectable = true
             }
 
-            let exceptionHandler: @convention(block) (JSContext?, JSValue?) -> Void = { context, value in
-                guard let value else {
-                    Log.js.warn("JScript exception in context: \(String(describing: context))")
-                    return
-                }
-                Log.js.warn("JScript exception: \(String(describing: value))")
-            }
-            context.exceptionHandler = exceptionHandler
-
             actionDispatcher = JSActionDispatcher(
                 actionHandler,
                 configuration
             )
+
+            context.exceptionHandler = actionDispatcher.jsExceptionHandler
 
             context.setObject(actionDispatcher, forKeyedSubscript: "SDK" as NSString)
         }
