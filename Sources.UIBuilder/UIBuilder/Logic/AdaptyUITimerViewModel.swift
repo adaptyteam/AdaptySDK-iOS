@@ -132,11 +132,15 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         return timeLeft
     }
 
-    package func resetTimersState() {
-        Log.ui.verbose("#\(logId)# resetTimersState")
-        timers.removeAll()
-        timerCallbacks.removeAll()
+    package func pauseTimers() {
+        Log.ui.verbose("#\(logId)# pauseTimers")
         stopCentralTimer()
+    }
+
+    package func resumeTimers() {
+        Log.ui.verbose("#\(logId)# resumeTimers")
+        checkExpiredCallbacks()
+        startCentralTimerIfNeeded()
     }
 
     // MARK: - Central Timer Loop
