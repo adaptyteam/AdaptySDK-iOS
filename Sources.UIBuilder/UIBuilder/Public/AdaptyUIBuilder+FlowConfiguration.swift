@@ -160,7 +160,6 @@ public extension AdaptyUIBuilder {
         func reportOnDisappear() {
             logic.reportViewDidDisappear()
             flowViewModel.resetLogShowPaywall()
-            productsViewModel.resetSelectedProducts()
             timerViewModel.pauseTimers()
         }
     }

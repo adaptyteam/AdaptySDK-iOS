@@ -104,7 +104,6 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-
     nonisolated func openUrl(
         url: URL,
         openIn: VC.Action.WebOpenInParameter
@@ -226,13 +225,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         productId: String
     ) {
         Task { @MainActor [weak self] in
-            // TODO: move animation out of here
-            withAnimation(.linear(duration: 0.0)) {
-                self?.productsViewModel.selectProduct(
-                    id: productId,
-                    forGroupId: "paywallId deprecated" // TODO: x check
-                )
-            }
+            self?.productsViewModel.selectProduct(id: productId)
         }
     }
 
