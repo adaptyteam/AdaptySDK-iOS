@@ -18,14 +18,14 @@ extension Cache {
         let storedAt: Date
         var lastAccessedAt: Date
 
+        let dataVersion: Int
         let locale: String?
-        let dataHash: String?
 
         init(
             key: ItemKey,
             size: Int,
             locale: String?,
-            dataHash: String?,
+            dataVersion: Int,
             storedAt: Date,
             lastAccessedAt: Date
         ) {
@@ -33,7 +33,7 @@ extension Cache {
             schemaVersion = key.itemType.schemaVersion
             self.size = size
             self.locale = locale
-            self.dataHash = dataHash
+            self.dataVersion = dataVersion
             self.storedAt = storedAt
             self.lastAccessedAt = lastAccessedAt
         }
@@ -45,10 +45,10 @@ extension Cache.Meta: Codable {
         case profileId = "profile"
         case itemType = "type"
         case itemId = "id"
-        case schemaVersion = "version"
+        case schemaVersion = "format"
         case size
         case locale
-        case dataHash = "hash"
+        case dataVersion = "version"
         case storedAt = "stored_at"
         case lastAccessedAt = "last_accessed_at"
     }
@@ -56,27 +56,27 @@ extension Cache.Meta: Codable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         key = try .init(
-            profileId: container.decode(String.self, forKey: .profileId),
+            profileId: container.decodeIfPresent(String.self, forKey: .profileId),
             itemType: container.decode(Cache.ItemType.self, forKey: .itemType),
             itemId: container.decode(String.self, forKey: .itemId)
         )
         schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
         size = try container.decode(Int.self, forKey: .size)
         locale = try container.decodeIfPresent(String.self, forKey: .locale)
-        dataHash = try container.decodeIfPresent(String.self, forKey: .dataHash)
+        dataVersion = try container.decode(Int.self, forKey: .dataVersion)
         storedAt = try Date(timeIntervalSince1970: container.decode(Double.self, forKey: .storedAt))
         lastAccessedAt = try Date(timeIntervalSince1970: container.decode(Double.self, forKey: .lastAccessedAt))
     }
 
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(key.profileId, forKey: .profileId)
+        try container.encodeIfPresent(key.profileId, forKey: .profileId)
         try container.encode(key.itemType, forKey: .itemType)
         try container.encode(key.itemId, forKey: .itemId)
         try container.encode(schemaVersion, forKey: .schemaVersion)
         try container.encode(size, forKey: .size)
         try container.encodeIfPresent(locale, forKey: .locale)
-        try container.encodeIfPresent(dataHash, forKey: .dataHash)
+        try container.encode(dataVersion, forKey: .dataVersion)
         try container.encode(storedAt.timeIntervalSince1970, forKey: .storedAt)
         try container.encode(lastAccessedAt.timeIntervalSince1970, forKey: .lastAccessedAt)
     }

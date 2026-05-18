@@ -11,6 +11,7 @@ import Foundation
 extension Cache {
     static let metaFileExtension = "meta"
     static let dataFileExtension = "data"
+    static let sharedDirectoryName = "shared"
 
     static var rootDirectory: URL = {
         let fm = fileManager
@@ -29,18 +30,21 @@ extension Cache {
     }()
 
     @inlinable
-    static func directoryName(forProfileId profileId: String) -> String {
-        profileId.sha256.hexString
+    static func directoryName(forProfileId profileId: String?) -> String {
+        guard let profileId else {
+            return sharedDirectoryName
+        }
+        return profileId.sha256.hexString
     }
 
     @inlinable
-    static func directory(forProfileId profileId: String) -> URL {
+    static func directory(forProfileId profileId: String?) -> URL {
         rootDirectory
             .appendingPathComponent(directoryName(forProfileId: profileId), isDirectory: true)
     }
 
     @inlinable
-    static func directory(forProfileId profileId: String, itemType: Cache.ItemType) -> URL {
+    static func directory(forProfileId profileId: String?, itemType: Cache.ItemType) -> URL {
         directory(forProfileId: profileId)
             .appendingPathComponent(itemType.rawValue, isDirectory: true)
     }

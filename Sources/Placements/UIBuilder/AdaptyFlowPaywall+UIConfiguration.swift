@@ -8,6 +8,8 @@
 import AdaptyUIBuilder
 import Foundation
 
+private let log = Log.default
+
 @AdaptyActor
 extension Adapty {
     package nonisolated static func getUIConfiguration(
@@ -32,7 +34,7 @@ extension Adapty {
             throw .isNoViewConfigurationInFlow()
         }
 
-        let schema = try await fetchUISchema(
+        let schema = try await getUISchema(
             flowId: flow.id,
             viewConfigurationId: viewConfigurationId,
             loadTimeout: loadTimeout
@@ -57,18 +59,78 @@ extension Adapty {
         return try await extractLocaleTask.valueWithThrowsTyped()
     }
 
-    private func fetchUISchema(
+    private func getUISchema(
         flowId: String,
         viewConfigurationId: String,
         loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> AdaptyUISchema {
-        if let schema = try? Adapty.fallbackPlacements?.getUISchema(byViewConfigurationId: viewConfigurationId) {
+        let isTestUser = profileManager?.isTestUser ?? false
+        let cacheKey = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: viewConfigurationId)
+
+        if !isTestUser, let schema = await fetchLocalUISchema(cacheKey) {
             return schema
         }
 
+        let schema: AdaptyUISchema
+        let data: Data
+
+        do {
+            (schema, data) = try await fetchBackendUISchema(
+                flowId: flowId,
+                viewConfigurationId: viewConfigurationId,
+                loadTimeout: loadTimeout,
+                disableServerCache: isTestUser
+            )
+            log.verbose("UI schema source = backend (\(viewConfigurationId))")
+        } catch {
+            if isTestUser, let schema = await fetchLocalUISchema(cacheKey) {
+                return schema
+            }
+            throw error
+        }
+
+        Task.detached {
+            do {
+                try await Cache.write(
+                    data,
+                    key: cacheKey,
+                    dataVersion: 0,
+                    accept: { _, _ in true }
+                )
+            } catch {
+                Log.cache.error("Failed to write schema to cache: \(error)")
+            }
+        }
+
+        return schema
+    }
+
+    private func fetchLocalUISchema(_ key: Cache.ItemKey) async -> AdaptyUISchema? {
+        if let schema = await Cache.read(
+            key,
+            accept: { _ in true },
+            decode: AdaptyUISchema.init
+        ) {
+            log.verbose("UI schema source = disk cache (\(key.itemId))")
+            return schema
+        }
+
+        if let schema = try? Adapty.fallbackPlacements?.getUISchema(byViewConfigurationId: key.itemId) {
+            log.verbose("UI schema source = packed fallback (\(key.itemId))")
+            return schema
+        }
+
+        return nil
+    }
+
+    private func fetchBackendUISchema(
+        flowId: String,
+        viewConfigurationId: String,
+        loadTimeout: TaskDuration,
+        disableServerCache: Bool
+    ) async throws(AdaptyError) -> (schema: AdaptyUISchema, data: Data) {
         let session = httpFallbackSession
         let apiKeyPrefix = apiKeyPrefix
-        let isTestUser = profileManager?.isTestUser ?? false
 
         do {
             return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
@@ -76,7 +138,7 @@ extension Adapty {
                     apiKeyPrefix: apiKeyPrefix,
                     flowId: flowId,
                     viewConfigurationId: viewConfigurationId,
-                    disableServerCache: isTestUser
+                    disableServerCache: disableServerCache
                 )
             }
         } catch {
@@ -90,11 +152,10 @@ extension Adapty {
                 apiKeyPrefix: apiKeyPrefix,
                 flowId: flowId,
                 viewConfigurationId: viewConfigurationId,
-                disableServerCache: isTestUser
+                disableServerCache: disableServerCache
             )
         } catch {
             throw error.asAdaptyError
         }
     }
 }
-

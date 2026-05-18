@@ -25,7 +25,7 @@ extension ResponseCacheTests {
         ) throws -> Cache.ItemKey {
             let key = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: itemId)
             let body = Data(count: bodySize)
-            _ = try Cache.write(body, key: key) { _, _ in true }
+            _ = try Cache.write(body, key: key, dataVersion: 0) { _, _ in true }
 
             // Rewrite meta directly with the desired storedAt/lastAccessedAt.
             let existing = readMetaFromDisk(for: key)!
@@ -37,7 +37,7 @@ extension ResponseCacheTests {
                 ),
                 size: existing.size,
                 locale: existing.locale,
-                dataHash: existing.dataHash,
+                dataVersion: existing.dataVersion,
                 storedAt: storedAt,
                 lastAccessedAt: lastAccessedAt
             )
@@ -49,51 +49,38 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            await configureCache(maxBytes: 100, evictionGracePeriod: 3600)
+            // Sized so that exactly one entry must be evicted:
+            // total = 50 + 50 + 1 = 101; maxBytes = 60; needToFree = 41;
+            // removing k1 (50B, coldest) frees 50 ≥ 41 → done.
+            await configureCache(maxBytes: 60, evictionGracePeriod: 3600)
 
-            let oldStored = Date(timeIntervalSinceNow: -7200) // 2 hours ago → not grace-protected
-            // Three "old" entries, 50 bytes each, different lastAccessedAt:
+            let oldStored = Date(timeIntervalSinceNow: -7200) // 2h ago → out of grace
             let k1 = try await putEntry(itemId: "o1",
                                         bodySize: 50,
                                         storedAt: oldStored,
-                                        lastAccessedAt: Date(timeIntervalSinceNow: -300)) // 5 min ago
+                                        lastAccessedAt: Date(timeIntervalSinceNow: -600)) // coldest (10 min ago)
             let k2 = try await putEntry(itemId: "o2",
                                         bodySize: 50,
                                         storedAt: oldStored,
-                                        lastAccessedAt: Date(timeIntervalSinceNow: -600)) // 10 min ago (coldest)
-            let k3 = try await putEntry(itemId: "o3",
-                                        bodySize: 50,
-                                        storedAt: oldStored,
-                                        lastAccessedAt: Date(timeIntervalSinceNow: -60)) // 1 min ago
+                                        lastAccessedAt: Date(timeIntervalSinceNow: -60))  // warmer (1 min ago)
 
-            // Total = 150 > maxBytes=100. Eviction should trigger after the next write.
-            let k4 = try await putEntry(itemId: "o4",
-                                        bodySize: 50,
-                                        storedAt: oldStored,
-                                        lastAccessedAt: Date())
-
-            // putEntry rewrites meta bypassing enforceCacheSizeLimit, so we issue one
-            // more real write on a separate key — that triggers eviction.
+            // putEntry bypasses enforceCacheSizeLimit; one real write triggers it.
             let triggerKey = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "trigger")
-            _ = try await Cache.write(Data(count: 1), key: triggerKey) { _, _ in true }
+            // Reset upper-bound so eviction does a fresh scan over our hand-crafted metas.
+            await resetCacheCounters()
+            _ = try await Cache.write(Data(count: 1), key: triggerKey, dataVersion: 0) { _, _ in true }
 
-            // After eviction the total size must be <= maxBytes.
+            // Exact post-state: k1 evicted, k2 + trigger survive.
+            let files1 = await filesExist(for: k1)
+            let files2 = await filesExist(for: k2)
+            let filesT = await filesExist(for: triggerKey)
+            #expect(!files1.meta && !files1.body, "coldest entry k1 must be evicted")
+            #expect(files2.meta && files2.body, "warmer entry k2 must survive")
+            #expect(filesT.meta && filesT.body, "fresh trigger must survive (grace-protected)")
+
             let entries = await collectAllMeta()
             let total = entries.reduce(0) { $0 + $1.size }
-            #expect(total <= 100)
-
-            // The "coldest" k2 should be removed first.
-            let files2 = await filesExist(for: k2)
-            #expect(!files2.meta && !files2.body)
-
-            // The freshly-accessed (k4) survives.
-            let files4 = await filesExist(for: k4)
-            #expect(files4.meta && files4.body)
-
-            // Note: something from {k1, k3} could also have been evicted —
-            // we don't assert exact state, only the total-size invariant.
-            _ = k1
-            _ = k3
+            #expect(total <= 60)
         }
 
         @Test func eviction_grace_protects_young_records() async throws {
@@ -119,7 +106,7 @@ extension ResponseCacheTests {
 
             // Trigger eviction.
             let trigger = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "trigger")
-            _ = try await Cache.write(Data(count: 1), key: trigger) { _, _ in true }
+            _ = try await Cache.write(Data(count: 1), key: trigger, dataVersion: 0) { _, _ in true }
 
             // All three should survive despite exceeding the limit.
             for k in [k1, k2, k3] {
@@ -142,10 +129,89 @@ extension ResponseCacheTests {
 
             // Trigger eviction. Total size ~100+1 < 1024 → nothing removed.
             let trigger = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "trigger")
-            _ = try await Cache.write(Data(count: 1), key: trigger) { _, _ in true }
+            _ = try await Cache.write(Data(count: 1), key: trigger, dataVersion: 0) { _, _ in true }
 
             let files = await filesExist(for: k)
             #expect(files.meta && files.body)
+        }
+
+        @Test func eviction_sets_cooldown_when_grace_blocks_eviction() async throws {
+            let root = await prepareCacheTest()
+            defer { cleanupCacheTest(root) }
+
+            // 100s grace, all entries fresh → grace blocks every eviction candidate.
+            await configureCache(maxBytes: 30, evictionGracePeriod: 100)
+
+            let now = Date()
+            _ = try await putEntry(itemId: "o1", bodySize: 40,
+                                   storedAt: now, lastAccessedAt: now)
+            _ = try await putEntry(itemId: "o2", bodySize: 40,
+                                   storedAt: now, lastAccessedAt: now)
+
+            // Trigger a real write so enforceCacheSizeLimit runs.
+            await resetCacheCounters()
+            let trigger = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "trigger")
+            _ = try await Cache.write(Data(count: 1), key: trigger, dataVersion: 0) { _, _ in true }
+
+            // Cooldown must be set, pointing roughly at storedAt + gracePeriod (~now + 100s).
+            let cooldown = await Cache.nextEvictionScanAllowedAt
+            #expect(cooldown != nil)
+            if let cooldown {
+                let expected = now.addingTimeInterval(100)
+                #expect(abs(cooldown.timeIntervalSince(expected)) < 5)
+            }
+        }
+
+        @Test func totalBytesUpperBound_never_underestimates_actual_size() async throws {
+            let root = await prepareCacheTest()
+            defer { cleanupCacheTest(root) }
+
+            await configureCache(maxBytes: 10_000, evictionGracePeriod: 3600)
+
+            // Three writes; the in-memory upper bound is updated incrementally.
+            let k1 = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "a")
+            let k2 = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "b")
+            let k3 = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "c")
+            _ = try await Cache.write(Data(count: 100), key: k1, dataVersion: 0) { _, _ in true }
+            _ = try await Cache.write(Data(count: 100), key: k2, dataVersion: 0) { _, _ in true }
+            _ = try await Cache.write(Data(count: 100), key: k3, dataVersion: 0) { _, _ in true }
+
+            // After three writes the upper bound should equal the actual size.
+            let metasAll = await collectAllMeta()
+            let actualAll = metasAll.reduce(0) { $0 + $1.size }
+            let upperAll = await Cache.totalBytesUpperBound
+            #expect(upperAll != nil)
+            #expect(upperAll ?? -1 >= actualAll)
+
+            // Bulk-remove via removeCacheItem bypasses the counter delta.
+            // The upper bound becomes an overestimate — but never an underestimate.
+            await removeCacheItem(for: k2)
+
+            let metasAfter = await collectAllMeta()
+            let actualAfter = metasAfter.reduce(0) { $0 + $1.size }
+            let upperAfter = await Cache.totalBytesUpperBound
+            #expect(upperAfter != nil)
+            #expect(upperAfter ?? -1 >= actualAfter, "upper bound must never underestimate actual size")
+        }
+
+        @Test func eviction_clears_cooldown_when_freed_under_limit() async throws {
+            let root = await prepareCacheTest()
+            defer { cleanupCacheTest(root) }
+
+            await configureCache(maxBytes: 60, evictionGracePeriod: 3600)
+
+            let oldStored = Date(timeIntervalSinceNow: -7200)
+            _ = try await putEntry(itemId: "o1", bodySize: 50,
+                                   storedAt: oldStored,
+                                   lastAccessedAt: Date(timeIntervalSinceNow: -600))
+
+            await resetCacheCounters()
+            let trigger = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "trigger")
+            _ = try await Cache.write(Data(count: 1), key: trigger, dataVersion: 0) { _, _ in true }
+
+            // Eviction succeeded; no cooldown should be set.
+            let cooldown = await Cache.nextEvictionScanAllowedAt
+            #expect(cooldown == nil)
         }
     }
 }

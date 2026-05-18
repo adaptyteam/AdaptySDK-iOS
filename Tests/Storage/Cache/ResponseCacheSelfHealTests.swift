@@ -21,7 +21,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             // Overwrite .meta with garbage.
             try await writeRawMeta(Data("{ not json".utf8), for: key)
@@ -42,7 +42,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             // Construct meta with a different profileId, but write it under the original key's URL.
             let badKey = Cache.ItemKey(profileId: "different", itemType: key.itemType, itemId: key.itemId)
@@ -50,7 +50,97 @@ extension ResponseCacheTests {
                 key: badKey,
                 size: 100,
                 locale: nil,
-                dataHash: nil,
+                dataVersion: 0,
+                storedAt: Date(),
+                lastAccessedAt: Date()
+            )
+            try await overwriteMeta(bad, for: key)
+
+            let value: TestPayload? = await Cache.read(
+                key,
+                accept: { _ in true },
+                decode: TestPayload.decode(_:)
+            )
+            #expect(value == nil)
+
+            let files = await filesExist(for: key)
+            #expect(!files.meta)
+            #expect(!files.body)
+        }
+
+        @Test func mismatched_profileId_nil_vs_non_nil_causes_self_heal() async throws {
+            let root = await prepareCacheTest()
+            defer { cleanupCacheTest(root) }
+
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
+
+            // Meta written under profileId="p1" file, but with profileId=nil inside.
+            let badKey = Cache.ItemKey(profileId: nil, itemType: key.itemType, itemId: key.itemId)
+            let bad = Cache.Meta(
+                key: badKey,
+                size: 100,
+                locale: nil,
+                dataVersion: 0,
+                storedAt: Date(),
+                lastAccessedAt: Date()
+            )
+            try await overwriteMeta(bad, for: key)
+
+            let value: TestPayload? = await Cache.read(
+                key,
+                accept: { _ in true },
+                decode: TestPayload.decode(_:)
+            )
+            #expect(value == nil)
+
+            let files = await filesExist(for: key)
+            #expect(!files.meta)
+            #expect(!files.body)
+        }
+
+        @Test func mismatched_itemType_in_meta_causes_self_heal() async throws {
+            let root = await prepareCacheTest()
+            defer { cleanupCacheTest(root) }
+
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
+
+            // Meta declares a different itemType than the key requests.
+            let badKey = Cache.ItemKey(profileId: key.profileId, itemType: .onboarding, itemId: key.itemId)
+            let bad = Cache.Meta(
+                key: badKey,
+                size: 100,
+                locale: nil,
+                dataVersion: 0,
+                storedAt: Date(),
+                lastAccessedAt: Date()
+            )
+            try await overwriteMeta(bad, for: key)
+
+            let value: TestPayload? = await Cache.read(
+                key,
+                accept: { _ in true },
+                decode: TestPayload.decode(_:)
+            )
+            #expect(value == nil)
+
+            let files = await filesExist(for: key)
+            #expect(!files.meta)
+            #expect(!files.body)
+        }
+
+        @Test func mismatched_itemId_in_meta_causes_self_heal() async throws {
+            let root = await prepareCacheTest()
+            defer { cleanupCacheTest(root) }
+
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
+
+            // Meta declares a different itemId than the key requests.
+            let badKey = Cache.ItemKey(profileId: key.profileId, itemType: key.itemType, itemId: "different-id")
+            let bad = Cache.Meta(
+                key: badKey,
+                size: 100,
+                locale: nil,
+                dataVersion: 0,
                 storedAt: Date(),
                 lastAccessedAt: Date()
             )
@@ -72,7 +162,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             await removeBodyOnly(for: key)
 
             let value: TestPayload? = await Cache.read(
@@ -91,7 +181,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             await removeMetaOnly(for: key)
 
             let value: TestPayload? = await Cache.read(
@@ -108,7 +198,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             // Patch the meta-file's schemaVersion to an unknown one.
             try await overwriteMetaSchemaVersion(99, for: key)
@@ -134,8 +224,8 @@ extension ResponseCacheTests {
             let flowPayload = TestPayload(id: "flow", value: 1)
             let onbPayload = TestPayload(id: "onb", value: 2)
 
-            _ = try await Cache.write(flowPayload.encoded(), key: flowKey) { _, _ in true }
-            _ = try await Cache.write(onbPayload.encoded(), key: onbKey) { _, _ in true }
+            _ = try await Cache.write(flowPayload.encoded(), key: flowKey, dataVersion: 0) { _, _ in true }
+            _ = try await Cache.write(onbPayload.encoded(), key: onbKey, dataVersion: 0) { _, _ in true }
 
             // Simulate a schema bump for flow: rewrite schemaVersion in meta to an outdated value.
             try await overwriteMetaSchemaVersion(0, for: flowKey)
@@ -161,7 +251,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             try await writeRawMeta(Data("not-json".utf8), for: key)
 
             let touched = await Cache.touch(key) { _ in true }

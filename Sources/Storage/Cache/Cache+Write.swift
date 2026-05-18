@@ -17,7 +17,7 @@ extension Cache {
         _ data: Data,
         key: ItemKey,
         locale: String? = nil,
-        dataHash: String? = nil,
+        dataVersion: Int,
         accept: @Sendable (_ new: Meta, _ existing: Meta) -> Bool
     ) throws -> Bool {
         let now = Date()
@@ -26,7 +26,7 @@ extension Cache {
             key: key,
             size: data.count,
             locale: locale,
-            dataHash: dataHash,
+            dataVersion: dataVersion,
             storedAt: now,
             lastAccessedAt: now
         )

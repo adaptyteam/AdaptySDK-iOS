@@ -72,6 +72,10 @@ public extension Adapty {
             AdaptyConfiguration.idfaCollectionDisabled = configuration.idfaCollectionDisabled // TODO: Refactoring
             AdaptyConfiguration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled // TODO: Refactoring
 
+            Task.detached(priority: .background) {
+                await Cache.cleanup()
+            }
+
             let environment = await Environment.instance
 
             let backend = await Backend(with: configuration, environment: environment)
@@ -89,7 +93,6 @@ public extension Adapty {
             set(shared: sdk)
 
             UserAcquisitionManager.activate(sdk)
-
             LifecycleManager.shared.initialize()
             return sdk
         }

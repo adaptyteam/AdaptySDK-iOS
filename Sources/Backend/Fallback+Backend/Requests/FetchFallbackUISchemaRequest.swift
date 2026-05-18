@@ -35,7 +35,7 @@ extension Backend.FallbackExecutor {
         flowId: String,
         viewConfigurationId: String,
         disableServerCache _: Bool
-    ) async throws(HTTPError) -> AdaptyUISchema {
+    ) async throws(HTTPError) -> (schema: AdaptyUISchema, data: Data) {
         let request = FetchFallbackUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
             flowId: flowId,
@@ -49,7 +49,7 @@ extension Backend.FallbackExecutor {
             ]
         )
 
-        let response: HTTPResponse<AdaptyUISchema> = try await perform(request, withDecoder: AdaptyUISchema.decoder)
+        let response: HTTPResponse<(schema: AdaptyUISchema, data: Data)> = try await perform(request, withDecoder: AdaptyUISchema.decoder)
         return response.body
     }
 }

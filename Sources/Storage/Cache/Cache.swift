@@ -27,10 +27,10 @@ extension Cache {
     /// Upper-bound estimate of the total data-file size under `rootDirectory`.
     /// **Never underestimates** — actual size is always ≤ this value.
     /// `nil` → not computed yet (cold start / reset in tests).
-    /// Maintained via deltas on write. Bulk-remove operations (`removeProfile`/
-    /// `removeItemType`/`cleanup`) intentionally do **not** update it — an
-    /// extra overestimate is safe, since `enforceCacheSizeLimit()` will
-    /// recompute the exact value on the next overflow.
+    /// Maintained via deltas on write. Bulk-remove operations (`removeOtherProfiles`/
+    /// `cleanup`) intentionally do **not** update it — an extra overestimate
+    /// is safe, since `enforceCacheSizeLimit()` will recompute the exact value
+    /// on the next overflow. `removeAll` resets it to 0 directly.
     static var totalBytesUpperBound: Int?
 
     /// Cooldown: when set, `enforceCacheSizeLimit()` skips the full scan until

@@ -9,37 +9,31 @@ import Foundation
 
 @Cache.Actor
 extension Cache {
-    @inlinable
-    static func cleanup(profileId: String) {
+    static func cleanup() {
         let fm = fileManager
+        let rootDirectoryPath = rootDirectory.path
         guard
-            fm.fileExists(atPath: rootDirectory.path),
-            let profileIds = try? fm.contentsOfDirectory(atPath: rootDirectory.path),
-            !profileIds.isEmpty
-        else { return }
-
-        // remove old profiles data
-        let currentDirName = directoryName(forProfileId: profileId)
-        for id in profileIds where id != currentDirName {
-            try? fm.removeItem(at: rootDirectory.appendingPathComponent(id, isDirectory: true))
-        }
-
-        let currentDir = directory(forProfileId: profileId)
-        guard
-            fm.fileExists(atPath: currentDir.path),
-            let itemTypes = try? fm.contentsOfDirectory(atPath: currentDir.path),
-            !itemTypes.isEmpty
+            fm.fileExists(atPath: rootDirectoryPath),
+            let subdirectories = try? fm.contentsOfDirectory(atPath: rootDirectoryPath),
+            !subdirectories.isEmpty
         else { return }
 
         let knownTypes = Set(ItemType.allCases.map(\.rawValue))
-        // remove unknown item types
-        for type in itemTypes where !knownTypes.contains(type) {
-            try? fm.removeItem(at: currentDir.appendingPathComponent(type, isDirectory: true))
+        for name in subdirectories {
+            let directory = rootDirectory.appendingPathComponent(name, isDirectory: true)
+            guard
+                let itemTypes = try? fm.contentsOfDirectory(atPath: directory.path),
+                !itemTypes.isEmpty
+            else { continue }
+            for type in itemTypes where !knownTypes.contains(type) {
+                // remove unknown item types
+                try? fm.removeItem(at: directory.appendingPathComponent(type, isDirectory: true))
+            }
         }
 
         // remove unpaired meta/data files
         guard let enumerator = fm.enumerator(
-            at: currentDir,
+            at: rootDirectory,
             includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
         ) else { return }

@@ -44,10 +44,10 @@ extension AdaptyUISchema {
         _ response: HTTPDataResponse,
         _: HTTPCodableConfiguration?,
         _: HTTPRequest
-    ) async throws -> HTTPResponse<AdaptyUISchema> {
+    ) async throws -> HTTPResponse<(schema: AdaptyUISchema, data: Data)> {
         guard let data = response.body else { throw URLError(.cannotDecodeRawData) }
         let schema = try AdaptyUISchema(from: data)
-        return response.replaceBody(schema)
+        return response.replaceBody((schema, data))
     }
 }
 
@@ -57,7 +57,7 @@ extension Backend.MainExecutor {
         flowId: String,
         viewConfigurationId: String,
         disableServerCache: Bool
-    ) async throws(HTTPError) -> AdaptyUISchema {
+    ) async throws(HTTPError) -> (schema: AdaptyUISchema, data: Data) {
         let request = FetchUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
             flowId: flowId,
@@ -73,8 +73,7 @@ extension Backend.MainExecutor {
             ]
         )
 
-        let response: HTTPResponse<AdaptyUISchema> = try await perform(request, withDecoder: AdaptyUISchema.decoder)
+        let response: HTTPResponse<(schema: AdaptyUISchema, data: Data)> = try await perform(request, withDecoder: AdaptyUISchema.decoder)
         return response.body
     }
 }
-

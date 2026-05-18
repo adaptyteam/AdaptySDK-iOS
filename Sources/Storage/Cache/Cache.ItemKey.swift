@@ -9,7 +9,7 @@ import Foundation
 
 extension Cache {
     struct ItemKey: Hashable, Sendable {
-        let profileId: String
+        let profileId: String?
         let itemType: ItemType
         let itemId: String
     }

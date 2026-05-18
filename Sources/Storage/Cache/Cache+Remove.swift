@@ -17,15 +17,20 @@ extension Cache {
     }
 
     @inlinable
-    static func removeProfile(_ profileId: String) {
-        let dir = directory(forProfileId: profileId)
-        try? fileManager.removeItem(at: dir)
-    }
+    static func removeOtherProfiles(_ profileId: String) {
+        let fm = fileManager
+        let rootDirectoryPath = rootDirectory.path
+        guard
+            fm.fileExists(atPath: rootDirectoryPath),
+            let subdirectories = try? fm.contentsOfDirectory(atPath: rootDirectoryPath),
+            !subdirectories.isEmpty
+        else { return }
 
-    @inlinable
-    static func removeItemType(profileId: String, itemType: ItemType) {
-        let dir = directory(forProfileId: profileId, itemType: itemType)
-        try? fileManager.removeItem(at: dir)
+        let currentProfileDirectoryName = directoryName(forProfileId: profileId)
+        for name in subdirectories
+            where name != currentProfileDirectoryName && name != sharedDirectoryName {
+            try? fm.removeItem(at: rootDirectory.appendingPathComponent(name, isDirectory: true))
+        }
     }
 }
 

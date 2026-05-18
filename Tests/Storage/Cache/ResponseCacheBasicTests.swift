@@ -28,7 +28,7 @@ extension ResponseCacheTests {
                 payload.encoded(),
                 key: key,
                 locale: "en",
-                dataHash: "hash-1"
+                dataVersion: 7
             ) { _, _ in true }
 
             #expect(written)
@@ -45,7 +45,7 @@ extension ResponseCacheTests {
             )
             #expect(value == payload)
             #expect(captured.value?.locale == "en")
-            #expect(captured.value?.dataHash == "hash-1")
+            #expect(captured.value?.dataVersion == 7)
             #expect(try captured.value?.size == (payload.encoded()).count)
         }
 
@@ -53,13 +53,14 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let originalMeta = await readMetaFromDisk(for: key)
             #expect(originalMeta != nil)
 
             let written = try await Cache.write(
                 altPayload.encoded(),
-                key: key
+                key: key,
+                dataVersion: 0
             ) { _, _ in false } // accept=false → don't overwrite
 
             #expect(!written)
@@ -77,11 +78,12 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             let written = try await Cache.write(
                 altPayload.encoded(),
-                key: key
+                key: key,
+                dataVersion: 0
             ) { _, _ in true }
 
             #expect(written)
@@ -98,8 +100,8 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
-            _ = try await Cache.write(altPayload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
+            _ = try await Cache.write(altPayload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             let dir = await key.directory
             let contents = try FileManager.default.contentsOfDirectory(atPath: dir.path)
@@ -123,7 +125,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             let value: TestPayload? = await Cache.read(
                 key,
@@ -137,12 +139,12 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let originalLastAccessed = await readMetaFromDisk(for: key)?.lastAccessedAt
             #expect(originalLastAccessed != nil)
 
             // sleep 1ms so Date() is guaranteed to differ
-            try await Task.sleep(nanoseconds: 1_000_000)
+            try await Task.sleep(nanoseconds: 10_000_000)
 
             let value: TestPayload? = await Cache.read(
                 key,
@@ -171,7 +173,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             let value: TestPayload? = await Cache.read(
                 key,
@@ -189,10 +191,10 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 5_000_000) // 5ms
+            try await Task.sleep(nanoseconds: 10_000_000) // 10ms
 
             _ = await Cache.read(
                 key,
@@ -213,10 +215,10 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 5_000_000)
+            try await Task.sleep(nanoseconds: 10_000_000)
 
             let touched = await Cache.touch(key) { _ in true }
             #expect(touched)
@@ -231,10 +233,10 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 1_000_000)
+            try await Task.sleep(nanoseconds: 10_000_000)
 
             let touched = await Cache.touch(key) { _ in false }
             #expect(!touched)
@@ -260,6 +262,7 @@ extension ResponseCacheTests {
             let result = try await Cache.writeOrRead(
                 payload.encoded(),
                 key: key,
+                dataVersion: 0,
                 accept: { _, _ in true },
                 decode: TestPayload.decode(_:)
             )
@@ -278,11 +281,12 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             let result = try await Cache.writeOrRead(
                 altPayload.encoded(),
                 key: key,
+                dataVersion: 0,
                 accept: { _, _ in false }, // don't use new → read cached
                 decode: TestPayload.decode(_:)
             )
@@ -301,14 +305,15 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 5_000_000)
+            try await Task.sleep(nanoseconds: 10_000_000)
 
             _ = try await Cache.writeOrRead(
                 altPayload.encoded(),
                 key: key,
+                dataVersion: 0,
                 accept: { _, _ in false },
                 decode: TestPayload.decode(_:)
             )
@@ -323,11 +328,12 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             let result = try await Cache.writeOrRead(
                 altPayload.encoded(),
                 key: key,
+                dataVersion: 0,
                 accept: { _, _ in true }, // use new
                 decode: TestPayload.decode(_:)
             )
@@ -349,6 +355,7 @@ extension ResponseCacheTests {
                 let _: TestPayload = try await Cache.writeOrRead(
                     Data([0xFF, 0xFE]),
                     key: key,
+                    dataVersion: 0,
                     accept: { _, _ in true },
                     decode: { (_: Data) throws -> TestPayload in throw TestDecodeError() }
                 )
@@ -364,13 +371,14 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
 
             // New data fails to decode, but a valid entry exists in cache
             // (accept=true → "use new", but new is broken → fallback to cached).
             let result = try await Cache.writeOrRead(
                 Data([0xFF, 0xFE]),
                 key: key,
+                dataVersion: 0,
                 accept: { _, _ in true },
                 decode: { data -> TestPayload in
                     // Throw only on 0xFF-bytes; valid JSON decodes normally.
@@ -393,13 +401,14 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             // Replace body with garbage. accept=false (we want cached), but it's broken.
             try await writeRawBody(Data([0xAB, 0xCD]), for: key)
 
             let result = try await Cache.writeOrRead(
                 altPayload.encoded(),
                 key: key,
+                dataVersion: 0,
                 accept: { _, _ in false }, // we want cached
                 decode: TestPayload.decode(_:) // but cached decode will fail — fallback to new
             )
@@ -418,13 +427,14 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            _ = try await Cache.write(payload.encoded(), key: key) { _, _ in true }
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             try await writeRawBody(Data([0xAB, 0xCD]), for: key)
 
             await #expect(throws: TestDecodeError.self) {
                 let _: TestPayload = try await Cache.writeOrRead(
                     Data([0xFF, 0xFE]),
                     key: key,
+                    dataVersion: 0,
                     accept: { _, _ in false },
                     decode: { _ throws -> TestPayload in throw TestDecodeError() }
                 )

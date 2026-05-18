@@ -40,6 +40,14 @@ func configureCache(maxBytes: Int, evictionGracePeriod: TimeInterval) {
     Cache.evictionGracePeriod = evictionGracePeriod
 }
 
+/// Forces `enforceCacheSizeLimit` to do a full disk scan on the next write
+/// (otherwise the in-memory counter may short-circuit eviction).
+@Cache.Actor
+func resetCacheCounters() {
+    Cache.totalBytesUpperBound = nil
+    Cache.nextEvictionScanAllowedAt = nil
+}
+
 /// Test payload for encode/decode checks.
 struct TestPayload: Codable, Equatable, Sendable {
     let id: String
@@ -140,7 +148,7 @@ func overwriteMetaSchemaVersion(_ schemaVersion: Int, for key: Cache.ItemKey) th
     else {
         throw TestDecodeError()
     }
-    dict["version"] = schemaVersion
+    dict["format"] = schemaVersion
     let patched = try JSONSerialization.data(withJSONObject: dict, options: [.sortedKeys])
     try writeRawMeta(patched, for: key)
 }
