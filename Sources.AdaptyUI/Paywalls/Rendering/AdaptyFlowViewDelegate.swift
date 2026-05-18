@@ -57,7 +57,7 @@ package protocol AdaptyFlowViewDelegate: AnyObject {
 
     func flowView(
         _ view: AdaptyFlowUIView,
-        didFailRenderingWith error: AdaptyUIError
+        didReceiveError error: AdaptyUIError
     )
 
     func flowView(

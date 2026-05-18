@@ -26,7 +26,7 @@ package final class AdaptyEventsHandler {
     var didStartRestore: (() -> Void)?
     var didFinishRestore: ((AdaptyProfile) -> Void)?
     var didFailRestore: ((AdaptyError) -> Void)?
-    var didFailRendering: ((AdaptyUIError) -> Void)?
+    var didReceiveError: ((AdaptyUIError) -> Void)?
     var didFailLoadingProducts: ((AdaptyError) -> Bool)?
     var didPartiallyLoadProducts: (([String]) -> Void)?
     var didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
@@ -42,7 +42,7 @@ package final class AdaptyEventsHandler {
         self.didStartRestore = nil
         self.didFinishRestore = nil
         self.didFailRestore = nil
-        self.didFailRendering = nil
+        self.didReceiveError = nil
         self.didFailLoadingProducts = nil
         self.didPartiallyLoadProducts = nil
         self.didReceiveAnalyticEvent = nil
@@ -122,9 +122,9 @@ package final class AdaptyEventsHandler {
         didFailRestore?(error)
     }
 
-    func event_didFailRendering(with error: AdaptyUIBuilderError) {
-        Log.ui.error("#\(logId)# event_didFailRendering: \(error)")
-        didFailRendering?(error.toAdaptyUIError)
+    func event_didReceiveError(_ error: AdaptyUIBuilderError) {
+        Log.ui.error("#\(logId)# event_didReceiveError: \(error)")
+        didReceiveError?(error.toAdaptyUIError)
     }
 
     func event_didFailLoadingProducts(with error: AdaptyError) -> Bool {

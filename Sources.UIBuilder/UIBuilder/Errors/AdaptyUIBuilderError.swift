@@ -11,4 +11,5 @@ public enum AdaptyUIBuilderError: Error {
     case unsupportedTemplate(String) // TODO: x rename
     case wrongComponentType(String)
     case wrongAssetType(String)
+    case jsException(String)
 }

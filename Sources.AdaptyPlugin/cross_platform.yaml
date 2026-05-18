@@ -745,11 +745,11 @@ $events:
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       error: { $ref: "#/$defs/AdaptyError" }
 
-  FlowViewEvent.DidFailRendering:
+  FlowViewEvent.DidReceiveError:
     type: object
     required: [id, view, error]
     properties:
-      id: { const: "flow_view_did_fail_rendering" }
+      id: { const: "flow_view_did_receive_error" }
       view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
       error: { $ref: "#/$defs/AdaptyError" }
 

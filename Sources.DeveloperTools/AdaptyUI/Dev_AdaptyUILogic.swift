@@ -91,8 +91,8 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         }
     }
 
-    func reportDidFailRendering(with error: AdaptyUIBuilderError) {
-        events.event_didFailRendering(with: error)
+    func reportDidReceiveError(_ error: AdaptyUIBuilderError) {
+        events.event_didReceiveError(error)
     }
 
     func reportCustomerAnalyticEvent(

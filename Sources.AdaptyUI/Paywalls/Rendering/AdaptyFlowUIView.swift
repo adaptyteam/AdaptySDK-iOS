@@ -102,9 +102,9 @@ package final class AdaptyFlowUIView: UIView {
             self.delegate?.flowView(self, didFailRestoreWith: error)
         }
 
-        configuration.eventsHandler.didFailRendering = { [weak self] error in
+        configuration.eventsHandler.didReceiveError = { [weak self] error in
             guard let self else { return }
-            self.delegate?.flowView(self, didFailRenderingWith: error)
+            self.delegate?.flowView(self, didReceiveError: error)
         }
 
         configuration.eventsHandler.didFailLoadingProducts = { [weak self] error in

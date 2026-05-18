@@ -28,8 +28,8 @@ package final class AdaptyUIFlowViewModel: ObservableObject {
 
     private var logShowPaywallCalled = false
 
-    func reportDidFailRendering(with error: AdaptyUIBuilderError) {
-        logic.reportDidFailRendering(with: error)
+    func reportDidReceiveError(_ error: AdaptyUIBuilderError) {
+        logic.reportDidReceiveError(error)
     }
 
     package func logShowPaywall() {

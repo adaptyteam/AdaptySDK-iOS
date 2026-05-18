@@ -147,13 +147,13 @@ public protocol AdaptyFlowControllerDelegate: AnyObject {
         didFailRestoreWith error: AdaptyError
     )
 
-    /// This method will be invoked in case of errors during the screen rendering process.
+    /// This method is invoked in case of errors during the screen rendering process or runtime errors from the flow script (e.g. JavaScript exceptions).
     /// - Parameters:
     ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - error: an ``AdaptyError`` object representing the error.
     func flowController(
         _ controller: AdaptyFlowController,
-        didFailRenderingWith error: AdaptyUIError
+        didReceiveError error: AdaptyUIError
     )
 
     /// This method is invoked in case of errors during the products loading process.

@@ -133,7 +133,7 @@ public struct Dev_AdaptyUIRendererView: View {
     private let didFinishPurchase: (String, String) -> Void
     private let didStartRestore: () -> Void
     private let didFinishRestore: (String) -> Void
-    private let didFailRendering: (AdaptyUIBuilderError) -> Void
+    private let didReceiveError: (AdaptyUIBuilderError) -> Void
     private let didReceiveAnalyticEvent: (String, [String: any Sendable]) -> Void
 
     private let safeAreaOverride: EdgeInsets?
@@ -156,7 +156,7 @@ public struct Dev_AdaptyUIRendererView: View {
         didFinishPurchase: @escaping (String, String) -> Void,
         didStartRestore: @escaping () -> Void,
         didFinishRestore: @escaping (String) -> Void,
-        didFailRendering: @escaping (AdaptyUIBuilderError) -> Void,
+        didReceiveError: @escaping (AdaptyUIBuilderError) -> Void,
         didReceiveAnalyticEvent: @escaping (String, [String: any Sendable]) -> Void
     ) {
         self.safeAreaOverride = safeAreaOverride
@@ -183,7 +183,7 @@ public struct Dev_AdaptyUIRendererView: View {
         self.didFinishPurchase = didFinishPurchase
         self.didStartRestore = didStartRestore
         self.didFinishRestore = didFinishRestore
-        self.didFailRendering = didFailRendering
+        self.didReceiveError = didReceiveError
         self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
     }
 
@@ -204,7 +204,7 @@ public struct Dev_AdaptyUIRendererView: View {
         galleryConfiguration.eventsHandler.didFinishRestore = { [didFinishRestore] result in
             didFinishRestore(result.rawValue)
         }
-        galleryConfiguration.eventsHandler.didFailRendering = didFailRendering
+        galleryConfiguration.eventsHandler.didReceiveError = didReceiveError
         galleryConfiguration.eventsHandler.didReceiveAnalyticEvent = didReceiveAnalyticEvent
 
         return AdaptyUIPaywallView_Internal(

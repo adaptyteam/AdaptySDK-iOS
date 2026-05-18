@@ -24,7 +24,7 @@ struct AdaptyUIFlowViewModifier<Placeholder>: ViewModifier where Placeholder: Vi
     private let didSelectProduct: ((ProductResolver) -> Void)?
     private let didStartPurchase: ((ProductResolver) -> Void)?
     private let didStartRestore: (() -> Void)?
-    private let didFailRendering: (AdaptyUIBuilderError) -> Void
+    private let didReceiveError: (AdaptyUIBuilderError) -> Void
     private let placeholderBuilder: () -> Placeholder
 
     init(
@@ -37,7 +37,7 @@ struct AdaptyUIFlowViewModifier<Placeholder>: ViewModifier where Placeholder: Vi
         didSelectProduct: ((ProductResolver) -> Void)?,
         didStartPurchase: ((ProductResolver) -> Void)?,
         didStartRestore: (() -> Void)?,
-        didFailRendering: @escaping (AdaptyUIBuilderError) -> Void,
+        didReceiveError: @escaping (AdaptyUIBuilderError) -> Void,
         placeholderBuilder: @escaping (() -> Placeholder)
     ) {
         self.isPresented = isPresented
@@ -49,7 +49,7 @@ struct AdaptyUIFlowViewModifier<Placeholder>: ViewModifier where Placeholder: Vi
         self.didSelectProduct = didSelectProduct
         self.didStartPurchase = didStartPurchase
         self.didStartRestore = didStartRestore
-        self.didFailRendering = didFailRendering
+        self.didReceiveError = didReceiveError
         self.placeholderBuilder = placeholderBuilder
     }
 
@@ -64,7 +64,7 @@ struct AdaptyUIFlowViewModifier<Placeholder>: ViewModifier where Placeholder: Vi
                 didSelectProduct: didSelectProduct,
                 didStartPurchase: didStartPurchase,
                 didStartRestore: didStartRestore,
-                didFailRendering: didFailRendering
+                didReceiveError: didReceiveError
             )
         } else {
             placeholderBuilder()
@@ -110,7 +110,7 @@ public extension View {
         didSelectProduct: ((ProductResolver) -> Void)? = nil,
         didStartPurchase: ((ProductResolver) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,
-        didFailRendering: @escaping (AdaptyUIBuilderError) -> Void,
+        didReceiveError: @escaping (AdaptyUIBuilderError) -> Void,
         placeholderBuilder: @escaping (() -> Placeholder)
     ) -> some View {
         modifier(
@@ -124,7 +124,7 @@ public extension View {
                 didSelectProduct: didSelectProduct,
                 didStartPurchase: didStartPurchase,
                 didStartRestore: didStartRestore,
-                didFailRendering: didFailRendering,
+                didReceiveError: didReceiveError,
                 placeholderBuilder: placeholderBuilder
             )
         )
@@ -143,7 +143,7 @@ public struct AdaptyUIFlowView: View {
     private let didSelectProduct: ((ProductResolver) -> Void)?
     private let didStartPurchase: ((ProductResolver) -> Void)?
     private let didStartRestore: (() -> Void)?
-    private let didFailRendering: ((AdaptyUIBuilderError) -> Void)?
+    private let didReceiveError: ((AdaptyUIBuilderError) -> Void)?
 
     public init(
         flowConfiguration: AdaptyUIBuilder.FlowConfiguration,
@@ -153,7 +153,7 @@ public struct AdaptyUIFlowView: View {
         didSelectProduct: ((ProductResolver) -> Void)? = nil,
         didStartPurchase: ((ProductResolver) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,
-        didFailRendering: @escaping (AdaptyUIBuilderError) -> Void
+        didReceiveError: @escaping (AdaptyUIBuilderError) -> Void
     ) {
         self.flowConfiguration = flowConfiguration
         self.didAppear = didAppear
@@ -162,7 +162,7 @@ public struct AdaptyUIFlowView: View {
         self.didSelectProduct = didSelectProduct
         self.didStartPurchase = didStartPurchase
         self.didStartRestore = didStartRestore
-        self.didFailRendering = didFailRendering
+        self.didReceiveError = didReceiveError
     }
 
     public var body: some View {
@@ -184,7 +184,7 @@ public struct AdaptyUIFlowView: View {
         flowConfiguration.eventsHandler.didStartPurchase = didStartPurchase ?? { _ in }
 
         flowConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
-        flowConfiguration.eventsHandler.didFailRendering = didFailRendering
+        flowConfiguration.eventsHandler.didReceiveError = didReceiveError
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false,

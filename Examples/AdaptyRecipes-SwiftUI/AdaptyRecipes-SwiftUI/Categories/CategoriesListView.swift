@@ -77,9 +77,9 @@ struct CategoriesListView: View {
             didFailRestore: { error in
                 alertPaywallError = .init(title: "didFailRestore error!", error: error)
             },
-            didFailRendering: { error in
+            didReceiveError: { error in
                 presentPaywallModally = false
-                alertPaywallError = .init(title: "didFailRendering error!", error: error)
+                alertPaywallError = .init(title: "didReceiveError error!", error: error)
             },
             showAlertItem: $alertPaywallError,
             showAlertBuilder: { errorItem in
