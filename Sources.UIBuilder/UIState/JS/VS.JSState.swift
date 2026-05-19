@@ -42,11 +42,11 @@ extension VS {
 extension VS.JSState {
     func setEnvironmentConstants(_ config: AdaptyUIConfiguration) {
         Self.setEnvironmentConstants(config, in: context)
-        Self.setProductConstants(config.environment.flow.products, in: context)
+        Self.setProductConstants(config.environment.flow.products, final: false, in: context)
     }
 
-    func setProductConstants(_ products: [VC.FlowConstants.ProductConstants]) {
-        Self.setProductConstants(products, in: context)
+    func setProductConstants(_ products: [VC.FlowConstants.ProductConstants], final: Bool = true) {
+        Self.setProductConstants(products, final: final, in: context)
     }
 
     func sendSDKEvent(_ event: VS.SDKEvent) {

@@ -33,7 +33,7 @@ extension VS.JSState {
     }
 
     @inlinable
-    static func setProductConstants(_ products: [VC.FlowConstants.ProductConstants], in context: JSContext) {
+    static func setProductConstants(_ products: [VC.FlowConstants.ProductConstants], final: Bool, in context: JSContext) {
         guard
             products.isNotEmpty,
             let global = context.globalObject
@@ -44,16 +44,13 @@ extension VS.JSState {
 
         let objectClass = context.objectForKeyedSubscript("Object")
         objectClass?.invokeMethod("freeze", withArguments: [products])
-//        #if DEBUG
-//        global.setObject(products, forKeyedSubscript: "SDKProducts" as NSString)
-//        #else
+
         if let objectClass, let descriptor = JSValue(newObjectIn: context) {
             descriptor.setObject(products, forKeyedSubscript: "value" as NSString)
             descriptor.setObject(false, forKeyedSubscript: "writable" as NSString)
-            descriptor.setObject(false, forKeyedSubscript: "configurable" as NSString)
+            descriptor.setObject(!final, forKeyedSubscript: "configurable" as NSString)
             descriptor.setObject(false, forKeyedSubscript: "enumerable" as NSString)
             objectClass.invokeMethod("defineProperty", withArguments: [global, "SDKProducts", descriptor])
         }
-//        #endif
     }
 }
