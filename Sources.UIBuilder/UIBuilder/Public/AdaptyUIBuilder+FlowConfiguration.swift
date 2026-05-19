@@ -154,13 +154,13 @@ public extension AdaptyUIBuilder {
         func reportOnAppear() {
             logic.reportViewDidAppear()
             flowViewModel.logShowPaywall()
+            timerViewModel.resumeTimers()
         }
 
         func reportOnDisappear() {
             logic.reportViewDidDisappear()
             flowViewModel.resetLogShowPaywall()
-            productsViewModel.resetSelectedProducts()
-            timerViewModel.resetTimersState()
+            timerViewModel.pauseTimers()
         }
     }
 }

@@ -325,54 +325,6 @@ extension UIImage {
     }
 }
 
-// @MainActor
-// extension VC.Text {
-//    enum ProductInfoContainer {
-//        case notApplicable
-//        case notFound
-//        case found(ProductResolver)
-//    }
-//
-//    func extract(
-//        _productsInfoProvider: ProductsInfoProvider
-//    ) -> (VC.RichText, ProductInfoContainer) {
-//        switch value {
-//        case let .stringId(stringId):
-//            return (.empty, .notApplicable) // TODO: implement
-//        case let .variable(variableStringId):
-//            return (.empty, .notApplicable) // TODO: implement
-//        case let .product(.id(productId, sufix)):
-//            return (.empty, .notApplicable) // TODO: implement
-//        case let .product(.variable(variableProductId, sufix)):
-//            return (.empty, .notApplicable) // TODO: implement
-
-//
-//        case let .text(value):
-//            return (value, .notApplicable)
-//        case let .productText(value):
-//            guard let underlying = productsInfoProvider.productInfo(by: value.adaptyProductId) else {
-//                return (value.richText(), .notFound)
-//            }
-//
-//            return (
-//                value.richText(byPaymentMode: underlying.paymentMode),
-//                .found(underlying)
-//            )
-//        case let .selectedProductText(value):
-//            guard let underlying = productsInfoProvider.selectedProductInfo(by: value.productGroupId)
-//            else {
-//                return (value.richText(), .notFound)
-//            }
-//
-//            return (
-//                value.richText(adaptyProductId: underlying.adaptyProductId,
-//                               byPaymentMode: underlying.paymentMode),
-//                .found(underlying)
-//            )
-//        }
-//    }
-// }
-
 @MainActor
 extension AttributedString {
     static func createFrom(

@@ -11,16 +11,10 @@ import Foundation
 
 @MainActor
 protocol ProductsInfoProvider {
-    func selectedProductInfo(by groupId: String) -> ProductResolver?
     func productInfo(by productId: String) -> ProductResolver?
 }
 
 extension AdaptyUIProductsViewModel: ProductsInfoProvider {
-    func selectedProductInfo(by groupId: String) -> ProductResolver? {
-        guard let selectedProductId = selectedProductId(by: groupId) else { return nil }
-        return productInfo(by: selectedProductId)
-    }
-
     func productInfo(by flowProductId: String) -> ProductResolver? {
         flowProducts?[flowProductId]
     }
@@ -37,7 +31,6 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
     @Published fileprivate var flowProducts: [String: ProductResolver]?
 
-    @Published var selectedProductsIds: [String: String]
     @Published var productsLoadingInProgress: Bool = false
     @Published var purchaseInProgress: Bool = false
     @Published var restoreInProgress: Bool = false
@@ -59,50 +52,18 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         if let products {
             flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
         }
-
-        selectedProductsIds = [:] // TODO: use JS
     }
-
-    private var groupIdsForAutoNotification = Set<String>()
-
-    package func resetSelectedProducts() {
-        Log.ui.verbose("#\(logId)# resetSelectedProducts")
-
-        groupIdsForAutoNotification.removeAll()
-        selectedProductsIds = [:] // TODO: use JS
-    }
-
+    
     package func loadProductsIfNeeded() {
         guard !productsLoadingInProgress, flowProducts == nil else { return }
 
         loadProducts()
     }
 
-    func selectedProductId(by groupId: String) -> String? {
-        guard let productId = selectedProductsIds[groupId] else {
-            return nil
-        }
-
-        if !groupIdsForAutoNotification.contains(groupId),
-           let selectedProduct = flowProducts?[productId]
-        {
-            logic.reportDidSelectProduct(selectedProduct, automatic: true)
-            groupIdsForAutoNotification.insert(groupId)
-        }
-
-        return productId
-    }
-
-    func selectProduct(id: String, forGroupId groupId: String) {
-        selectedProductsIds[groupId] = id
-
+    func selectProduct(id: String) {
         if let selectedProduct = flowProducts?[id] {
             logic.reportDidSelectProduct(selectedProduct, automatic: false)
         }
-    }
-
-    func unselectProduct(forGroupId groupId: String) {
-        selectedProductsIds.removeValue(forKey: groupId)
     }
 
     private func loadProducts() {
@@ -140,19 +101,6 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
     }
 
     // MARK: Actions
-
-    func purchaseSelectedProduct(
-        fromGroupId groupId: String,
-        service: VC.Action.PaymentService,
-        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
-    ) {
-        guard let productId = selectedProductId(by: groupId) else { return }
-        purchaseProduct(
-            id: productId,
-            service: service,
-            onFinish: onFinish
-        )
-    }
 
     func purchaseProduct(
         id flowProductId: String,
