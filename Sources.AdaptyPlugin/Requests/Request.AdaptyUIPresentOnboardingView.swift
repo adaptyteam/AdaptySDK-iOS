@@ -20,6 +20,7 @@ extension Request {
             case presentationStyle = "ios_presentation_style"
         }
 
+        @available(*, deprecated, message: "Onboarding Feature is deprecated.")
         func execute() async throws -> AdaptyJsonData {
             try await AdaptyUI.Plugin.presentOnboardingView(
                 viewId: viewId,

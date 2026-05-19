@@ -78,7 +78,7 @@ extension Response {
             try container.encode(wrapped.variationId, forKey: .paywallVariationId)
             try container.encode(wrapped.paywallABTestName, forKey: .paywallABTestName)
             try container.encode(wrapped.paywallName, forKey: .paywallName)
-            try container.encodeIfPresent((wrapped as? WebPaywallURLProviding)?.webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
+            try container.encodeIfPresent(wrapped.webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
             try container.encode(wrapped.localizedDescription, forKey: .localizedDescription)
             try container.encode(wrapped.localizedTitle, forKey: .localizedTitle)
             try container.encode(wrapped.isFamilyShareable, forKey: .isFamilyShareable)

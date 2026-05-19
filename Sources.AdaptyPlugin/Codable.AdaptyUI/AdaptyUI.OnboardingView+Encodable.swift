@@ -8,6 +8,7 @@
 import AdaptyUI
 import Foundation
 
+@available(*, deprecated, message: "Onboarding Feature is deprecated.")
 extension AdaptyUI.OnboardingView: Encodable {
     enum CodingKeys: String, CodingKey {
         case id

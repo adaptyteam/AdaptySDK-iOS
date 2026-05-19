@@ -13,6 +13,7 @@ extension Request {
     struct AdaptyUICreateOnboardingView: AdaptyPluginRequest {
         static let method = "adapty_ui_create_onboarding_view"
 
+        @available(*, deprecated, message: "Onboarding Feature is deprecated.")
         let onboarding: AdaptyOnboarding
         let externalUrlsPresentation: AdaptyWebPresentation
 
@@ -21,6 +22,7 @@ extension Request {
             case externalUrlsPresentation = "external_urls_presentation"
         }
 
+        @available(*, deprecated, message: "Onboarding Feature is deprecated.")
         func execute() async throws -> AdaptyJsonData {
             try .success(
                 await AdaptyUI.Plugin.createOnboardingView(

@@ -11,6 +11,7 @@ import Adapty
 import AdaptyUI
 import UIKit
 
+@available(*, deprecated, message: "Onboarding Feature is deprecated.")
 public final class AdaptyOnboardingPlatformViewWrapper: UIView {
     private let eventHandler: EventHandler
     private let onboardingView: AdaptyOnboardingUIView
@@ -45,6 +46,7 @@ public final class AdaptyOnboardingPlatformViewWrapper: UIView {
     }
 }
 
+@available(*, deprecated, message: "Onboarding Feature is deprecated.")
 @MainActor
 extension AdaptyOnboardingPlatformViewWrapper: AdaptyOnboardingViewDelegate {
     package func onboardingView(

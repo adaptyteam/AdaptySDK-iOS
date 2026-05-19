@@ -7,6 +7,7 @@
 
 import AdaptyUI
 
+@available(*, deprecated, message: "Onboarding Feature is deprecated.")
 extension OnboardingViewEvent {
     struct OnAnalyticsAction: AdaptyPluginEvent {
         let id = "onboarding_on_analytics_action"

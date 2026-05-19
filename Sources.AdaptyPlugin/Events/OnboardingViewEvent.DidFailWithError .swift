@@ -7,6 +7,7 @@
 
 import AdaptyUI
 
+@available(*, deprecated, message: "Onboarding Feature is deprecated.")
 extension OnboardingViewEvent {
     struct DidFailWithError: AdaptyPluginEvent {
         let id = "onboarding_did_fail_with_error"

@@ -44,8 +44,10 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
 import UIKit
 
 extension AdaptyPlugin {
+    @available(*, deprecated, message: "Onboarding Feature is deprecated.")
     static let xibName = "AdaptyOnboardingPlaceholderView"
 
+    @available(*, deprecated, message: "Onboarding Feature is deprecated.")
     static func instantiateOnboardingPlaceholderView() -> UIView? {
         guard Bundle.main.path(forResource: xibName, ofType: "nib") != nil else { return nil }
 
@@ -196,6 +198,7 @@ extension AdaptyPluginDelegate: AdaptyFlowControllerDelegate {
     }
 }
 
+@available(*, deprecated, message: "Onboarding Feature is deprecated.")
 extension AdaptyPluginDelegate: AdaptyOnboardingControllerDelegate {
     func onboardingController(
         _ controller: AdaptyOnboardingController,

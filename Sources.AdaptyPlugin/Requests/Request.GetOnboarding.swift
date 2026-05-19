@@ -25,6 +25,7 @@ extension Request {
             case loadTimeout = "load_timeout"
         }
 
+        @available(*, deprecated, message: "Onboarding Feature is deprecated.")
         func execute() async throws -> AdaptyJsonData {
             try .success(await Adapty.getOnboarding(
                 placementId: placementId,

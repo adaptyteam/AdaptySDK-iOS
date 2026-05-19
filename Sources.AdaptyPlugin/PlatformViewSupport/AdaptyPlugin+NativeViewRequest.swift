@@ -33,6 +33,7 @@ public extension AdaptyPlugin {
         )
     }
 
+    @available(*, deprecated, message: "Onboarding Feature is deprecated.")
     static func getOnboardingViewConfiguration(
         withJson jsonString: AdaptyJsonString
     ) async throws -> AdaptyUI.OnboardingConfiguration {

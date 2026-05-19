@@ -7,6 +7,7 @@
 
 import AdaptyUI
 
+@available(*, deprecated, message: "Onboarding Feature is deprecated.")
 extension OnboardingViewEvent {
     struct DidFinishLoading: AdaptyPluginEvent {
         let id = "onboarding_did_finish_loading"
