@@ -52,7 +52,6 @@ struct AdaptyUISectionView<ScreenHolderContent: View>: View {
                         }
                     }
                 )
-                .id(content)
             }
         }
         .onAppear {

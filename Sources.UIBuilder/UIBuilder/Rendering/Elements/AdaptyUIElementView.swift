@@ -178,6 +178,17 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             .onChange(of: eventBus.revision) { _ in
                 consumeAndProcessPendingEvents(properties: element.properties)
             }
+            .onChange(of: elementIndex) { newIndex in
+                // SwiftUI keeps this view's identity across section index swaps
+                // (same structural position, same View type), so .onAppear doesn't
+                // re-fire on the new content. Re-arm sticky lifecycle events for
+                // the new subtree by replaying pending events against the new
+                // element's properties.
+                lastProcessedSequence = 0
+                if let element = elementPool[safe: newIndex] {
+                    consumeAndProcessPendingEvents(properties: element.properties)
+                }
+            }
         } else {
             AdaptyUIUnknownElementView(value: "missing_element_\(elementIndex)")
         }
