@@ -128,7 +128,6 @@ struct AdaptyUIRadialProgressView: View {
     }
 
     @State private var animatedValue: Double?
-    @State private var pendingAction: DispatchWorkItem?
 
     private var resolvedAsset: AdaptyUIResolvedColorOrGradientOrImageAsset? {
         assetsViewModel.resolvedAsset(
@@ -171,30 +170,12 @@ struct AdaptyUIRadialProgressView: View {
         }
         .onChange(of: targetValue) { newValue in
             animatedValue = newValue
-            fireActionsWhenTransitionEnds()
         }
-        .onDisappear {
-            pendingAction?.cancel()
-            pendingAction = nil
-        }
-    }
-
-    private func fireActionsWhenTransitionEnds() {
-        pendingAction?.cancel()
-        pendingAction = nil
-        guard !progress.actions.isEmpty else { return }
-        let totalDelay = progress.transition.startDelay + progress.transition.duration
-        let actions = progress.actions
-        let screen = screen
-        if totalDelay > 0 {
-            let work = DispatchWorkItem { [weak stateViewModel] in
-                stateViewModel?.execute(actions: actions, screen: screen)
-            }
-            pendingAction = work
-            DispatchQueue.main.asyncAfter(deadline: .now() + totalDelay, execute: work)
-        } else {
-            stateViewModel.execute(actions: actions, screen: screen)
-        }
+        .fireProgressActions(
+            actions: progress.actions,
+            transition: progress.transition,
+            value: targetValue
+        )
     }
 
     @ViewBuilder

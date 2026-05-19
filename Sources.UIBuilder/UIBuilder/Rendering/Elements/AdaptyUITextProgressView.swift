@@ -30,7 +30,6 @@ struct AdaptyUITextProgressView: View {
     }
 
     @State private var animatedValue: Double?
-    @State private var pendingAction: DispatchWorkItem?
 
     var body: some View {
         let targetValue = stateViewModel.getValue(
@@ -59,36 +58,18 @@ struct AdaptyUITextProgressView: View {
                 withAnimation(swiftUIAnimation) {
                     animatedValue = newValue
                 }
-                fireActionsWhenTransitionEnds()
             }
-            .onDisappear {
-                pendingAction?.cancel()
-                pendingAction = nil
-            }
+            .fireProgressActions(
+                actions: progress.actions,
+                transition: progress.transition,
+                value: targetValue
+            )
     }
 
     private var swiftUIAnimation: Animation {
         progress.transition.interpolator.createAnimation(
             duration: progress.transition.duration
         )
-    }
-
-    private func fireActionsWhenTransitionEnds() {
-        pendingAction?.cancel()
-        pendingAction = nil
-        guard !progress.actions.isEmpty else { return }
-        let totalDelay = progress.transition.startDelay + progress.transition.duration
-        let actions = progress.actions
-        let screen = screen
-        if totalDelay > 0 {
-            let work = DispatchWorkItem { [weak stateViewModel] in
-                stateViewModel?.execute(actions: actions, screen: screen)
-            }
-            pendingAction = work
-            DispatchQueue.main.asyncAfter(deadline: .now() + totalDelay, execute: work)
-        } else {
-            stateViewModel.execute(actions: actions, screen: screen)
-        }
     }
 }
 
