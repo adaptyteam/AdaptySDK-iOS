@@ -111,6 +111,9 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         guard let transition = navigator.transitions?[transitionId] else {
             Log.ui.verbose("#\(logId)# screen:\(screen.id) in navigator:\(navigator.id) - no transition found")
 
+            executeScreenActions(.onDidDisappear, screen: currentScreen.instance)
+            eventBus.clearPending(for: currentScreen.instance.id)
+
             screens.removeAll()
 
             screen.transitionId = transitionId
