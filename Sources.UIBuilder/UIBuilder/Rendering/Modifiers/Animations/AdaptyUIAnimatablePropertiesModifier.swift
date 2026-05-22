@@ -9,6 +9,20 @@
 
 import SwiftUI
 
+// Tracks animation tokens with a class identity, so cleanup runs on real
+// view destruction (StateObject deinit) — not on every temporary disappear
+// (modal cover, app backgrounding) that .onDisappear conflates.
+private final class AdaptyUIAnimationCoordinator: ObservableObject {
+    var tokens: Set<AdaptyUIAnimationToken> = []
+
+    deinit {
+        let tokens = tokens
+        Task { @MainActor in
+            for token in tokens { token.invalidate() }
+        }
+    }
+}
+
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private var play: Binding<[VC.Animation]>
 
@@ -42,7 +56,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     @State private var animatedBlurRadius: Double?
 
-    @State private var animationTokens = Set<AdaptyUIAnimationToken>()
+    @StateObject private var animationCoordinator = AdaptyUIAnimationCoordinator()
 
     init(
         _ properties: VC.Element.Properties,
@@ -159,10 +173,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             .scaleEffect(x: scaleX, y: scaleY, anchor: scaleAnchor)
             .opacity(opacity)
             .onChange(of: play.wrappedValue) { startAnimations($0) }
-            .onDisappear {
-                animationTokens.forEach { $0.invalidate() }
-                animationTokens.removeAll()
-            }
     }
 
     private func startAnimations(_ animations: [VC.Animation]) {
@@ -276,7 +286,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             }
         }
 
-        animationTokens = tokens
+        animationCoordinator.tokens = tokens
     }
 }
 
