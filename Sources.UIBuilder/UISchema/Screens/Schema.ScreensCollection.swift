@@ -155,7 +155,7 @@ private extension Decoder {
             background: navigatorBackground,
             content: .init(
                 properties: nil,
-                node: .compositeElement(Schema.Box(
+                node: .box(Schema.Box(
                     width: .fillMax,
                     height: .fillMax,
                     horizontalAlignment: .center,

@@ -35,6 +35,7 @@ extension Schema {
         case screenHolder
         case simpleElement(any SimpleElement)
         case compositeElement(any CompositeElement)
+        indirect case box(Schema.Box)
         case unknown(String)
     }
 }
@@ -63,6 +64,10 @@ extension Schema.ConfigurationBuilder {
             taskStack.append(.buildElement(from))
             planElementProperties(from.properties, in: &taskStack)
             element.planTasks(in: &taskStack)
+        case let .box(element):
+            taskStack.append(.buildElement(from))
+            planElementProperties(from.properties, in: &taskStack)
+            element.planTasks(in: &taskStack)
         }
     }
 
@@ -85,6 +90,12 @@ extension Schema.ConfigurationBuilder {
                 buildElementProperties(from.properties, &elementIndices)
             )
         case let .compositeElement(composite):
+            try composite.buildElement(
+                self,
+                buildElementProperties(from.properties, &elementIndices),
+                &elementIndices
+            )
+        case let .box(composite):
             try composite.buildElement(
                 self,
                 buildElementProperties(from.properties, &elementIndices),
@@ -173,7 +184,7 @@ extension Schema.Element: DecodableWithConfiguration {
         case .box:
             try self.init(
                 properties: propertyOrNil(),
-                node: .compositeElement(Schema.Box(from: decoder, configuration: configuration))
+                node: .box(AdaptyUISchema.Box(from: decoder, configuration: configuration))
             )
         case .vStack, .hStack, .zStack:
             try self.init(

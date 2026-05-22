@@ -65,7 +65,9 @@ private extension Schema.Screen {
 private extension Schema.Element {
     var legacyReferencedElements: [(String, Schema.Element)] {
         var childs: [Self]?
-        if case let .compositeElement(element) = node {
+        if case let .box(box) = node {
+            childs = box.content.map { [$0] }
+        } else if case let .compositeElement(element) = node {
             if let stack = element as? Schema.Stack {
                 childs = stack.items
                     .compactMap {
@@ -78,8 +80,6 @@ private extension Schema.Element {
                     }
             } else if let button = element as? Schema.Button {
                 childs = [button.content, button.legacySelectedContent].compactMap(\.self)
-            } else if let box = element as? Schema.Box {
-                childs = box.content.map { [$0] }
             } else if let row = element as? Schema.Row {
                 childs = row.items.map(\.content)
             } else if let column = element as? Schema.Column {

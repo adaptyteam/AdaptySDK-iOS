@@ -24,6 +24,9 @@ extension Schema.Box {
     )
 }
 
+// TODO: drop this conformance — Box is routed via `Schema.Node.box(Schema.Box)`
+// and no longer needs to be packed into `any CompositeElement`. Kept temporarily
+// to avoid churning unrelated call sites in the same change.
 extension Schema.Box: Schema.CompositeElement {
     @inlinable
     func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
