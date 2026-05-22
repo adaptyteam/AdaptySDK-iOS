@@ -4,7 +4,7 @@
 //
 //  Created by Aleksei Valiano on 08.04.2026.
 //
-#if canImport(CSimdjson)
+#if SWIFT_PACKAGE
 import CSimdjson
 #endif
 import Foundation
