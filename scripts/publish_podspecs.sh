@@ -79,7 +79,7 @@ if [ "$VERBOSE" = true ]; then
 fi
 
 # Podspecs in dependency order (must be published in this order)
-PODSPECS=("AdaptyLogger.podspec" "AdaptyUIBuilder.podspec" "Adapty.podspec" "AdaptyUI.podspec" "AdaptyPlugin.podspec")
+PODSPECS=("AdaptyCodable.podspec" "AdaptyLogger.podspec" "AdaptyUIBuilder.podspec" "Adapty.podspec" "AdaptyUI.podspec" "AdaptyPlugin.podspec")
 
 # Function to extract pod name from podspec
 get_pod_name() {

@@ -4,7 +4,9 @@
 //
 //  Created by Aleksei Valiano on 08.04.2026.
 //
+#if canImport(CSimdjson)
 import CSimdjson
+#endif
 import Foundation
 
 public enum JsonExtractError: Error, Sendable, CustomStringConvertible {

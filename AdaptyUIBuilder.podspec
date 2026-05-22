@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '15.0'
   s.osx.deployment_target = '12.0'
   
-  s.swift_version = '6.2'
+  s.swift_version = '6.0'
   
   s.source_files = 'Sources.UIBuilder/**/*.swift'
   
@@ -25,6 +25,7 @@ Pod::Spec.new do |s|
   s.ios.framework = 'UIKit'
   
   s.dependency 'AdaptyLogger', s.version.to_s
+  s.dependency 'AdaptyCodable', s.version.to_s
     
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
