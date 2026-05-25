@@ -12,8 +12,13 @@ import SwiftUI
 
 @MainActor
 final class AdaptyUIScreenViewModel: ObservableObject {
-    var id: String { instance.id }
-    var configuration: VC.Screen { instance.configuration }
+    var id: String {
+        instance.id
+    }
+
+    var configuration: VC.Screen {
+        instance.configuration
+    }
 
     let instance: VS.ScreenInstance
     var zIndex: Double = 1.0
@@ -43,13 +48,18 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     let appearTransitionId: String
     let logId: String
 
-    var id: VC.NavigatorIdentifier { navigator.id }
-    var order: Double { Double(navigator.order) }
+    var id: VC.NavigatorIdentifier {
+        navigator.id
+    }
+
+    var order: Double {
+        Double(navigator.order)
+    }
 
     var initialBackground: VC.AssetReference? {
         appearTransition?.background?.initialBackground ?? navigator.background
     }
-    
+
     var appearTransition: VC.Navigator.AppearanceTransition? {
         navigator.appearances?[appearTransitionId]
     }
@@ -189,6 +199,19 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             self.screens.first?.zIndex = 1.0
             completion?()
 
+            // TODO: SDK-1043 — disarming armed @Published values after the
+            // animation deadline is fragile: if the app is backgrounded
+            // mid-transition (or the view tree remounts before this fires),
+            // re-subscribers will still receive the armed value and replay
+            // the animation. Replace with a one-shot signal (e.g. UUID
+            // nonce) so transition triggers fire exactly once regardless of
+            // re-subscriptions. Also applies to startNavigatorTransition
+            // (backgroundAnimation / contentAnimations) below. Investigate
+            // the orthogonal issue of why AdaptyNavigatorView remounts
+            // twice on app foreground.
+            currentScreen.startOutgoingTransition(nil)
+            screen.startIncomingTransition(nil)
+
             // Fire onDidAppear for the new screen
             self.executeScreenActions(.onDidAppear, screen: screen.instance)
             self.eventBus.publish(
@@ -260,6 +283,9 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         ) { [weak self] in
             guard let self else { return }
             Log.ui.verbose("#\(self.logId)# navigator:\(self.navigator.id) - transition finished")
+
+            self.backgroundAnimation = nil
+            self.contentAnimations = nil
 
             completion?()
 
