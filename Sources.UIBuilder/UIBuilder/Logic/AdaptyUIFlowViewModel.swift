@@ -26,34 +26,38 @@ package final class AdaptyUIFlowViewModel: ObservableObject {
         self.viewConfiguration = viewConfiguration
     }
 
-    private var logShowPaywallCalled = false
+    private var logShowFlowCalled = false
 
     func reportDidReceiveError(_ error: AdaptyUIBuilderError) {
         logic.reportDidReceiveError(error)
     }
 
-    package func logShowPaywall() {
-        guard !logShowPaywallCalled else { return }
-        logShowPaywallCalled = true
+    package func logShowFlow() {
+        guard viewConfiguration.formatVersion.isLegacyVersion else {
+            Log.ui.verbose("#\(logId)# logShowFlow skipped (non-legacy view configuration)")
+            return
+        }
+
+        guard !logShowFlowCalled else { return }
+        logShowFlowCalled = true
 
         let logId = logId
-        Log.ui.verbose("#\(logId)# logShowPaywall begin")
+
+        Log.ui.verbose("#\(logId)# logShowFlow begin")
 
         Task {
             do {
-                try await logic.logShowPaywall(
-                    viewConfiguration: viewConfiguration
-                )
-                Log.ui.verbose("#\(logId)# logShowPaywall success")
+                try await logic.logShowFlow()
+                Log.ui.verbose("#\(logId)# logShowFlow success")
             } catch {
-                Log.ui.error("#\(logId)# logShowPaywall fail: \(error)")
+                Log.ui.error("#\(logId)# logShowFlow fail: \(error)")
             }
         }
     }
 
-    package func resetLogShowPaywall() {
-        Log.ui.verbose("#\(logId)# resetLogShowPaywall")
-        logShowPaywallCalled = false
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        logShowFlowCalled = false
     }
 }
 

@@ -57,18 +57,8 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didFailLoadingProducts(with: error.asAdaptyError)
     }
 
-    package func logShowPaywall(
-        viewConfiguration: AdaptyUIConfiguration
-    ) async {
-        try? await Adapty.logFlowAnalyticsViaAdaptyUI(
-            variationId: flow.variationId,
-            viewConfigurationId: viewConfiguration.id,
-            params: AdaptyUIFlowScreenShowedParameters( // TODO: log show screen
-                screenInstanceId: "unknown_screen",
-                screenOrder: 0,
-                isLatestScreen: false
-            )
-        )
+    package func logShowFlow() async throws {
+        try await Adapty.logShowFlow(flow)
     }
 
     package func getProducts() async throws -> [ProductResolver] {
@@ -130,8 +120,8 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
             )
 
             switch purchaseResult {
-            case .success:      return .success
-            case .pending:      return .pending
+            case .success: return .success
+            case .pending: return .pending
             case .userCancelled: return .userCanceled
             }
         } catch {

@@ -143,6 +143,14 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         startCentralTimerIfNeeded()
     }
 
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        stopCentralTimer()
+        timers.removeAll()
+        timerCallbacks.removeAll()
+        objectWillChange.send()
+    }
+
     // MARK: - Central Timer Loop
 
     private func startCentralTimerIfNeeded() {

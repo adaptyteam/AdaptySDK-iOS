@@ -153,14 +153,37 @@ public extension AdaptyUIBuilder {
 
         func reportOnAppear() {
             logic.reportViewDidAppear()
-            flowViewModel.logShowPaywall()
+            flowViewModel.logShowFlow()
             timerViewModel.resumeTimers()
         }
 
         func reportOnDisappear() {
             logic.reportViewDidDisappear()
-            flowViewModel.resetLogShowPaywall()
             timerViewModel.pauseTimers()
+        }
+
+        /// Resets the transient runtime state of this configuration so it can
+        /// be presented again as a fresh paywall view.
+        ///
+        /// By default a `FlowConfiguration` is single-shot: it deduplicates
+        /// the `paywall_showed` event and keeps its in-memory timer state for
+        /// the lifetime of the instance. Cross-platform SDKs that cache and
+        /// re-present the same configuration should call this method before
+        /// each new presentation to:
+        ///
+        /// - re-arm the `paywall_showed` event so it fires again on the next
+        ///   `viewDidAppear`;
+        /// - clear local timer end dates and pending callbacks (timers with
+        ///   `continue` or `persisted` behavior keep their persisted source
+        ///   of truth and will resume from it on the next `setTimer` call).
+        ///
+        /// If you only need a clean state for a single presentation, prefer
+        /// creating a new `FlowConfiguration` instead.
+        public func prepareForReuse() {
+            Log.ui.verbose("#\(logId)# prepareForReuse")
+            flowViewModel.prepareForReuse()
+            timerViewModel.prepareForReuse()
+            stateViewModel.prepareForReuse()
         }
     }
 }
