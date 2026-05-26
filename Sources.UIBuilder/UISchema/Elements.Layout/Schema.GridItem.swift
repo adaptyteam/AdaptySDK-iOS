@@ -65,12 +65,16 @@ extension Schema.GridItem: DecodableWithConfiguration {
             }
         }
 
-        let length: Schema.GridItem.Length =
-            if let value = try container.decodeIfPresent(Int.self, forKey: .weight) {
-                .weight(value)
-            } else {
-                try .fixed(container.decode(Schema.Unit.self, forKey: .fixed))
+        let length: Schema.GridItem.Length
+        if let value = try container.decodeIfPresent(Int.self, forKey: .weight) {
+            guard value > 1 else {
+                throw DecodingError
+                    .dataCorruptedError(forKey: .weight, in: container, debugDescription: "value of weight must be greater than 1")
             }
+            length = .weight(value)
+        } else {
+            length = try .fixed(container.decode(Schema.Unit.self, forKey: .fixed))
+        }
 
         try self.init(
             length: length,
@@ -80,3 +84,4 @@ extension Schema.GridItem: DecodableWithConfiguration {
         )
     }
 }
+
