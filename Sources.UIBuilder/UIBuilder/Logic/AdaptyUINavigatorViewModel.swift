@@ -27,10 +27,20 @@ final class AdaptyUIScreenViewModel: ObservableObject {
     @Published var playIncomingTransition: [VC.Animation]? = nil
     @Published var playOutgoingTransition: [VC.Animation]? = nil
 
+    /// Drained by AdaptyScreenView's .onAppear so onDidAppear script-actions
+    /// run after SwiftUI has rendered the screen's first body.
+    var pendingFireOnDidAppear: (() -> Void)?
+
     init(
         instance: VS.ScreenInstance
     ) {
         self.instance = instance
+    }
+
+    func consumeFireOnDidAppear() {
+        let pending = pendingFireOnDidAppear
+        pendingFireOnDidAppear = nil
+        pending?()
     }
 
     func startIncomingTransition(_ animations: [VC.Animation]?) {
@@ -139,13 +149,11 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
             completion?()
 
-            // Defer onDidAppear to the next runloop so SwiftUI can complete
-            // the initial render of the incoming screen before screen-action
-            // scripts mutate state. Otherwise elements that animate on state
-            // changes (e.g. horizontal_progress) miss the 0 → target
-            // transition because the body first sees the post-script value.
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
+            // Defer onDidAppear to AdaptyScreenView's .onAppear so screen
+            // actions that mutate state (e.g. flipping a progress value from
+            // 0 to 1) run after the screen's first body, not before it.
+            screen.pendingFireOnDidAppear = { [weak self, weak screen] in
+                guard let self, let screen else { return }
                 self.executeScreenActions(.onDidAppear, screen: screen.instance)
                 self.eventBus.publish(
                     eventId: .onDidAppear,
@@ -250,17 +258,16 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             Log.ui.verbose("#\(logId)# navigator:\(navigator.id) - no transition found")
             completion?()
 
-            // Defer onDidAppear to the next runloop so SwiftUI can complete
-            // the initial render before screen-action scripts mutate state.
-            // See startScreenTransition for the same pattern and rationale.
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                self.eventBus.publish(
-                    eventId: .onDidAppear,
-                    transitionId: transitionId,
-                    screenInstanceId: nil
-                )
-                if let screen = self.screens.first {
+            // Defer onDidAppear to AdaptyScreenView's .onAppear (see
+            // startScreenTransition for the rationale).
+            if let screen = screens.first {
+                screen.pendingFireOnDidAppear = { [weak self, weak screen] in
+                    guard let self, let screen else { return }
+                    self.eventBus.publish(
+                        eventId: .onDidAppear,
+                        transitionId: transitionId,
+                        screenInstanceId: nil
+                    )
                     self.executeScreenActions(.onDidAppear, screen: screen.instance)
                     self.eventBus.publish(
                         eventId: .onDidAppear,

@@ -56,6 +56,7 @@ struct AdaptyScreenView: View {
         )
         .onReceive(screenInstance.$playIncomingTransition) { playIncomingTransition = $0 ?? [] }
         .onReceive(screenInstance.$playOutgoingTransition) { playOutgoingTransition = $0 ?? [] }
+        .onAppear { screenInstance.consumeFireOnDidAppear() }
     }
 
     @ViewBuilder
