@@ -53,6 +53,7 @@ extension Schema.ConfigurationBuilder {
     func localize(envoriment: VC.EnvironmentConstants) throws -> AdaptyUIConfiguration {
         templateIds.removeAll()
         return try .init(
+            formatVersion: source.formatVersion,
             id: configuarationId,
             localizationId: localizationId,
             locale: locale,

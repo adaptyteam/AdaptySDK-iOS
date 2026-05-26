@@ -361,15 +361,15 @@ $requests:
         properties:
           success: { const: true }
 
-  ### logShowPaywall ###
-  LogShowPaywall.Request: #request
+  ### logShowFlow ###
+  LogShowFlow.Request: #request
     type: object
     required: [method, paywall]
     properties:
-      method: { const: "log_show_paywall" }
-      paywall: { $ref: "#/$defs/AdaptyPaywall" }
+      method: { const: "log_show_flow" }
+      flow: { $ref: "#/$defs/AdaptyFlow" }
 
-  LogShowPaywall.Response: #response
+  LogShowFlow.Response: #response
     type: object
     oneOf:
       - required: [error]
