@@ -139,6 +139,11 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
 
     private var playerManagers = [String: AdaptyUIVideoPlayerManager]()
 
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        playerManagers.removeAll()
+    }
+
     func getOrCreatePlayerManager(
         for video: AdaptyUIResolvedVideoAsset,
         assetRef: VC.AssetReference,

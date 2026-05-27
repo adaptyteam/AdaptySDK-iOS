@@ -39,6 +39,11 @@ package final class AdaptyUIPresentationViewModel: ObservableObject {
         presentationState = .disappeared
         logic.reportViewDidDisappear()
     }
+
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        presentationState = .initial
+    }
 }
 
 #endif

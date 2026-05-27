@@ -60,6 +60,13 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         loadProducts()
     }
 
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        productsLoadingInProgress = false
+        purchaseInProgress = false
+        restoreInProgress = false
+    }
+
     func selectProduct(id: String) {
         if let selectedProduct = flowProducts?[id] {
             logic.reportDidSelectProduct(selectedProduct, automatic: false)
