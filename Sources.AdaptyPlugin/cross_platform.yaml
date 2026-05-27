@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/3.17.0/schema"
+$id: "https://adapty.io/crossPlatform/3.17.1/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -1223,6 +1223,12 @@ $defs:
       profile_id: { type: string }
       customer_user_id: { type: string }
       segment_hash: { type: string }
+      applied_attribution_sources:
+        type: array
+        items:
+            type: string
+            enum: [apple_search_ads]
+            description: "Identifiers of attribution sources applied to the profile. Known values: 'apple_search_ads'. Other identifiers may be emitted in future versions — clients must tolerate unknown values."
       custom_attributes: { $ref: "#/$defs/AdaptyProfile.CustomAttributes" }
       paid_access_levels:
         type: object
