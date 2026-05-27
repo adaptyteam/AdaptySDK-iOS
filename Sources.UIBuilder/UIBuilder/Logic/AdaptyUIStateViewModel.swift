@@ -179,10 +179,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     package func prepareForReuse() {
         Log.ui.verbose("#\(logId)# prepareForReuse")
-        // TODO: reset the underlying JS state (stateHolder.state / VS.JSState)
-        // so a reused FlowConfiguration starts with a clean state tree.
-        // Until implemented, callers should create a fresh FlowConfiguration
-        // when they need a fully reset state.
+        stateHolder.prepareForReuse()
     }
 
     func createBinding<T: JSValueRepresentable & JSValueConvertable>(
