@@ -32,6 +32,9 @@ extension Schema.RadialProgress: Decodable {
         case duration
         case interpolator
         case actions = "action"
+        case maxValue = "max"
+        case minValue = "min"
+        case skipAnimationOnOverflow = "skip_animation_on_overflow"
     }
 
     init(from decoder: any Decoder) throws {
@@ -51,7 +54,10 @@ extension Schema.RadialProgress: Decodable {
                 duration: container.decode(Double.self, forKey: .duration) / 1000.0,
                 interpolator: container.decodeIfPresent(VC.Animation.Interpolator.self, forKey: .interpolator) ?? .default
             ),
-            actions: container.decodeIfPresentActions(forKey: .actions) ?? []
+            actions: container.decodeIfPresentActions(forKey: .actions) ?? [],
+            maxValue: container.decodeIfPresent(Double.self, forKey: .maxValue) ?? 1,
+            minValue: container.decodeIfPresent(Double.self, forKey: .minValue) ?? 0,
+            skipAnimationOnOverflow: container.decodeIfPresent(Bool.self, forKey: .skipAnimationOnOverflow) ?? false
         )
     }
 }

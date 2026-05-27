@@ -13,5 +13,8 @@ extension VC {
         let value: Variable
         let transition: Transition
         let actions: [Action]
+        let maxValue: Double
+        let minValue: Double
+        let skipAnimationOnOverflow: Bool
     }
 }
