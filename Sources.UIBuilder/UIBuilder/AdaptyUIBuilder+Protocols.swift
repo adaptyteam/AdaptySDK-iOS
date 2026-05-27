@@ -50,9 +50,7 @@ package protocol AdaptyUIBuilderLogic {
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool
 
-    func logShowPaywall(
-        viewConfiguration: AdaptyUIConfiguration
-    ) async throws
+    func logShowFlow() async throws
 
     func getProducts() async throws -> [ProductResolver]
 

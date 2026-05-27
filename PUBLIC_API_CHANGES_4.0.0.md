@@ -176,3 +176,47 @@ public enum AdaptyUIError: Error {
 **Reason:** Consistency with the renamed Swift callback and the broader error semantics (rendering + JS exceptions).
 
 **Migration:** Update Flutter / React Native / Unity plugin consumers to listen for `flow_view_did_receive_error` instead of `flow_view_did_fail_rendering`.
+
+---
+
+## `Adapty.logShowPaywall(_:)` → `Adapty.logShowFlow(_:)`
+
+**Module:** Adapty (core), AdaptyUI, AdaptyUIBuilder, AdaptyPlugin
+
+**Files:**
+- `Sources/Events/Adapty+Events.swift`
+- `Sources/Adapty+Completion.swift`
+- `Sources/Events/Entities/Event.Name.swift`
+- `Sources/Events/Entities/AdaptyFlowShowedParameters.swift` (renamed from `AdaptyPaywallShowedParameters.swift`)
+- `Sources.AdaptyPlugin/Requests/Request.LogShowFlow.swift` (renamed from `Request.LogShowPaywall.swift`)
+- `Sources.AdaptyPlugin/cross_platform.yaml`
+
+**Change:** The public method that reports a paywall view to Adapty has been renamed, its parameter type has changed, the emitted event name has changed, and the `paywall_builder_id` field has been removed from the event payload.
+
+Before:
+```swift
+Adapty.logShowPaywall(_ paywall: AdaptyFlowPaywall) async throws
+Adapty.logShowPaywall(_ paywall: AdaptyFlowPaywall, _ completion: AdaptyErrorCompletion?)
+```
+Event payload (`paywall_showed`):
+```json
+{ "variation_id": "...", "paywall_builder_id": "..." }
+```
+
+After:
+```swift
+Adapty.logShowFlow(_ flow: AdaptyFlow) async throws
+Adapty.logShowFlow(_ flow: AdaptyFlow, _ completion: AdaptyErrorCompletion?)
+```
+Event payload (`flow_showed`):
+```json
+{ "variation_id": "..." }
+```
+
+**Reason:** The unit of analytics is now an `AdaptyFlow`, not a paywall — a flow can contain multiple screens. `paywall_builder_id` is gone because the builder id is no longer part of the flow-view contract.
+
+**Migration:**
+1. Replace every call to `Adapty.logShowPaywall(paywall)` with `Adapty.logShowFlow(flow)`. The `flow` is the `AdaptyFlow` you obtained from `Adapty.getPaywall(...)` (still returns an `AdaptyFlow` in 4.0+).
+2. If you parse `paywall_showed` events on your backend or in analytics, switch to `flow_showed` and drop the `paywall_builder_id` field.
+3. **Only call this method when you present a flow without a visual configuration.** When AdaptyUI renders the flow for you (you used `Adapty.getFlowConfiguration(...)` and one of the `AdaptyUI.FlowConfiguration` presentation APIs), the SDK calls `logShowFlow` for you automatically — exactly as it did for `logShowPaywall` before.
+4. **Do not call this method for new visual flows (format `>= 4.8`).** Those flows emit a `flow_screen_showed` event from their own JS script via `Adapty.sendAnalyticsEvent(...)` on every screen transition; calling `logShowFlow` in addition would double up the analytics. The SDK now branches on `viewConfiguration.formatVersion` internally and skips the automatic call for non-legacy configurations.
