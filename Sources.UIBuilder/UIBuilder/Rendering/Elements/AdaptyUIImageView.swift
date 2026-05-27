@@ -7,6 +7,7 @@
 
 #if canImport(UIKit)
 
+import AdaptyMediaCache
 import SwiftUI
 import UIKit
 
@@ -101,17 +102,9 @@ struct AdaptyUIImageView: View {
                 limitWidth: true
             )
         case .remote(let url, let preview):
-            KFImage
-                .url(url)
-                .targetCache(AdaptyUIBuilder.imageCache)
-                .onSuccess { res in
-                    Log.ui.verbose("IMG load success, cache: \(res.cacheType), url: \(url)")
-                }
-                .onFailure { error in
-                    Log.ui.verbose("IMG load error, \(error), url: \(url)")
-                }
-                .resizable()
-                .placeholder {
+            RemoteImage(
+                url: url,
+                placeholder: {
                     if let preview {
                         rasterImage(
                             preview,
@@ -122,8 +115,16 @@ struct AdaptyUIImageView: View {
                     } else {
                         EmptyView()
                     }
+                },
+                onSuccess: { hit in
+                    Log.ui.verbose("IMG load success, cache: \(hit), url: \(url)")
+                },
+                onFailure: { error in
+                    Log.ui.verbose("IMG load error, \(error), url: \(url)")
                 }
-                .aspectRatio(aspect, limitWidth: true)
+            )
+            .resizable()
+            .aspectRatio(aspect, limitWidth: true)
         }
     }
 

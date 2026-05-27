@@ -37,6 +37,7 @@ Publishes in dependency order: Adapty → AdaptyUI → AdaptyPlugin.
 | ---------------------- | ------------------------- | ------------------------------------------ |
 | `Adapty`               | `Sources/`                | Adapty SDK                                 |
 | `AdaptyLogger`         | `Sources.Logger/`         | Library for Logging                        |
+| `AdaptyMediaCache`     | `Sources.MediaCache/`     | Image cache + downloader + SwiftUI loader  |
 | `AdaptyUIBuilder`      | `Sources.UIBuilder/`      | Library for build UI from JSON config.     |
 | `AdaptyUI`             | `Sources.AdaptyUI/`       | Adapty UI SDK for Onbording and Paywall UI |
 | `AdaptyPlugin`         | `Sources.AdaptyPlugin/`   | Library for cross-platform bridge          |
