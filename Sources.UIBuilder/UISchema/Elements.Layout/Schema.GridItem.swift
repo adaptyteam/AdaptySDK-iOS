@@ -67,7 +67,7 @@ extension Schema.GridItem: DecodableWithConfiguration {
 
         let length: Schema.GridItem.Length
         if let value = try container.decodeIfPresent(Int.self, forKey: .weight) {
-            guard value > 1 else {
+            guard value >= 1 else {
                 throw DecodingError
                     .dataCorruptedError(forKey: .weight, in: container, debugDescription: "value of weight must be greater than 1")
             }

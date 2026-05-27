@@ -657,7 +657,7 @@ UI:
                         - $ref: "#/UI/TextProgress"
                   - properties:
                         decorator: { $ref: "#/UI/Element/Decorator" }
-                        padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
+                        padding: { $ref: "#/Entities/EdgeInsets", default: 0, description: Use values of 0 or greater for padding. }
                         offset: { $ref: "#/Entities/Offset" }
                         rotation: { $ref: "#/Entities/Rotation" }
                         scale: { $ref: "#/Entities/Scale" }
@@ -1139,7 +1139,7 @@ UI:
                         fixed: { $ref: "#/Entities/Unit" }
                   - required: [weight]
                     properties:
-                        weight: { type: integer }
+                        weight: { type: integer , minimum: 1}
             - properties:
                   type: { const: grid_item }
                   h_align:
@@ -1181,7 +1181,7 @@ UI:
             page_height:
                 $ref: "#/UI/Pager/Length"
                 default: { parent: 1 }
-            page_padding: { $ref: "#/Entities/EdgeInsets" }
+            page_padding: { $ref: "#/Entities/EdgeInsets" , description: Use values of 0 or greater for padding.}
             spacing: { type: number, default: 0 }
             content:
                 type: array
@@ -1197,7 +1197,7 @@ UI:
                             $ref: "#/Entities/VerticalAlignment",
                             default: bottom,
                         }
-                    padding: { $ref: "#/Entities/EdgeInsets", default: 6 }
+                    padding: { $ref: "#/Entities/EdgeInsets", default: 6 , description: Use values of 0 or greater for padding.}
                     dot_size: { type: number, default: 6 }
                     spacing: { type: number, default: 6 }
                     color: { $ref: "#/AssetIdOrColor/Binding", default: "#FFFFFFFF" }
@@ -1315,6 +1315,9 @@ UI:
             duration: { type: number , description: "milliseconds to change value"}
             interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
             action: { $ref: "#/Script/ActionOrArray" }
+            min: { type: number, default: 0 }
+            max: { type: number, default: 1 }
+            skip_animation_on_overflow: { type: boolean, default: false }
             
     VerticalProgress:
         type: object
@@ -1330,6 +1333,9 @@ UI:
             duration: { type: number , description: "milliseconds to change value"}
             interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
             action: { $ref: "#/Script/ActionOrArray" }
+            min: { type: number, default: 0 }
+            max: { type: number, default: 1 }
+            skip_animation_on_overflow: { type: boolean, default: false }
 
     RadialProgress:
         type: object
@@ -1347,6 +1353,9 @@ UI:
             duration: { type: number , description: "milliseconds to change value"}
             interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
             action: { $ref: "#/Script/ActionOrArray" }
+            min: { type: number, default: 0 }
+            max: { type: number, default: 1 }
+            skip_animation_on_overflow: { type: boolean, default: false }
 
     TextProgress:
         type: object
@@ -1359,6 +1368,9 @@ UI:
                   duration: { type: number , description: "milliseconds to change value"}
                   interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
                   action: { $ref: "#/Script/ActionOrArray" }
+                  min: { type: number, default: 0 }
+                  max: { type: number, default: 1 }
+                  skip_animation_on_overflow: { type: boolean, default: false }
             - $ref: "#/UI/Text/Attributes"
     
             
