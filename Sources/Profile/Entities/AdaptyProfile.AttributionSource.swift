@@ -13,7 +13,7 @@ extension AdaptyProfile {
             self.rawValue = rawValue
         }
 
-        public static let appleSearchAds = AttributionSource(rawValue: "apple_search_ads")
+        public static let appleAds = AttributionSource(rawValue: "apple_search_ads")
     }
 }
 
