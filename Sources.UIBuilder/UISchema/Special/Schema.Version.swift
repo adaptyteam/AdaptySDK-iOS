@@ -8,37 +8,6 @@
 import Foundation
 
 package extension Schema {
-    typealias Version = String // TODO: optimize - create struct with int array
+    typealias Version = VC.Version // TODO: optimize - create struct with int array
 }
 
-extension Schema.Version {
-    private var asIntArray: [Int] {
-        components(separatedBy: CharacterSet(charactersIn: " -.")).map { Int($0) ?? 0 }
-    }
-
-    func isSameOrNewerVersion(than older: Self) -> Bool {
-        asIntArray.isSameOrNewerVersion(than: older.asIntArray)
-    }
-
-    var isNotLegacyVersion: Bool {
-        asIntArray.isSameOrNewerVersion(than: [4, 8])
-    }
-}
-
-private extension [Int] {
-    func isSameOrNewerVersion(than older: Self) -> Bool {
-        var newer = self
-        let diffCount = older.count - newer.count
-        if diffCount > 0 {
-            newer.append(contentsOf: repeatElement(0, count: diffCount))
-        }
-        for (index, newerElement) in newer.enumerated() {
-            guard older.indices.contains(index) else { return true }
-            let olderElement = older[index]
-            if newerElement > olderElement { return true }
-            if newerElement < olderElement { return false }
-        }
-
-        return true
-    }
-}

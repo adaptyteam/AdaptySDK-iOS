@@ -16,7 +16,7 @@ enum Log {
     static func Category(name: String) -> AdaptyLogger.Category {
         AdaptyLogger.Category(
             subsystem: "io.adapty.ui",
-            version: "UIBuilder:\(AdaptyUISchema.formatVersion)",
+            version: "\(AdaptyUISchema.formatVersion)",
             name: name
         )
     }

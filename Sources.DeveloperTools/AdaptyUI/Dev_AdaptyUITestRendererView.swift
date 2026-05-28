@@ -12,7 +12,7 @@ import SwiftUI
 
 public extension AdaptyUI {
     @MainActor
-    final class Dev_GalleryPreviewConfiguration {
+    final class Dev_GalleryPreviewConfiguration: ObservableObject {
         package let eventsHandler: AdaptyUIEventsHandler
 
         package let presentationViewModel: AdaptyUIPresentationViewModel
@@ -123,7 +123,7 @@ public extension AdaptyUI {
 
 public struct Dev_AdaptyUIRendererView: View {
     let viewConfiguration: AdaptyUIConfiguration
-    let galleryConfiguration: AdaptyUI.Dev_GalleryPreviewConfiguration
+    @StateObject private var galleryConfiguration: AdaptyUI.Dev_GalleryPreviewConfiguration
 
     private let didAppear: () -> Void
     private let didDisappear: () -> Void
@@ -163,16 +163,23 @@ public struct Dev_AdaptyUIRendererView: View {
         self.showDebugOverlay = showDebugOverlay
         self.displayMissingTags = displayMissingTags
         self.viewConfiguration = viewConfiguration.wrapped
-        galleryConfiguration = .init(
-            logId: "test",
-            viewConfiguration: viewConfiguration.wrapped,
-            previewProducts: viewConfiguration.previewProducts,
-            observerModeResolver: nil,
-            tagResolver: ["TEST_TAG": "Adapty"],
-            timerResolver: nil,
-            assetsResolver: assetsResolver,
-            systemRequestsHandler: systemRequestsHandler,
-            rtlOverride: rtlOverride
+        // @StateObject so the configuration (and its JS state) survives
+        // parent body recomputes. Use `.id(...)` at the call site to force a
+        // fresh configuration when the bundle changes.
+        let previewProducts = viewConfiguration.previewProducts
+        let wrapped = viewConfiguration.wrapped
+        _galleryConfiguration = StateObject(
+            wrappedValue: AdaptyUI.Dev_GalleryPreviewConfiguration(
+                logId: "test",
+                viewConfiguration: wrapped,
+                previewProducts: previewProducts,
+                observerModeResolver: nil,
+                tagResolver: ["TEST_TAG": "Adapty"],
+                timerResolver: nil,
+                assetsResolver: assetsResolver,
+                systemRequestsHandler: systemRequestsHandler,
+                rtlOverride: rtlOverride
+            )
         )
 
         self.didAppear = didAppear

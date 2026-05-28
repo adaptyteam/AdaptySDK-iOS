@@ -9,7 +9,7 @@ import Foundation
 
 enum Event: Sendable {
     case appOpened
-    case paywallShowed(AdaptyPaywallShowedParameters)
+    case flowShowed(AdaptyFlowShowedParameters)
     case flowAnalytics(AdaptyFlowAnalyticsParameters)
     case flowVariationAssigned(AdaptyFlowVariationAssignedParameters)
     case onboardingVariationAssigned(AdaptyOnboardingVariationAssignedParameters)
@@ -34,7 +34,7 @@ extension Event: Encodable {
         switch self {
         case .appOpened:
             break
-        case let .paywallShowed(value):
+        case let .flowShowed(value):
             try value.encode(to: encoder)
         case let .flowAnalytics(value):
             try value.encode(to: encoder)

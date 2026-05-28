@@ -36,13 +36,17 @@ extension Schema.Pager.PageControl: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let paddingOrNil = try container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .padding)
+        if let paddingOrNil, let error = paddingOrNil.errorStringIfLessZero {
+            throw DecodingError.dataCorruptedError(forKey: .padding, in: container, debugDescription: error)
+        }
+
         try self.init(
             layout: container.decodeIfPresent(Layout.self, forKey: .layout)
                 ?? Self.default.layout,
             verticalAlignment: container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment)
                 ?? Self.default.verticalAlignment,
-            padding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .padding)
-                ?? Self.default.padding,
+            padding: paddingOrNil ?? Self.default.padding,
             dotSize: container.decodeIfPresent(Double.self, forKey: .dotSize)
                 ?? Self.default.dotSize,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing)

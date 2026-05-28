@@ -19,5 +19,21 @@ extension VC {
         let value: Variable
         let transition: Transition
         let actions: [Action]
+        let maxValue: Double
+        let minValue: Double
+        let skipAnimationOnOverflow: Bool
+    }
+}
+
+extension VC.RadialProgress {
+    func normalize(_ raw: Double) -> Double {
+        let span = maxValue - minValue
+        guard span > 0 else { return 0 }
+        let clamped = min(max(raw, minValue), maxValue)
+        return (clamped - minValue) / span
+    }
+
+    func isOverflow(_ raw: Double) -> Bool {
+        raw < minValue || raw > maxValue
     }
 }

@@ -13,6 +13,21 @@ extension Schema {
 
 extension Schema.EdgeInsets {
     static let zero = Self(same: .zero)
+
+    var errorStringIfLessZero: String? {
+        if let error = leading.errorStringIfLessZero {
+             "Leading " + error
+        }else if let error = trailing.errorStringIfLessZero {
+             "Trailing " + error
+        }else if let error = top.errorStringIfLessZero {
+             "Top " + error
+        }else if let error = bottom.errorStringIfLessZero {
+             "Bottom " + error
+        } else {
+            nil
+        }
+
+    }
 }
 
 extension Schema.EdgeInsets: Decodable {
@@ -22,7 +37,8 @@ extension Schema.EdgeInsets: Decodable {
         case trailing
         case bottom
     }
-
+    
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Schema.Unit.self) {

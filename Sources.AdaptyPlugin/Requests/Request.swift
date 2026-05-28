@@ -24,7 +24,7 @@ enum Request {
             GetProfile.self,
             Identify.self,
             Logout.self,
-            LogShowPaywall.self,
+            LogShowFlow.self,
             MakePurchase.self,
             OpenWebPaywall.self,
             CreateWebPaywallUrl.self,

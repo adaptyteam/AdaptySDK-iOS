@@ -153,14 +153,28 @@ public extension AdaptyUIBuilder {
 
         func reportOnAppear() {
             logic.reportViewDidAppear()
-            flowViewModel.logShowPaywall()
+            flowViewModel.logShowFlow()
             timerViewModel.resumeTimers()
         }
 
         func reportOnDisappear() {
             logic.reportViewDidDisappear()
-            flowViewModel.resetLogShowPaywall()
             timerViewModel.pauseTimers()
+        }
+
+        /// Resets the transient runtime state so this configuration can be
+        /// presented again as a fresh flow. Intended for cross-platform SDKs
+        /// that reuse a cached `FlowConfiguration`; otherwise prefer creating
+        /// a new one.
+        public func prepareForReuse() {
+            Log.ui.verbose("#\(logId)# prepareForReuse")
+            screensViewModel.prepareForReuse()
+            productsViewModel.prepareForReuse()
+            assetsViewModel.prepareForReuse()
+            presentationViewModel.prepareForReuse()
+            timerViewModel.prepareForReuse()
+            stateViewModel.prepareForReuse()
+            flowViewModel.prepareForReuse()
         }
     }
 }

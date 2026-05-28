@@ -67,7 +67,7 @@ struct AdaptyUIFlowRendererView: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            flowViewModel.logShowPaywall()
+            flowViewModel.logShowFlow()
         }
         .alert(
             stateViewModel.alertDialog?.params.title ?? "",

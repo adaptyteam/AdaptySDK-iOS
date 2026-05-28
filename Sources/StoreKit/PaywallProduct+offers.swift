@@ -15,12 +15,14 @@ extension Adapty {
         paywalls: [AdaptyFlowPaywall],
         productsManager: ProductsManager
     ) async throws(AdaptyError) -> [AdaptyPaywallProduct] {
-        let skProducts = try await productsManager.fetchProductsInSameOrder(
-            ids: paywalls.flatMap(\.vendorProductIds),
+        let skProducts = try await productsManager.fetchProducts(
+            ids: Set(paywalls.flatMap(\.vendorProductIds)),
             fetchPolicy: .returnCacheDataElseLoad
         )
 
-        let skProductsById = Dictionary(uniqueKeysWithValues: skProducts.map { ($0.id, $0) })
+        let skProductsById = [String:StoreKit.Product](
+            uniqueKeysWithValues: skProducts.map { ($0.id, $0) }
+        )
 
         var products = [ProductTuple]()
         products.reserveCapacity(paywalls.reduce(into: 0) { $0 += $1.products.count })

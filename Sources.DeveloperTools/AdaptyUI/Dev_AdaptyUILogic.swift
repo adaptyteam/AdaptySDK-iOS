@@ -41,11 +41,11 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didSelectProduct(product, automatic: automatic)
     }
 
-    func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool { false }
+    func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool {
+        false
+    }
 
-    package func logShowPaywall(
-        viewConfiguration: AdaptyUIConfiguration
-    ) async {}
+    package func logShowFlow() async throws {}
 
     package func getProducts() async throws -> [ProductResolver] {
         try await Task.sleep(nanoseconds: 1_500_000_000)

@@ -37,7 +37,8 @@ struct AdaptyUITextProgressView: View {
             defaultValue: 0.0,
             screen: screen
         )
-        let displayValue = animatedValue ?? targetValue
+        let skip = progress.skipAnimationOnOverflow && progress.isOverflow(targetValue)
+        let displayValue = animatedValue ?? progress.normalize(targetValue)
 
         Color.clear
             .modifier(
@@ -52,16 +53,25 @@ struct AdaptyUITextProgressView: View {
                 )
             )
             .onAppear {
-                animatedValue = targetValue
+                animatedValue = progress.normalize(targetValue)
             }
             .onChange(of: targetValue) { newValue in
-                withAnimation(swiftUIAnimation) {
-                    animatedValue = newValue
+                let normalised = progress.normalize(newValue)
+                let skipNow = progress.skipAnimationOnOverflow && progress.isOverflow(newValue)
+                if skipNow {
+                    var txn = Transaction()
+                    txn.disablesAnimations = true
+                    withTransaction(txn) { animatedValue = normalised }
+                } else {
+                    withAnimation(swiftUIAnimation) {
+                        animatedValue = normalised
+                    }
                 }
             }
             .fireProgressActions(
                 actions: progress.actions,
-                transition: progress.transition,
+                effectiveStartDelay: skip ? 0 : progress.transition.startDelay,
+                effectiveDuration: skip ? 0 : progress.transition.duration,
                 value: targetValue
             )
     }

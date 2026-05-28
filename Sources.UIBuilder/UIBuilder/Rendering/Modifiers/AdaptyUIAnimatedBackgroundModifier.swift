@@ -45,14 +45,6 @@ struct AdaptyUIAnimatedBackgroundView: View {
                     startAnimation(anim)
                 }
             }
-            .onAppear {
-                if let currentAnimation = navigatorViewModel.backgroundAnimation {
-                    startAnimation(currentAnimation)
-                }
-                else {
-                    print("")
-                }
-            }
             .onDisappear {
                 animationTokens.forEach { $0.invalidate() }
                 animationTokens.removeAll()
@@ -122,7 +114,6 @@ struct AdaptyUIAnimatedBackgroundView: View {
                 from: animation.range.start,
                 to: animation.range.end,
                 updateBlock: { value in
-                    print("#BG# animation to \(value)")
                     self.animatedBackgroundFilling = value
                 }
                 // TODO: x add finish block and finish value

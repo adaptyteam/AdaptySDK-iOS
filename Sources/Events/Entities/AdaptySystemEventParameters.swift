@@ -156,7 +156,7 @@ enum MethodName: String {
 
     case setFallback = "set_fallback_file"
 
-    case logShowPaywall = "log_show_paywall"
+    case logShowFlow = "log_show_flow"
 
     case presentCodeRedemptionSheet = "present_code_redemption_sheet"
 

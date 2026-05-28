@@ -11,6 +11,17 @@ extension Schema {
 
 extension Schema.Unit {
     static let zero = Self.point(0.0)
+    var errorStringIfLessZero: String? {
+        let test = switch self {
+        case let .point(v):
+            v >= 0
+        case let .screen(v):
+            v >= 0
+        case .safeArea:
+            true
+        }
+        return test ? nil : "Value must be greater than or equal to 0"
+    }
 }
 
 extension Schema.Unit: Decodable {
@@ -48,3 +59,4 @@ extension Schema.Unit: Decodable {
         }
     }
 }
+

@@ -92,23 +92,22 @@ extension Adapty {
 }
 
 public extension Adapty {
-    /// Call this method to notify Adapty SDK, that particular paywall was shown to user.
+    /// Call this method to notify Adapty SDK that a particular flow was shown to the user.
     ///
-    /// Adapty helps you to measure the performance of the paywalls. We automatically collect all the metrics related to purchases except for paywall views. This is because only you know when the paywall was shown to a customer.
-    /// Whenever you show a paywall to your user, call .logShowPaywall(paywall) to log the event, and it will be accumulated in the paywall metrics.
+    /// Adapty helps you measure the performance of your flows. We automatically collect all the metrics related to purchases except for flow views. This is because only you know when the flow was shown to a customer.
+    /// Whenever you show a flow to your user, call `.logShowFlow(flow)` to log the event, and it will be accumulated in the flow metrics.
     ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
+    /// Read more in the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics).
     ///
     /// - Parameters:
-    ///   - paywall: A ``AdaptyFlowPaywall`` object.
-    ///  - Throws: An ``AdaptyError`` object
-    nonisolated static func logShowPaywall(_ paywall: AdaptyFlowPaywall) async throws(AdaptyError) {
+    ///   - paywall: An ``AdaptyFlow`` object.
+    /// - Throws: An ``AdaptyError`` object.
+    nonisolated static func logShowFlow(_ flow: AdaptyFlow) async throws(AdaptyError) {
         let now = Date()
-        try await withActivatedSDK(methodName: .logShowPaywall) { _ throws(AdaptyError) in
+        try await withActivatedSDK(methodName: .logShowFlow) { _ throws(AdaptyError) in
             try await trackEvent(
-                .paywallShowed(.init(
-                    variationId: paywall.variationId,
-                    viewConfigurationId: nil
+                .flowShowed(.init(
+                    variationId: flow.variationId
                 )),
                 date: now
             )

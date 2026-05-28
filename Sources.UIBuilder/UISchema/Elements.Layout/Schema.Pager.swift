@@ -81,13 +81,17 @@ extension Schema.Pager: DecodableWithConfiguration {
 
     init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let pagePaddingOrNil = try container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .pagePadding)
+        if let pagePaddingOrNil, let error = pagePaddingOrNil.errorStringIfLessZero {
+            throw DecodingError.dataCorruptedError(forKey: .pagePadding, in: container, debugDescription: error)
+        }
+
         try self.init(
             pageWidth: container.decodeIfPresent(Length.self, forKey: .pageWidth)
                 ?? Self.default.pageWidth,
             pageHeight: container.decodeIfPresent(Length.self, forKey: .pageHeight)
                 ?? Self.default.pageHeight,
-            pagePadding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .pagePadding)
-                ?? Self.default.pagePadding,
+            pagePadding: pagePaddingOrNil ?? Self.default.pagePadding,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing)
                 ?? Self.default.spacing,
             content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),

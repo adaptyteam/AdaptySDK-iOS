@@ -177,6 +177,11 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         alertDialog = AlertDialogState(params: params)
     }
 
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        stateHolder.prepareForReuse()
+    }
+
     func createBinding<T: JSValueRepresentable & JSValueConvertable>(
         _ variable: VC.Variable,
         defaultValue: T,

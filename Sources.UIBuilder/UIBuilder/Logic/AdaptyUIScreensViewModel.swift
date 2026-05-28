@@ -89,6 +89,12 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         }
     }
 
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        navigatorsViewModels.removeAll()
+        dismissingNavigatorIds.removeAll()
+    }
+
     func dismiss(
         navigatorId: String,
         transitionId: String,

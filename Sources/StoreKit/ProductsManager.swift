@@ -54,14 +54,6 @@ actor ProductsManager {
 }
 
 extension ProductsManager {
-    func fetchProductsInSameOrder(ids productIds: [String], fetchPolicy: ProductsFetchPolicy = .default) async throws(AdaptyError) -> [StoreKit.Product] {
-        let products = try await fetchProducts(ids: Set(productIds), fetchPolicy: fetchPolicy)
-
-        return productIds.compactMap { id in
-            products.first { $0.id == id }
-        }
-    }
-
     func fetchProduct(id productId: String, fetchPolicy: ProductsFetchPolicy = .default, retryCount: Int = 3) async throws(AdaptyError) -> StoreKit.Product {
         do throws(AdaptyError) {
             let products = try await fetchProducts(ids: Set([productId]), fetchPolicy: fetchPolicy, retryCount: retryCount)

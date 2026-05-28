@@ -122,10 +122,10 @@ extension Dev_MockProduct {
         case ("day", .year): return n / 365
         case ("week", .day): return n * 7
         case ("week", .week): return n
-        case ("week", .month): return n / 4.375
+        case ("week", .month): return n / (30.0 / 7.0)
         case ("week", .year): return n / 52
         case ("month", .day): return n * 30
-        case ("month", .week): return n * 4.375
+        case ("month", .week): return n * (30.0 / 7.0)
         case ("month", .month): return n
         case ("month", .year): return n / 12
         case ("year", .day): return n * 365

@@ -92,15 +92,15 @@ struct AdaptyUILinearProgressView: View {
 
     var body: some View {
         let targetValue = stateViewModel.getValue(progress.value, defaultValue: 0.0, screen: screen)
-        let displayValue = animatedValue ?? targetValue
-        let clampedValue = min(max(displayValue, 0), 1)
+        let skip = progress.skipAnimationOnOverflow && progress.isOverflow(targetValue)
+        let displayValue = animatedValue ?? progress.normalize(targetValue)
 
         Group {
             if progress.clip {
                 assetView(aspect: progress.imageAspect)
                     .mask(
                         AdaptyUILinearProgressMaskShape(
-                            progress: clampedValue,
+                            progress: displayValue,
                             cornerRadius: progress.cornerRadius,
                             isHorizontal: isHorizontal,
                             anchor: maskAnchor
@@ -111,8 +111,8 @@ struct AdaptyUILinearProgressView: View {
             } else {
                 GeometryReader { geometry in
                     let size = geometry.size
-                    let w = isHorizontal ? size.width * clampedValue : size.width
-                    let h = isHorizontal ? size.height : size.height * clampedValue
+                    let w = isHorizontal ? size.width * displayValue : size.width
+                    let h = isHorizontal ? size.height : size.height * displayValue
 
                     assetView(aspect: progress.imageAspect)
                         .applyingCornerRadius(progress.cornerRadius)
@@ -125,16 +125,24 @@ struct AdaptyUILinearProgressView: View {
                 }
             }
         }
-        .animation(swiftUIAnimation, value: animatedValue)
         .onAppear {
-            animatedValue = targetValue
+            animatedValue = progress.normalize(targetValue)
         }
         .onChange(of: targetValue) { newValue in
-            animatedValue = newValue
+            let normalised = progress.normalize(newValue)
+            let skipNow = progress.skipAnimationOnOverflow && progress.isOverflow(newValue)
+            if skipNow {
+                var txn = Transaction()
+                txn.disablesAnimations = true
+                withTransaction(txn) { animatedValue = normalised }
+            } else {
+                withAnimation(swiftUIAnimation) { animatedValue = normalised }
+            }
         }
         .fireProgressActions(
             actions: progress.actions,
-            transition: progress.transition,
+            effectiveStartDelay: skip ? 0 : progress.transition.startDelay,
+            effectiveDuration: skip ? 0 : progress.transition.duration,
             value: targetValue
         )
     }
