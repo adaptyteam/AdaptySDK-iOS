@@ -102,6 +102,24 @@ static bool is_array_index(const std::string& s) {
     return true;
 }
 
+/// Returns the length of a raw JSON string starting at `p` (right after the
+/// opening quote) up to — but not including — the closing quote. Handles
+/// backslash escape sequences (\", \\, \uXXXX, …) so a quote inside an
+/// escape is not mistaken for the end. Returns SIZE_MAX if the buffer ends
+/// before a closing quote is found.
+static size_t raw_string_length(const char* start, const char* buf_end) {
+    const char* p = start;
+    while (p < buf_end && *p != '"') {
+        if (*p == '\\') {
+            p++;
+            if (p >= buf_end) return SIZE_MAX;
+        }
+        p++;
+    }
+    if (p >= buf_end) return SIZE_MAX;
+    return static_cast<size_t>(p - start);
+}
+
 // ---- extract ----
 
 static SDJsonResult extract_at_pointer(ondemand::document& doc, const char* pointer) {
@@ -312,15 +330,32 @@ SDJsonInspectResult sdjson_inspect(const char* json_data,
             auto err = val.get_object().get(obj);
             if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
 
+            // Keys are returned in their raw JSON form (byte-for-byte as they
+            // appear between the quotes in the source buffer). This lets the
+            // caller use the same bytes to construct a JSON Pointer and find
+            // the same key again — simdjson at_pointer and our sdjson_range
+            // both compare segments byte-for-byte against the raw key, so the
+            // round-trip is consistent regardless of whether the key uses
+            // \uXXXX escapes or literal UTF-8.
+            const char* buf_start = padded.data();
+            const char* buf_end = buf_start + padded.size();
+
             std::vector<std::string_view> key_views;
             size_t total_len = 0;
 
             for (auto field : obj) {
-                std::string_view key;
-                err = field.unescaped_key().get(key);
+                ondemand::raw_json_string raw_key;
+                err = field.key().get(raw_key);
                 if (err) { result.error = SDJSON_ERR_SERIALIZE; return result; }
-                key_views.push_back(key);
-                total_len += key.size() + 1;
+
+                const char* key_ptr = raw_key.raw();
+                size_t key_len = raw_string_length(key_ptr, buf_end);
+                if (key_len == SIZE_MAX) {
+                    result.error = SDJSON_ERR_PARSE; return result;
+                }
+
+                key_views.emplace_back(key_ptr, key_len);
+                total_len += key_len + 1;
             }
 
             result.count = key_views.size();
