@@ -29,3 +29,4 @@ extension VC.LinearProgress {
         case vertical(VC.VerticalAlignment)
     }
 }
+
