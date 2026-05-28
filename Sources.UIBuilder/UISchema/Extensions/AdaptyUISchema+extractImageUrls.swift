@@ -18,9 +18,9 @@ package extension AdaptyUISchema {
 
         return Set(assets.values.compactMap {
             switch $0 {
-            case let .image(image):
+            case let .asset(.image(image)):
                 image.url
-            case let .video(video):
+            case let .asset(.video(video)):
                 video.image.url
             default:
                 nil

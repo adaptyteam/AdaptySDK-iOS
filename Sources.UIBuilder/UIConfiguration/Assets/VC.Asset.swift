@@ -14,7 +14,7 @@ extension VC {
         case image(ImageData)
         case video(VideoData)
         case font(Font)
-        case unknown(String?)
+        case unknown(String)
     }
 }
 
