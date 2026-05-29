@@ -657,7 +657,7 @@ UI:
                         - $ref: "#/UI/TextProgress"
                   - properties:
                         decorator: { $ref: "#/UI/Element/Decorator" }
-                        padding: { $ref: "#/Entities/EdgeInsets", default: 0, description: Use values of 0 or greater for padding. }
+                        padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
                         offset: { $ref: "#/Entities/Offset" }
                         rotation: { $ref: "#/Entities/Rotation" }
                         scale: { $ref: "#/Entities/Scale" }
@@ -1209,7 +1209,7 @@ UI:
             page_height:
                 $ref: "#/UI/Pager/Length"
                 default: { parent: 1 }
-            page_padding: { $ref: "#/Entities/EdgeInsets" , description: Use values of 0 or greater for padding.}
+            page_padding: { $ref: "#/Entities/EdgeInsets" }
             spacing: { type: number, default: 0 }
             content:
                 type: array
@@ -1225,7 +1225,7 @@ UI:
                             $ref: "#/Entities/VerticalAlignment",
                             default: bottom,
                         }
-                    padding: { $ref: "#/Entities/EdgeInsets", default: 6 , description: Use values of 0 or greater for padding.}
+                    padding: { $ref: "#/Entities/EdgeInsets", default: 6 }
                     dot_size: { type: number, default: 6 }
                     spacing: { type: number, default: 6 }
                     color: { $ref: "#/AssetIdOrColor/Binding", default: "#FFFFFFFF" }
