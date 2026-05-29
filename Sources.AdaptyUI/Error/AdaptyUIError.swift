@@ -16,7 +16,6 @@ public enum AdaptyUIError: Error {
 
     case webKit(Error)
 
-    case unsupportedTemplate(String)
     case wrongComponentType(String)
     case wrongAssetType(String)
 
@@ -35,7 +34,6 @@ public extension AdaptyUIError {
 
         case webKit = 4200
 
-        case unsupportedTemplate = 4100
         case wrongComponentType = 4103
         case wrongAssetType = 4104
         case jsException = 4105
@@ -54,7 +52,6 @@ extension AdaptyUIError: CustomNSError {
         case .adaptyUINotActivated: Code.adaptyUINotActivated.rawValue
         case .activateOnce: Code.activateOnce.rawValue
         case .webKit: Code.webKit.rawValue
-        case .unsupportedTemplate: Code.unsupportedTemplate.rawValue
         case .wrongComponentType: Code.wrongComponentType.rawValue
         case .wrongAssetType: Code.wrongAssetType.rawValue
         case .jsException: Code.jsException.rawValue
@@ -95,8 +92,6 @@ import AdaptyUIBuilder
 extension AdaptyUIBuilderError {
     var toAdaptyUIError: AdaptyUIError {
         switch self {
-        case .unsupportedTemplate(let v):
-            .unsupportedTemplate(v)
         case .wrongComponentType(let v):
             .wrongComponentType(v)
         case .wrongAssetType(let v):

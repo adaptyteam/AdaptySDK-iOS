@@ -192,12 +192,6 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    nonisolated func openWebPaywall(
-        openIn _: VC.Action.WebOpenInParameter
-    ) {
-        // TODO: Deperecated
-    }
-
     nonisolated func restorePurchases(callback: VS.JSAction?) {
         let token = UUID().uuidString
 
