@@ -20,7 +20,6 @@ protocol AdaptyUIActionHandler: AnyObject {
     func openScreen(instance: VS.ScreenInstance, transitionId: String)
     func closeScreen(navigatorId: String, transitionId: String)
 
-    func registerState(_ state: AdaptyUIState) // TODO: remove
     func changeFocus(id: String?)
     func setTimer(id: String, endAt: Date, callback: VS.JSAction?)
     func setTimer(id: String, duration: TimeInterval, behavior: VS.SetTimerBehavior, callback: VS.JSAction?)

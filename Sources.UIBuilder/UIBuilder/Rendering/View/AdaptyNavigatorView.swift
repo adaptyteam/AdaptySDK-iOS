@@ -74,13 +74,13 @@ struct AdaptyScreenView: View {
         default:
             AdaptyUIElementView(
                 screen.content,
-                screenHolderBuilder: { EmptyView() } // TODO: x check
+                screenHolderBuilder: { EmptyView() }
             )
             .background {
                 if let background = screen.background {
                     AdaptyUIBackgroundElementsView(
                         backgrounds: background,
-                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                        screenHolderBuilder: { EmptyView() }
                     )
                 }
             }
@@ -88,7 +88,7 @@ struct AdaptyScreenView: View {
                 if let overlay = screen.overlay {
                     AdaptyUIOverlayElementsView(
                         overlays: overlay,
-                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                        screenHolderBuilder: { EmptyView() }
                     )
                 }
             }

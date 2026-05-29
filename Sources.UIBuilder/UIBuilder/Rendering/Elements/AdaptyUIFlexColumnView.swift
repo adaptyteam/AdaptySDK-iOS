@@ -90,13 +90,7 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
 
                 AdaptyUIElementView(
                     item.content,
-                    screenHolderBuilder: {
-                        if idx == 0 {
-                            screenHolderBuilder()
-                        } else {
-                            EmptyView()
-                        }
-                    }
+                    screenHolderBuilder: screenHolderBuilder
                 )
                 .frame(
                     maxWidth: .infinity,
@@ -131,13 +125,7 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
 
                     AdaptyUIElementView(
                         item.content,
-                        screenHolderBuilder: {
-                            if idx == 0 {
-                                screenHolderBuilder()
-                            } else {
-                                EmptyView()
-                            }
-                        }
+                        screenHolderBuilder: screenHolderBuilder
                     )
                     .frame(
                         maxWidth: .infinity,

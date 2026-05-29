@@ -38,7 +38,7 @@ struct AdaptyUIFlatContainerView: View {
             ScrollView {
                 AdaptyUIElementView(
                     element,
-                    screenHolderBuilder: { EmptyView() }, // TODO: x check
+                    screenHolderBuilder: { EmptyView() },
                     drawDecoratorBackground: drawFooterBackground
                 )
                 .id(ScrollAnchor.footerTop)
@@ -61,7 +61,7 @@ struct AdaptyUIFlatContainerView: View {
         } else {
             AdaptyUIElementView(
                 element,
-                screenHolderBuilder: { EmptyView() }, // TODO: x check
+                screenHolderBuilder: { EmptyView() },
                 drawDecoratorBackground: drawFooterBackground
             )
             .fixedSize(horizontal: false, vertical: true)
@@ -76,7 +76,7 @@ struct AdaptyUIFlatContainerView: View {
                         VStack {
                             AdaptyUIElementView(
                                 screen.content,
-                                screenHolderBuilder: { EmptyView() } // TODO: x check
+                                screenHolderBuilder: { EmptyView() }
                             )
                             .id(ScrollAnchor.contentTop)
                             .frame(maxWidth: .infinity)
@@ -115,7 +115,7 @@ struct AdaptyUIFlatContainerView: View {
                     if let background = screen.background {
                         AdaptyUIBackgroundElementsView(
                             backgrounds: background,
-                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                            screenHolderBuilder: { EmptyView() }
                         )
                     }
                 }
@@ -123,7 +123,7 @@ struct AdaptyUIFlatContainerView: View {
                     if let overlay = screen.overlay {
                         AdaptyUIOverlayElementsView(
                             overlays: overlay,
-                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                            screenHolderBuilder: { EmptyView() }
                         )
                     }
                 }
