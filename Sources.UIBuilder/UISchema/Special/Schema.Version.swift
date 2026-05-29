@@ -8,6 +8,6 @@
 import Foundation
 
 package extension Schema {
-    typealias Version = VC.Version // TODO: optimize - create struct with int array
+    typealias Version = VC.Version
 }
 
