@@ -56,6 +56,7 @@ final class AdaptyUIScreenViewModel: ObservableObject {
 package final class AdaptyUINavigatorViewModel: ObservableObject {
     let navigator: VC.Navigator
     let appearTransitionId: String
+    let isRightToLeft: Bool
     let logId: String
 
     var id: VC.NavigatorIdentifier {
@@ -71,7 +72,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     }
 
     var appearTransition: VC.Navigator.AppearanceTransition? {
-        navigator.appearances?[appearTransitionId]
+        navigator.appearanceTransition(id: appearTransitionId, isRightToLeft: isRightToLeft)
     }
 
     let eventBus = AdaptyUIEventBus()
@@ -90,11 +91,13 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         logId: String,
         navigator: VC.Navigator,
         screen: AdaptyUIScreenViewModel,
-        appearTransitionId: String
+        appearTransitionId: String,
+        isRightToLeft: Bool
     ) {
         self.logId = logId
         self.navigator = navigator
         self.appearTransitionId = appearTransitionId
+        self.isRightToLeft = isRightToLeft
 
         screens = [screen]
     }
@@ -134,7 +137,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             screenInstanceId: currentScreen.instance.id
         )
 
-        guard let transition = navigator.transitions?[transitionId] else {
+        guard let transition = navigator.screenTransition(id: transitionId, isRightToLeft: isRightToLeft) else {
             Log.ui.verbose("#\(logId)# screen:\(screen.id) in navigator:\(navigator.id) - no transition found")
 
             executeScreenActions(.onDidDisappear, screen: currentScreen.instance)
@@ -260,7 +263,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             )
         }
 
-        guard let transition = navigator.appearances?[transitionId] else {
+        guard let transition = navigator.appearanceTransition(id: transitionId, isRightToLeft: isRightToLeft) else {
             Log.ui.verbose("#\(logId)# navigator:\(navigator.id) - no transition found")
             completion?()
 

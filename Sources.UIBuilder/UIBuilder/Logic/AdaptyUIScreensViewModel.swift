@@ -80,7 +80,8 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
                 logId: logId,
                 navigator: navigatorConfig,
                 screen: screen,
-                appearTransitionId: transitionId
+                appearTransitionId: transitionId,
+                isRightToLeft: isRightToLeft
             )
 
             navigatorVM.executeActions = executeActions

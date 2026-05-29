@@ -9,6 +9,29 @@
 
 import Foundation
 
+extension VC.Navigator {
+    static let rtlSuffix = "@rtl"
+
+    /// Resolves a screen transition by id, preferring the `@rtl` variant in
+    /// right-to-left layouts and falling back to the base id. Mirrors the
+    /// dark-mode asset resolution in `VS+Assets` (`[id + suffix]` → `[id]`).
+    func screenTransition(id: String, isRightToLeft: Bool) -> ScreenTransition? {
+        if isRightToLeft, let value = transitions?[id + Self.rtlSuffix] {
+            return value
+        }
+        return transitions?[id]
+    }
+
+    /// Resolves an appearance transition by id, preferring the `@rtl` variant
+    /// in right-to-left layouts and falling back to the base id.
+    func appearanceTransition(id: String, isRightToLeft: Bool) -> AppearanceTransition? {
+        if isRightToLeft, let value = appearances?[id + Self.rtlSuffix] {
+            return value
+        }
+        return appearances?[id]
+    }
+}
+
 extension VC.Navigator.AppearanceTransition {
     var totalDuration: TimeInterval {
         let backgroundTimeline: [VC.Animation.Timeline] = if let background { [background.timeline] } else { [] }
