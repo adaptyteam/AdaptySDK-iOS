@@ -27,6 +27,10 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "Invalid asset type '\(assetType)'. Please contact support."
         case let .jsException(message):
             "JavaScript runtime exception: \(message). Please contact support."
+        case let .navigatorNotFound(navigatorId):
+            "Navigator with ID '\(navigatorId)' was not found in the view configuration. Please contact support."
+        case let .invalidActionURL(stringId):
+            "Could not resolve a valid URL for the open-url action's string ID '\(stringId)'. Please contact support."
         }
     }
 
@@ -48,6 +52,10 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "AdaptyUIError.wrongAssetType (Code: 4104): Asset with type '\(assetType)' is incompatible with element. This typically indicates a template structure issue or version incompatibility. Please contact support."
         case let .jsException(message):
             "AdaptyUIError.jsException (Code: 4105): JavaScript runtime exception thrown from the paywall script: \(message). This typically indicates a bug in the paywall script or a script/runtime mismatch. Please contact support."
+        case let .navigatorNotFound(navigatorId):
+            "AdaptyUIError.navigatorNotFound (Code: 4106): Navigator with ID '\(navigatorId)' was not found in the view configuration, and no 'default' navigator is available as a fallback. This typically indicates a template structure issue or a script referencing a navigator that does not exist. Please contact support."
+        case let .invalidActionURL(stringId):
+            "AdaptyUIError.invalidActionURL (Code: 4107): An open-url action referenced string ID '\(stringId)', which did not resolve to a parseable URL (the string is missing, empty, or not a valid URL). This typically indicates a template content issue or a script/runtime mismatch. Please contact support."
         }
     }
 }

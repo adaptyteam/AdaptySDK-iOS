@@ -11,4 +11,6 @@ public enum AdaptyUIBuilderError: Error {
     case wrongComponentType(String)
     case wrongAssetType(String)
     case jsException(String)
+    case navigatorNotFound(String)
+    case invalidActionURL(String)
 }

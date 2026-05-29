@@ -20,6 +20,9 @@ public enum AdaptyUIError: Error {
     case wrongAssetType(String)
 
     case jsException(String)
+
+    case navigatorNotFound(String)
+    case invalidActionURL(String)
 }
 
 public extension AdaptyUIError {
@@ -37,6 +40,8 @@ public extension AdaptyUIError {
         case wrongComponentType = 4103
         case wrongAssetType = 4104
         case jsException = 4105
+        case navigatorNotFound = 4106
+        case invalidActionURL = 4107
 
         case platformView = 4300
     }
@@ -55,6 +60,8 @@ extension AdaptyUIError: CustomNSError {
         case .wrongComponentType: Code.wrongComponentType.rawValue
         case .wrongAssetType: Code.wrongAssetType.rawValue
         case .jsException: Code.jsException.rawValue
+        case .navigatorNotFound: Code.navigatorNotFound.rawValue
+        case .invalidActionURL: Code.invalidActionURL.rawValue
         }
     }
 }
@@ -98,6 +105,10 @@ extension AdaptyUIBuilderError {
             .wrongAssetType(v)
         case .jsException(let v):
             .jsException(v)
+        case .navigatorNotFound(let v):
+            .navigatorNotFound(v)
+        case .invalidActionURL(let v):
+            .invalidActionURL(v)
         }
     }
 }

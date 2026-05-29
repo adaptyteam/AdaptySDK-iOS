@@ -107,6 +107,9 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         screensViewModel.executeActions = { [weak state] actions, screen in
             try? state?.execute(actions: actions, screenInstance: screen)
         }
+        screensViewModel.reportError = { [weak self] error in
+            self?.logic.reportDidReceiveError(error)
+        }
     }
 
     nonisolated func jsException(_ message: String) {
@@ -138,7 +141,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 let str = text.asString,
                 let url = URL(string: str)
             else {
-                // TODO: x warn
+                self?.logic.reportDidReceiveError(.invalidActionURL(stringId))
                 return
             }
 

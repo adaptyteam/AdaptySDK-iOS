@@ -110,14 +110,20 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         Log.ui.verbose("#\(logId)# startScreenTransition screen:\(screen.id) in navigator:\(navigator.id)")
 
         guard let currentScreen = screens.firstIfSingle else {
-            // TODO: x throw error?
+            // A transition is mid-flight (more than one screen in the stack).
+            // The incoming request is intentionally dropped rather than queued
+            // or force-applied: replacing a screen mid-animation would leave the
+            // transition's deferred cleanup (see asyncAfter below) acting on a
+            // stale screen. Dropping is the safe behavior for release.
             Log.ui.error("#\(logId)# navigator:\(navigator.id) has animations in progress")
-            return // in the process of animation, TODO: x think about force replacement?
+            return
         }
 
         guard currentScreen.id != screen.id else {
-            Log.ui.error("#\(logId)# screen:\(screen.id) is already presented in navigator:\(navigator.id)")
-            return // TODO: x throw error?
+            // Idempotent re-request: the screen is already the single presented
+            // screen. Nothing to transition to, so this is a no-op, not an error.
+            Log.ui.warn("#\(logId)# screen:\(screen.id) is already presented in navigator:\(navigator.id)")
+            return
         }
 
         // Fire onWillDisappear for outgoing screen
