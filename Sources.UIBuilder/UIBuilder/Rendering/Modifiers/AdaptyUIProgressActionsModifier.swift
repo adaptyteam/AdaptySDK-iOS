@@ -11,7 +11,8 @@ import SwiftUI
 
 struct AdaptyUIProgressActionsModifier: ViewModifier {
     private let actions: [VC.Action]
-    private let transition: VC.Transition
+    private let effectiveStartDelay: Double
+    private let effectiveDuration: Double
     private let value: Double
 
     @Environment(\.adaptyScreenInstance)
@@ -22,9 +23,15 @@ struct AdaptyUIProgressActionsModifier: ViewModifier {
 
     @State private var pendingAction: DispatchWorkItem?
 
-    init(actions: [VC.Action], transition: VC.Transition, value: Double) {
+    init(
+        actions: [VC.Action],
+        effectiveStartDelay: Double,
+        effectiveDuration: Double,
+        value: Double
+    ) {
         self.actions = actions
-        self.transition = transition
+        self.effectiveStartDelay = effectiveStartDelay
+        self.effectiveDuration = effectiveDuration
         self.value = value
     }
 
@@ -43,7 +50,7 @@ struct AdaptyUIProgressActionsModifier: ViewModifier {
         pendingAction?.cancel()
         pendingAction = nil
         guard !actions.isEmpty else { return }
-        let totalDelay = transition.startDelay + transition.duration
+        let totalDelay = effectiveStartDelay + effectiveDuration
         let actions = self.actions
         let screen = self.screen
         if totalDelay > 0 {
@@ -61,13 +68,15 @@ struct AdaptyUIProgressActionsModifier: ViewModifier {
 extension View {
     func fireProgressActions(
         actions: [VC.Action],
-        transition: VC.Transition,
+        effectiveStartDelay: Double,
+        effectiveDuration: Double,
         value: Double
     ) -> some View {
         modifier(
             AdaptyUIProgressActionsModifier(
                 actions: actions,
-                transition: transition,
+                effectiveStartDelay: effectiveStartDelay,
+                effectiveDuration: effectiveDuration,
                 value: value
             )
         )

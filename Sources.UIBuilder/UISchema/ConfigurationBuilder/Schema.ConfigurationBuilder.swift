@@ -14,7 +14,7 @@ extension Schema {
         let localizationId: LocaleId
         let locale: Locale
         let isRightToLeft: Bool
-        let assets: [String: Asset]
+        let assets: [String: VC.Asset]
         let strings: [String: VC.RichText]
 
         let source: AdaptyUISchema
@@ -23,15 +23,12 @@ extension Schema {
         init(id: String, source: AdaptyUISchema, withLocaleId localizationId: LocaleId) {
             let localization = source.localization(by: localizationId)
 
-            var assets = source.assets
-            if let other = localization?.assets {
-                assets = assets.merging(other, uniquingKeysWith: { _, other in other })
-            }
-
             configuarationId = id
             self.source = source
             isRightToLeft = localization?.isRightToLeft ?? false
-            self.assets = assets
+
+            assets = Self.convertAssets(source.assets, localization?.assets)
+
             strings = localization?.strings?.mapValues {
                 VC.RichText(
                     items: $0.value.items,
@@ -50,6 +47,45 @@ extension Schema {
 }
 
 extension Schema.ConfigurationBuilder {
+    fileprivate static func convertAssets(
+        _ assets: [Schema.AssetIdentifier: Schema.Asset],
+        _ locolizedAssets: [Schema.AssetIdentifier: Schema.Asset]?
+    ) -> [VC.AssetIdentifier: VC.Asset] {
+        var assets = assets
+        if let other = locolizedAssets {
+            assets = assets.merging(other, uniquingKeysWith: { _, other in other })
+        }
+
+        return assets.reduce(into: [VC.AssetIdentifier: VC.Asset]()) { result, item in
+            let (startAssetId, startAsset) = item
+            var currentAsset = startAsset
+            var visited = Set<Schema.AssetIdentifier>()
+
+            while true {
+                switch currentAsset {
+                case let .asset(asset):
+                    result[startAssetId] = asset
+                    return
+                case let .unknown(type, fallbackAssetId):
+                    guard let fallbackAssetId else {
+                        result[startAssetId] = .unknown(type)
+                        return
+                    }
+                    // cycle detection
+                    if !visited.insert(fallbackAssetId).inserted {
+                        result[startAssetId] = .unknown(type)
+                        return
+                    }
+                    guard let next = assets[fallbackAssetId] else {
+                        result[startAssetId] = .unknown(type)
+                        return
+                    }
+                    currentAsset = next
+                }
+            }
+        }
+    }
+
     func localize(envoriment: VC.EnvironmentConstants) throws -> AdaptyUIConfiguration {
         templateIds.removeAll()
         return try .init(
@@ -69,3 +105,4 @@ extension Schema.ConfigurationBuilder {
         )
     }
 }
+
