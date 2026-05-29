@@ -44,6 +44,38 @@ case player(item: AVPlayerItem, player: AVPlayer, preview: AdaptyUICustomImageAs
 
 **Migration:** Replace `AVQueuePlayer` with `AVPlayer` when constructing `.player(...)` cases.
 
+---
+
+**Change:** The `.font` case now carries an `AdaptyUICustomFontAsset` value instead of a bare `UIFont`, so the host can supply a default text color, letter spacing, and line height alongside the custom font.
+
+Before:
+```swift
+case font(UIFont)
+```
+
+After:
+```swift
+case font(AdaptyUICustomFontAsset)
+
+public struct AdaptyUICustomFontAsset: Sendable {
+    public let font: UIFont
+    public let defaultColor: AdaptyUICustomColorAsset?
+    public let defaultLetterSpacing: Double?
+    public let defaultLineHeight: Double?
+
+    public init(
+        font: UIFont,
+        defaultColor: AdaptyUICustomColorAsset? = nil,
+        defaultLetterSpacing: Double? = nil,
+        defaultLineHeight: Double? = nil
+    )
+}
+```
+
+**Reason:** Previously a custom font override resolved to a hardcoded `defaultColor` (`.darkText`) and `nil` spacing/line height, silently discarding the schema-defined styling for that font (the resolved value falls back to the custom asset as a whole, not field-by-field). The new struct lets the host carry those defaults explicitly. Note: this custom-asset type is not yet wired up on the cross-platform side.
+
+**Migration:** Wrap the `UIFont` in `AdaptyUICustomFontAsset`: `.font(myFont)` → `.font(.init(font: myFont))`. The extra fields default to `nil`, which reproduces the previous behavior (`.darkText` color, no spacing/line-height overrides).
+
 ## AdaptyUIResolvedFontAsset
 
 **Module:** AdaptyUIBuilder
