@@ -9,38 +9,34 @@ import Foundation
 
 extension Adapty {
     public nonisolated static func setIntegrationIdentifier(
-        key: String,
-        value: String
+        _ identifiers: AdaptyIntegrationIdentifier...
     ) async throws(AdaptyError) {
-        let key = key.trimmed
-        let value = value.trimmed
-        // TODO: throw error if key isEmpty
-
-        try await setIntegrationIdentifiers([key: value])
+        try await setIntegrationIdentifiers(identifiers)
     }
 
     package nonisolated static func setIntegrationIdentifiers(
-        _ keyValues: [String: String]
+        _ identifiers: [AdaptyIntegrationIdentifier]
     ) async throws(AdaptyError) {
-        try await withActivatedSDK(methodName: .setIntegrationIdentifiers, logParams: keyValues) { sdk throws(AdaptyError) in
+        try await withActivatedSDK(methodName: .setIntegrationIdentifiers, logParams: identifiers.asDictionary) { sdk throws(AdaptyError) in
             try await sdk.setIntegrationIdentifier(
-                keyValues: keyValues
+                identifiers: identifiers
             )
         }
     }
 
     func setIntegrationIdentifier(
-        keyValues: [String: String]
+        identifiers: [AdaptyIntegrationIdentifier]
     ) async throws(AdaptyError) {
         let userId = try await createdProfileManager.userId
 
         do {
             try await httpSession.setIntegrationIdentifier(
                 userId: userId,
-                keyValues: keyValues
+                identifiers: identifiers
             )
         } catch {
             throw error.asAdaptyError
         }
     }
 }
+
