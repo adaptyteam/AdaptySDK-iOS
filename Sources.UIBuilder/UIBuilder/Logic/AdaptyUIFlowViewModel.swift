@@ -16,6 +16,8 @@ package final class AdaptyUIFlowViewModel: ObservableObject {
 
     @Published package var viewConfiguration: AdaptyUIConfiguration
 
+    @Published package private(set) var flowStartedAt: Date?
+
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,
@@ -33,6 +35,8 @@ package final class AdaptyUIFlowViewModel: ObservableObject {
     }
 
     package func logShowFlow() {
+        if flowStartedAt == nil { flowStartedAt = Date() }
+
         guard viewConfiguration.formatVersion.isLegacyVersion else {
             Log.ui.verbose("#\(logId)# logShowFlow skipped (non-legacy view configuration)")
             return
@@ -58,6 +62,7 @@ package final class AdaptyUIFlowViewModel: ObservableObject {
     package func prepareForReuse() {
         Log.ui.verbose("#\(logId)# prepareForReuse")
         logShowFlowCalled = false
+        flowStartedAt = nil
     }
 }
 

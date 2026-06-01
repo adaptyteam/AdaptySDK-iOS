@@ -37,7 +37,7 @@ struct AdaptyUITransparentContainerView: View {
         ScrollView {
             AdaptyUIElementView(
                 element,
-                screenHolderBuilder: { EmptyView() } // TODO: x check
+                screenHolderBuilder: { EmptyView() }
             )
             .fixedSize(horizontal: false, vertical: true)
             .id(ScrollAnchor.footerTop)
@@ -72,7 +72,7 @@ struct AdaptyUITransparentContainerView: View {
                 ZStack(alignment: .bottom) {
                     AdaptyUIElementView(
                         screen.content,
-                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                        screenHolderBuilder: { EmptyView() }
                     )
 
                     if let footer = screen.footer {
@@ -89,7 +89,7 @@ struct AdaptyUITransparentContainerView: View {
                     if let background = screen.background {
                         AdaptyUIBackgroundElementsView(
                             backgrounds: background,
-                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                            screenHolderBuilder: { EmptyView() }
                         )
                     }
                 }
@@ -97,7 +97,7 @@ struct AdaptyUITransparentContainerView: View {
                     if let overlay = screen.overlay {
                         AdaptyUIOverlayElementsView(
                             overlays: overlay,
-                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                            screenHolderBuilder: { EmptyView() }
                         )
                     }
                 }

@@ -23,7 +23,7 @@ extension Environment {
 
         static let model: String = {
             #if os(macOS) || targetEnvironment(macCatalyst)
-            let service = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+            let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
 
             var modelIdentifier: String?
             if let modelData = IORegistryEntryCreateCFProperty(service, "model" as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? Data {

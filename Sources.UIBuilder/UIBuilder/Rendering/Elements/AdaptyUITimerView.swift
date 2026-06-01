@@ -43,7 +43,7 @@ struct AdaptyUITimerView: View {
                     defaultAttributes: timer.format.textAttributes,
                     assetsCache: assetsViewModel.cache,
                     stateViewModel: stateViewModel,
-                    tagValues: nil, // TODO: x check
+                    tagValues: nil,
                     internalTagResolver: { [timeLeft] tag in
                         tag == "TIMER" ? timeLeft : nil
                     },

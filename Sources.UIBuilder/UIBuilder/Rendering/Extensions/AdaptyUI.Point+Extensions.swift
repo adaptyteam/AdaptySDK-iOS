@@ -1,5 +1,5 @@
 //
-//  AdaptyUI+ElementProperties.swift
+//  AdaptyUI.Point+Extensions.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksey Goncharov on 3.4.24..
@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-// TODO: move out
 extension VC.Point {
     var unitPoint: UnitPoint { UnitPoint(x: x, y: y) }
 }

@@ -286,21 +286,3 @@ package extension AdaptyUI.Plugin {
 #endif
     }
 }
-
-// TODO: Remove
-@MainActor
-@available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
-package extension AdaptyUI.Plugin {
-    static func createOnboardingViewForTest(
-        placementId: String,
-        externalUrlsPresentation: AdaptyWebPresentation
-    ) async throws -> AdaptyUI.OnboardingView {
-        let onboarding = try await Adapty.getOnboarding(
-            placementId: placementId
-        )
-        return try await AdaptyUI.Plugin.createOnboardingView(
-            onboarding: onboarding,
-            externalUrlsPresentation: externalUrlsPresentation
-        )
-    }
-}

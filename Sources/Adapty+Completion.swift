@@ -125,7 +125,7 @@ public extension Adapty {
     /// - Parameter completion: A result containing an optional error.
     nonisolated static func updateAttribution(
         _ attribution: [AnyHashable: Any],
-        source: String,
+        source: AdaptyAttributionSource,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         let attributionJson: String
@@ -143,12 +143,11 @@ public extension Adapty {
     }
 
     nonisolated static func setIntegrationIdentifier(
-        key: String,
-        value: String,
-        _ completion: AdaptyErrorCompletion? = nil
+        _ identifiers: AdaptyIntegrationIdentifier...,
+        completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await setIntegrationIdentifier(key: key, value: value)
+            try await setIntegrationIdentifiers(identifiers)
         }
     }
 

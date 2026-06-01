@@ -56,6 +56,7 @@ final class AdaptyUIScreenViewModel: ObservableObject {
 package final class AdaptyUINavigatorViewModel: ObservableObject {
     let navigator: VC.Navigator
     let appearTransitionId: String
+    let isRightToLeft: Bool
     let logId: String
 
     var id: VC.NavigatorIdentifier {
@@ -71,7 +72,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     }
 
     var appearTransition: VC.Navigator.AppearanceTransition? {
-        navigator.appearances?[appearTransitionId]
+        navigator.appearanceTransition(id: appearTransitionId, isRightToLeft: isRightToLeft)
     }
 
     let eventBus = AdaptyUIEventBus()
@@ -90,11 +91,13 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         logId: String,
         navigator: VC.Navigator,
         screen: AdaptyUIScreenViewModel,
-        appearTransitionId: String
+        appearTransitionId: String,
+        isRightToLeft: Bool
     ) {
         self.logId = logId
         self.navigator = navigator
         self.appearTransitionId = appearTransitionId
+        self.isRightToLeft = isRightToLeft
 
         screens = [screen]
     }
@@ -110,14 +113,20 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         Log.ui.verbose("#\(logId)# startScreenTransition screen:\(screen.id) in navigator:\(navigator.id)")
 
         guard let currentScreen = screens.firstIfSingle else {
-            // TODO: x throw error?
+            // A transition is mid-flight (more than one screen in the stack).
+            // The incoming request is intentionally dropped rather than queued
+            // or force-applied: replacing a screen mid-animation would leave the
+            // transition's deferred cleanup (see asyncAfter below) acting on a
+            // stale screen. Dropping is the safe behavior for release.
             Log.ui.error("#\(logId)# navigator:\(navigator.id) has animations in progress")
-            return // in the process of animation, TODO: x think about force replacement?
+            return
         }
 
         guard currentScreen.id != screen.id else {
-            Log.ui.error("#\(logId)# screen:\(screen.id) is already presented in navigator:\(navigator.id)")
-            return // TODO: x throw error?
+            // Idempotent re-request: the screen is already the single presented
+            // screen. Nothing to transition to, so this is a no-op, not an error.
+            Log.ui.warn("#\(logId)# screen:\(screen.id) is already presented in navigator:\(navigator.id)")
+            return
         }
 
         // Fire onWillDisappear for outgoing screen
@@ -128,7 +137,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             screenInstanceId: currentScreen.instance.id
         )
 
-        guard let transition = navigator.transitions?[transitionId] else {
+        guard let transition = navigator.screenTransition(id: transitionId, isRightToLeft: isRightToLeft) else {
             Log.ui.verbose("#\(logId)# screen:\(screen.id) in navigator:\(navigator.id) - no transition found")
 
             executeScreenActions(.onDidDisappear, screen: currentScreen.instance)
@@ -254,7 +263,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             )
         }
 
-        guard let transition = navigator.appearances?[transitionId] else {
+        guard let transition = navigator.appearanceTransition(id: transitionId, isRightToLeft: isRightToLeft) else {
             Log.ui.verbose("#\(logId)# navigator:\(navigator.id) - no transition found")
             completion?()
 
@@ -345,64 +354,6 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         if let actions, !actions.isEmpty {
             executeActions?(actions, screen)
         }
-    }
-}
-
-// TODO: x move out
-extension VC.Animation.Background {
-    var initialBackground: VC.AssetReference {
-        range.start
-    }
-}
-
-extension VC.Navigator.AppearanceTransition {
-    var totalDuration: TimeInterval {
-        let backgroundTimeline: [VC.Animation.Timeline] = if let background { [background.timeline] } else { [] }
-
-        return
-            (backgroundTimeline + (content?.map(\.timeline) ?? []))
-                .map { $0.duration + $0.startDelay }
-                .max() ?? 0.0
-    }
-
-    var initialContentOpacity: Double {
-        content?
-            .compactMap {
-                if case let .opacity(range) = $0.kind {
-                    return (timeline: $0.timeline, range: range)
-                } else {
-                    return nil
-                }
-            }
-            .min(by: { lhs, rhs in lhs.timeline.startDelay < rhs.timeline.startDelay })
-            .map { $0.range.start } ?? 1.0
-    }
-
-    var initialContentOffset: VC.Offset {
-        content?
-            .compactMap {
-                if case let .offset(range) = $0.kind {
-                    return (timeline: $0.timeline, range: range)
-                } else {
-                    return nil
-                }
-            }
-            .min(by: { lhs, rhs in lhs.timeline.startDelay < rhs.timeline.startDelay })
-            .map { $0.range.start } ?? .zero
-    }
-}
-
-extension VC.Navigator.ScreenTransition {
-    var totalDuration: TimeInterval {
-        ((incoming ?? []) + (outgoing ?? [])).totalDuration
-    }
-}
-
-extension [VC.Animation] {
-    var totalDuration: TimeInterval {
-        map(\.timeline)
-            .map { $0.duration + $0.startDelay }
-            .max() ?? 0.0
     }
 }
 

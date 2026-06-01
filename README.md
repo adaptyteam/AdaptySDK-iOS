@@ -10,9 +10,6 @@
 
 <p align="center">
 <a href="https://go.adapty.io/subhub-community-ios-rep"><img src="https://img.shields.io/badge/Adapty-discord-purple"></a>
-<a href="http://bit.ly/3qXy7cf"><img src="https://img.shields.io/cocoapods/v/Adapty.svg?style=flat"></a>
-<a href="https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE"><img src="https://img.shields.io/cocoapods/l/Adapty.svg?style=flat"></a>
-<a href="http://bit.ly/3qXy7cf2"><img src="https://img.shields.io/cocoapods/p/Adapty.svg?style=flat"></a>
 <a href="https://adapty.io/docs/sdk-installation-ios#install-adapty-sdk?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS"><img src="https://img.shields.io/badge/SwiftPM-compatible-orange.svg"></a>
 </p>
 

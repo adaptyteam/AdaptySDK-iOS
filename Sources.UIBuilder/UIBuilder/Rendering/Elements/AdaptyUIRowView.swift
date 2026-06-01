@@ -89,13 +89,7 @@ struct AdaptyUIRowView<ScreenHolderContent: View>: View {
                     ForEach(0 ..< row.items.count, id: \.self) { idx in
                         AdaptyUIElementView(
                             row.items[idx].content,
-                            screenHolderBuilder: {
-                                if idx == 0 {
-                                    screenHolderBuilder() // TODO: x check
-                                } else {
-                                    EmptyView()
-                                }
-                            }
+                            screenHolderBuilder: screenHolderBuilder
                         )
                     }
                 }
