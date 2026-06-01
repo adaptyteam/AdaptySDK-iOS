@@ -1,5 +1,5 @@
 //
-//  Request.AdaptyUIDismissView.swift
+//  Request.AdaptyUIDismissFlowView.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 13.11.2024.
@@ -9,8 +9,8 @@ import AdaptyUI
 import Foundation
 
 extension Request {
-    struct AdaptyUIDismissPaywallView: AdaptyPluginRequest {
-        static let method = "adapty_ui_dismiss_paywall_view" // TODO: x
+    struct AdaptyUIDismissFlowView: AdaptyPluginRequest {
+        static let method = "adapty_ui_dismiss_flow_view"
 
         let viewId: String
         let destroy: Bool
