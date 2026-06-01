@@ -20,7 +20,7 @@ public extension AdaptyPlugin {
         withJson jsonString: AdaptyJsonString
     ) async throws -> AdaptyUI.FlowConfiguration {
         let request = try AdaptyPlugin.decoder.decode(
-            Request.AdaptyUICreatePaywallView.self,
+            Request.AdaptyUICreateFlowView.self,
             from: jsonString.asAdaptyJsonData
         )
 

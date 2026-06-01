@@ -1,5 +1,5 @@
 //
-//  Request.GetPaywall.swift
+//  Request.GetFlow.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 08.11.2024.
@@ -9,17 +9,15 @@ import Adapty
 import Foundation
 
 extension Request {
-    struct GetPaywall: AdaptyPluginRequest {
-        static let method = "get_paywall" // TODO: x
+    struct GetFlow: AdaptyPluginRequest {
+        static let method = "get_flow"
 
         let placementId: String
-        let locale: String?
         let fetchPolicy: AdaptyPlacementFetchPolicy?
         let loadTimeout: TimeInterval?
 
         enum CodingKeys: String, CodingKey {
             case placementId = "placement_id"
-            case locale
             case fetchPolicy = "fetch_policy"
             case loadTimeout = "load_timeout"
         }

@@ -11,57 +11,35 @@ import Foundation
 extension Request {
     struct OpenWebPaywall: AdaptyPluginRequest {
         static let method = "open_web_paywall"
-        let operation: Operation
+        let product: AdaptyPluginPaywallProduct
         let presentation: AdaptyWebPresentation
-        
+
         enum CodingKeys: String, CodingKey {
+            case product
             case presentation = "open_in"
         }
-        
+
         init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            product = try container.decode(AdaptyPluginPaywallProduct.self, forKey: .product)
             presentation = try container.decodeIfPresent(AdaptyWebPresentation.self, forKey: .presentation) ?? .externalBrowser
-            operation = try Operation(from: decoder)
         }
-        
+
         func execute() async throws -> AdaptyJsonData {
-            switch operation {
-            case .openProduct(let product):
-                let product = try await Adapty.getPaywallProduct(
-                    flowProductId: product.flowProductId,
-                    adaptyProductId: product.adaptyProductId,
-                    productInfo: product.productInfo,
-                    paywallProductIndex: product.paywallProductIndex,
-                    subscriptionOfferIdentifier: product.subscriptionOfferIdentifier,
-                    variationId: product.variationId,
-                    paywallABTestName: product.paywallABTestName,
-                    paywallName: product.paywallName,
-                    webPaywallBaseUrl: product.webPaywallBaseUrl
-                )
-                try await Adapty.openWebPaywall(for: product, in: presentation)
-//            case .openPaywall(let paywall): // TODO: x
-//                try await Adapty.openWebPaywall(for: paywall, in: presentation)
-            }
+            let product = try await Adapty.getPaywallProduct(
+                flowProductId: product.flowProductId,
+                adaptyProductId: product.adaptyProductId,
+                productInfo: product.productInfo,
+                paywallProductIndex: product.paywallProductIndex,
+                subscriptionOfferIdentifier: product.subscriptionOfferIdentifier,
+                variationId: product.variationId,
+                paywallABTestName: product.paywallABTestName,
+                paywallName: product.paywallName,
+                webPaywallBaseUrl: product.webPaywallBaseUrl
+            )
+            try await Adapty.openWebPaywall(for: product, in: presentation)
             return .success()
-        }
-        
-        enum Operation {
-            case openProduct(AdaptyPluginPaywallProduct)
-//            case openPaywall(AdaptyPaywall) // TODO: x
-            
-            enum CodingKeys: CodingKey {
-                case product
-                case paywall
-            }
-            
-            init(from decoder: any Decoder) throws {
-                let container = try decoder.container(keyedBy: CodingKeys.self)
-//                if container.contains(.product) {
-                    self = try .openProduct(container.decode(AdaptyPluginPaywallProduct.self, forKey: .product))
-//                } else {
-//                    self = try .openPaywall(container.decode(AdaptyPaywall.self, forKey: .paywall))  // TODO: x
-//                }
-            }
         }
     }
 }
+

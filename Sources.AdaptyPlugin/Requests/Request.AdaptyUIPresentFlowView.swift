@@ -1,5 +1,5 @@
 //
-//  Request.AdaptyUIPresentView.swift
+//  Request.AdaptyUIPresentFlowView.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 13.11.2024.
@@ -9,8 +9,8 @@ import AdaptyUI
 import Foundation
 
 extension Request {
-    struct AdaptyUIPresentPaywallView: AdaptyPluginRequest {
-        static let method = "adapty_ui_present_paywall_view" // TODO: x
+    struct AdaptyUIPresentFlowView: AdaptyPluginRequest {
+        static let method = "adapty_ui_present_flow_view"
 
         let viewId: String
         let presentationStyle: AdaptyUIViewPresentationStyle?

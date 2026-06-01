@@ -1,5 +1,5 @@
 //
-//  Request.AdaptyUICreatePaywallView.swift
+//  Request.AdaptyUICreateFlowView.swift
 //  AdaptyPlugin
 //
 //  Created by Aleksei Valiano on 13.11.2024.
@@ -47,8 +47,8 @@ public extension [AdaptyCustomAsset.Identifiable] {
 }
 
 extension Request {
-    struct AdaptyUICreatePaywallView: AdaptyPluginRequest {
-        static let method = "adapty_ui_create_paywall_view"
+    struct AdaptyUICreateFlowView: AdaptyPluginRequest {
+        static let method = "adapty_ui_create_flow_view"
 
         let flow: AdaptyFlow
         let loadTimeout: TimeInterval?

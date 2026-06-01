@@ -16,8 +16,8 @@ enum Request {
             GetLogLevel.self,
             SetLogLevel.self,
             Activate.self,
-            GetPaywall.self,
-            GetPaywallForDefaultAudience.self,
+            GetFlow.self,
+            GetFlowForDefaultAudience.self,
             GetOnboarding.self,
             GetOnboardingForDefaultAudience.self,
             GetPaywallProducts.self,
@@ -42,9 +42,9 @@ enum Request {
 
 #if canImport(UIKit)
         let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
-            AdaptyUICreatePaywallView.self,
-            AdaptyUIDismissPaywallView.self,
-            AdaptyUIPresentPaywallView.self,
+            AdaptyUICreateFlowView.self,
+            AdaptyUIDismissFlowView.self,
+            AdaptyUIPresentFlowView.self,
 
             AdaptyUICreateOnboardingView.self,
             AdaptyUIDismissOnboardingView.self,
