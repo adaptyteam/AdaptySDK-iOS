@@ -62,7 +62,7 @@ Adapty.makePurchase(product: product) { [weak self] result in
 
 ## Design flows in the no-code Flow Builder
 
-![No-code Flow Builder](https://adapty.io/assets/uploads/2024/09/img-builder-and-templates@2x.webp)
+![No-code Flow Builder](https://adapty-portal-media-production.s3.amazonaws.com/github/flow-cover.webp)
 
 With the [Adapty Flow Builder](https://adapty.io/docs/adapty-flow-builder?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS), you can visually design complete user experiences — from single-screen paywalls to multi-step onboardings, surveys, and quizzes.
 
