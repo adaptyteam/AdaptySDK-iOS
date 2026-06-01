@@ -11,7 +11,6 @@ import Adapty
 import UIKit
 import WebKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension WKWebView {
     static func createForOnboarding() -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -24,7 +23,6 @@ extension WKWebView {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package final class AdaptyOnboardingUIView: UIView {
     let id: String
     let configuration: AdaptyUI.OnboardingConfiguration

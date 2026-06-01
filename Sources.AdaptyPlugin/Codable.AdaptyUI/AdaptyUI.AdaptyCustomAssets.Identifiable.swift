@@ -12,7 +12,6 @@ import AdaptyUI
 import AdaptyUIBuilder
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUICustomAsset {
     struct Identifiable {
         let id: String
@@ -22,11 +21,24 @@ extension AdaptyUICustomAsset {
     enum Value {
         case asset(AdaptyUICustomAsset)
         case imageFlutterAssetId(String)
-        case videoFlutterAssetId(String)
+        case videoFlutterAssetId(String, resolution: CGSize?)
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension VC.Color {
+    var asCustomAsset: AdaptyUICustomAsset {
+        // TODO: x implement
+        .color(.swiftUIColor(.clear))
+    }
+}
+
+extension VC.ColorGradient {
+    var asCustomAsset: AdaptyUICustomAsset {
+        // TODO: x implement
+        .gradient(.angular(gradient: .init(colors: []), center: .center, angle: .zero))
+    }
+}
+
 extension AdaptyUICustomAsset.Identifiable: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
@@ -34,6 +46,8 @@ extension AdaptyUICustomAsset.Identifiable: Decodable {
         case value
         case path
         case flutterAssetId = "asset_id"
+        case verticalResolution = "v_res"
+        case horizontalResolution = "h_res"
     }
 
     enum TypeValueConstants: String, Decodable {
@@ -73,10 +87,19 @@ extension AdaptyUICustomAsset.Identifiable: Decodable {
             }
 
         case .video:
+            let resolution: CGSize? = {
+                guard
+                    let h = try? container.decodeIfPresent(Int.self, forKey: .horizontalResolution),
+                    let v = try? container.decodeIfPresent(Int.self, forKey: .verticalResolution),
+                    h > 0, v > 0
+                else { return nil }
+                return CGSize(width: h, height: v)
+            }()
+
             if let path = try container.decodeIfPresent(String.self, forKey: .path) {
-                value = .asset(.video(.file(url: path.asFileURL, preview: nil)))
+                value = .asset(.video(.file(url: path.asFileURL, preview: nil, resolution: resolution)))
             } else if let flutterAssetId = try container.decodeIfPresent(String.self, forKey: .flutterAssetId) {
-                value = .videoFlutterAssetId(flutterAssetId)
+                value = .videoFlutterAssetId(flutterAssetId, resolution: resolution)
             } else {
                 throw DecodingError.keyNotFound(CodingKeys.path, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Corrupted video asset, not found path"))
             }
@@ -86,7 +109,7 @@ extension AdaptyUICustomAsset.Identifiable: Decodable {
 
 private extension String {
     var asFileURL: URL {
-        if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
+        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
             URL(filePath: self)
         } else {
             URL(fileURLWithPath: self)

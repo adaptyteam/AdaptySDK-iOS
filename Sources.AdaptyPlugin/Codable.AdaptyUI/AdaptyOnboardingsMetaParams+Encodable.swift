@@ -8,6 +8,7 @@
 import AdaptyUI
 import Foundation
 
+@available(*, deprecated, message: "Onboarding Feature is deprecated.")
 extension AdaptyOnboardingsMetaParams: Encodable {
     private enum CodingKeys: String, CodingKey {
         case onboardingId = "onboarding_id"

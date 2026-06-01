@@ -21,10 +21,16 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "AdaptyUI SDK can only be activated once per application lifecycle. Multiple activation attempts are not allowed."
         case let .webKit(error):
             "An internal WebKit error occurred: \(error). This may be related to web view initialization or rendering issues."
-        case let .unsupportedTemplate(templateId):
-            "The template with ID '\(templateId)' is not supported or not found. Please contact support."
         case let .wrongComponentType(componentId):
             "Invalid component type for component with ID '\(componentId)'. Please contact support."
+        case let .wrongAssetType(assetType):
+            "Invalid asset type '\(assetType)'. Please contact support."
+        case let .jsException(message):
+            "JavaScript runtime exception: \(message). Please contact support."
+        case let .navigatorNotFound(navigatorId):
+            "Navigator with ID '\(navigatorId)' was not found in the view configuration. Please contact support."
+        case let .invalidActionURL(stringId):
+            "Could not resolve a valid URL for the open-url action's string ID '\(stringId)'. Please contact support."
         }
     }
 
@@ -40,10 +46,16 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "AdaptyUIError.activateOnce (Code: 4005): Multiple activation attempts detected. AdaptyUI SDK can only be activated once per application lifecycle. This is a configuration error that should be handled during app initialization."
         case let .webKit(error):
             "AdaptyUIError.webKit (Code: 4200): Internal WebKit error occurred - \(error). This may affect the UI rendering or functionality. Check the underlying WebKit error for more details about the specific rendering issue."
-        case let .unsupportedTemplate(templateId):
-            "AdaptyUIError.unsupportedTemplate (Code: 4100): Template with ID '\(templateId)' is not available or not supported in the current configuration. This may indicate a missing template, version mismatch, or configuration issue. Please contact support."
         case let .wrongComponentType(componentId):
             "AdaptyUIError.wrongComponentType (Code: 4103): Component with ID '\(componentId)' has an invalid or unsupported type configuration. This typically indicates a template structure issue or version incompatibility. Please contact support."
+        case let .wrongAssetType(assetType):
+            "AdaptyUIError.wrongAssetType (Code: 4104): Asset with type '\(assetType)' is incompatible with element. This typically indicates a template structure issue or version incompatibility. Please contact support."
+        case let .jsException(message):
+            "AdaptyUIError.jsException (Code: 4105): JavaScript runtime exception thrown from the paywall script: \(message). This typically indicates a bug in the paywall script or a script/runtime mismatch. Please contact support."
+        case let .navigatorNotFound(navigatorId):
+            "AdaptyUIError.navigatorNotFound (Code: 4106): Navigator with ID '\(navigatorId)' was not found in the view configuration, and no 'default' navigator is available as a fallback. This typically indicates a template structure issue or a script referencing a navigator that does not exist. Please contact support."
+        case let .invalidActionURL(stringId):
+            "AdaptyUIError.invalidActionURL (Code: 4107): An open-url action referenced string ID '\(stringId)', which did not resolve to a parseable URL (the string is missing, empty, or not a valid URL). This typically indicates a template content issue or a script/runtime mismatch. Please contact support."
         }
     }
 }

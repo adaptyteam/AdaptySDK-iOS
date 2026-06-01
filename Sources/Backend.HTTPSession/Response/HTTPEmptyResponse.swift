@@ -19,8 +19,8 @@ extension HTTPResponse {
 extension HTTPEmptyResponse {
     static func emptyBodyDecoder(
         _ response: HTTPDataResponse,
-        _ configuration: HTTPCodableConfiguration?,
-        _ request: HTTPRequest
+        _: HTTPCodableConfiguration?,
+        _: HTTPRequest
     ) async throws -> HTTPEmptyResponse {
         response.asHTTPEmptyResponse
     }

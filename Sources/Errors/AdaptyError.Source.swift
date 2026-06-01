@@ -23,5 +23,7 @@ public extension AdaptyError {
 }
 
 extension AdaptyError.Source: CustomStringConvertible {
-    public var description: String { "[\(version)]: \(file)#\(line)" }
+    public var description: String {
+        "[\(version)]: \(file)#\(line)"
+    }
 }

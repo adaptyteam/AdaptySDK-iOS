@@ -10,8 +10,8 @@
 import Adapty
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
+@available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
 public final class AdaptyOnboardingController: UIViewController {
     public var id: String { onboardingView.id }
     public var onboarding: AdaptyOnboarding { onboardingView.configuration.viewModel.onboarding }
@@ -77,7 +77,7 @@ public final class AdaptyOnboardingController: UIViewController {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+@available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
 extension AdaptyOnboardingController: AdaptyOnboardingViewDelegate {
     package func onboardingView(
         _ view: AdaptyOnboardingUIView,

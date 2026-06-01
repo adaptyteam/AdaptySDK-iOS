@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 public struct AdaptyOnboardingView<Placeholder: View>: View {
     private let configuration: AdaptyUI.OnboardingConfiguration
@@ -83,13 +82,13 @@ public struct AdaptyOnboardingView<Placeholder: View>: View {
     }
 
     public var body: some View {
-        if #available(iOS 14.0, *) {
+//        if #available(iOS 14.0, *) {
             zstackBody
                 .ignoresSafeArea()
-        } else {
-            zstackBody
-                .edgesIgnoringSafeArea(.all)
-        }
+//        } else {
+//            zstackBody
+//                .edgesIgnoringSafeArea(.all)
+//        }
     }
 }
 

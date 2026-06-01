@@ -5,8 +5,8 @@ This file provides guidance to AI coding agents when working with code in this r
 ## Project Overview
 
 Adapty iOS SDK for - an open-source framework.
-Supports iOS 13+, macOS 11+, and visionOS 1+.
-The codebase uses Swift 6.0 with strict concurrency.
+Supports iOS 15+, macOS 12+, and visionOS 2+.
+The codebase uses Swift 6.2 with strict concurrency.
 Public APIs of SDK support both async/await and completion handlers.
 
 ## Building SDK
@@ -25,12 +25,9 @@ swift test
 ## SDK Version Management
 For update version read scripts/README.md 
 
-## Publishing to CocoaPods
+## Distribution
 
-```bash
-./scripts/publish_podspecs.sh [--skip-lint] [--skip-tests] [--max-retries N]
-```
-Publishes in dependency order: Adapty → AdaptyUI → AdaptyPlugin.
+Distributed via Swift Package Manager only. CocoaPods support was dropped in 4.0.0.
 
 ## Sources Structure
 | Module                 | Path                      | Purpose                                    |

@@ -44,20 +44,20 @@ extension Environment {
             appLaunchCount: Int,
             includedAnalyticIds: Bool
         ) async {
-            self.bundleId = Application.bundleIdentifier
+            bundleId = Application.bundleIdentifier
             if includedAnalyticIds {
-                self.idfv = await Device.idfv
-                self.idfa = await Device.idfa
+                idfv = await Device.idfv
+                idfa = await Device.idfa
             } else {
-                self.idfv = nil
-                self.idfa = nil
+                idfv = nil
+                idfa = nil
             }
-            self.osName = await System.name
-            self.osVersion = await System.version
-            self.deviceModel = Device.model
-            self.screen = await Device.mainScreenInfo
-            self.timezone = System.timezone
-            self.locale = System.locale
+            osName = await System.name
+            osVersion = await System.version
+            deviceModel = Device.model
+            screen = await Device.mainScreenInfo
+            timezone = System.timezone
+            locale = System.locale
             self.installTime = installTime
             self.appLaunchCount = appLaunchCount
         }

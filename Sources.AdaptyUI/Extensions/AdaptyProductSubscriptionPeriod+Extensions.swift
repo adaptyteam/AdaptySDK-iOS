@@ -23,7 +23,7 @@ extension AdaptySubscriptionPeriod {
         switch unit {
         case .day: return Double(numberOfUnits) / 7.0
         case .week: return Double(numberOfUnits)
-        case .month: return Double(numberOfUnits) * 4.0
+        case .month: return Double(numberOfUnits) * (30.0 / 7.0)
         case .year: return Double(numberOfUnits) * 52.0
         case .unknown: return 0.0
         }
@@ -32,7 +32,7 @@ extension AdaptySubscriptionPeriod {
     private func numberOfMonths() -> Double {
         switch unit {
         case .day: return Double(numberOfUnits) / 30.0
-        case .week: return Double(numberOfUnits) / 4.0
+        case .week: return Double(numberOfUnits) / (30.0 / 7.0)
         case .month: return Double(numberOfUnits)
         case .year: return Double(numberOfUnits) * 12.0
         case .unknown: return 0.0

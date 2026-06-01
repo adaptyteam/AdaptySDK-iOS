@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(macOS 10.15, iOS 13.0, *)
 extension VC {
     enum DebugElement: String {
         case circle
@@ -36,7 +35,6 @@ extension VC {
     }
 }
 
-@available(macOS 10.15, iOS 13.0, *)
 extension VC.DebugElement: View {
     var body: some View {
         switch self {
@@ -49,7 +47,6 @@ extension VC.DebugElement: View {
     }
 }
 
-@available(macOS 10.15, iOS 13.0, *)
 struct AdaptyUIUnknownElementView: View {
     var value: String
 
@@ -64,22 +61,23 @@ struct AdaptyUIUnknownElementView: View {
             debugElement
         } else {
             Text("Unknown View \(value)")
+                .onAppear {
+                    Log.ui.error("AdaptyUIUnknownElementView: \(value)")
+                }
         }
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Element {
     var testCircle: Self {
-        .unknown("circle", nil)
+        .unknown("circle")
     }
 
     var testRectangle: Self {
-        .unknown("rectangle", nil)
+        .unknown("rectangle")
     }
 }
 
-@available(macOS 10.15, iOS 13.0, *)
 #Preview {
     AdaptyUIUnknownElementView(value: VC.DebugElement.rectangle.rawValue)
 }

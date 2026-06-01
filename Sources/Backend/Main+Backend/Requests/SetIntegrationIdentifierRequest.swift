@@ -5,6 +5,7 @@
 //  Created by Aleksei Valiano on 23.09.2022.
 //
 
+import AdaptyCodable
 import Foundation
 
 private struct SetIntegrationIdentifierRequest: BackendEncodableRequest {
@@ -23,14 +24,14 @@ private struct SetIntegrationIdentifierRequest: BackendEncodableRequest {
     let userId: AdaptyUserId
     let keyValues: [String: String]
 
-    init(userId: AdaptyUserId, keyValues: [String: String]) {
+    init(userId: AdaptyUserId, identifiers: [AdaptyIntegrationIdentifier]) {
         headers = HTTPHeaders()
             .setUserProfileId(userId)
 
+        let identifiers = identifiers.asDictionary
         self.userId = userId
-        self.keyValues = keyValues
-
-        logParams = keyValues
+        keyValues = identifiers
+        logParams = identifiers
     }
 
     func encode(to encoder: Encoder) throws {
@@ -44,12 +45,13 @@ private struct SetIntegrationIdentifierRequest: BackendEncodableRequest {
 extension Backend.MainExecutor {
     func setIntegrationIdentifier(
         userId: AdaptyUserId,
-        keyValues: [String: String]
+        identifiers: [AdaptyIntegrationIdentifier]
     ) async throws(HTTPError) {
         let request = SetIntegrationIdentifierRequest(
             userId: userId,
-            keyValues: keyValues
+            identifiers: identifiers
         )
         let _: HTTPEmptyResponse = try await perform(request)
     }
 }
+

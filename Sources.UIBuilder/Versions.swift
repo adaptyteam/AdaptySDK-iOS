@@ -6,6 +6,6 @@
 //
 
 package extension AdaptyUISchema {
-    nonisolated static let formatVersion = "4.4.0"
-    nonisolated static let builderVersion = "4_4"
+    static let formatVersion: Version = "5.0.0"
+    static let builderVersion = "5_0"
 }

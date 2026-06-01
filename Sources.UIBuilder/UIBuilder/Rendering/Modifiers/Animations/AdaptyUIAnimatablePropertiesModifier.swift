@@ -9,11 +9,26 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
-    private let animations: [VC.Animation]
+// Tracks animation tokens with a class identity, so cleanup runs on real
+// view destruction (StateObject deinit) — not on every temporary disappear
+// (modal cover, app backgrounding) that .onDisappear conflates.
+private final class AdaptyUIAnimationCoordinator: ObservableObject {
+    var tokens: Set<AdaptyUIAnimationToken> = []
 
-    private let initialShadowFilling: VC.Mode<VC.Filling>?
+    deinit {
+        let tokens = tokens
+        Task { @MainActor in
+            for token in tokens { token.invalidate() }
+        }
+    }
+}
+
+struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
+    private var play: Binding<[VC.Animation]>
+
+    private let initialBlurRadius: Double
+
+    private let initialShadowFilling: VC.AssetReference?
     private let initialOffset: VC.Offset
     private let initialShadowOffset: VC.Offset
     private let initialShadowBlurRadius: Double
@@ -22,6 +37,13 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
     private var safeArea: EdgeInsets
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
+
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyUIAssetsViewModel
 
     @State private var scaleX: CGFloat
     @State private var scaleY: CGFloat
@@ -32,25 +54,66 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     @State private var opacity: Double
 
-    @State private var animationTokens = Set<AdaptyUIAnimationToken>()
+    @State private var animatedBlurRadius: Double?
 
-    init(_ properties: VC.Element.Properties) {
-        self.opacity = properties.opacity ?? 1.0
+    @StateObject private var animationCoordinator = AdaptyUIAnimationCoordinator()
 
-        self.scaleX = 1.0
-        self.scaleY = 1.0
-        self.scaleAnchor = .center
+    init(
+        _ properties: VC.Element.Properties,
+        play: Binding<[VC.Animation]>
+    ) {
+        self.opacity = properties.opacity
 
-        self.rotation = .zero
-        self.rotationAnchor = .center
+        self.scaleX = properties.scale?.scale.x ?? 1.0
+        self.scaleY = properties.scale?.scale.y ?? 1.0
+        self.scaleAnchor = properties.scale?.anchor.unitPoint ?? .center
+
+        self.rotation = properties.rotation.map { .degrees($0.angle) } ?? .zero
+        self.rotationAnchor = properties.rotation?.anchor.unitPoint ?? .center
 
         self.initialOffset = properties.offset ?? .zero
+
+        self.initialBlurRadius = properties.decorator?.blurRadius ?? .zero
 
         self.initialShadowFilling = properties.decorator?.shadow?.filling
         self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
         self.initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
 
-        self.animations = properties.onAppear
+        self.play = play
+    }
+
+    init(
+        play: Binding<[VC.Animation]>,
+        initialOpacity: Double,
+        initialScaleX: Double,
+        initialScaleY: Double,
+        initialScaleAnchor: UnitPoint,
+        initialRotation: Angle,
+        initialRotationAnchor: UnitPoint,
+        initialOffset: VC.Offset,
+        initialBlurRadius: Double,
+        initialShadowFilling: VC.AssetReference?,
+        initialShadowOffset: VC.Offset,
+        initialShadowBlurRadius: Double,
+    ) {
+        self.opacity = initialOpacity
+
+        self.scaleX = initialScaleX
+        self.scaleY = initialScaleY
+        self.scaleAnchor = initialScaleAnchor
+
+        self.rotation = initialRotation
+        self.rotationAnchor = initialRotationAnchor
+
+        self.initialOffset = initialOffset
+
+        self.initialBlurRadius = initialBlurRadius
+
+        self.initialShadowFilling = initialShadowFilling
+        self.initialShadowOffset = initialShadowOffset
+        self.initialShadowBlurRadius = initialShadowBlurRadius
+
+        self.play = play
     }
 
     @State private var animatedOffsetX: CGFloat?
@@ -58,16 +121,20 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     private var resolvedOffset: CGSize {
         CGSize(
-            width: animatedOffsetX ?? initialOffset.x.points(.horizontal, screenSize, safeArea) ?? 0.0,
-            height: animatedOffsetY ?? initialOffset.y.points(.vertical, screenSize, safeArea) ?? 0.0
+            width: animatedOffsetX ?? initialOffset.x.points(.horizontal, screenSize, safeArea),
+            height: animatedOffsetY ?? initialOffset.y.points(.vertical, screenSize, safeArea)
         )
     }
 
-    @State private var animatedShadowFilling: VC.Mode<VC.Filling>?
+    private var resolvedBlurRadius: Double {
+        animatedBlurRadius ?? initialBlurRadius
+    }
+
+    @State private var animatedShadowFilling: VC.AssetReference?
     @State private var animatedShadowBlurRadius: Double?
     @State private var animatedShadowOffset: CGSize?
 
-    private var resolvedShadowFilling: VC.Mode<VC.Filling>? {
+    private var resolvedShadowFilling: VC.AssetReference? {
         animatedShadowFilling ?? initialShadowFilling
     }
 
@@ -76,36 +143,46 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     }
 
     private var resolvedShadowOffset: CGSize {
-        CGSize(
-            width: animatedShadowOffset?.width ?? initialShadowOffset.x.points(.horizontal, screenSize, safeArea) ?? 0.0,
-            height: animatedShadowOffset?.height ?? initialShadowOffset.y.points(.vertical, screenSize, safeArea) ?? 0.0
-        )
+        if let animatedShadowOffset {
+            CGSize(
+                width: animatedShadowOffset.width,
+                height: animatedShadowOffset.height
+            )
+        } else {
+            CGSize(
+                width: initialShadowOffset.x.points(.horizontal, screenSize, safeArea),
+                height: initialShadowOffset.y.points(.vertical, screenSize, safeArea)
+            )
+        }
     }
 
     func body(content: Content) -> some View {
         content
             .shadow(
-                filling: resolvedShadowFilling,
+                color: assetsViewModel.resolvedAsset(
+                    resolvedShadowFilling,
+                    mode: colorScheme.toVCMode,
+                    screen: screen
+                ).asColorAsset,
                 blurRadius: resolvedShadowBlurRadius,
                 offset: resolvedShadowOffset
             )
+            .blur(radius: resolvedBlurRadius)
             .offset(resolvedOffset)
             .rotationEffect(rotation, anchor: rotationAnchor)
             .scaleEffect(x: scaleX, y: scaleY, anchor: scaleAnchor)
             .opacity(opacity)
-            .onAppear { startAnimations() }
-            .onDisappear {
-                animationTokens.forEach { $0.invalidate() }
-                animationTokens.removeAll()
-            }
+            .onChange(of: play.wrappedValue) { startAnimations($0) }
     }
 
-    private func startAnimations() {
+    private func startAnimations(_ animations: [VC.Animation]) {
         var tokens = Set<AdaptyUIAnimationToken>()
 
         for animation in animations {
-            switch animation {
-            case let .opacity(timeline, value):
+            let timeline = animation.timeline
+            switch animation.kind {
+            case let .opacity(value):
+                opacity = value.start
                 tokens.insert(
                     timeline.animate(
                         from: value.start,
@@ -115,7 +192,9 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
-            case let .offset(timeline, value):
+            case let .offset(value):
+                animatedOffsetX = value.start.x.points(.horizontal, screenSize, safeArea)
+                animatedOffsetY = value.start.y.points(.vertical, screenSize, safeArea)
                 tokens.insert(
                     timeline.animate(
                         from: value.start,
@@ -126,7 +205,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
-            case let .rotation(timeline, value):
+            case let .rotation(value):
                 rotation = .degrees(value.angle.start)
                 rotationAnchor = value.anchor.unitPoint
                 tokens.insert(
@@ -138,7 +217,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
-            case let .scale(timeline, value):
+            case let .scale(value):
                 scaleX = value.scale.start.x
                 scaleY = value.scale.start.y
                 scaleAnchor = value.anchor.unitPoint
@@ -153,7 +232,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
-            case let .shadow(timeline, value):
+            case let .shadow(value):
                 if let colorValue = value.color {
                     animatedShadowFilling = colorValue.start
                 }
@@ -191,24 +270,75 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         }
                     )
                 )
+            case let .blur(value):
+                animatedBlurRadius = value.start
+                tokens.insert(
+                    timeline.animate(
+                        from: value.start,
+                        to: value.end,
+                        updateBlock: {
+                            self.animatedBlurRadius = $0
+                        }
+                    )
+                )
             default:
                 break
             }
         }
 
-        animationTokens = tokens
+        animationCoordinator.tokens = tokens
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func animatableProperties(_ properties: VC.Element.Properties?) -> some View {
+    func animatableProperties(
+        _ properties: VC.Element.Properties?,
+        play: Binding<[VC.Animation]>
+    ) -> some View {
         if let properties {
-            modifier(AdaptyUIAnimatablePropertiesModifier(properties))
+            modifier(
+                AdaptyUIAnimatablePropertiesModifier(
+                    properties,
+                    play: play
+                )
+            )
         } else {
             self
         }
+    }
+
+    @ViewBuilder
+    func animatablePropertiesTransition(
+        play: Binding<[VC.Animation]>,
+        initialOpacity: Double = 1.0,
+        initialScaleX: Double = 1.0,
+        initialScaleY: Double = 1.0,
+        initialScaleAnchor: UnitPoint = .center,
+        initialRotation: Angle = .zero,
+        initialRotationAnchor: UnitPoint = .center,
+        initialOffset: VC.Offset = .zero,
+        initialBlurRadius: Double = .zero,
+        initialShadowFilling: VC.AssetReference? = nil,
+        initialShadowOffset: VC.Offset = .zero,
+        initialShadowBlurRadius: Double = .zero,
+    ) -> some View {
+        modifier(
+            AdaptyUIAnimatablePropertiesModifier(
+                play: play,
+                initialOpacity: initialOpacity,
+                initialScaleX: initialScaleX,
+                initialScaleY: initialScaleY,
+                initialScaleAnchor: initialScaleAnchor,
+                initialRotation: initialRotation,
+                initialRotationAnchor: initialRotationAnchor,
+                initialOffset: initialOffset,
+                initialBlurRadius: initialBlurRadius,
+                initialShadowFilling: initialShadowFilling,
+                initialShadowOffset: initialShadowOffset,
+                initialShadowBlurRadius: initialShadowBlurRadius,
+            )
+        )
     }
 }
 

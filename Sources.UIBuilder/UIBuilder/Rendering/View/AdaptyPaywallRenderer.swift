@@ -9,71 +9,88 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-package extension VC {
-    enum Template: String {
-        case basic
-        case flat
-        case transparent
+extension VS.ShowAlertDialogParameters.ActionStyle {
+    var buttonRole: ButtonRole? {
+        switch self {
+        case .default: nil
+        case .cancel: .cancel
+        case .destructive: .destructive
+        }
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyUIPaywallRendererView: View {
-    @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
-    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
-    @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
+struct AdaptyUIFlowRendererView: View {
+    @EnvironmentObject
+    private var flowViewModel: AdaptyUIFlowViewModel
+    @EnvironmentObject
+    private var productsViewModel: AdaptyUIProductsViewModel
+    @EnvironmentObject
+    private var screensViewModel: AdaptyUIScreensViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
 
-    @ViewBuilder
-    private func templateResolverView(_ template: VC.Template, screen: VC.Screen) -> some View {
-        switch template {
-        case .basic:
-            AdaptyUIBasicContainerView(screen: screen)
-        case .flat:
-            AdaptyUIFlatContainerView(screen: screen)
-        case .transparent:
-            AdaptyUITransparentContainerView(screen: screen)
-        }
+    private var alertIsPresented: Binding<Bool> {
+        Binding(
+            get: { stateViewModel.alertDialog != nil },
+            set: { newValue in
+                if !newValue {
+                    stateViewModel.alertDialog = nil
+                }
+            }
+        )
     }
 
-    public var body: some View {
-        let viewConfiguration = paywallViewModel.viewConfiguration
-
-        if let template = VC.Template(rawValue: viewConfiguration.templateId) {
-            ZStack(alignment: .bottom) {
-                templateResolverView(template, screen: viewConfiguration.screen)
-                    .staticBackground(viewConfiguration.screen.background)
-
-                Color.black
-                    .opacity(!screensViewModel.presentedScreensStack.isEmpty ? 0.4 : 0.0)
-                    .onTapGesture {
-                        screensViewModel.dismissTopScreen()
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            GeometryReader { geometry in
+                ZStack {
+                    ForEach(screensViewModel.navigatorsViewModels, id: \.id) { navigator in
+                        AdaptyNavigatorView()
+                            .environmentObject(navigator)
                     }
-
-                ForEach(screensViewModel.bottomSheetsViewModels, id: \.id) { vm in
-                    AdaptyUIBottomSheetView()
-                        .environmentObject(vm)
                 }
-
-                if productsViewModel.purchaseInProgress || productsViewModel.restoreInProgress {
-                    AdaptyUILoaderView()
-                        .transition(.opacity)
-                }
+                .frame(width: geometry.size.width, height: geometry.size.height)
             }
-            .ignoresSafeArea()
-            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
-            .onAppear {
-                paywallViewModel.logShowPaywall()
+            .clipped()
+            .environment(
+                \.layoutDirection,
+                screensViewModel.isRightToLeft ? .rightToLeft : .leftToRight
+            )
+
+            if productsViewModel.purchaseInProgress, screensViewModel.showPurchaseLoader {
+                AdaptyUILoaderView()
+                    .transition(.opacity)
+            } else if productsViewModel.restoreInProgress, screensViewModel.showRestoreLoader {
+                AdaptyUILoaderView()
+                    .transition(.opacity)
             }
-        } else {
-            Rectangle()
-                .hidden()
-                .onAppear {
-                    paywallViewModel.reportDidFailRendering(
-                        with: .unsupportedTemplate(viewConfiguration.templateId)
-                    )
-                }
         }
+        .ignoresSafeArea()
+        .onAppear {
+            flowViewModel.logShowFlow()
+        }
+        .alert(
+            stateViewModel.alertDialog?.params.title ?? "",
+            isPresented: alertIsPresented,
+            actions: {
+                if let buttons = stateViewModel.alertDialog?.params.buttons, !buttons.isEmpty {
+                    ForEach(buttons.indices, id: \.self) { idx in
+                        let button = buttons[idx]
+                        Button(button.title ?? "", role: button.style.buttonRole) {
+                            stateViewModel.onAlertDialogResponse?(
+                                button.actionId,
+                                screensViewModel.topmostScreenInstance
+                            )
+                        }
+                    }
+                }
+            },
+            message: {
+                if let message = stateViewModel.alertDialog?.params.message {
+                    Text(message)
+                }
+            }
+        )
     }
 }
 

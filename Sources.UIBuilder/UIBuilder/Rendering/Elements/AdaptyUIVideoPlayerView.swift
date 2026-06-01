@@ -19,9 +19,26 @@ extension VC.AspectRatio {
         case .stretch: .resize
         }
     }
+
+    var swiftUIContentMode: SwiftUI.ContentMode {
+        switch self {
+        case .fit: .fit
+        case .fill, .stretch: .fill
+        }
+    }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+extension View {
+    @ViewBuilder
+    func applyAspectLayout(ratio: Double?, aspect: VC.AspectRatio) -> some View {
+        if let ratio {
+            aspectRatio(ratio, contentMode: aspect.swiftUIContentMode)
+        } else {
+            frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+}
+
 struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
     var player: AVPlayer
     var videoGravity: AVLayerVideoGravity
@@ -39,6 +56,8 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.player = player
         playerViewController.videoGravity = videoGravity
         playerViewController.allowsPictureInPicturePlayback = false
+        player.seek(to: .zero)
+        player.play()
 
         DispatchQueue.main.async {
 #if os(visionOS)
@@ -81,163 +100,68 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIVideoView: View {
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
     @EnvironmentObject
     private var viewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
-
-    private let video: VC.VideoPlayer
-
-    init(video: VC.VideoPlayer, colorScheme _: ColorScheme) {
-        self.video = video
-    }
-
-    private let id: String = UUID().uuidString
-
-    @ViewBuilder
-    private func colorSchemeVideoView(videoData: VC.VideoData, id: String) -> some View {
-        AdaptyUIVideoColorSchemeSpecificView(
-            video: videoData,
-            aspect: video.aspect,
-            loop: video.loop
-        )
-        .environmentObject(viewModel)
-        .environmentObject(
-            viewModel.getOrCreatePlayerManager(
-                for: videoData,
-                loop: video.loop,
-                id: id
-            )
-        )
-        .onDisappear {
-            viewModel.dismissPlayerManager(id: id)
-        }
-    }
-
-    var body: some View {
-        switch colorScheme {
-        case .light:
-            colorSchemeVideoView(
-                videoData: video.asset.mode(.light),
-                id: id
-            )
-        case .dark:
-            colorSchemeVideoView(
-                videoData: video.asset.mode(.dark),
-                id: id
-            )
-        @unknown default:
-            colorSchemeVideoView(
-                videoData: video.asset.mode(.light),
-                id: id
-            )
-        }
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyUIVideoColorSchemeSpecificView: View {
-    @EnvironmentObject
-    private var viewModel: AdaptyUIAssetsViewModel
-    @EnvironmentObject
-    private var playerManager: AdaptyUIVideoPlayerManager
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
     @State
     private var showPlaceholder = true
 
-    private let video: VC.VideoData
-    private let aspect: VC.AspectRatio
-    private let loop: Bool
-    private let placeholder: VC.ImageData
+    private let video: VC.VideoPlayer
 
-    init(
-        video: VC.VideoData,
-        aspect: VC.AspectRatio,
-        loop: Bool
-    ) {
+    init(video: VC.VideoPlayer) {
         self.video = video
-        self.aspect = aspect
-        self.loop = loop
-        self.placeholder = video.image
     }
 
     var body: some View {
-        ZStack {
-            if let player = playerManager.player {
-                AdaptyUIVideoPlayerView(
-                    player: player,
-                    videoGravity: aspect.videoGravity,
-                    onReadyForDisplay: {
-                        showPlaceholder = false
-                    }
-                )
-            }
+        if let videoAsset = viewModel.resolvedAsset(
+            video.asset,
+            mode: colorScheme.toVCMode,
+            screen: screen
+        ).asVideoAsset {
+            let playerManager = viewModel.getOrCreatePlayerManager(
+                for: videoAsset,
+                assetRef: video.asset,
+                loop: video.loop,
+                onPlayToEnd: video.actions.isEmpty ? nil : { [weak stateViewModel] in
+                    stateViewModel?.execute(actions: video.actions, screen: screen)
+                }
+            )
 
-            if showPlaceholder {
-                AdaptyUIImageView(
-                    asset: placeholder,
-                    aspect: aspect,
-                    tint: nil
-                )
+            ZStack {
+                if let player = playerManager.player {
+                    AdaptyUIVideoPlayerView(
+                        player: player,
+                        videoGravity: video.aspect.videoGravity,
+                        onReadyForDisplay: {
+                            showPlaceholder = false
+                        }
+                    )
+                }
+
+                if showPlaceholder, let placeholder = videoAsset.image {
+                    AdaptyUIImageView(
+                        .resolvedImageAsset(
+                            asset: placeholder,
+                            aspect: video.aspect,
+                            tint: nil
+                        )
+                    )
+                    .allowsHitTesting(false)
+                }
             }
+            .applyAspectLayout(ratio: videoAsset.ratio, aspect: video.aspect)
+            .id(videoAsset.id)
+        } else {
+            Rectangle()
         }
     }
 }
-
-#if DEBUG
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension VC.VideoPlayer {
-    private static let url1 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%201.mp4?alt=media&token=5e7ac250-091e-4bb3-8a99-6ac4f0735b37")!
-
-    private static let imgUrl = URL(string: "http://www.libpng.org/pub/png/img_png/OwlAlpha.png")!
-
-    private static let url2 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%202.mp4?alt=media&token=8735a549-d035-432f-b609-fe795bfb4efb")!
-
-    private static let url3 = URL(string: "https://firebasestorage.googleapis.com/v0/b/api-8970033217728091060-294809.appspot.com/o/Paywall%20video%203.mov?alt=media&token=ba0e2ec6-f81e-424f-84e6-e18617bedfbf")!
-
-    static let test1 = VC.VideoPlayer.create(
-        asset: .same(.create(url: url1, image: .create(customId: "video_preview_0", url: imgUrl))),
-        aspect: .stretch,
-        loop: true
-    )
-
-    static let test2 = VC.VideoPlayer.create(
-        asset: .same(.create(url: url2, image: .create(customId: "general-tab-icon", url: imgUrl))),
-        aspect: .fit,
-        loop: false
-    )
-    static let test3 = VC.VideoPlayer.create(
-        asset: .same(.create(url: url3, image: .create(customId: "general-tab-icon", url: imgUrl))),
-        aspect: .fill,
-        loop: true
-    )
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-#Preview {
-    VStack {
-        AdaptyUIVideoView(video: .test1, colorScheme: .light)
-        AdaptyUIVideoView(video: .test2, colorScheme: .light)
-        AdaptyUIVideoView(video: .test3, colorScheme: .light)
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-public struct AdaptyUIVideoTestView: View {
-    public init() {}
-
-    public var body: some View {
-        VStack {
-            AdaptyUIVideoView(video: .test1, colorScheme: .light)
-            AdaptyUIVideoView(video: .test2, colorScheme: .light)
-            AdaptyUIVideoView(video: .test3, colorScheme: .light)
-        }
-    }
-}
-
-#endif
 
 #endif

@@ -7,16 +7,29 @@
 
 extension Collection {
     @inlinable
-    var nonEmptyOrNil: Self? { isEmpty ? nil : self }
+    var nonEmptyOrNil: Self? {
+        isEmpty ? nil : self
+    }
+
     @inlinable
-    var isNotEmpty: Bool { !isEmpty }
+    var isNotEmpty: Bool {
+        !isEmpty
+    }
 }
 
 extension Optional where Wrapped: Collection {
     @inlinable
-    var nonEmptyOrNil: Self { self?.nonEmptyOrNil }
+    var nonEmptyOrNil: Self {
+        self?.nonEmptyOrNil
+    }
+
     @inlinable
-    var isEmpty: Bool { self?.isEmpty ?? true }
+    var isEmpty: Bool {
+        self?.isEmpty ?? true
+    }
+
     @inlinable
-    var isNotEmpty: Bool { !isEmpty }
+    var isNotEmpty: Bool {
+        !isEmpty
+    }
 }

@@ -1,0 +1,134 @@
+//
+//  AdaptyUIEventBus.swift
+//  AdaptyUIBuilder
+//
+//  Created on 09.04.2026.
+//
+
+#if canImport(UIKit)
+
+import SwiftUI
+
+@MainActor
+final class AdaptyUIEventBus: ObservableObject {
+    struct Event: Equatable {
+        let sequence: UInt
+        let eventId: VC.EventHandler.EventId
+        let transitionId: String?
+        let screenInstanceId: String?
+    }
+
+    private var nextSequence: UInt = 1
+
+    /// Sticky buffer — events published before subscribers exist.
+    /// Elements consume pending events on mount.
+    private(set) var pendingEvents: [Event] = []
+
+    /// Custom-event sequences staged for eviction. Drained synchronously on
+    /// the next publish, by which point SwiftUI has already processed the
+    /// revision change from the prior publish and the previously-mounted
+    /// subscribers have had their chance to consume.
+    private var customEventsToEvict: Set<UInt> = []
+
+    /// Incremented on each publish. Elements observe this via onChange.
+    @Published private(set) var revision: UInt = 0
+
+    func publish(eventId: VC.EventHandler.EventId, transitionId: String?, screenInstanceId: String?) {
+        // Drain custom events staged by the previous publish. Doing it here
+        // (synchronously, before publishing the new event) replaces the racy
+        // DispatchQueue.main.async eviction that could fire before SwiftUI
+        // had processed the revision change.
+        if !customEventsToEvict.isEmpty {
+            pendingEvents.removeAll { customEventsToEvict.contains($0.sequence) }
+            customEventsToEvict.removeAll()
+        }
+
+        let event = Event(
+            sequence: nextSequence,
+            eventId: eventId,
+            transitionId: transitionId,
+            screenInstanceId: screenInstanceId
+        )
+        nextSequence += 1
+        pendingEvents.append(event)
+        incrementFireCount(screenInstanceId: screenInstanceId, eventId: eventId)
+        revision &+= 1
+
+        // Custom events are transient signals: deliver to currently-mounted
+        // listeners via the revision change above, then drop. Lifecycle events
+        // (onWillAppear/etc.) stay in the buffer so a late-mounting element can
+        // pick them up on first appear, but custom events shouldn't be replayed
+        // for elements that mount after publication. Stage for eviction at the
+        // top of the next publish.
+        if case .custom = eventId {
+            customEventsToEvict.insert(event.sequence)
+        }
+    }
+
+    /// Returns pending events matching the given context, newer than afterSequence.
+    func consumePending(
+        afterSequence: UInt,
+        screenInstanceId: String?,
+        currentTopScreenInstanceId: String?
+    ) -> [Event] {
+        pendingEvents.filter { event in
+            event.sequence > afterSequence
+                && matchesScope(event, screenInstanceId: screenInstanceId, currentTopScreenInstanceId: currentTopScreenInstanceId)
+        }
+    }
+
+    // MARK: - Fire counts for first/notFirst filter
+
+    /// Tracks how many times each event has fired per screen instance.
+    /// Key: screenInstanceId (empty string for navigator-level).
+    private var eventFireCounts: [String: [VC.EventHandler.EventId: Int]] = [:]
+
+    func fireCount(screenInstanceId: String?, eventId: VC.EventHandler.EventId) -> Int {
+        eventFireCounts[screenInstanceId ?? ""]?[eventId] ?? 0
+    }
+
+    func incrementFireCount(screenInstanceId: String?, eventId: VC.EventHandler.EventId) {
+        let key = screenInstanceId ?? ""
+        eventFireCounts[key, default: [:]][eventId, default: 0] += 1
+    }
+
+    // MARK: - Pending event cleanup
+
+    /// Clear events that are no longer relevant.
+    func clearPending(for screenInstanceId: String?) {
+        if let screenInstanceId {
+            let cleared = Set(pendingEvents.lazy.filter { $0.screenInstanceId == screenInstanceId }.map(\.sequence))
+            pendingEvents.removeAll { $0.screenInstanceId == screenInstanceId }
+            customEventsToEvict.subtract(cleared)
+        } else {
+            pendingEvents.removeAll()
+            customEventsToEvict.removeAll()
+        }
+    }
+
+    private func matchesScope(
+        _ event: Event,
+        screenInstanceId: String?,
+        currentTopScreenInstanceId: String?
+    ) -> Bool {
+        switch event.eventId {
+        case .onWillAppear, .onDidAppear, .onWillDisappear, .onDidDisappear:
+            if let screenInstanceId {
+                return event.screenInstanceId == screenInstanceId
+            }
+            return event.screenInstanceId == nil
+
+        case .custom:
+            if let eventTargetId = event.screenInstanceId {
+                if let screenInstanceId {
+                    return eventTargetId == screenInstanceId
+                } else {
+                    return eventTargetId == currentTopScreenInstanceId
+                }
+            }
+            return true
+        }
+    }
+}
+
+#endif

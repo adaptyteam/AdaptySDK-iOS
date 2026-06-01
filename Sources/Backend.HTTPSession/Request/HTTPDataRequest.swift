@@ -13,5 +13,7 @@ protocol HTTPDataRequest: HTTPRequest {
 }
 
 extension HTTPDataRequest {
-    var contentType: String? { nil }
+    var contentType: String? {
+        nil
+    }
 }

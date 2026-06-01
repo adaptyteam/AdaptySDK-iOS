@@ -9,13 +9,11 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension CoordinateSpace {
     static let adaptyGlobalName = "adapty.container.global"
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIGeometryFramePreferenceKey: PreferenceKey {
     static let defaultValue: CGRect = .zero
 
@@ -24,7 +22,6 @@ struct AdaptyUIGeometryFramePreferenceKey: PreferenceKey {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct FooterVerticalFillerView: View {
     var height: Double
     var onFrameChange: (CGRect) -> Void

@@ -106,14 +106,14 @@ extension Backend {
             _ requestName: BackendRequestName,
             _ error: HTTPError
         ) {
-            guard case .backend(_, _, _, _, _, let error) = error,
+            guard case let .backend(_, _, _, _, _, error) = error,
                   let error = error as? BackendUnavailableError
             else { return }
 
             switch error {
             case .unauthorized:
                 serverBlockedByKind.insert(serverKind)
-            case .blockedUntil(let expiresAt):
+            case let .blockedUntil(expiresAt):
                 guard let expiresAt else { return }
                 if let oldExpiresAt = requestBlockedUntil[requestName],
                    oldExpiresAt > expiresAt { return }

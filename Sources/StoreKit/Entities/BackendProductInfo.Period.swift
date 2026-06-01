@@ -73,11 +73,13 @@ extension BackendProductInfo.Period: CustomStringConvertible {
         case .lifetime: "lifetime"
         case .consumable: "consumable"
         case .nonSubscriptions: "nonsubscriptions"
-        case .uncategorised(let value): value ?? "uncategorised"
+        case let .uncategorised(value): value ?? "uncategorised"
         }
     }
 
-    package var description: String { rawValue }
+    package var description: String {
+        rawValue
+    }
 }
 
 extension BackendProductInfo.Period: Codable {

@@ -35,7 +35,7 @@ struct VH<Value: Sendable>: Sendable {
 extension VH {
     @inlinable
     func IsNotEqualHash(_ other: VH<Value>) -> Bool {
-        guard let hash = hash, let other = other.hash else { return true }
+        guard let hash, let other = other.hash else { return true }
         return hash != other
     }
 }

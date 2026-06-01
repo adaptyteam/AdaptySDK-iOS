@@ -9,7 +9,6 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
     let logId: String
     let events: AdaptyUIEventsHandler
@@ -45,35 +44,40 @@ struct AdaptyUIBuilderAppLogic: AdaptyUIBuilderLogic {
         false
     }
 
-    func logShowPaywall(viewConfiguration: AdaptyUIConfiguration) async {}
+    func logShowFlow() async {}
 
-    func getProducts(determineOffers: Bool) async throws -> [ProductResolver] {
+    func getProducts() async throws -> [ProductResolver] {
         products
     }
 
     func makePurchase(
         product: ProductResolver,
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     ) {
         events.event_didStartPurchase(product: product)
     }
 
     func restorePurchases(
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
+        onFinish: @MainActor @Sendable @escaping (VS.RestorePurchasesResult) -> Void
     ) {
         events.event_didStartRestore()
     }
 
     func openWebPaywall(
         for product: ProductResolver,
-        in openIn: VC.WebOpenInParameter
+        in openIn: VC.Action.WebOpenInParameter,
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     ) async {}
 
-    func reportDidFailRendering(with error: AdaptyUIBuilderError) {
-        events.event_didFailRendering(with: error)
+    func reportDidReceiveError(_ error: AdaptyUIBuilderError) {
+        events.event_didReceiveError(error)
     }
+
+    func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable]) {}
+
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
 }
 
 #endif

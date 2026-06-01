@@ -52,7 +52,9 @@ extension EventsError {
 extension EventsError {
     static func sending(
         _ error: Error,
-        file: String = #fileID, function: String = #function, line: UInt = #line
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         .sending(
             AdaptyError.Source(
@@ -66,7 +68,9 @@ extension EventsError {
 
     static func encoding(
         _ error: Error,
-        file: String = #fileID, function: String = #function, line: UInt = #line
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         .encoding(
             AdaptyError.Source(
@@ -80,7 +84,9 @@ extension EventsError {
 
     static func decoding(
         _ error: Error,
-        file: String = #fileID, function: String = #function, line: UInt = #line
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
     ) -> Self {
         .decoding(
             AdaptyError.Source(

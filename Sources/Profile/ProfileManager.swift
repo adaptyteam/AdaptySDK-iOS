@@ -17,12 +17,22 @@ final class ProfileManager {
 
     let crossPlacmentStorage = CrossPlacementStorage()
     let placementStorage = PlacementStorage()
-    let backendIntroductoryOfferEligibilityStorage = BackendIntroductoryOfferEligibilityStorage()
 
-    var currentProfile: AdaptyProfile { cachedProfile.value }
-    var isTestUser: Bool { cachedProfile.value.isTestUser }
-    var segmentId: String { cachedProfile.value.segmentId }
-    var lastResponseHash: String? { cachedProfile.hash }
+    var currentProfile: AdaptyProfile {
+        cachedProfile.value
+    }
+
+    var isTestUser: Bool {
+        cachedProfile.value.isTestUser
+    }
+
+    var segmentId: String {
+        cachedProfile.value.segmentId
+    }
+
+    var lastResponseHash: String? {
+        cachedProfile.hash
+    }
 
     @AdaptyActor
     init(
@@ -30,9 +40,9 @@ final class ProfileManager {
         profile: VH<AdaptyProfile>,
         sentEnvironment: SentEnvironment
     ) {
-        self.userId = profile.userId
-        self.cachedProfile = profile
-        self.onceSentEnvironment = sentEnvironment
+        userId = profile.userId
+        cachedProfile = profile
+        onceSentEnvironment = sentEnvironment
         self.storage = storage
 
         Task { @AdaptyActor [weak self] in
@@ -172,9 +182,8 @@ extension Adapty {
         _ = try? profileManager?.saveProfileAndStartNotifyTask(response)
     }
 
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
     func recalculateOfflineAccessLevels() async -> AdaptyProfile {
-        await (transactionManager as? SK2TransactionManager)?.clearCache()
+        await transactionManager.clearCache()
 
         if let manger = profileManager {
             return await manger.notifyProfileDidChanged()
@@ -196,18 +205,10 @@ extension Adapty {
     }
 
     func profileWithOfflineAccessLevels(_ serverProfile: AdaptyProfile) async -> AdaptyProfile {
-        guard #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
-              let transactionManager = transactionManager as? SK2TransactionManager,
-              let productsManager = productsManager as? SK2ProductsManager
-        else {
-            return serverProfile
-        }
         var verifiedCurrentEntitlements = await transactionManager.getVerifiedCurrentEntitlements()
 
         if await !transactionManager.hasUnfinishedTransactions {
-            verifiedCurrentEntitlements = verifiedCurrentEntitlements.filter {
-                $0.unfEnvironment == SK2Transaction.xcodeEnvironment
-            }
+            verifiedCurrentEntitlements = verifiedCurrentEntitlements.filter(\.isXcodeEnvironment)
         }
 
         guard !verifiedCurrentEntitlements.isEmpty else { return serverProfile }

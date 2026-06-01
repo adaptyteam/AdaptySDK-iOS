@@ -9,62 +9,83 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-package final class AdaptyUIEventsHandler: ObservableObject {
+package final class AdaptyUIEventsHandler {
     let logId: String
 
-    var didAppear: (() -> Void)?
-    var didDisappear: (() -> Void)?
+    package var didAppear: (() -> Void)?
+    package var didDisappear: (() -> Void)?
 
-    var didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
-    var didSelectProduct: ((ProductResolver) -> Void)?
-    var didStartPurchase: ((ProductResolver) -> Void)?
-    var didStartRestore: (() -> Void)?
-    var didFailRendering: ((AdaptyUIBuilderError) -> Void)?
+    package var didPerformAction: ((AdaptyUIBuilder.Action) -> Void)?
+    package var didSelectProduct: ((ProductResolver) -> Void)?
+    package var didStartPurchase: ((ProductResolver) -> Void)?
+    package var didFinishPurchase: ((ProductResolver, VS.PurchaseResult) -> Void)?
+    package var didStartRestore: (() -> Void)?
+    package var didFinishRestore: ((VS.RestorePurchasesResult) -> Void)?
+    package var didReceiveError: ((AdaptyUIBuilderError) -> Void)?
+    package var didReceiveAnalyticEvent: ((String, [String: any Sendable]) -> Void)?
 
     package init(logId: String) {
         self.logId = logId
         self.didPerformAction = nil
         self.didSelectProduct = nil
         self.didStartPurchase = nil
+        self.didFinishPurchase = nil
         self.didStartRestore = nil
-        self.didFailRendering = nil
+        self.didFinishRestore = nil
+        self.didReceiveError = nil
+        self.didReceiveAnalyticEvent = nil
     }
 
-    func event_viewDidAppear() {
+    package func event_viewDidAppear() {
         Log.app.verbose("#\(logId)# event_didAppear")
         didAppear?()
     }
 
-    func event_viewDidDisappear() {
+    package func event_viewDidDisappear() {
         Log.app.verbose("#\(logId)# event_didDisappear")
         didDisappear?()
     }
 
-    func event_didPerformAction(_ action: AdaptyUIBuilder.Action) {
+    package func event_didPerformAction(_ action: AdaptyUIBuilder.Action) {
         Log.app.verbose("#\(logId)# event_didPerformAction: \(action)")
         didPerformAction?(action)
     }
 
-    func event_didSelectProduct(_ product: ProductResolver, automatic: Bool) {
-        Log.app.verbose("#\(logId)# event_didSelectProduct: \(product.adaptyProductId) automatic: \(automatic)")
+    // TODO: x check automatic behaviour
+    package func event_didSelectProduct(_ product: ProductResolver, automatic: Bool) {
+        Log.app.verbose("#\(logId)# event_didSelectProduct: \(product.flowId) automatic: \(automatic)")
         didSelectProduct?(product)
     }
 
-    func event_didStartPurchase(product: ProductResolver) {
+    package func event_didStartPurchase(product: ProductResolver) {
         Log.app.verbose("#\(logId)# event_didStartPurchase")
         didStartPurchase?(product)
     }
 
-    func event_didStartRestore() {
+    package func event_didFinishPurchase(product: ProductResolver, result: VS.PurchaseResult) {
+        Log.app.verbose("#\(logId)# event_didFinishPurchase: \(result.rawValue)")
+        didFinishPurchase?(product, result)
+    }
+
+    package func event_didStartRestore() {
         Log.app.verbose("#\(logId)# event_didStartRestore")
         didStartRestore?()
     }
 
-    func event_didFailRendering(with error: AdaptyUIBuilderError) {
-        Log.app.error("#\(logId)# event_didFailRendering: \(error)")
-        didFailRendering?(error)
+    package func event_didFinishRestore(result: VS.RestorePurchasesResult) {
+        Log.app.verbose("#\(logId)# event_didFinishRestore: \(result.rawValue)")
+        didFinishRestore?(result)
+    }
+
+    package func event_didReceiveError(_ error: AdaptyUIBuilderError) {
+        Log.app.error("#\(logId)# event_didReceiveError: \(error)")
+        didReceiveError?(error)
+    }
+
+    package func event_didReceiveAnalyticEvent(name: String, params: [String: any Sendable]) {
+        Log.app.verbose("#\(logId)# event_didReceiveAnalyticEvent: \(name)")
+        didReceiveAnalyticEvent?(name, params)
     }
 }
 

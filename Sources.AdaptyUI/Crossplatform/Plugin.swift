@@ -8,7 +8,6 @@
 import Adapty
 import AdaptyUIBuilder
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package enum AdaptyUIViewPresentationStyle: String, Codable {
     case fullScreen = "full_screen"
     case pageSheet = "page_sheet"
@@ -18,29 +17,35 @@ package enum AdaptyUIViewPresentationStyle: String, Codable {
 
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension UIViewController {
     var isOrContainsAdaptyController: Bool {
         guard let presentedViewController = presentedViewController else {
-            return self is AdaptyPaywallController
+            return self is AdaptyFlowController
         }
-        return presentedViewController is AdaptyPaywallController
+        return presentedViewController is AdaptyFlowController
     }
 }
 
 fileprivate extension UIWindow {
     var topViewController: UIViewController? {
         var topViewController = rootViewController
-    
+
         while let presentedController = topViewController?.presentedViewController {
             topViewController = presentedController
         }
-        
+
         return topViewController
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
+fileprivate extension UIApplication {
+    var firstKeyWindow: UIWindow? {
+        connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+            .first
+    }
+}
+
 extension AdaptyUIViewPresentationStyle {
     var uiKitPresentationStyle: UIModalPresentationStyle {
         switch self {
@@ -52,15 +57,14 @@ extension AdaptyUIViewPresentationStyle {
 
 #endif
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 package extension AdaptyUI {
     @MainActor
     class Plugin {
 #if canImport(UIKit)
         
-        private static var paywallControllers = [String: AdaptyPaywallController]()
+        private static var paywallControllers = [String: AdaptyFlowController]()
         
-        private static func cachePaywallController(_ controller: AdaptyPaywallController, id: String) {
+        private static func cachePaywallController(_ controller: AdaptyFlowController, id: String) {
             paywallControllers[id] = controller
         }
         
@@ -68,44 +72,48 @@ package extension AdaptyUI {
             paywallControllers.removeValue(forKey: id)
         }
         
-        private static func cachedPaywallController(_ id: String) -> AdaptyPaywallController? {
+        private static func cachedPaywallController(_ id: String) -> AdaptyFlowController? {
             paywallControllers[id]
         }
         
+        @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static var onboardingControllers = [String: AdaptyOnboardingController]()
-        
+
+        @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static func cacheOnboardingController(_ controller: AdaptyOnboardingController, id: String) {
             onboardingControllers[id] = controller
         }
-        
+
+        @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static func deleteCachedOnboardingController(_ id: String) {
             onboardingControllers.removeValue(forKey: id)
         }
-        
+
+        @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static func cachedOnboardingController(_ id: String) -> AdaptyOnboardingController? {
             onboardingControllers[id]
         }
 #endif
         
 #if canImport(UIKit)
-        package static func createPaywallView(
-            paywall: AdaptyPaywall,
+        package static func createFlowView(
+            flow: AdaptyFlow,
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyUIAssetsResolver?
-        ) async throws -> AdaptyUI.PaywallView {
+        ) async throws -> AdaptyUI.FlowView {
             let products: [AdaptyPaywallProduct]?
             
-            if preloadProducts {
-                products = try await Adapty.getPaywallProducts(paywall: paywall)
-            } else {
+//            if preloadProducts {
+//                products = try await Adapty.getPaywallProducts(paywall: paywall)
+//            } else {
                 products = nil
-            }
+//            }
             
-            let configuration = try await AdaptyUI.getPaywallConfiguration(
-                forPaywall: paywall,
+            let configuration = try await AdaptyUI.getFlowConfiguration(
+                forFlow: flow,
                 loadTimeout: loadTimeout,
                 products: products,
                 observerModeResolver: nil,
@@ -120,7 +128,7 @@ package extension AdaptyUI {
         }
 #endif
 
-        package static func presentPaywallView(
+        package static func presentFlowView(
             viewId: String,
             presentationStyle: AdaptyUIViewPresentationStyle?
         ) async throws {
@@ -129,7 +137,7 @@ package extension AdaptyUI {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
             }
             
-            guard let rootVC = UIApplication.shared.windows.first?.topViewController else {
+            guard let rootVC = UIApplication.shared.firstKeyWindow?.topViewController else {
                 throw AdaptyError(AdaptyUI.PluginError.viewPresentationError(viewId))
             }
             
@@ -150,7 +158,7 @@ package extension AdaptyUI {
 #endif
         }
         
-        package static func dismissPaywallView(
+        package static func dismissFlowView(
             viewId: String,
             destroy: Bool
         ) async throws {
@@ -203,8 +211,8 @@ package extension AdaptyUI {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
+@available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
 package extension AdaptyUI.Plugin {
     static func createOnboardingView(
         onboarding: AdaptyOnboarding,
@@ -235,7 +243,7 @@ package extension AdaptyUI.Plugin {
             throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
         }
         
-        guard let rootVC = UIApplication.shared.windows.first?.topViewController else {
+        guard let rootVC = UIApplication.shared.firstKeyWindow?.topViewController else {
             throw AdaptyError(AdaptyUI.PluginError.viewPresentationError(viewId))
         }
         
@@ -276,23 +284,5 @@ package extension AdaptyUI.Plugin {
 #else
         throw AdaptyUIError.platformNotSupported
 #endif
-    }
-}
-
-// TODO: Remove
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-package extension AdaptyUI.Plugin {
-    static func createOnboardingViewForTest(
-        placementId: String,
-        externalUrlsPresentation: AdaptyWebPresentation
-    ) async throws -> AdaptyUI.OnboardingView {
-        let onboarding = try await Adapty.getOnboarding(
-            placementId: placementId
-        )
-        return try await AdaptyUI.Plugin.createOnboardingView(
-            onboarding: onboarding,
-            externalUrlsPresentation: externalUrlsPresentation
-        )
     }
 }

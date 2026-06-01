@@ -9,11 +9,11 @@ import Adapty
 import AdaptyUI
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Request {
     struct AdaptyUICreateOnboardingView: AdaptyPluginRequest {
         static let method = "adapty_ui_create_onboarding_view"
 
+        @available(*, deprecated, message: "Onboarding Feature is deprecated.")
         let onboarding: AdaptyOnboarding
         let externalUrlsPresentation: AdaptyWebPresentation
 
@@ -22,6 +22,7 @@ extension Request {
             case externalUrlsPresentation = "external_urls_presentation"
         }
 
+        @available(*, deprecated, message: "Onboarding Feature is deprecated.")
         func execute() async throws -> AdaptyJsonData {
             try .success(
                 await AdaptyUI.Plugin.createOnboardingView(

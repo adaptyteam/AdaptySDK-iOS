@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import StoreKit
 
 private let log = Log.storage
 
@@ -43,16 +44,17 @@ final class PurchasePayloadStorage {
         return true
     }
 
-    private static var purchasePayloadByTransactionId: [String: PurchasePayload] = (try? userDefaults.getJSON([String: PurchasePayload].self, forKey: Constants.purchasePayloadByTransactionId)) ?? [:]
+    private static var purchasePayloadByTransactionId: [UInt64: PurchasePayload] = (try? userDefaults.getJSON([String: PurchasePayload].self, forKey: Constants.purchasePayloadByTransactionId))?.mapKeys(UInt64.init) ?? [:]
 
-    private static func setPurchasePayload(_ payload: PurchasePayload, forTransactionId transactionId: String) -> Bool {
-        guard payload != purchasePayloadByTransactionId.updateValue(payload, forKey: transactionId) else { return false }
-        try? userDefaults.setJSON(purchasePayloadByTransactionId, forKey: Constants.purchasePayloadByTransactionId)
+    private static func setPurchasePayload(_ payload: PurchasePayload, forTransactionId transactionId: UInt64) -> Bool {
+        guard payload != purchasePayloadByTransactionId.updateValue(payload, forKey: transactionId)
+        else { return false }
+        try? userDefaults.setJSON(purchasePayloadByTransactionId.mapKeys(String.init), forKey: Constants.purchasePayloadByTransactionId)
         log.debug("Saving purchase payload for transactionId: \(transactionId)")
         return true
     }
 
-    private static func removePurchasePayload(forTransactionId transactionId: String) -> Bool {
+    private static func removePurchasePayload(forTransactionId transactionId: UInt64) -> Bool {
         guard purchasePayloadByTransactionId.removeValue(forKey: transactionId) != nil else { return false }
         try? userDefaults.setJSON(purchasePayloadByTransactionId, forKey: Constants.purchasePayloadByTransactionId)
         log.debug("Remove purchase payload for transactionId = \(transactionId)")
@@ -77,20 +79,20 @@ final class PurchasePayloadStorage {
         return true
     }
 
-    private static var unfinishedTransactionState: [String: Bool] = userDefaults
-        .dictionary(forKey: Constants.unfinishedTransactionState) as? [String: Bool] ?? [:]
+    private static var unfinishedTransactionState: [UInt64: Bool] = (userDefaults
+        .dictionary(forKey: Constants.unfinishedTransactionState) as? [String: Bool])?.mapKeys(UInt64.init) ?? [:]
 
-    private static func setUnfinishedTransactionState(synced: Bool, forTransactionId transactionId: String) -> Bool {
+    private static func setUnfinishedTransactionState(synced: Bool, forTransactionId transactionId: UInt64) -> Bool {
         let changing = unfinishedTransactionState[transactionId].map { !$0 && synced } ?? true
         if changing {
             unfinishedTransactionState[transactionId] = synced
-            userDefaults.set(unfinishedTransactionState, forKey: Constants.unfinishedTransactionState)
+            userDefaults.set(unfinishedTransactionState.mapKeys(String.init), forKey: Constants.unfinishedTransactionState)
         }
         log.debug("Saving state (\(synced ? "unsynced" : "synced"))  for transactionId: \(transactionId)")
         return changing
     }
 
-    private static func removeUnfinishedTransactionState(forTransactionId transactionId: String) -> Bool {
+    private static func removeUnfinishedTransactionState(forTransactionId transactionId: UInt64) -> Bool {
         guard unfinishedTransactionState.removeValue(forKey: transactionId) != nil else { return false }
         userDefaults.set(unfinishedTransactionState, forKey: Constants.unfinishedTransactionState)
         log.debug("Remove state for transactionId: \(transactionId)")
@@ -195,20 +197,26 @@ extension PurchasePayloadStorage {
         ))
     }
 
-    func purchasePayload(byTransaction transaction: SKTransaction, orCreateFor userId: AdaptyUserId) -> PurchasePayload {
-        if let payload = Self.purchasePayloadByTransactionId[transaction.unfIdentifier] {
+    func purchasePayload(
+        byTransaction transaction: StoreKit.Transaction,
+        orCreateFor userId: AdaptyUserId
+    ) -> PurchasePayload {
+        if let payload = Self.purchasePayloadByTransactionId[transaction.id] {
             return payload
         }
 
-        let payload = purchasePayload(byProductId: transaction.unfProductId, orCreateFor: userId)
+        let payload = purchasePayload(byProductId: transaction.productID, orCreateFor: userId)
         setPurchasePayload(payload, forTransaction: transaction)
         return payload
     }
 
-    func setPurchasePayload(_ payload: PurchasePayload, forTransaction transaction: SKTransaction) {
+    func setPurchasePayload(
+        _ payload: PurchasePayload,
+        forTransaction transaction: StoreKit.Transaction
+    ) {
         if Self.setPurchasePayload(
             payload,
-            forTransactionId: transaction.unfIdentifier
+            forTransactionId: transaction.id
         ) {
             Adapty.trackSystemEvent(AdaptyInternalEventParameters(
                 eventName: "did_set_variations_ids",
@@ -217,11 +225,11 @@ extension PurchasePayloadStorage {
                 ]
             ))
         }
-        removePurchasePayload(forProductId: transaction.unfProductId)
+        removePurchasePayload(forProductId: transaction.productID)
     }
 
-    func removePurchasePayload(forTransaction transaction: SKTransaction) {
-        if Self.removePurchasePayload(forTransactionId: transaction.unfIdentifier) {
+    func removePurchasePayload(forTransaction transaction: StoreKit.Transaction) {
+        if Self.removePurchasePayload(forTransactionId: transaction.id) {
             Adapty.trackSystemEvent(AdaptyInternalEventParameters(
                 eventName: "did_set_variations_ids",
                 params: [
@@ -229,10 +237,12 @@ extension PurchasePayloadStorage {
                 ]
             ))
         }
-        removePurchasePayload(forProductId: transaction.unfProductId)
+        removePurchasePayload(forProductId: transaction.productID)
     }
 
-    func onboardingVariationId() -> String? { Self.persistentOnboardingVariationsId }
+    func onboardingVariationId() -> String? {
+        Self.persistentOnboardingVariationsId
+    }
 
     func setOnboardingVariationId(_ variationId: String) {
         if Self.setPersistentOnboardingVariationId(variationId) {
@@ -245,15 +255,15 @@ extension PurchasePayloadStorage {
         }
     }
 
-    func unfinishedTransactionIds() -> Set<String> {
+    func unfinishedTransactionIds() -> Set<UInt64> {
         Set(Self.unfinishedTransactionState.keys)
     }
 
-    func isSyncedTransaction(_ transactionId: String) -> Bool {
+    func isSyncedTransaction(_ transactionId: UInt64) -> Bool {
         Self.unfinishedTransactionState[transactionId] ?? false
     }
 
-    func addUnfinishedTransaction(_ transactionId: String) -> Bool {
+    func addUnfinishedTransaction(_ transactionId: UInt64) -> Bool {
         let added = Self.setUnfinishedTransactionState(synced: false, forTransactionId: transactionId)
         if added {
             log.debug("Storage after add state of unfinishedTransaction:\(transactionId) all:\(Self.unfinishedTransactionState)")
@@ -267,7 +277,7 @@ extension PurchasePayloadStorage {
         return added
     }
 
-    func canFinishSyncedTransaction(_ transactionId: String) -> Bool {
+    func canFinishSyncedTransaction(_ transactionId: UInt64) -> Bool {
         guard Self.unfinishedTransactionState[transactionId] != nil else { return true }
         if Self.setUnfinishedTransactionState(synced: true, forTransactionId: transactionId) {
             log.debug("Storage after change state of unfinishedTransaction:\(transactionId) all: \(Self.unfinishedTransactionState)")
@@ -282,7 +292,7 @@ extension PurchasePayloadStorage {
         return false
     }
 
-    func removeUnfinishedTransaction(_ transactionId: String) {
+    func removeUnfinishedTransaction(_ transactionId: UInt64) {
         guard Self.unfinishedTransactionState[transactionId] != nil else { return }
         if Self.removeUnfinishedTransactionState(forTransactionId: transactionId) {
             log.debug("Storage after remove state of unfinishedTransaction:\(transactionId) all: \(Self.unfinishedTransactionState)")

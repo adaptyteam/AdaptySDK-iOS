@@ -9,11 +9,14 @@ import Foundation
 
 @AdaptyActor
 final class OfflineProfileManager {
-    var userId: AdaptyUserId { currentProfile.userId }
+    var userId: AdaptyUserId {
+        currentProfile.userId
+    }
+
     var currentProfile: AdaptyProfile
 
     init(profile: AdaptyProfile) {
-        self.currentProfile = profile
+        currentProfile = profile
     }
 
     convenience init(userId: AdaptyUserId) {
@@ -22,6 +25,7 @@ final class OfflineProfileManager {
             segmentId: "", // TODO: The user hasn't been created on the server; the segmentID is unknown. This user is created when a purchase is made in the Xcode environment, and the server hasn't created the user yet.
             isTestUser: false,
             codableCustomAttributes: nil,
+            appliedAttributionSources: [],
             customAttributes: [:],
             accessLevels: [:],
             subscriptions: [:],
@@ -76,6 +80,7 @@ private extension AdaptyProfile {
             segmentId: segmentId,
             isTestUser: isTestUser,
             codableCustomAttributes: codableCustomAttributes,
+            appliedAttributionSources: appliedAttributionSources,
             customAttributes: customAttributes,
             accessLevels: accessLevels,
             subscriptions: subscriptions,

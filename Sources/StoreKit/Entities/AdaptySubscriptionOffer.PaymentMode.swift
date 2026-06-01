@@ -33,7 +33,7 @@ extension AdaptySubscriptionOffer.PaymentMode {
             case .unknown: nil
             }
 
-        return value.map { $0.rawValue }
+        return value.map(\.rawValue)
     }
 }
 

@@ -9,127 +9,86 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 protocol ProductsInfoProvider {
-    func selectedProductInfo(by groupId: String) -> ProductResolver?
     func productInfo(by productId: String) -> ProductResolver?
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension AdaptyUIProductsViewModel: ProductsInfoProvider {
-    func selectedProductInfo(by groupId: String) -> ProductResolver? {
-        guard let selectedProductId = selectedProductId(by: groupId) else { return nil }
-        return productInfo(by: selectedProductId)
-    }
-
-    func productInfo(by productId: String) -> ProductResolver? {
-        products.first(where: { $0.adaptyProductId == productId })
+    func productInfo(by flowProductId: String) -> ProductResolver? {
+        flowProducts?[flowProductId]
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyUIProductsViewModel: ObservableObject {
     private let queue = DispatchQueue(label: "AdaptyUI.SDK.AdaptyUIProductsViewModel.Queue")
 
     private let logId: String
     private let logic: AdaptyUIBuilderLogic
-    private let paywallViewModel: AdaptyUIPaywallViewModel
+    private let flowViewModel: AdaptyUIFlowViewModel
     private let presentationViewModel: AdaptyUIPresentationViewModel
 
-    @Published private var paywallProductsWithoutOffer: [ProductResolver]?
-    @Published private var paywallProducts: [ProductResolver]?
+    @Published fileprivate var flowProducts: [String: ProductResolver]?
 
-    var products: [ProductResolver] {
-        return
-            paywallProducts ?? paywallProductsWithoutOffer ?? []
-    }
-
-    @Published var selectedProductsIds: [String: String]
     @Published var productsLoadingInProgress: Bool = false
     @Published var purchaseInProgress: Bool = false
     @Published var restoreInProgress: Bool = false
+
+    package var onProductsLoaded: (([ProductResolver]) -> Void)?
 
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,
         presentationViewModel: AdaptyUIPresentationViewModel,
-        paywallViewModel: AdaptyUIPaywallViewModel,
+        flowViewModel: AdaptyUIFlowViewModel,
         products: [any ProductResolver]?
     ) {
         self.logId = logId
         self.logic = logic
         self.presentationViewModel = presentationViewModel
-        self.paywallViewModel = paywallViewModel
+        self.flowViewModel = flowViewModel
 
-        paywallProducts = products
-        selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
+        if let products {
+            flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+        }
     }
-
-    private var groupIdsForAutoNotification = Set<String>()
-
-    package func resetSelectedProducts() {
-        Log.ui.verbose("#\(logId)# resetSelectedProducts")
-
-        groupIdsForAutoNotification.removeAll()
-        selectedProductsIds = paywallViewModel.viewConfiguration.selectedProducts
-    }
-
+    
     package func loadProductsIfNeeded() {
-        guard !productsLoadingInProgress, paywallProducts == nil else { return }
-        loadProducts(determineOffers: paywallProductsWithoutOffer != nil)
+        guard !productsLoadingInProgress, flowProducts == nil else { return }
+
+        loadProducts()
     }
 
-    func selectedProductId(by groupId: String) -> String? {
-        guard let productId = selectedProductsIds[groupId] else {
-            return nil
-        }
-
-        if !groupIdsForAutoNotification.contains(groupId),
-           let selectedProduct = products.first(where: { $0.adaptyProductId == productId })
-        {
-            logic.reportDidSelectProduct(selectedProduct, automatic: true)
-            groupIdsForAutoNotification.insert(groupId)
-        }
-
-        return productId
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        productsLoadingInProgress = false
+        purchaseInProgress = false
+        restoreInProgress = false
     }
 
-    func selectProduct(id: String, forGroupId groupId: String) {
-        selectedProductsIds[groupId] = id
-
-        if let selectedProduct = products.first(where: { $0.adaptyProductId == id }) {
+    func selectProduct(id: String) {
+        if let selectedProduct = flowProducts?[id] {
             logic.reportDidSelectProduct(selectedProduct, automatic: false)
         }
     }
 
-    func unselectProduct(forGroupId groupId: String) {
-        selectedProductsIds.removeValue(forKey: groupId)
-    }
-
-    private func loadProducts(determineOffers: Bool) {
+    private func loadProducts() {
         productsLoadingInProgress = true
         let logId = logId
-        Log.ui.verbose("#\(logId)# loadProducts determineOffers: \(determineOffers) begin")
+        Log.ui.verbose("#\(logId)# loadProducts begin")
 
         Task { @MainActor [weak self] in
             guard let self else { return }
 
             do {
-                let productsResult = try await logic.getProducts(
-                    determineOffers: determineOffers
-                )
-                if determineOffers {
-                    self.paywallProducts = productsResult
-                } else {
-                    self.paywallProductsWithoutOffer = productsResult
-                    self.loadProducts(determineOffers: true)
-                }
+                let products = try await logic.getProducts()
+                flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+                onProductsLoaded?(products)
             } catch {
-                Log.ui.error("#\(logId)# loadProducts determineOffers: \(determineOffers) fail: \(error)")
-                self.productsLoadingInProgress = false
-                self.retryLoadingProductsIfNeeded(error: error)
+                Log.ui.error("#\(logId)# loadProducts fail: \(error)")
+                productsLoadingInProgress = false
+                retryLoadingProductsIfNeeded(error: error)
             }
         }
     }
@@ -142,26 +101,28 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
             try await Task.sleep(seconds: 2)
 
-            if self.presentationViewModel.presentationState == .appeared {
-                self.loadProductsIfNeeded()
+            if presentationViewModel.presentationState == .appeared {
+                loadProductsIfNeeded()
             }
         }
     }
 
     // MARK: Actions
 
-    func purchaseSelectedProduct(
-        fromGroupId groupId: String,
-        service: VC.PaymentService
+    func purchaseProduct(
+        id flowProductId: String,
+        service: VC.Action.PaymentService,
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     ) {
-        guard let productId = selectedProductId(by: groupId) else { return }
-        purchaseProduct(id: productId, service: service)
-    }
-
-    func purchaseProduct(id productId: String, service: VC.PaymentService) {
-        guard let product = paywallProducts?.first(where: { $0.adaptyProductId == productId }) else {
-            Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(productId)")
+        guard let product = flowProducts?[flowProductId] else {
+            Log.ui.warn("#\(logId)# purchaseProduct unable to purchase \(flowProductId)")
+            Task { @MainActor in onFinish(.fail) }
             return
+        }
+
+        let finish: @MainActor @Sendable (VS.PurchaseResult) -> Void = { [weak self] value in
+            self?.purchaseInProgress = false
+            onFinish(value)
         }
 
         switch service {
@@ -169,19 +130,28 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
             logic.makePurchase(
                 product: product,
                 onStart: { [weak self] in self?.purchaseInProgress = true },
-                onFinish: { [weak self] in self?.purchaseInProgress = false }
+                onFinish: finish
             )
         case .openWebPaywall(let openIn):
             Task { @MainActor [weak self] in
-                await self?.logic.openWebPaywall(for: product, in: openIn)
+                await self?.logic.openWebPaywall(
+                    for: product,
+                    in: openIn,
+                    onFinish: finish
+                )
             }
         }
     }
 
-    func restorePurchases() {
+    func restorePurchases(
+        onFinish: @MainActor @Sendable @escaping (VS.RestorePurchasesResult) -> Void
+    ) {
         logic.restorePurchases(
             onStart: { [weak self] in self?.restoreInProgress = true },
-            onFinish: { [weak self] in self?.restoreInProgress = false }
+            onFinish: { [weak self] value in
+                self?.restoreInProgress = false
+                onFinish(value)
+            }
         )
     }
 }

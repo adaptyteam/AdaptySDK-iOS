@@ -12,10 +12,10 @@ extension HTTPError {
         switch self {
         case .perform:
             false
-        case .network(_, _, _, let error):
+        case let .network(_, _, _, error):
             error.isServerUnavailable
-        case .decoding(_, _, let statusCode, _, _, _),
-             .backend(_, _, let statusCode, _, _, _):
+        case let .decoding(_, _, statusCode, _, _, _),
+             let .backend(_, _, statusCode, _, _, _):
             switch statusCode {
             case 503, 520, 524, 526:
                 true

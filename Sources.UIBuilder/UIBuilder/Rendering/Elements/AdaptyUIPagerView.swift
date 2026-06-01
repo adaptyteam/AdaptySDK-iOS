@@ -9,19 +9,16 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.VerticalAlignment {
     var swiftUIAlignment: Alignment {
         switch self {
         case .top: .top
         case .center: .center
         case .bottom: .bottom
-        case .justified: .center
         }
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Pager.Length {
     func valueWith(parent: Double, screenSize: Double, safeAreaStart: Double, safeAreaEnd: Double) -> CGFloat {
         switch self {
@@ -31,14 +28,12 @@ extension VC.Pager.Length {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension VC.TransitionSlide {
+extension VC.Transition {
     var swiftUIAnimation: Animation {
         interpolator.createAnimation(duration: duration)
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func dragGesture(condition: Bool,
@@ -57,11 +52,10 @@ extension View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-struct AdaptyUIPagerView: View {
-    private static let pageControllTapAnimationDuration = 0.3
+fileprivate let pageControllTapAnimationDuration = 0.3
 
+@MainActor
+struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
     @Environment(\.layoutDirection)
@@ -72,8 +66,18 @@ struct AdaptyUIPagerView: View {
     private var safeArea: EdgeInsets
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
+    @EnvironmentObject
+    var stateViewModel: AdaptyUIStateViewModel
 
-    var pager: VC.Pager
+    private let pager: VC.Pager
+    private let screenHolderBuilder: () -> ScreenHolderContent
+
+    private var pageIndexFromBinding: Int {
+        guard let variable = pager.pageIndex else { return currentPage }
+        return Int(stateViewModel.getValue(variable, defaultValue: Int32(0), screen: screen))
+    }
 
     // We had to introduce this additional State variable to workaround weird SwiftUI crash caused animated currentPage change
     // PageControl now relies on currentPageSelectedIndex variable which is updating outside of withAnimation block
@@ -90,8 +94,12 @@ struct AdaptyUIPagerView: View {
     @State private var isInteracting = false
     @State private var timer: Timer?
 
-    init(_ pager: VC.Pager) {
+    init(
+        _ pager: VC.Pager,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
+    ) {
         self.pager = pager
+        self.screenHolderBuilder = screenHolderBuilder
     }
 
     @ViewBuilder
@@ -133,6 +141,16 @@ struct AdaptyUIPagerView: View {
         .onDisappear {
             stopAutoScroll()
         }
+        .onChange(of: currentPage) { newPage in
+            handlePageChanged(to: newPage)
+        }
+        .onChange(of: pageIndexFromBinding) { newTarget in
+            let clamped = max(0, min(newTarget, pager.content.count - 1))
+            guard clamped != currentPage else { return }
+            withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
+                currentPage = clamped
+            }
+        }
     }
 
     private func handlePageControlTap(index: Int) {
@@ -151,25 +169,25 @@ struct AdaptyUIPagerView: View {
         }
 
         if pager.animation != nil {
-            withAnimation(.easeInOut(duration: Self.pageControllTapAnimationDuration)) {
+            withAnimation(
+                .easeInOut(
+                    duration: pageControllTapAnimationDuration
+                )
+            ) {
                 currentPage = index
             }
             if shouldScheduleAutoscroll {
-                Task {
-                    try await Task.sleep(seconds: Self.pageControllTapAnimationDuration)
-                    scheduleAutoScroll()
-                }
+                resumeAutoScrollAfterInteraction()
             }
         } else {
             currentPage = index
             if shouldScheduleAutoscroll {
-                scheduleAutoScroll()
+                resumeAutoScrollAfterInteraction()
             }
         }
     }
 
-    // View for the Pager
-    @ViewBuilder
+    /// View for the Pager
     private var pagerView: some View {
         GeometryReader { proxy in
             let pagePaddingLeading = pager.pagePadding.leading.points(
@@ -210,17 +228,20 @@ struct AdaptyUIPagerView: View {
                 - pagePaddingTop
                 - pagePaddingBottom
 
-            let hPadding = (proxy.size.width - width) / 2.0
             let pages = pager.content
             HStack(spacing: pager.spacing) {
                 ForEach(0 ..< pages.count, id: \.self) { idx in
-                    AdaptyUIElementView(pages[idx])
-                        .frame(width: max(width, 0), height: max(height, 0))
-                        .clipped()
-                        .padding(.leading, idx == 0 ? hPadding : 0)
-                        .padding(.trailing, idx == pages.count - 1 ? hPadding : 0)
+                    AdaptyUIElementView(
+                        pages[idx],
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                    .frame(width: max(width, 0), height: max(height, 0))
+                    .clipped()
+                    .padding(.leading, idx == 0 ? pagePaddingLeading : 0)
+                    .padding(.trailing, idx == pages.count - 1 ? pagePaddingTrailing : 0)
                 }
             }
+            .padding(.top, pagePaddingTop)
             .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)
             .dragGesture(
                 condition: pager.interactionBehavior != .none,
@@ -238,7 +259,7 @@ struct AdaptyUIPagerView: View {
                         isInteracting = false
 
                         if pager.interactionBehavior == .pauseAnimation {
-                            scheduleAutoScroll()
+                            resumeAutoScrollAfterInteraction()
                         }
                     }
                 }
@@ -246,15 +267,19 @@ struct AdaptyUIPagerView: View {
         }
     }
 
-    @ViewBuilder
-    private func pageControlView(_ pageControl: VC.Pager.PageControl, onDotTap: @escaping (Int) -> Void) -> some View {
+    private func pageControlView(
+        _ pageControl: VC.Pager.PageControl,
+        onDotTap: @escaping (Int) -> Void
+    ) -> some View {
         HStack(spacing: pageControl.spacing) {
             ForEach(0 ..< pager.content.count, id: \.self) { idx in
                 Circle()
                     .fill(
-                        idx == currentPageSelectedIndex ?
-                            pageControl.selectedColor.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme) :
-                            pageControl.color.resolve(with: assetsViewModel.assetsResolver, colorScheme: colorScheme)
+                        asset: assetsViewModel.resolvedAsset(
+                            idx == currentPageSelectedIndex ? pageControl.selectedColor : pageControl.color,
+                            mode: colorScheme.toVCMode,
+                            screen: screen
+                        ).asColorOrGradientOrImageAsset
                     )
                     .frame(width: pageControl.dotSize,
                            height: pageControl.dotSize)
@@ -274,8 +299,26 @@ struct AdaptyUIPagerView: View {
             repeats: false
         ) { _ in
             Task { @MainActor in
+                performNextPageTransition()
                 scheduleAutoScroll()
             }
+        }
+    }
+
+    private func performNextPageTransition() {
+        guard let config = pager.animation else { return }
+        guard !isInteracting else { return }
+
+        if currentPage < pager.content.count - 1 {
+            withAnimation(config.pageTransition.swiftUIAnimation) {
+                currentPage += 1
+            }
+        } else if let repeatTransition = config.repeatTransition {
+            withAnimation(repeatTransition.swiftUIAnimation) {
+                currentPage = 0
+            }
+        } else {
+            stopAutoScroll()
         }
     }
 
@@ -287,19 +330,22 @@ struct AdaptyUIPagerView: View {
             repeats: true
         ) { _ in
             Task { @MainActor in
-                guard !isInteracting else { return }
+                performNextPageTransition()
+            }
+        }
+    }
 
-                if currentPage < pager.content.count - 1 {
-                    withAnimation(config.pageTransition.swiftUIAnimation) {
-                        currentPage += 1
-                    }
-                } else if let repeatTransition = config.repeatTransition {
-                    withAnimation(repeatTransition.swiftUIAnimation) {
-                        currentPage = 0
-                    }
-                } else {
-                    stopAutoScroll()
-                }
+    private func resumeAutoScrollAfterInteraction() {
+        guard let config = pager.animation else { return }
+
+        stopAutoScroll()
+        timer = Timer.scheduledTimer(
+            withTimeInterval: config.afterInteractionDelay,
+            repeats: false
+        ) { _ in
+            Task { @MainActor in
+                performNextPageTransition()
+                scheduleAutoScroll()
             }
         }
     }
@@ -307,6 +353,16 @@ struct AdaptyUIPagerView: View {
     private func stopAutoScroll() {
         timer?.invalidate()
         timer = nil
+    }
+
+    private func handlePageChanged(to newPage: Int) {
+        if let pageIndexVariable = pager.pageIndex {
+            stateViewModel.setPageIndex(
+                newPage,
+                variable: pageIndexVariable,
+                screen: screen
+            )
+        }
     }
 }
 

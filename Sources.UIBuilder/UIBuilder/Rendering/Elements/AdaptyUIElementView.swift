@@ -9,93 +9,114 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension View {
-    @ViewBuilder
-    func paddingIfNeeded(_ insets: EdgeInsets?) -> some View {
-        if let insets {
-            padding(insets)
-        } else {
-            self
-        }
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension VC.Element {
-    var properties: VC.Element.Properties? {
-        switch self {
-        case .space:
-            return nil
-        case let .box(_, properties), let .stack(_, properties),
-             let .text(_, properties), let .image(_, properties),
-             let .button(_, properties), let .row(_, properties),
-             let .column(_, properties), let .section(_, properties),
-             let .toggle(_, properties), let .timer(_, properties),
-             let .pager(_, properties), let .unknown(_, properties),
-             let .video(_, properties):
-            return properties
-        }
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
-struct AdaptyUIElementWithoutPropertiesView: View {
-    private var element: VC.Element
-
-    @Environment(\.colorScheme)
-    private var colorScheme: ColorScheme
+struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
+    private let element: VC.Element
+    private let screenHolderBuilder: () -> ScreenHolderContent
+    private var playAnimations: Binding<[VC.Animation]>
 
     init(
-        _ element: VC.Element
+        _ element: VC.Element,
+        playAnimations: Binding<[VC.Animation]>,
+        screenHolderBuilder: @escaping () -> ScreenHolderContent
     ) {
         self.element = element
+        self.playAnimations = playAnimations
+        self.screenHolderBuilder = screenHolderBuilder
     }
 
     var body: some View {
         switch element {
-        case let .space(count):
-            if count > 0 {
-                ForEach(0 ..< count, id: \.self) { _ in
-                    Spacer()
-                }
-            }
-        case let .box(box, props):
+        case let .box(box, _):
             elementOrEmpty(box.content)
-                .animatableFrame(box: box, animations: props?.onAppear)
+                .animatableFrame(
+                    box: box,
+                    play: playAnimations
+                )
                 .rangedFrame(box: box)
         case let .stack(stack, _):
-            AdaptyUIStackView(stack)
+            AdaptyUIStackView(
+                stack,
+                screenHolderBuilder: screenHolderBuilder
+            )
         case let .text(text, _):
             AdaptyUITextView(text)
+        case let .textField(textField, props):
+            AdaptyUITextField(textField, focusId: props?.focusId)
+        case let .slider(slider, _):
+            AdaptyUISliderView(slider)
         case let .image(image, _):
-            AdaptyUIImageView(image)
+            AdaptyUIImageView(.unresolvedAsset(image))
         case let .video(video, _):
-            AdaptyUIVideoView(video: video, colorScheme: colorScheme)
+            AdaptyUIVideoView(video: video)
         case let .button(button, _):
             AdaptyUIButtonView(button)
         case let .row(row, _):
-            AdaptyUIRowView(row)
+            switch row.width {
+            case .legacy:
+                AdaptyUIRowView(
+                    row,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            case .hug, .fill:
+                AdaptyUIFlexRowView(
+                    row,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            }
         case let .column(column, _):
-            AdaptyUIColumnView(column)
+            switch column.height {
+            case .legacy:
+                AdaptyUIColumnView(
+                    column,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            case .hug, .fill:
+                AdaptyUIFlexColumnView(
+                    column,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            }
         case let .section(section, _):
-            AdaptyUISectionView(section)
+            AdaptyUISectionView(
+                section,
+                screenHolderBuilder: screenHolderBuilder
+            )
         case let .toggle(toggle, _):
             AdaptyUIToggleView(toggle)
         case let .timer(timer, _):
             AdaptyUITimerView(timer)
         case let .pager(pager, _):
-            AdaptyUIPagerView(pager)
-        case let .unknown(value, _):
+            AdaptyUIPagerView(
+                pager,
+                screenHolderBuilder: screenHolderBuilder
+            )
+        case .screenHolder:
+            screenHolderBuilder()
+        case let .dateTimePicker(dateTimePicker, _):
+            AdaptyUIDateTimePickerView(dateTimePicker)
+        case let .wheelItemsPicker(wheelItemsPicker, _):
+            AdaptyUIWheelItemsPickerView(wheelItemsPicker)
+        case let .wheelRangePicker(wheelRangePicker, _):
+            AdaptyUIWheelRangePickerView(wheelRangePicker)
+        case let .textProgress(textProgress, _):
+            AdaptyUITextProgressView(textProgress)
+        case let .linearProgress(linearProgress, _):
+            AdaptyUILinearProgressView(linearProgress)
+        case let .radialProgress(radialProgress, _):
+            AdaptyUIRadialProgressView(radialProgress)
+        case let .unknown(value):
             AdaptyUIUnknownElementView(value: value)
         }
     }
 
     @ViewBuilder
-    private func elementOrEmpty(_ content: VC.Element?) -> some View {
+    private func elementOrEmpty(_ content: VC.ElementIndex?) -> some View {
         if let content {
-            AdaptyUIElementView(content)
+            AdaptyUIElementView(
+                content,
+                screenHolderBuilder: screenHolderBuilder
+            )
         } else {
             Color.clear
                 .frame(idealWidth: 0, idealHeight: 0)
@@ -103,33 +124,182 @@ struct AdaptyUIElementWithoutPropertiesView: View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-package struct AdaptyUIElementView: View {
-    private var element: VC.Element
-    private var additionalPadding: EdgeInsets?
-    private var drawDecoratorBackground: Bool
+struct AdaptyUIElementView<ScreenHolderContent: View>: View {
+    private let elementIndex: VC.ElementIndex
+    private let drawDecoratorBackground: Bool
+    private let screenHolderBuilder: () -> ScreenHolderContent
 
-    package init(
-        _ element: VC.Element,
-        additionalPadding: EdgeInsets? = nil,
+    init(
+        _ elementIndex: VC.ElementIndex,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent,
         drawDecoratorBackground: Bool = true
     ) {
-        self.element = element
-        self.additionalPadding = additionalPadding
+        self.elementIndex = elementIndex
+        self.screenHolderBuilder = screenHolderBuilder
         self.drawDecoratorBackground = drawDecoratorBackground
     }
 
-    package var body: some View {
-        AdaptyUIElementWithoutPropertiesView(element)
-            .paddingIfNeeded(additionalPadding)
+    @Environment(\.adaptyElementPool) private var elementPool
+    @EnvironmentObject private var eventBus: AdaptyUIEventBus
+    @EnvironmentObject private var navigatorViewModel: AdaptyUINavigatorViewModel
+    @EnvironmentObject private var stateViewModel: AdaptyUIStateViewModel
+    @Environment(\.adaptyScreenInstanceId) private var screenInstanceId: String?
+
+    @State private var playAnimations: [VC.Animation] = []
+    @State private var lastProcessedSequence: UInt = 0
+
+    var body: some View {
+        if let element = elementPool[safe: elementIndex] {
+            AdaptyUIElementWithoutPropertiesView(
+                element,
+                playAnimations: $playAnimations,
+                screenHolderBuilder: screenHolderBuilder
+            )
             .animatableDecorator(
                 element.properties?.decorator,
-                animations: element.properties?.onAppear,
+                play: $playAnimations,
                 includeBackground: drawDecoratorBackground
             )
-            .animatableProperties(element.properties)
+            .modifier(ElementBackgroundModifier(
+                backgrounds: element.properties?.background,
+                screenHolderBuilder: screenHolderBuilder
+            ))
+            .modifier(ElementOverlayModifier(
+                overlays: element.properties?.overlay,
+                screenHolderBuilder: screenHolderBuilder
+            ))
+            .animatableProperties(element.properties, play: $playAnimations)
             .padding(element.properties?.padding)
+            .modifier(ElementInteractionEnabledModifier(element.properties?.interactionEnabled))
             .modifier(DebugOverlayModifier())
+            .onAppear {
+                consumeAndProcessPendingEvents(properties: element.properties)
+            }
+            .onChange(of: eventBus.revision) { _ in
+                consumeAndProcessPendingEvents(properties: element.properties)
+            }
+            .onChange(of: elementIndex) { newIndex in
+                // SwiftUI keeps this view's identity across section index swaps
+                // (same structural position, same View type), so .onAppear doesn't
+                // re-fire on the new content. Re-arm sticky lifecycle events for
+                // the new subtree by replaying pending events against the new
+                // element's properties.
+                lastProcessedSequence = 0
+                if let element = elementPool[safe: newIndex] {
+                    consumeAndProcessPendingEvents(properties: element.properties)
+                }
+            }
+        } else {
+            AdaptyUIUnknownElementView(value: "missing_element_\(elementIndex)")
+        }
+    }
+
+    private func consumeAndProcessPendingEvents(properties: VC.Element.Properties?) {
+        guard let properties,
+              properties.eventHandlers.isNotEmpty else { return }
+
+        let pending = eventBus.consumePending(
+            afterSequence: lastProcessedSequence,
+            screenInstanceId: screenInstanceId,
+            currentTopScreenInstanceId: navigatorViewModel.currentScreenInstanceIfSingle?.id
+        )
+
+        guard !pending.isEmpty else { return }
+
+        for event in pending {
+            processEvent(event, properties: properties)
+        }
+
+        lastProcessedSequence = pending.last!.sequence
+    }
+
+    private func processEvent(_ event: AdaptyUIEventBus.Event, properties: VC.Element.Properties) {
+        var combinedAnimations: [VC.Animation] = []
+        var firingHandlers: [VC.EventHandler] = []
+
+        for eventHandler in properties.eventHandlers {
+            guard shouldFireHandler(eventHandler, for: event) else { continue }
+            firingHandlers.append(eventHandler)
+            combinedAnimations.append(contentsOf: eventHandler.animations)
+        }
+
+        if !combinedAnimations.isEmpty {
+            if playAnimations == combinedAnimations {
+                // Same animations — reset first, defer re-set to next run loop
+                playAnimations = []
+                DispatchQueue.main.async {
+                    playAnimations = combinedAnimations
+                }
+            } else {
+                playAnimations = combinedAnimations
+            }
+        }
+
+        for eventHandler in firingHandlers where eventHandler.onAnimationsFinish.isNotEmpty {
+            scheduleAnimationsFinish(eventHandler)
+        }
+    }
+
+    private func shouldFireHandler(
+        _ handler: VC.EventHandler,
+        for event: AdaptyUIEventBus.Event
+    ) -> Bool {
+        for trigger in handler.triggers {
+            guard trigger.events.contains(event.eventId) else { continue }
+
+            if let allowedTransitions = trigger.screenTransitions {
+                guard let tid = event.transitionId,
+                      allowedTransitions.contains(tid) else { continue }
+            }
+
+            let count = eventBus.fireCount(screenInstanceId: event.screenInstanceId, eventId: event.eventId)
+            if let filter = trigger.filter {
+                switch filter {
+                case .first: guard count <= 1 else { continue }
+                case .notFirst: guard count > 1 else { continue }
+                }
+            }
+
+            return true
+        }
+        return false
+    }
+
+    private func scheduleAnimationsFinish(_ handler: VC.EventHandler) {
+        // Infinite loops (loop != nil && loopCount == nil) never finish
+        let hasInfiniteLoop = handler.animations.contains {
+            $0.timeline.loop != nil && $0.timeline.loopCount == nil
+        }
+        guard !hasInfiniteLoop else { return }
+
+        let totalDuration = handler.animations
+            .map { animation -> TimeInterval in
+                let tl = animation.timeline
+                let baseDuration = tl.duration + tl.startDelay
+                guard let loop = tl.loop, let loopCount = tl.loopCount else {
+                    return baseDuration
+                }
+                let loopDuration: TimeInterval =
+                    switch loop {
+                    case .normal:
+                        tl.duration + tl.loopDelay
+                    case .pingPong:
+                        tl.duration * 2 + tl.pingPongDelay
+                    }
+                return baseDuration + loopDuration * Double(loopCount)
+            }
+            .max() ?? 0
+
+        let actions = handler.onAnimationsFinish
+        guard let screenInstance = navigatorViewModel.currentScreenInstanceIfSingle else { return }
+
+        if totalDuration > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration) { [weak stateViewModel] in
+                stateViewModel?.execute(actions: actions, screen: screenInstance)
+            }
+        } else {
+            stateViewModel.execute(actions: actions, screen: screenInstance)
+        }
     }
 }
 

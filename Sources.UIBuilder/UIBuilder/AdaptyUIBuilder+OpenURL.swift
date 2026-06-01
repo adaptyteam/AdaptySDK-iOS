@@ -14,7 +14,6 @@ import UIKit
 import SafariServices
 #endif
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package extension URL {
     func open(in presentation: AdaptyUIBuilder.WebPresentation) {
@@ -35,7 +34,6 @@ package extension URL {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 private extension UIApplication {
     var topPresentedController: UIViewController? {
@@ -51,7 +49,6 @@ private extension UIApplication {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 private extension UIViewController {
     func topPresentedController() -> UIViewController {

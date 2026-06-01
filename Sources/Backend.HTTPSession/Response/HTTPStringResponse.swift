@@ -18,8 +18,8 @@ extension HTTPDataResponse {
 extension HTTPStringResponse {
     static func stringDecoder(
         _ response: HTTPDataResponse,
-        _ configuration: HTTPCodableConfiguration?,
-        _ request: HTTPRequest
+        _: HTTPCodableConfiguration?,
+        _: HTTPRequest
     ) async throws -> HTTPStringResponse {
         response.asHTTPStringResponse
     }

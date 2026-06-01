@@ -10,51 +10,99 @@
 import AdaptyUIBuilder
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
-    func reportViewDidAppear() {}
+    let logId: String
+    let events: AdaptyUIEventsHandler
+    let products: [Dev_MockProduct]
 
-    func reportViewDidDisappear() {}
-
-    func reportDidPerformAction(_ action: AdaptyUIBuilder.Action) {}
-
-    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {}
-
-    func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool { false }
-
-    package func logShowPaywall(
-        viewConfiguration: AdaptyUIConfiguration
-    ) async {}
-
-    package func getProducts(
-        determineOffers: Bool
-    ) async throws -> [ProductResolver] {
-        []
+    init(
+        logId: String,
+        events: AdaptyUIEventsHandler,
+        products: [Dev_MockProduct]
+    ) {
+        self.logId = logId
+        self.events = events
+        self.products = products
     }
 
-    private func getProductsInternal(
-        determineOffers: Bool
-    ) async throws -> ([ProductResolver], [String]) {
-        ([], [])
+    func reportViewDidAppear() {
+        events.event_viewDidAppear()
+    }
+
+    func reportViewDidDisappear() {
+        events.event_viewDidDisappear()
+    }
+
+    func reportDidPerformAction(_ action: AdaptyUIBuilder.Action) {
+        events.event_didPerformAction(action)
+    }
+
+    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {
+        events.event_didSelectProduct(product, automatic: automatic)
+    }
+
+    func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool {
+        false
+    }
+
+    package func logShowFlow() async throws {}
+
+    package func getProducts() async throws -> [ProductResolver] {
+        try await Task.sleep(nanoseconds: 1_500_000_000)
+        return products
     }
 
     func makePurchase(
         product: ProductResolver,
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
-    ) {}
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
+    ) {
+        onStart()
+        events.event_didStartPurchase(product: product)
+
+        Task { @MainActor in
+            try await Task.sleep(nanoseconds: 1_500_000_000)
+            events.event_didFinishPurchase(product: product, result: .success)
+            onFinish(.success)
+        }
+    }
 
     func openWebPaywall(
         for product: ProductResolver,
-        in openIn: VC.WebOpenInParameter
-    ) async {}
+        in openIn: VC.Action.WebOpenInParameter,
+        onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
+    ) async {
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        events.event_didFinishPurchase(product: product, result: .success)
+        onFinish(.success)
+    }
 
     func restorePurchases(
         onStart: @MainActor @Sendable @escaping () -> Void,
-        onFinish: @MainActor @Sendable @escaping () -> Void
-    ) {}
+        onFinish: @MainActor @Sendable @escaping (VS.RestorePurchasesResult) -> Void
+    ) {
+        onStart()
+        events.event_didStartRestore()
 
-    func reportDidFailRendering(with error: AdaptyUIBuilderError) {}
+        Task { @MainActor in
+            try await Task.sleep(nanoseconds: 1_500_000_000)
+            events.event_didFinishRestore(result: .success)
+            onFinish(.success)
+        }
+    }
+
+    func reportDidReceiveError(_ error: AdaptyUIBuilderError) {
+        events.event_didReceiveError(error)
+    }
+
+    func reportCustomerAnalyticEvent(
+        name: String,
+        params: [String: any Sendable]
+    ) {
+        events.event_didReceiveAnalyticEvent(name: name, params: params)
+    }
+
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
 }
 
 #endif
