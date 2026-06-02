@@ -6,7 +6,7 @@
 //
 
 import Foundation
-#if !ADAPTY_KIDS_MODE && canImport(AdServices)
+#if canImport(AdServices)
 import AdServices
 
 private let log = Log.default
