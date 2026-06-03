@@ -14,12 +14,16 @@ private let log = Log.default
 extension Adapty {
     package nonisolated static func getUIConfiguration(
         flow: AdaptyFlow,
+        device: DeviceInfo,
+        customLayoutId: String?,
         locale: String?,
         loadTimeout: TimeInterval? = nil
     ) async throws -> AdaptyUIConfiguration {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
         return try await activatedSDK.getUIConfiguration(
             flow: flow,
+            device: device,
+            customLayoutId: customLayoutId,
             locale: locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale,
             loadTimeout: loadTimeout
         )
@@ -27,16 +31,34 @@ extension Adapty {
 
     private func getUIConfiguration(
         flow: AdaptyFlow,
+        device: DeviceInfo,
+        customLayoutId: String?,
         locale: AdaptyLocale,
         loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> AdaptyUIConfiguration {
-        guard let viewConfigurationId = flow.viewConfigurationId else {
+        guard
+            let flowVersionId = flow.versionId
+        else {
+            throw .isNoViewConfigurationInFlow()
+        }
+
+        let flowLayoutId =
+            if Adapty.uiBuilderVersion == "5_0" {
+                flowVersionId
+            } else {
+                try flow.viewConfiguration?.getLayout(for: device, with: customLayoutId)?.id
+            }
+
+        guard
+            let flowLayoutId
+        else {
             throw .isNoViewConfigurationInFlow()
         }
 
         let schema = try await getUISchema(
             flowId: flow.id,
-            viewConfigurationId: viewConfigurationId,
+            flowVersionId: flowVersionId,
+            flowLayoutId: flowLayoutId,
             loadTimeout: loadTimeout
         )
 
@@ -47,7 +69,7 @@ extension Adapty {
         let extractLocaleTask = Task.detachedWithThrowsTyped(priority: .userInitiated) { () async throws(AdaptyError) -> AdaptyUIConfiguration in
             do {
                 return try schema.extractUIConfiguration(
-                    id: viewConfigurationId,
+                    id: flowLayoutId,
                     withLocaleId: locale.id,
                     envoriment: envoriment
                 )
@@ -61,11 +83,12 @@ extension Adapty {
 
     private func getUISchema(
         flowId: String,
-        viewConfigurationId: String,
+        flowVersionId: String,
+        flowLayoutId: String,
         loadTimeout: TaskDuration
     ) async throws(AdaptyError) -> AdaptyUISchema {
         let isTestUser = profileManager?.isTestUser ?? false
-        let cacheKey = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: viewConfigurationId)
+        let cacheKey = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: flowLayoutId)
 
         if !isTestUser, let schema = await fetchLocalUISchema(cacheKey) {
             return schema
@@ -77,11 +100,12 @@ extension Adapty {
         do {
             (schema, data) = try await fetchBackendUISchema(
                 flowId: flowId,
-                viewConfigurationId: viewConfigurationId,
+                flowVersionId: flowVersionId,
+                flowLayoutId: flowLayoutId,
                 loadTimeout: loadTimeout,
                 disableServerCache: isTestUser
             )
-            log.verbose("UI schema source = backend (\(viewConfigurationId))")
+            log.verbose("UI schema source = backend (\(flowLayoutId))")
         } catch {
             if isTestUser, let schema = await fetchLocalUISchema(cacheKey) {
                 return schema
@@ -115,7 +139,7 @@ extension Adapty {
             return schema
         }
 
-        if let schema = try? Adapty.fallbackPlacements?.getUISchema(byViewConfigurationId: key.itemId) {
+        if let schema = try? Adapty.fallbackPlacements?.getUISchema(byFlowLayoutId: key.itemId) {
             log.verbose("UI schema source = packed fallback (\(key.itemId))")
             return schema
         }
@@ -125,7 +149,8 @@ extension Adapty {
 
     private func fetchBackendUISchema(
         flowId: String,
-        viewConfigurationId: String,
+        flowVersionId: String,
+        flowLayoutId: String,
         loadTimeout: TaskDuration,
         disableServerCache: Bool
     ) async throws(AdaptyError) -> (schema: AdaptyUISchema, data: Data) {
@@ -137,7 +162,8 @@ extension Adapty {
                 try await session.fetchUISchema(
                     apiKeyPrefix: apiKeyPrefix,
                     flowId: flowId,
-                    viewConfigurationId: viewConfigurationId,
+                    flowVersionId: flowVersionId,
+                    flowLayoutId: flowLayoutId,
                     disableServerCache: disableServerCache
                 )
             }
@@ -151,7 +177,8 @@ extension Adapty {
             return try await httpSession.fetchFallbackUISchema(
                 apiKeyPrefix: apiKeyPrefix,
                 flowId: flowId,
-                viewConfigurationId: viewConfigurationId,
+                flowVersionId: flowVersionId,
+                flowLayoutId: flowLayoutId,
                 disableServerCache: disableServerCache
             )
         } catch {
@@ -159,3 +186,4 @@ extension Adapty {
         }
     }
 }
+

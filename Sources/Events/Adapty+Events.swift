@@ -62,7 +62,7 @@ extension Adapty {
         if let flow = draw.content as? AdaptyFlow {
             event = .flowVariationAssigned(.init(
                 variationId: flow.variationId,
-                viewConfigurationId: flow.viewConfigurationId,
+                flowVersionId: flow.versionId,
                 placementAudienceVersionId: draw.placementAudienceVersionId
             ))
 

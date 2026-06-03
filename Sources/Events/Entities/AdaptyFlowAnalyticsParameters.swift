@@ -13,21 +13,21 @@ package protocol AdaptyFlowAnalyticsPayload: Sendable, Encodable {}
 
 struct AdaptyFlowAnalyticsParameters: Sendable {
     let variationId: String
-    let viewConfigurationId: String?
+    let flowVersionId: String?
     let payload: AdaptyFlowAnalyticsPayload
 }
 
 extension AdaptyFlowAnalyticsParameters: Encodable {
     enum CodingKeys: String, CodingKey {
         case variationId = "variation_id"
-        case viewConfigurationId = "flow_version_id"
+        case flowVersionId = "flow_version_id"
         case payload = "event_properties"
     }
 
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(variationId, forKey: .variationId)
-        try container.encodeIfPresent(viewConfigurationId, forKey: .viewConfigurationId)
+        try container.encodeIfPresent(flowVersionId, forKey: .flowVersionId)
         try container.encode(payload, forKey: .payload)
 //        try payload.encode(to: container.superEncoder(forKey: .payload))
     }

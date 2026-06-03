@@ -316,6 +316,12 @@ public extension AdaptyUI {
 
         let viewConfiguration = try await Adapty.getUIConfiguration(
             flow: flow,
+            device: .init( // TODO: use layouts
+                kind: .phone,
+                vertical: 1920,
+                horizontal: 1080
+            ),
+            customLayoutId: nil,
             locale: locale,
             loadTimeout: loadTimeout
         )
@@ -358,3 +364,4 @@ public extension AdaptyUI {
     }
 }
 #endif
+

@@ -215,7 +215,7 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         Task {
             try? await Adapty.logFlowAnalyticsViaAdaptyUI(
                 variationId: flow.variationId,
-                viewConfigurationId: viewConfigurationId,
+                flowVersionId: viewConfigurationId, // TODO: layouts: flow.versionId
                 params: event
             )
         }

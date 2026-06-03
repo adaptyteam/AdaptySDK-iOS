@@ -16,10 +16,15 @@ public struct AdaptyFlow: PlacementContent, Identifiable {
     public let remoteConfigs: [AdaptyRemoteConfig]
 
     public var hasViewConfiguration: Bool {
-        viewConfigurationId != nil
+        if Adapty.uiBuilderVersion == "5_0" {
+            versionId != nil
+        } else {
+            versionId != nil && viewConfiguration != nil
+        }
     }
 
-    let viewConfigurationId: String?
+    let versionId: String?
+    let viewConfiguration: ViewConfiguration?
 
     package let paywalls: [AdaptyFlowPaywall]
 }
@@ -48,7 +53,8 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
         case name = "flow_name"
         case remoteConfigs = "remote_configs"
         case paywalls = "variations"
-        case viewConfigurationId = "flow_version_id"
+        case versionId = "flow_version_id"
+        case viewConfiguration = "ui_schema"
     }
 
     public init(from decoder: Decoder) throws {
@@ -71,7 +77,8 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
             variationId: container.decode(String.self, forKey: .variationId),
             name: container.decode(String.self, forKey: .name),
             remoteConfigs: container.decodeIfPresent([AdaptyRemoteConfig].self, forKey: .remoteConfigs) ?? [],
-            viewConfigurationId: container.decodeIfPresent(String.self, forKey: .viewConfigurationId),
+            versionId: container.decodeIfPresent(String.self, forKey: .versionId),
+            viewConfiguration: container.decodeIfPresent(ViewConfiguration.self, forKey: .viewConfiguration),
             paywalls: container.decodeIfExist([AdaptyFlowPaywall].self, forKey: .paywalls, configuration: configuration) ?? []
         )
     }
@@ -84,8 +91,10 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
         if remoteConfigs.isNotEmpty {
             try container.encode(remoteConfigs, forKey: .remoteConfigs)
         }
-        try container.encodeIfPresent(viewConfigurationId, forKey: .viewConfigurationId)
+        try container.encodeIfPresent(versionId, forKey: .versionId)
+        try container.encodeIfPresent(viewConfiguration, forKey: .viewConfiguration)
         try container.encode(paywalls, forKey: .paywalls)
         try placement.encode(to: encoder)
     }
 }
+

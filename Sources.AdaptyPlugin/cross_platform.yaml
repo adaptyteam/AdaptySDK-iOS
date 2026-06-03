@@ -1105,6 +1105,48 @@ $defs:
       variations:
         type: array
         items: { $ref: "#/$defs/AdaptyFlowPaywall" }
+      ui_schema:
+        type: object
+        required: [ grids, layouts ]
+        properties:
+          layouts:
+            type: array
+            items:
+              type: object
+              required: [ flow_layout_id ]
+              properties:
+                flow_layout_id:
+                  type: string
+          grids:
+            type: array
+            items:
+              type: object
+              required: [ cells ]
+              properties:
+                platforms:
+                  oneOf:
+                    - const: "all"
+                    - type: array
+                      items: { enum: [ "ios", "android" ] }
+                  default: []
+                devices:
+                  oneOf:
+                    - const: "all"
+                    - type: array
+                      items: { enum: ["phone","tab"] }
+                  default: []
+                custom_id: { type: string }
+                h_breakpoints:
+                  type: array
+                  items: { type: integer }
+                  default: []
+                v_breakpoints:
+                  type: array
+                  items: { type: integer }
+                  default: []
+                cells:
+                  type: array
+                  items: { type: integer }
       payload_data: { type: string }
       response_created_at: { type: integer }
 

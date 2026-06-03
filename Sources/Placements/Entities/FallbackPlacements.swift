@@ -74,7 +74,7 @@ struct FallbackPlacements: Sendable {
     }
 
     func getUISchema(
-        byViewConfigurationId id: String
+        byFlowLayoutId id: String
     ) throws -> AdaptyUISchema? {
         let schema: AdaptyUISchema?
         do {
