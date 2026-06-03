@@ -215,7 +215,9 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         Task {
             try? await Adapty.logFlowAnalyticsViaAdaptyUI(
                 variationId: flow.variationId,
+                sessionId: nil, // TODO: run session of flow
                 flowVersionId: viewConfigurationId, // TODO: layouts: flow.versionId
+                flowLayoutId: viewConfigurationId,
                 params: event
             )
         }
