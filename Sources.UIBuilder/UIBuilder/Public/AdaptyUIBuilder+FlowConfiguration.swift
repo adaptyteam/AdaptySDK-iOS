@@ -116,6 +116,7 @@ public extension AdaptyUIBuilder {
             actionHandler = AdaptyUIStateActionHandler(
                 productsViewModel: productsViewModel,
                 screensViewModel: screensViewModel,
+                flowViewModel: flowViewModel,
                 logic: logic
             )
             let stateHolder = AdaptyUIStateHolder(

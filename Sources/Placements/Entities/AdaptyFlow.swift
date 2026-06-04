@@ -23,7 +23,7 @@ public struct AdaptyFlow: PlacementContent, Identifiable {
         }
     }
 
-    let versionId: String?
+    package let versionId: String?
     let viewConfiguration: ViewConfiguration?
 
     package let paywalls: [AdaptyFlowPaywall]

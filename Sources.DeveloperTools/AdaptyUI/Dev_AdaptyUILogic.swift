@@ -102,7 +102,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didReceiveAnalyticEvent(name: name, params: params)
     }
 
-    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {}
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent, sessionId: UUID) {}
 }
 
 #endif

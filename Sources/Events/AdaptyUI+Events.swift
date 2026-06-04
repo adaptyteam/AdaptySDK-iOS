@@ -10,7 +10,7 @@ import Foundation
 package extension Adapty {
     nonisolated static func logFlowAnalyticsViaAdaptyUI(
         variationId: String,
-        sessionId: UUID?,
+        sessionId: UUID,
         flowVersionId: String,
         flowLayoutId: String,
         params: AdaptyFlowAnalyticsPayload

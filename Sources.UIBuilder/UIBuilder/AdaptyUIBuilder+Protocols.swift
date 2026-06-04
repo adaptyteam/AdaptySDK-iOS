@@ -74,7 +74,7 @@ package protocol AdaptyUIBuilderLogic {
     func reportDidReceiveError(_ error: AdaptyUIBuilderError)
 
     func reportCustomerAnalyticEvent(name: String, params: [String: any Sendable])
-    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent)
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent, sessionId: UUID)
 }
 
 @MainActor
