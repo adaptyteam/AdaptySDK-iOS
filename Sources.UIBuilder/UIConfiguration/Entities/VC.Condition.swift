@@ -14,7 +14,6 @@ extension VC {
         case screenWidth(min: Double?, max: Double?)
         case screenHeight(min: Double?, max: Double?)
         case orientation(VC.Orientation)
-        case `true`
     }
 }
 

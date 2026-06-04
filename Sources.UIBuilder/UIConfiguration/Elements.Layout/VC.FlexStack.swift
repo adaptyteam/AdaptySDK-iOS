@@ -11,7 +11,7 @@ import Foundation
 extension VC {
     struct FlexStack: Sendable {
         let condition: [Condition]
-        let direction: Flex.Kind
+        let direction: Flex.Direction
         let horizontalAlignment: HorizontalAlignment
         let verticalAlignment: VerticalAlignment
         let horizontalSpacing: Double

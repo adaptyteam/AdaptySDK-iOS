@@ -112,9 +112,12 @@ extension Schema.Element: DecodableWithConfiguration {
         case vStack = "v_stack"
         case hStack = "h_stack"
         case zStack = "z_stack"
+        case flexStack = "flex_stack"
         case row
         case column
+        case flex
         case section
+        case `switch`
         case toggle
         case slider
         case timer
@@ -180,6 +183,11 @@ extension Schema.Element: DecodableWithConfiguration {
                 properties: propertyOrNil(),
                 node: .compositeElement(Schema.Stack(from: decoder, configuration: configuration))
             )
+        case .flexStack:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.FlexStack(from: decoder, configuration: configuration))
+            )
         case .button:
             try self.init(
                 properties: propertyOrNil(),
@@ -205,6 +213,11 @@ extension Schema.Element: DecodableWithConfiguration {
                 properties: propertyOrNil(),
                 node: .simpleElement(Schema.VideoPlayer(from: decoder))
             )
+        case .flex:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.Flex(from: decoder, configuration: configuration))
+            )
         case .row:
             try self.init(
                 properties: propertyOrNil(),
@@ -219,6 +232,11 @@ extension Schema.Element: DecodableWithConfiguration {
             try self.init(
                 properties: propertyOrNil(),
                 node: .compositeElement(Schema.Section(from: decoder, configuration: configuration))
+            )
+        case .switch:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.Switch(from: decoder, configuration: configuration))
             )
         case .toggle:
             try self.init(
@@ -278,3 +296,4 @@ extension Schema.Element: DecodableWithConfiguration {
         }
     }
 }
+

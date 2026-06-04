@@ -10,7 +10,7 @@ import Foundation
 extension VC {
     struct Switch: Sendable {
         let `cases`: [Case]
-        let `defaul`: ElementIndex
+        let `default`: ElementIndex
         let transition: Transition?
     }
 

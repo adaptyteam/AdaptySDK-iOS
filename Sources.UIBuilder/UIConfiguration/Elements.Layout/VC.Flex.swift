@@ -10,7 +10,7 @@ import Foundation
 extension VC {
     struct Flex: Sendable {
         let condition: [Condition]
-        let direction: Flex.Kind
+        let direction: Flex.Direction
         let width: AutoSizeMode
         let height: AutoSizeMode
         let horizontalSpacing: Double
