@@ -1,12 +1,12 @@
 # yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
-$id: "https://adapty.io/uibuilder/5.0.0-draft/schema"
+$id: "https://adapty.io/uibuilder/5.1.0/schema"
 title: "AdaptyUI Configuration"
 type: object
 required: [format, screens, scripts]
 properties:
     format:
         type: string
-        const: "5.0.0-draft"
+        const: "5.1.0"
     assets:
         title: "Default assets"
         $ref: "#/Assets"
@@ -92,6 +92,106 @@ Entities:
         enum:
             - hug
             - fill
+
+    Condition:
+        title: Condition
+        description: "Predicate resolving to boolean; used by flex, flex_stack and switch"
+        oneOf:
+            - title: Size threshold
+              type: object
+              required: [metric]
+              properties:
+                  metric:
+                      type: string
+                      enum:
+                          - available_width
+                          - available_height
+                          - screen_width
+                          - screen_height
+                  min:
+                      type: number
+                      description: "Inclusive lower bound, in points"
+                  max:
+                      type: number
+                      description: "Inclusive upper bound, in points"
+              additionalProperties: false
+            - title: Device type
+              type: object
+              required: [device]
+              properties:
+                  device:
+                      title: "True when the device type matches at least one of the listed values"
+                      type: array
+                      minItems: 1
+                      items: { enum: [phone, tab] }
+              additionalProperties: false
+            - title: Screen orientation
+              type: object
+              required: [orientation]
+              properties:
+                  orientation: { enum: [landscape, portrait] }
+              additionalProperties: false
+            - title: Platform
+              type: object
+              required: [platform]
+              properties:
+                  platform:
+                      title: "True when the platform matches at least one of the listed values"
+                      type: array
+                      minItems: 1
+                      items: { enum: [ios, android] }
+              additionalProperties: false
+            - title: Version range
+              type: object
+              anyOf:
+                  - required: [version]
+                  - required: [to_version]
+              properties:
+                  version:
+                      type: string
+                      pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$"
+                      description: "Minimum format version (inclusive, lower bound)"
+                  to_version:
+                      type: string
+                      pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$"
+                      description: "Maximum format version (exclusive, upper bound)"
+              additionalProperties: false
+            - title: Available (per-OS minimum version)
+              type: object
+              required: [available]
+              properties:
+                  available:
+                      type: array
+                      description: >
+                          Per-OS minimum-version constraints (semantics of Swift's
+                          @available). Each item declares the minimum (inclusive)
+                          runtime version required for the named OS. Operating
+                          systems NOT listed carry no constraint — true for them at
+                          any version. False only when the runtime OS is listed AND
+                          its version is below that item's os_version. Each os_name
+                          MUST appear at most once.
+                      items:
+                          type: object
+                          required: [os_name, os_version]
+                          properties:
+                              os_name:
+                                  type: string
+                                  description: "Operating system name to match against the runtime OS."
+                                  enum:
+                                      - iOS
+                                      - macOS
+                                      - tvOS
+                                      - watchOS
+                                      - visionOS
+                                      - Android
+                              os_version:
+                                  type: string
+                                  pattern: "^[0-9]+\\.[0-9]+$"
+                                  description: "Minimum runtime OS version (inclusive) required for this os_name."
+                          additionalProperties: false
+                      uniqueItems: true
+                      minItems: 1
+              additionalProperties: false
 
     CornerRadius:
         title: "Corner radius"
@@ -642,10 +742,13 @@ UI:
                         - $ref: "#/UI/Slider"
                         - $ref: "#/UI/Button"
                         - $ref: "#/UI/Stack"
+                        - $ref: "#/UI/FlexStack"
                         - $ref: "#/UI/Box"
                         - $ref: "#/UI/Section"
+                        - $ref: "#/UI/Switch"
                         - $ref: "#/UI/Row"
                         - $ref: "#/UI/Column"
+                        - $ref: "#/UI/Flex"
                         - $ref: "#/UI/Timer"
                         - $ref: "#/UI/Pager"
                         - $ref: "#/UI/DateTimePicker"
@@ -789,7 +892,18 @@ UI:
         required: [type, then, else]
         properties:
             type: { const: if }
-            platform: { enum: [ios, android] }
+            platform:
+                oneOf:
+                    - enum: [ios, android]
+                    - type: array
+                      items: { enum: [ios, android] }
+                      minItems: 1
+                      uniqueItems: true
+            device:
+                type: array
+                items: { enum: [phone, tab] }
+                minItems: 1
+                uniqueItems: true
             available:
                 type: array
                 description: >
@@ -809,7 +923,7 @@ UI:
                             type: string
                             description: "Operating system name to match against the runtime OS."
                             enum:
-                                - iOS # includes iPadOS
+                                - iOS
                                 - macOS
                                 - tvOS
                                 - watchOS
@@ -1111,6 +1225,42 @@ UI:
             count: { type: integer, default: 1, minimum: 1 }
         additionalProperties: false
 
+    FlexStack:
+        type: object
+        required: [type, condition, direction, content]
+        properties:
+            type: { const: flex_stack }
+            condition:
+                title: "Conditions combined with logical AND; empty array is always true"
+                type: array
+                items: { $ref: "#/Entities/Condition" }
+            direction:
+                enum: [h_stack, v_stack]
+                description: "Mode when condition is true; the opposite mode when false"
+            h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
+            v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
+            h_spacing:
+                type: number
+                default: 0
+                description: "Spacing between children in h_stack mode"
+            v_spacing:
+                type: number
+                default: 0
+                description: "Spacing between children in v_stack mode"
+            duration:
+                title: "Animation duration in milliseconds. If absent, no animation."
+                type: number
+            interpolator:
+                { $ref: "#/Animation/Interpolator", default: ease_in_out }
+            content:
+                title: "Child elements"
+                type: array
+                minItems: 1
+                items:
+                    oneOf:
+                        - $ref: "#/UI/StackSpace"
+                        - $ref: "#/UI/Element"
+
     Section:
         type: object
         required: [type, index, content]
@@ -1131,6 +1281,36 @@ UI:
                 minItems: 1
                 items: { $ref: "#/UI/Element" } # { $ref: "#/pool_index" }
 
+    Switch:
+        type: object
+        required: [type, cases, default]
+        properties:
+            type: { const: switch }
+            duration:
+                title: "Transition animation duration in milliseconds. If absent, no animation."
+                type: number
+            interpolator:
+                { $ref: "#/Animation/Interpolator", default: ease_in_out }
+            cases:
+                title: "Cases evaluated top to bottom; the first matching case is rendered"
+                type: array
+                minItems: 1
+                items: { $ref: "#/UI/Switch/Case" }
+            default:
+                title: "Rendered when no case matches"
+                $ref: "#/UI/Element"
+
+        Case:
+            type: object
+            required: [condition, content]
+            properties:
+                condition:
+                    title: "Conditions combined with logical AND; empty array is always true"
+                    type: array
+                    items: { $ref: "#/Entities/Condition" }
+                content: { $ref: "#/UI/Element" }
+            additionalProperties: false
+
     Row:
         type: object
         required: [type, items]
@@ -1150,6 +1330,44 @@ UI:
             type: { const: column }
             height: { $ref: "#/Entities/AutoSizeMode", default: fill }
             spacing: { type: number, default: 0 }
+            items:
+                type: array
+                minItems: 1
+                items: { $ref: "#/UI/GridItem" } # { $ref: "#/pool_index" }
+
+    Flex:
+        type: object
+        required: [type, condition, direction, items]
+        properties:
+            type: { const: flex }
+            condition:
+                title: "Conditions combined with logical AND; empty array is always true"
+                type: array
+                items: { $ref: "#/Entities/Condition" }
+            direction:
+                enum: [row, column]
+                description: "Direction when condition is true; the opposite direction when false"
+            width:
+                $ref: "#/Entities/AutoSizeMode"
+                default: fill
+                description: "Main-axis size in row mode"
+            height:
+                $ref: "#/Entities/AutoSizeMode"
+                default: fill
+                description: "Main-axis size in column mode"
+            h_spacing:
+                type: number
+                default: 0
+                description: "Spacing between children in row mode"
+            v_spacing:
+                type: number
+                default: 0
+                description: "Spacing between children in column mode"
+            duration:
+                title: "Animation duration in milliseconds. If absent, no animation."
+                type: number
+            interpolator:
+                { $ref: "#/Animation/Interpolator", default: ease_in_out }
             items:
                 type: array
                 minItems: 1
