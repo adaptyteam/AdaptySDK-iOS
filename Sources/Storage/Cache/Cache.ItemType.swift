@@ -21,8 +21,7 @@ extension Cache.ItemType {
         switch self {
         case .flow: 1
         case .onboarding: 1
-        case .uischema:
-            if Adapty.uiBuilderVersion == "5_0" { 1 } else { 2 }
+        case .uischema: 2
         }
     }
 }

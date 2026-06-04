@@ -211,12 +211,12 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didReceiveAnalyticEvent(name: name, params: params)
     }
 
-    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent, sessionId: UUID) {
         Task {
             try? await Adapty.logFlowAnalyticsViaAdaptyUI(
                 variationId: flow.variationId,
-                sessionId: nil, // TODO: run session of flow
-                flowVersionId: viewConfigurationId, // TODO: layouts: flow.versionId
+                sessionId: sessionId,
+                flowVersionId: viewConfigurationId, // TODO: flow.versionId !
                 flowLayoutId: viewConfigurationId,
                 params: event
             )

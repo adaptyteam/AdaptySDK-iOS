@@ -70,6 +70,7 @@ package final class AdaptyUIStateHolder {
 package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUITimerCallbackHandler {
     private let productsViewModel: AdaptyUIProductsViewModel
     private let screensViewModel: AdaptyUIScreensViewModel
+    private let flowViewModel: AdaptyUIFlowViewModel
 
     private let logic: AdaptyUIBuilderLogic
     private weak var state: AdaptyUIState?
@@ -95,10 +96,12 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     package init(
         productsViewModel: AdaptyUIProductsViewModel,
         screensViewModel: AdaptyUIScreensViewModel,
+        flowViewModel: AdaptyUIFlowViewModel,
         logic: AdaptyUIBuilderLogic
     ) {
         self.productsViewModel = productsViewModel
         self.screensViewModel = screensViewModel
+        self.flowViewModel = flowViewModel
         self.logic = logic
     }
 
@@ -417,8 +420,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
     nonisolated func sendAnalyticsEvent(_ event: VS.AnalyticEvent) {
         Task { @MainActor [weak self] in
-            if event.isBackend {
-                self?.logic.reportBackendAnalyticEvent(event)
+            if event.isBackend, let self {
+                self.logic.reportBackendAnalyticEvent(event, sessionId: self.flowViewModel.sessionId)
             }
 
             if event.isCustomer {

@@ -299,6 +299,7 @@ public extension AdaptyUI {
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         locale: String? = nil,
+        customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
@@ -316,12 +317,8 @@ public extension AdaptyUI {
 
         let viewConfiguration = try await Adapty.getUIConfiguration(
             flow: flow,
-            device: .init( // TODO: use layouts
-                kind: .phone,
-                vertical: 1920,
-                horizontal: 1080
-            ),
-            customLayoutId: nil,
+            device: .current,
+            customLayoutId: customLayoutId,
             locale: locale,
             loadTimeout: loadTimeout
         )
@@ -363,5 +360,20 @@ public extension AdaptyUI {
         )
     }
 }
-#endif
 
+private extension Adapty.DeviceInfo {
+    /// Device descriptor used to pick the matching flow layout: logical points
+    /// in the screen orientation at the moment of the request (not native
+    /// pixels, and not orientation-fixed — so it must be read fresh, never
+    /// cached).
+    @MainActor
+    static var current: Self {
+        let size = UIScreen.main.bounds.size
+        return .init(
+            kind: UIDevice.current.userInterfaceIdiom == .phone ? .phone : .tab,
+            vertical: Int(size.height),
+            horizontal: Int(size.width)
+        )
+    }
+}
+#endif

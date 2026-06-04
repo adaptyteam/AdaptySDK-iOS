@@ -24,19 +24,11 @@ struct FetchUISchemaRequest: BackendRequest {
         disableServerCache: Bool,
         logParams: EventParameters?
     ) {
-        if Adapty.uiBuilderVersion == "5_0" {
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path:
-                "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowVersionId)/config/"
-            )
-        } else {
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path:
-                "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowVersionId)/layout/\(flowLayoutId)/config/"
-            )
-        }
+        endpoint = HTTPEndpoint(
+            method: .get,
+            path:
+            "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowVersionId)/layout/\(flowLayoutId)/config/"
+        )
 
         headers = HTTPHeaders()
             .setBuilderVersion(Adapty.uiBuilderVersion)

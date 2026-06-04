@@ -924,7 +924,7 @@ $defs:
       log_level: { $ref: "#/$defs/AdaptyLog.Level" }
       cross_platform_sdk_name: { type: string }
       cross_platform_sdk_version: { type: string }
-      activate_ui: { type: boolean, dafault: false }
+      activate_ui: { type: boolean, default: false }
       media_cache:
         type: object
         properties:
@@ -1096,7 +1096,7 @@ $defs:
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       flow_id: { type: string }
-      flowl_name: { type: string }
+      flow_name: { type: string }
       variation_id: { type: string }
       remote_configs: 
         type: array
@@ -1181,7 +1181,7 @@ $defs:
       audience_name: { type: string }
       revision: { type: integer }
       ab_test_name: { type: string }
-      is_tracking_purchases: { type: bool, default: false }
+      is_tracking_purchases: { type: boolean, default: false }
       placement_audience_version_id: { type: string }
 
   AdaptyPlacementFetchPolicy: #request

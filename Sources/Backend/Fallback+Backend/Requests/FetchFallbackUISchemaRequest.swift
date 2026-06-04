@@ -21,17 +21,10 @@ private struct FetchFallbackUISchemaRequest: BackendRequest {
         flowLayoutId: String,
         logParams: EventParameters
     ) {
-        if Adapty.uiBuilderVersion == "5_0" {
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowVersionId)/\(Adapty.uiBuilderVersion)/config.json"
-            )
-        } else {
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowVersionId)/layout/\(flowLayoutId)/\(Adapty.uiBuilderVersion)/config.json"
-            )
-        }
+        endpoint = HTTPEndpoint(
+            method: .get,
+            path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowVersionId)/layout/\(flowLayoutId)/\(Adapty.uiBuilderVersion)/config.json"
+        )
 
         self.logParams = logParams
     }

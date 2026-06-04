@@ -16,14 +16,10 @@ public struct AdaptyFlow: PlacementContent, Identifiable {
     public let remoteConfigs: [AdaptyRemoteConfig]
 
     public var hasViewConfiguration: Bool {
-        if Adapty.uiBuilderVersion == "5_0" {
-            versionId != nil
-        } else {
-            versionId != nil && viewConfiguration != nil
-        }
+        versionId != nil && viewConfiguration != nil
     }
 
-    let versionId: String?
+    package let versionId: String?
     let viewConfiguration: ViewConfiguration?
 
     package let paywalls: [AdaptyFlowPaywall]

@@ -42,12 +42,7 @@ extension Adapty {
             throw .isNoViewConfigurationInFlow()
         }
 
-        let flowLayoutId =
-            if Adapty.uiBuilderVersion == "5_0" {
-                flowVersionId
-            } else {
-                try flow.viewConfiguration?.getLayout(for: device, with: customLayoutId)?.id
-            }
+        let flowLayoutId = try flow.viewConfiguration?.getLayout(for: device, with: customLayoutId)?.id
 
         guard
             let flowLayoutId
