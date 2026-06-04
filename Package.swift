@@ -31,12 +31,20 @@ let package = Package(
             targets: ["AdaptyUI"]
         ),
         .library(
+            name: "AdaptyUI_KidsMode",
+            targets: ["AdaptyUI_KidsMode"]
+        ),
+        .library(
             name: "AdaptyDeveloperTools",
             targets: ["AdaptyDeveloperTools"]
         ),
         .library(
             name: "AdaptyPlugin",
             targets: ["AdaptyPlugin"]
+        ),
+        .library(
+            name: "AdaptyPlugin_KidsMode",
+            targets: ["AdaptyPlugin_KidsMode"]
         ),
     ],
     targets: [
@@ -75,6 +83,19 @@ let package = Package(
             resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .target(
+            name: "AdaptyUI_KidsMode",
+            dependencies: [
+                "AdaptyUIBuilder",
+                "Adapty_KidsMode",
+                "AdaptyLogger",
+            ],
+            path: "Sources.AdaptyUI.KidsMode",
+            resources: [.copy("PrivacyInfo.xcprivacy")],
+            swiftSettings: [
+                .unsafeFlags(["-module-alias", "Adapty=Adapty_KidsMode"]),
+            ]
+        ),
+        .target(
             name: "AdaptyDeveloperTools",
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.DeveloperTools"
@@ -85,6 +106,20 @@ let package = Package(
             path: "Sources.AdaptyPlugin",
             exclude: [
                 "cross_platform.yaml"
+            ]
+        ),
+        .target(
+            name: "AdaptyPlugin_KidsMode",
+            dependencies: ["AdaptyUIBuilder", "Adapty_KidsMode", "AdaptyUI_KidsMode", "AdaptyLogger"],
+            path: "Sources.AdaptyPlugin.KidsMode",
+            exclude: [
+                "cross_platform.yaml"
+            ],
+            swiftSettings: [
+                .unsafeFlags([
+                    "-module-alias", "Adapty=Adapty_KidsMode",
+                    "-module-alias", "AdaptyUI=AdaptyUI_KidsMode",
+                ]),
             ]
         ),
         .testTarget(
