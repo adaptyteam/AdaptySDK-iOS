@@ -1003,6 +1003,7 @@ $defs:
       - price
     properties:
       vendor_product_id: { type: string }
+      flow_product_id: { type: string }
       adapty_product_id: { type: string }
       access_level_id: { type: string }
       product_type: { type: string }
@@ -1315,6 +1316,9 @@ $defs:
           items: { $ref: "#/$defs/AdaptyProfile.NonSubscription" }
       timestamp: { type: integer }
       is_test_user: { type: boolean }
+      applied_attribution_sources:
+        type: array
+        items: { type: string }
 
   AdaptyProfile.AccessLevel: #response
     type: object
@@ -1453,6 +1457,10 @@ $defs:
         properties:
           id: { type: string }
           type: { type: string, enum: [promotional, win_back] }
+      - required: [type]
+        properties:
+          id: { type: string }
+          type: { type: string, const: code }
 
   AdaptySubscriptionOffer.PaymentMode: #response
     type: string
@@ -1700,6 +1708,8 @@ $assets:
     properties:
       id: { type: string }
       type: { const: video }
+      h_res: { type: number }
+      v_res: { type: number }
     oneOf:
       - required: [asset_id]
         properties:
