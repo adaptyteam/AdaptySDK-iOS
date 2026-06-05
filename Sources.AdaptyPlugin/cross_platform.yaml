@@ -629,7 +629,53 @@ $requests:
         properties:
           success: { const: true }
 
+  ### didRequestPermissionResponse ###
+  DidRequestPermissionResponse.Request: #request
+    type: object
+    required: [method, request_id, status]
+    properties:
+      method: { const: "did_request_permission_response" }
+      request_id: { type: string }
+      status: { type: string, enum: ["granted", "denied", "unavailable"] }
+      detail: { type: string }
+
+  DidRequestPermissionResponse.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
 $events:
+  Event.DidRequestPermission:
+    type: object
+    required: [id, request_id, permission]
+    properties:
+      id: { const: "did_request_permission" }
+      request_id: { type: string }
+      permission: { type: string }
+      custom_args:
+        type: object
+        additionalProperties: { type: string }
+
+  Event.DidRequestAppReview:
+    type: object
+    required: [id]
+    properties:
+      id: { const: "did_request_app_review" }
+
+  FlowViewEvent.DidReceiveAnalyticEvent:
+    type: object
+    required: [id, view, name, params]
+    properties:
+      id: { const: "flow_view_did_receive_analytic_event" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      name: { type: string }
+      params: { type: object }
+
   Event.DidLoadLatestProfile:
     type: object
     required: [id, profile]

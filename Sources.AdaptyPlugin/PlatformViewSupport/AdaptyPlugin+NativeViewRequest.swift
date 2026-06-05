@@ -24,12 +24,16 @@ public extension AdaptyPlugin {
             from: jsonString.asAdaptyJsonData
         )
 
+        let systemRequestsHandler = AdaptyPlugin.sharedEventHandler
+            .map(PluginSystemRequestsHandler.init(eventHandler:))
+
         return try await AdaptyUI.getFlowConfiguration(
             forFlow: request.flow,
             loadTimeout: request.loadTimeout,
             tagResolver: request.customTags,
             timerResolver: request.customTimers,
-            assetsResolver: request.customAssets?.assetsResolver()
+            assetsResolver: request.customAssets?.assetsResolver(),
+            systemRequestsHandler: systemRequestsHandler
         )
     }
 

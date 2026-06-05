@@ -72,13 +72,16 @@ extension Request {
 
         @MainActor
         func executeInMainActor() async throws -> AdaptyJsonData {
+            let systemRequestsHandler = AdaptyPlugin.sharedEventHandler
+                .map(PluginSystemRequestsHandler.init(eventHandler:))
             let result: AdaptyUI.FlowView = try await AdaptyUI.Plugin.createFlowView(
                 flow: flow,
                 loadTimeout: loadTimeout,
                 preloadProducts: preloadProducts ?? false,
                 tagResolver: customTags,
                 timerResolver: customTimers,
-                assetsResolver: assetsResolver()
+                assetsResolver: assetsResolver(),
+                systemRequestsHandler: systemRequestsHandler
             )
 
             return .success(result)
