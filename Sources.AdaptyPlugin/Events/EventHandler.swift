@@ -19,7 +19,11 @@ public extension AdaptyPlugin {
     private static var delegate: AdaptyPluginDelegate?
 
     @MainActor
+    static var sharedEventHandler: EventHandler? { delegate?.eventHandler }
+
+    @MainActor
     static func register(eventHandler: EventHandler) {
+        HostRequestRegistry.shared.flushCancelled()
         let delegate = AdaptyPluginDelegate(eventHandler: eventHandler)
         self.delegate = delegate
         Adapty.delegate = delegate

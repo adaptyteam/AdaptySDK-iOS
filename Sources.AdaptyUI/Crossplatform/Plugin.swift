@@ -102,7 +102,8 @@ package extension AdaptyUI {
             preloadProducts: Bool,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
-            assetsResolver: AdaptyUIAssetsResolver?
+            assetsResolver: AdaptyUIAssetsResolver?,
+            systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
         ) async throws -> AdaptyUI.FlowView {
             let products: [AdaptyPaywallProduct]?
             
@@ -119,7 +120,8 @@ package extension AdaptyUI {
                 observerModeResolver: nil,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver,
-                assetsResolver: assetsResolver
+                assetsResolver: assetsResolver,
+                systemRequestsHandler: systemRequestsHandler
             )
             
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
