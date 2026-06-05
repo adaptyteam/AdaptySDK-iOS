@@ -18,19 +18,21 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
     private var layoutDirection: LayoutDirection
 
     private let column: VC.Column
+    private let externalSize: CGSize?
     private let screenHolderBuilder: () -> ScreenHolderContent
 
     init(
         _ column: VC.Column,
+        externalSize: CGSize? = nil,
         @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
     ) {
         self.column = column
+        self.externalSize = externalSize
         self.screenHolderBuilder = screenHolderBuilder
     }
 
     private func calculateTotalWeight(
-        for items: [VC.GridItem],
-        in _: GeometryProxy
+        for items: [VC.GridItem]
     ) -> (Int, CGFloat) {
         var totalWeight = 0
         var reservedLength: CGFloat = 0.0
@@ -116,7 +118,7 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
 
     private var weightedBody: some View {
         GeometryReader { proxy in
-            let (totalWeight, reservedLength) = calculateTotalWeight(for: column.items, in: proxy)
+            let (totalWeight, reservedLength) = calculateTotalWeight(for: column.items)
             let weightsAvailableLength = max(0, proxy.size.height - reservedLength)
 
             VStack(spacing: column.spacing) {
@@ -150,7 +152,7 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .onGeometrySizeChange { contentsSize = $0 }
         }
-        .frame(minWidth: contentsSize.width)
+        .frame(minWidth: externalSize?.width ?? contentsSize.width)
     }
 }
 
