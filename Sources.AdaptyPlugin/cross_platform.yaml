@@ -1486,7 +1486,7 @@ $defs:
     oneOf:
       - required: [type]
         properties:
-          type: { type: string, const: ["close", "system_back"] }
+          type: { type: string, enum: ["close", "system_back"] }
       - required: [type, value, open_in]
         properties:
           type: { type: string, const: "open_url" }
