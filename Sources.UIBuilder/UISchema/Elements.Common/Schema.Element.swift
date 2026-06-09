@@ -143,12 +143,12 @@ extension Schema.Element: DecodableWithConfiguration {
         guard let contentType = ContentType(rawValue: type) else {
             if configuration.isLegacy, type.hasPrefix(Schema.Template.keyPrefix) {
                 self.init(
-                    properties: propertyOrNil(),
+                    properties: try? propertyOrNil(),
                     node: .unknown(type)
                 )
             } else {
                 try self.init(
-                    properties: propertyOrNil(),
+                    properties: try? propertyOrNil(),
                     node: .templateInstance(Schema.TemplateInstance(from: decoder, configuration: configuration))
                 )
             }
