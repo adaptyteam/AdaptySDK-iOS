@@ -290,8 +290,8 @@ extension Schema.Element: DecodableWithConfiguration {
             )
         }
 
-        func propertyOrNil() -> Schema.ElementProperties? {
-            guard let properties = try? Schema.ElementProperties(from: decoder, configuration: configuration) else { return nil }
+        func propertyOrNil() throws -> Schema.ElementProperties? {
+            let properties = try Schema.ElementProperties(from: decoder, configuration: configuration) 
             return properties.isEmpty ? nil : properties
         }
     }
