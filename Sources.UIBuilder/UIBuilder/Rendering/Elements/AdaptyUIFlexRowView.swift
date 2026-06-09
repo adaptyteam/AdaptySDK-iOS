@@ -18,13 +18,16 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     private var layoutDirection: LayoutDirection
 
     private let row: VC.Row
+    private let externalSize: CGSize?
     private let screenHolderBuilder: () -> ScreenHolderContent
 
     init(
         _ row: VC.Row,
+        externalSize: CGSize? = nil,
         @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
     ) {
         self.row = row
+        self.externalSize = externalSize
         self.screenHolderBuilder = screenHolderBuilder
     }
 
@@ -115,7 +118,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
 
     private var weightedBody: some View {
         let (totalWeight, reservedLength) = calculateTotalWeight(for: row.items)
-        let weightsAvailableLength = max(0, measuredSize.width - reservedLength)
+        let weightsAvailableLength = max(0, (externalSize?.width ?? measuredSize.width) - reservedLength)
 
         return HStack(spacing: row.spacing) {
             ForEach(0 ..< row.items.count, id: \.self) { idx in

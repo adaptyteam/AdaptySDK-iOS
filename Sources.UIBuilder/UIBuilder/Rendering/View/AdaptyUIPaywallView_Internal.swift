@@ -37,6 +37,7 @@ package struct AdaptyUIPaywallView_Internal: View {
                         height: proxy.size.height + safeArea.top + safeArea.bottom
                     )
                 )
+                .withInterfaceOrientation(.currentInterface)
                 .withSafeArea(safeArea)
                 .withDebugOverlayEnabled(showDebugOverlay)
                 .withDisplayMissingTags(displayMissingTags)

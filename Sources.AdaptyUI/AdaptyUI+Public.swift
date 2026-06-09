@@ -1,5 +1,5 @@
 //
-//  AdaptyFlowControllerDelegate.swift
+//  AdaptyUI+Public.swift
 //
 //
 //  Created by Alexey Goncharov on 27.1.23..
@@ -308,6 +308,34 @@ public extension AdaptyUI {
         assetsResolver: AdaptyUIAssetsResolver? = nil,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
     ) async throws -> FlowConfiguration {
+        try await getFlowConfiguration(
+            forFlow: flow,
+            device: .current,
+            locale: locale,
+            customLayoutId: customLayoutId,
+            loadTimeout: loadTimeout,
+            products: products,
+            observerModeResolver: observerModeResolver,
+            tagResolver: tagResolver,
+            timerResolver: timerResolver,
+            assetsResolver: assetsResolver,
+            systemRequestsHandler: systemRequestsHandler
+        )
+    }
+
+    package static func getFlowConfiguration(
+        forFlow flow: AdaptyFlow,
+        device: Adapty.DeviceInfo,
+        locale: String? = nil,
+        customLayoutId: String? = nil,
+        loadTimeout: TimeInterval? = nil,
+        products: [AdaptyPaywallProduct]? = nil,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
+        tagResolver: AdaptyUITagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil,
+        assetsResolver: AdaptyUIAssetsResolver? = nil,
+        systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
+    ) async throws -> FlowConfiguration {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyUINotActivated
             Log.ui.error("AdaptyUI getViewConfiguration error: \(err)")
@@ -317,7 +345,7 @@ public extension AdaptyUI {
 
         let viewConfiguration = try await Adapty.getUIConfiguration(
             flow: flow,
-            device: .current,
+            device: device,
             customLayoutId: customLayoutId,
             locale: locale,
             loadTimeout: loadTimeout
@@ -361,7 +389,7 @@ public extension AdaptyUI {
     }
 }
 
-private extension Adapty.DeviceInfo {
+package extension Adapty.DeviceInfo {
     /// Device descriptor used to pick the matching flow layout: logical points
     /// in the screen orientation at the moment of the request (not native
     /// pixels, and not orientation-fixed — so it must be read fresh, never

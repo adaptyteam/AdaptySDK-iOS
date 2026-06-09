@@ -83,11 +83,20 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                 screenHolderBuilder: screenHolderBuilder
             )
         case let .switch(`switch`, _):
-            AdaptyUIUnknownElementView(value: "switch")
+            AdaptyUISwitchView(
+                `switch`,
+                screenHolderBuilder: screenHolderBuilder
+            )
         case let .flex(flex, _):
-            AdaptyUIUnknownElementView(value: "flex")
-        case let .flexStack(flextStack, _):
-            AdaptyUIUnknownElementView(value: "flexStack")
+            AdaptyUIFlexView(
+                flex,
+                screenHolderBuilder: screenHolderBuilder
+            )
+        case let .flexStack(flexStack, _):
+            AdaptyUIFlexStackView(
+                flexStack,
+                screenHolderBuilder: screenHolderBuilder
+            )
         case let .toggle(toggle, _):
             AdaptyUIToggleView(toggle)
         case let .timer(timer, _):
