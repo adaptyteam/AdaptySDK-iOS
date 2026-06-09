@@ -1,11 +1,12 @@
 //
-//  Adapty.DeviceInfo+ViewConfiguration.swift
+//  AdaptyUISchema.DeviceInfo+ViewConfiguration.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 02.06.2026.
 //
 
 import Foundation
+import AdaptyUIBuilder
 
 extension AdaptyFlow.ViewConfiguration {
     func getLayout(for info: Adapty.DeviceInfo, with customId: String?) throws(AdaptyError) -> AdaptyFlow.Layout? {

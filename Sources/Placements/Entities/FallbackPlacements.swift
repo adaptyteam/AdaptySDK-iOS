@@ -74,7 +74,8 @@ struct FallbackPlacements: Sendable {
     }
 
     func getUISchema(
-        byFlowLayoutId id: String
+        byFlowLayoutId id: String,
+        decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) throws -> AdaptyUISchema? {
         let schema: AdaptyUISchema?
         do {
@@ -82,7 +83,7 @@ struct FallbackPlacements: Sendable {
             guard let data = try file.jsonExtractIfPresent(pointer: "/ui_builder/\(id)") else {
                 return nil
             }
-            schema = try AdaptyUISchema(from: data)
+            schema = try AdaptyUISchema(from: data, configuration: decodingConfiguration)
         } catch {
             log.error(String(describing: error))
             throw error

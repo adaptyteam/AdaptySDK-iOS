@@ -114,7 +114,7 @@ extension Schema.Screen: DecodableWithConfiguration {
         case footerScrollValue = "footer_scroll_value"
     }
 
-    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: any Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let layoutBehaviour =

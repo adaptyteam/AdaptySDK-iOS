@@ -19,7 +19,7 @@ extension Schema.TemplateInstance: DecodableWithConfiguration {
         case type
     }
 
-    init(from decoder: Decoder, configuration _: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration _: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
         guard type.hasPrefix(Schema.Template.keyPrefix), type.count < 2 else {

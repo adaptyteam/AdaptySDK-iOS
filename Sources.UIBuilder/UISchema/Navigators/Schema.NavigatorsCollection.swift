@@ -25,7 +25,7 @@ extension Schema {
 }
 
 extension Schema.NavigatorsCollection: DecodableWithConfiguration {
-    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: any Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: AnyCodingKey.self)
         var nestedConfiguration = configuration
 

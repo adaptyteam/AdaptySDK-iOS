@@ -53,7 +53,7 @@ extension Schema.Button: DecodableWithConfiguration {
         case legacySelectedCondition = "selected_condition"
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         guard configuration.isLegacy else {

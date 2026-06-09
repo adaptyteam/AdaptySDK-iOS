@@ -41,14 +41,21 @@ struct FetchUISchemaRequest: BackendRequest {
 }
 
 extension AdaptyUISchema {
-    static func decoder(
-        _ response: HTTPDataResponse,
-        _: HTTPCodableConfiguration?,
-        _: HTTPRequest
-    ) async throws -> HTTPResponse<(schema: AdaptyUISchema, data: Data)> {
-        guard let data = response.body else { throw URLError(.cannotDecodeRawData) }
-        let schema = try AdaptyUISchema(from: data)
-        return response.replaceBody((schema, data))
+    static func createDecoder(
+        _ decodingConfiguration: AdaptyUISchema.DecodingConfiguration
+    ) -> HTTPDecoder<(schema: AdaptyUISchema, data: Data)> {
+        return decoder
+
+        @Sendable
+        func decoder(
+            _ response: HTTPDataResponse,
+            _: HTTPCodableConfiguration?,
+            _: HTTPRequest
+        ) async throws -> HTTPResponse<(schema: AdaptyUISchema, data: Data)> {
+            guard let data = response.body else { throw URLError(.cannotDecodeRawData) }
+            let schema = try AdaptyUISchema(from: data, configuration: decodingConfiguration)
+            return response.replaceBody((schema, data))
+        }
     }
 }
 
@@ -58,7 +65,8 @@ extension Backend.MainExecutor {
         flowId: String,
         flowVersionId: String,
         flowLayoutId: String,
-        disableServerCache: Bool
+        disableServerCache: Bool,
+        decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(HTTPError) -> (schema: AdaptyUISchema, data: Data) {
         let request = FetchUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
@@ -77,7 +85,7 @@ extension Backend.MainExecutor {
             ]
         )
 
-        let response: HTTPResponse<(schema: AdaptyUISchema, data: Data)> = try await perform(request, withDecoder: AdaptyUISchema.decoder)
+        let response: HTTPResponse<(schema: AdaptyUISchema, data: Data)> = try await perform(request, withDecoder: AdaptyUISchema.createDecoder(decodingConfiguration))
         return response.body
     }
 }

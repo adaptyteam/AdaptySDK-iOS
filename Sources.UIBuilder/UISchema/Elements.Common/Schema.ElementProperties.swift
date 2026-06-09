@@ -136,7 +136,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         case interactionEnabled = "ui_enabled"
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let eventHandlers: [Schema.EventHandler]

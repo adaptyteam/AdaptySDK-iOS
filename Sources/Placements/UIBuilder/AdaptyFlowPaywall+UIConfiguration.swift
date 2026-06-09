@@ -54,7 +54,8 @@ extension Adapty {
             flowId: flow.id,
             flowVersionId: flowVersionId,
             flowLayoutId: flowLayoutId,
-            loadTimeout: loadTimeout
+            loadTimeout: loadTimeout,
+            decodingConfiguration: .init(device: device.kind)
         )
 
         AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: locale.id)
@@ -80,12 +81,13 @@ extension Adapty {
         flowId: String,
         flowVersionId: String,
         flowLayoutId: String,
-        loadTimeout: TaskDuration
+        loadTimeout: TaskDuration,
+        decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(AdaptyError) -> AdaptyUISchema {
         let isTestUser = profileManager?.isTestUser ?? false
         let cacheKey = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: flowLayoutId)
 
-        if !isTestUser, let schema = await fetchLocalUISchema(cacheKey) {
+        if !isTestUser, let schema = await fetchLocalUISchema(cacheKey, decodingConfiguration: decodingConfiguration) {
             return schema
         }
 
@@ -98,11 +100,12 @@ extension Adapty {
                 flowVersionId: flowVersionId,
                 flowLayoutId: flowLayoutId,
                 loadTimeout: loadTimeout,
-                disableServerCache: isTestUser
+                disableServerCache: isTestUser,
+                decodingConfiguration: decodingConfiguration
             )
             log.verbose("UI schema source = backend (\(flowLayoutId))")
         } catch {
-            if isTestUser, let schema = await fetchLocalUISchema(cacheKey) {
+            if isTestUser, let schema = await fetchLocalUISchema(cacheKey, decodingConfiguration: decodingConfiguration) {
                 return schema
             }
             throw error
@@ -124,17 +127,25 @@ extension Adapty {
         return schema
     }
 
-    private func fetchLocalUISchema(_ key: Cache.ItemKey) async -> AdaptyUISchema? {
+    private func fetchLocalUISchema(
+        _ key: Cache.ItemKey,
+        decodingConfiguration: AdaptyUISchema.DecodingConfiguration
+    ) async -> AdaptyUISchema? {
         if let schema = await Cache.read(
             key,
             accept: { _ in true },
-            decode: AdaptyUISchema.init
+            decode: { data in
+                try AdaptyUISchema(from: data, configuration: decodingConfiguration)
+            }
         ) {
             log.verbose("UI schema source = disk cache (\(key.itemId))")
             return schema
         }
 
-        if let schema = try? Adapty.fallbackPlacements?.getUISchema(byFlowLayoutId: key.itemId) {
+        if let schema = try? Adapty.fallbackPlacements?.getUISchema(
+            byFlowLayoutId: key.itemId,
+            decodingConfiguration: decodingConfiguration
+        ) {
             log.verbose("UI schema source = packed fallback (\(key.itemId))")
             return schema
         }
@@ -147,7 +158,8 @@ extension Adapty {
         flowVersionId: String,
         flowLayoutId: String,
         loadTimeout: TaskDuration,
-        disableServerCache: Bool
+        disableServerCache: Bool,
+        decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(AdaptyError) -> (schema: AdaptyUISchema, data: Data) {
         let session = httpFallbackSession
         let apiKeyPrefix = apiKeyPrefix
@@ -159,7 +171,8 @@ extension Adapty {
                     flowId: flowId,
                     flowVersionId: flowVersionId,
                     flowLayoutId: flowLayoutId,
-                    disableServerCache: disableServerCache
+                    disableServerCache: disableServerCache,
+                    decodingConfiguration: decodingConfiguration
                 )
             }
         } catch {
@@ -174,7 +187,8 @@ extension Adapty {
                 flowId: flowId,
                 flowVersionId: flowVersionId,
                 flowLayoutId: flowLayoutId,
-                disableServerCache: disableServerCache
+                disableServerCache: disableServerCache,
+                decodingConfiguration: decodingConfiguration
             )
         } catch {
             throw error.asAdaptyError

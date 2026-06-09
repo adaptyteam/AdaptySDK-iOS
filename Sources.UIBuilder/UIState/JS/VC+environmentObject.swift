@@ -47,7 +47,7 @@ extension VC {
 
     private func value(for key: VS.EnvironmentConstantsKey) -> (any JSValueConvertable)? {
         switch key {
-        case .platform: "ios"
+        case .platform: AdaptyUISchema.platform
         case .schemaVersion: AdaptyUISchema.formatVersion
         case .localizationId: localizationId
         case .localizationDirection: isRightToLeft ? "rtl" : "ltr"

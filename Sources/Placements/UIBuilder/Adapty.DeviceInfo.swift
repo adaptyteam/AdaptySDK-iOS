@@ -2,12 +2,14 @@
 //  Adapty.DeviceInfo.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 02.06.2026.
+//  Created by Aleksei Valiano on 09.06.2026.
 //
 
+import AdaptyUIBuilder
 import Foundation
 
 package extension Adapty {
+    typealias DeviceKind = AdaptyUISchema.DeviceKind
     struct DeviceInfo: Sendable {
         package let kind: DeviceKind
         package let vertical: Int
@@ -19,15 +21,5 @@ package extension Adapty {
             self.horizontal = horizontal
         }
     }
-
-    struct DeviceKind: RawRepresentable, Hashable, Sendable, Codable {
-        package let rawValue: String
-
-        package init(rawValue: String) {
-            self.rawValue = rawValue.trimmed
-        }
-
-        package static let phone = DeviceKind(rawValue: "phone")
-        package static let tab = DeviceKind(rawValue: "tab")
-    }
 }
+

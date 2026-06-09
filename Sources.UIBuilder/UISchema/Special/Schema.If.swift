@@ -13,21 +13,25 @@ extension Schema {
 
         enum CodingKeys: String, CodingKey {
             case platform
+            case devices = "device"
             case startVersion = "version"
             case endVersion = "to_version"
             case available
-            case osName = "os_name"
-            case osVersion = "os_version"
             case then
             case `else`
         }
 
-        init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
+        init(from decoder: Decoder, configuration: InternalDecodingConfiguration) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
+            let device = configuration.device
 
-            var result = try container.decodeIfPresent(String.self, forKey: .platform).map { $0 == "ios" } ?? true
+            var result = try container.decodeIfPresent(String.self, forKey: .platform).map { $0 == Schema.platform } ?? true
 
-            if result, let available = try container.decodeIfPresent([Schema.If.AvailableEntry].self, forKey: .available) {
+            if result, let devices = try container.decodeIfPresent([String].self, forKey: .devices) {
+                result = devices.contains(device.rawValue)
+            }
+
+            if result, let available = try container.decodeIfPresent([Schema.Condition.AvailableEntry].self, forKey: .available) {
                 result = available.isSatisfied
             }
 
@@ -43,51 +47,3 @@ extension Schema {
         }
     }
 }
-
-private extension Schema.If {
-    struct AvailableEntry: Decodable {
-        static let currentOSName: String? = {
-            #if os(visionOS)
-            return "visionOS" // VisionOS should come before iOS—it also has true os(iOS) in zippered targets.
-            #elseif os(iOS)
-            return "iOS"
-            #elseif os(macOS)
-            return "macOS"
-            #elseif os(tvOS)
-            return "tvOS"
-            #elseif os(watchOS)
-            return "watchOS"
-            #else
-            return nil
-            #endif
-        }()
-
-        let osName: String
-        let osVersion: String
-
-        enum CodingKeys: String, CodingKey {
-            case osName = "os_name"
-            case osVersion = "os_version"
-        }
-
-        var requiredVersion: OperatingSystemVersion? {
-            let parts = osVersion.split(separator: ".").compactMap { Int($0) }
-            guard parts.count >= 2 else { return nil }
-            return .init(majorVersion: parts[0],
-                         minorVersion: parts[1],
-                         patchVersion: 0)
-        }
-    }
-}
-
-private extension [Schema.If.AvailableEntry] {
-    var isSatisfied: Bool {
-        guard
-            let current = Schema.If.AvailableEntry.currentOSName,
-            let entry = self.first(where: { $0.osName == current }),
-            let version = entry.requiredVersion
-        else { return true }
-        return ProcessInfo.processInfo.isOperatingSystemAtLeast(version)
-    }
-}
-

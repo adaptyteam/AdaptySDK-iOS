@@ -61,122 +61,22 @@ extension [Schema.Condition] {
     }
 }
 
-//
-// Condition:
-//    title: Condition
-//    description: "Predicate resolving to boolean; used by flex, flex_stack and switch"
-//    oneOf:
-//        - title: Size threshold
-//          type: object
-//          required: [metric]
-//          properties:
-//              metric:
-//                  type: string
-//                  enum:
-//                      - available_width
-//                      - available_height
-//                      - screen_width
-//                      - screen_height
-//              min:
-//                  type: number
-//                  description: "Inclusive lower bound, in points"
-//              max:
-//                  type: number
-//                  description: "Inclusive upper bound, in points"
-//          additionalProperties: false
-//        - title: Device type
-//          type: object
-//          required: [device]
-//          properties:
-//              device:
-//                  title: "True when the device type matches at least one of the listed values"
-//                  type: array
-//                  minItems: 1
-//                  items: { enum: [phone, tab] }
-//          additionalProperties: false
-//        - title: Screen orientation
-//          type: object
-//          required: [orientation]
-//          properties:
-//              orientation: { enum: [landscape, portrait] }
-//          additionalProperties: false
-//        - title: Platform
-//          type: object
-//          required: [platform]
-//          properties:
-//              platform:
-//                  title: "True when the platform matches at least one of the listed values"
-//                  type: array
-//                  minItems: 1
-//                  items: { enum: [ios, android] }
-//          additionalProperties: false
-//        - title: Version range
-//          type: object
-//          anyOf:
-//              - required: [version]
-//              - required: [to_version]
-//          properties:
-//              version:
-//                  type: string
-//                  pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$"
-//                  description: "Minimum format version (inclusive, lower bound)"
-//              to_version:
-//                  type: string
-//                  pattern: "^[0-9]+(\\.[0-9]+){0,2}(-[A-Za-z0-9._]+)?$"
-//                  description: "Maximum format version (exclusive, upper bound)"
-//          additionalProperties: false
-//        - title: Available (per-OS minimum version)
-//          type: object
-//          required: [available]
-//          properties:
-//              available:
-//                  type: array
-//                  description: >
-//                      Per-OS minimum-version constraints (semantics of Swift's
-//                      @available). Each item declares the minimum (inclusive)
-//                      runtime version required for the named OS. Operating
-//                      systems NOT listed carry no constraint — true for them at
-//                      any version. False only when the runtime OS is listed AND
-//                      its version is below that item's os_version. Each os_name
-//                      MUST appear at most once.
-//                  items:
-//                      type: object
-//                      required: [os_name, os_version]
-//                      properties:
-//                          os_name:
-//                              type: string
-//                              description: "Operating system name to match against the runtime OS."
-//                              enum:
-//                                  - iOS
-//                                  - macOS
-//                                  - tvOS
-//                                  - watchOS
-//                                  - visionOS
-//                                  - Android
-//                          os_version:
-//                              type: string
-//                              pattern: "^[0-9]+\\.[0-9]+$"
-//                              description: "Minimum runtime OS version (inclusive) required for this os_name."
-//                      additionalProperties: false
-//                  uniqueItems: true
-//                  minItems: 1
-//          additionalProperties: false
-
-extension Schema.Condition: Decodable {
+extension Schema.Condition: DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case metric
         case min
         case max
         case orientation
-        case device
-        case platform
-        case version
-        case toVersion = "to_version"
+        case devices = "device"
+        case platforms = "platform"
+        case startVersion = "version"
+        case endVersion = "to_version"
         case available
     }
 
-    init(from decoder: Decoder) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let device = configuration.device
 
         if container.contains(.metric) {
             let metric = try container.decode(String.self, forKey: .metric)
@@ -190,7 +90,7 @@ extension Schema.Condition: Decodable {
             default:
                 throw DecodingError.dataCorruptedError(forKey: .metric, in: container, debugDescription: "unknown metric: \(metric)")
             }
-            if min == nil && max == nil {
+            if min == nil, max == nil {
                 self = .true
             } else {
                 self = .condition(condition)
@@ -198,18 +98,19 @@ extension Schema.Condition: Decodable {
         } else if container.contains(.orientation) {
             let orientation = try container.decode(Schema.Orientation.self, forKey: .orientation)
             self = .condition(.orientation(orientation))
-        } else if container.contains(.platform) {
-            let platforms = try container.decode([String].self, forKey: .platform)
-            self = platforms.contains("ios") ? .true : .false
-        } else if container.contains(.device) {
-            self = .true
-        } else if container.contains(.version) || container.contains(.toVersion) {
+        } else if container.contains(.platforms) {
+            let platforms = try container.decode([String].self, forKey: .platforms)
+            self = platforms.contains(Schema.platform) ? .true : .false
+        } else if container.contains(.devices) {
+            let devices = try container.decode([String].self, forKey: .devices)
+            self = devices.contains(device.rawValue) ? .true : .false
+        } else if container.contains(.startVersion) || container.contains(.endVersion) {
             var result = true
-            if let version = try container.decodeIfPresent(String.self, forKey: .version) {
-                result = Schema.formatVersion.isSameOrNewerVersion(than: version)
+            if let startVersion = try container.decodeIfPresent(String.self, forKey: .startVersion) {
+                result = Schema.formatVersion.isSameOrNewerVersion(than: startVersion)
             }
-            if result, let toVersion = try container.decodeIfPresent(String.self, forKey: .toVersion) {
-                result = !toVersion.isSameOrNewerVersion(than: Schema.formatVersion)
+            if result, let endVersion = try container.decodeIfPresent(String.self, forKey: .endVersion) {
+                result = !endVersion.isSameOrNewerVersion(than: Schema.formatVersion)
             }
             self = result ? .true : .false
         } else if container.contains(.available) {
@@ -224,11 +125,11 @@ extension Schema.Condition: Decodable {
     }
 }
 
-private extension Schema.Condition {
+extension Schema.Condition {
     struct AvailableEntry: Decodable {
         static let currentOSName: String? = {
             #if os(visionOS)
-            return "visionOS"
+            return "visionOS" // VisionOS should come before iOS—it also has true os(iOS) in zippered targets.
             #elseif os(iOS)
             return "iOS"
             #elseif os(macOS)
@@ -253,12 +154,16 @@ private extension Schema.Condition {
         var requiredVersion: OperatingSystemVersion? {
             let parts = osVersion.split(separator: ".").compactMap { Int($0) }
             guard parts.count >= 2 else { return nil }
-            return .init(majorVersion: parts[0], minorVersion: parts[1], patchVersion: 0)
+            return .init(
+                majorVersion: parts[0],
+                minorVersion: parts[1],
+                patchVersion: 0
+            )
         }
     }
 }
 
-private extension [Schema.Condition.AvailableEntry] {
+extension [Schema.Condition.AvailableEntry] {
     var isSatisfied: Bool {
         guard
             let current = Schema.Condition.AvailableEntry.currentOSName,

@@ -54,7 +54,7 @@ extension Schema.GridItem: DecodableWithConfiguration {
         case content
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         if !configuration.isLegacy {

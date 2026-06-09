@@ -136,7 +136,7 @@ extension Schema.Element: DecodableWithConfiguration {
         case radialProgress = "radial_progress"
     }
 
-    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: any Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
 

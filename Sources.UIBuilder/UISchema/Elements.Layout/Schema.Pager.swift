@@ -79,7 +79,7 @@ extension Schema.Pager: DecodableWithConfiguration {
         case pageIndex = "page_index"
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             pageWidth: container.decodeIfPresent(Length.self, forKey: .pageWidth)

@@ -22,7 +22,7 @@ extension Schema.Template: DecodableWithConfiguration {
         case content
     }
 
-    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: any Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         try self.init(

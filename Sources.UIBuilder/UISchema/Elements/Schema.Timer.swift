@@ -48,7 +48,7 @@ extension Schema.Timer: DecodableWithConfiguration {
         case overflowMode = "on_overflow"
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let id = try container.decode(String.self, forKey: .id)
 

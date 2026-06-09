@@ -8,13 +8,27 @@
 import Foundation
 
 extension AdaptyUISchema {
-    struct DecodingConfiguration {
+    public struct DecodingConfiguration: Sendable {
+        let device: DeviceKind
+
+        public init(device: DeviceKind) {
+            self.device = device
+        }
+    }
+
+    struct InternalDecodingConfiguration {
+        let device: DeviceKind
         let isLegacy: Bool
         var insideTemplateId: String?
         var insideScreenId: String?
         var insideNavigatorId: String?
         var legacyTemplateId: String?
         nonisolated(unsafe) let collector: DecodingCollector = .init()
+
+        init(from: DecodingConfiguration, isLegacy: Bool) {
+            self.device = from.device
+            self.isLegacy = isLegacy
+        }
     }
 
     final class DecodingCollector {
@@ -23,7 +37,7 @@ extension AdaptyUISchema {
     }
 }
 
-extension AdaptyUISchema.DecodingConfiguration {
+extension AdaptyUISchema.InternalDecodingConfiguration {
     var isNavigator: Bool {
         insideNavigatorId != nil
     }
@@ -35,7 +49,7 @@ extension AdaptyUISchema.DecodingConfiguration {
 
 // # mark legacy
 
-extension AdaptyUISchema.DecodingConfiguration {
+extension AdaptyUISchema.InternalDecodingConfiguration {
     var screenLayoutBehaviourFromLegacy: Schema.Screen.LayoutBehaviour? {
         guard isLegacy else {
             return nil
@@ -51,3 +65,4 @@ extension AdaptyUISchema.DecodingConfiguration {
         return .init(rawValue: legacyTemplateId) ?? .default
     }
 }
+

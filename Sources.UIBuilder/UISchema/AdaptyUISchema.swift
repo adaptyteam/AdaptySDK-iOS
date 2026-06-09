@@ -23,7 +23,7 @@ public struct AdaptyUISchema: Sendable {
     let showRestoreLoader: Bool
 }
 
-extension AdaptyUISchema: Decodable {
+extension AdaptyUISchema: DecodableWithConfiguration {
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
         case legacyTemplateId = "template_id"
@@ -43,12 +43,12 @@ extension AdaptyUISchema: Decodable {
         case showPurchaseLoader = "show_purchase_loader"
         case showRestoreLoader = "show_restore_loader"
     }
-
-    public init(from decoder: Decoder) throws {
+    
+    public init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         formatVersion = try container.decode(Version.self, forKey: .formatVersion)
 
-        var configuration = DecodingConfiguration(isLegacy: !formatVersion.isNotLegacyVersion)
+        var configuration = InternalDecodingConfiguration(from: configuration, isLegacy: !formatVersion.isNotLegacyVersion)
 
         if configuration.isLegacy {
             configuration.legacyTemplateId = try container.decode(String.self, forKey: .legacyTemplateId)
@@ -133,7 +133,7 @@ private enum ScriptCodingKeys: String, CodingKey {
 }
 
 private extension Decoder {
-    func decodeScript(configuration _: AdaptyUISchema.DecodingConfiguration) throws -> [String] {
+    func decodeScript(configuration _: AdaptyUISchema.InternalDecodingConfiguration) throws -> [String] {
         let container = try container(keyedBy: ScriptCodingKeys.self)
         guard container.contains(.scripts) else {
             return []

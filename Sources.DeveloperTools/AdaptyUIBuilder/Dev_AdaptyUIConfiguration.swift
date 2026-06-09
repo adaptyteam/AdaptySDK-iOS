@@ -23,6 +23,7 @@ public extension Dev_AdaptyUIConfiguration {
         contents: [AdaptyUISchema.ExampleContent],
         script: String? = nil,
         startScreenName: String?,
+        decodingConfiguration: AdaptyUISchema.DecodingConfiguration,
         environment: Dev_PreviewEnvironment = .empty
     ) throws -> Self {
         let json = try AdaptyUISchema.createJson(
@@ -34,15 +35,20 @@ public extension Dev_AdaptyUIConfiguration {
             startScreenName: startScreenName
         )
 
-        return try create(json: json, environment: environment)
+        return try create(
+            json: json,
+            decodingConfiguration: decodingConfiguration,
+            environment: environment
+        )
     }
 
     static func create(
         json: String,
+        decodingConfiguration: AdaptyUISchema.DecodingConfiguration,
         environment: Dev_PreviewEnvironment = .empty
     ) throws -> Self {
         let uuid = UUID().uuidString.lowercased()
-        let schema = try AdaptyUISchema(from: json)
+        let schema = try AdaptyUISchema(from: json, configuration: decodingConfiguration)
         let configuration = try schema.extractUIConfiguration(
             id: uuid,
             envoriment: .init(

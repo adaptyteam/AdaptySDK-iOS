@@ -65,7 +65,7 @@ extension Schema.Switch: DecodableWithConfiguration {
         case interpolator
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let cases = try container.decode([Schema.Case].self, forKeys: .cases, configuration: configuration)
 
@@ -112,10 +112,10 @@ extension Schema.Case: DecodableWithConfiguration {
         case content
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        if let condition = try container.decode([Schema.Condition].self, forKey: .condition).asConditions {
+        if let condition = try container.decode([Schema.Condition].self, forKey: .condition, configuration: configuration).asConditions {
             try self.init(
                 condition: condition,
                 content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration)

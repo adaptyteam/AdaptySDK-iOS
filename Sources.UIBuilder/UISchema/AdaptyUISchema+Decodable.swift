@@ -6,17 +6,18 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 public extension AdaptyUISchema {
-    init(from jsonData: Data) throws {
+    init(from jsonData: Data, configuration: DecodingConfiguration) throws {
         self = try Self.decodeOnLargeStack {
-            try JSONDecoder().decode(AdaptyUISchema.self, from: jsonData)
+            try JSONDecoder().decode(AdaptyUISchema.self, from: jsonData, with: configuration)
         }
     }
 
     @inlinable
-    init(from jsonData: String) throws {
-        try self.init(from: jsonData.data(using: .utf8) ?? Data())
+    init(from jsonData: String, configuration: DecodingConfiguration) throws {
+        try self.init(from: jsonData.data(using: .utf8) ?? Data(), configuration: configuration)
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyUIBuilder
 
 extension AdaptyFlow {
     struct ViewConfiguration {
@@ -16,7 +17,7 @@ extension AdaptyFlow {
     struct Grid: Sendable {
 
         let platforms: [String]?
-        let devices: [Adapty.DeviceKind]?
+        let devices: [AdaptyUISchema.DeviceKind]?
         let customId: String?
         let hBreakpoints: [Int]
         let vBreakpoints: [Int]
@@ -56,7 +57,7 @@ extension AdaptyFlow.Grid: Codable {
         if let v = try? container.decode(String.self, forKey: .devices), v == "all" {
             devices = nil
         } else {
-            devices = try container.decodeIfPresent([Adapty.DeviceKind].self, forKey: .devices) ?? []
+            devices = try container.decodeIfPresent([AdaptyUISchema.DeviceKind].self, forKey: .devices) ?? []
         }
         customId = try container.decodeIfPresent(String.self, forKey: .customId)
         hBreakpoints = try container.decodeIfPresent([Int].self, forKey: .hBreakpoints) ?? []

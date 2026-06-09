@@ -16,7 +16,7 @@ extension Schema {
 }
 
 extension Schema.ScreensCollection: DecodableWithConfiguration {
-    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: any Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: AnyCodingKey.self)
         var nestedConfiguration = configuration
 
@@ -50,7 +50,7 @@ private enum LegacyScreenCodingKeys: String, CodingKey {
 
 private extension Decoder {
     func legacyGenerateNavigators(
-        configuration: Schema.DecodingConfiguration
+        configuration: Schema.InternalDecodingConfiguration
     ) throws -> [Schema.NavigatorIdentifier: Schema.Navigator] {
         let container = try container(keyedBy: AnyCodingKey.self)
 

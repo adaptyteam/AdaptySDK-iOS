@@ -69,10 +69,10 @@ extension Schema.FlexStack: DecodableWithConfiguration {
         case content
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        let condition = try container.decode([Schema.Condition].self, forKey: .condition).asConditions
+        let condition = try container.decode([Schema.Condition].self, forKey: .condition, configuration: configuration).asConditions
 
         let direction: Schema.Flex.Direction =
             switch try container.decode(String.self, forKey: .direction) {

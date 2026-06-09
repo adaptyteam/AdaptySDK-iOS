@@ -13,18 +13,14 @@ import AdaptyUIBuilder
 import Foundation
 
 public struct Dev_DeviceOverride: Sendable {
-    public enum Kind: Sendable {
-        case phone
-        case tab
-    }
 
-    public var kind: Kind
+    public var kind: AdaptyUISchema.DeviceKind
     /// Logical points; maps to `Adapty.DeviceInfo.horizontal`.
     public var width: Int
     /// Logical points; maps to `Adapty.DeviceInfo.vertical`.
     public var height: Int
 
-    public init(kind: Kind, width: Int, height: Int) {
+    public init(kind: AdaptyUISchema.DeviceKind, width: Int, height: Int) {
         self.kind = kind
         self.width = width
         self.height = height
