@@ -18,7 +18,7 @@ struct FallbackPlacements: Sendable {
         head.formatVersion
     }
 
-    var version: Int64 {
+    var version: Int {
         head.version
     }
 
@@ -101,7 +101,7 @@ private extension FallbackPlacements {
 
     struct Head: Sendable, Decodable {
         var placementIds: Set<String>?
-        let version: Int64
+        let version: Int
         let formatVersion: Int
 
         enum CodingKeys: String, CodingKey {
@@ -132,7 +132,7 @@ private extension FallbackPlacements {
             }
 
             self.formatVersion = formatVersion
-            version = try container.decode(Int64.self, forKey: .version)
+            version = try container.decode(Int.self, forKey: .version)
             placementIds = try container.decodeIfPresent(Set<String>.self, forKey: .placementIds)
         }
     }
@@ -142,7 +142,7 @@ private extension FallbackPlacements {
         withUserId userId: AdaptyUserId,
         withVariationId variationId: String?,
         withRequestLocale requestLocale: AdaptyLocale?,
-        withFallbackVersion fallbackVersion: Int64
+        withFallbackVersion fallbackVersion: Int
     ) throws -> AdaptyPlacement.Draw<Content> {
         let jsonDecoder = FallbackPlacements.decoder()
 

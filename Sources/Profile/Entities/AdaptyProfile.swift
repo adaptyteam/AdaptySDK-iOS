@@ -40,7 +40,7 @@ public struct AdaptyProfile: Sendable {
     /// The keys are product ids from the store. The values are arrays of information about consumables. Can be null if the customer has no purchases.
     public let nonSubscriptions: [String: [NonSubscription]]
 
-    package let version: Int64
+    package let version: Int
 }
 
 extension AdaptyProfile {
@@ -116,7 +116,7 @@ extension AdaptyProfile: Codable {
         )
         segmentId = try container.decode(String.self, forKey: .segmentId)
         isTestUser = try container.decodeIfPresent(Bool.self, forKey: .isTestUser) ?? false
-        version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
+        version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 0
         codableCustomAttributes = try container.decodeIfPresent(AdaptyProfile.CustomAttributes.self, forKey: .customAttributes)
         customAttributes = codableCustomAttributes?.convertToSimpleDictionary() ?? [:]
         accessLevels = try container.decodeIfPresent([String: AccessLevel].self, forKey: .accessLevels) ?? [:]

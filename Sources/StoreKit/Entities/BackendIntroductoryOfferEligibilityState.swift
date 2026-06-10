@@ -10,7 +10,7 @@ import Foundation
 struct BackendIntroductoryOfferEligibilityState: Sendable, Hashable {
     let vendorId: String
     var value: Bool
-    let version: Int64
+    let version: Int
 }
 
 extension BackendIntroductoryOfferEligibilityState: CustomStringConvertible {

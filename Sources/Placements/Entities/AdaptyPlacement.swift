@@ -19,11 +19,11 @@ public struct AdaptyPlacement: Sendable, Identifiable {
 
     let shouldTrackOnboardingShown: Bool
 
-    var version: Int64
+    var version: Int
 }
 
 extension AdaptyPlacement {
-    func replace(version: Int64) -> Self {
+    func replace(version: Int) -> Self {
         var placement = self
         placement.version = version
         return placement
@@ -78,7 +78,7 @@ extension AdaptyPlacement: Codable {
         abTestName = try placement.decode(String.self, forKey: .abTestName)
         audienceVersionId = try placement.decode(String.self, forKey: .audienceVersionId)
         shouldTrackOnboardingShown = try placement.decodeIfPresent(Bool.self, forKey: .shouldTrackOnboardingShown) ?? false
-        version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
+        version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 0
     }
 
     public func encode(to encoder: Encoder) throws {
