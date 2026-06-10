@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Cache.Actor
+@StorageActor
 extension Cache {
     static let metaFileExtension = "meta"
     static let dataFileExtension = "data"
@@ -49,3 +49,4 @@ extension Cache {
             .appendingPathComponent(itemType.rawValue, isDirectory: true)
     }
 }
+

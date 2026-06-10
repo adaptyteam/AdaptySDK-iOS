@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Cache.Actor
+@StorageActor
 extension Cache {
     static func cleanup() {
         let fm = fileManager
@@ -65,3 +65,4 @@ extension Cache {
         }
     }
 }
+

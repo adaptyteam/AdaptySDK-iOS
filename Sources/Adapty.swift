@@ -169,10 +169,6 @@ public final class Adapty {
                         profile: createdProfile,
                         sentEnvironment: meta.sentEnvironment
                     )
-                    let profileId = createdProfile.profileId
-                    Task.detached(priority: .background) {
-                        await Cache.removeOtherProfiles(profileId)
-                    }
                     self.sharedProfileManager = .current(manager)
                     manager.saveCrossPlacementState(crossPlacementState)
                     return manager
@@ -375,3 +371,4 @@ extension ProfileManager? {
         }
     }
 }
+

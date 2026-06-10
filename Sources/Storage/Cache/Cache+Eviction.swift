@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Cache.Actor
+@StorageActor
 extension FileManager {
     /// If `Cache.totalBytesUpperBound` is known and ≤ `maxBytes` — no-op.
     /// If a previous scan left a cooldown (grace blocked everything) and it
@@ -85,3 +85,4 @@ extension FileManager {
         }
     }
 }
+

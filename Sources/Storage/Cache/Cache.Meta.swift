@@ -19,12 +19,15 @@ extension Cache {
         var lastAccessedAt: Date
 
         let dataVersion: Int
-        let locale: String?
+
+        let eligibleCrossABtest: Bool
+        let locale: AdaptyLocale?
 
         init(
             key: ItemKey,
             size: Int,
-            locale: String?,
+            locale: AdaptyLocale?,
+            eligibleCrossABtest: Bool,
             dataVersion: Int,
             storedAt: Date,
             lastAccessedAt: Date
@@ -33,6 +36,7 @@ extension Cache {
             schemaVersion = key.itemType.schemaVersion
             self.size = size
             self.locale = locale
+            self.eligibleCrossABtest = eligibleCrossABtest
             self.dataVersion = dataVersion
             self.storedAt = storedAt
             self.lastAccessedAt = lastAccessedAt
@@ -48,6 +52,7 @@ extension Cache.Meta: Codable {
         case schemaVersion = "format"
         case size
         case locale
+        case eligibleCrossABtest = "eligible_cross_ab"
         case dataVersion = "version"
         case storedAt = "stored_at"
         case lastAccessedAt = "last_accessed_at"
@@ -62,7 +67,8 @@ extension Cache.Meta: Codable {
         )
         schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
         size = try container.decode(Int.self, forKey: .size)
-        locale = try container.decodeIfPresent(String.self, forKey: .locale)
+        locale = try container.decodeIfPresent(AdaptyLocale.self, forKey: .locale)
+        eligibleCrossABtest = try container.decodeIfPresent(Bool.self, forKey: .eligibleCrossABtest) ?? false
         dataVersion = try container.decode(Int.self, forKey: .dataVersion)
         storedAt = try Date(timeIntervalSince1970: container.decode(Double.self, forKey: .storedAt))
         lastAccessedAt = try Date(timeIntervalSince1970: container.decode(Double.self, forKey: .lastAccessedAt))
@@ -76,13 +82,16 @@ extension Cache.Meta: Codable {
         try container.encode(schemaVersion, forKey: .schemaVersion)
         try container.encode(size, forKey: .size)
         try container.encodeIfPresent(locale, forKey: .locale)
+        if eligibleCrossABtest {
+            try container.encode(eligibleCrossABtest, forKey: .eligibleCrossABtest)
+        }
         try container.encode(dataVersion, forKey: .dataVersion)
         try container.encode(storedAt.timeIntervalSince1970, forKey: .storedAt)
         try container.encode(lastAccessedAt.timeIntervalSince1970, forKey: .lastAccessedAt)
     }
 }
 
-@Cache.Actor
+@StorageActor
 extension Cache.Meta {
     @discardableResult
     @inlinable
@@ -111,3 +120,4 @@ extension Cache.Meta {
                        options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
     }
 }
+

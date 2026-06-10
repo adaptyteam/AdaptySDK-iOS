@@ -7,15 +7,8 @@
 
 import Foundation
 
+@StorageActor
 enum Cache {
-    @globalActor
-    actor Actor {
-        static let shared = Actor()
-    }
-}
-
-@Cache.Actor
-extension Cache {
     static var maxBytes: Int = 20 * 1024 * 1024
     /// How long a freshly-written entry is protected from LRU eviction,
     /// counted from `storedAt`. 15 min covers a typical user session plus
@@ -44,3 +37,4 @@ extension Cache {
     /// foreign code may install on `FileManager.default`.
     static let fileManager = FileManager()
 }
+

@@ -62,7 +62,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: kOther, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kShared, dataVersion: 0) { _, _ in true }
 
-            await Cache.removeOtherProfiles("p1")
+            await Cache.removeOtherProfiles(userId("p1"))
 
             let current = await filesExist(for: kCurrent)
             let other = await filesExist(for: kOther)
@@ -80,7 +80,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
             // root not created yet (no writes). Must not crash.
-            await Cache.removeOtherProfiles("p1")
+            await Cache.removeOtherProfiles(userId("p1"))
             #expect(!FileManager.default.fileExists(atPath: root.path))
         }
 
@@ -93,7 +93,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: kCurrent, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kShared, dataVersion: 0) { _, _ in true }
 
-            await Cache.removeOtherProfiles("p1")
+            await Cache.removeOtherProfiles(userId("p1"))
 
             // Nothing removed; both entries intact.
             let current = await filesExist(for: kCurrent)
@@ -114,7 +114,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: kShared, dataVersion: 0) { _, _ in true }
 
             // Profile "p3" has no directory; both p1 and p2 are "other".
-            await Cache.removeOtherProfiles("p3")
+            await Cache.removeOtherProfiles(userId("p3"))
 
             let f1 = await filesExist(for: k1)
             let f2 = await filesExist(for: k2)

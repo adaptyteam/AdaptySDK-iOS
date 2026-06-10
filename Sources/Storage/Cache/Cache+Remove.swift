@@ -7,7 +7,7 @@
 
 import Foundation
 
-@Cache.Actor
+@StorageActor
 extension Cache {
     @inlinable
     static func removeAll() {
@@ -17,7 +17,7 @@ extension Cache {
     }
 
     @inlinable
-    static func removeOtherProfiles(_ profileId: String) {
+    static func removeOtherProfiles(_ userId: AdaptyUserId) {
         let fm = fileManager
         let rootDirectoryPath = rootDirectory.path
         guard
@@ -26,15 +26,16 @@ extension Cache {
             !subdirectories.isEmpty
         else { return }
 
-        let currentProfileDirectoryName = directoryName(forProfileId: profileId)
+        let currentProfileDirectoryName = directoryName(forProfileId: userId.profileId)
         for name in subdirectories
-            where name != currentProfileDirectoryName && name != sharedDirectoryName {
+            where name != currentProfileDirectoryName && name != sharedDirectoryName
+        {
             try? fm.removeItem(at: rootDirectory.appendingPathComponent(name, isDirectory: true))
         }
     }
 }
 
-@Cache.Actor
+@StorageActor
 extension FileManager {
     func removeCacheItem(key: Cache.ItemKey) {
         removeCacheItem(
@@ -48,3 +49,4 @@ extension FileManager {
         try? removeItem(at: dataFileURL)
     }
 }
+

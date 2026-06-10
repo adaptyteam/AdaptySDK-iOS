@@ -16,7 +16,7 @@ extension ResponseCacheTests {
     struct EvictionTests {
         /// Writes an entry with arbitrary storedAt/lastAccessedAt and a body of known size.
         /// Returns the key for later inspection.
-        @Cache.Actor
+        @StorageActor
         private func putEntry(
             itemId: String,
             bodySize: Int,

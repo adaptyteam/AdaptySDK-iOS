@@ -169,6 +169,11 @@ final class ProfileStorage {
 
         CrossPlacementStorage.clear()
         PlacementStorage.clear()
+
+        Task { @StorageActor in
+            let userId = await ProfileStorage.userId
+            Cache.removeOtherProfiles(userId)
+        }
     }
 }
 
