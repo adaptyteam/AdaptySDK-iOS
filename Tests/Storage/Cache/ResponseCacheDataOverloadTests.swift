@@ -27,7 +27,7 @@ extension ResponseCacheTests {
             let encoded = try payload.encoded()
             _ = try await Cache.write(encoded, key: key, dataVersion: 0) { _, _ in true }
 
-            let data: Data? = await Cache.read(key, accept: { _ in true })
+            let data: Data? = await Cache.read(key)
             #expect(data == encoded)
         }
 
@@ -75,7 +75,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            let data: Data? = await Cache.read(key, accept: { _ in true })
+            let data: Data? = await Cache.read(key)
             #expect(data == nil)
         }
 
@@ -88,7 +88,7 @@ extension ResponseCacheTests {
 
             try await Task.sleep(nanoseconds: 10_000_000)
 
-            _ = await Cache.read(key, accept: { _ in true })
+            _ = await Cache.read(key)
 
             let after = await readMetaFromDisk(for: key)?.lastAccessedAt
             #expect(before != nil && after != nil)
@@ -104,7 +104,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             await removeBodyOnly(for: key)
 
-            let data: Data? = await Cache.read(key, accept: { _ in true })
+            let data: Data? = await Cache.read(key)
             #expect(data == nil)
 
             let files = await filesExist(for: key)
@@ -119,7 +119,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             try await writeRawMeta(Data("garbage".utf8), for: key)
 
-            let data: Data? = await Cache.read(key, accept: { _ in true })
+            let data: Data? = await Cache.read(key)
             #expect(data == nil)
 
             let files = await filesExist(for: key)
@@ -135,7 +135,7 @@ extension ResponseCacheTests {
             let raw = Data((0 ... 255).map { UInt8($0) })
             _ = try await Cache.write(raw, key: key, dataVersion: 0) { _, _ in true }
 
-            let read: Data? = await Cache.read(key, accept: { _ in true })
+            let read: Data? = await Cache.read(key)
             #expect(read == raw)
         }
 
@@ -149,12 +149,11 @@ extension ResponseCacheTests {
             let returned = try await Cache.writeOrRead(
                 newData,
                 key: key,
-                dataVersion: 0,
-                accept: { _, _ in true }
+                dataVersion: 0
             )
             #expect(returned == newData)
 
-            let onDisk: Data? = await Cache.read(key, accept: { _ in true })
+            let onDisk: Data? = await Cache.read(key)
             #expect(onDisk == newData)
         }
 
@@ -173,7 +172,7 @@ extension ResponseCacheTests {
             )
             #expect(returned == newData)
 
-            let onDisk: Data? = await Cache.read(key, accept: { _ in true })
+            let onDisk: Data? = await Cache.read(key)
             #expect(onDisk == newData)
         }
 
@@ -194,7 +193,7 @@ extension ResponseCacheTests {
             #expect(returned == cachedEncoded)
 
             // Disk still holds the original bytes — newData was not written.
-            let onDisk: Data? = await Cache.read(key, accept: { _ in true })
+            let onDisk: Data? = await Cache.read(key)
             #expect(onDisk == cachedEncoded)
         }
 
@@ -238,7 +237,7 @@ extension ResponseCacheTests {
             )
             #expect(returned == newData)
 
-            let onDisk: Data? = await Cache.read(key, accept: { _ in true })
+            let onDisk: Data? = await Cache.read(key)
             #expect(onDisk == newData)
         }
 
@@ -283,7 +282,7 @@ extension ResponseCacheTests {
             )
             #expect(returned == newData)
 
-            let onDisk: Data? = await Cache.read(key, accept: { _ in true })
+            let onDisk: Data? = await Cache.read(key)
             #expect(onDisk == newData)
         }
 
@@ -295,12 +294,11 @@ extension ResponseCacheTests {
             let returned = try await Cache.writeOrRead(
                 raw,
                 key: key,
-                dataVersion: 0,
-                accept: { _, _ in true }
+                dataVersion: 0
             )
             #expect(returned == raw)
 
-            let onDisk: Data? = await Cache.read(key, accept: { _ in true })
+            let onDisk: Data? = await Cache.read(key)
             #expect(onDisk == raw)
         }
 
@@ -313,10 +311,9 @@ extension ResponseCacheTests {
             let encoded = try payload.encoded()
             _ = try await Cache.write(encoded, key: key, dataVersion: 0) { _, _ in true }
 
-            let dataView: Data? = await Cache.read(key, accept: { _ in true })
+            let dataView: Data? = await Cache.read(key)
             let decodedView: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
 

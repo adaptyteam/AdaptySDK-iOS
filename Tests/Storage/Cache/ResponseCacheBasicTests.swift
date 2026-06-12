@@ -68,7 +68,6 @@ extension ResponseCacheTests {
             // Contents are unchanged.
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == payload)
@@ -90,7 +89,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == altPayload)
@@ -113,7 +111,6 @@ extension ResponseCacheTests {
             // body contains the fresh data.
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == altPayload)
@@ -163,7 +160,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == nil)
@@ -177,7 +173,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: { _ in throw TestDecodeError() }
             )
             #expect(value == nil)
@@ -198,7 +193,6 @@ extension ResponseCacheTests {
 
             _ = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
 
@@ -263,15 +257,13 @@ extension ResponseCacheTests {
                 payload.encoded(),
                 key: key,
                 dataVersion: 0,
-                accept: { _, _ in true },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(result == payload)
 
             // The entry was stored in the cache.
             let cached: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(cached == payload)
@@ -288,14 +280,13 @@ extension ResponseCacheTests {
                 key: key,
                 dataVersion: 0,
                 accept: { _, _ in false }, // don't use new → read cached
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(result == payload) // returned cached, not altPayload
 
             // Old body is still on disk.
             let cached: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(cached == payload)
@@ -315,7 +306,7 @@ extension ResponseCacheTests {
                 key: key,
                 dataVersion: 0,
                 accept: { _, _ in false },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
 
             let after = await readMetaFromDisk(for: key)?.lastAccessedAt
@@ -335,13 +326,12 @@ extension ResponseCacheTests {
                 key: key,
                 dataVersion: 0,
                 accept: { _, _ in true }, // use new
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(result == altPayload)
 
             let cached: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(cached == altPayload)
@@ -356,8 +346,7 @@ extension ResponseCacheTests {
                     Data([0xFF, 0xFE]),
                     key: key,
                     dataVersion: 0,
-                    accept: { _, _ in true },
-                    decode: { (_: Data) throws -> TestPayload in throw TestDecodeError() }
+                    decode: { (_, _: Data) throws -> TestPayload in throw TestDecodeError() }
                 )
             }
 
@@ -379,8 +368,7 @@ extension ResponseCacheTests {
                 Data([0xFF, 0xFE]),
                 key: key,
                 dataVersion: 0,
-                accept: { _, _ in true },
-                decode: { data -> TestPayload in
+                decode: { _, data -> TestPayload in
                     // Throw only on 0xFF-bytes; valid JSON decodes normally.
                     if data == Data([0xFF, 0xFE]) { throw TestDecodeError() }
                     return try TestPayload.decode(data)
@@ -391,7 +379,6 @@ extension ResponseCacheTests {
             // Cache was not overwritten.
             let cached: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(cached == payload)
@@ -410,14 +397,13 @@ extension ResponseCacheTests {
                 key: key,
                 dataVersion: 0,
                 accept: { _, _ in false }, // we want cached
-                decode: TestPayload.decode(_:) // but cached decode will fail — fallback to new
+                decode: TestPayload.decode(_:_:) // but cached decode will fail — fallback to new
             )
             #expect(result == altPayload)
 
             // Cache replaced with the new entry.
             let cached: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(cached == altPayload)
@@ -436,7 +422,7 @@ extension ResponseCacheTests {
                     key: key,
                     dataVersion: 0,
                     accept: { _, _ in false },
-                    decode: { _ throws -> TestPayload in throw TestDecodeError() }
+                    decode: { _, _ throws -> TestPayload in throw TestDecodeError() }
                 )
             }
 

@@ -57,7 +57,7 @@ extension ResponseCacheTests {
 
             let kCurrent = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "a")
             let kOther = Cache.ItemKey(profileId: "p2", itemType: .flow, itemId: "a")
-            let kShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "s")
+            let kShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "s")
             _ = try await Cache.write(payload.encoded(), key: kCurrent, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kOther, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kShared, dataVersion: 0) { _, _ in true }
@@ -89,7 +89,7 @@ extension ResponseCacheTests {
             defer { cleanupCacheTest(root) }
 
             let kCurrent = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "a")
-            let kShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "s")
+            let kShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "s")
             _ = try await Cache.write(payload.encoded(), key: kCurrent, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kShared, dataVersion: 0) { _, _ in true }
 
@@ -108,7 +108,7 @@ extension ResponseCacheTests {
 
             let k1 = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "a")
             let k2 = Cache.ItemKey(profileId: "p2", itemType: .flow, itemId: "a")
-            let kShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "s")
+            let kShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "s")
             _ = try await Cache.write(payload.encoded(), key: k1, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: k2, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kShared, dataVersion: 0) { _, _ in true }
@@ -214,7 +214,6 @@ extension ResponseCacheTests {
             // And the entry is still readable.
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == payload)
@@ -258,8 +257,8 @@ extension ResponseCacheTests {
             defer { cleanupCacheTest(root) }
 
             // Valid shared entry + orphan body in shared + stray unknown dir in shared.
-            let validShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "ok")
-            let orphanShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "orphan")
+            let validShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "ok")
+            let orphanShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "orphan")
             _ = try await Cache.write(payload.encoded(), key: validShared, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: orphanShared, dataVersion: 0) { _, _ in true }
             await removeMetaOnly(for: orphanShared)

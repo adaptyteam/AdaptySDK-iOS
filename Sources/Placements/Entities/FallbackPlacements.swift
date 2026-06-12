@@ -115,8 +115,6 @@ private extension FallbackPlacements {
 
             let formatVersion = try container.decode(Int.self, forKey: .formatVersion)
 
-            print(formatVersion)
-
             guard formatVersion == Adapty.fallbackFormatVersion else {
                 let error = Adapty.fallbackFormatVersion > formatVersion
                     ? "The fallback paywalls version is not correct. Download a new one from the Adapty Dashboard."

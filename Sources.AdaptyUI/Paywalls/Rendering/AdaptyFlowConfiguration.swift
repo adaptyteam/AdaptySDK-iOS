@@ -43,6 +43,7 @@ public extension AdaptyUI {
         package init(
             logId: String,
             flow: AdaptyFlow,
+            flowLayout: AdaptyFlow.Layout,
             viewConfiguration: AdaptyUIConfiguration,
             products: [AdaptyPaywallProduct]?,
             observerModeResolver: AdaptyObserverModeResolver?,
@@ -70,7 +71,7 @@ public extension AdaptyUI {
             logic = AdaptyUILogic(
                 logId: logId,
                 flow: flow,
-                viewConfigurationId: viewConfiguration.id,
+                flowLayout: flowLayout,
                 events: eventsHandler,
                 observerModeResolver: observerModeResolver
             )

@@ -16,13 +16,11 @@ extension AdaptyPlacement {
     }
 }
 
-extension AdaptyPlacement.Draw {
+extension AdaptyPlacement.Draw: DecodableWithConfiguration {
     var participatesInCrossPlacementABTest: Bool {
         variationIdByPlacements.isNotEmpty
     }
-}
 
-extension AdaptyPlacement.Draw: DecodableWithConfiguration {
     init(from decoder: Decoder, configuration: AdaptyPlacement.DecodingConfiguration) throws {
         let userId = try configuration.userIdOrThrow
         let placement = configuration.placement
@@ -76,3 +74,4 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placement content with index \(index) not found"))
     }
 }
+

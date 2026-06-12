@@ -28,7 +28,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == nil)
@@ -50,6 +49,7 @@ extension ResponseCacheTests {
                 key: badKey,
                 size: 100,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(),
                 lastAccessedAt: Date()
@@ -58,7 +58,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == nil)
@@ -80,6 +79,7 @@ extension ResponseCacheTests {
                 key: badKey,
                 size: 100,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(),
                 lastAccessedAt: Date()
@@ -88,7 +88,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == nil)
@@ -110,6 +109,7 @@ extension ResponseCacheTests {
                 key: badKey,
                 size: 100,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(),
                 lastAccessedAt: Date()
@@ -118,7 +118,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == nil)
@@ -140,6 +139,7 @@ extension ResponseCacheTests {
                 key: badKey,
                 size: 100,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(),
                 lastAccessedAt: Date()
@@ -148,7 +148,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == nil)
@@ -167,7 +166,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == nil)
@@ -186,7 +184,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == nil)
@@ -205,7 +202,6 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(value == nil)
@@ -233,7 +229,6 @@ extension ResponseCacheTests {
             // Read flow → self-heal (schemaVersion does not match itemType.schemaVersion).
             let f: TestPayload? = await Cache.read(
                 flowKey,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(f == nil)
@@ -241,7 +236,6 @@ extension ResponseCacheTests {
             // Onboarding is untouched — reads normally.
             let o: TestPayload? = await Cache.read(
                 onbKey,
-                accept: { _ in true },
                 decode: TestPayload.decode(_:)
             )
             #expect(o == onbPayload)

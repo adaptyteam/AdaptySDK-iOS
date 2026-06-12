@@ -10,10 +10,10 @@ import Foundation
 extension Cache {
     enum ItemType: String, Hashable, Sendable, Codable, CaseIterable {
         case flow
+        case flowLayout = "flow_layout"
         case flowVariants = "flow_variants"
         case onboarding
         case onboardingVariants = "onboarding_variants"
-        case uischema
     }
 }
 
@@ -22,8 +22,8 @@ extension Cache.ItemType {
     var schemaVersion: Int {
         switch self {
         case .flow, .flowVariants: 1
+        case .flowLayout: 1
         case .onboarding, .onboardingVariants: 1
-        case .uischema: 2
         }
     }
 }

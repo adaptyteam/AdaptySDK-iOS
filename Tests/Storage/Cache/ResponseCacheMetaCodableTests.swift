@@ -39,7 +39,7 @@ extension ResponseCacheTests {
             // Shared cache entries omit the "profile" key entirely.
             let json = """
             {
-                "type": "uischema",
+                "type": "flow_layout",
                 "id": "vc-123",
                 "format": 1,
                 "version": 0,
@@ -51,7 +51,7 @@ extension ResponseCacheTests {
 
             let meta = try JSONDecoder().decode(Cache.Meta.self, from: json)
             #expect(meta.key.profileId == nil)
-            #expect(meta.key.itemType == .uischema)
+            #expect(meta.key.itemType == .flowLayout)
             #expect(meta.key.itemId == "vc-123")
         }
 
@@ -61,6 +61,7 @@ extension ResponseCacheTests {
                 key: key,
                 size: 10,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(timeIntervalSince1970: 1_700_000_000),
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
@@ -72,11 +73,12 @@ extension ResponseCacheTests {
         }
 
         @Test func encode_meta_without_profile_omits_profile_key() async throws {
-            let key = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "vc-123")
+            let key = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "vc-123")
             let meta = Cache.Meta(
                 key: key,
                 size: 10,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(timeIntervalSince1970: 1_700_000_000),
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
@@ -88,11 +90,12 @@ extension ResponseCacheTests {
         }
 
         @Test func roundtrip_preserves_nil_profile() async throws {
-            let key = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "vc-1")
+            let key = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "vc-1")
             let original = Cache.Meta(
                 key: key,
                 size: 10,
                 locale: "en",
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(timeIntervalSince1970: 1_700_000_000),
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
@@ -102,7 +105,7 @@ extension ResponseCacheTests {
             let decoded = try JSONDecoder().decode(Cache.Meta.self, from: encoded)
 
             #expect(decoded.key.profileId == nil)
-            #expect(decoded.key.itemType == .uischema)
+            #expect(decoded.key.itemType == .flowLayout)
             #expect(decoded.key.itemId == "vc-1")
             #expect(decoded.locale == "en")
         }
@@ -113,6 +116,7 @@ extension ResponseCacheTests {
                 key: key,
                 size: 10,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(timeIntervalSince1970: 1_700_000_000),
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
@@ -129,6 +133,7 @@ extension ResponseCacheTests {
                 key: key,
                 size: 10,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(timeIntervalSince1970: 1_700_000_000),
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
@@ -148,6 +153,7 @@ extension ResponseCacheTests {
                 key: key,
                 size: 10,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 42,
                 storedAt: Date(timeIntervalSince1970: 1_700_000_000),
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
@@ -164,6 +170,7 @@ extension ResponseCacheTests {
                 key: key,
                 size: 10,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 0,
                 storedAt: Date(timeIntervalSince1970: 1_700_000_000),
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
@@ -180,6 +187,7 @@ extension ResponseCacheTests {
                 key: key,
                 size: 10,
                 locale: nil,
+                eligibleCrossABtest: false,
                 dataVersion: 1_234_567_890,
                 storedAt: Date(timeIntervalSince1970: 1_700_000_000),
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)

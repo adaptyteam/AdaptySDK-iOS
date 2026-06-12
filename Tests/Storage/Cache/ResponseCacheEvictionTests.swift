@@ -37,6 +37,7 @@ extension ResponseCacheTests {
                 ),
                 size: existing.size,
                 locale: existing.locale,
+                eligibleCrossABtest: existing.eligibleCrossABtest,
                 dataVersion: existing.dataVersion,
                 storedAt: storedAt,
                 lastAccessedAt: lastAccessedAt

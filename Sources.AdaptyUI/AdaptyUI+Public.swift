@@ -343,7 +343,7 @@ public extension AdaptyUI {
             throw err
         }
 
-        let viewConfiguration = try await Adapty.getUIConfiguration(
+        let (flowLayout, viewConfiguration) = try await Adapty.getUIConfiguration(
             flow: flow,
             device: device,
             customLayoutId: customLayoutId,
@@ -354,6 +354,7 @@ public extension AdaptyUI {
         return FlowConfiguration(
             logId: Log.stamp,
             flow: flow,
+            flowLayout: flowLayout,
             viewConfiguration: viewConfiguration,
             products: products,
             observerModeResolver: observerModeResolver,
@@ -364,7 +365,7 @@ public extension AdaptyUI {
         )
     }
 
-    /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyFlowController`` to present it afterwards.
+    /// Right after receiving ``AdaptyUI.FlowConfiguration``, you can create the corresponding ``AdaptyFlowController`` to present it afterwards.
     ///
     /// - Parameters:
     ///   - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.

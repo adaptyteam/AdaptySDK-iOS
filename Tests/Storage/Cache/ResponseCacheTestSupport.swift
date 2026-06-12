@@ -62,6 +62,11 @@ extension TestPayload {
     static func decode(_ data: Data) throws -> TestPayload {
         try JSONDecoder().decode(TestPayload.self, from: data)
     }
+
+    /// `decode` for `Cache.writeOrRead` — ignores the isNew flag.
+    static func decode(_ isNew: Bool, _ data: Data) throws -> TestPayload {
+        try decode(data)
+    }
 }
 
 /// Marker error for decoders, to distinguish "intentional failure from our code" from any other.

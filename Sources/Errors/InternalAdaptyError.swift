@@ -182,13 +182,13 @@ extension AdaptyError {
         InternalAdaptyError.wrongParam(AdaptyError.Source(file: file, function: function, line: line), text).asAdaptyError
     }
 
-    static func decodingViewConfiguration(
+    static func extractAdaptyUIConfiguration(
         _ error: Error,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) -> Self {
-        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Decoding ViewConfiguration failed", error: error).asAdaptyError
+        InternalAdaptyError.decodingFailed(AdaptyError.Source(file: file, function: function, line: line), "Extract AdaptyUIConfiguration failed", error: error).asAdaptyError
     }
 
     static func wrongParamPurchasedTransaction(
