@@ -173,7 +173,7 @@ extension JSONDecoder {
             from: body
         ).value
 
-        var configuration = AdaptyPlacement.DecodingConfiguration(
+        let configuration = AdaptyPlacement.DecodingConfiguration(
             userId: userId,
             placement: placement,
             requestLocale: requestLocale,

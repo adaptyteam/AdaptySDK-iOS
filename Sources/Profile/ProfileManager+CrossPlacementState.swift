@@ -15,7 +15,7 @@ private extension Adapty {
             throw error.asAdaptyError
         }
 
-        guard let manager = try profileManager(withProfileId: userId) else {
+        guard try profileManager(withProfileId: userId) != nil else {
             throw .profileWasChanged()
         }
 

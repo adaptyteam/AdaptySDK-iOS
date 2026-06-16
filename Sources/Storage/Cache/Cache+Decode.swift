@@ -1,5 +1,5 @@
 //
-//  Cache+Read.swift
+//  Cache+Decode.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 11.05.2026.
