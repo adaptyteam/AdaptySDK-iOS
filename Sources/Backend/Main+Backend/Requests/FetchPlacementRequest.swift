@@ -98,7 +98,6 @@ extension Backend.MainExecutor {
         placementId: String,
         variationId: String,
         locale: AdaptyLocale? = nil,
-        cached: Content?,
         disableServerCache: Bool
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
         let request: BackendRequest =
@@ -121,12 +120,12 @@ extension Backend.MainExecutor {
                 )
             }
 
-        let response = try await perform(request, withDecoder: AdaptyPlacementChosen.createDecoder(
+        let response = try await perform(request, withDecoder: AdaptyPlacement.Draw<Content>.placementDecoder(
             withUserId: userId,
-            withRequestLocale: locale,
-            withCached: cached
+            withVariationId: variationId,
+            withRequestLocale: locale
         ))
 
-        return response.body
+        return .draw(response.body)
     }
 }

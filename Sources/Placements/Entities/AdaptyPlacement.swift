@@ -28,10 +28,6 @@ extension AdaptyPlacement {
         placement.version = version
         return placement
     }
-
-    func isNewerThan(_ other: AdaptyPlacement) -> Bool {
-        version > other.version
-    }
 }
 
 extension AdaptyPlacement: CustomStringConvertible {

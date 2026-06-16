@@ -9,13 +9,22 @@ import Foundation
 
 private let log = Log.cache
 
+extension Cache {
+    /// Thrown by a `read` decode closure when the cached bytes are valid but not the value
+    /// the caller wants (e.g. the requested variation is absent). `read` returns nil WITHOUT
+    /// deleting the entry. Read-only: `writeOrRead` does not special-case it.
+    struct DecodeRejected: Error {
+        let underlying: Error
+    }
+}
+
 @StorageActor
 extension Cache {
     @inlinable
     static func read<T: Sendable>(
         _ key: ItemKey,
         accept: (@Sendable (_ existing: Meta) -> Bool)? = nil,
-        decode: @StorageActor (Data) throws -> T
+        decode: @StorageActor (Meta, Data) throws -> T
     ) -> T? {
         let fm = fileManager
         guard let meta = fm.readValidatedCacheMeta(for: key) else {
@@ -36,7 +45,10 @@ extension Cache {
 
         let decoded: T
         do {
-            decoded = try decode(data)
+            decoded = try decode(meta, data)
+        } catch let error as DecodeRejected {
+            log.warn("Cached data decode failed: \(error.underlying). Keep existing data.")
+            return nil
         } catch {
             log.warn("Cached data decode failed: \(error). Self-heal pair. Remove invalid data.")
             fm.removeCacheItem(key: key)
@@ -54,7 +66,7 @@ extension Cache {
         eligibleCrossABtest: Bool = false,
         dataVersion: Int,
         accept: (@Sendable (_ new: Meta, _ existing: Meta) -> Bool)? = nil,
-        decode: @StorageActor (Bool, Data) throws -> T
+        decode: @StorageActor (Meta, Data) throws -> T
     ) throws -> T {
         let now = Date()
         let newMeta = Meta(
@@ -110,14 +122,14 @@ private extension FileManager {
         newData: Data,
         newMeta: Cache.Meta,
         existingMeta: Cache.Meta,
-        decode: @StorageActor (Bool, Data) throws -> T
+        decode: @StorageActor (Cache.Meta, Data) throws -> T
     ) throws -> T {
         let metaFileURL = existingMeta.key.metaFileURL
         let dataFileURL = existingMeta.key.dataFileURL
 
-        if let data = try? Data(contentsOf: dataFileURL) {
+        if let existingData = try? Data(contentsOf: dataFileURL) {
             do {
-                let decoded = try decode(false, data)
+                let decoded = try decode(existingMeta, existingData)
                 existingMeta.syncLastAccessed()
                 return decoded
             } catch {
@@ -141,11 +153,11 @@ private extension FileManager {
         newData: Data,
         newMeta: Cache.Meta,
         existingMeta: Cache.Meta?,
-        decode: @StorageActor (Bool, Data) throws -> T
+        decode: @StorageActor (Cache.Meta, Data) throws -> T
     ) throws -> T {
         let decodedNew: T
         do {
-            decodedNew = try decode(true, newData)
+            decodedNew = try decode(newMeta, newData)
         } catch {
             guard let existingMeta else {
                 log.warn("New data decode failed: \(error)")
@@ -174,12 +186,12 @@ private extension FileManager {
     private func readExistingOrFallbackError<T: Sendable>(
         existingMeta: Cache.Meta,
         fallbackError: Error,
-        decode: @StorageActor (Bool, Data) throws -> T
+        decode: @StorageActor (Cache.Meta, Data) throws -> T
     ) throws -> T {
         let metaFileURL = existingMeta.key.metaFileURL
         let dataFileURL = existingMeta.key.dataFileURL
 
-        guard let data = try? Data(contentsOf: dataFileURL) else {
+        guard let existingData = try? Data(contentsOf: dataFileURL) else {
             log.warn("Cached data read failed. Remove invalid data. Return previous error.")
             removeCacheItem(metaFileURL: metaFileURL, dataFileURL: dataFileURL)
             throw fallbackError
@@ -187,7 +199,7 @@ private extension FileManager {
 
         let decodedCached: T
         do {
-            decodedCached = try decode(false, data)
+            decodedCached = try decode(existingMeta, existingData)
         } catch {
             log.warn("Cached data decode failed: \(error). Remove invalid data. Return previous error.")
             removeCacheItem(metaFileURL: metaFileURL, dataFileURL: dataFileURL)

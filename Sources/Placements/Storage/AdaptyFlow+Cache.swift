@@ -24,12 +24,12 @@ extension AdaptyFlow {
         )
     }
 
-//    static func shouldUseNew(new: Cache.Meta, existing: Cache.Meta) -> Bool {
-//        existing.dataVersion <= new.dataVersion
-//    }
-//
-//    static func shouldUseExisting(with fetchPolicy: AdaptyPlacementFetchPolicy, locale _: AdaptyLocale?) -> (@Sendable (Cache.Meta) -> Bool) {
-//        fetchPolicy.canReturn
-//    }
+    static func shouldUseNew(new: Cache.Meta, existing: Cache.Meta) -> Bool {
+        existing.dataVersion <= new.dataVersion
+    }
+
+    static func shouldUseExisting(with fetchPolicy: AdaptyPlacementFetchPolicy, locale _: AdaptyLocale?) -> (@Sendable (Cache.Meta) -> Bool) {
+        fetchPolicy.canReturnCache
+    }
 }
 

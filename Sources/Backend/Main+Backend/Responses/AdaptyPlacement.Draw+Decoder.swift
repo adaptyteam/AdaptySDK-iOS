@@ -1,0 +1,104 @@
+//
+//  AdaptyPlacement.Draw+Decoder.swift
+//  AdaptySDK
+//
+//  Created by Aleksei Valiano on 11.11.2025.
+//
+
+import Foundation
+
+extension AdaptyPlacement.Draw {
+    @inlinable
+    static func placementVariationsDecoder(
+        withUserId userId: AdaptyUserId,
+        withPlacementId placementId: String,
+        withRequestLocale requestLocale: AdaptyLocale?,
+        crossPlacementEligible: Bool
+    ) -> HTTPDecoder<AdaptyPlacement.Draw<Content>> {
+        return decoder
+
+        @StorageActor
+        func decoder(
+            _ response: HTTPDataResponse,
+            _ configuration: HTTPCodableConfiguration?,
+            _: HTTPRequest
+        ) async throws -> HTTPResponse<AdaptyPlacement.Draw<Content>> {
+            let body = response.body ?? Data()
+            let jsonDecoder = JSONDecoder()
+            configuration?.configure(jsonDecoder: jsonDecoder)
+
+            let draw: AdaptyPlacement.Draw<Content> = try Cache.writeOrRead(
+                body,
+                key: Content.cacheKey(placementId: placementId, for: userId),
+                locale: requestLocale,
+                eligibleCrossABtest: crossPlacementEligible,
+                dataVersion: jsonDecoder.decodeAdaptyPlacementVersion(from: body),
+                accept: Content.shouldUseNew,
+                decode: { meta, data in
+                    try jsonDecoder.decodePlacementVariations(
+                        withUserId: userId,
+                        withRequestLocale: requestLocale,
+                        crossPlacementEligible: meta.eligibleCrossABtest,
+                        from: data
+                    )
+                }
+            )
+            return response.replaceBody(draw)
+        }
+    }
+
+    @inlinable
+    static func placementDecoder(
+        withUserId userId: AdaptyUserId,
+        withVariationId variationId: String,
+        withRequestLocale requestLocale: AdaptyLocale? = nil
+    ) -> HTTPDecoder<AdaptyPlacement.Draw<Content>> {
+        return decoder
+
+        @StorageActor
+        func decoder(
+            _ response: HTTPDataResponse,
+            _ configuration: HTTPCodableConfiguration?,
+            _: HTTPRequest
+        ) async throws -> HTTPResponse<AdaptyPlacement.Draw<Content>> {
+            let body = response.body ?? Data()
+            let jsonDecoder = JSONDecoder()
+            configuration?.configure(jsonDecoder: jsonDecoder)
+
+            let draw: AdaptyPlacement.Draw<Content> = try Cache.writeOrRead(
+                body,
+                key: Content.cacheKey(variationId: variationId),
+                locale: requestLocale,
+                dataVersion: jsonDecoder.decodeAdaptyPlacementVersion(from: body),
+                accept: Content.shouldUseNew,
+                decode: { _, data in
+                    try jsonDecoder.decodePlacement(
+                        withUserId: userId,
+                        withRequestLocale: requestLocale,
+                        from: data
+                    )
+                }
+            )
+
+            return response.replaceBody(draw)
+        }
+    }
+}
+
+private extension JSONDecoder {
+    func decodeAdaptyPlacementVersion(from body: Data) throws -> Int {
+        struct Meta: Decodable {
+            let version: Int
+
+            init(from decoder: any Decoder) throws {
+                let container = try decoder.container(keyedBy: AdaptyPlacement.CodingKeys.self)
+                version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 0
+            }
+        }
+
+        return try decode(
+            Backend.Response.Meta<Meta>.self,
+            from: body
+        ).value.version
+    }
+}

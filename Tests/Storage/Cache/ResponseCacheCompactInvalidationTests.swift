@@ -214,7 +214,7 @@ extension ResponseCacheTests {
             // And the entry is still readable.
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == payload)
         }

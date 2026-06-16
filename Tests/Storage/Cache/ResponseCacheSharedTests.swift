@@ -26,7 +26,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 sharedKey,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == payload)
         }
@@ -80,11 +80,11 @@ extension ResponseCacheTests {
             // Reads return their own payloads.
             let sharedValue: TestPayload? = await Cache.read(
                 sharedKey,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             let profileValue: TestPayload? = await Cache.read(
                 profileKey,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(sharedValue == payload)
             #expect(profileValue == altPayload)
@@ -104,7 +104,7 @@ extension ResponseCacheTests {
 
             let cached: TestPayload? = await Cache.read(
                 sharedKey,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(cached == payload)
         }

@@ -63,8 +63,8 @@ extension TestPayload {
         try JSONDecoder().decode(TestPayload.self, from: data)
     }
 
-    /// `decode` for `Cache.writeOrRead` — ignores the isNew flag.
-    static func decode(_ isNew: Bool, _ data: Data) throws -> TestPayload {
+    /// `decode` for `Cache.read` / `Cache.writeOrRead` — `meta` corresponds to `data`; ignored here.
+    static func decode(_ meta: Cache.Meta, _ data: Data) throws -> TestPayload {
         try decode(data)
     }
 }

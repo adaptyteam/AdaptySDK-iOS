@@ -15,9 +15,6 @@ final class ProfileManager {
     private var onceSentEnvironment: SentEnvironment
     private let storage: ProfileStorage
 
-    let crossPlacmentStorage = CrossPlacementStorage()
-    let placementStorage = PlacementStorage()
-
     var currentProfile: AdaptyProfile {
         cachedProfile.value
     }

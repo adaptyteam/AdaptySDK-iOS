@@ -43,35 +43,17 @@ extension Backend.FallbackExecutor {
         userId: AdaptyUserId,
         placementId: String,
         locale: AdaptyLocale? = nil,
-        cached: Content?,
-        variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
-        if Content.self == AdaptyOnboarding.self {
-            let locale = locale ?? .defaultPlacementLocale
-            return try await _performFetchFallbackPlacementVariationsRequestByLocale(
-                apiKeyPrefix,
-                userId,
-                placementId,
-                locale: locale,
-                locale,
-                cached,
-                variationIdResolver,
-                disableServerCache,
-                timeoutInterval
-            )
-        } else {
-            return try await _performFetchFallbackPlacementVariationsRequest(
-                apiKeyPrefix,
-                userId,
-                placementId,
-                cached,
-                variationIdResolver,
-                disableServerCache,
-                timeoutInterval
-            )
-        }
+        try await _fetchFallbackPlacementVariations(
+            apiKeyPrefix,
+            userId,
+            placementId,
+            locale ?? .defaultPlacementLocale,
+            disableServerCache,
+            timeoutInterval
+        )
     }
 }
 
@@ -81,157 +63,107 @@ extension Backend.ConfigsExecutor {
         userId: AdaptyUserId,
         placementId: String,
         locale: AdaptyLocale? = nil,
-        cached: Content?,
-        variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
-        if Content.self == AdaptyOnboarding.self {
-            let locale = locale ?? .defaultPlacementLocale
-            return try await _performFetchFallbackPlacementVariationsRequestByLocale(
-                apiKeyPrefix,
-                userId,
-                placementId,
-                locale: locale,
-                locale,
-                cached,
-                variationIdResolver,
-                disableServerCache,
-                timeoutInterval
-            )
-        } else {
-            return try await _performFetchFallbackPlacementVariationsRequest(
-                apiKeyPrefix,
-                userId,
-                placementId,
-                cached,
-                variationIdResolver,
-                disableServerCache,
-                timeoutInterval
-            )
-        }
+        try await _fetchFallbackPlacementVariations(
+            apiKeyPrefix,
+            userId,
+            placementId,
+            locale ?? .defaultPlacementLocale,
+            disableServerCache,
+            timeoutInterval
+        )
     }
 }
 
 private extension BackendExecutor {
-    func _performFetchFallbackPlacementVariationsRequest<Content: PlacementContent>(
+    func _fetchFallbackPlacementVariations<Content: PlacementContent>(
         _ apiKeyPrefix: String,
         _ userId: AdaptyUserId,
         _ placementId: String,
-        _ cached: Content?,
-        _ variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
-        _ disableServerCache: Bool,
-        _ timeoutInterval: TimeInterval?
-    ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
-        let endpoint: HTTPEndpoint
-        let requestName: BackendRequestName
-        if Content.self == AdaptyFlow.self {
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/app_store/fallback.json"
-            )
-            requestName = kind == .fallback ? .fetchFallbackPaywallVariations : .fetchPaywallVariationsForDefaultAudience
-
-        } else {
-            throw .notAvailable("Not available for \(String(describing: Content.self))")
-        }
-
-        let request = FetchFallbackPlacementVariationsRequest(
-            endpoint: endpoint,
-            disableServerCache: disableServerCache,
-            timeoutInterval: timeoutInterval,
-            logName: requestName,
-            logParams: [
-                "api_prefix": apiKeyPrefix,
-                "placement_id": placementId,
-                "builder_version": Adapty.uiBuilderVersion,
-                "builder_config_format_version": Adapty.uiSchemaVersion,
-                "disable_server_cache": disableServerCache,
-            ]
-        )
-
-        let response = try await perform(request, withDecoder: AdaptyPlacementChosen.createDecoder(
-            withUserId: userId,
-            withPlacementId: placementId,
-            withCached: cached,
-            variationIdResolver: variationIdResolver
-        ))
-
-        return response.body
-    }
-
-    func _performFetchFallbackPlacementVariationsRequestByLocale<Content: PlacementContent>(
-        _ apiKeyPrefix: String,
-        _ userId: AdaptyUserId,
-        _ placementId: String,
-        locale: AdaptyLocale,
         _ requestLocale: AdaptyLocale,
-        _ cached: Content?,
-        _ variationIdResolver: AdaptyPlacementChosen<Content>.VariationIdResolver?,
         _ disableServerCache: Bool,
         _ timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacementChosen<Content> {
-        let endpoint: HTTPEndpoint
-        let requestName: BackendRequestName
-        if Content.self == AdaptyOnboarding.self {
-            endpoint = HTTPEndpoint(
-                method: .get,
-                path:
-                "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(locale.languageCode.lowercased())/fallback.json"
-            )
-            requestName = kind == .fallback ? .fetchFallbackOnboardingVariations : .fetchOnboardingVariationsForDefaultAudience
+        var locale = requestLocale
+        var timeoutInterval = timeoutInterval
+        var lastError: HTTPError
+        repeat {
+            let endpoint: HTTPEndpoint
+            let requestName: BackendRequestName
+            let logParams: EventParameters
+            if Content.self == AdaptyFlow.self {
+                endpoint = HTTPEndpoint(
+                    method: .get,
+                    path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/app_store/fallback.json"
+                )
+                requestName = kind == .fallback ? .fetchFallbackPaywallVariations : .fetchPaywallVariationsForDefaultAudience
 
-        } else {
-            throw .notAvailable("Not available for \(String(describing: Content.self))")
-        }
+                logParams = [
+                    "api_prefix": apiKeyPrefix,
+                    "placement_id": placementId,
+                    "builder_version": Adapty.uiBuilderVersion,
+                    "builder_config_format_version": Adapty.uiSchemaVersion,
+                    "disable_server_cache": disableServerCache,
+                ]
 
-        let request = FetchFallbackPlacementVariationsRequest(
-            endpoint: endpoint,
-            disableServerCache: disableServerCache,
-            timeoutInterval: timeoutInterval,
-            logName: requestName,
-            logParams: [
-                "api_prefix": apiKeyPrefix,
-                "placement_id": placementId,
-                "language_code": locale.languageCode,
-                "request_locale": requestLocale.id,
-                "builder_version": Adapty.uiBuilderVersion,
-                "builder_config_format_version": Adapty.uiSchemaVersion,
-                "disable_server_cache": disableServerCache,
-            ]
-        )
+            } else if Content.self == AdaptyOnboarding.self {
+                endpoint = HTTPEndpoint(
+                    method: .get,
+                    path:
+                    "/sdk/in-apps/\(apiKeyPrefix)/onboarding/variations/\(placementId)/\(locale.languageCode.lowercased())/fallback.json"
+                )
+                requestName = kind == .fallback ? .fetchFallbackOnboardingVariations : .fetchOnboardingVariationsForDefaultAudience
 
-        let startRequestTime = Date()
+                logParams = [
+                    "api_prefix": apiKeyPrefix,
+                    "placement_id": placementId,
+                    "language_code": locale.languageCode,
+                    "request_locale": requestLocale.id,
+                    "builder_version": Adapty.uiBuilderVersion,
+                    "builder_config_format_version": Adapty.uiSchemaVersion,
+                    "disable_server_cache": disableServerCache,
+                ]
 
-        do {
-            let response = try await perform(request, withDecoder: AdaptyPlacementChosen.createDecoder(
-                withUserId: userId,
-                withPlacementId: placementId,
-                withRequestLocale: requestLocale,
-                withCached: cached,
-                variationIdResolver: variationIdResolver
-            ))
-
-            return response.body
-
-        } catch {
-            guard error.statusCode == 404,
-                  !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
-            else {
-                throw error
+            } else {
+                throw .notAvailable("Not available for \(String(describing: Content.self))")
             }
 
-            return try await _performFetchFallbackPlacementVariationsRequestByLocale(
-                apiKeyPrefix,
-                userId,
-                placementId,
-                locale: .defaultPlacementLocale,
-                requestLocale,
-                cached,
-                variationIdResolver,
-                disableServerCache,
-                timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
+            let request = FetchFallbackPlacementVariationsRequest(
+                endpoint: endpoint,
+                disableServerCache: disableServerCache,
+                timeoutInterval: timeoutInterval,
+                logName: requestName,
+                logParams: logParams
             )
-        }
+
+            let startRequestTime = Date()
+
+            do throws(HTTPError) {
+                let response = try await perform(request, withDecoder: AdaptyPlacement.Draw<Content>.placementVariationsDecoder(
+                    withUserId: userId,
+                    withPlacementId: placementId,
+                    withRequestLocale: requestLocale,
+                    crossPlacementEligible: false
+                ))
+
+                return .draw(response.body)
+            } catch {
+                if error.statusCode == 404,
+                   Content.self == AdaptyOnboarding.self,
+                   !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
+                {
+                    locale = .defaultPlacementLocale
+                    timeoutInterval = timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
+                    lastError = error
+                    continue
+                } else {
+                    throw error
+                }
+            }
+        } while !Task.isCancelled
+
+        throw lastError
     }
 }

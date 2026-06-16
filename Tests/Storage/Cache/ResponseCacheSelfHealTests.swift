@@ -28,7 +28,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
 
@@ -58,7 +58,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
 
@@ -88,7 +88,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
 
@@ -118,7 +118,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
 
@@ -148,7 +148,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
 
@@ -166,7 +166,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
 
@@ -184,7 +184,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
 
@@ -202,7 +202,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
 
@@ -229,14 +229,14 @@ extension ResponseCacheTests {
             // Read flow → self-heal (schemaVersion does not match itemType.schemaVersion).
             let f: TestPayload? = await Cache.read(
                 flowKey,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(f == nil)
 
             // Onboarding is untouched — reads normally.
             let o: TestPayload? = await Cache.read(
                 onbKey,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(o == onbPayload)
         }

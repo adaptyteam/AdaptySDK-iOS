@@ -121,7 +121,7 @@ extension Adapty {
     ) async -> AdaptyUISchema? {
         if let schema = await Cache.read(
             key,
-            decode: { data in
+            decode: { _, data in
                 try AdaptyUISchema(from: data, configuration: decodingConfiguration)
             }
         ) {

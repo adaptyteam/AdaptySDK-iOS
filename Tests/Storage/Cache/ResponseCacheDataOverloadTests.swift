@@ -314,7 +314,7 @@ extension ResponseCacheTests {
             let dataView: Data? = await Cache.read(key)
             let decodedView: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
 
             #expect(dataView == encoded)

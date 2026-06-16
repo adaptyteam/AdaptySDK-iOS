@@ -41,7 +41,7 @@ extension ResponseCacheTests {
                     captured.value = meta
                     return true
                 },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == payload)
             #expect(captured.value?.locale == "en")
@@ -68,7 +68,7 @@ extension ResponseCacheTests {
             // Contents are unchanged.
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == payload)
         }
@@ -89,7 +89,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == altPayload)
         }
@@ -111,7 +111,7 @@ extension ResponseCacheTests {
             // body contains the fresh data.
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == altPayload)
         }
@@ -127,7 +127,7 @@ extension ResponseCacheTests {
             let value: TestPayload? = await Cache.read(
                 key,
                 accept: { _ in true },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == payload)
         }
@@ -146,7 +146,7 @@ extension ResponseCacheTests {
             let value: TestPayload? = await Cache.read(
                 key,
                 accept: { _ in false },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
 
@@ -160,7 +160,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == nil)
         }
@@ -173,13 +173,31 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 key,
-                decode: { _ in throw TestDecodeError() }
+                decode: { _, _ in throw TestDecodeError() }
             )
             #expect(value == nil)
 
             let files = await filesExist(for: key)
             #expect(!files.meta)
             #expect(!files.body)
+        }
+
+        @Test func read_decodeRejected_returns_nil_and_keeps_pair() async throws {
+            let root = await prepareCacheTest()
+            defer { cleanupCacheTest(root) }
+
+            _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
+
+            let value: TestPayload? = await Cache.read(
+                key,
+                decode: { _, _ in throw Cache.DecodeRejected(underlying: TestDecodeError()) }
+            )
+            #expect(value == nil)
+
+            // Unlike a real decode failure, DecodeRejected must NOT delete the cached pair.
+            let files = await filesExist(for: key)
+            #expect(files.meta)
+            #expect(files.body)
         }
 
         @Test func read_updates_lastAccessedAt_on_success() async throws {
@@ -193,7 +211,7 @@ extension ResponseCacheTests {
 
             _ = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
 
             let after = await readMetaFromDisk(for: key)?.lastAccessedAt
@@ -264,7 +282,7 @@ extension ResponseCacheTests {
             // The entry was stored in the cache.
             let cached: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(cached == payload)
         }
@@ -287,7 +305,7 @@ extension ResponseCacheTests {
             // Old body is still on disk.
             let cached: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(cached == payload)
         }
@@ -332,7 +350,7 @@ extension ResponseCacheTests {
 
             let cached: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(cached == altPayload)
         }
@@ -379,7 +397,7 @@ extension ResponseCacheTests {
             // Cache was not overwritten.
             let cached: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(cached == payload)
         }
@@ -404,7 +422,7 @@ extension ResponseCacheTests {
             // Cache replaced with the new entry.
             let cached: TestPayload? = await Cache.read(
                 key,
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(cached == altPayload)
         }
