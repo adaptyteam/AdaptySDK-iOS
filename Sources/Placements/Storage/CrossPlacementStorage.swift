@@ -13,29 +13,37 @@ private let log = Log.crossAB
 final class CrossPlacementStorage {
     private enum Constants {
         static let crossPlacementStateKey = "AdaptySDK_Cross_Placement_State"
+        static let profileIdKey = "AdaptySDK_Profile_Id"
     }
 
     private static let userDefaults = Storage.userDefaults
 
-    private static var crossPlacementState: CrossPlacementState? = {
-        do {
-            return try userDefaults.getJSON(CrossPlacementState.self, forKey: Constants.crossPlacementStateKey)
-        } catch {
-            log.warn(error.localizedDescription)
-            return nil
+    private static var statesByProfileId: [String: CrossPlacementState] = {
+        if let map = try? userDefaults.getJSON([String: CrossPlacementState].self, forKey: Constants.crossPlacementStateKey) {
+            return map
         }
+
+        guard
+            let legacyState = try? userDefaults.getJSON(CrossPlacementState.self, forKey: Constants.crossPlacementStateKey),
+            let profileId = userDefaults.string(forKey: Constants.profileIdKey)
+        else {
+            userDefaults.removeObject(forKey: Constants.crossPlacementStateKey)
+            return [:]
+        }
+
+        let migrated = [profileId: legacyState]
+        try? userDefaults.setJSON(migrated, forKey: Constants.crossPlacementStateKey)
+        log.verbose("migrated legacy cross-placement state to profile \(profileId)")
+        return migrated
     }()
 
-    // TODO: per-profile state not implemented yet. `userId` is ignored and a single
-    // global state is returned, so one profile's cross-placement assignment leaks into
-    // another. Key the storage by `userId.profileId`. To be fixed in a follow-up commit.
-    static func state(for _: AdaptyUserId) -> CrossPlacementState? {
-        crossPlacementState
+    static func state(for userId: AdaptyUserId) -> CrossPlacementState? {
+        statesByProfileId[userId.profileId]
     }
 
     static func set(draw: AdaptyPlacement.Draw<some PlacementContent>) {
         guard
-            let currentValue = crossPlacementState,
+            let currentValue = statesByProfileId[draw.userId.profileId],
             currentValue.canParticipateInABTest,
             draw.participatesInCrossPlacementABTest
         else { return }
@@ -49,7 +57,7 @@ final class CrossPlacementStorage {
     }
 
     static func set(crossPlacementState newValue: CrossPlacementState, for userId: AdaptyUserId) {
-        let oldValue = crossPlacementState
+        let oldValue = statesByProfileId[userId.profileId]
         guard newValue.isNewerThan(oldValue) else { return }
 
         log.verbose("update crossPlacementState \(userId) to version = \(newValue.version), newValue = \(newValue.variationIdByPlacements), oldValue = \(oldValue?.variationIdByPlacements.description ?? "DISABLED")")
@@ -57,32 +65,30 @@ final class CrossPlacementStorage {
         save(crossPlacementState: newValue, for: userId)
     }
 
-    // TODO: `userId` is ignored — state is persisted under one global key shared by all
-    // profiles. Persist per `userId.profileId`. To be fixed in a follow-up commit.
     private static func save(crossPlacementState newValue: CrossPlacementState, for userId: AdaptyUserId) {
-        crossPlacementState = newValue
+        statesByProfileId[userId.profileId] = newValue
+        persist()
+    }
+
+    private static func persist() {
         do {
-            try userDefaults.setJSON(newValue, forKey: Constants.crossPlacementStateKey)
+            if statesByProfileId.isEmpty {
+                userDefaults.removeObject(forKey: Constants.crossPlacementStateKey)
+            } else {
+                try userDefaults.setJSON(statesByProfileId, forKey: Constants.crossPlacementStateKey)
+            }
             log.verbose("saving crossPlacementState success.")
         } catch {
             log.error("saving crossPlacementState fail. \(error.localizedDescription)")
         }
     }
 
-    // TODO: ignores `userId` and wipes the single global key, so it also clears the
-    // CURRENT profile's state instead of only other profiles'. Once storage is keyed by
-    // profileId, remove only entries whose profileId != userId.profileId.
-    // To be fixed in a follow-up commit.
-    //
-    // KNOWN BUG (present now): on the profile-changed branch of `createNewProfileOnServer`
-    // (Adapty.swift), `ProfileStorage.clearProfile` schedules this method on an un-awaited
-    // `Task { @StorageActor }`, while `CrossPlacementStorage.set(crossPlacementState:for:)`
-    // is awaited inline. Both run on @StorageActor with undefined ordering; if this clear
-    // lands AFTER `set`, it wipes the just-fetched cross-placement state. Resolved once the
-    // per-profile fix above lands (removing only OTHER profiles won't touch the current one).
-    static func removeOtherProfiles(_: AdaptyUserId) {
-        userDefaults.removeObject(forKey: Constants.crossPlacementStateKey)
-        crossPlacementState = nil
-        log.verbose("clear CrossPlacementStorage")
+    static func removeOtherProfiles(_ userId: AdaptyUserId) {
+        let profileId = userId.profileId
+        guard statesByProfileId.contains(where: { $0.key != profileId }) else { return }
+        statesByProfileId = statesByProfileId.filter { $0.key == profileId }
+        persist()
+        log.verbose("clear cross-placement state of other profiles")
     }
 }
+
