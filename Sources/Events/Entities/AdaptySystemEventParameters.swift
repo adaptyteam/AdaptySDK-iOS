@@ -148,6 +148,11 @@ enum MethodName: String {
     case getCurrentInstallationStatus = "get_current_installation_status"
     case restorePurchases = "restore_purchases"
 
+    case preloadFlows = "preload_flows"
+    case preloadFlowsForDefaultAudience = "preload_flows_for_default_audience"
+    case preloadOnboardings = "preload_onboardings"
+    case preloadOnboardingsForDefaultAudience = "preload_onboardings_for_default_audience"
+
     case getFlow = "get_flow"
     case getOnboarding = "get_onboarding"
 
