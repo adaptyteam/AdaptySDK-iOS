@@ -1234,7 +1234,7 @@ $defs:
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       flow_id: { type: string }
-      flowl_name: { type: string }
+      flow_name: { type: string }
       variation_id: { type: string }
       remote_configs: 
         type: array
