@@ -649,23 +649,114 @@ $requests:
         properties:
           success: { const: true }
 
-$events:
-  Event.DidRequestPermission:
+  ### observerPurchaseDidStart ###
+  ObserverPurchaseDidStart.Request: #request
     type: object
-    required: [id, request_id, permission]
+    required: [method, request_id]
     properties:
-      id: { const: "did_request_permission" }
+      method: { const: "observer_purchase_did_start" }
+      request_id: { type: string }
+
+  ObserverPurchaseDidStart.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerPurchaseDidFinish ###
+  ObserverPurchaseDidFinish.Request: #request
+    type: object
+    required: [method, request_id]
+    properties:
+      method: { const: "observer_purchase_did_finish" }
+      request_id: { type: string }
+
+  ObserverPurchaseDidFinish.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerRestoreDidStart ###
+  ObserverRestoreDidStart.Request: #request
+    type: object
+    required: [method, request_id]
+    properties:
+      method: { const: "observer_restore_did_start" }
+      request_id: { type: string }
+
+  ObserverRestoreDidStart.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerRestoreDidFinish ###
+  ObserverRestoreDidFinish.Request: #request
+    type: object
+    required: [method, request_id]
+    properties:
+      method: { const: "observer_restore_did_finish" }
+      request_id: { type: string }
+
+  ObserverRestoreDidFinish.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+$events:
+  FlowViewEvent.DidRequestPermission:
+    type: object
+    required: [id, view, request_id, permission]
+    properties:
+      id: { const: "flow_view_did_request_permission" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       request_id: { type: string }
       permission: { type: string }
       custom_args:
         type: object
         additionalProperties: { type: string }
 
-  Event.DidRequestAppReview:
+  FlowViewEvent.DidRequestAppReview:
     type: object
-    required: [id]
+    required: [id, view]
     properties:
-      id: { const: "did_request_app_review" }
+      id: { const: "flow_view_did_request_app_review" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+
+  FlowViewEvent.ObserverDidInitiatePurchase:
+    type: object
+    required: [id, view, request_id, product]
+    properties:
+      id: { const: "flow_view_observer_did_initiate_purchase" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      request_id: { type: string }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
+
+  FlowViewEvent.ObserverDidInitiateRestore:
+    type: object
+    required: [id, view, request_id]
+    properties:
+      id: { const: "flow_view_observer_did_initiate_restore" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      request_id: { type: string }
 
   FlowViewEvent.DidReceiveAnalyticEvent:
     type: object
@@ -1158,12 +1249,13 @@ $defs:
   AdaptyFlowPaywall: #request #response
     type: object
     required:
-      - placement
       - paywall_id
       - paywall_name
       - variation_id
       - products
     properties:
+      # Not emitted in responses: a variation's placement is a property of the
+      # parent AdaptyFlow and is injected on decode (see AdaptyFlowPaywall in core).
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       paywall_id: { type: string }
       paywall_name: { type: string }

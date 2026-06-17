@@ -26,15 +26,27 @@ public extension AdaptyPlugin {
 
         let systemRequestsHandler = AdaptyPlugin.sharedEventHandler
             .map(PluginSystemRequestsHandler.init(eventHandler:))
+        let observerModeResolver = AdaptyPlugin.sharedEventHandler
+            .map(PluginObserverModeResolver.init(eventHandler:))
 
-        return try await AdaptyUI.getFlowConfiguration(
+        let configuration = try await AdaptyUI.getFlowConfiguration(
             forFlow: request.flow,
             loadTimeout: request.loadTimeout,
+            observerModeResolver: observerModeResolver,
             tagResolver: request.customTags,
             timerResolver: request.customTimers,
             assetsResolver: request.customAssets?.assetsResolver(),
             systemRequestsHandler: systemRequestsHandler
         )
+
+        // Platform views resolve their instance id only when the wrapper builds
+        // the flow view (with the host-provided viewId). Hand the per-view
+        // resolver/handler the config's late-bound identity box so their host
+        // events carry the originating view.
+        observerModeResolver?.identityBox = configuration.flowViewIdentityBox
+        systemRequestsHandler?.identityBox = configuration.flowViewIdentityBox
+
+        return configuration
     }
 
     @available(*, deprecated, message: "Onboarding Feature is deprecated.")

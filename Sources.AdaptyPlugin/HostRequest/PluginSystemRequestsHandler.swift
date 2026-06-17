@@ -5,20 +5,37 @@
 
 #if canImport(UIKit)
 
+    import AdaptyUI
     import AdaptyUIBuilder
 
     /// Bridges flow system requests to the cross-platform host:
     /// permissions round-trip through `HostRequestRegistry`; app review is fire-and-forget.
+    ///
+    /// One instance is created per flow view. The owning view's identity is
+    /// late-bound by the plugin via `identityBox` (see `FlowViewIdentityBox`), so
+    /// the public `AdaptyUISystemRequestsHandler` protocol stays free of view
+    /// parameters while every emitted event still carries its originating view.
     @MainActor
-    struct PluginSystemRequestsHandler: AdaptyUISystemRequestsHandler {
+    final class PluginSystemRequestsHandler: AdaptyUISystemRequestsHandler {
         let eventHandler: EventHandler
+        var identityBox: FlowViewIdentityBox?
+
+        init(eventHandler: EventHandler) {
+            self.eventHandler = eventHandler
+        }
+
+        private var currentView: AdaptyUI.FlowView {
+            identityBox?.value ?? AdaptyUI.FlowView(id: "", placementId: "", variationId: "")
+        }
 
         func handlePermission(
             _ permission: AdaptyUIPermission,
             withCustomArgs customArgs: [String: String]?
         ) async -> AdaptyUIPermissionResult {
+            let view = currentView
             let resolution: PermissionResolution? = await HostRequestRegistry.shared.perform { requestId in
-                eventHandler.handle(event: Event.DidRequestPermission(
+                eventHandler.handle(event: FlowViewEvent.DidRequestPermission(
+                    view: view,
                     requestId: requestId,
                     permission: permission.wireValue,
                     customArgs: customArgs
@@ -34,7 +51,9 @@
         }
 
         func handleAppReviewRequest() async {
-            eventHandler.handle(event: Event.DidRequestAppReview())
+            eventHandler.handle(event: FlowViewEvent.DidRequestAppReview(
+                view: currentView
+            ))
         }
     }
 

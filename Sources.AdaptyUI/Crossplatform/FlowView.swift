@@ -12,6 +12,12 @@ public extension AdaptyUI {
         package let id: String
         package let placementId: String
         package let variationId: String
+
+        package init(id: String, placementId: String, variationId: String) {
+            self.id = id
+            self.placementId = placementId
+            self.variationId = variationId
+        }
     }
 
     struct OnboardingView: Sendable {

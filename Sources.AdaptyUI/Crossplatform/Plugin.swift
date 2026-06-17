@@ -103,6 +103,7 @@ package extension AdaptyUI {
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyUIAssetsResolver?,
+            observerModeResolver: AdaptyObserverModeResolver? = nil,
             systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
         ) async throws -> AdaptyUI.FlowView {
             let products: [AdaptyPaywallProduct]?
@@ -117,7 +118,7 @@ package extension AdaptyUI {
                 forFlow: flow,
                 loadTimeout: loadTimeout,
                 products: products,
-                observerModeResolver: nil,
+                observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver,
                 assetsResolver: assetsResolver,

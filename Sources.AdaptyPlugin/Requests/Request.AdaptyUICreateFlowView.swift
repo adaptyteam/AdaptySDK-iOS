@@ -74,6 +74,8 @@ extension Request {
         func executeInMainActor() async throws -> AdaptyJsonData {
             let systemRequestsHandler = AdaptyPlugin.sharedEventHandler
                 .map(PluginSystemRequestsHandler.init(eventHandler:))
+            let observerModeResolver = AdaptyPlugin.sharedEventHandler
+                .map(PluginObserverModeResolver.init(eventHandler:))
             let result: AdaptyUI.FlowView = try await AdaptyUI.Plugin.createFlowView(
                 flow: flow,
                 loadTimeout: loadTimeout,
@@ -81,8 +83,17 @@ extension Request {
                 tagResolver: customTags,
                 timerResolver: customTimers,
                 assetsResolver: assetsResolver(),
+                observerModeResolver: observerModeResolver,
                 systemRequestsHandler: systemRequestsHandler
             )
+
+            // The view instance id is known only once the flow view is built;
+            // stamp the per-view resolver/handler so their host events carry the
+            // originating view.
+            let identityBox = FlowViewIdentityBox()
+            identityBox.value = result
+            observerModeResolver?.identityBox = identityBox
+            systemRequestsHandler?.identityBox = identityBox
 
             return .success(result)
         }

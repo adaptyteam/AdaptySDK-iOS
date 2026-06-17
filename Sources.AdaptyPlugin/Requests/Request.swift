@@ -39,6 +39,10 @@ enum Request {
             UpdateRefundPreference.self,
             GetCurrentInstallationStatus.self,
             DidRequestPermissionResponse.self,
+            ObserverPurchaseDidStart.self,
+            ObserverPurchaseDidFinish.self,
+            ObserverRestoreDidStart.self,
+            ObserverRestoreDidFinish.self,
         ]
 
 #if canImport(UIKit)

@@ -30,6 +30,7 @@ public extension AdaptyUI {
         package let timerViewModel: AdaptyUITimerViewModel
         package let screensViewModel: AdaptyUIScreensViewModel
         package let assetsViewModel: AdaptyUIAssetsViewModel
+        package let flowViewIdentityBox: FlowViewIdentityBox
 
         private let logic: AdaptyUILogic
 
@@ -65,7 +66,10 @@ public extension AdaptyUI {
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
             self.systemRequestsHandler = systemRequestsHandler
-            
+
+            let flowViewIdentityBox = FlowViewIdentityBox()
+            self.flowViewIdentityBox = flowViewIdentityBox
+
             eventsHandler = AdaptyEventsHandler(logId: logId)
             logic = AdaptyUILogic(
                 logId: logId,
