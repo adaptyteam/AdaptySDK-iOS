@@ -155,6 +155,7 @@ extension JSONDecoder {
         ).value
 
         return AdaptyPlacement.Draw<Content>(
+            date: Date(),
             userId: userId,
             content: content,
             placementAudienceVersionId: placement.audienceVersionId,

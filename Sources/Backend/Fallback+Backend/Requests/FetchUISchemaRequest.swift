@@ -1,5 +1,5 @@
 //
-//  FetchFallbackUISchemaRequest.swift
+//  FetchUISchemaRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
@@ -8,7 +8,7 @@
 import AdaptyUIBuilder
 import Foundation
 
-private struct FetchFallbackUISchemaRequest: BackendRequest {
+private struct FetchUISchemaRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let stamp = Log.stamp
     let requestName = BackendRequestName.fetchUISchema
@@ -29,15 +29,34 @@ private struct FetchFallbackUISchemaRequest: BackendRequest {
     }
 }
 
+extension AdaptyUISchema {
+    static func createDecoder(
+        _ decodingConfiguration: AdaptyUISchema.DecodingConfiguration
+    ) -> HTTPDecoder<(schema: AdaptyUISchema, data: Data)> {
+        return decoder
+
+        @Sendable
+        func decoder(
+            _ response: HTTPDataResponse,
+            _: HTTPCodableConfiguration?,
+            _: HTTPRequest
+        ) async throws -> HTTPResponse<(schema: AdaptyUISchema, data: Data)> {
+            guard let data = response.body else { throw URLError(.cannotDecodeRawData) }
+            let schema = try AdaptyUISchema(from: data, configuration: decodingConfiguration)
+            return response.replaceBody((schema, data))
+        }
+    }
+}
+
 extension Backend.FallbackExecutor {
     func fetchUISchema(
         apiKeyPrefix: String,
         flowId: String,
         flowLayout: AdaptyFlow.Layout,
         disableServerCache _: Bool,
-        decodingConfiguration : AdaptyUISchema.DecodingConfiguration
+        decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(HTTPError) -> (schema: AdaptyUISchema, data: Data) {
-        let request = FetchFallbackUISchemaRequest(
+        let request = FetchUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
             flowId: flowId,
             flowLayout: flowLayout,

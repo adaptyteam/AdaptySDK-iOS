@@ -25,7 +25,9 @@ extension AdaptyOnboarding {
     }
 
     static func shouldUseNew(new: Cache.Meta, existing: Cache.Meta) -> Bool {
-        existing.locale != new.locale || existing.dataVersion <= new.dataVersion
+        let existingLocale = existing.locale ?? .defaultPlacementLocale
+        let newLocale = new.locale ?? .defaultPlacementLocale
+        return !existingLocale.equalLanguageCode(newLocale) || existing.dataVersion <= new.dataVersion
     }
 
     static func shouldUseExisting(with fetchPolicy: AdaptyPlacementFetchPolicy, locale requestLocale: AdaptyLocale?) -> @Sendable (Cache.Meta) -> Bool {
@@ -33,12 +35,10 @@ extension AdaptyOnboarding {
 
         @Sendable func accept(_ meta: Cache.Meta) -> Bool {
             guard fetchPolicy.canReturnCache(meta) else { return false }
-            guard
-                let locale = meta.locale,
-                !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
-            else { return true }
-
-            return requestLocale?.equalLanguageCode(locale) ?? false
+            let existingLocale = meta.locale ?? .defaultPlacementLocale
+            let newLocale = requestLocale ?? .defaultPlacementLocale
+            return existingLocale.equalLanguageCode(newLocale)
         }
     }
 }
+

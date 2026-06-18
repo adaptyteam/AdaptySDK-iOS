@@ -9,8 +9,9 @@ import Foundation
 
 extension AdaptyPlacement {
     struct Draw<Content: PlacementContent>: Sendable {
+        let date: Date
         let userId: AdaptyUserId
-        var content: Content
+        let content: Content
         let placementAudienceVersionId: String
         let variationIdByPlacements: [String: String]
     }
@@ -54,6 +55,7 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
         let content = try Self.content(from: decoder, index: index, configuration: configuration)
 
         self.init(
+            date: Date(),
             userId: userId,
             content: content,
             placementAudienceVersionId: placementAudienceVersionId,

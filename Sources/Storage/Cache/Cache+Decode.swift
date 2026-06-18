@@ -83,10 +83,9 @@ extension Cache {
         let existingMeta: Meta? = fm.readValidatedCacheMeta(for: key)
 
         guard let existingMeta else {
-            return try fm.writeNewOrReturnExisting(
+            return try fm.writeNew(
                 newData: newData,
                 newMeta: newMeta,
-                existingMeta: nil,
                 decode: decode
             )
         }
@@ -99,14 +98,14 @@ extension Cache {
             }
 
         if shouldUseNew {
-            return try fm.writeNewOrReturnExisting(
+            return try fm.writeNewElseReadExisting(
                 newData: newData,
                 newMeta: newMeta,
                 existingMeta: existingMeta,
                 decode: decode
             )
         } else {
-            return try fm.readExistingOrWriteNew(
+            return try fm.readExistingElseWriteNew(
                 newData: newData,
                 newMeta: newMeta,
                 existingMeta: existingMeta,
@@ -118,7 +117,7 @@ extension Cache {
 
 @StorageActor
 private extension FileManager {
-    func readExistingOrWriteNew<T: Sendable>(
+    func readExistingElseWriteNew<T: Sendable>(
         newData: Data,
         newMeta: Cache.Meta,
         existingMeta: Cache.Meta,
@@ -141,15 +140,14 @@ private extension FileManager {
             removeCacheItem(metaFileURL: metaFileURL, dataFileURL: dataFileURL)
         }
 
-        return try writeNewOrReturnExisting(
+        return try writeNew(
             newData: newData,
             newMeta: newMeta,
-            existingMeta: nil,
             decode: decode
         )
     }
 
-    func writeNewOrReturnExisting<T: Sendable>(
+    func writeNewElseReadExisting<T: Sendable>(
         newData: Data,
         newMeta: Cache.Meta,
         existingMeta: Cache.Meta?,
@@ -164,7 +162,7 @@ private extension FileManager {
                 throw error
             }
             log.warn("New data decode failed: \(error) Self-heal + try existing.")
-            return try readExistingOrFallbackError(
+            return try readExistingElseFallbackError(
                 existingMeta: existingMeta,
                 fallbackError: error,
                 decode: decode
@@ -183,7 +181,7 @@ private extension FileManager {
         return decodedNew
     }
 
-    private func readExistingOrFallbackError<T: Sendable>(
+    private func readExistingElseFallbackError<T: Sendable>(
         existingMeta: Cache.Meta,
         fallbackError: Error,
         decode: @StorageActor (Cache.Meta, Data) throws -> T
@@ -208,6 +206,31 @@ private extension FileManager {
 
         existingMeta.syncLastAccessed()
         return decodedCached
+    }
+
+    func writeNew<T: Sendable>(
+        newData: Data,
+        newMeta: Cache.Meta,
+        decode: @StorageActor (Cache.Meta, Data) throws -> T
+    ) throws -> T {
+        let decodedNew: T
+        do {
+            decodedNew = try decode(newMeta, newData)
+        } catch {
+            log.warn("New data decode failed: \(error)")
+            throw error
+        }
+
+        do {
+            try writeCacheItem(
+                data: newData,
+                meta: newMeta,
+                oldDataSize: 0
+            )
+        } catch {
+            log.warn("Write data failed (new data still returned): \(error)")
+        }
+        return decodedNew
     }
 }
 

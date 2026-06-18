@@ -76,14 +76,14 @@ public extension Adapty {
         }()
 
         if !isTestUser {
-            if let cached: AdaptyPlacement.Draw<Content> = await Cache.read(
+            if let draw: AdaptyPlacement.Draw<Content> = await Cache.read(
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy,
                 for: userId
             ) {
-                Adapty.trackEventIfNeed(.draw(cached))
-                return cached.content
+                Adapty.trackEventIfNeed(draw)
+                return draw.content
             }
         }
 
@@ -99,12 +99,11 @@ public extension Adapty {
                 userId,
                 placementId,
                 locale
-            )  {
+            ) {
                 return content
             }
 
             throw error
-
         }
     }
 
@@ -122,9 +121,10 @@ public extension Adapty {
             let requestWithSpecialVariation = variationId != nil
 
             do throws(HTTPError) {
-                let chosen: AdaptyPlacementChosen<Content> =
+                let draw: AdaptyPlacement.Draw<Content> =
                     if let variationId {
                         try await httpConfigsSession.fetchPlacementForDefaultAudience(
+                            Content.self,
                             apiKeyPrefix: apiKeyPrefix,
                             userId: userId,
                             placementId: placementId,
@@ -135,6 +135,7 @@ public extension Adapty {
                         )
                     } else {
                         try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
+                            Content.self,
                             apiKeyPrefix: apiKeyPrefix,
                             userId: userId,
                             placementId: placementId,
@@ -143,8 +144,8 @@ public extension Adapty {
                             timeoutInterval: nil
                         )
                     }
-                Adapty.trackEventIfNeed(chosen)
-                return chosen.content
+                Adapty.trackEventIfNeed(draw)
+                return draw.content
 
             } catch {
                 if !requestWithSpecialVariation,

@@ -52,12 +52,8 @@ extension Adapty {
     }
 
     nonisolated static func trackEventIfNeed(
-        _ chosen: AdaptyPlacementChosen<some PlacementContent>,
-        date: Date = Date()
+        _ draw: AdaptyPlacement.Draw<some PlacementContent>
     ) {
-        guard case let .draw(draw) = chosen else {
-            return
-        }
         let event: Event
         if let flow = draw.content as? AdaptyFlow {
             event = .flowVariationAssigned(.init(
@@ -85,7 +81,7 @@ extension Adapty {
             try? await trackEvent(
                 event,
                 for: draw.userId,
-                date: date
+                date: draw.date
             )
         }
     }
@@ -148,3 +144,4 @@ public extension Adapty {
         }
     }
 }
+

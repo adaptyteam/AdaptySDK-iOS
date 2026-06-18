@@ -51,7 +51,7 @@ extension AdaptyPlacement.Draw {
     static func placementDecoder(
         withUserId userId: AdaptyUserId,
         withVariationId variationId: String,
-        withRequestLocale requestLocale: AdaptyLocale? = nil
+        withRequestLocale requestLocale: AdaptyLocale?
     ) -> HTTPDecoder<AdaptyPlacement.Draw<Content>> {
         return decoder
 
@@ -83,6 +83,65 @@ extension AdaptyPlacement.Draw {
             return response.replaceBody(draw)
         }
     }
+
+    @inlinable
+    static func persistPlacementVariations(
+        withUserId userId: AdaptyUserId,
+        withPlacementId placementId: String,
+        withRequestLocale requestLocale: AdaptyLocale?,
+        crossPlacementEligible: Bool
+    ) -> HTTPDecoder<Data?> {
+        return decoder
+
+        @StorageActor
+        func decoder(
+            _ response: HTTPDataResponse,
+            _ configuration: HTTPCodableConfiguration?,
+            _: HTTPRequest
+        ) async throws -> HTTPDataResponse {
+            let body = response.body ?? Data()
+            let jsonDecoder = JSONDecoder()
+            configuration?.configure(jsonDecoder: jsonDecoder)
+
+            try Cache.write(
+                body,
+                key: Content.cacheKey(placementId: placementId, for: userId),
+                locale: requestLocale,
+                eligibleCrossABtest: crossPlacementEligible,
+                dataVersion: jsonDecoder.decodeAdaptyPlacementVersion(from: body),
+                accept: Content.shouldUseNew
+            )
+            return response
+        }
+    }
+
+    @inlinable
+    static func persistPlacement(
+        withVariationId variationId: String,
+        withRequestLocale requestLocale: AdaptyLocale?
+    ) -> HTTPDecoder<Data?> {
+        return decoder
+
+        @StorageActor
+        func decoder(
+            _ response: HTTPDataResponse,
+            _ configuration: HTTPCodableConfiguration?,
+            _: HTTPRequest
+        ) async throws -> HTTPDataResponse {
+            let body = response.body ?? Data()
+            let jsonDecoder = JSONDecoder()
+            configuration?.configure(jsonDecoder: jsonDecoder)
+
+            try Cache.write(
+                body,
+                key: Content.cacheKey(variationId: variationId),
+                locale: requestLocale,
+                dataVersion: jsonDecoder.decodeAdaptyPlacementVersion(from: body),
+                accept: Content.shouldUseNew
+            )
+            return response
+        }
+    }
 }
 
 private extension JSONDecoder {
@@ -102,3 +161,4 @@ private extension JSONDecoder {
         ).value.version
     }
 }
+

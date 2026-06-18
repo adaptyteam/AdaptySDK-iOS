@@ -92,7 +92,7 @@ extension Adapty {
 
         var fetchBackendError: AdaptyError?
         do {
-            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
+            return try await withThrowingTimeout(max(loadTimeout - .milliseconds(500), .milliseconds(500))) {
                 let manager = try await self.createdProfileManager
                 let createdUserId = manager.userId
                 isTestUser = await manager.isTestUser
@@ -153,14 +153,14 @@ extension Adapty {
         _ isTestUser: Bool
     ) async throws(AdaptyError) -> Content {
         if !isTestUser {
-            if let cached: AdaptyPlacement.Draw<Content> = await Cache.read(
+            if let draw: AdaptyPlacement.Draw<Content> = await Cache.read(
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy,
                 for: userId
             ) {
-                Adapty.trackEventIfNeed(.draw(cached))
-                return cached.content
+                Adapty.trackEventIfNeed(draw)
+                return draw.content
             }
         }
 
@@ -173,9 +173,10 @@ extension Adapty {
             let requestWithSpecialVariation = variationId != nil
 
             do throws(HTTPError) {
-                let chosen: AdaptyPlacementChosen<Content> =
+                let draw: AdaptyPlacement.Draw<Content> =
                     if let variationId {
                         try await httpSession.fetchPlacement(
+                            Content.self,
                             apiKeyPrefix: apiKeyPrefix,
                             userId: userId,
                             placementId: placementId,
@@ -185,6 +186,7 @@ extension Adapty {
                         )
                     } else {
                         try await httpSession.fetchPlacementVariations(
+                            Content.self,
                             apiKeyPrefix: apiKeyPrefix,
                             userId: userId,
                             placementId: placementId,
@@ -194,8 +196,8 @@ extension Adapty {
                             disableServerCache: isTestUser
                         )
                     }
-                Adapty.trackEventIfNeed(chosen)
-                return chosen.content
+                Adapty.trackEventIfNeed(draw)
+                return draw.content
 
             } catch {
                 guard !requestWithSpecialVariation else {
@@ -232,14 +234,14 @@ extension Adapty {
         _ locale: AdaptyLocale?
     ) async -> Content? {
         // TODO: need implement (Search in Fallback)
-        if let cached: AdaptyPlacement.Draw<Content> = await Cache.read(
+        if let draw: AdaptyPlacement.Draw<Content> = await Cache.read(
             placementId: placementId,
             locale: locale,
             fetchPolicy: .returnCacheDataElseLoad,
             for: userId
         ) {
-            Adapty.trackEventIfNeed(.draw(cached))
-            return cached.content
+            Adapty.trackEventIfNeed(draw)
+            return draw.content
         }
         return nil
 
@@ -283,9 +285,10 @@ extension Adapty {
             let requestWithSpecialVariation = variationId != nil
 
             do throws(HTTPError) {
-                let chosen: AdaptyPlacementChosen<Content> =
+                let draw: AdaptyPlacement.Draw<Content> =
                     if let variationId {
-                        try await httpFallbackSession.fetchFallbackPlacement(
+                        try await httpFallbackSession.fetchPlacementForDefaultAudience(
+                            Content.self,
                             apiKeyPrefix: apiKeyPrefix,
                             userId: userId,
                             placementId: placementId,
@@ -295,7 +298,8 @@ extension Adapty {
                             timeoutInterval: timeoutInterval
                         )
                     } else {
-                        try await httpFallbackSession.fetchFallbackPlacementVariations(
+                        try await httpFallbackSession.fetchPlacementVariationsForDefaultAudience(
+                            Content.self,
                             apiKeyPrefix: apiKeyPrefix,
                             userId: userId,
                             placementId: placementId,
@@ -304,8 +308,8 @@ extension Adapty {
                             timeoutInterval: timeoutInterval
                         )
                     }
-                Adapty.trackEventIfNeed(chosen)
-                return chosen.content
+                Adapty.trackEventIfNeed(draw)
+                return draw.content
 
             } catch {
                 if !requestWithSpecialVariation,
@@ -335,7 +339,7 @@ extension TimeInterval {
     }
 }
 
-private extension AdaptyError {
+extension AdaptyError {
     var canUseFallbackServer: Bool {
         if let error = wrapped as? HTTPError,
            Backend.canUseFallbackServer(error)

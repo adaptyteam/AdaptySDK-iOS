@@ -202,11 +202,13 @@ public extension Adapty {
 
     nonisolated static func preloadFlows(
         placementIds: [String],
+        loadTimeout: TimeInterval? = nil,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
             try await preloadFlows(
-                placementIds: placementIds
+                placementIds: placementIds,
+                loadTimeout: loadTimeout
             )
         }
     }
@@ -214,12 +216,14 @@ public extension Adapty {
     nonisolated static func preloadOnboardings(
         placementIds: [String],
         locale: String? = nil,
+        loadTimeout: TimeInterval? = nil,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
             try await preloadOnboardings(
                 placementIds: placementIds,
-                locale: locale
+                locale: locale,
+                loadTimeout: loadTimeout
             )
         }
     }

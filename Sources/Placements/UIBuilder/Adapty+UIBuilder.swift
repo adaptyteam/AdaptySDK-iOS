@@ -151,7 +151,7 @@ extension Adapty {
         let apiKeyPrefix = apiKeyPrefix
 
         do {
-            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
+            return try await withThrowingTimeout(max(loadTimeout - .milliseconds(500), .milliseconds(500))) {
                 try await session.fetchUISchema(
                     apiKeyPrefix: apiKeyPrefix,
                     flowId: flowId,

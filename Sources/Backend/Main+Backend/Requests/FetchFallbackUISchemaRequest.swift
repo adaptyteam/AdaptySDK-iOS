@@ -1,5 +1,5 @@
 //
-//  FetchUISchemaRequest.swift
+//  FetchFallbackUISchemaRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 02.04.2026.
@@ -8,7 +8,7 @@
 import AdaptyUIBuilder
 import Foundation
 
-struct FetchUISchemaRequest: BackendRequest {
+private struct FetchFallbackUISchemaRequest: BackendRequest {
     let endpoint: HTTPEndpoint
     let headers: HTTPHeaders
     let queryItems: QueryItems
@@ -26,7 +26,7 @@ struct FetchUISchemaRequest: BackendRequest {
         endpoint = HTTPEndpoint(
             method: .get,
             path:
-                "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayout.versionId)/layout/\(flowLayout.id)/config/"
+            "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayout.versionId)/layout/\(flowLayout.id)/config/"
         )
 
         headers = HTTPHeaders()
@@ -39,24 +39,7 @@ struct FetchUISchemaRequest: BackendRequest {
     }
 }
 
-extension AdaptyUISchema {
-    static func createDecoder(
-        _ decodingConfiguration: AdaptyUISchema.DecodingConfiguration
-    ) -> HTTPDecoder<(schema: AdaptyUISchema, data: Data)> {
-        return decoder
 
-        @Sendable
-        func decoder(
-            _ response: HTTPDataResponse,
-            _: HTTPCodableConfiguration?,
-            _: HTTPRequest
-        ) async throws -> HTTPResponse<(schema: AdaptyUISchema, data: Data)> {
-            guard let data = response.body else { throw URLError(.cannotDecodeRawData) }
-            let schema = try AdaptyUISchema(from: data, configuration: decodingConfiguration)
-            return response.replaceBody((schema, data))
-        }
-    }
-}
 
 extension Backend.MainExecutor {
     func fetchFallbackUISchema(
@@ -66,7 +49,7 @@ extension Backend.MainExecutor {
         disableServerCache: Bool,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(HTTPError) -> (schema: AdaptyUISchema, data: Data) {
-        let request = FetchUISchemaRequest(
+        let request = FetchFallbackUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
             flowId: flowId,
             flowLayout: flowLayout,
