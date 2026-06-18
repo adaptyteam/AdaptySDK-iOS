@@ -59,7 +59,8 @@ extension Schema.Pager: Schema.CompositeElement {
                 pageControl: pageControl,
                 animation: animation,
                 interactionBehavior: interactionBehavior,
-                pageIndex: pageIndex
+                pageIndex: pageIndex,
+                lastPagePositioning: VC.Pager.lastPagePositioningDefault
             ),
             properties
         )

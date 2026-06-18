@@ -242,7 +242,16 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 }
             }
             .padding(.top, pagePaddingTop)
-            .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)
+            .offset(x: VC.Pager.pagesOffsetX(
+                positioning: pager.lastPagePositioning,
+                currentPage: currentPage,
+                pageCount: pages.count,
+                pageWidth: width,
+                spacing: pager.spacing,
+                viewportWidth: proxy.size.width,
+                pagePaddingLeading: pagePaddingLeading,
+                pagePaddingTrailing: pagePaddingTrailing
+            ) + offset)
             .dragGesture(
                 condition: pager.interactionBehavior != .none,
                 onChanged: { value in
