@@ -235,7 +235,7 @@ public protocol AdaptyObserverModeResolver: Sendable {
 @MainActor
 public extension AdaptyUI {
     internal static var isActivated: Bool = false
-    internal static var isObserverModeEnabled: Bool = false
+    package internal(set) static var isObserverModeEnabled: Bool = false
 
     /// Use this method to initialize the AdaptyUI SDK.
     ///

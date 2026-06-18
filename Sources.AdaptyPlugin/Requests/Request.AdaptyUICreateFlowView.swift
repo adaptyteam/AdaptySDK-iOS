@@ -74,8 +74,13 @@ extension Request {
         func executeInMainActor() async throws -> AdaptyJsonData {
             let systemRequestsHandler = AdaptyPlugin.sharedEventHandler
                 .map(PluginSystemRequestsHandler.init(eventHandler:))
-            let observerModeResolver = AdaptyPlugin.sharedEventHandler
-                .map(PluginObserverModeResolver.init(eventHandler:))
+            // Only forward an observer-mode resolver in Observer Mode. Passing one in
+            // Full Mode would make the SDK delegate every purchase to the host instead
+            // of calling Adapty.makePurchase (the SDK gates on resolver presence, not
+            // on the observer-mode flag).
+            let observerModeResolver = AdaptyUI.isObserverModeEnabled
+                ? AdaptyPlugin.sharedEventHandler.map(PluginObserverModeResolver.init(eventHandler:))
+                : nil
             let result: AdaptyUI.FlowView = try await AdaptyUI.Plugin.createFlowView(
                 flow: flow,
                 loadTimeout: loadTimeout,
