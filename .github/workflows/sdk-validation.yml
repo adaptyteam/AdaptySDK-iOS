@@ -1,0 +1,375 @@
+name: SDK Validation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  workflow_dispatch:
+    inputs:
+      build_sdk_targets:
+        description: Build SDK library targets and iOS package
+        type: boolean
+        required: true
+        default: true
+      build_test_app:
+        description: Build AdaptyRecipes test app
+        type: boolean
+        required: true
+        default: true
+      run_tests:
+        description: Run SDK swift test matrix
+        type: boolean
+        required: true
+        default: true
+      lint_pods:
+        description: Run CocoaPods pod lib lint
+        type: boolean
+        required: true
+        default: false
+      build_matrix_override_json:
+        description: Optional build matrix override (JSON array or object with include[])
+        type: string
+        required: false
+        default: ''
+      sdk_tests_matrix_override_json:
+        description: Optional SDK tests matrix override (JSON array or object with include[])
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare_config:
+    name: Prepare CI config
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run_build_sdk_targets: ${{ steps.prepare.outputs.run_build_sdk_targets }}
+      run_build_test_app: ${{ steps.prepare.outputs.run_build_test_app }}
+      run_tests: ${{ steps.prepare.outputs.run_tests }}
+      run_lint_pods: ${{ steps.prepare.outputs.run_lint_pods }}
+      build_matrix_json: ${{ steps.prepare.outputs.build_matrix_json }}
+      test_app_matrix_json: ${{ steps.prepare.outputs.test_app_matrix_json }}
+      sdk_tests_matrix_json: ${{ steps.prepare.outputs.sdk_tests_matrix_json }}
+      sdk_runner: ${{ steps.prepare.outputs.sdk_runner }}
+      sdk_xcode: ${{ steps.prepare.outputs.sdk_xcode }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Prepare effective config
+        id: prepare
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_BUILD_SDK_TARGETS: ${{ github.event.inputs.build_sdk_targets }}
+          INPUT_BUILD_TEST_APP: ${{ github.event.inputs.build_test_app }}
+          INPUT_RUN_TESTS: ${{ github.event.inputs.run_tests }}
+          INPUT_LINT_PODS: ${{ github.event.inputs.lint_pods }}
+          INPUT_BUILD_MATRIX_OVERRIDE_JSON: ${{ github.event.inputs.build_matrix_override_json }}
+          INPUT_SDK_TESTS_MATRIX_OVERRIDE_JSON: ${{ github.event.inputs.sdk_tests_matrix_override_json }}
+        shell: bash
+        run: node scripts/ci/sdk_validation/prepare-config.js
+
+  build_sdk_matrix:
+    name: SDK build (Xcode ${{ matrix.xcode }})
+    needs: prepare_config
+    if: ${{ needs.prepare_config.outputs.run_build_sdk_targets == 'true' }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    continue-on-error: ${{ matrix.informational }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare_config.outputs.build_matrix_json) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Select Xcode
+        id: setup_xcode
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+        continue-on-error: true
+        with:
+          xcode-version: ${{ matrix.xcode }}
+
+      - name: Handle unavailable Xcode for informational matrix entry
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational }}
+        shell: bash
+        run: |
+          echo "::warning::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}. Skipping informational build."
+
+      - name: Fail when required Xcode version is unavailable
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational == false }}
+        shell: bash
+        run: |
+          echo "::error::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}."
+          exit 1
+
+      - name: Print toolchain versions
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Build SDK library targets (SwiftPM)
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          args=(
+            --log swift-build-products.log
+            --scratch-path ".build-sdk-validation-${{ matrix.runner }}-${{ matrix.xcode }}"
+            --resolve-package
+          )
+
+          if [[ "${{ matrix.runner }}" == "${{ needs.prepare_config.outputs.sdk_runner }}" && "${{ matrix.xcode }}" == "${{ needs.prepare_config.outputs.sdk_xcode }}" ]]; then
+            args+=(--package-scheme Adapty-Package --package-destination "generic/platform=iOS")
+          fi
+
+          bash scripts/ci/sdk_validation/build-spm-library-targets.sh "${args[@]}"
+
+      - name: Upload swift build products log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: swift-build-products-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}
+          path: swift-build-products.log
+          if-no-files-found: ignore
+
+  build_test_app_matrix:
+    name: Test app build (Xcode ${{ matrix.xcode }})
+    needs: prepare_config
+    if: ${{ needs.prepare_config.outputs.run_build_test_app == 'true' }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    continue-on-error: ${{ matrix.informational }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare_config.outputs.test_app_matrix_json) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Select Xcode
+        id: setup_xcode
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+        continue-on-error: true
+        with:
+          xcode-version: ${{ matrix.xcode }}
+
+      - name: Handle unavailable Xcode for informational matrix entry
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational }}
+        shell: bash
+        run: |
+          echo "::warning::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}. Skipping informational build."
+
+      - name: Fail when required Xcode version is unavailable
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational == false }}
+        shell: bash
+        run: |
+          echo "::error::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}."
+          exit 1
+
+      - name: Print toolchain versions
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Prepare demo constants for CI
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: bash scripts/ci/sdk_validation/write-demo-constants.sh
+
+      - name: Build demo app
+        id: build_test_app
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: bash scripts/ci/sdk_validation/build-demo-app.sh --log xcodebuild.log
+
+      - name: Fail on demo build failure
+        if: ${{ steps.build_test_app.outcome == 'success' && steps.build_test_app.outputs.exit_code != '0' }}
+        shell: bash
+        run: |
+          echo "::error::Test app build failed. See artifact 'demo-build-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}'."
+          exit 1
+
+      - name: Upload demo build log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: demo-build-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}
+          path: xcodebuild.log
+          if-no-files-found: ignore
+
+  macos_sdk_build:
+    name: SDK macOS build
+    needs: prepare_config
+    if: ${{ needs.prepare_config.outputs.run_build_sdk_targets == 'true' }}
+    runs-on: ${{ needs.prepare_config.outputs.sdk_runner }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Select Xcode
+        id: setup_xcode
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+        continue-on-error: true
+        with:
+          xcode-version: ${{ needs.prepare_config.outputs.sdk_xcode }}
+
+      - name: Fail when macOS build Xcode version is unavailable
+        if: ${{ steps.setup_xcode.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo "::error::Xcode ${{ needs.prepare_config.outputs.sdk_xcode }} is unavailable on ${{ needs.prepare_config.outputs.sdk_runner }}."
+          exit 1
+
+      - name: Print toolchain versions
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Build SDK library targets for macOS 11 (SwiftPM)
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: bash scripts/ci/sdk_validation/build-spm-library-targets.sh --log swift-build-macos.log --resolve-package --triple arm64-apple-macosx11.0 --scratch-path .build-sdk-validation-macos-${{ needs.prepare_config.outputs.sdk_runner }}-${{ needs.prepare_config.outputs.sdk_xcode }}
+
+      - name: Upload macOS swift build log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: swift-build-macos-log-xcode-${{ needs.prepare_config.outputs.sdk_xcode }}
+          path: swift-build-macos.log
+          if-no-files-found: ignore
+
+  cocoapods_lint:
+    name: CocoaPods lint
+    needs: prepare_config
+    if: ${{ needs.prepare_config.outputs.run_lint_pods == 'true' }}
+    runs-on: ${{ needs.prepare_config.outputs.sdk_runner }}
+    timeout-minutes: 25
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Select Xcode
+        id: setup_xcode
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+        continue-on-error: true
+        with:
+          xcode-version: ${{ needs.prepare_config.outputs.sdk_xcode }}
+
+      - name: Fail when CocoaPods lint Xcode version is unavailable
+        if: ${{ steps.setup_xcode.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo "::error::Xcode ${{ needs.prepare_config.outputs.sdk_xcode }} is unavailable on ${{ needs.prepare_config.outputs.sdk_runner }}."
+          exit 1
+
+      - name: Print toolchain versions
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+          pod --version
+
+      - name: Run pod lib lint (published podspecs)
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: bash scripts/ci/sdk_validation/run-pod-lib-lint.sh --log pod-lib-lint.log
+
+      - name: Upload pod lib lint log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pod-lib-lint-log-xcode-${{ needs.prepare_config.outputs.sdk_xcode }}
+          path: pod-lib-lint.log
+          if-no-files-found: ignore
+
+  sdk_tests:
+    name: SDK tests (Xcode ${{ matrix.xcode }})
+    needs: prepare_config
+    if: ${{ needs.prepare_config.outputs.run_tests == 'true' }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    continue-on-error: ${{ matrix.informational }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare_config.outputs.sdk_tests_matrix_json) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Select Xcode
+        id: setup_xcode
+        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1.6.0
+        continue-on-error: true
+        with:
+          xcode-version: ${{ matrix.xcode }}
+
+      - name: Handle unavailable Xcode for informational test matrix entry
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational }}
+        shell: bash
+        run: |
+          echo "::warning::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}. Skipping informational test run."
+
+      - name: Fail when required SDK test Xcode version is unavailable
+        if: ${{ steps.setup_xcode.outcome == 'failure' && matrix.informational == false }}
+        shell: bash
+        run: |
+          echo "::error::Xcode ${{ matrix.xcode }} is unavailable on ${{ matrix.runner }}."
+          exit 1
+
+      - name: Print toolchain versions
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Run SDK tests
+        id: tests
+        if: ${{ steps.setup_xcode.outcome == 'success' }}
+        shell: bash
+        run: bash scripts/ci/sdk_validation/run-sdk-tests.sh --log swift-test.log
+
+      - name: Fail on SDK test failure
+        if: ${{ steps.tests.outcome == 'success' && steps.tests.outputs.exit_code != '0' }}
+        shell: bash
+        run: |
+          echo "::error::swift test failed. See artifact 'sdk-tests-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}'."
+          exit 1
+
+      - name: Upload swift test log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sdk-tests-log-${{ matrix.runner }}-xcode-${{ matrix.xcode }}
+          path: swift-test.log
+          if-no-files-found: ignore
