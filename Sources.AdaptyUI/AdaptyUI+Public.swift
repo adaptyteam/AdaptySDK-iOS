@@ -92,10 +92,8 @@ public protocol AdaptyFlowControllerDelegate: AnyObject {
 
     /// This method is invoked when a successful purchase is made.
     ///
-    /// The default implementation is simply dismissing the controller:
-    /// ```
-    /// controller.dismiss(animated: true)
-    /// ```
+    /// There is no default implementation; implement this method to decide what
+    /// happens after a successful purchase (e.g. continue the flow or dismiss the controller).
     /// - Parameters:
     ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
