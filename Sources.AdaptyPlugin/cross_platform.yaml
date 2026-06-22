@@ -729,7 +729,7 @@ $events:
       id: { const: "flow_view_did_request_permission" }
       view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       request_id: { type: string }
-      permission: { type: string }
+      permission: { $ref: "#/$defs/AdaptyUI.Permission" }
       custom_args:
         type: object
         additionalProperties: { type: string }
@@ -1600,6 +1600,36 @@ $defs:
         properties:
           type: { type: string, const: "custom" }
           value: { type: string }
+
+  AdaptyUI.Permission: #event
+    description: "Permission identifier requested by a flow. The values below are the
+      known cross-platform set; any string is valid — unknown or Android-only ids
+      (e.g. \"phone\", \"sms\") and future values pass through unchanged."
+    anyOf:
+      - type: string
+        enum:
+          - push
+          - camera
+          - microphone
+          - location_when_use
+          - location_always
+          - location_full_accuracy
+          - photos
+          - contacts
+          - tracking
+          - calendar
+          - bluetooth
+          - motion
+          - reminders
+          - speech
+          - media_library
+          - local_network
+          - focus_status
+          - homekit
+          - health
+          - siri
+          - music
+      - type: string
 
   AdaptyUI.CustomTagsValues: #request
     type: object
