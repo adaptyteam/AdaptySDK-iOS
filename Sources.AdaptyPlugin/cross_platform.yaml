@@ -164,6 +164,42 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyUI.DialogActionType" }
 
+  ### adaptyUIOpenUrl ###
+  AdaptyUIOpenUrl.Request: #request
+    type: object
+    required: [method, url]
+    properties:
+      method: { const: "adapty_ui_open_url" }
+      url: { type: string }
+      open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
+
+  AdaptyUIOpenUrl.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### adaptyUIRequestAppReview ###
+  AdaptyUIRequestAppReview.Request: #request
+    type: object
+    required: [method]
+    properties:
+      method: { const: "adapty_ui_request_app_review" }
+
+  AdaptyUIRequestAppReview.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### getOnboarding ###
   GetOnboarding.Request: #request
     type: object

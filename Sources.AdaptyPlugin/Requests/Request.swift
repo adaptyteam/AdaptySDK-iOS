@@ -56,6 +56,9 @@ enum Request {
             AdaptyUIPresentOnboardingView.self,
 
             AdaptyUIShowDialog.self,
+
+            AdaptyUIOpenUrl.self,
+            AdaptyUIRequestAppReview.self,
         ]
         allRequests.append(contentsOf: adaptyUiRequests)
 
