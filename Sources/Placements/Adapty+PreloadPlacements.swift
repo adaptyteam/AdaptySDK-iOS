@@ -10,9 +10,8 @@ import Foundation
 
 private let log = Log.default
 
-extension Adapty {
-
-    public nonisolated static func preloadFlows(
+public extension Adapty {
+    nonisolated static func preloadFlows(
         placementIds: [String],
         loadTimeout: TimeInterval? = nil
     ) async throws(AdaptyError) {
@@ -23,7 +22,7 @@ extension Adapty {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
 
         let logParams: EventParameters = [
-            "placement_ids": placementIds
+            "placement_ids": placementIds,
         ]
 
         return try await withActivatedSDK(methodName: .preloadFlows, logParams: logParams) { sdk throws(AdaptyError) in
@@ -35,29 +34,7 @@ extension Adapty {
         }
     }
 
-    public nonisolated static func preloadFlowsForDefaultAudience(
-        placementIds: [String]
-    ) async throws(AdaptyError){
-        let placementIds = Set(placementIds.compactMap {
-            let placementId = $0.trimmed
-            return placementId.isEmpty ? nil : placementId
-        })
-
-        let logParams: EventParameters = [
-            "placement_ids": placementIds
-        ]
-
-        return try await withActivatedSDK(methodName: .preloadFlowsForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
-            try await sdk.preloadPlacements(
-                AdaptyFlow.self,
-                placementIds: placementIds,
-                loadTimeout: .seconds(5),
-                forDefaultAudience: true
-            )
-        }
-    }
-
-    public nonisolated static func preloadOnboardings(
+    nonisolated static func preloadOnboardings(
         placementIds: [String],
         locale: String? = nil,
         loadTimeout: TimeInterval? = nil
@@ -71,7 +48,7 @@ extension Adapty {
 
         let logParams: EventParameters = [
             "placement_ids": placementIds,
-            "locale": locale
+            "locale": locale,
         ]
 
         return try await withActivatedSDK(methodName: .preloadOnboardings, logParams: logParams) { sdk throws(AdaptyError) in
@@ -84,42 +61,15 @@ extension Adapty {
         }
     }
 
-    public nonisolated static func preloadOnboardingsForDefaultAudience(
-        placementIds: [String],
-        locale: String? = nil
-    ) async throws(AdaptyError){
-        let placementIds = Set(placementIds.compactMap {
-            let placementId = $0.trimmed
-            return placementId.isEmpty ? nil : placementId
-        })
-        let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) }
-
-        let logParams: EventParameters = [
-            "placement_ids": placementIds,
-            "locale": locale
-        ]
-
-        return try await withActivatedSDK(methodName: .preloadOnboardingsForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
-            try await sdk.preloadPlacements(
-                AdaptyOnboarding.self,
-                placementIds: placementIds,
-                locale: locale,
-                loadTimeout: .seconds(5),
-                forDefaultAudience: true
-            )
-        }
-    }
-
-    private func preloadPlacements<Content: PlacementContent>(
-        _ type: Content.Type,
+    private func preloadPlacements(
+        _ type: (some PlacementContent).Type,
         placementIds: Set<String>,
         locale: AdaptyLocale? = nil,
-        loadTimeout: TaskDuration,
-        forDefaultAudience: Bool = false
-    )  async throws(AdaptyError) {
+        loadTimeout: TaskDuration
+    ) async throws(AdaptyError) {
         guard placementIds.isNotEmpty else { return }
 
-        let (userId, isTestUser) = {
+        var (userId, isTestUser) = {
             let manager = profileManager
             return (
                 userId: manager?.userId ?? profileStorage.userId,
@@ -127,192 +77,211 @@ extension Adapty {
             )
         }()
 
-        for placementId in placementIds {
-            do {
-                if forDefaultAudience {
-                    try await preloadPlacementForDefaultAudience(
-                        type,
-                        httpConfigsSession,
-                        placementId,
-                        locale,
-                        forUserId: userId,
-                        isTestUser,
-                        loadTimeout: loadTimeout.asTimeInterval
-                    )
-                } else {
-                    try await preloadPlacement(
-                        type,
-                        placementId,
-                        locale,
-                        forUserId: userId,
-                        isTestUser,
-                        loadTimeout: loadTimeout
-                    )
-                }
-            } catch {
-                throw error
-            }
-        }
-    }
-
-    private func preloadPlacement<Content: PlacementContent>(
-        _ type: Content.Type,
-        _ placementId: String,
-        _ locale: AdaptyLocale? = nil,
-        forUserId userId: AdaptyUserId,
-        _ isTestUser: Bool,
-        loadTimeout: TaskDuration
-    )  async throws(AdaptyError) {
-
-        var userId = userId
-        var isTestUser = isTestUser
-
+        let preloaded: [String: AdaptyError?]
         let startTaskTime = Date()
 
-        var fetchBackendError: AdaptyError?
         do {
-            return try await withThrowingTimeout(max(loadTimeout - .milliseconds(500), .milliseconds(500))) {
-                let manager = try await self.createdProfileManager
-                let createdUserId = manager.userId
-                isTestUser = await manager.isTestUser
+            preloaded = try await withThrowingTimeout(max(loadTimeout - .milliseconds(500), .milliseconds(500))) {
+                let (createdUserId, createdIsTestUser, segmentId) = try await { @AdaptyActor in
+                    let manager = try await self.createdProfileManager
+                    return (
+                        manager.userId,
+                        manager.isTestUser,
+                        manager.segmentId
+                    )
+                }()
 
                 if createdUserId.isNotEqualProfileId(userId) {
-                    log.verbose("fetchPlacementOrFallbackPlacement: profile changed from \(userId) to \(createdUserId)")
+                    log.verbose("preloadPlacements: profile changed from \(userId) to \(createdUserId)")
                     userId = createdUserId
                 }
 
-                try await self.preloadBackendPlacement(
+                isTestUser = createdIsTestUser
+
+                return await self.preloadBackendPlacementsWithRepeatWrongSegmentId(
                     type,
-                    placementId,
+                    placementIds,
                     locale,
-                    forUserId: userId,
+                    segmentId,
+                    userId,
                     isTestUser
                 )
             }
-
+        } catch is TimeoutError {
+            preloaded = [:]
         } catch let error as AdaptyError {
-            fetchBackendError =
-                if error.canUseFallbackServer { nil } else { error }
+            throw error
         } catch {
-            fetchBackendError =
-                if error is TimeoutError { nil } else { .unknown(error) }
+            throw .unknown(error)
         }
 
-        if let fetchBackendError {
-            throw fetchBackendError
+        let placementIdsForDefaultAudience = placementIds
+            .filter { placementId in
+                guard preloaded.keys.contains(placementId) else { return true }
+                guard let adaptyError = preloaded[placementId] as? AdaptyError else { return false }
+                return adaptyError.canUseFallbackServer
+            }
+
+        var preloadedForDefaultAudience: [String: AdaptyError?] = [:]
+        if placementIdsForDefaultAudience.isNotEmpty {
+            preloadedForDefaultAudience = await preloadBackendPlacementsForDefaultAudience(
+                type,
+                httpFallbackSession,
+                Set(placementIdsForDefaultAudience),
+                locale,
+                userId,
+                isTestUser,
+                max(loadTimeout.asTimeInterval + startTaskTime.timeIntervalSinceNow, 0.5)
+            )
         }
 
-        try await preloadPlacementForDefaultAudience(
-            type,
-            httpFallbackSession,
-            placementId,
-            locale,
-            forUserId: userId,
-            isTestUser,
-            loadTimeout: loadTimeout.asTimeInterval + startTaskTime.timeIntervalSinceNow
-        )
+        let errors = preloaded.merging(preloadedForDefaultAudience, uniquingKeysWith: { _, other in
+            other
+        }).compactMapValues { $0 }
+
+        if errors.isNotEmpty {
+            throw PreloadPlacementsError(errors).asAdaptyError
+        }
     }
 
-    private func preloadBackendPlacement<Content: PlacementContent>(
-        _ type: Content.Type,
-        _ placementId: String,
+    private func preloadBackendPlacementsWithRepeatWrongSegmentId(
+        _ type: (some PlacementContent).Type,
+        _ placementIds: Set<String>,
         _ locale: AdaptyLocale?,
-        forUserId userId: AdaptyUserId,
+        _ segmentId: String,
+        _ userId: AdaptyUserId,
         _ isTestUser: Bool
-    ) async throws(AdaptyError)  {
-        var lastError: AdaptyError
+    ) async -> [String: AdaptyError?] {
+        guard placementIds.isNotEmpty else { return [:] }
+
+        var segmentId = segmentId
+
+        var results = await preloadBackendPlacements(
+            type,
+            placementIds,
+            locale,
+            segmentId,
+            userId,
+            isTestUser
+        )
 
         repeat {
-            let crossPlacementState = await CrossPlacementStorage.state(for: userId)
-            let segmentId = try profileManager(withProfileId: userId).orThrows.segmentId
-            let variationId = crossPlacementState?.variationId(placementId: placementId)
-            let requestWithSpecialVariation = variationId != nil
-
-            do throws(HTTPError) {
-                    if let variationId {
-                        try await httpSession.preloadPlacement(
-                            type,
-                            apiKeyPrefix: apiKeyPrefix,
-                            userId: userId,
-                            placementId: placementId,
-                            variationId: variationId,
-                            locale: locale,
-                            disableServerCache: isTestUser
-                        )
-                    } else {
-                        try await httpSession.preloadPlacementVariations(
-                            type,
-                            apiKeyPrefix: apiKeyPrefix,
-                            userId: userId,
-                            placementId: placementId,
-                            locale: locale,
-                            segmentId: segmentId,
-                            crossPlacementEligible: crossPlacementState?.canParticipateInABTest ?? false,
-                            disableServerCache: isTestUser
-                        )
-                    }
-                return
-
-            } catch {
-                guard !requestWithSpecialVariation else {
-                    throw error.asAdaptyError
-                }
-
-                if Backend.wrongProfileSegmentId(error),
-                   try await updateSegmentId(for: userId, oldSegmentId: segmentId)
-                {
-                    lastError = error.asAdaptyError
-                    continue
-                }
-                throw error.asAdaptyError
+            let hasWrongSegmentIdError = results.values.contains {
+                guard $0.option.isUseSegmentId, let error = $0.error else { return false }
+                return Backend.wrongProfileSegmentId(error)
             }
+
+            guard hasWrongSegmentIdError else { break }
+            guard let manager = try? profileManager(withProfileId: userId).orThrows() else { break }
+            var currentSegmentId = manager.segmentId
+            if currentSegmentId == segmentId {
+               let refreshedSegmentId = await manager.fetchSegmentId()
+                guard refreshedSegmentId != segmentId else { break }
+                currentSegmentId = refreshedSegmentId
+            }
+
+            let segmentBasedPlacementIds = Set(
+                results.compactMap { $0.value.option.isUseSegmentId ? $0.key : nil }
+            )
+
+            log.verbose("preloadPlacements: segmentId changed from \(segmentId) to \(currentSegmentId), reloading \(segmentBasedPlacementIds.count) placement(s)")
+
+            segmentId = currentSegmentId
+            let reloaded = await preloadBackendPlacements(
+                type,
+                segmentBasedPlacementIds,
+                locale,
+                segmentId,
+                userId,
+                isTestUser
+            )
+
+            results.merge(reloaded) { _, new in new }
+
         } while !Task.isCancelled
 
-        throw lastError
-
-        func updateSegmentId(for userId: AdaptyUserId, oldSegmentId: String) async throws(AdaptyError) -> Bool {
-            let manager = try profileManager(withProfileId: userId).orThrows
-            guard manager.segmentId == oldSegmentId else { return true }
-            return await manager.fetchSegmentId() != oldSegmentId
-        }
+        return results.mapValues { $0.error?.asAdaptyError }
     }
 
-    private func preloadPlacementForDefaultAudience<Content: PlacementContent>(
-        _ type: Content.Type,
-        _ session: Backend.DefaultAudienceExecutor,
-        _ placementId: String,
-        _ locale: AdaptyLocale?,
-        forUserId userId: AdaptyUserId,
-        _ isTestUser: Bool,
-        loadTimeout timeoutInterval: TimeInterval?
-    )  async throws(AdaptyError) {
-        let crossPlacementState = await CrossPlacementStorage.state(for: userId)
-        let variationId = crossPlacementState?.variationId(placementId: placementId)
+    private struct LoadOption: OptionSet {
+        let rawValue: Int
 
-        do throws(HTTPError) {
-            if let variationId {
-                try await session.preloadPlacementForDefaultAudience(
-                    type,
-                    apiKeyPrefix: apiKeyPrefix,
-                    placementId: placementId,
-                    variationId: variationId,
-                    locale: locale,
-                    disableServerCache: isTestUser,
-                    timeoutInterval: timeoutInterval
-                )
-            } else {
-                try await session.preloadPlacementVariationsForDefaultAudience(
-                    type,
-                    apiKeyPrefix: apiKeyPrefix,
-                    userId: userId,
-                    placementId: placementId,
-                    locale: locale,
-                    disableServerCache: isTestUser,
-                    timeoutInterval: timeoutInterval
-                )
+        static let useSegmentId = LoadOption(rawValue: 1 << 0)
+        static let useCrossPlacementEligible = LoadOption(rawValue: 1 << 1)
+
+        var isUseSegmentId : Bool { contains(.useSegmentId) }
+        var crossPlacementEligible : Bool { contains(.useCrossPlacementEligible) }
+    }
+
+    private func preloadBackendPlacements(
+        _ type: (some PlacementContent).Type,
+        _ placementIds: Set<String>,
+        _ locale: AdaptyLocale?,
+        _ segmentId: String,
+        _ userId: AdaptyUserId,
+        _ isTestUser: Bool
+    ) async -> [String: (option: LoadOption, error: HTTPError?)] {
+        guard placementIds.isNotEmpty else { return [:] }
+
+        let session = httpSession
+        let apiKeyPrefix = apiKeyPrefix
+
+        return await withTaskGroup(
+            of: (placementId: String, option: LoadOption, error: HTTPError?).self
+        ) { group in
+            let crossPlacementState = await CrossPlacementStorage.state(for: userId)
+            let crossPlacementEligible = crossPlacementState?.canParticipateInABTest ?? false
+            for placementId in placementIds {
+                if let variationId = crossPlacementState?.variationId(placementId: placementId) {
+                    group.addTask {
+                        do throws(HTTPError) {
+                            try await session.preloadPlacement(
+                                type,
+                                apiKeyPrefix: apiKeyPrefix,
+                                userId: userId,
+                                placementId: placementId,
+                                variationId: variationId,
+                                locale: locale,
+                                disableServerCache: isTestUser
+                            )
+                            return (placementId, [], nil)
+                        } catch {
+                            return (placementId, [], error)
+                        }
+                    }
+                } else {
+                    group.addTask {
+                        let option: LoadOption =
+                        if crossPlacementEligible {
+                            [.useSegmentId, .useCrossPlacementEligible]
+                        } else {
+                            .useSegmentId
+                        }
+                        do throws(HTTPError) {
+                            try await session.preloadPlacementVariations(
+                                type,
+                                apiKeyPrefix: apiKeyPrefix,
+                                userId: userId,
+                                placementId: placementId,
+                                locale: locale,
+                                segmentId: segmentId,
+                                crossPlacementEligible: crossPlacementEligible,
+                                disableServerCache: isTestUser
+                            )
+                            return (placementId, option, nil)
+                        } catch {
+                            return (placementId, option, error)
+                        }
+                    }
+                }
             }
-        } catch {
-            throw error.asAdaptyError
+
+            var result = [String: (LoadOption, HTTPError?)]()
+            result.reserveCapacity(placementIds.count)
+            for await (placementId, option, error) in group {
+                result[placementId] = (option, error)
+            }
+            return result
         }
     }
 }

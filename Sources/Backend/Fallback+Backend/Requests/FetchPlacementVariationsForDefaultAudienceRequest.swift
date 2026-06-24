@@ -23,10 +23,11 @@ private struct FetchPlacementVariationsForDefaultAudienceRequest: BackendRequest
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) throws(HTTPError) {
+
         if type == AdaptyFlow.self {
             endpoint = HTTPEndpoint(
                 method: .get,
-                path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/app_store/fallback.json"
+                path: "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/app_store/\(Adapty.uiBuilderVersion)/fallback.json"
             )
             requestName = .fetchFlowVariationsForDefaultAudience
             logParams = [
@@ -48,8 +49,6 @@ private struct FetchPlacementVariationsForDefaultAudienceRequest: BackendRequest
                 "api_prefix": apiKeyPrefix,
                 "placement_id": placementId,
                 "language_code": locale.languageCode,
-                "builder_version": Adapty.uiBuilderVersion,
-                "builder_config_format_version": Adapty.uiSchemaVersion,
                 "disable_server_cache": disableServerCache,
             ]
 
@@ -78,11 +77,12 @@ extension Backend.DefaultAudienceExecutor {
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacement.Draw<Content> {
-        try await _fetchPlacementVariationsForDefaultAudience(
+        let locale = locale ?? .defaultPlacementLocale
+        return try await _fetchPlacementVariationsForDefaultAudience(
             type,
             apiKeyPrefix,
             placementId,
-            locale ?? .defaultPlacementLocale,
+            locale,
             disableServerCache,
             timeoutInterval,
             withDecoder: AdaptyPlacement.Draw<Content>.placementVariationsDecoder(
@@ -103,11 +103,12 @@ extension Backend.DefaultAudienceExecutor {
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) {
+        let locale = locale ?? .defaultPlacementLocale
         _ = try await _fetchPlacementVariationsForDefaultAudience(
             type,
             apiKeyPrefix,
             placementId,
-            locale ?? .defaultPlacementLocale,
+            locale,
             disableServerCache,
             timeoutInterval,
             withDecoder: AdaptyPlacement.Draw<Content>.persistPlacementVariations(
@@ -123,12 +124,12 @@ extension Backend.DefaultAudienceExecutor {
         _ type: Content.Type,
         _ apiKeyPrefix: String,
         _ placementId: String,
-        _ requestLocale: AdaptyLocale,
+        _ requestLocale: AdaptyLocale?,
         _ disableServerCache: Bool,
         _ timeoutInterval: TimeInterval?,
         withDecoder decoder: @escaping HTTPDecoder<ResponseBody>
     ) async throws(HTTPError) -> ResponseBody {
-        var locale = requestLocale
+        var locale = requestLocale ?? .defaultPlacementLocale
         var timeoutInterval = timeoutInterval
         var lastError: HTTPError
         repeat {

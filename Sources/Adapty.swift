@@ -364,14 +364,12 @@ extension Adapty {
 }
 
 extension ProfileManager? {
-    var orThrows: ProfileManager {
-        get throws(AdaptyError) {
-            switch self {
-            case nil:
-                throw .profileWasChanged()
-            case let value?:
-                value
-            }
+    func orThrows(file: String = #fileID, function: String = #function, line: UInt = #line) throws(AdaptyError) -> ProfileManager {
+        switch self {
+        case nil:
+            throw .profileWasChanged(file:file, function:function, line:line)
+        case let value?:
+            value
         }
     }
 }

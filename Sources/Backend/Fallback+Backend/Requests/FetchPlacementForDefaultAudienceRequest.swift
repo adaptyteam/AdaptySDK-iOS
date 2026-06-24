@@ -28,7 +28,7 @@ private struct FetchPlacementForDefaultAudienceRequest: BackendRequest {
             endpoint = HTTPEndpoint(
                 method: .get,
                 path:
-                "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/\(variationId)/app_store/fallback.json"
+                "/sdk/in-apps/\(apiKeyPrefix)/flow/variations/\(placementId)/\(variationId)/app_store/\(Adapty.uiBuilderVersion)/fallback.json"
             )
             requestName = .fetchFlowForDefaultAudience
             logParams = [
@@ -50,8 +50,6 @@ private struct FetchPlacementForDefaultAudienceRequest: BackendRequest {
                 "api_prefix": apiKeyPrefix,
                 "placement_id": placementId,
                 "variation_id": variationId,
-                "builder_version": Adapty.uiBuilderVersion,
-                "builder_config_format_version": Adapty.uiSchemaVersion,
                 "language_code": locale.languageCode,
                 "disable_server_cache": disableServerCache,
             ]
@@ -82,12 +80,13 @@ extension Backend.DefaultAudienceExecutor {
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) -> AdaptyPlacement.Draw<Content> {
-        try await _fetchPlacementForDefaultAudience(
+        let locale = locale ?? .defaultPlacementLocale
+        return try await _fetchPlacementForDefaultAudience(
             type,
             apiKeyPrefix,
             placementId,
             variationId,
-            locale ?? .defaultPlacementLocale,
+            locale,
             disableServerCache,
             timeoutInterval,
             withDecoder: AdaptyPlacement.Draw<Content>.placementDecoder(
@@ -107,12 +106,13 @@ extension Backend.DefaultAudienceExecutor {
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) async throws(HTTPError) {
+        let locale = locale ?? .defaultPlacementLocale
         _ = try await _fetchPlacementForDefaultAudience(
             type,
             apiKeyPrefix,
             placementId,
             variationId,
-            locale ?? .defaultPlacementLocale,
+            locale,
             disableServerCache,
             timeoutInterval,
             withDecoder: AdaptyPlacement.Draw<Content>.persistPlacement(
