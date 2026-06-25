@@ -9,15 +9,15 @@ extension Request {
     struct ObserverRestoreDidStart: AdaptyPluginRequest {
         static let method = "observer_restore_did_start"
 
-        let requestId: String
+        let eventId: String
 
         enum CodingKeys: String, CodingKey {
-            case requestId = "request_id"
+            case eventId = "event_id"
         }
 
         func execute() async throws -> AdaptyJsonData {
             await MainActor.run {
-                HostRequestRegistry.shared.invokeCallback(requestId: requestId, signal: "restore_start")
+                HostRequestRegistry.shared.invokeCallback(eventId: eventId, signal: "restore_start")
             }
             return .success()
         }

@@ -33,10 +33,10 @@
             withCustomArgs customArgs: [String: String]?
         ) async -> AdaptyUIPermissionResult {
             let view = currentView
-            let resolution: PermissionResolution? = await HostRequestRegistry.shared.perform { requestId in
-                eventHandler.handle(event: FlowViewEvent.DidRequestPermission(
+            let resolution: PermissionResolution? = await HostRequestRegistry.shared.perform { eventId in
+                eventHandler.handle(event: FlowViewEvent.DidAskPermission(
                     view: view,
-                    requestId: requestId,
+                    eventId: eventId,
                     permission: permission.wireValue,
                     customArgs: customArgs
                 ))

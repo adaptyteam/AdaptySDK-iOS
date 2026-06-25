@@ -38,7 +38,7 @@ enum Request {
             UpdateCollectingRefundDataConsent.self,
             UpdateRefundPreference.self,
             GetCurrentInstallationStatus.self,
-            DidRequestPermissionResponse.self,
+            FlowViewDidAnswerPermission.self,
             ObserverPurchaseDidStart.self,
             ObserverPurchaseDidFinish.self,
             ObserverRestoreDidStart.self,

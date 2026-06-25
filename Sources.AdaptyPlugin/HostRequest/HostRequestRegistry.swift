@@ -5,7 +5,7 @@
 
 import Foundation
 
-/// Correlates native-initiated host requests to their responses by `request_id`.
+/// Correlates native-initiated host requests to their responses by `event_id`.
 /// View-agnostic: keyed only by id. Cleanup = host response (`resolve`) or `flushCancelled` on teardown.
 @MainActor
 final class HostRequestRegistry {
@@ -18,7 +18,7 @@ final class HostRequestRegistry {
     private var callbacks: [String: [String: @MainActor @Sendable () -> Void]] = [:]
 
     /// Generates a fresh correlation id.
-    func nextRequestId() -> String {
+    func nextEventId() -> String {
         counter &+= 1
         return "hr_\(counter)"
     }
@@ -27,36 +27,36 @@ final class HostRequestRegistry {
     /// Returns `nil` when cancelled/flushed. (Ask-once flavor.)
     func perform<Result>(
         _: Result.Type = Result.self,
-        emit: (_ requestId: String) -> Void
+        emit: (_ eventId: String) -> Void
     ) async -> Result? {
-        let requestId = nextRequestId()
+        let eventId = nextEventId()
         let raw: (any Sendable)? = await withCheckedContinuation { continuation in
-            pending[requestId] = continuation
-            emit(requestId)
+            pending[eventId] = continuation
+            emit(eventId)
         }
         return raw as? Result
     }
 
     /// Resolves a pending ask-once request. Unknown ids are ignored.
-    func resolve(requestId: String, with value: (any Sendable)?) {
-        pending.removeValue(forKey: requestId)?.resume(returning: value)
+    func resolve(eventId: String, with value: (any Sendable)?) {
+        pending.removeValue(forKey: eventId)?.resume(returning: value)
     }
 
     // MARK: - Lifecycle-callbacks flavor (e.g. ObserverMode purchase/restore)
 
-    /// Stores a set of host-invoked lifecycle callbacks keyed by `request_id` (`signal` -> closure).
-    func registerCallbacks(_ requestId: String, _ map: [String: @MainActor @Sendable () -> Void]) {
-        callbacks[requestId] = map
+    /// Stores a set of host-invoked lifecycle callbacks keyed by `event_id` (`signal` -> closure).
+    func registerCallbacks(_ eventId: String, _ map: [String: @MainActor @Sendable () -> Void]) {
+        callbacks[eventId] = map
     }
 
     /// Invokes one stored lifecycle callback. Unknown id/signal is ignored.
-    func invokeCallback(requestId: String, signal: String) {
-        callbacks[requestId]?[signal]?()
+    func invokeCallback(eventId: String, signal: String) {
+        callbacks[eventId]?[signal]?()
     }
 
     /// Drops a finished lifecycle request's callbacks.
-    func releaseCallbacks(requestId: String) {
-        callbacks.removeValue(forKey: requestId)
+    func releaseCallbacks(eventId: String) {
+        callbacks.removeValue(forKey: eventId)
     }
 
     /// Resolves every pending ask-once request with `nil` and clears all lifecycle callbacks.

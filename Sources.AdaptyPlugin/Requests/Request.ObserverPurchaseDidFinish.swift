@@ -9,16 +9,16 @@ extension Request {
     struct ObserverPurchaseDidFinish: AdaptyPluginRequest {
         static let method = "observer_purchase_did_finish"
 
-        let requestId: String
+        let eventId: String
 
         enum CodingKeys: String, CodingKey {
-            case requestId = "request_id"
+            case eventId = "event_id"
         }
 
         func execute() async throws -> AdaptyJsonData {
             await MainActor.run {
-                HostRequestRegistry.shared.invokeCallback(requestId: requestId, signal: "purchase_finish")
-                HostRequestRegistry.shared.releaseCallbacks(requestId: requestId)
+                HostRequestRegistry.shared.invokeCallback(eventId: eventId, signal: "purchase_finish")
+                HostRequestRegistry.shared.releaseCallbacks(eventId: eventId)
             }
             return .success()
         }

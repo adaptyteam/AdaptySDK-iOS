@@ -1,5 +1,5 @@
 //
-//  FlowViewEvent.DidRequestPermission.swift
+//  FlowViewEvent.DidAskPermission.swift
 //  AdaptyPlugin
 //
 
@@ -8,17 +8,17 @@ import AdaptyUI
 import Foundation
 
 extension FlowViewEvent {
-    struct DidRequestPermission: AdaptyPluginEvent {
-        let id = "flow_view_did_request_permission"
+    struct DidAskPermission: AdaptyPluginEvent {
+        let id = "flow_view_did_ask_permission"
         let view: AdaptyUI.FlowView
-        let requestId: String
+        let eventId: String
         let permission: String
         let customArgs: [String: String]?
 
         enum CodingKeys: String, CodingKey {
             case id
             case view
-            case requestId = "request_id"
+            case eventId = "event_id"
             case permission
             case customArgs = "custom_args"
         }

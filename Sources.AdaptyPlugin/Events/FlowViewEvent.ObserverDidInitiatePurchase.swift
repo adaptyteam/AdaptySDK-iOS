@@ -11,13 +11,13 @@ extension FlowViewEvent {
     struct ObserverDidInitiatePurchase: AdaptyPluginEvent {
         let id = "flow_view_observer_did_initiate_purchase"
         let view: AdaptyUI.FlowView
-        let requestId: String
+        let eventId: String
         let product: Response.AdaptyPluginPaywallProduct
 
         enum CodingKeys: String, CodingKey {
             case id
             case view
-            case requestId = "request_id"
+            case eventId = "event_id"
             case product
         }
     }

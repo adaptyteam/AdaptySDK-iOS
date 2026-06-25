@@ -10,7 +10,7 @@
 
     /// Bridges flow Observer Mode purchase/restore to the cross-platform host.
     /// Each native-initiated purchase/restore registers `start`/`finish` lifecycle
-    /// callbacks in `HostRequestRegistry`, keyed by `request_id`; the host drives
+    /// callbacks in `HostRequestRegistry`, keyed by `event_id`; the host drives
     /// them via the `observer_*` requests and releases on `*_finish`.
     ///
     /// One instance is created per flow view. The owning view's identity is
@@ -45,14 +45,14 @@
             onFinishPurchase: @MainActor @Sendable @escaping () -> Void
         ) {
             MainActor.assumeIsolated {
-                let rid = HostRequestRegistry.shared.nextRequestId()
-                HostRequestRegistry.shared.registerCallbacks(rid, [
+                let eventId = HostRequestRegistry.shared.nextEventId()
+                HostRequestRegistry.shared.registerCallbacks(eventId, [
                     "purchase_start": onStartPurchase,
                     "purchase_finish": onFinishPurchase,
                 ])
                 eventHandler.handle(event: FlowViewEvent.ObserverDidInitiatePurchase(
                     view: currentView,
-                    requestId: rid,
+                    eventId: eventId,
                     product: Response.AdaptyPluginPaywallProduct(product)
                 ))
             }
@@ -63,14 +63,14 @@
             onFinishRestore: @MainActor @Sendable @escaping () -> Void
         ) {
             MainActor.assumeIsolated {
-                let rid = HostRequestRegistry.shared.nextRequestId()
-                HostRequestRegistry.shared.registerCallbacks(rid, [
+                let eventId = HostRequestRegistry.shared.nextEventId()
+                HostRequestRegistry.shared.registerCallbacks(eventId, [
                     "restore_start": onStartRestore,
                     "restore_finish": onFinishRestore,
                 ])
                 eventHandler.handle(event: FlowViewEvent.ObserverDidInitiateRestore(
                     view: currentView,
-                    requestId: rid
+                    eventId: eventId
                 ))
             }
         }

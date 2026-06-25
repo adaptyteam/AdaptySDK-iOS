@@ -1,20 +1,20 @@
 //
-//  Request.DidRequestPermissionResponse.swift
+//  Request.FlowViewDidAnswerPermission.swift
 //  AdaptyPlugin
 //
 
 import Foundation
 
 extension Request {
-    struct DidRequestPermissionResponse: AdaptyPluginRequest {
-        static let method = "did_request_permission_response"
+    struct FlowViewDidAnswerPermission: AdaptyPluginRequest {
+        static let method = "flow_view_did_answer_permission"
 
-        let requestId: String
+        let eventId: String
         let status: PermissionResolution.Status
         let detail: String?
 
         enum CodingKeys: String, CodingKey {
-            case requestId = "request_id"
+            case eventId = "event_id"
             case status
             case detail
         }
@@ -22,7 +22,7 @@ extension Request {
         func execute() async throws -> AdaptyJsonData {
             let resolution = PermissionResolution(status: status, detail: detail)
             await MainActor.run {
-                HostRequestRegistry.shared.resolve(requestId: requestId, with: resolution)
+                HostRequestRegistry.shared.resolve(eventId: eventId, with: resolution)
             }
             return .success()
         }

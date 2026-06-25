@@ -11,12 +11,12 @@ extension FlowViewEvent {
     struct ObserverDidInitiateRestore: AdaptyPluginEvent {
         let id = "flow_view_observer_did_initiate_restore"
         let view: AdaptyUI.FlowView
-        let requestId: String
+        let eventId: String
 
         enum CodingKeys: String, CodingKey {
             case id
             case view
-            case requestId = "request_id"
+            case eventId = "event_id"
         }
     }
 }
