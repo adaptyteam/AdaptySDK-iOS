@@ -434,10 +434,14 @@ $requests:
 
   OpenWebPaywall.Request: #request
     type: object
-    required: [method, product]
+    required: [method]
+    oneOf:
+      - required: [product]
+      - required: [paywall]
     properties:
       method: { const: "open_web_paywall" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      paywall: { $ref: "#/$defs/AdaptyFlowPaywall" }
       open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
 
   OpenWebPaywall.Response: #response
@@ -452,10 +456,14 @@ $requests:
 
   CreateWebPaywallUrl.Request: #request
     type: object
-    required: [method, product]
+    required: [method]
+    oneOf:
+      - required: [product]
+      - required: [paywall]
     properties:
       method: { const: "create_web_paywall_url" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      paywall: { $ref: "#/$defs/AdaptyFlowPaywall" }
 
   CreateWebPaywallUrl.Response: #response
     type: object
