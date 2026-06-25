@@ -39,8 +39,6 @@ private struct FetchFallbackUISchemaRequest: BackendRequest {
     }
 }
 
-
-
 extension Backend.MainExecutor {
     func fetchFallbackUISchema(
         apiKeyPrefix: String,
@@ -69,4 +67,3 @@ extension Backend.MainExecutor {
         return response.body
     }
 }
-

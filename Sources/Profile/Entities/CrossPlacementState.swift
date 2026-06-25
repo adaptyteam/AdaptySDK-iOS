@@ -54,4 +54,3 @@ extension CrossPlacementState: Codable {
         version = try container.decode(Int.self, forKey: .version)
     }
 }
-

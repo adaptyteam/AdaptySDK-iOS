@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 29.03.2023
 //
 
-import Foundation
 import AdaptyCodable
+import Foundation
 
 package protocol AdaptySystemEventParameters: Sendable, Encodable {}
 

@@ -36,7 +36,6 @@ public extension Adapty {
         _ attributionJson: String,
         source: AdaptyAttributionSource
     ) async throws(AdaptyError) {
-
         let logParams: EventParameters = [
             "source": source,
         ]

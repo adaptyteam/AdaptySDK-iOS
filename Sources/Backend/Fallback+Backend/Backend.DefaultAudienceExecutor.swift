@@ -10,4 +10,3 @@ import Foundation
 extension Backend {
     protocol DefaultAudienceExecutor: BackendExecutor {}
 }
-

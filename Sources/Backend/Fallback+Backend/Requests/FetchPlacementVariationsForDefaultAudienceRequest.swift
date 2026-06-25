@@ -23,7 +23,6 @@ private struct FetchPlacementVariationsForDefaultAudienceRequest: BackendRequest
         disableServerCache: Bool,
         timeoutInterval: TimeInterval?
     ) throws(HTTPError) {
-
         if type == AdaptyFlow.self {
             endpoint = HTTPEndpoint(
                 method: .get,
@@ -165,4 +164,3 @@ extension Backend.DefaultAudienceExecutor {
         throw lastError
     }
 }
-

@@ -73,7 +73,7 @@ extension Cache {
         return Cache.read(
             Content.cacheKey(variationId: variationId),
             accept: Content.shouldUseExisting(with: .returnCacheDataElseLoad, locale: locale),
-            decode: { meta, data in
+            decode: { _, data in
                 try jsonDecoder.decodePlacement(
                     withUserId: userId,
                     withRequestLocale: locale,
@@ -95,7 +95,7 @@ extension Cache {
         let cached: AdaptyPlacement.Draw<Content>? = Cache.read(
             Content.cacheKey(variationId: variationId),
             accept: Content.shouldUseExisting(with: .returnCacheDataElseLoad, locale: locale),
-            decode: { meta, data in
+            decode: { _, data in
                 try jsonDecoder.decodePlacement(
                     withUserId: userId,
                     withRequestLocale: locale,
@@ -109,7 +109,7 @@ extension Cache {
         return Cache.read(
             Content.cacheKey(placementId: placementId, for: userId),
             accept: Content.shouldUseExisting(with: .returnCacheDataElseLoad, locale: locale),
-            decode: { meta, data in
+            decode: { _, data in
                 do {
                     return try jsonDecoder.decodePlacementVariations(
                         variationId: variationId,
@@ -195,7 +195,6 @@ extension JSONDecoder {
         crossPlacementEligible: Bool,
         from body: Data
     ) throws -> AdaptyPlacement.Draw<Content> {
-
         let placement = try decode(
             Backend.Response.Meta<AdaptyPlacement>.self,
             from: body

@@ -54,4 +54,3 @@ extension HTTPRequest {
         return request
     }
 }
-

@@ -16,6 +16,7 @@ extension Cache {
         key: ItemKey,
         locale: AdaptyLocale? = nil,
         eligibleCrossABtest: Bool = false,
+        segmentId: String? = nil,
         dataVersion: Int,
         accept: (@Sendable (_ new: Meta, _ existing: Meta) -> Bool)? = nil
     ) throws -> Data {
@@ -25,6 +26,7 @@ extension Cache {
             size: newData.count,
             locale: locale,
             eligibleCrossABtest: eligibleCrossABtest,
+            segmentId: segmentId,
             dataVersion: dataVersion,
             storedAt: now,
             lastAccessedAt: now
@@ -109,4 +111,3 @@ private extension FileManager {
         }
     }
 }
-

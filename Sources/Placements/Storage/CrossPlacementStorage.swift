@@ -91,4 +91,3 @@ final class CrossPlacementStorage {
         log.verbose("clear cross-placement state of other profiles")
     }
 }
-

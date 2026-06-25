@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 02.06.2026.
 //
 
-import Foundation
 import AdaptyUIBuilder
+import Foundation
 
 extension AdaptyFlow.LayoutsConfiguration {
     package func getLayout(for info: Adapty.DeviceInfo, with customId: String?) throws(AdaptyError) -> AdaptyFlow.Layout? {
@@ -63,4 +63,3 @@ private extension AdaptyFlow.LayoutsConfiguration.Grid {
         return cells[index]
     }
 }
-

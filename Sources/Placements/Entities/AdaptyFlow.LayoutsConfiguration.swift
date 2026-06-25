@@ -131,4 +131,3 @@ extension AdaptyFlow.LayoutsConfiguration.Layout: Codable {
         case id = "flow_layout_id"
     }
 }
-

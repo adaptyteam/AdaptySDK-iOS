@@ -30,7 +30,7 @@ extension Adapty {
 
 private let log = Log.fallbackPlacements
 //
-//extension PlacementStorage {
+// extension PlacementStorage {
 //    private func getPlacement<Content: PlacementContent>(
 //        byPlacementId placementId: String,
 //        withVariationId variationId: String?,
@@ -138,5 +138,5 @@ private let log = Log.fallbackPlacements
 //            return fallBacked
 //        }
 //    }
-//}
+// }
 //

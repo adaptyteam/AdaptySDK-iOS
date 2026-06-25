@@ -23,7 +23,9 @@ extension Environment {
             AdaptyLocale(Locale.preferredLanguages.first ?? Locale.current.identifier)
         }
 
-        static var preferredLanguages: [String] {  Locale.preferredLanguages }
+        static var preferredLanguages: [String] {
+            Locale.preferredLanguages
+        }
 
         static var uses24HourClock: Bool {
             if #available(iOS 16.0, macOS 13.0, *) {

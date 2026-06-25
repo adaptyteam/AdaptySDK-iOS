@@ -76,4 +76,3 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placement content with index \(index) not found"))
     }
 }
-

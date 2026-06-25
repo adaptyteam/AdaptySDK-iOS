@@ -39,7 +39,7 @@ extension Adapty {
         guard
             let layoutsConfiguration = flow.layoutsConfiguration,
             let layout = try layoutsConfiguration.getLayout(for: device, with: customLayoutId)
-        else {  throw .isNoViewConfigurationInFlow() }
+        else { throw .isNoViewConfigurationInFlow() }
 
         let schema = try await getUISchema(
             flowId: flow.id,
@@ -105,7 +105,7 @@ extension Adapty {
                 try await Cache.write(
                     data,
                     key: cacheKey,
-                    dataVersion: 0,
+                    dataVersion: 0
                 )
             } catch {
                 Log.cache.error("Failed to write schema to cache: \(error)")
@@ -179,4 +179,3 @@ extension Adapty {
         }
     }
 }
-

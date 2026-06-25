@@ -54,4 +54,3 @@ extension Backend.MainExecutor {
         let _: HTTPEmptyResponse = try await perform(request)
     }
 }
-

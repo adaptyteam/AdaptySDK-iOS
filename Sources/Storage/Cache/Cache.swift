@@ -37,4 +37,3 @@ enum Cache {
     /// foreign code may install on `FileManager.default`.
     static let fileManager = FileManager()
 }
-

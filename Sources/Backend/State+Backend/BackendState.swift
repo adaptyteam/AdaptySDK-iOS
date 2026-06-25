@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 24.09.2022.
 //
 
-import Foundation
 import AdaptyCodable
+import Foundation
 
 struct BackendState: Sendable {
     let eventBlacklist: Set<String>

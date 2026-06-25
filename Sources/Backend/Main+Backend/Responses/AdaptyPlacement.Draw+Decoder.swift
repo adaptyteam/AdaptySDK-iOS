@@ -13,7 +13,8 @@ extension AdaptyPlacement.Draw {
         withUserId userId: AdaptyUserId,
         withPlacementId placementId: String,
         withRequestLocale requestLocale: AdaptyLocale?,
-        crossPlacementEligible: Bool
+        crossPlacementEligible: Bool,
+        segmentId: String? = nil
     ) -> HTTPDecoder<AdaptyPlacement.Draw<Content>> {
         return decoder
 
@@ -32,6 +33,7 @@ extension AdaptyPlacement.Draw {
                 key: Content.cacheKey(placementId: placementId, for: userId),
                 locale: requestLocale,
                 eligibleCrossABtest: crossPlacementEligible,
+                segmentId: segmentId,
                 dataVersion: jsonDecoder.decodeAdaptyPlacementVersion(from: body),
                 accept: Content.shouldUseNew,
                 decode: { meta, data in
@@ -89,7 +91,8 @@ extension AdaptyPlacement.Draw {
         withUserId userId: AdaptyUserId,
         withPlacementId placementId: String,
         withRequestLocale requestLocale: AdaptyLocale?,
-        crossPlacementEligible: Bool
+        crossPlacementEligible: Bool,
+        segmentId: String? = nil
     ) -> HTTPDecoder<Data?> {
         return decoder
 
@@ -108,6 +111,7 @@ extension AdaptyPlacement.Draw {
                 key: Content.cacheKey(placementId: placementId, for: userId),
                 locale: requestLocale,
                 eligibleCrossABtest: crossPlacementEligible,
+                segmentId: segmentId,
                 dataVersion: jsonDecoder.decodeAdaptyPlacementVersion(from: body),
                 accept: Content.shouldUseNew
             )
@@ -161,4 +165,3 @@ private extension JSONDecoder {
         ).value.version
     }
 }
-

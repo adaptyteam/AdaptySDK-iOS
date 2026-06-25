@@ -21,6 +21,7 @@ extension Cache {
         let dataVersion: Int
 
         let eligibleCrossABtest: Bool
+        let segmentId: String?
         let locale: AdaptyLocale?
 
         init(
@@ -28,6 +29,7 @@ extension Cache {
             size: Int,
             locale: AdaptyLocale?,
             eligibleCrossABtest: Bool,
+            segmentId: String?,
             dataVersion: Int,
             storedAt: Date,
             lastAccessedAt: Date
@@ -37,6 +39,7 @@ extension Cache {
             self.size = size
             self.locale = locale
             self.eligibleCrossABtest = eligibleCrossABtest
+            self.segmentId = segmentId
             self.dataVersion = dataVersion
             self.storedAt = storedAt
             self.lastAccessedAt = lastAccessedAt
@@ -53,6 +56,7 @@ extension Cache.Meta: Codable {
         case size
         case locale
         case eligibleCrossABtest = "eligible_cross_ab"
+        case segmentId = "segment_id"
         case dataVersion = "version"
         case storedAt = "stored_at"
         case lastAccessedAt = "last_accessed_at"
@@ -69,6 +73,7 @@ extension Cache.Meta: Codable {
         size = try container.decode(Int.self, forKey: .size)
         locale = try container.decodeIfPresent(AdaptyLocale.self, forKey: .locale)
         eligibleCrossABtest = try container.decodeIfPresent(Bool.self, forKey: .eligibleCrossABtest) ?? false
+        segmentId = try container.decodeIfPresent(String.self, forKey: .segmentId)
         dataVersion = try container.decode(Int.self, forKey: .dataVersion)
         storedAt = try Date(timeIntervalSince1970: container.decode(Double.self, forKey: .storedAt))
         lastAccessedAt = try Date(timeIntervalSince1970: container.decode(Double.self, forKey: .lastAccessedAt))
@@ -85,6 +90,7 @@ extension Cache.Meta: Codable {
         if eligibleCrossABtest {
             try container.encode(eligibleCrossABtest, forKey: .eligibleCrossABtest)
         }
+        try container.encodeIfPresent(segmentId, forKey: .segmentId)
         try container.encode(dataVersion, forKey: .dataVersion)
         try container.encode(storedAt.timeIntervalSince1970, forKey: .storedAt)
         try container.encode(lastAccessedAt.timeIntervalSince1970, forKey: .lastAccessedAt)
@@ -120,4 +126,3 @@ extension Cache.Meta {
                        options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
     }
 }
-

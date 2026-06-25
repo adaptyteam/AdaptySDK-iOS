@@ -56,4 +56,3 @@ enum BackendRequestName: String {
 
     case reqisterInstall = "reqister_install"
 }
-

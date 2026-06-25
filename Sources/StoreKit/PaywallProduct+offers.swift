@@ -20,7 +20,7 @@ extension Adapty {
             fetchPolicy: .returnCacheDataElseLoad
         )
 
-        let skProductsById = [String:StoreKit.Product](
+        let skProductsById = [String: StoreKit.Product](
             uniqueKeysWithValues: skProducts.map { ($0.id, $0) }
         )
 
@@ -257,4 +257,3 @@ extension Adapty {
         return renewalInfo.eligibleWinBackOfferIDs
     }
 }
-

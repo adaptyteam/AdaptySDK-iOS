@@ -74,4 +74,3 @@ extension [AdaptyPlacement.Variation] {
         return sortedItems[index].offset
     }
 }
-

@@ -112,7 +112,8 @@ extension Backend.MainExecutor {
             withUserId: userId,
             withPlacementId: placementId,
             withRequestLocale: locale,
-            crossPlacementEligible: crossPlacementEligible
+            crossPlacementEligible: crossPlacementEligible,
+            segmentId: segmentId
         ))
 
         return response.body
@@ -145,9 +146,9 @@ extension Backend.MainExecutor {
                 withUserId: userId,
                 withPlacementId: placementId,
                 withRequestLocale: locale,
-                crossPlacementEligible: crossPlacementEligible
+                crossPlacementEligible: crossPlacementEligible,
+                segmentId: segmentId
             )
         )
     }
 }
-

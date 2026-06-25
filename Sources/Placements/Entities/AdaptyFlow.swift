@@ -91,10 +91,9 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
             try container.encode(remoteConfigs, forKey: .remoteConfigs)
         }
         try container.encode(paywalls, forKey: .paywalls)
-        if let layoutsConfiguration = layoutsConfiguration {
+        if let layoutsConfiguration {
             try layoutsConfiguration.encode(to: encoder)
         }
         try placement.encode(to: encoder)
     }
 }
-

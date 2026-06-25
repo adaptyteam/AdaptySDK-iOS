@@ -42,7 +42,7 @@ extension AdaptyPlacement: Codable {
         let placement: AdaptyPlacement
         let requestLocale: AdaptyLocale?
         var variationId: String?
-        
+
         var userIdOrThrow: AdaptyUserId {
             get throws {
                 if let userId {
@@ -92,4 +92,3 @@ extension AdaptyPlacement: Codable {
         try container.encode(version, forKey: .version)
     }
 }
-

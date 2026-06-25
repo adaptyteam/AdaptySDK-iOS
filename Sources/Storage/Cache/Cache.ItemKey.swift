@@ -43,4 +43,3 @@ extension Cache.ItemKey {
             .appendingPathExtension(Cache.dataFileExtension)
     }
 }
-

@@ -77,7 +77,7 @@ public extension Adapty {
             )
         }()
 
-        let preloaded: [String: AdaptyError?]
+        let preloaded: [String: HTTPError?]
         let startTaskTime = Date()
 
         do {
@@ -117,12 +117,14 @@ public extension Adapty {
 
         let placementIdsForDefaultAudience = placementIds
             .filter { placementId in
-                guard preloaded.keys.contains(placementId) else { return true }
-                guard let adaptyError = preloaded[placementId] as? AdaptyError else { return false }
-                return adaptyError.canUseFallbackServer
+                switch preloaded[placementId] {
+                case nil: true
+                case .some(nil): false
+                case let .some(error?): Backend.canUseFallbackServer(error)
+                }
             }
 
-        var preloadedForDefaultAudience: [String: AdaptyError?] = [:]
+        var preloadedForDefaultAudience: [String: HTTPError?] = [:]
         if placementIdsForDefaultAudience.isNotEmpty {
             preloadedForDefaultAudience = await preloadBackendPlacementsForDefaultAudience(
                 type,
@@ -137,7 +139,7 @@ public extension Adapty {
 
         let errors = preloaded.merging(preloadedForDefaultAudience, uniquingKeysWith: { _, other in
             other
-        }).compactMapValues { $0 }
+        }).compactMapValues { $0?.asAdaptyError }
 
         if errors.isNotEmpty {
             throw PreloadPlacementsError(errors).asAdaptyError
@@ -151,7 +153,7 @@ public extension Adapty {
         _ segmentId: String,
         _ userId: AdaptyUserId,
         _ isTestUser: Bool
-    ) async -> [String: AdaptyError?] {
+    ) async -> [String: HTTPError?] {
         guard placementIds.isNotEmpty else { return [:] }
 
         var segmentId = segmentId
@@ -175,7 +177,7 @@ public extension Adapty {
             guard let manager = try? profileManager(withProfileId: userId).orThrows() else { break }
             var currentSegmentId = manager.segmentId
             if currentSegmentId == segmentId {
-               let refreshedSegmentId = await manager.fetchSegmentId()
+                let refreshedSegmentId = await manager.fetchSegmentId()
                 guard refreshedSegmentId != segmentId else { break }
                 currentSegmentId = refreshedSegmentId
             }
@@ -200,7 +202,7 @@ public extension Adapty {
 
         } while !Task.isCancelled
 
-        return results.mapValues { $0.error?.asAdaptyError }
+        return results.mapValues { $0.error }
     }
 
     private struct LoadOption: OptionSet {
@@ -209,8 +211,13 @@ public extension Adapty {
         static let useSegmentId = LoadOption(rawValue: 1 << 0)
         static let useCrossPlacementEligible = LoadOption(rawValue: 1 << 1)
 
-        var isUseSegmentId : Bool { contains(.useSegmentId) }
-        var crossPlacementEligible : Bool { contains(.useCrossPlacementEligible) }
+        var isUseSegmentId: Bool {
+            contains(.useSegmentId)
+        }
+
+        var crossPlacementEligible: Bool {
+            contains(.useCrossPlacementEligible)
+        }
     }
 
     private func preloadBackendPlacements(
@@ -252,11 +259,11 @@ public extension Adapty {
                 } else {
                     group.addTask {
                         let option: LoadOption =
-                        if crossPlacementEligible {
-                            [.useSegmentId, .useCrossPlacementEligible]
-                        } else {
-                            .useSegmentId
-                        }
+                            if crossPlacementEligible {
+                                [.useSegmentId, .useCrossPlacementEligible]
+                            } else {
+                                .useSegmentId
+                            }
                         do throws(HTTPError) {
                             try await session.preloadPlacementVariations(
                                 type,

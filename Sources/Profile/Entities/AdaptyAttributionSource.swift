@@ -32,4 +32,3 @@ extension AdaptyAttributionSource: ExpressibleByStringLiteral {
         self.init(rawValue: stringLiteral)
     }
 }
-

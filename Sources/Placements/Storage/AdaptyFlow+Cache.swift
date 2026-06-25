@@ -32,4 +32,3 @@ extension AdaptyFlow {
         fetchPolicy.canReturnCache
     }
 }
-

@@ -49,4 +49,3 @@ extension FileManager {
         try? removeItem(at: dataFileURL)
     }
 }
-

@@ -10,9 +10,8 @@ import Foundation
 
 private let log = Log.default
 
-extension Adapty {
-
-    public nonisolated static func preloadFlowsForDefaultAudience(
+public extension Adapty {
+    nonisolated static func preloadFlowsForDefaultAudience(
         placementIds: [String]
     ) async throws(AdaptyError) {
         let placementIds = Set(placementIds.compactMap {
@@ -21,7 +20,7 @@ extension Adapty {
         })
 
         let logParams: EventParameters = [
-            "placement_ids": placementIds
+            "placement_ids": placementIds,
         ]
 
         return try await withActivatedSDK(methodName: .preloadFlowsForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
@@ -33,7 +32,7 @@ extension Adapty {
         }
     }
 
-    public nonisolated static func preloadOnboardingsForDefaultAudience(
+    nonisolated static func preloadOnboardingsForDefaultAudience(
         placementIds: [String],
         locale: String? = nil
     ) async throws(AdaptyError) {
@@ -45,7 +44,7 @@ extension Adapty {
 
         let logParams: EventParameters = [
             "placement_ids": placementIds,
-            "locale": locale
+            "locale": locale,
         ]
 
         return try await withActivatedSDK(methodName: .preloadOnboardingsForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
@@ -58,8 +57,8 @@ extension Adapty {
         }
     }
 
-    private func preloadPlacementsForDefaultAudience<Content: PlacementContent>(
-        _ type: Content.Type,
+    private func preloadPlacementsForDefaultAudience(
+        _ type: (some PlacementContent).Type,
         _ session: Backend.DefaultAudienceExecutor,
         placementIds: Set<String>,
         locale: AdaptyLocale? = nil
@@ -81,23 +80,22 @@ extension Adapty {
             locale,
             userId,
             isTestUser
-        )
+        ).compactMapValues { $0?.asAdaptyError }
 
         if errors.isNotEmpty {
             throw PreloadPlacementsError(errors).asAdaptyError
         }
     }
 
-    func preloadBackendPlacementsForDefaultAudience<Content: PlacementContent>(
-        _ type: Content.Type,
+    internal func preloadBackendPlacementsForDefaultAudience(
+        _ type: (some PlacementContent).Type,
         _ session: Backend.DefaultAudienceExecutor,
         _ placementIds: Set<String>,
         _ locale: AdaptyLocale?,
         _ userId: AdaptyUserId,
         _ isTestUser: Bool,
         _ timeoutInterval: TimeInterval? = nil
-    ) async -> [String: AdaptyError?] {
-
+    ) async -> [String: HTTPError?] {
         guard placementIds.isNotEmpty else { return [:] }
         let apiKeyPrefix = apiKeyPrefix
 
@@ -143,10 +141,10 @@ extension Adapty {
                 }
             }
 
-            var result = [String: AdaptyError?]()
+            var result = [String: HTTPError?]()
             result.reserveCapacity(placementIds.count)
             for await (placementId, error) in group {
-                result[placementId] = error?.asAdaptyError
+                result[placementId] = error
             }
             return result
         }

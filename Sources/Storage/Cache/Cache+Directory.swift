@@ -49,4 +49,3 @@ extension Cache {
             .appendingPathComponent(itemType.rawValue, isDirectory: true)
     }
 }
-

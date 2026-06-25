@@ -145,6 +145,5 @@ extension AdaptyProfile: Codable {
         if appliedAttributionSources.isNotEmpty {
             try container.encode(appliedAttributionSources, forKey: .appliedAttributionSources)
         }
-
     }
 }

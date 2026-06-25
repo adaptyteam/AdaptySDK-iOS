@@ -135,4 +135,3 @@ extension [AdaptyIntegrationIdentifier] {
         return result
     }
 }
-

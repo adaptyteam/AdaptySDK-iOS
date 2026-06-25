@@ -8,7 +8,6 @@
 import Foundation
 
 public struct AdaptyOnboarding: PlacementContent, Identifiable {
-
     public let placement: AdaptyPlacement
 
     public let id: String
@@ -92,4 +91,3 @@ extension AdaptyOnboarding: Codable, DecodableWithConfiguration {
         try placement.encode(to: encoder)
     }
 }
-

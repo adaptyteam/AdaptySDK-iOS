@@ -360,4 +360,3 @@ extension AdaptyError {
         }
     }
 }
-

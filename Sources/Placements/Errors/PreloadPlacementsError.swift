@@ -46,4 +46,3 @@ public extension AdaptyError {
         (wrapped as? PreloadPlacementsError)?.originalErrors
     }
 }
-

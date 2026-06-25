@@ -162,4 +162,3 @@ public extension Adapty {
         throw lastError
     }
 }
-
