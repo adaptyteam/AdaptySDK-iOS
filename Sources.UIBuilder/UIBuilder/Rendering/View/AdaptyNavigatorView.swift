@@ -113,14 +113,14 @@ struct AdaptyNavigatorView: View {
             .onTapGesture {
                 guard let currentScreen = navigatorViewModel.screens.last else { return }
 
-                if let navigatorActions = navigatorViewModel.navigator.defaultScreenActions.onOutsideTap {
-                    stateViewModel.execute(
-                        actions: navigatorActions,
-                        screen: currentScreen.instance
-                    )
-                } else if let actions = currentScreen.configuration.screenActions.onOutsideTap {
+                if let actions = currentScreen.configuration.screenActions.onOutsideTap {
                     stateViewModel.execute(
                         actions: actions,
+                        screen: currentScreen.instance
+                    )
+                } else if let navigatorActions = navigatorViewModel.navigator.defaultScreenActions.onOutsideTap {
+                    stateViewModel.execute(
+                        actions: navigatorActions,
                         screen: currentScreen.instance
                     )
                 }
