@@ -45,7 +45,7 @@ package protocol AdaptyUIBuilderLogic {
 
     func reportDidPerformAction(_ action: AdaptyUIBuilder.Action)
 
-    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool)
+    func reportDidSelectProduct(_ product: ProductResolver)
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool
 

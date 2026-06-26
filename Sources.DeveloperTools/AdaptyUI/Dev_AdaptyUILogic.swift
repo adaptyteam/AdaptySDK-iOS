@@ -37,8 +37,8 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didPerformAction(action)
     }
 
-    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {
-        events.event_didSelectProduct(product, automatic: automatic)
+    func reportDidSelectProduct(_ product: ProductResolver) {
+        events.event_didSelectProduct(product)
     }
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool {
