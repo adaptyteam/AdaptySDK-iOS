@@ -2,39 +2,28 @@
 //  FetchUISchemaRequest.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 02.04.2026.
+//  Created by Aleksei Valiano on 19.01.2023
 //
 
 import AdaptyUIBuilder
 import Foundation
 
-struct FetchUISchemaRequest: BackendRequest {
+private struct FetchUISchemaRequest: BackendRequest {
     let endpoint: HTTPEndpoint
-    let headers: HTTPHeaders
-    let queryItems: QueryItems
     let stamp = Log.stamp
-    let requestName = BackendRequestName.fetchFallBackUISchema
+    let requestName = BackendRequestName.fetchUISchema
     let logParams: EventParameters?
 
     init(
         apiKeyPrefix: String,
         flowId: String,
-        flowVersionId: String,
-        flowLayoutId: String,
-        disableServerCache: Bool,
-        logParams: EventParameters?
+        flowLayout: AdaptyFlow.Layout,
+        logParams: EventParameters
     ) {
         endpoint = HTTPEndpoint(
             method: .get,
-            path:
-            "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowVersionId)/layout/\(flowLayoutId)/config/"
+            path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayout.versionId)/layout/\(flowLayout.id)/\(Adapty.uiBuilderVersion)/config.json"
         )
-
-        headers = HTTPHeaders()
-            .setBuilderVersion(Adapty.uiBuilderVersion)
-            .setBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
-
-        queryItems = QueryItems().setDisableServerCache(disableServerCache)
 
         self.logParams = logParams
     }
@@ -59,29 +48,25 @@ extension AdaptyUISchema {
     }
 }
 
-extension Backend.MainExecutor {
-    func fetchFallbackUISchema(
+extension Backend.FallbackExecutor {
+    func fetchUISchema(
         apiKeyPrefix: String,
         flowId: String,
-        flowVersionId: String,
-        flowLayoutId: String,
-        disableServerCache: Bool,
+        flowLayout: AdaptyFlow.Layout,
+        disableServerCache _: Bool,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(HTTPError) -> (schema: AdaptyUISchema, data: Data) {
         let request = FetchUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
             flowId: flowId,
-            flowVersionId: flowVersionId,
-            flowLayoutId: flowLayoutId,
-            disableServerCache: disableServerCache,
+            flowLayout: flowLayout,
             logParams: [
                 "api_prefix": apiKeyPrefix,
                 "flow_id": flowId,
-                "flow_version_id": flowVersionId,
-                "flow_layout_id": flowLayoutId,
+                "flow_version_id": flowLayout.versionId,
+                "flow_layout_id": flowLayout.id,
                 "builder_version": Adapty.uiBuilderVersion,
-                "builder_config_format_version": Adapty.uiSchemaVersion,
-                "disable_server_cache": disableServerCache,
+                "builder_schema_version": Adapty.uiSchemaVersion,
             ]
         )
 
@@ -89,4 +74,3 @@ extension Backend.MainExecutor {
         return response.body
     }
 }
-

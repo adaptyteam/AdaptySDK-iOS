@@ -20,6 +20,12 @@ extension Request {
             case destroy
         }
 
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            viewId = try container.decode(String.self, forKey: .viewId)
+            destroy = try container.decodeIfPresent(Bool.self, forKey: .destroy) ?? false
+        }
+
         @available(*, deprecated, message: "Onboarding Feature is deprecated.")
         func execute() async throws -> AdaptyJsonData {
             try await AdaptyUI.Plugin.dismissOnboardingView(

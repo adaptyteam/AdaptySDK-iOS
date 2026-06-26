@@ -1,5 +1,5 @@
 //
-//  AdaptyFlow+UIBuilder.swift
+//  Adapty+UIBuilder.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 19.01.2023
@@ -18,7 +18,7 @@ extension Adapty {
         customLayoutId: String?,
         locale: String?,
         loadTimeout: TimeInterval? = nil
-    ) async throws -> AdaptyUIConfiguration {
+    ) async throws -> (flowLayout: AdaptyFlow.Layout, configuration: AdaptyUIConfiguration) {
         let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
         return try await activatedSDK.getUIConfiguration(
             flow: flow,
@@ -35,25 +35,15 @@ extension Adapty {
         customLayoutId: String?,
         locale: AdaptyLocale,
         loadTimeout: TaskDuration
-    ) async throws(AdaptyError) -> AdaptyUIConfiguration {
+    ) async throws(AdaptyError) -> (flowLayout: AdaptyFlow.Layout, configuration: AdaptyUIConfiguration) {
         guard
-            let flowVersionId = flow.versionId
-        else {
-            throw .isNoViewConfigurationInFlow()
-        }
-
-        let flowLayoutId = try flow.viewConfiguration?.getLayout(for: device, with: customLayoutId)?.id
-
-        guard
-            let flowLayoutId
-        else {
-            throw .isNoViewConfigurationInFlow()
-        }
+            let layoutsConfiguration = flow.layoutsConfiguration,
+            let layout = try layoutsConfiguration.getLayout(for: device, with: customLayoutId)
+        else { throw .isNoViewConfigurationInFlow() }
 
         let schema = try await getUISchema(
             flowId: flow.id,
-            flowVersionId: flowVersionId,
-            flowLayoutId: flowLayoutId,
+            flowLayout: layout,
             loadTimeout: loadTimeout,
             decodingConfiguration: .init(device: device.kind)
         )
@@ -65,27 +55,27 @@ extension Adapty {
         let extractLocaleTask = Task.detachedWithThrowsTyped(priority: .userInitiated) { () async throws(AdaptyError) -> AdaptyUIConfiguration in
             do {
                 return try schema.extractUIConfiguration(
-                    id: flowLayoutId,
+                    id: layout.id,
                     withLocaleId: locale.id,
                     envoriment: envoriment
                 )
             } catch {
-                throw .decodingViewConfiguration(error)
+                throw .extractAdaptyUIConfiguration(error)
             }
         }
 
-        return try await extractLocaleTask.valueWithThrowsTyped()
+        let configuration = try await extractLocaleTask.valueWithThrowsTyped()
+        return (layout, configuration)
     }
 
     private func getUISchema(
         flowId: String,
-        flowVersionId: String,
-        flowLayoutId: String,
+        flowLayout: AdaptyFlow.Layout,
         loadTimeout: TaskDuration,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(AdaptyError) -> AdaptyUISchema {
         let isTestUser = profileManager?.isTestUser ?? false
-        let cacheKey = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: flowLayoutId)
+        let cacheKey = flowLayout.cacheKey
 
         if !isTestUser, let schema = await fetchLocalUISchema(cacheKey, decodingConfiguration: decodingConfiguration) {
             return schema
@@ -97,13 +87,12 @@ extension Adapty {
         do {
             (schema, data) = try await fetchBackendUISchema(
                 flowId: flowId,
-                flowVersionId: flowVersionId,
-                flowLayoutId: flowLayoutId,
+                flowLayout: flowLayout,
                 loadTimeout: loadTimeout,
                 disableServerCache: isTestUser,
                 decodingConfiguration: decodingConfiguration
             )
-            log.verbose("UI schema source = backend (\(flowLayoutId))")
+            log.verbose("UI schema source = backend (\(flowLayout.id))")
         } catch {
             if isTestUser, let schema = await fetchLocalUISchema(cacheKey, decodingConfiguration: decodingConfiguration) {
                 return schema
@@ -116,8 +105,7 @@ extension Adapty {
                 try await Cache.write(
                     data,
                     key: cacheKey,
-                    dataVersion: 0,
-                    accept: { _, _ in true }
+                    dataVersion: 0
                 )
             } catch {
                 Log.cache.error("Failed to write schema to cache: \(error)")
@@ -133,8 +121,7 @@ extension Adapty {
     ) async -> AdaptyUISchema? {
         if let schema = await Cache.read(
             key,
-            accept: { _ in true },
-            decode: { data in
+            decode: { _, data in
                 try AdaptyUISchema(from: data, configuration: decodingConfiguration)
             }
         ) {
@@ -155,8 +142,7 @@ extension Adapty {
 
     private func fetchBackendUISchema(
         flowId: String,
-        flowVersionId: String,
-        flowLayoutId: String,
+        flowLayout: AdaptyFlow.Layout,
         loadTimeout: TaskDuration,
         disableServerCache: Bool,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
@@ -165,12 +151,11 @@ extension Adapty {
         let apiKeyPrefix = apiKeyPrefix
 
         do {
-            return try await withThrowingTimeout(loadTimeout - .milliseconds(500)) {
+            return try await withThrowingTimeout(max(loadTimeout - .milliseconds(500), .milliseconds(500))) {
                 try await session.fetchUISchema(
                     apiKeyPrefix: apiKeyPrefix,
                     flowId: flowId,
-                    flowVersionId: flowVersionId,
-                    flowLayoutId: flowLayoutId,
+                    flowLayout: flowLayout,
                     disableServerCache: disableServerCache,
                     decodingConfiguration: decodingConfiguration
                 )
@@ -185,8 +170,7 @@ extension Adapty {
             return try await httpSession.fetchFallbackUISchema(
                 apiKeyPrefix: apiKeyPrefix,
                 flowId: flowId,
-                flowVersionId: flowVersionId,
-                flowLayoutId: flowLayoutId,
+                flowLayout: flowLayout,
                 disableServerCache: disableServerCache,
                 decodingConfiguration: decodingConfiguration
             )
@@ -195,4 +179,3 @@ extension Adapty {
         }
     }
 }
-

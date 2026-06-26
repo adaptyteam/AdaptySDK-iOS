@@ -164,17 +164,17 @@ public final class Adapty {
                         self.profileStorage.setIdentifiedProfile(createdProfile)
                     }
 
+                    await CrossPlacementStorage.set(
+                        crossPlacementState: crossPlacementState,
+                        for: createdProfile.userId
+                    )
+
                     let manager = ProfileManager(
                         storage: self.profileStorage,
                         profile: createdProfile,
                         sentEnvironment: meta.sentEnvironment
                     )
-                    let profileId = createdProfile.profileId
-                    Task.detached(priority: .background) {
-                        await Cache.removeOtherProfiles(profileId)
-                    }
                     self.sharedProfileManager = .current(manager)
-                    manager.saveCrossPlacementState(crossPlacementState)
                     return manager
 
                 case .failure:
@@ -364,14 +364,12 @@ extension Adapty {
 }
 
 extension ProfileManager? {
-    var orThrows: ProfileManager {
-        get throws(AdaptyError) {
-            switch self {
-            case nil:
-                throw .profileWasChanged()
-            case let value?:
-                value
-            }
+    func orThrows(file: String = #fileID, function: String = #function, line: UInt = #line) throws(AdaptyError) -> ProfileManager {
+        switch self {
+        case nil:
+            throw .profileWasChanged(file: file, function: function, line: line)
+        case let value?:
+            value
         }
     }
 }

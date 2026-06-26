@@ -22,7 +22,7 @@ extension Cache.ItemKey {
     }
 }
 
-@Cache.Actor
+@StorageActor
 extension Cache.ItemKey {
     @inlinable
     var directory: URL {

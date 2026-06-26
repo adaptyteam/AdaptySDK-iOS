@@ -92,10 +92,8 @@ public protocol AdaptyFlowControllerDelegate: AnyObject {
 
     /// This method is invoked when a successful purchase is made.
     ///
-    /// The default implementation is simply dismissing the controller:
-    /// ```
-    /// controller.dismiss(animated: true)
-    /// ```
+    /// There is no default implementation; implement this method to decide what
+    /// happens after a successful purchase (e.g. continue the flow or dismiss the controller).
     /// - Parameters:
     ///   - controller: an ``AdaptyFlowController`` within which the event occurred.
     ///   - product: an ``AdaptyPaywallProduct`` of the purchase.
@@ -235,7 +233,7 @@ public protocol AdaptyObserverModeResolver: Sendable {
 @MainActor
 public extension AdaptyUI {
     internal static var isActivated: Bool = false
-    internal static var isObserverModeEnabled: Bool = false
+    package internal(set) static var isObserverModeEnabled: Bool = false
 
     /// Use this method to initialize the AdaptyUI SDK.
     ///
@@ -343,7 +341,7 @@ public extension AdaptyUI {
             throw err
         }
 
-        let viewConfiguration = try await Adapty.getUIConfiguration(
+        let (flowLayout, viewConfiguration) = try await Adapty.getUIConfiguration(
             flow: flow,
             device: device,
             customLayoutId: customLayoutId,
@@ -354,6 +352,7 @@ public extension AdaptyUI {
         return FlowConfiguration(
             logId: Log.stamp,
             flow: flow,
+            flowLayout: flowLayout,
             viewConfiguration: viewConfiguration,
             products: products,
             observerModeResolver: observerModeResolver,
@@ -364,7 +363,7 @@ public extension AdaptyUI {
         )
     }
 
-    /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyFlowController`` to present it afterwards.
+    /// Right after receiving ``AdaptyUI.FlowConfiguration``, you can create the corresponding ``AdaptyFlowController`` to present it afterwards.
     ///
     /// - Parameters:
     ///   - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.

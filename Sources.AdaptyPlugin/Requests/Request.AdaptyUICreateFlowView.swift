@@ -72,14 +72,33 @@ extension Request {
 
         @MainActor
         func executeInMainActor() async throws -> AdaptyJsonData {
+            let systemRequestsHandler = AdaptyPlugin.sharedEventHandler
+                .map(PluginSystemRequestsHandler.init(eventHandler:))
+            // Only forward an observer-mode resolver in Observer Mode. Passing one in
+            // Full Mode would make the SDK delegate every purchase to the host instead
+            // of calling Adapty.makePurchase (the SDK gates on resolver presence, not
+            // on the observer-mode flag).
+            let observerModeResolver = AdaptyUI.isObserverModeEnabled
+                ? AdaptyPlugin.sharedEventHandler.map(PluginObserverModeResolver.init(eventHandler:))
+                : nil
             let result: AdaptyUI.FlowView = try await AdaptyUI.Plugin.createFlowView(
                 flow: flow,
                 loadTimeout: loadTimeout,
                 preloadProducts: preloadProducts ?? false,
                 tagResolver: customTags,
                 timerResolver: customTimers,
-                assetsResolver: assetsResolver()
+                assetsResolver: assetsResolver(),
+                observerModeResolver: observerModeResolver,
+                systemRequestsHandler: systemRequestsHandler
             )
+
+            // The view instance id is known only once the flow view is built;
+            // stamp the per-view resolver/handler so their host events carry the
+            // originating view.
+            let identityBox = FlowViewIdentityBox()
+            identityBox.value = result
+            observerModeResolver?.identityBox = identityBox
+            systemRequestsHandler?.identityBox = identityBox
 
             return .success(result)
         }

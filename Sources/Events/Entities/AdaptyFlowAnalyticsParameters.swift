@@ -83,4 +83,3 @@ extension VS.AnalyticEvent: AdaptyFlowAnalyticsPayload {
         try container.encodeIfPresent(screenInstanceId, forKey: .init(CodingKeys.screenInstanceId))
     }
 }
-

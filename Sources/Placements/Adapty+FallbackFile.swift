@@ -29,114 +29,114 @@ extension Adapty {
 }
 
 private let log = Log.fallbackPlacements
-
-extension PlacementStorage {
-    private func getPlacement<Content: PlacementContent>(
-        byPlacementId placementId: String,
-        withVariationId variationId: String?,
-        userId _: AdaptyUserId,
-        locale: AdaptyLocale?
-    ) -> AdaptyPlacementChosen<Content>? {
-        guard let placement: Content = getPlacementById(
-            placementId,
-            withLocale: locale,
-            orDefaultLocale: true,
-            withVariationId: variationId
-        )?.value
-        else { return nil }
-        return AdaptyPlacementChosen.restore(placement)
-    }
-
-    func getPlacementWithFallback<Content: PlacementContent>(
-        byPlacementId placementId: String,
-        withVariationId variationId: String?,
-        userId: AdaptyUserId,
-        locale: AdaptyLocale?
-    ) -> AdaptyPlacementChosen<Content>? {
-        let cachedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
-            : getPlacement(byPlacementId: placementId, withVariationId: variationId, userId: userId, locale: locale)
-
-        let cachedB: AdaptyPlacementChosen<Content>? = cachedA != nil ? nil
-            : getPlacement(byPlacementId: placementId, withVariationId: nil, userId: userId, locale: locale)
-
-        guard let fallbackFile = Adapty.fallbackPlacements, fallbackFile.contains(placementId: placementId) ?? true
-        else {
-            guard let cached = cachedA ?? cachedB else { return nil }
-            Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version) no-fallback")
-            return cached
-        }
-
-        switch (cachedA, cachedB) {
-        case let (cached?, _):
-            if fallbackFile.version > cached.content.placement.version,
-               let fallbacked: AdaptyPlacementChosen<Content> = try? fallbackFile.getPlacement(
-                   byPlacementId: placementId,
-                   withVariationId: variationId,
-                   userId: userId,
-                   requestLocale: locale
-               )
-            {
-                Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallbacked.content.variationId), version: \(fallbacked.content.placement.version)) same-variation")
-                return fallbacked
-            } else {
-                Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version) same-variation")
-                return cached
-            }
-
-        case let (_, cached?):
-            let fallBackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
-                : try? fallbackFile.getPlacement(
-                    byPlacementId: placementId,
-                    withVariationId: variationId,
-                    userId: userId,
-                    requestLocale: locale
-                )
-
-            let fallBackedB: AdaptyPlacementChosen<Content>? = (fallBackedA != nil || cached.content.placement.version >= fallbackFile.version) ? nil
-                : try? fallbackFile.getPlacement(
-                    byPlacementId: placementId,
-                    withVariationId: nil,
-                    userId: userId,
-                    requestLocale: locale
-                )
-
-            if let fallBacked = fallBackedA ?? fallBackedB {
-                Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallBacked.content.variationId), version: \(fallBacked.content.placement.version))")
-
-                return fallBacked
-            } else {
-                Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version)")
-                return cached
-            }
-
-        default:
-            let fallBacked: AdaptyPlacementChosen<Content>? = if let variationId {
-                (try? fallbackFile.getPlacement(
-                    byPlacementId: placementId,
-                    withVariationId: variationId,
-                    userId: userId,
-                    requestLocale: locale
-                )) ?? (try? fallbackFile.getPlacement(
-                    byPlacementId: placementId,
-                    withVariationId: nil,
-                    userId: userId,
-                    requestLocale: locale
-                ))
-            } else {
-                try? fallbackFile.getPlacement(
-                    byPlacementId: placementId,
-                    withVariationId: nil,
-                    userId: userId,
-                    requestLocale: locale
-                )
-            }
-
-            guard let fallBacked else { return nil }
-
-            Log.crossAB.verbose("return from fallback plqcement content (placementId: \(placementId), variationId: \(fallBacked.content.variationId), version: \(fallBacked.content.placement.version)) no-cache")
-
-            return fallBacked
-        }
-    }
-}
-
+//
+// extension PlacementStorage {
+//    private func getPlacement<Content: PlacementContent>(
+//        byPlacementId placementId: String,
+//        withVariationId variationId: String?,
+//        userId _: AdaptyUserId,
+//        locale: AdaptyLocale?
+//    ) -> AdaptyPlacementChosen<Content>? {
+//        guard let placement: Content = getPlacementById(
+//            placementId,
+//            withLocale: locale,
+//            orDefaultLocale: true,
+//            withVariationId: variationId
+//        )?.value
+//        else { return nil }
+//        return AdaptyPlacementChosen.restore(placement)
+//    }
+//
+//    func getPlacementWithFallback<Content: PlacementContent>(
+//        byPlacementId placementId: String,
+//        withVariationId variationId: String?,
+//        userId: AdaptyUserId,
+//        locale: AdaptyLocale?
+//    ) -> AdaptyPlacementChosen<Content>? {
+//        let cachedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
+//            : getPlacement(byPlacementId: placementId, withVariationId: variationId, userId: userId, locale: locale)
+//
+//        let cachedB: AdaptyPlacementChosen<Content>? = cachedA != nil ? nil
+//            : getPlacement(byPlacementId: placementId, withVariationId: nil, userId: userId, locale: locale)
+//
+//        guard let fallbackFile = Adapty.fallbackPlacements, fallbackFile.contains(placementId: placementId) ?? true
+//        else {
+//            guard let cached = cachedA ?? cachedB else { return nil }
+//            Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version) no-fallback")
+//            return cached
+//        }
+//
+//        switch (cachedA, cachedB) {
+//        case let (cached?, _):
+//            if fallbackFile.version > cached.content.placement.version,
+//               let fallbacked: AdaptyPlacementChosen<Content> = try? fallbackFile.getPlacement(
+//                   byPlacementId: placementId,
+//                   withVariationId: variationId,
+//                   userId: userId,
+//                   requestLocale: locale
+//               )
+//            {
+//                Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallbacked.content.variationId), version: \(fallbacked.content.placement.version)) same-variation")
+//                return fallbacked
+//            } else {
+//                Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version) same-variation")
+//                return cached
+//            }
+//
+//        case let (_, cached?):
+//            let fallBackedA: AdaptyPlacementChosen<Content>? = variationId == nil ? nil
+//                : try? fallbackFile.getPlacement(
+//                    byPlacementId: placementId,
+//                    withVariationId: variationId,
+//                    userId: userId,
+//                    requestLocale: locale
+//                )
+//
+//            let fallBackedB: AdaptyPlacementChosen<Content>? = (fallBackedA != nil || cached.content.placement.version >= fallbackFile.version) ? nil
+//                : try? fallbackFile.getPlacement(
+//                    byPlacementId: placementId,
+//                    withVariationId: nil,
+//                    userId: userId,
+//                    requestLocale: locale
+//                )
+//
+//            if let fallBacked = fallBackedA ?? fallBackedB {
+//                Log.crossAB.verbose("return from fallback placement content (placementId: \(placementId), variationId: \(fallBacked.content.variationId), version: \(fallBacked.content.placement.version))")
+//
+//                return fallBacked
+//            } else {
+//                Log.crossAB.verbose("return cached placement content (placementId: \(placementId), variationId: \(cached.content.variationId), version: \(cached.content.placement.version)")
+//                return cached
+//            }
+//
+//        default:
+//            let fallBacked: AdaptyPlacementChosen<Content>? = if let variationId {
+//                (try? fallbackFile.getPlacement(
+//                    byPlacementId: placementId,
+//                    withVariationId: variationId,
+//                    userId: userId,
+//                    requestLocale: locale
+//                )) ?? (try? fallbackFile.getPlacement(
+//                    byPlacementId: placementId,
+//                    withVariationId: nil,
+//                    userId: userId,
+//                    requestLocale: locale
+//                ))
+//            } else {
+//                try? fallbackFile.getPlacement(
+//                    byPlacementId: placementId,
+//                    withVariationId: nil,
+//                    userId: userId,
+//                    requestLocale: locale
+//                )
+//            }
+//
+//            guard let fallBacked else { return nil }
+//
+//            Log.crossAB.verbose("return from fallback plqcement content (placementId: \(placementId), variationId: \(fallBacked.content.variationId), version: \(fallBacked.content.placement.version)) no-cache")
+//
+//            return fallBacked
+//        }
+//    }
+// }
+//

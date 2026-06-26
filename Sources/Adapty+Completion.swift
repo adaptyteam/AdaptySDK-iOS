@@ -200,6 +200,34 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func preloadFlows(
+        placementIds: [String],
+        loadTimeout: TimeInterval? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await preloadFlows(
+                placementIds: placementIds,
+                loadTimeout: loadTimeout
+            )
+        }
+    }
+
+    nonisolated static func preloadOnboardings(
+        placementIds: [String],
+        locale: String? = nil,
+        loadTimeout: TimeInterval? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await preloadOnboardings(
+                placementIds: placementIds,
+                locale: locale,
+                loadTimeout: loadTimeout
+            )
+        }
+    }
+
     /// This method enables you to retrieve the paywall from the Default Audience without having to wait for the Adapty SDK to send all the user information required for segmentation to the server.
     ///
     /// - Parameters:
@@ -230,6 +258,30 @@ public extension Adapty {
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy
+            )
+        }
+    }
+
+    nonisolated static func preloadFlowsForDefaultAudience(
+        placementIds: [String],
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await preloadFlowsForDefaultAudience(
+                placementIds: placementIds
+            )
+        }
+    }
+
+    nonisolated static func preloadOnboardingsForDefaultAudience(
+        placementIds: [String],
+        locale: String? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await preloadOnboardingsForDefaultAudience(
+                placementIds: placementIds,
+                locale: locale
             )
         }
     }
@@ -538,4 +590,3 @@ private func withCompletion<T: Sendable>(
         }
     }
 }
-

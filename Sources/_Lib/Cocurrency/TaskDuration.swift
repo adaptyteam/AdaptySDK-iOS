@@ -105,5 +105,5 @@ func min(_ a: TaskDuration, _ b: TaskDuration) -> TaskDuration {
 }
 
 func max(_ a: TaskDuration, _ b: TaskDuration) -> TaskDuration {
-    a.asNanoseconds <= b.asNanoseconds ? a : b
+    a.asNanoseconds >= b.asNanoseconds ? a : b
 }

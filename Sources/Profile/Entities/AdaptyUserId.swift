@@ -39,7 +39,7 @@ extension AdaptyUserId {
 
 extension AdaptyUserId: CustomStringConvertible {
     package var description: String {
-        "(profileId: \(profileId), customerUserId: \(customerId ?? "nil")"
+        "(profileId: \(profileId), customerUserId: \(customerId ?? "nil"))"
     }
 }
 

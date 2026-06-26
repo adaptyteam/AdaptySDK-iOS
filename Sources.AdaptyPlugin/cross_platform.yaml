@@ -164,6 +164,42 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyUI.DialogActionType" }
 
+  ### adaptyUIOpenUrl ###
+  AdaptyUIOpenUrl.Request: #request
+    type: object
+    required: [method, url]
+    properties:
+      method: { const: "adapty_ui_open_url" }
+      url: { type: string }
+      open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
+
+  AdaptyUIOpenUrl.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### adaptyUIRequestAppReview ###
+  AdaptyUIRequestAppReview.Request: #request
+    type: object
+    required: [method]
+    properties:
+      method: { const: "adapty_ui_request_app_review" }
+
+  AdaptyUIRequestAppReview.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### getOnboarding ###
   GetOnboarding.Request: #request
     type: object
@@ -398,10 +434,14 @@ $requests:
 
   OpenWebPaywall.Request: #request
     type: object
-    required: [method, product]
+    required: [method]
+    oneOf:
+      - required: [product]
+      - required: [paywall]
     properties:
       method: { const: "open_web_paywall" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      paywall: { $ref: "#/$defs/AdaptyFlowPaywall" }
       open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
 
   OpenWebPaywall.Response: #response
@@ -416,10 +456,14 @@ $requests:
 
   CreateWebPaywallUrl.Request: #request
     type: object
-    required: [method, product]
+    required: [method]
+    oneOf:
+      - required: [product]
+      - required: [paywall]
     properties:
       method: { const: "create_web_paywall_url" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      paywall: { $ref: "#/$defs/AdaptyFlowPaywall" }
 
   CreateWebPaywallUrl.Response: #response
     type: object
@@ -629,7 +673,144 @@ $requests:
         properties:
           success: { const: true }
 
+  ### flowViewDidAnswerPermission ###
+  FlowViewDidAnswerPermission.Request: #request
+    type: object
+    required: [method, event_id, status]
+    properties:
+      method: { const: "flow_view_did_answer_permission" }
+      event_id: { type: string }
+      status: { type: string, enum: ["granted", "denied", "unavailable"] }
+      detail: { type: string }
+
+  FlowViewDidAnswerPermission.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerPurchaseDidStart ###
+  ObserverPurchaseDidStart.Request: #request
+    type: object
+    required: [method, event_id]
+    properties:
+      method: { const: "observer_purchase_did_start" }
+      event_id: { type: string }
+
+  ObserverPurchaseDidStart.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerPurchaseDidFinish ###
+  ObserverPurchaseDidFinish.Request: #request
+    type: object
+    required: [method, event_id]
+    properties:
+      method: { const: "observer_purchase_did_finish" }
+      event_id: { type: string }
+
+  ObserverPurchaseDidFinish.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerRestoreDidStart ###
+  ObserverRestoreDidStart.Request: #request
+    type: object
+    required: [method, event_id]
+    properties:
+      method: { const: "observer_restore_did_start" }
+      event_id: { type: string }
+
+  ObserverRestoreDidStart.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerRestoreDidFinish ###
+  ObserverRestoreDidFinish.Request: #request
+    type: object
+    required: [method, event_id]
+    properties:
+      method: { const: "observer_restore_did_finish" }
+      event_id: { type: string }
+
+  ObserverRestoreDidFinish.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
 $events:
+  FlowViewEvent.DidAskPermission:
+    type: object
+    required: [id, view, event_id, permission]
+    properties:
+      id: { const: "flow_view_did_ask_permission" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      event_id: { type: string }
+      permission: { $ref: "#/$defs/AdaptyUI.Permission" }
+      custom_args:
+        type: object
+        additionalProperties: { type: string }
+
+  FlowViewEvent.DidRequestAppReview:
+    type: object
+    required: [id, view]
+    properties:
+      id: { const: "flow_view_did_request_app_review" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+
+  FlowViewEvent.ObserverDidInitiatePurchase:
+    type: object
+    required: [id, view, event_id, product]
+    properties:
+      id: { const: "flow_view_observer_did_initiate_purchase" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      event_id: { type: string }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
+
+  FlowViewEvent.ObserverDidInitiateRestore:
+    type: object
+    required: [id, view, event_id]
+    properties:
+      id: { const: "flow_view_observer_did_initiate_restore" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      event_id: { type: string }
+
+  FlowViewEvent.DidReceiveAnalyticEvent:
+    type: object
+    required: [id, view, name, params]
+    properties:
+      id: { const: "flow_view_did_receive_analytic_event" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      name: { type: string }
+      params: { type: object }
+
   Event.DidLoadLatestProfile:
     type: object
     required: [id, profile]
@@ -957,6 +1138,7 @@ $defs:
       - price
     properties:
       vendor_product_id: { type: string }
+      flow_product_id: { type: string }
       adapty_product_id: { type: string }
       access_level_id: { type: string }
       product_type: { type: string }
@@ -1269,6 +1451,9 @@ $defs:
           items: { $ref: "#/$defs/AdaptyProfile.NonSubscription" }
       timestamp: { type: integer }
       is_test_user: { type: boolean }
+      applied_attribution_sources:
+        type: array
+        items: { type: string }
 
   AdaptyProfile.AccessLevel: #response
     type: object
@@ -1397,16 +1582,18 @@ $defs:
   AdaptySubscriptionOffer.Identifier: #request #response
     type: string
     oneOf:
-      - required:
-          - type
-          - id # Android Only
+      - required: [type]
         properties:
-          id: { type: string }
+          id: { type: string } # Required for Android
           type: { type: string, const: introductory }
       - required: [id, type]
         properties:
           id: { type: string }
           type: { type: string, enum: [promotional, win_back] }
+      - required: [type] # iOS Only
+        properties:
+          id: { type: string }
+          type: { type: string, const: code }
 
   AdaptySubscriptionOffer.PaymentMode: #response
     type: string
@@ -1486,7 +1673,7 @@ $defs:
     oneOf:
       - required: [type]
         properties:
-          type: { type: string, const: ["close", "system_back"] }
+          type: { type: string, enum: [close, system_back] }
       - required: [type, value, open_in]
         properties:
           type: { type: string, const: "open_url" }
@@ -1496,6 +1683,35 @@ $defs:
         properties:
           type: { type: string, const: "custom" }
           value: { type: string }
+
+  AdaptyUI.Permission: #event
+    description: "Permission identifier requested by a flow. The values below are the
+      known cross-platform set; any string is valid — unknown or Android-only ids
+      (e.g. \"phone\", \"sms\") and future values pass through unchanged."
+    anyOf:
+      - enum:
+          - push
+          - camera
+          - microphone
+          - location_when_use
+          - location_always
+          - location_full_accuracy
+          - photos
+          - contacts
+          - tracking
+          - calendar
+          - bluetooth
+          - motion
+          - reminders
+          - speech
+          - media_library
+          - local_network
+          - focus_status
+          - homekit
+          - health
+          - siri
+          - music
+      - type: string
 
   AdaptyUI.CustomTagsValues: #request
     type: object
@@ -1654,6 +1870,8 @@ $assets:
     properties:
       id: { type: string }
       type: { const: video }
+      h_res: { type: number }
+      v_res: { type: number }
     oneOf:
       - required: [asset_id]
         properties:

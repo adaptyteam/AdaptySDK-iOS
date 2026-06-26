@@ -9,16 +9,18 @@ import Foundation
 
 private let log = Log.cache
 
-@Cache.Actor
+@StorageActor
 extension Cache {
     @discardableResult
     @inlinable
     static func write(
         _ data: Data,
         key: ItemKey,
-        locale: String? = nil,
+        locale: AdaptyLocale? = nil,
+        eligibleCrossABtest: Bool = false,
+        segmentId: String? = nil,
         dataVersion: Int,
-        accept: @Sendable (_ new: Meta, _ existing: Meta) -> Bool
+        accept: (@Sendable (_ new: Meta, _ existing: Meta) -> Bool)? = nil
     ) throws -> Bool {
         let now = Date()
 
@@ -26,6 +28,8 @@ extension Cache {
             key: key,
             size: data.count,
             locale: locale,
+            eligibleCrossABtest: eligibleCrossABtest,
+            segmentId: segmentId,
             dataVersion: dataVersion,
             storedAt: now,
             lastAccessedAt: now
@@ -33,8 +37,10 @@ extension Cache {
 
         let fm = fileManager
         let existing = fm.readValidatedCacheMeta(for: key)
-        if let existing, !accept(newMeta, existing) {
-            return false
+        if let existing, let accept {
+            guard accept(newMeta, existing) else {
+                return false
+            }
         }
 
         try fm.writeCacheItem(
@@ -46,7 +52,7 @@ extension Cache {
     }
 }
 
-@Cache.Actor
+@StorageActor
 extension FileManager {
     func writeCacheItem(
         data: Data,

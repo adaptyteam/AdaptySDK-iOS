@@ -20,4 +20,3 @@ extension Adapty {
 extension AdaptyOnboarding {
     nonisolated static let viewConfigurationVersion = "2.0.0"
 }
-

@@ -21,6 +21,8 @@ public struct AdaptyUISchema: Sendable {
     let scripts: [String]
     let showPurchaseLoader: Bool
     let showRestoreLoader: Bool
+
+    let legacySelectedProducts: [String: String]?
 }
 
 extension AdaptyUISchema: DecodableWithConfiguration {
@@ -108,12 +110,14 @@ extension AdaptyUISchema: DecodableWithConfiguration {
             screens: screens
         )
 
-        scripts =
-            if configuration.isLegacy {
-                try decoder.legacyGenerateScript(collector: configuration.collector)
-            } else {
-                try decoder.decodeScript(configuration: configuration)
-            }
+        if configuration.isLegacy {
+            let result = try decoder.legacyGenerateScript(collector: configuration.collector)
+            scripts = result.scripts
+            legacySelectedProducts = result.selectedProducts
+        } else {
+            scripts = try decoder.decodeScript(configuration: configuration)
+            legacySelectedProducts = [:]
+        }
 
         if let behavior = try? container.nestedContainer(keyedBy: BehaviorKeys.self, forKey: .behavior) {
             showRestoreLoader = try behavior.decodeIfPresent(Bool.self, forKey: .showRestoreLoader) ?? true
@@ -159,18 +163,23 @@ private enum LegacyCodingKeys: String, CodingKey {
 }
 
 private extension Decoder {
-    func legacyGenerateScript(collector: AdaptyUISchema.DecodingCollector) throws -> [String] {
+    func legacyGenerateScript(
+        collector: AdaptyUISchema.DecodingCollector
+    ) throws -> (scripts: [String], selectedProducts: [String: String]) {
         let container = try container(keyedBy: LegacyCodingKeys.self)
 
         var scripts = [String]()
+        var selectedProducts = [String: String]()
 
         if container.exist(.products) {
             let container = try container.nestedContainer(keyedBy: LegacyCodingKeys.self, forKey: .products)
             if let selected = try? container.decodeIfPresent(String.self, forKey: .selected) {
+                selectedProducts["group_A"] = selected
                 scripts += [Schema.LegacyScripts.legacySelectProductScript(productId: selected)]
             } else {
-                let selectedProducts = try container.decode([String: String].self, forKey: .selected)
-                scripts += selectedProducts.map { groupId, productId in
+                let decoded = try container.decode([String: String].self, forKey: .selected)
+                selectedProducts = decoded
+                scripts += decoded.map { groupId, productId in
                     Schema.LegacyScripts.legacySelectProductScript(groupId: groupId, productId: productId)
                 }
             }
@@ -182,7 +191,7 @@ private extension Decoder {
 
         scripts.append(contentsOf: collector.legacyTimers.values)
 
-        return [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
+        let scriptsResult = [Schema.LegacyScripts.actions] + scripts + [Schema.LegacyScripts.legacyOpenDefaultScreen()]
+        return (scriptsResult, selectedProducts)
     }
 }
-

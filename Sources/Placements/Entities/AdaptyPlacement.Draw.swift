@@ -9,20 +9,19 @@ import Foundation
 
 extension AdaptyPlacement {
     struct Draw<Content: PlacementContent>: Sendable {
+        let date: Date
         let userId: AdaptyUserId
-        var content: Content
+        let content: Content
         let placementAudienceVersionId: String
         let variationIdByPlacements: [String: String]
     }
 }
 
-extension AdaptyPlacement.Draw {
+extension AdaptyPlacement.Draw: DecodableWithConfiguration {
     var participatesInCrossPlacementABTest: Bool {
         variationIdByPlacements.isNotEmpty
     }
-}
 
-extension AdaptyPlacement.Draw: DecodableWithConfiguration {
     init(from decoder: Decoder, configuration: AdaptyPlacement.DecodingConfiguration) throws {
         let userId = try configuration.userIdOrThrow
         let placement = configuration.placement
@@ -56,6 +55,7 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
         let content = try Self.content(from: decoder, index: index, configuration: configuration)
 
         self.init(
+            date: Date(),
             userId: userId,
             content: content,
             placementAudienceVersionId: placementAudienceVersionId,

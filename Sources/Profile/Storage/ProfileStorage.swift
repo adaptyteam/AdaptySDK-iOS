@@ -167,8 +167,11 @@ final class ProfileStorage {
         userDefaults.removeObject(forKey: Constants.lastStartAcceleratedSyncProfileKey)
         lastStartAcceleratedSyncProfileDate = nil
 
-        CrossPlacementStorage.clear()
-        PlacementStorage.clear()
+        Task { @StorageActor in
+            let userId = await ProfileStorage.userId
+            Cache.removeOtherProfiles(userId)
+            CrossPlacementStorage.removeOtherProfiles(userId)
+        }
     }
 }
 

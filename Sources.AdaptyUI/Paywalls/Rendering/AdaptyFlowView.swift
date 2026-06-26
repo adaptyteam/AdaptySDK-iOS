@@ -42,7 +42,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
         didPerformAction: ((AdaptyUI.Action) -> Void)? = nil,
         didSelectProduct: ((AdaptyPaywallProduct) -> Void)? = nil,
         didStartPurchase: ((AdaptyPaywallProduct) -> Void)? = nil,
-        didFinishPurchase: ((AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void)? = nil,
+        didFinishPurchase: @escaping (AdaptyPaywallProduct, AdaptyPurchaseResult) -> Void,
         didFailPurchase: @escaping (AdaptyPaywallProduct, AdaptyError) -> Void,
         didFinishWebPaymentNavigation: ((AdaptyPaywallProduct?, AdaptyError?) -> Void)? = nil,
         didStartRestore: (() -> Void)? = nil,
@@ -92,11 +92,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
 
         flowConfiguration.eventsHandler.didSelectProduct = didSelectProduct ?? { _ in }
         flowConfiguration.eventsHandler.didStartPurchase = didStartPurchase ?? { _ in }
-        flowConfiguration.eventsHandler.didFinishPurchase = didFinishPurchase ?? { _, res in
-            if !res.isPurchaseCancelled {
-                presentationMode.wrappedValue.dismiss()
-            }
-        }
+        flowConfiguration.eventsHandler.didFinishPurchase = didFinishPurchase
         flowConfiguration.eventsHandler.didFailPurchase = didFailPurchase
         flowConfiguration.eventsHandler.didStartRestore = didStartRestore ?? {}
         flowConfiguration.eventsHandler.didFinishRestore = didFinishRestore

@@ -14,7 +14,7 @@ import Testing
 extension ResponseCacheTests {
     @Suite("shared cache (profileId: nil)")
     struct SharedCacheTests {
-        private let sharedKey = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "vc-1")
+        private let sharedKey = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "vc-1")
         private let payload = TestPayload(id: "x", value: 1)
         private let altPayload = TestPayload(id: "y", value: 2)
 
@@ -26,8 +26,7 @@ extension ResponseCacheTests {
 
             let value: TestPayload? = await Cache.read(
                 sharedKey,
-                accept: { _ in true },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == payload)
         }
@@ -63,7 +62,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
 
-            let profileKey = Cache.ItemKey(profileId: "p1", itemType: .uischema, itemId: "vc-1")
+            let profileKey = Cache.ItemKey(profileId: "p1", itemType: .flowLayout, itemId: "vc-1")
             // Same itemType + itemId, but shared (profileId == nil) and profile-scoped.
 
             _ = try await Cache.write(payload.encoded(), key: sharedKey, dataVersion: 0) { _, _ in true }
@@ -81,13 +80,11 @@ extension ResponseCacheTests {
             // Reads return their own payloads.
             let sharedValue: TestPayload? = await Cache.read(
                 sharedKey,
-                accept: { _ in true },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             let profileValue: TestPayload? = await Cache.read(
                 profileKey,
-                accept: { _ in true },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(sharedValue == payload)
             #expect(profileValue == altPayload)
@@ -101,15 +98,13 @@ extension ResponseCacheTests {
                 payload.encoded(),
                 key: sharedKey,
                 dataVersion: 0,
-                accept: { _, _ in true },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(result == payload)
 
             let cached: TestPayload? = await Cache.read(
                 sharedKey,
-                accept: { _ in true },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(cached == payload)
         }

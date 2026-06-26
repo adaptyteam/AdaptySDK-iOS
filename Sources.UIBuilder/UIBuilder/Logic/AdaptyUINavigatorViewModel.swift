@@ -341,13 +341,13 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     func executeScreenActions(_ eventId: VC.EventHandler.EventId, screen: VS.ScreenInstance) {
         let actions: [VC.Action]? = switch eventId {
         case .onWillAppear:
-            navigator.defaultScreenActions.onWillAppear ?? screen.configuration.screenActions.onWillAppear
+            screen.configuration.screenActions.onWillAppear ?? navigator.defaultScreenActions.onWillAppear
         case .onDidAppear:
-            navigator.defaultScreenActions.onDidAppear ?? screen.configuration.screenActions.onDidAppear
+            screen.configuration.screenActions.onDidAppear ?? navigator.defaultScreenActions.onDidAppear
         case .onWillDisappear:
-            navigator.defaultScreenActions.onWillDisappear ?? screen.configuration.screenActions.onWillDisappear
+            screen.configuration.screenActions.onWillDisappear ?? navigator.defaultScreenActions.onWillDisappear
         case .onDidDisappear:
-            navigator.defaultScreenActions.onDidDisappear ?? screen.configuration.screenActions.onDidDisappear
+            screen.configuration.screenActions.onDidDisappear ?? navigator.defaultScreenActions.onDidDisappear
         default:
             nil
         }

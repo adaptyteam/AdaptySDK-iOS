@@ -199,7 +199,10 @@ struct FallbackTests {
         for schemaId in schemas {
             let startTime = CFAbsoluteTimeGetCurrent()
             do {
-                _ = try fallback.getUISchema(byViewConfigurationId: schemaId)
+                _ = try fallback.getUISchema(
+                    byFlowLayoutId: schemaId,
+                    decodingConfiguration: .init(device: .phone)
+                )
             } catch {
                 Issue.record("schema[\(schemaId)]: \(error)")
             }

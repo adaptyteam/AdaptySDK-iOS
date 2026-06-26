@@ -1,16 +1,16 @@
 //
-//  AdaptyUISchema.DeviceInfo+ViewConfiguration.swift
+//  AdaptyFlow.LayoutsConfiguration+Layout.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 02.06.2026.
 //
 
-import Foundation
 import AdaptyUIBuilder
+import Foundation
 
-extension AdaptyFlow.ViewConfiguration {
-    func getLayout(for info: Adapty.DeviceInfo, with customId: String?) throws(AdaptyError) -> AdaptyFlow.Layout? {
-        let grid: AdaptyFlow.Grid
+extension AdaptyFlow.LayoutsConfiguration {
+    package func getLayout(for info: Adapty.DeviceInfo, with customId: String?) throws(AdaptyError) -> AdaptyFlow.Layout? {
+        let grid: Grid
         if let customId {
             guard let value = getGrid(for: customId) else { return nil }
             grid = value
@@ -20,16 +20,21 @@ extension AdaptyFlow.ViewConfiguration {
 
         let index = try grid.getIndex(horizontal: info.horizontal, vertical: info.vertical)
         guard layouts.indices.contains(index) else { throw .isNoViewConfigurationInFlow() }
-        return layouts[index]
+        let layout = layouts[index]
+
+        return .init(
+            versionId: versionId,
+            id: layout.id
+        )
     }
 
-    private func getGrid(for customId: String) -> AdaptyFlow.Grid? {
+    private func getGrid(for customId: String) -> Grid? {
         grids.first { $0.customId == customId }
     }
 
     private static let currentPlatform = "ios"
 
-    private func getGrid(for device: Adapty.DeviceKind) throws(AdaptyError) -> AdaptyFlow.Grid {
+    private func getGrid(for device: Adapty.DeviceKind) throws(AdaptyError) -> Grid {
         let result = grids.first { grid in
             if let platform = grid.platforms {
                 guard platform.contains(where: { $0 == Self.currentPlatform }) else {
@@ -49,7 +54,7 @@ extension AdaptyFlow.ViewConfiguration {
     }
 }
 
-private extension AdaptyFlow.Grid {
+private extension AdaptyFlow.LayoutsConfiguration.Grid {
     func getIndex(horizontal: Int, vertical: Int) throws(AdaptyError) -> Int {
         let col = hBreakpoints.prefix { horizontal >= $0 }.count
         let row = vBreakpoints.prefix { vertical >= $0 }.count
@@ -58,4 +63,3 @@ private extension AdaptyFlow.Grid {
         return cells[index]
     }
 }
-

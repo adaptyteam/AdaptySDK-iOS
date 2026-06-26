@@ -1,21 +1,28 @@
 //
-//  AdaptyFlow.ViewConfiguration.swift
+//  AdaptyFlow.LayoutsConfiguration.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 02.06.2026.
 //
 
-import Foundation
 import AdaptyUIBuilder
+import Foundation
 
 extension AdaptyFlow {
-    struct ViewConfiguration {
+    struct LayoutsConfiguration {
+        let versionId: String
         let layouts: [Layout]
         let grids: [Grid]
     }
 
-    struct Grid: Sendable {
+    package struct Layout: Sendable, Identifiable {
+        package let versionId: String
+        package let id: String
+    }
+}
 
+extension AdaptyFlow.LayoutsConfiguration {
+    struct Grid: Sendable {
         let platforms: [String]?
         let devices: [AdaptyUISchema.DeviceKind]?
         let customId: String?
@@ -29,14 +36,36 @@ extension AdaptyFlow {
     }
 }
 
-extension AdaptyFlow.ViewConfiguration: Codable {
+extension AdaptyFlow.LayoutsConfiguration: Codable {
     enum CodingKeys: String, CodingKey {
+        case versionId = "flow_version_id"
+        case container = "ui_schema"
+    }
+
+    enum ContainerCodingKeys: String, CodingKey {
         case layouts
         case grids
     }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        versionId = try container.decode(String.self, forKey: .versionId)
+        let subContainer = try container.nestedContainer(keyedBy: ContainerCodingKeys.self, forKey: .container)
+        layouts = try subContainer.decode([Layout].self, forKey: .layouts)
+        grids = try subContainer.decode([Grid].self, forKey: .grids)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(versionId, forKey: .versionId)
+        var subContainer = container.nestedContainer(keyedBy: ContainerCodingKeys.self, forKey: .container)
+        try subContainer.encode(layouts, forKey: .layouts)
+        try subContainer.encode(grids, forKey: .grids)
+    }
 }
 
-extension AdaptyFlow.Grid: Codable {
+extension AdaptyFlow.LayoutsConfiguration.Grid: Codable {
     enum CodingKeys: String, CodingKey {
         case platforms
         case devices
@@ -97,9 +126,8 @@ extension AdaptyFlow.Grid: Codable {
     }
 }
 
-extension AdaptyFlow.Layout: Codable {
+extension AdaptyFlow.LayoutsConfiguration.Layout: Codable {
     enum CodingKeys: String, CodingKey {
         case id = "flow_layout_id"
     }
 }
-
