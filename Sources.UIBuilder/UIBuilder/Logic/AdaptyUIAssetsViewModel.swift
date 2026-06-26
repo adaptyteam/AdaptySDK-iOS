@@ -66,7 +66,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
         productInfo: ProductInfoContainer
     ) {
         switch ref {
-        case let .stringId(stringId, tagValues): // TODO: x need use tagValues
+        case let .stringId(stringId, tagValues):
             let text = try? stateHolder.state.richText(stringId)
             return (
                 richText: text ?? .empty,
@@ -138,6 +138,11 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
     // MARK: - Video Player Logic
 
     private var playerManagers = [String: AdaptyUIVideoPlayerManager]()
+
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        playerManagers.removeAll()
+    }
 
     func getOrCreatePlayerManager(
         for video: AdaptyUIResolvedVideoAsset,

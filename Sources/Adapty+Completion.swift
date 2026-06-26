@@ -125,7 +125,7 @@ public extension Adapty {
     /// - Parameter completion: A result containing an optional error.
     nonisolated static func updateAttribution(
         _ attribution: [AnyHashable: Any],
-        source: String,
+        source: AdaptyAttributionSource,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         let attributionJson: String
@@ -143,12 +143,11 @@ public extension Adapty {
     }
 
     nonisolated static func setIntegrationIdentifier(
-        key: String,
-        value: String,
-        _ completion: AdaptyErrorCompletion? = nil
+        _ identifiers: AdaptyIntegrationIdentifier...,
+        completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await setIntegrationIdentifier(key: key, value: value)
+            try await setIntegrationIdentifiers(identifiers)
         }
     }
 
@@ -428,22 +427,22 @@ public extension Adapty {
         }
     }
 
-    /// Call this method to notify Adapty SDK, that particular paywall was shown to user.
+    /// Call this method to notify Adapty SDK that a particular flow was shown to the user.
     ///
-    /// Adapty helps you to measure the performance of the paywalls. We automatically collect all the metrics related to purchases except for paywall views. This is because only you know when the paywall was shown to a customer.
-    /// Whenever you show a paywall to your user, call .logShowPaywall(paywall) to log the event, and it will be accumulated in the paywall metrics.
+    /// Adapty helps you measure the performance of your flows. We automatically collect all the metrics related to purchases except for flow views. This is because only you know when the flow was shown to a customer.
+    /// Whenever you show a flow to your user, call `.logShowFlow(flow)` to log the event, and it will be accumulated in the flow metrics.
     ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics)
+    /// Read more in the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-displaying-products#paywall-analytics).
     ///
     /// - Parameters:
-    ///   - paywall: A `AdaptyFlowPaywall` object.
+    ///   - paywall: An `AdaptyFlow` object.
     ///   - completion: Result callback.
-    nonisolated static func logShowPaywall(
-        _ paywall: AdaptyFlowPaywall,
+    nonisolated static func logShowFlow(
+        _ flow: AdaptyFlow,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await logShowPaywall(paywall)
+            try await logShowFlow(flow)
         }
     }
 

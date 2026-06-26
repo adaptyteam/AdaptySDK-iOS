@@ -8,7 +8,6 @@
 #if canImport(UIKit)
 
 import Foundation
-import StoreKit
 import UIKit
 
 typealias AdaptyUIInternalTagResolver = (String) -> Any?
@@ -46,13 +45,11 @@ package protocol AdaptyUIBuilderLogic {
 
     func reportDidPerformAction(_ action: AdaptyUIBuilder.Action)
 
-    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool)
+    func reportDidSelectProduct(_ product: ProductResolver)
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool
 
-    func logShowPaywall(
-        viewConfiguration: AdaptyUIConfiguration
-    ) async throws
+    func logShowFlow() async throws
 
     func getProducts() async throws -> [ProductResolver]
 
@@ -91,11 +88,7 @@ public protocol AdaptyUISystemRequestsHandler: Sendable {
 
 public extension AdaptyUISystemRequestsHandler {
     func handleAppReviewRequest() async {
-        if let windowScene = UIApplication.shared.connectedScenes
-            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene
-        {
-            SKStoreReviewController.requestReview(in: windowScene)
-        }
+        AdaptyUIBuilder.requestAppReview()
     }
 }
 

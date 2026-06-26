@@ -20,7 +20,6 @@ protocol AdaptyUIActionHandler: AnyObject {
     func openScreen(instance: VS.ScreenInstance, transitionId: String)
     func closeScreen(navigatorId: String, transitionId: String)
 
-    func registerState(_ state: AdaptyUIState) // TODO: remove
     func changeFocus(id: String?)
     func setTimer(id: String, endAt: Date, callback: VS.JSAction?)
     func setTimer(id: String, duration: TimeInterval, behavior: VS.SetTimerBehavior, callback: VS.JSAction?)
@@ -56,24 +55,27 @@ extension VS {
 
 package extension VS {
     struct AnalyticEvent: Sendable {
-        package enum CodingKeys: String, CodingKey {
-            case name = "event_type"
-            case screenInstanceId = "screen_id"
+        package enum ParamsInternalKeys: String, CaseIterable {
+            case name
+            case instanceId
+            case isBackendEvent
+            case isCustomerEvent
         }
 
         package let name: String
         package let params: [String: any Sendable]
 
         package var screenInstanceId: String? {
-            (params[CodingKeys.screenInstanceId.rawValue] ?? params["instanceId"]) as? String
+            params[ParamsInternalKeys.instanceId.rawValue] as? String
         }
 
         package var isBackend: Bool {
-            params["isBackendEvent"] as? Bool ?? false
+            params[ParamsInternalKeys.isBackendEvent.rawValue] as? Bool ?? true
         }
 
         package var isCustomer: Bool {
-            params["isCustomerEvent"] as? Bool ?? false
+            params[ParamsInternalKeys.isCustomerEvent.rawValue] as? Bool ?? false
         }
     }
 }
+

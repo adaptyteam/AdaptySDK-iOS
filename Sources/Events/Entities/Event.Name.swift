@@ -15,7 +15,7 @@ extension Event {
     private enum Name: String, Sendable, Hashable {
         case appOpened = "app_opened"
         case flowAnalytics = "flow_event"
-        case paywallShowed = "paywall_showed"
+        case flowShowed = "flow_showed"
 
         case system = "system_log"
         case flowVariationAssigned = "flow_variation_assigned"
@@ -30,8 +30,8 @@ extension Event {
             switch self {
             case .appOpened:
                 .appOpened
-            case .paywallShowed:
-                .paywallShowed
+            case .flowShowed:
+                .flowShowed
             case .flowAnalytics:
                 .flowAnalytics
             case .system:

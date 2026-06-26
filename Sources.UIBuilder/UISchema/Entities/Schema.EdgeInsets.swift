@@ -22,7 +22,7 @@ extension Schema.EdgeInsets: Decodable {
         case trailing
         case bottom
     }
-
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let value = try? container.decode(Schema.Unit.self) {

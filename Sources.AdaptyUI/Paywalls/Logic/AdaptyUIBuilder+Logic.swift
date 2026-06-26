@@ -44,31 +44,21 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didPerformAction(action.adaptyUIAction)
     }
 
-    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {
+    func reportDidSelectProduct(_ product: ProductResolver) {
         guard let product = product as? AdaptyPaywallProduct else {
             Log.ui.error("#\(logId)# reportDidSelectProduct error: product is not AdaptyPaywallProduc")
             return
         }
 
-        events.event_didSelectProduct(product, automatic: automatic)
+        events.event_didSelectProduct(product)
     }
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool {
         events.event_didFailLoadingProducts(with: error.asAdaptyError)
     }
 
-    package func logShowPaywall(
-        viewConfiguration: AdaptyUIConfiguration
-    ) async {
-        try? await Adapty.logFlowAnalyticsViaAdaptyUI(
-            variationId: flow.variationId,
-            viewConfigurationId: viewConfiguration.id,
-            params: AdaptyUIFlowScreenShowedParameters( // TODO: log show screen
-                screenInstanceId: "unknown_screen",
-                screenOrder: 0,
-                isLatestScreen: false
-            )
-        )
+    package func logShowFlow() async throws {
+        try await Adapty.logShowFlow(flow)
     }
 
     package func getProducts() async throws -> [ProductResolver] {
@@ -130,8 +120,8 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
             )
 
             switch purchaseResult {
-            case .success:      return .success
-            case .pending:      return .pending
+            case .success: return .success
+            case .pending: return .pending
             case .userCancelled: return .userCanceled
             }
         } catch {

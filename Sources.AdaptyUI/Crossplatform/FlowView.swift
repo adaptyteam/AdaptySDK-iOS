@@ -10,9 +10,14 @@ import Foundation
 public extension AdaptyUI {
     struct FlowView: Sendable {
         package let id: String
-        package let templateId: String
         package let placementId: String
         package let variationId: String
+
+        package init(id: String, placementId: String, variationId: String) {
+            self.id = id
+            self.placementId = placementId
+            self.variationId = variationId
+        }
     }
 
     struct OnboardingView: Sendable {
@@ -28,9 +33,8 @@ package extension AdaptyFlowUIView {
     func toAdaptyUIView() -> AdaptyUI.FlowView {
         AdaptyUI.FlowView(
             id: id,
-            templateId: "// TODO: todo", // configuration.flowViewModel.viewConfiguration.deprecated_defaultScreen.templateId,
-            placementId: configuration.paywallPlacementId,
-            variationId: configuration.paywallVariationId
+            placementId: configuration.flowPlacementId,
+            variationId: configuration.flowVariationId
         )
     }
 }
@@ -39,9 +43,8 @@ public extension AdaptyFlowController {
     func toAdaptyUIView() -> AdaptyUI.FlowView {
         AdaptyUI.FlowView(
             id: id,
-            templateId: "// TODO: todo",
-            placementId: configuration.paywallVariationId,
-            variationId: configuration.paywallVariationId
+            placementId: configuration.flowPlacementId,
+            variationId: configuration.flowVariationId
         )
     }
 }

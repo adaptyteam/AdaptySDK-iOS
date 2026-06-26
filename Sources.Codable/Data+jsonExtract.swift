@@ -52,6 +52,25 @@ public enum JsonExtractError: Error, Sendable, CustomStringConvertible {
 /// // Parse only this small piece with a regular JSONDecoder
 /// let placement = try JSONDecoder().decode(Placement.self, from: placementData)
 /// ```
+///
+/// # Raw-form contract for object keys
+///
+/// JSON allows a non-ASCII character in an object key to be written either as
+/// literal UTF-8 bytes (e.g. `"€"`) or as a `\uXXXX` escape (e.g. `"€"`).
+/// Both forms are valid and represent the same logical key, but their byte
+/// sequences differ.
+///
+/// All pointer-based APIs in this module — `jsonExtract`, `jsonContains`,
+/// `jsonExist`, `jsonExtractMany`, `jsonFastInspect`, `jsonInspect`,
+/// `jsonExtractRange` — compare pointer segments to JSON keys **byte-for-byte
+/// against the raw form**, without normalising between the two representations.
+/// Consequently, a pointer segment must be written in the same form as the
+/// key appears in the source JSON.
+///
+/// `jsonInspect` and `jsonExtractRange` return keys in their raw JSON form,
+/// so a pointer built from a previously returned key always finds that key
+/// again. Pointer segments containing literal `/` or `~` still require
+/// RFC 6901 escaping (`~1` and `~0`) regardless of the chosen form.
 public extension Data {
     enum JsonValueInfo: Sendable, Equatable {
         case object(keys: [String])

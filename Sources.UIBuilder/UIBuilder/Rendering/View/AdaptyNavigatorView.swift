@@ -56,6 +56,7 @@ struct AdaptyScreenView: View {
         )
         .onReceive(screenInstance.$playIncomingTransition) { playIncomingTransition = $0 ?? [] }
         .onReceive(screenInstance.$playOutgoingTransition) { playOutgoingTransition = $0 ?? [] }
+        .onAppear { screenInstance.consumeFireOnDidAppear() }
     }
 
     @ViewBuilder
@@ -73,13 +74,13 @@ struct AdaptyScreenView: View {
         default:
             AdaptyUIElementView(
                 screen.content,
-                screenHolderBuilder: { EmptyView() } // TODO: x check
+                screenHolderBuilder: { EmptyView() }
             )
             .background {
                 if let background = screen.background {
                     AdaptyUIBackgroundElementsView(
                         backgrounds: background,
-                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                        screenHolderBuilder: { EmptyView() }
                     )
                 }
             }
@@ -87,7 +88,7 @@ struct AdaptyScreenView: View {
                 if let overlay = screen.overlay {
                     AdaptyUIOverlayElementsView(
                         overlays: overlay,
-                        screenHolderBuilder: { EmptyView() } // TODO: x check
+                        screenHolderBuilder: { EmptyView() }
                     )
                 }
             }
@@ -112,14 +113,14 @@ struct AdaptyNavigatorView: View {
             .onTapGesture {
                 guard let currentScreen = navigatorViewModel.screens.last else { return }
 
-                if let navigatorActions = navigatorViewModel.navigator.defaultScreenActions.onOutsideTap {
-                    stateViewModel.execute(
-                        actions: navigatorActions,
-                        screen: currentScreen.instance
-                    )
-                } else if let actions = currentScreen.configuration.screenActions.onOutsideTap {
+                if let actions = currentScreen.configuration.screenActions.onOutsideTap {
                     stateViewModel.execute(
                         actions: actions,
+                        screen: currentScreen.instance
+                    )
+                } else if let navigatorActions = navigatorViewModel.navigator.defaultScreenActions.onOutsideTap {
+                    stateViewModel.execute(
+                        actions: navigatorActions,
                         screen: currentScreen.instance
                     )
                 }

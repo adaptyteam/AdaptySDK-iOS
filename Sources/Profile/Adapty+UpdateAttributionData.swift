@@ -16,7 +16,7 @@ public extension Adapty {
     /// - Parameter source: a source of attribution.
     nonisolated static func updateAttribution(
         _ attribution: [AnyHashable: Any],
-        source: String
+        source: AdaptyAttributionSource
     ) async throws(AdaptyError) {
         let attributionJson: String
         do {
@@ -34,10 +34,8 @@ public extension Adapty {
 
     nonisolated static func updateAttribution(
         _ attributionJson: String,
-        source: String
+        source: AdaptyAttributionSource
     ) async throws(AdaptyError) {
-        let source = source.trimmed
-        // TODO: throw error if source isEmpty
 
         let logParams: EventParameters = [
             "source": source,
@@ -52,7 +50,7 @@ public extension Adapty {
     }
 
     private func setAttributionData(
-        source: String,
+        source: AdaptyAttributionSource,
         attributionJson: String
     ) async throws(AdaptyError) {
         let (userId, oldResponseHash) = try await { () async throws(AdaptyError) in

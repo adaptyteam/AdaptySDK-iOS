@@ -30,7 +30,7 @@ extension Schema.Pager.PageControl: Decodable {
         case padding
         case dotSize = "dot_size"
         case spacing
-        case color = "color"
+        case color
         case selectedColor = "selected_color"
     }
 
@@ -52,3 +52,4 @@ extension Schema.Pager.PageControl: Decodable {
         )
     }
 }
+

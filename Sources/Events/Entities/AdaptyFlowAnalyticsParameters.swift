@@ -61,17 +61,21 @@ package struct AdaptyUIFlowScreenShowedParameters: AdaptyFlowAnalyticsPayload {
 }
 
 extension VS.AnalyticEvent: AdaptyFlowAnalyticsPayload {
+    private enum CodingKeys: String, CodingKey {
+        case name = "event_type"
+        case screenInstanceId = "screen_id"
+    }
+
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: AnyCodingKey.self)
+        var params = params
+        for internalkey in ParamsInternalKeys.allCases {
+            params.removeValue(forKey: internalkey.rawValue)
+        }
         try container.encodeDictionary(params)
 
-        if !params.keys.contains(CodingKeys.name.rawValue) {
-            try container.encode(name, forKey: .init(CodingKeys.name))
-        }
-
-        if !params.keys.contains(CodingKeys.screenInstanceId.rawValue), let screenId = screenInstanceId {
-            try container.encode(screenId, forKey: .init(CodingKeys.screenInstanceId))
-        }
+        try container.encode(name, forKey: .init(CodingKeys.name))
+        try container.encodeIfPresent(screenInstanceId, forKey: .init(CodingKeys.screenInstanceId))
     }
 }
 

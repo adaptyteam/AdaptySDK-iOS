@@ -46,6 +46,9 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
     /// Set by state action handler to enable screen lifecycle action execution
     var executeActions: ((_ actions: [VC.Action], _ screen: VS.ScreenInstance) -> Void)?
 
+    /// Set by state action handler to surface navigation errors to the logic layer
+    var reportError: ((AdaptyUIBuilderError) -> Void)?
+
     var topmostScreenInstance: VS.ScreenInstance? {
         navigatorsViewModels.max(by: { $0.order < $1.order })?.screens.last?.instance
     }
@@ -58,8 +61,9 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
         Log.ui.verbose("#\(logId)# present screen:\(screen.id) in navigator:\(screen.navigatorId)")
 
         guard let navigatorConfig = viewConfiguration.navigator(id: screen.navigatorId) else {
-            Log.ui.warn("#\(logId)# failed to present screen:\(screen.id) in navigator:\(screen.navigatorId) (navigator not found)")
-            return // TODO: x error?
+            Log.ui.error("#\(logId)# failed to present screen:\(screen.id) in navigator:\(screen.navigatorId) (navigator not found)")
+            reportError?(.navigatorNotFound(screen.navigatorId))
+            return
         }
 
         let screen = AdaptyUIScreenViewModel(instance: screen)
@@ -76,7 +80,8 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
                 logId: logId,
                 navigator: navigatorConfig,
                 screen: screen,
-                appearTransitionId: transitionId
+                appearTransitionId: transitionId,
+                isRightToLeft: isRightToLeft
             )
 
             navigatorVM.executeActions = executeActions
@@ -87,6 +92,12 @@ package final class AdaptyUIScreensViewModel: ObservableObject {
                 completion: completion
             )
         }
+    }
+
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        navigatorsViewModels.removeAll()
+        dismissingNavigatorIds.removeAll()
     }
 
     func dismiss(

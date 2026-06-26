@@ -790,10 +790,38 @@ UI:
         properties:
             type: { const: if }
             platform: { enum: [ios, android] }
-            os_version:
-                type: string
-                pattern: "^[0-9]+\\.[0-9]+$"
-                description: "Minimum OS version (inclusive)"
+            available:
+                type: array
+                description: >
+                    Per-OS minimum-version constraints (semantics of Swift's
+                    @available). Each item declares the minimum (inclusive)
+                    runtime version required for the named OS. Operating
+                    systems NOT listed in the array carry no constraint —
+                    the condition is true for them at any version.
+                    The condition is false only when the runtime OS is
+                    listed AND the runtime version is below that item's
+                    os_version. Each os_name MUST appear at most once.
+                items:
+                    type: object
+                    required: [os_name, os_version]
+                    properties:
+                        os_name:
+                            type: string
+                            description: "Operating system name to match against the runtime OS."
+                            enum:
+                                - iOS # includes iPadOS
+                                - macOS
+                                - tvOS
+                                - watchOS
+                                - visionOS
+                                - Android
+                        os_version:
+                            type: string
+                            pattern: "^[0-9]+\\.[0-9]+$"
+                            description: "Minimum runtime OS version (inclusive) required for this os_name."
+                    additionalProperties: false
+                uniqueItems: true
+                minItems: 1
             version:
                 {
                     type: string,
@@ -1139,7 +1167,7 @@ UI:
                         fixed: { $ref: "#/Entities/Unit" }
                   - required: [weight]
                     properties:
-                        weight: { type: integer }
+                        weight: { type: integer , minimum: 1}
             - properties:
                   type: { const: grid_item }
                   h_align:
@@ -1315,6 +1343,9 @@ UI:
             duration: { type: number , description: "milliseconds to change value"}
             interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
             action: { $ref: "#/Script/ActionOrArray" }
+            min: { type: number, default: 0 }
+            max: { type: number, default: 1 }
+            skip_animation_on_overflow: { type: boolean, default: false }
             
     VerticalProgress:
         type: object
@@ -1330,6 +1361,9 @@ UI:
             duration: { type: number , description: "milliseconds to change value"}
             interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
             action: { $ref: "#/Script/ActionOrArray" }
+            min: { type: number, default: 0 }
+            max: { type: number, default: 1 }
+            skip_animation_on_overflow: { type: boolean, default: false }
 
     RadialProgress:
         type: object
@@ -1347,6 +1381,9 @@ UI:
             duration: { type: number , description: "milliseconds to change value"}
             interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
             action: { $ref: "#/Script/ActionOrArray" }
+            min: { type: number, default: 0 }
+            max: { type: number, default: 1 }
+            skip_animation_on_overflow: { type: boolean, default: false }
 
     TextProgress:
         type: object
@@ -1359,6 +1396,9 @@ UI:
                   duration: { type: number , description: "milliseconds to change value"}
                   interpolator: { $ref: "#/Animation/Interpolator", default: "ease_in_out" }
                   action: { $ref: "#/Script/ActionOrArray" }
+                  min: { type: number, default: 0 }
+                  max: { type: number, default: 1 }
+                  skip_animation_on_overflow: { type: boolean, default: false }
             - $ref: "#/UI/Text/Attributes"
     
             
@@ -1536,6 +1576,9 @@ Assets:
                 type: string
             custom_id:
                 title: User asset identifier
+                type: string
+            fallback_asset_id:
+                title: fallback asset identifier
                 type: string
         oneOf:
             - $ref: "#/Assets/Color"

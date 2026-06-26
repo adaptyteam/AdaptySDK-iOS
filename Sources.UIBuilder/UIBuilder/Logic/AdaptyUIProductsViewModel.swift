@@ -15,7 +15,7 @@ protocol ProductsInfoProvider {
 }
 
 extension AdaptyUIProductsViewModel: ProductsInfoProvider {
-    func productInfo(by flowProductId: String) -> ProductResolver? {
+    package func productInfo(by flowProductId: String) -> ProductResolver? {
         flowProducts?[flowProductId]
     }
 }
@@ -60,9 +60,16 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         loadProducts()
     }
 
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        productsLoadingInProgress = false
+        purchaseInProgress = false
+        restoreInProgress = false
+    }
+
     func selectProduct(id: String) {
         if let selectedProduct = flowProducts?[id] {
-            logic.reportDidSelectProduct(selectedProduct, automatic: false)
+            logic.reportDidSelectProduct(selectedProduct)
         }
     }
 

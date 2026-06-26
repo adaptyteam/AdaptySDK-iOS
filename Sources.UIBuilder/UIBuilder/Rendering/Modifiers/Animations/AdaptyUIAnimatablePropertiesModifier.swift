@@ -9,6 +9,20 @@
 
 import SwiftUI
 
+// Tracks animation tokens with a class identity, so cleanup runs on real
+// view destruction (StateObject deinit) — not on every temporary disappear
+// (modal cover, app backgrounding) that .onDisappear conflates.
+private final class AdaptyUIAnimationCoordinator: ObservableObject {
+    var tokens: Set<AdaptyUIAnimationToken> = []
+
+    deinit {
+        let tokens = tokens
+        Task { @MainActor in
+            for token in tokens { token.invalidate() }
+        }
+    }
+}
+
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private var play: Binding<[VC.Animation]>
 
@@ -31,31 +45,49 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
 
-    @State private var scaleX: CGFloat
-    @State private var scaleY: CGFloat
-    @State private var scaleAnchor: UnitPoint
+    private let initialScaleX: CGFloat
+    private let initialScaleY: CGFloat
+    private let initialScaleAnchor: UnitPoint
 
-    @State private var rotation: Angle
-    @State private var rotationAnchor: UnitPoint
+    private let initialRotation: Angle
+    private let initialRotationAnchor: UnitPoint
 
-    @State private var opacity: Double
+    private let initialOpacity: Double
+
+    @State private var animatedScaleX: CGFloat?
+    @State private var animatedScaleY: CGFloat?
+    @State private var animatedScaleAnchor: UnitPoint?
+
+    @State private var animatedRotation: Angle?
+    @State private var animatedRotationAnchor: UnitPoint?
+
+    @State private var animatedOpacity: Double?
+
+    private var resolvedScaleX: CGFloat { animatedScaleX ?? initialScaleX }
+    private var resolvedScaleY: CGFloat { animatedScaleY ?? initialScaleY }
+    private var resolvedScaleAnchor: UnitPoint { animatedScaleAnchor ?? initialScaleAnchor }
+
+    private var resolvedRotation: Angle { animatedRotation ?? initialRotation }
+    private var resolvedRotationAnchor: UnitPoint { animatedRotationAnchor ?? initialRotationAnchor }
+
+    private var resolvedOpacity: Double { animatedOpacity ?? initialOpacity }
 
     @State private var animatedBlurRadius: Double?
 
-    @State private var animationTokens = Set<AdaptyUIAnimationToken>()
+    @StateObject private var animationCoordinator = AdaptyUIAnimationCoordinator()
 
     init(
         _ properties: VC.Element.Properties,
         play: Binding<[VC.Animation]>
     ) {
-        self.opacity = properties.opacity
+        self.initialOpacity = properties.opacity
 
-        self.scaleX = properties.scale?.scale.x ?? 1.0
-        self.scaleY = properties.scale?.scale.y ?? 1.0
-        self.scaleAnchor = properties.scale?.anchor.unitPoint ?? .center
+        self.initialScaleX = properties.scale?.scale.x ?? 1.0
+        self.initialScaleY = properties.scale?.scale.y ?? 1.0
+        self.initialScaleAnchor = properties.scale?.anchor.unitPoint ?? .center
 
-        self.rotation = properties.rotation.map { .degrees($0.angle) } ?? .zero
-        self.rotationAnchor = properties.rotation?.anchor.unitPoint ?? .center
+        self.initialRotation = properties.rotation.map { .degrees($0.angle) } ?? .zero
+        self.initialRotationAnchor = properties.rotation?.anchor.unitPoint ?? .center
 
         self.initialOffset = properties.offset ?? .zero
 
@@ -82,14 +114,14 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         initialShadowOffset: VC.Offset,
         initialShadowBlurRadius: Double,
     ) {
-        self.opacity = initialOpacity
+        self.initialOpacity = initialOpacity
 
-        self.scaleX = initialScaleX
-        self.scaleY = initialScaleY
-        self.scaleAnchor = initialScaleAnchor
+        self.initialScaleX = initialScaleX
+        self.initialScaleY = initialScaleY
+        self.initialScaleAnchor = initialScaleAnchor
 
-        self.rotation = initialRotation
-        self.rotationAnchor = initialRotationAnchor
+        self.initialRotation = initialRotation
+        self.initialRotationAnchor = initialRotationAnchor
 
         self.initialOffset = initialOffset
 
@@ -155,14 +187,10 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             )
             .blur(radius: resolvedBlurRadius)
             .offset(resolvedOffset)
-            .rotationEffect(rotation, anchor: rotationAnchor)
-            .scaleEffect(x: scaleX, y: scaleY, anchor: scaleAnchor)
-            .opacity(opacity)
+            .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
+            .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
+            .opacity(resolvedOpacity)
             .onChange(of: play.wrappedValue) { startAnimations($0) }
-            .onDisappear {
-                animationTokens.forEach { $0.invalidate() }
-                animationTokens.removeAll()
-            }
     }
 
     private func startAnimations(_ animations: [VC.Animation]) {
@@ -172,13 +200,13 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             let timeline = animation.timeline
             switch animation.kind {
             case let .opacity(value):
-                opacity = value.start
+                animatedOpacity = value.start
                 tokens.insert(
                     timeline.animate(
                         from: value.start,
                         to: value.end,
                         updateBlock: {
-                            self.opacity = $0
+                            self.animatedOpacity = $0
                         }
                     )
                 )
@@ -196,29 +224,29 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     )
                 )
             case let .rotation(value):
-                rotation = .degrees(value.angle.start)
-                rotationAnchor = value.anchor.unitPoint
+                animatedRotation = .degrees(value.angle.start)
+                animatedRotationAnchor = value.anchor.unitPoint
                 tokens.insert(
                     timeline.animate(
                         from: value.angle.start,
                         to: value.angle.end,
                         updateBlock: {
-                            self.rotation = .degrees($0)
+                            self.animatedRotation = .degrees($0)
                         }
                     )
                 )
             case let .scale(value):
-                scaleX = value.scale.start.x
-                scaleY = value.scale.start.y
-                scaleAnchor = value.anchor.unitPoint
+                animatedScaleX = value.scale.start.x
+                animatedScaleY = value.scale.start.y
+                animatedScaleAnchor = value.anchor.unitPoint
 
                 tokens.insert(
                     timeline.animate(
                         from: value.scale.start,
                         to: value.scale.end,
                         updateBlock: {
-                            self.scaleX = $0.x
-                            self.scaleY = $0.y
+                            self.animatedScaleX = $0.x
+                            self.animatedScaleY = $0.y
                         }
                     )
                 )
@@ -276,7 +304,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             }
         }
 
-        animationTokens = tokens
+        animationCoordinator.tokens = tokens
     }
 }
 

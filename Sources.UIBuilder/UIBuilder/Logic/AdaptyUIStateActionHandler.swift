@@ -16,7 +16,9 @@ package final class AdaptyUIStateHolder {
     let state: AdaptyUIState
 
     private let logId: String
+    private let actionHandler: AdaptyUIStateActionHandler
     private var cancellables = Set<AnyCancellable>()
+    private var lastProducts: [VC.FlowConstants.ProductConstants]?
 
     package init(
         logId: String,
@@ -25,6 +27,7 @@ package final class AdaptyUIStateHolder {
         isInspectable: Bool
     ) {
         self.logId = logId
+        self.actionHandler = actionHandler
         self.state = AdaptyUIState(
             name: "AdaptyJSState_[\(logId)]",
             configuration: viewConfiguration,
@@ -49,7 +52,17 @@ package final class AdaptyUIStateHolder {
     }
 
     package func setProducts(_ products: [VC.FlowConstants.ProductConstants]) {
+        lastProducts = products
         state.setProductsConstants(products)
+    }
+
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        actionHandler.clearPendingCallbacks()
+        state.prepareForReuse()
+        if let lastProducts {
+            state.setProductsConstants(lastProducts)
+        }
     }
 }
 
@@ -89,12 +102,13 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         self.logic = logic
     }
 
-    nonisolated func registerState(_ state: AdaptyUIState) {
-        Task { @MainActor [weak self] in
-            self?.state = state
-            self?.screensViewModel.executeActions = { [weak state] actions, screen in
-                try? state?.execute(actions: actions, screenInstance: screen)
-            }
+    func registerState(_ state: AdaptyUIState) {
+        self.state = state
+        screensViewModel.executeActions = { [weak state] actions, screen in
+            try? state?.execute(actions: actions, screenInstance: screen)
+        }
+        screensViewModel.reportError = { [weak self] error in
+            self?.logic.reportDidReceiveError(error)
         }
     }
 
@@ -127,7 +141,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 let str = text.asString,
                 let url = URL(string: str)
             else {
-                // TODO: x warn
+                self?.logic.reportDidReceiveError(.invalidActionURL(stringId))
                 return
             }
 
@@ -177,12 +191,6 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 }
             )
         }
-    }
-
-    nonisolated func openWebPaywall(
-        openIn _: VC.Action.WebOpenInParameter
-    ) {
-        // TODO: Deperecated
     }
 
     nonisolated func restorePurchases(callback: VS.JSAction?) {
@@ -308,6 +316,14 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         Task { @MainActor [weak self] in
             self?.stateViewModel?.showAlertDialog(params: params)
         }
+    }
+
+    package func clearPendingCallbacks() {
+        pendingAlertDialogCallback = nil
+        pendingPermissionCallback = nil
+        pendingTimerCallbacks.removeAll()
+        pendingPurchaseCallbacks.removeAll()
+        pendingRestoreCallbacks.removeAll()
     }
 
     func handleAlertDialogResponse(actionId: String?, screenInstance: VS.ScreenInstance?) {

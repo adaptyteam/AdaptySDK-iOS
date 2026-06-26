@@ -10,6 +10,7 @@ import Foundation
 package typealias VC = AdaptyUIConfiguration
 
 package struct AdaptyUIConfiguration: Sendable {
+    package let formatVersion: String
     package let id: String
     package let localizationId: LocaleId
     package let locale: Locale
@@ -24,6 +25,8 @@ package struct AdaptyUIConfiguration: Sendable {
     let scripts: [String]
     let showPurchaseLoader: Bool
     let showRestoreLoader: Bool
+    
+    package let legacySelectedProducts: [String: String]?
 }
 
 extension AdaptyUIConfiguration: CustomStringConvertible {

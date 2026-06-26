@@ -16,15 +16,15 @@ enum Request {
             GetLogLevel.self,
             SetLogLevel.self,
             Activate.self,
-            GetPaywall.self,
-            GetPaywallForDefaultAudience.self,
+            GetFlow.self,
+            GetFlowForDefaultAudience.self,
             GetOnboarding.self,
             GetOnboardingForDefaultAudience.self,
             GetPaywallProducts.self,
             GetProfile.self,
             Identify.self,
             Logout.self,
-            LogShowPaywall.self,
+            LogShowFlow.self,
             MakePurchase.self,
             OpenWebPaywall.self,
             CreateWebPaywallUrl.self,
@@ -38,19 +38,27 @@ enum Request {
             UpdateCollectingRefundDataConsent.self,
             UpdateRefundPreference.self,
             GetCurrentInstallationStatus.self,
+            FlowViewDidAnswerPermission.self,
+            ObserverPurchaseDidStart.self,
+            ObserverPurchaseDidFinish.self,
+            ObserverRestoreDidStart.self,
+            ObserverRestoreDidFinish.self,
         ]
 
 #if canImport(UIKit)
         let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
-            AdaptyUICreatePaywallView.self,
-            AdaptyUIDismissPaywallView.self,
-            AdaptyUIPresentPaywallView.self,
+            AdaptyUICreateFlowView.self,
+            AdaptyUIDismissFlowView.self,
+            AdaptyUIPresentFlowView.self,
 
             AdaptyUICreateOnboardingView.self,
             AdaptyUIDismissOnboardingView.self,
             AdaptyUIPresentOnboardingView.self,
 
             AdaptyUIShowDialog.self,
+
+            AdaptyUIOpenUrl.self,
+            AdaptyUIRequestAppReview.self,
         ]
         allRequests.append(contentsOf: adaptyUiRequests)
 

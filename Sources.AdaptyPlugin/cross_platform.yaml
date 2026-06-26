@@ -21,15 +21,15 @@ $requests:
         properties:
           success: { const: true }
 
-  ### createPaywallView ###
-  AdaptyUICreatePaywallView.Request: #request
+  ### createFlowView ###
+  AdaptyUICreateFlowView.Request: #request
     type: object
     required:
       - method
-      - paywall
+      - flow
     properties:
-      method: { const: "adapty_ui_create_paywall_view" }
-      paywall: { $ref: "#/$defs/AdaptyPaywall" }
+      method: { const: "adapty_ui_create_flow_view" }
+      flow: { $ref: "#/$defs/AdaptyFlow" }
       load_timeout: { type: number, description: "seconds" }
       preload_products: { type: boolean, default: false }
       custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
@@ -38,7 +38,7 @@ $requests:
       product_purchase_parameters:
         { $ref: "#/$defs/AdaptyUI.ProductPurchaseParameters" }
 
-  AdaptyUICreatePaywallView.Response: #response
+  AdaptyUICreateFlowView.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -46,7 +46,7 @@ $requests:
           error: { $ref: "#/$defs/AdaptyError" }
       - required: [success]
         properties:
-          success: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+          success: { $ref: "#/$defs/AdaptyUI.FlowView" }
 
   ### createOnboardingView ###
   AdaptyUICreateOnboardingView.Request: #request
@@ -88,16 +88,16 @@ $requests:
         properties:
           success: { const: true }
 
-  ### dismissPaywallView ###
-  AdaptyUIDismissPaywallView.Request: #request
+  ### dismissFlowView ###
+  AdaptyUIDismissFlowView.Request: #request
     type: object
     required: [method, id]
     properties:
-      method: { const: "adapty_ui_dismiss_paywall_view" }
+      method: { const: "adapty_ui_dismiss_flow_view" }
       id: { type: string, description: "View Id" }
       destroy: { type: boolean, default: false }
 
-  AdaptyUIDismissPaywallView.Response: #response
+  AdaptyUIDismissFlowView.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -126,16 +126,16 @@ $requests:
         properties:
           success: { const: true }
 
-  ### presentPaywallView ###
-  AdaptyUIPresentPaywallView.Request: #request
+  ### presentFlowView ###
+  AdaptyUIPresentFlowView.Request: #request
     type: object
     required: [method, id]
     properties:
-      method: { const: "adapty_ui_present_paywall_view" }
+      method: { const: "adapty_ui_present_flow_view" }
       id: { type: string, description: "View Id" }
       ios_presentation_style: { $ref: "#/$defs/AdaptyUI.IOSPresentationStyle" }
 
-  AdaptyUIPresentPaywallView.Response: #response
+  AdaptyUIPresentFlowView.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -163,6 +163,42 @@ $requests:
       - required: [success]
         properties:
           success: { $ref: "#/$defs/AdaptyUI.DialogActionType" }
+
+  ### adaptyUIOpenUrl ###
+  AdaptyUIOpenUrl.Request: #request
+    type: object
+    required: [method, url]
+    properties:
+      method: { const: "adapty_ui_open_url" }
+      url: { type: string }
+      open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
+
+  AdaptyUIOpenUrl.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### adaptyUIRequestAppReview ###
+  AdaptyUIRequestAppReview.Request: #request
+    type: object
+    required: [method]
+    properties:
+      method: { const: "adapty_ui_request_app_review" }
+
+  AdaptyUIRequestAppReview.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
 
   ### getOnboarding ###
   GetOnboarding.Request: #request
@@ -205,18 +241,17 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyOnboarding" }
 
-  ### getPaywall ###
-  GetPaywall.Request: #request
+  ### getFlow ###
+  GetFlow.Request: #request
     type: object
     required: [method, placement_id]
     properties:
-      method: { const: "get_paywall" }
+      method: { const: "get_flow" }
       placement_id: { type: string }
-      locale: { $ref: "#/$defs/AdaptyLocale" }
       fetch_policy: { $ref: "#/$defs/AdaptyPlacementFetchPolicy" }
       load_timeout: { type: number, description: "seconds" }
 
-  GetPaywall.Response: #response
+  GetFlow.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -224,19 +259,18 @@ $requests:
           error: { $ref: "#/$defs/AdaptyError" }
       - required: [success]
         properties:
-          success: { $ref: "#/$defs/AdaptyPaywall" }
+          success: { $ref: "#/$defs/AdaptyFlow" }
 
-    ### getPaywallForDefaultAudience ###
-  GetPaywallForDefaultAudience.Request: #request
+  ### getFlowForDefaultAudience ###
+  GetFlowForDefaultAudience.Request: #request
     type: object
     required: [method, placement_id]
     properties:
-      method: { const: "get_paywall_for_default_audience" }
+      method: { const: "get_flow_for_default_audience" }
       placement_id: { type: string }
-      locale: { $ref: "#/$defs/AdaptyLocale" }
       fetch_policy: { $ref: "#/$defs/AdaptyPlacementFetchPolicy" }
 
-  GetPaywallForDefaultAudience.Response: #response
+  GetFlowForDefaultAudience.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -244,15 +278,15 @@ $requests:
           error: { $ref: "#/$defs/AdaptyError" }
       - required: [success]
         properties:
-          success: { $ref: "#/$defs/AdaptyPaywall" }
+          success: { $ref: "#/$defs/AdaptyFlow" }
 
   ### getPaywallProducts ###
   GetPaywallProducts.Request: #request
     type: object
-    required: [method, paywall]
+    required: [method, flow]
     properties:
       method: { const: "get_paywall_products" }
-      paywall: { $ref: "#/$defs/AdaptyPaywall" }
+      flow: { $ref: "#/$defs/AdaptyFlow" }
 
   GetPaywallProducts.Response: #response
     type: object
@@ -361,15 +395,15 @@ $requests:
         properties:
           success: { const: true }
 
-  ### logShowPaywall ###
-  LogShowPaywall.Request: #request
+  ### logShowFlow ###
+  LogShowFlow.Request: #request
     type: object
-    required: [method, paywall]
+    required: [method, flow]
     properties:
-      method: { const: "log_show_paywall" }
-      paywall: { $ref: "#/$defs/AdaptyPaywall" }
+      method: { const: "log_show_flow" }
+      flow: { $ref: "#/$defs/AdaptyFlow" }
 
-  LogShowPaywall.Response: #response
+  LogShowFlow.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -401,17 +435,14 @@ $requests:
   OpenWebPaywall.Request: #request
     type: object
     required: [method]
-    properties:
-      method: { const: "open_web_paywall" }
-      open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
     oneOf:
       - required: [product]
-        properties:
-          product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
       - required: [paywall]
-        properties:
-          paywall: { $ref: "#/$defs/AdaptyPaywall" }
-
+    properties:
+      method: { const: "open_web_paywall" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      paywall: { $ref: "#/$defs/AdaptyFlowPaywall" }
+      open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
 
   OpenWebPaywall.Response: #response
     type: object
@@ -426,15 +457,13 @@ $requests:
   CreateWebPaywallUrl.Request: #request
     type: object
     required: [method]
-    properties:
-      method: { const: "create_web_paywall_url" }
     oneOf:
       - required: [product]
-        properties:
-          product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
       - required: [paywall]
-        properties:
-          paywall: { $ref: "#/$defs/AdaptyPaywall" }
+    properties:
+      method: { const: "create_web_paywall_url" }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
+      paywall: { $ref: "#/$defs/AdaptyFlowPaywall" }
 
   CreateWebPaywallUrl.Response: #response
     type: object
@@ -644,7 +673,144 @@ $requests:
         properties:
           success: { const: true }
 
+  ### flowViewDidAnswerPermission ###
+  FlowViewDidAnswerPermission.Request: #request
+    type: object
+    required: [method, event_id, status]
+    properties:
+      method: { const: "flow_view_did_answer_permission" }
+      event_id: { type: string }
+      status: { type: string, enum: ["granted", "denied", "unavailable"] }
+      detail: { type: string }
+
+  FlowViewDidAnswerPermission.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerPurchaseDidStart ###
+  ObserverPurchaseDidStart.Request: #request
+    type: object
+    required: [method, event_id]
+    properties:
+      method: { const: "observer_purchase_did_start" }
+      event_id: { type: string }
+
+  ObserverPurchaseDidStart.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerPurchaseDidFinish ###
+  ObserverPurchaseDidFinish.Request: #request
+    type: object
+    required: [method, event_id]
+    properties:
+      method: { const: "observer_purchase_did_finish" }
+      event_id: { type: string }
+
+  ObserverPurchaseDidFinish.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerRestoreDidStart ###
+  ObserverRestoreDidStart.Request: #request
+    type: object
+    required: [method, event_id]
+    properties:
+      method: { const: "observer_restore_did_start" }
+      event_id: { type: string }
+
+  ObserverRestoreDidStart.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### observerRestoreDidFinish ###
+  ObserverRestoreDidFinish.Request: #request
+    type: object
+    required: [method, event_id]
+    properties:
+      method: { const: "observer_restore_did_finish" }
+      event_id: { type: string }
+
+  ObserverRestoreDidFinish.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
 $events:
+  FlowViewEvent.DidAskPermission:
+    type: object
+    required: [id, view, event_id, permission]
+    properties:
+      id: { const: "flow_view_did_ask_permission" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      event_id: { type: string }
+      permission: { $ref: "#/$defs/AdaptyUI.Permission" }
+      custom_args:
+        type: object
+        additionalProperties: { type: string }
+
+  FlowViewEvent.DidRequestAppReview:
+    type: object
+    required: [id, view]
+    properties:
+      id: { const: "flow_view_did_request_app_review" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+
+  FlowViewEvent.ObserverDidInitiatePurchase:
+    type: object
+    required: [id, view, event_id, product]
+    properties:
+      id: { const: "flow_view_observer_did_initiate_purchase" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      event_id: { type: string }
+      product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
+
+  FlowViewEvent.ObserverDidInitiateRestore:
+    type: object
+    required: [id, view, event_id]
+    properties:
+      id: { const: "flow_view_observer_did_initiate_restore" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      event_id: { type: string }
+
+  FlowViewEvent.DidReceiveAnalyticEvent:
+    type: object
+    required: [id, view, name, params]
+    properties:
+      id: { const: "flow_view_did_receive_analytic_event" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
+      name: { type: string }
+      params: { type: object }
+
   Event.DidLoadLatestProfile:
     type: object
     required: [id, profile]
@@ -671,21 +837,21 @@ $events:
     required: [id, view]
     properties:
       id: { const: "flow_view_did_appear" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
 
   FlowViewEvent.DidDisappear:
     type: object
     required: [id, view]
     properties:
       id: { const: "flow_view_did_disappear" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
 
   FlowViewEvent.DidUserAction:
     type: object
     required: [id, view, action]
     properties:
       id: { const: "flow_view_did_perform_action" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       action: { $ref: "#/$defs/AdaptyUI.UserAction" }
 
   FlowViewEvent.DidSelectProduct:
@@ -693,7 +859,7 @@ $events:
     required: [id, view, product_id]
     properties:
       id: { const: "flow_view_did_select_product" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       product_id: { type: string }
 
   FlowViewEvent.WillPurchase:
@@ -701,7 +867,7 @@ $events:
     required: [id, view, product]
     properties:
       id: { const: "flow_view_did_start_purchase" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
 
   FlowViewEvent.DidPurchase:
@@ -709,7 +875,7 @@ $events:
     required: [id, view, product, purchased_result]
     properties:
       id: { const: "flow_view_did_finish_purchase" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       purchased_result: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
@@ -718,7 +884,7 @@ $events:
     required: [id, view, product, error]
     properties:
       id: { const: "flow_view_did_fail_purchase" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       error: { $ref: "#/$defs/AdaptyError" }
 
@@ -727,14 +893,14 @@ $events:
     required: [id, view]
     properties:
       id: { const: "flow_view_did_start_restore" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
 
   FlowViewEvent.DidRestorePurchase:
     type: object
     required: [id, view, profile]
     properties:
       id: { const: "flow_view_did_finish_restore" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       profile: { $ref: "#/$defs/AdaptyProfile" }
 
   FlowViewEvent.DidFailRestorePurchase:
@@ -742,7 +908,7 @@ $events:
     required: [id, view, error]
     properties:
       id: { const: "flow_view_did_fail_restore" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       error: { $ref: "#/$defs/AdaptyError" }
 
   FlowViewEvent.DidReceiveError:
@@ -750,7 +916,7 @@ $events:
     required: [id, view, error]
     properties:
       id: { const: "flow_view_did_receive_error" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       error: { $ref: "#/$defs/AdaptyError" }
 
   FlowViewEvent.DidFailLoadingProducts:
@@ -758,7 +924,7 @@ $events:
     required: [id, view, error]
     properties:
       id: { const: "flow_view_did_fail_loading_products" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       error: { $ref: "#/$defs/AdaptyError" }
 
   FlowViewEvent.DidFinishWebPaymentNavigation:
@@ -766,7 +932,7 @@ $events:
     required: [id, view]
     properties:
       id: { const: "flow_view_did_finish_web_payment_navigation" }
-      view: { $ref: "#/$defs/AdaptyUI.PaywallView" }
+      view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
       error: { $ref: "#/$defs/AdaptyError" }
 
@@ -939,7 +1105,7 @@ $defs:
       log_level: { $ref: "#/$defs/AdaptyLog.Level" }
       cross_platform_sdk_name: { type: string }
       cross_platform_sdk_version: { type: string }
-      activate_ui: { type: boolean, dafault: false }
+      activate_ui: { type: boolean, default: false }
       media_cache:
         type: object
         properties:
@@ -972,6 +1138,7 @@ $defs:
       - price
     properties:
       vendor_product_id: { type: string }
+      flow_product_id: { type: string }
       adapty_product_id: { type: string }
       access_level_id: { type: string }
       product_type: { type: string }
@@ -1099,8 +1266,31 @@ $defs:
       response_created_at: { type: integer }
       request_locale: { $ref: "#/$defs/AdaptyLocale" }
 
+  AdaptyFlow: #request #response
+    type: object
+    required:
+      - placement
+      - flow_id
+      - flow_name
+      - variation_id
+      - variations
+      - response_created_at
+    properties:
+      placement: { $ref: "#/$defs/AdaptyPlacement" }
+      flow_id: { type: string }
+      flow_name: { type: string }
+      variation_id: { type: string }
+      remote_configs: 
+        type: array
+        items: { $ref: "#/$defs/AdaptyRemoteConfig" }
+      flow_version_id: { type: string }
+      variations:
+        type: array
+        items: { $ref: "#/$defs/AdaptyFlowPaywall" }
+      payload_data: { type: string }
+      response_created_at: { type: integer }
 
-  AdaptyPaywall: #request #response
+  AdaptyFlowPaywall: #request #response
     type: object
     required:
       - placement
@@ -1108,23 +1298,15 @@ $defs:
       - paywall_name
       - variation_id
       - products
-      - response_created_at
-      - request_locale
     properties:
       placement: { $ref: "#/$defs/AdaptyPlacement" }
       paywall_id: { type: string }
       paywall_name: { type: string }
       variation_id: { type: string }
-      remote_config: { $ref: "#/$defs/AdaptyRemoteConfig" }
-      paywall_builder: { $ref: "#/$defs/AdaptyPaywall.ViewConfiguration" }
       products:
         type: array
-        items: { $ref: "#/$defs/AdaptyPaywall.ProductReference" }
+        items: { $ref: "#/$defs/AdaptyFlowPaywall.ProductReference" }
       web_purchase_url: { type: string }
-      payload_data: { type: string }
-      response_created_at: { type: integer }
-      request_locale: { $ref: "#/$defs/AdaptyLocale" }
-
 
   AdaptyPlacement: #request #response
     type: object
@@ -1139,7 +1321,7 @@ $defs:
       audience_name: { type: string }
       revision: { type: integer }
       ab_test_name: { type: string }
-      is_tracking_purchases: { type: bool, default: false }
+      is_tracking_purchases: { type: boolean, default: false }
       placement_audience_version_id: { type: string }
 
   AdaptyPlacementFetchPolicy: #request
@@ -1168,7 +1350,7 @@ $defs:
       lang: { $ref: "#/$defs/AdaptyLocale" }
       data: { type: string, description: "custom JSON string" }
 
-  AdaptyPaywall.ProductReference: #request #response
+  AdaptyFlowPaywall.ProductReference: #request #response
     type: object
     required:
       - vendor_product_id
@@ -1176,6 +1358,7 @@ $defs:
       - access_level_id
       - product_type
     properties:
+      flow_product_id: { type: string }
       vendor_product_id: { type: string }
       adapty_product_id: { type: string }
       access_level_id: { type: string }
@@ -1184,17 +1367,6 @@ $defs:
       win_back_offer_id: { type: string, description: "iOS Only" }
       base_plan_id: { type: string, description: "Android Only" }
       offer_id: { type: string, description: "Android Only" }
-
-  AdaptyPaywall.ViewConfiguration:
-    type: object
-    required:
-      - paywall_builder_id
-      - lang
-      # - json
-    properties:
-      paywall_builder_id: { type: string }
-      lang: { $ref: "#/$defs/AdaptyLocale" }
-      json: { type: string }
 
   AdaptySubscriptionPeriod: #response
     type: object
@@ -1237,6 +1409,9 @@ $defs:
           items: { $ref: "#/$defs/AdaptyProfile.NonSubscription" }
       timestamp: { type: integer }
       is_test_user: { type: boolean }
+      applied_attribution_sources:
+        type: array
+        items: { type: string }
 
   AdaptyProfile.AccessLevel: #response
     type: object
@@ -1365,16 +1540,18 @@ $defs:
   AdaptySubscriptionOffer.Identifier: #request #response
     type: string
     oneOf:
-      - required:
-          - type
-          - id # Android Only
+      - required: [type]
         properties:
-          id: { type: string }
+          id: { type: string } # Required for Android
           type: { type: string, const: introductory }
       - required: [id, type]
         properties:
           id: { type: string }
           type: { type: string, enum: [promotional, win_back] }
+      - required: [type] # iOS Only
+        properties:
+          id: { type: string }
+          type: { type: string, const: code }
 
   AdaptySubscriptionOffer.PaymentMode: #response
     type: string
@@ -1427,7 +1604,7 @@ $defs:
         - $ref: "#/$assets/Image"
         - $ref: "#/$assets/Video"
 
-  AdaptyUI.PaywallView: #response #event
+  AdaptyUI.FlowView: #response #event
     type: object
     required:
       - id
@@ -1454,7 +1631,7 @@ $defs:
     oneOf:
       - required: [type]
         properties:
-          type: { type: string, const: ["close", "system_back"] }
+          type: { type: string, enum: [close, system_back] }
       - required: [type, value, open_in]
         properties:
           type: { type: string, const: "open_url" }
@@ -1464,6 +1641,35 @@ $defs:
         properties:
           type: { type: string, const: "custom" }
           value: { type: string }
+
+  AdaptyUI.Permission: #event
+    description: "Permission identifier requested by a flow. The values below are the
+      known cross-platform set; any string is valid — unknown or Android-only ids
+      (e.g. \"phone\", \"sms\") and future values pass through unchanged."
+    anyOf:
+      - enum:
+          - push
+          - camera
+          - microphone
+          - location_when_use
+          - location_always
+          - location_full_accuracy
+          - photos
+          - contacts
+          - tracking
+          - calendar
+          - bluetooth
+          - motion
+          - reminders
+          - speech
+          - media_library
+          - local_network
+          - focus_status
+          - homekit
+          - health
+          - siri
+          - music
+      - type: string
 
   AdaptyUI.CustomTagsValues: #request
     type: object
@@ -1622,6 +1828,8 @@ $assets:
     properties:
       id: { type: string }
       type: { const: video }
+      h_res: { type: number }
+      v_res: { type: number }
     oneOf:
       - required: [asset_id]
         properties:

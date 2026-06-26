@@ -56,7 +56,6 @@ fileprivate let pageControllTapAnimationDuration = 0.3
 
 @MainActor
 struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
-
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
     @Environment(\.layoutDirection)
@@ -188,8 +187,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
         }
     }
 
-    // View for the Pager
-    @ViewBuilder
+    /// View for the Pager
     private var pagerView: some View {
         GeometryReader { proxy in
             let pagePaddingLeading = pager.pagePadding.leading.points(
@@ -235,13 +233,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 ForEach(0 ..< pages.count, id: \.self) { idx in
                     AdaptyUIElementView(
                         pages[idx],
-                        screenHolderBuilder: {
-                            if idx == 0 {
-                                screenHolderBuilder() // TODO: x check
-                            } else {
-                                EmptyView()
-                            }
-                        }
+                        screenHolderBuilder: screenHolderBuilder
                     )
                     .frame(width: max(width, 0), height: max(height, 0))
                     .clipped()
@@ -275,7 +267,6 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
         }
     }
 
-    @ViewBuilder
     private func pageControlView(
         _ pageControl: VC.Pager.PageControl,
         onDotTap: @escaping (Int) -> Void
