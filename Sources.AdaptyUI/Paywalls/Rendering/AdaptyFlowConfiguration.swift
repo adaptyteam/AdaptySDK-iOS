@@ -15,9 +15,17 @@ import UIKit
 public extension AdaptyUI {
     @MainActor
     final class FlowConfiguration {
-        public var id: String { flowViewModel.viewConfiguration.id }
-        public var locale: String { flowViewModel.viewConfiguration.localizationId }
-        public var isRightToLeft: Bool { flowViewModel.viewConfiguration.isRightToLeft }
+        public var id: String {
+            flowViewModel.viewConfiguration.id
+        }
+
+        public var locale: String {
+            flowViewModel.viewConfiguration.localizationId
+        }
+
+        public var isRightToLeft: Bool {
+            flowViewModel.viewConfiguration.isRightToLeft
+        }
 
         package let eventsHandler: AdaptyEventsHandler
 
@@ -30,6 +38,7 @@ public extension AdaptyUI {
         package let timerViewModel: AdaptyUITimerViewModel
         package let screensViewModel: AdaptyUIScreensViewModel
         package let assetsViewModel: AdaptyUIAssetsViewModel
+        package let flowViewIdentityBox: FlowViewIdentityBox
 
         private let logic: AdaptyUILogic
 
@@ -39,6 +48,9 @@ public extension AdaptyUI {
         fileprivate let timerResolver: AdaptyTimerResolver?
         fileprivate let assetsResolver: AdaptyUIAssetsResolver?
         fileprivate let systemRequestsHandler: AdaptyUISystemRequestsHandler?
+
+        private var appeared = false
+        private var legacyAutoNotified = Set<String>()
 
         package init(
             logId: String,
@@ -66,7 +78,10 @@ public extension AdaptyUI {
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
             self.systemRequestsHandler = systemRequestsHandler
-            
+
+            let flowViewIdentityBox = FlowViewIdentityBox()
+            self.flowViewIdentityBox = flowViewIdentityBox
+
             eventsHandler = AdaptyEventsHandler(logId: logId)
             logic = AdaptyUILogic(
                 logId: logId,
@@ -129,9 +144,10 @@ public extension AdaptyUI {
                 stateHolder: stateHolder
             )
 
-            productsViewModel.onProductsLoaded = { [weak stateHolder] resolvers in
+            productsViewModel.onProductsLoaded = { [weak self, weak stateHolder] resolvers in
                 let constants = resolvers.compactMap { $0 as? AdaptyPaywallProduct }.asUIBuilderFlowProducts()
                 stateHolder?.setProducts(constants)
+                self?.tryEmitLegacyAutoSelect()
             }
 
             stateHolder.start()
@@ -144,9 +160,31 @@ public extension AdaptyUI {
         }
 
         func reportOnAppear() {
+            appeared = true
+            tryEmitLegacyAutoSelect()
             logic.reportViewDidAppear()
             flowViewModel.logShowFlow()
             timerViewModel.resumeTimers()
+        }
+
+        /// Emits the legacy default-product selection (`didSelectProduct`) once per
+        /// product group — but only after the view has appeared (so the event listeners
+        /// are already attached) and the products have been resolved. Mirrors the pre-v4
+        /// behavior where the auto-selection was reported natively at render time, and
+        /// avoids losing the event when products finish loading before the listeners are
+        /// wired up in `viewDidLoad` / SwiftUI `body`.
+        private func tryEmitLegacyAutoSelect() {
+            guard appeared else { return }
+
+            guard let legacySelected = flowViewModel.viewConfiguration.legacySelectedProducts,
+                  !legacySelected.isEmpty else { return }
+
+            for (groupId, productId) in legacySelected {
+                guard !legacyAutoNotified.contains(groupId) else { continue }
+                guard let product = productsViewModel.productInfo(by: productId) else { continue }
+                legacyAutoNotified.insert(groupId)
+                logic.reportDidSelectProduct(product)
+            }
         }
 
         func reportOnDisappear() {
@@ -160,6 +198,8 @@ public extension AdaptyUI {
         /// a new one.
         public func prepareForReuse() {
             Log.ui.verbose("#\(logId)# prepareForReuse")
+            appeared = false
+            legacyAutoNotified.removeAll()
             screensViewModel.prepareForReuse()
             productsViewModel.prepareForReuse()
             assetsViewModel.prepareForReuse()

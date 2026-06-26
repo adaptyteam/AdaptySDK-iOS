@@ -38,4 +38,8 @@ Distributed via Swift Package Manager only. CocoaPods support was dropped in 4.0
 | `AdaptyUI`             | `Sources.AdaptyUI/`       | Adapty UI SDK for Onbording and Paywall UI |
 | `AdaptyPlugin`         | `Sources.AdaptyPlugin/`   | Library for cross-platform bridge          |
 | `AdaptyDeveloperTools` | `Sources.DeveloperTools/` | Library for Developer utilities  bridge    |
-| `Adapty_KidsMode`      | `Sources.KidsMode/`       | COPPA-compliant variant of Adapty SDK      |
+
+Kids Mode (COPPA / App Store Kids Category) is a package **trait** `KidsMode`, not a
+separate module. Enable it on the `Adapty` / `AdaptyUI` / `AdaptyPlugin` dependency
+(`traits: ["KidsMode"]`) to activate the `#if KidsMode` guards that compile out IDFA /
+AdSupport.

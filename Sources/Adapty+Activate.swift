@@ -41,7 +41,7 @@ public extension Adapty {
     ) async throws(AdaptyError) {
         let stamp = Log.stamp
 
-        #if ADAPTY_KIDS_MODE
+        #if KidsMode
         let kidsModeEnabled = true
         #else
         let kidsModeEnabled = false

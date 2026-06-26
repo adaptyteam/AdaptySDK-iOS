@@ -44,13 +44,13 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didPerformAction(action.adaptyUIAction)
     }
 
-    func reportDidSelectProduct(_ product: ProductResolver, automatic: Bool) {
+    func reportDidSelectProduct(_ product: ProductResolver) {
         guard let product = product as? AdaptyPaywallProduct else {
             Log.ui.error("#\(logId)# reportDidSelectProduct error: product is not AdaptyPaywallProduc")
             return
         }
 
-        events.event_didSelectProduct(product, automatic: automatic)
+        events.event_didSelectProduct(product)
     }
 
     func reportDidFailLoadingProductsShouldRetry(with error: Error) -> Bool {

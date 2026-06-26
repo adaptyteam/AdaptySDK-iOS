@@ -38,6 +38,11 @@ enum Request {
             UpdateCollectingRefundDataConsent.self,
             UpdateRefundPreference.self,
             GetCurrentInstallationStatus.self,
+            FlowViewDidAnswerPermission.self,
+            ObserverPurchaseDidStart.self,
+            ObserverPurchaseDidFinish.self,
+            ObserverRestoreDidStart.self,
+            ObserverRestoreDidFinish.self,
         ]
 
 #if canImport(UIKit)
@@ -51,6 +56,9 @@ enum Request {
             AdaptyUIPresentOnboardingView.self,
 
             AdaptyUIShowDialog.self,
+
+            AdaptyUIOpenUrl.self,
+            AdaptyUIRequestAppReview.self,
         ]
         allRequests.append(contentsOf: adaptyUiRequests)
 

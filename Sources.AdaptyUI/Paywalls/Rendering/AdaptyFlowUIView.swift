@@ -29,6 +29,12 @@ package final class AdaptyFlowUIView: UIView {
         self.showDebugOverlay = showDebugOverlay
         logId = configuration.eventsHandler.logId
 
+        configuration.flowViewIdentityBox.value = AdaptyUI.FlowView(
+            id: id,
+            placementId: configuration.flowPlacementId,
+            variationId: configuration.flowVariationId
+        )
+
         super.init(frame: .zero)
     }
 

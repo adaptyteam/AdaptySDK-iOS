@@ -21,7 +21,7 @@ public struct AdaptyFlow: PlacementContent, Identifiable {
 
     let layoutsConfiguration: LayoutsConfiguration?
 
-    package let paywalls: [AdaptyFlowPaywall]
+    public let paywalls: [AdaptyFlowPaywall]
 }
 
 extension AdaptyFlow: CustomStringConvertible {
