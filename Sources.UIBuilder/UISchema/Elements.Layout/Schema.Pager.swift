@@ -18,6 +18,7 @@ extension Schema {
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
         let pageIndex: Schema.Variable?
+        let clampTrailingGap: Bool
     }
 }
 
@@ -31,7 +32,8 @@ extension Schema.Pager {
         pageControl: nil,
         animation: nil,
         interactionBehavior: .default,
-        pageIndex: nil
+        pageIndex: nil,
+        clampTrailingGap: false
     )
 }
 
@@ -60,7 +62,7 @@ extension Schema.Pager: Schema.CompositeElement {
                 animation: animation,
                 interactionBehavior: interactionBehavior,
                 pageIndex: pageIndex,
-                lastPagePositioning: VC.Pager.lastPagePositioningDefault
+                clampTrailingGap: clampTrailingGap
             ),
             properties
         )
@@ -78,6 +80,7 @@ extension Schema.Pager: DecodableWithConfiguration {
         case animation
         case interactionBehavior = "interaction"
         case pageIndex = "page_index"
+        case clampTrailingGap = "clamp_trailing_gap"
     }
 
     init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
@@ -99,7 +102,9 @@ extension Schema.Pager: DecodableWithConfiguration {
 
             interactionBehavior: container.decodeIfPresent(InteractionBehavior.self, forKey: .interactionBehavior)
                 ?? Self.default.interactionBehavior,
-            pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex)
+            pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex),
+            clampTrailingGap: container.decodeIfPresent(Bool.self, forKey: .clampTrailingGap)
+                ?? Self.default.clampTrailingGap
         )
     }
 }

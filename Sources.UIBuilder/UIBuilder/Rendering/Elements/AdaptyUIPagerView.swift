@@ -243,7 +243,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
             }
             .padding(.top, pagePaddingTop)
             .offset(x: VC.Pager.pagesOffsetX(
-                positioning: pager.lastPagePositioning,
+                clampTrailingGap: pager.clampTrailingGap,
                 currentPage: currentPage,
                 pageCount: pages.count,
                 pageWidth: width,
