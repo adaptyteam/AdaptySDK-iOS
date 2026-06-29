@@ -107,7 +107,7 @@ let package = Package(
             path: "Sources",
             exclude: [
                 "Events/adapty.events.schema.yaml",
-                "Placements/adapty.fallback.schema.yaml",
+                "Placements/adapty.fallback_file.cue",
             ],
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
