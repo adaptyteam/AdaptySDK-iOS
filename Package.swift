@@ -25,20 +25,12 @@ let package = Package(
             targets: ["Adapty"]
         ),
         .library(
-            name: "Adapty_KidsMode",
-            targets: ["Adapty_KidsMode"]
-        ),
-        .library(
             name: "AdaptyUIBuilder",
             targets: ["AdaptyUIBuilder"]
         ),
         .library(
             name: "AdaptyUI",
             targets: ["AdaptyUI"]
-        ),
-        .library(
-            name: "AdaptyUI_KidsMode",
-            targets: ["AdaptyUI_KidsMode"]
         ),
         .library(
             name: "AdaptyDeveloperTools",
@@ -48,9 +40,15 @@ let package = Package(
             name: "AdaptyPlugin",
             targets: ["AdaptyPlugin"]
         ),
-        .library(
-            name: "AdaptyPlugin_KidsMode",
-            targets: ["AdaptyPlugin_KidsMode"]
+    ],
+    traits: [
+        // COPPA / App Store Kids Category build trait. Off by default (not in a default
+        // set), so regular consumers are unaffected. When a consumer enables it, SwiftPM
+        // activates the `KidsMode` compilation condition package-wide, and the
+        // `#if KidsMode` guards compile out IDFA / AdSupport.
+        .trait(
+            name: "KidsMode",
+            description: "COPPA / App Store Kids Category build — compiles out IDFA / AdSupport."
         ),
     ],
     targets: [
@@ -111,16 +109,8 @@ let package = Package(
             ],
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
-                .swiftLanguageMode(.v6),
-            ]
-        ),
-        .target(
-            name: "Adapty_KidsMode",
-            dependencies: ["AdaptyUIBuilder", "AdaptyLogger", "AdaptyCodable"],
-            path: "Sources.KidsMode",
-            resources: [.copy("PrivacyInfo.xcprivacy")],
-            swiftSettings: [
-                .define("ADAPTY_KIDS_MODE"),
+                // Kids Mode is driven by the `KidsMode` trait (activates `#if KidsMode`
+                // package-wide); no per-target define, module alias, or unsafeFlags needed.
                 .swiftLanguageMode(.v6),
             ]
         ),
@@ -131,19 +121,6 @@ let package = Package(
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
-            ]
-        ),
-        .target(
-            name: "AdaptyUI_KidsMode",
-            dependencies: [
-                "AdaptyUIBuilder",
-                "Adapty_KidsMode",
-                "AdaptyLogger",
-            ],
-            path: "Sources.AdaptyUI.KidsMode",
-            resources: [.copy("PrivacyInfo.xcprivacy")],
-            swiftSettings: [
-                .unsafeFlags(["-module-alias", "Adapty=Adapty_KidsMode"]),
             ]
         ),
         .target(
@@ -163,20 +140,6 @@ let package = Package(
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
-            ]
-        ),
-        .target(
-            name: "AdaptyPlugin_KidsMode",
-            dependencies: ["AdaptyUIBuilder", "Adapty_KidsMode", "AdaptyUI_KidsMode", "AdaptyLogger"],
-            path: "Sources.AdaptyPlugin.KidsMode",
-            exclude: [
-                "cross_platform.yaml"
-            ],
-            swiftSettings: [
-                .unsafeFlags([
-                    "-module-alias", "Adapty=Adapty_KidsMode",
-                    "-module-alias", "AdaptyUI=AdaptyUI_KidsMode",
-                ]),
             ]
         ),
         .testTarget(

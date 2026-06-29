@@ -25,6 +25,8 @@ package struct AdaptyUIConfiguration: Sendable {
     let scripts: [String]
     let showPurchaseLoader: Bool
     let showRestoreLoader: Bool
+    
+    package let legacySelectedProducts: [String: String]?
 }
 
 extension AdaptyUIConfiguration: CustomStringConvertible {

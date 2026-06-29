@@ -101,7 +101,8 @@ extension Schema.ConfigurationBuilder {
             screens: source.screens.mapValues(convertScreen),
             scripts: source.scripts,
             showPurchaseLoader: source.showPurchaseLoader,
-            showRestoreLoader: source.showRestoreLoader
+            showRestoreLoader: source.showRestoreLoader,
+            legacySelectedProducts: source.legacySelectedProducts
         )
     }
 }

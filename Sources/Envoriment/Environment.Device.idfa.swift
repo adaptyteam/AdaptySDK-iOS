@@ -7,11 +7,11 @@
 
 import Foundation
 
-#if !ADAPTY_KIDS_MODE && canImport(AdSupport)
+#if !KidsMode && canImport(AdSupport)
 import AdSupport
 #endif
 
-#if !ADAPTY_KIDS_MODE && canImport(AppTrackingTransparency)
+#if !KidsMode && canImport(AppTrackingTransparency)
 import AppTrackingTransparency
 #endif
 
@@ -31,7 +31,7 @@ extension Environment.Device {
     }
 
     static var appTrackingTransparencyStatus: UInt? {
-        #if ADAPTY_KIDS_MODE || !canImport(AppTrackingTransparency)
+        #if KidsMode || !canImport(AppTrackingTransparency)
         nil
         #else
         ATTrackingManager.trackingAuthorizationStatus.rawValue
@@ -41,7 +41,7 @@ extension Environment.Device {
     @AdaptyActor
     static var idfaRetrievalStatus: IdfaRetrievalStatus {
         get async {
-            #if ADAPTY_KIDS_MODE || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
+            #if KidsMode || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
             return .notAvailable
             #else
             guard !AdaptyConfiguration.idfaCollectionDisabled else {
@@ -63,7 +63,7 @@ extension Environment.Device {
     @AdaptyActor
     static var idfa: String? {
         get async {
-            #if ADAPTY_KIDS_MODE || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
+            #if KidsMode || !canImport(AdSupport) || targetEnvironment(simulator) || os(macOS)
             return nil
             #else
 
@@ -96,7 +96,7 @@ extension Environment.Device {
     }
 }
 
-#if !ADAPTY_KIDS_MODE && canImport(AppTrackingTransparency)
+#if !KidsMode && canImport(AppTrackingTransparency)
 private extension ATTrackingManager {
     @MainActor
     static var canTakeIdfa: Environment.Device.IdfaRetrievalStatus {
