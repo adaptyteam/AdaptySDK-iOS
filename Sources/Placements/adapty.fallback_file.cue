@@ -40,7 +40,7 @@ fallback_file: {
 
 #PlacementVariations: {
 	meta!: #PlacementMeta
-	data!: [...#FlowData | #OnboardingData]
+	data!: [...#FlowData ] | [...#OnboardingData]
 	...
 }
 
@@ -103,7 +103,7 @@ fallback_file: {
 	paywall_name!:     string
 	variation_id!:     #Identifier
 	web_purchase_url?: null | #URL
-	products!: [...#PaywallProductData] //& list.MinItems(1)
+	products!: [...#PaywallProductData]
 	...
 }
 
@@ -120,8 +120,8 @@ fallback_file: {
 }
 
 #FlowLayoutsConfiguration: {
-	layouts!: [...#FlowLayout]
-	grids!: [...#FlowLayoutsGrid]
+	layouts!: [...#FlowLayout] & list.MinItems(1)
+	grids!: [...#FlowLayoutsGrid] & list.MinItems(1)
 }
 
 #FlowLayout: {
@@ -134,8 +134,8 @@ fallback_file: {
 	devices?: "all" | [...#DeviceTypeIdentifier]
 	custom_id?: null | #Identifier
 
-	h_breakpoints?: [...int & >0] & list.UniqueItems() & list.IsSorted(list.Ascending)
-	v_breakpoints?: [...int & >0] & list.UniqueItems() & list.IsSorted(list.Ascending)
+	h_breakpoints?: *[] | [...int & >0] & list.UniqueItems() & list.IsSorted(list.Ascending)
+	v_breakpoints?: *[] | [...int & >0] & list.UniqueItems() & list.IsSorted(list.Ascending)
 
 	// hidden computed values
 	_hCount: [if h_breakpoints != _|_ {len(h_breakpoints)}, 0][0]
