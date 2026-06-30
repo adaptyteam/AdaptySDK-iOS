@@ -16,6 +16,7 @@ extension AdaptyConfiguration.Builder: Decodable {
         case observerMode = "observer_mode"
         case idfaCollectionDisabled = "apple_idfa_collection_disabled"
         case ipAddressCollectionDisabled = "ip_address_collection_disabled"
+        case userAcquisitionEnabled = "user_acquisition_enabled"
         case clearDataOnBackup = "clear_data_on_backup"
         case backendProxyHost = "backend_proxy_host"
         case backendProxyPort = "backend_proxy_port"
@@ -57,6 +58,7 @@ extension AdaptyConfiguration.Builder: Decodable {
             observerMode: container.decodeIfPresent(Bool.self, forKey: .observerMode),
             idfaCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .idfaCollectionDisabled),
             ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled),
+            userAcquisitionEnabled: container.decodeIfPresent(Bool.self, forKey: .userAcquisitionEnabled),
             callbackDispatchQueue: nil,
             clearDataOnBackup: container.decodeIfPresent(Bool.self, forKey: .clearDataOnBackup),
             serverCluster: container.decodeIfPresent(AdaptyServerCluster.self, forKey: .serverCluster),

@@ -53,6 +53,7 @@ public extension Adapty {
             "app_account_token": configuration.appAccountToken?.uuidString,
             "idfa_collection_disabled": configuration.idfaCollectionDisabled,
             "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
+            "user_acquisition_enabled": configuration.userAcquisitionEnabled,
             "clear_data_on_backup": configuration.clearDataOnBackup,
             "kids_mode_enabled": kidsModeEnabled,
         ]
@@ -100,7 +101,9 @@ public extension Adapty {
 
             set(shared: sdk)
 
-            UserAcquisitionManager.activate(sdk)
+            if configuration.userAcquisitionEnabled {
+                UserAcquisitionManager.activate(sdk)
+            }
             LifecycleManager.shared.initialize()
             return sdk
         }
