@@ -37,6 +37,7 @@ $requests:
       custom_assets: { $ref: "#/$defs/AdaptyUI.CustomAssets" }
       product_purchase_parameters:
         { $ref: "#/$defs/AdaptyUI.ProductPurchaseParameters" }
+      enable_safe_area_paddings: { type: boolean, default: true, description: "Android Only" }
 
   AdaptyUICreateFlowView.Response: #response
     type: object
