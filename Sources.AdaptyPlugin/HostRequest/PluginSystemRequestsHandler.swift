@@ -45,7 +45,6 @@
             switch resolution?.status {
             case .granted: return .granted(resolution?.detail)
             case .denied: return .denied(resolution?.detail)
-            case .unavailable: return .denied(resolution?.detail ?? "unavailable")
             case nil: return .denied("cancelled") // flushed on teardown
             }
         }
