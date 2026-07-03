@@ -104,6 +104,7 @@ struct AdaptyUIImageView: View {
             KFImage
                 .url(url)
                 .targetCache(AdaptyUIBuilder.imageCache)
+                .downloader(AdaptyUIBuilder.imageDownloader)
                 .onSuccess { res in
                     Log.ui.verbose("IMG load success, cache: \(res.cacheType), url: \(url)")
                 }

@@ -176,6 +176,10 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
+            .blur(radius: resolvedBlurRadius)
+            .offset(resolvedOffset)
+            .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
+            .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
             .shadow(
                 color: assetsViewModel.resolvedAsset(
                     resolvedShadowFilling,
@@ -185,10 +189,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                 blurRadius: resolvedShadowBlurRadius,
                 offset: resolvedShadowOffset
             )
-            .blur(radius: resolvedBlurRadius)
-            .offset(resolvedOffset)
-            .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
-            .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
             .opacity(resolvedOpacity)
             .onChange(of: play.wrappedValue) { startAnimations($0) }
     }

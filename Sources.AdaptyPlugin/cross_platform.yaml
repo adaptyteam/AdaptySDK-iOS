@@ -37,6 +37,7 @@ $requests:
       custom_assets: { $ref: "#/$defs/AdaptyUI.CustomAssets" }
       product_purchase_parameters:
         { $ref: "#/$defs/AdaptyUI.ProductPurchaseParameters" }
+      enable_safe_area_paddings: { type: boolean, default: true, description: "Android Only" }
 
   AdaptyUICreateFlowView.Response: #response
     type: object
@@ -680,7 +681,7 @@ $requests:
     properties:
       method: { const: "flow_view_did_answer_permission" }
       event_id: { type: string }
-      status: { type: string, enum: ["granted", "denied", "unavailable"] }
+      status: { type: string, enum: ["granted", "denied"] }
       detail: { type: string }
 
   FlowViewDidAnswerPermission.Response: #response

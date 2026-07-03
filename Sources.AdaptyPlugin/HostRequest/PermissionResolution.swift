@@ -11,7 +11,6 @@ struct PermissionResolution {
     enum Status: String, Decodable {
         case granted
         case denied
-        case unavailable
     }
 
     let status: Status
