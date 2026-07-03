@@ -57,8 +57,8 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     private func itemWidth(
         _ item: VC.GridItem,
         totalWeight: Int,
-        weightsAvailableLength: CGFloat
-    ) -> CGFloat {
+        weightsAvailableLength: CGFloat?
+    ) -> CGFloat? {
         switch item.length {
         case let .fixed(length):
             length.points(
@@ -67,7 +67,9 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
                 safeAreaEnd: safeArea.trailing
             )
         case let .weight(weight):
-            totalWeight > 0 ? (Double(weight) / Double(totalWeight)) * weightsAvailableLength : 0
+            weightsAvailableLength.map {
+                totalWeight > 0 ? (Double(weight) / Double(totalWeight)) * $0 : 0
+            }
         }
     }
 
@@ -115,7 +117,12 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
 
     private var weightedBody: some View {
         let (totalWeight, reservedLength) = calculateTotalWeight(for: row.items)
-        let weightsAvailableLength = max(0, measuredSize.width - reservedLength)
+        // nil until the first measurement lands: for that frame weighted items keep
+        // their natural width instead of collapsing to width 0, where texts vanish
+        // and their ideal height explodes.
+        let weightsAvailableLength: CGFloat? = measuredSize == .zero
+            ? nil
+            : max(0, measuredSize.width - reservedLength)
 
         return HStack(spacing: row.spacing) {
             ForEach(0 ..< row.items.count, id: \.self) { idx in
