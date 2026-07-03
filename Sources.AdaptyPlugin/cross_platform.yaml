@@ -681,7 +681,7 @@ $requests:
     properties:
       method: { const: "flow_view_did_answer_permission" }
       event_id: { type: string }
-      status: { type: string, enum: ["granted", "denied", "unavailable"] }
+      status: { type: string, enum: ["granted", "denied"] }
       detail: { type: string }
 
   FlowViewDidAnswerPermission.Response: #response
