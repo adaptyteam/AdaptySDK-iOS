@@ -40,6 +40,6 @@ public struct AdaptyPaywallProduct: AdaptyProduct, WebPaywallURLProviding {
     package let webPaywallBaseUrl: URL?
 
     public var description: String {
-        "(adaptyProductId: \(adaptyProductId), info: \(productInfo), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map(\.description) ?? "nil") , skProduct:\(skProduct)"
+        "(adaptyProductId: \(adaptyProductId), info: \(productInfo), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map(\.description) ?? "nil") , skProduct:\(skProduct))"
     }
 }

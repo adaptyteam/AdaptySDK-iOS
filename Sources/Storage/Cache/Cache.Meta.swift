@@ -29,7 +29,7 @@ extension Cache {
             size: Int,
             locale: AdaptyLocale?,
             eligibleCrossABtest: Bool,
-            segmentId: String?,
+            segmentId: String? = nil,
             dataVersion: Int,
             storedAt: Date,
             lastAccessedAt: Date

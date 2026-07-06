@@ -172,7 +172,8 @@ $requests:
     properties:
       method: { const: "adapty_ui_open_url" }
       url: { type: string }
-      open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
+      open_in:
+        { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
 
   AdaptyUIOpenUrl.Response: #response
     type: object
@@ -327,7 +328,7 @@ $requests:
     properties:
       method: { const: "identify" }
       customer_user_id: { type: string }
-      parameters: { $ref: "#/$defs/CustomerIdentityParameters" } 
+      parameters: { $ref: "#/$defs/CustomerIdentityParameters" }
 
   Identify.Response: #response
     type: object
@@ -421,9 +422,27 @@ $requests:
     properties:
       method: { const: "make_purchase" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
-      parameters:  { $ref: "#/$defs/AdaptyPurchaseParameters" }
+      parameters: { $ref: "#/$defs/AdaptyPurchaseParameters" }
 
   MakePurchase.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { $ref: "#/$defs/AdaptyPurchaseResult" }
+
+  ### makePromotedPurchase ###
+  MakePromotedPurchase.Request: #request
+    type: object
+    required: [method, product]
+    properties:
+      method: { const: "make_promoted_purchase" }
+      product: { $ref: "#/$defs/AdaptyPromotedProduct.Request" }
+
+  MakePromotedPurchase.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -443,7 +462,8 @@ $requests:
       method: { const: "open_web_paywall" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
       paywall: { $ref: "#/$defs/AdaptyFlowPaywall" }
-      open_in: { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
+      open_in:
+        { $ref: "#/$defs/AdaptyWebPresentation", default: "browser_out_app" }
 
   OpenWebPaywall.Response: #response
     type: object
@@ -819,6 +839,13 @@ $events:
       id: { const: "did_load_latest_profile" }
       profile: { $ref: "#/$defs/AdaptyProfile" }
 
+  Event.DidReceivePromotedPurchase:
+    type: object
+    required: [id, product]
+    properties:
+      id: { const: "did_receive_promoted_purchase" }
+      product: { $ref: "#/$defs/AdaptyPromotedProduct.Response" }
+
   Event.OnInstallationDetailsSuccess:
     type: object
     required: [id, details]
@@ -1092,7 +1119,8 @@ $defs:
     properties:
       api_key: { type: string }
       customer_user_id: { type: string }
-      customer_identity_parameters: { $ref: "#/$defs/CustomerIdentityParameters" }    
+      customer_identity_parameters:
+        { $ref: "#/$defs/CustomerIdentityParameters" }
       observer_mode: { type: boolean, default: false }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
@@ -1121,7 +1149,7 @@ $defs:
     properties:
       app_account_token: { $ref: "#/$defs/UUID", description: "iOS Only" }
       obfuscated_account_id: { type: string, description: "Android Only" }
-      obfuscated_profile_id: { type: string, description: "Android Only" }     
+      obfuscated_profile_id: { type: string, description: "Android Only" }
 
   AdaptyPaywallProduct.Response: #response
     type: object
@@ -1155,7 +1183,7 @@ $defs:
         { type: boolean, default: false, description: "iOS Only" }
       region_code: { type: string }
       price: { $ref: "#/$defs/AdaptyPrice" }
-      subscription: { $ref: "#/$defs/AdaptyPaywallProduct.Subscription" }
+      subscription: { $ref: "#/$defs/AdaptyProduct.Subscription" }
       payload_data: { type: string }
 
   AdaptyPrice: #response
@@ -1167,7 +1195,43 @@ $defs:
       currency_symbol: { type: string }
       localized_string: { type: string }
 
-  AdaptyPaywallProduct.Subscription: #response
+  AdaptyPromotedProduct.Request: #request
+    type: object
+    required:
+      - vendor_product_id
+    properties:
+      vendor_product_id: { type: string }
+      subscription:
+        type: object
+        properties:
+          offer:
+            type: object
+            required: [offer_identifier]
+            properties:
+              offer_identifier:
+                { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
+      payload_data: { type: string }
+
+  AdaptyPromotedProduct.Response: #event
+    type: object
+    required:
+      - vendor_product_id
+      - localized_description
+      - localized_title
+      - is_family_shareable # iOS Only
+      - price
+    properties:
+      vendor_product_id: { type: string }
+      localized_description: { type: string }
+      localized_title: { type: string }
+      is_family_shareable:
+        { type: boolean, default: false, description: "iOS Only" }
+      region_code: { type: string }
+      price: { $ref: "#/$defs/AdaptyPrice" }
+      subscription: { $ref: "#/$defs/AdaptyProduct.Subscription" }
+      payload_data: { type: string }
+
+  AdaptyProduct.Subscription: #event #response
     type: object
     required:
       - group_identifier # iOS Only
@@ -1205,8 +1269,15 @@ $defs:
       access_level_id: { type: string }
       product_type: { type: string }
       paywall_product_index: { type: integer }
-      subscription_offer_identifier:
-        { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
+      subscription:
+        type: object
+        properties:
+          offer:
+            type: object
+            required: [offer_identifier]
+            properties:
+              offer_identifier:
+                { $ref: "#/$defs/AdaptySubscriptionOffer.Identifier" }
       paywall_variation_id: { type: string }
       paywall_ab_test_name: { type: string }
       paywall_name: { type: string }
@@ -1282,7 +1353,7 @@ $defs:
       flow_id: { type: string }
       flow_name: { type: string }
       variation_id: { type: string }
-      remote_configs: 
+      remote_configs:
         type: array
         items: { $ref: "#/$defs/AdaptyRemoteConfig" }
       flow_version_id: { type: string }
@@ -1291,13 +1362,13 @@ $defs:
         items: { $ref: "#/$defs/AdaptyFlowPaywall" }
       ui_schema:
         type: object
-        required: [ grids, layouts ]
+        required: [grids, layouts]
         properties:
           layouts:
             type: array
             items:
               type: object
-              required: [ flow_layout_id ]
+              required: [flow_layout_id]
               properties:
                 flow_layout_id:
                   type: string
@@ -1305,19 +1376,19 @@ $defs:
             type: array
             items:
               type: object
-              required: [ cells ]
+              required: [cells]
               properties:
                 platforms:
                   oneOf:
                     - const: "all"
                     - type: array
-                      items: { enum: [ "ios", "android" ] }
+                      items: { enum: ["ios", "android"] }
                   default: []
                 devices:
                   oneOf:
                     - const: "all"
                     - type: array
-                      items: { enum: ["phone","tab"] }
+                      items: { enum: ["phone", "tab"] }
                   default: []
                 custom_id: { type: string }
                 h_breakpoints:
@@ -1618,7 +1689,6 @@ $defs:
           apple_jws_transaction: { type: string }
           google_purchase_token: { type: string }
 
-
   AdaptyInstallationStatus: #response #event
     type: object
     oneOf:
@@ -1632,12 +1702,12 @@ $defs:
 
   AdaptyInstallationDetails: #response #event
     type: object
-    required: [ install_time, app_launch_count]
+    required: [install_time, app_launch_count]
     properties:
-      install_id:  { type: string }
+      install_id: { type: string }
       install_time: { $ref: "#/$defs/Date", nullable: false }
       app_launch_count: { type: integer, nullable: false }
-      payload:  { type: string }
+      payload: { type: string }
 
   AdaptyUI.CustomAssets:
     type: array
@@ -1687,9 +1757,10 @@ $defs:
           value: { type: string }
 
   AdaptyUI.Permission: #event
-    description: "Permission identifier requested by a flow. The values below are the
+    description:
+      'Permission identifier requested by a flow. The values below are the
       known cross-platform set; any string is valid — unknown or Android-only ids
-      (e.g. \"phone\", \"sms\") and future values pass through unchanged."
+      (e.g. "phone", "sms") and future values pass through unchanged.'
     anyOf:
       - enum:
           - push
@@ -1723,13 +1794,11 @@ $defs:
     type: object
     additionalProperties: { $ref: "#/$defs/Date", nullable: false }
 
-  AdaptyUI.ProductPurchaseParameters:  #request
+  AdaptyUI.ProductPurchaseParameters: #request
     type: object
     propertyNames: { description: "key is adapty_product_id" }
-    additionalProperties: { 
-      $ref: "#/$defs/AdaptyPurchaseParameters", 
-      nullable: false 
-    }
+    additionalProperties:
+      { $ref: "#/$defs/AdaptyPurchaseParameters", nullable: false }
 
   AdaptyUI.IOSPresentationStyle:
     type: string
@@ -1757,8 +1826,8 @@ $defs:
     enum:
       - primary
       - secondary
-  
-  AdaptyPurchaseParameters:  #request
+
+  AdaptyPurchaseParameters: #request
     type: object
     properties:
       subscription_update_params:
@@ -1767,7 +1836,6 @@ $defs:
           description: "Android Only",
         }
       is_offer_personalized: { type: boolean, description: "Android Only" }
-      
 
   AdaptySubscriptionUpdateParameters: #request # Android Only
     type: object

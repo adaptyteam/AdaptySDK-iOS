@@ -30,7 +30,8 @@ extension Request {
                 period: BackendProductInfo.Period(rawValue: container.decode(String.self, forKey: .adaptyProductType))
             )
             paywallProductIndex = try container.decode(Int.self, forKey: .paywallProductIndex)
-            subscriptionOfferIdentifier = try container.decodeIfPresent(AdaptySubscriptionOffer.Identifier.self, forKey: .subscriptionOfferIdentifier)
+            subscriptionOfferIdentifier =
+                try container.decodeSubscriptionOfferIdentifierIfPresent(forKey: .subscription) ?? container.decodeIfPresent(AdaptySubscriptionOffer.Identifier.self, forKey: .subscriptionOfferIdentifier)
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
             paywallName = try container.decode(String.self, forKey: .paywallName)
@@ -67,7 +68,7 @@ extension Response {
             self.wrapped = wrapped
         }
 
-        public func encode(to encoder: Encoder) throws {
+        func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(wrapped.vendorProductId, forKey: .vendorProductId)
             try container.encodeIfPresent(wrapped.flowProductId, forKey: .flowProductId)
@@ -84,50 +85,7 @@ extension Response {
             try container.encode(wrapped.isFamilyShareable, forKey: .isFamilyShareable)
             try container.encodeIfPresent(wrapped.regionCode, forKey: .regionCode)
             try container.encode(Price(from: wrapped), forKey: .price)
-            try container.encodeIfPresent(Subscription(product: wrapped), forKey: .subscription)
+            try container.encodeIfPresent(Subscription(product: wrapped, offer: wrapped.subscriptionOffer), forKey: .subscription)
         }
-    }
-}
-
-public extension AdaptyPaywallProduct {
-    var asAdaptyJsonData: AdaptyJsonData {
-        get throws {
-            try AdaptyPlugin.encoder.encode(
-                Response.AdaptyPluginPaywallProduct(self)
-            )
-        }
-    }
-}
-
-private struct Subscription: Sendable, Encodable {
-    let groupIdentifier: String
-    let period: AdaptySubscriptionPeriod
-    let localizedPeriod: String?
-    let offer: AdaptySubscriptionOffer?
-
-    init?(product: AdaptyPaywallProduct) {
-        guard let groupIdentifier = product.subscriptionGroupIdentifier,
-              let period = product.subscriptionPeriod
-        else { return nil }
-
-        self.groupIdentifier = groupIdentifier
-        self.period = period
-        localizedPeriod = product.localizedSubscriptionPeriod
-        offer = product.subscriptionOffer
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case groupIdentifier = "group_identifier"
-        case period
-        case localizedPeriod = "localized_period"
-        case offer
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(groupIdentifier, forKey: .groupIdentifier)
-        try container.encode(period, forKey: .period)
-        try container.encodeIfPresent(localizedPeriod, forKey: .localizedPeriod)
-        try container.encode(offer, forKey: .offer)
     }
 }

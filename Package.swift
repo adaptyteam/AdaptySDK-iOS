@@ -152,9 +152,6 @@ let package = Package(
                 "UISchema",
                 "UIConfiguration",
             ],
-            resources: [
-                .process("Placements/fallback.json"),
-            ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
             ]
@@ -162,4 +159,3 @@ let package = Package(
     ],
     cxxLanguageStandard: .cxx20
 )
-

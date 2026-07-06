@@ -19,13 +19,20 @@ extension AdaptySubscriptionOffer.Identifier: Codable {
         let offerType = try container.decode(AdaptySubscriptionOfferType.self, forKey: .offerType)
         switch offerType {
         case .introductory:
-            self = .introductory
-        case .promotional:
-            self = try .promotional(container.decode(String.self, forKey: .offerId))
-        case .winBack:
-            self = try .winBack(container.decode(String.self, forKey: .offerId))
-        case .code:
-            self = try .code(container.decodeIfPresent(String.self, forKey: .offerId))
+            self.init(
+                offerId: nil,
+                offerType: offerType
+            )
+        case .promotional, .winBack:
+            try self.init(
+                offerId: container.decode(String.self, forKey: .offerId),
+                offerType: offerType
+            )
+        default:
+            try self.init(
+                offerId: container.decodeIfPresent(String.self, forKey: .offerId),
+                offerType: offerType
+            )
         }
     }
 

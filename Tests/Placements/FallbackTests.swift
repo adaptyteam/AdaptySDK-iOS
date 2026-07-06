@@ -15,8 +15,15 @@ import Testing
 struct FallbackTests {
     enum Json: String {
         case medium = "fallback.json"
-        var url: URL {
-            Bundle.module.url(forResource: rawValue, withExtension: nil)!
+        var url: URL? {
+            let url = URL(fileURLWithPath: #filePath)
+                .deletingLastPathComponent()
+                .appendingPathComponent(rawValue)
+            return FileManager.default.fileExists(atPath: url.path) ? url : nil
+        }
+
+        var hasFile: Bool {
+            url != nil
         }
     }
 
@@ -72,18 +79,19 @@ struct FallbackTests {
         #expect(ok)
     }
 
-    @Test func read_all() throws {
-        let data = try Data(contentsOf: Json.medium.url)//.jsonExtract(pointer: "/data")
+    @Test(.enabled(if: Json.medium.hasFile))
+    func read_all() throws {
+        let data = try Data(contentsOf: #require(Json.medium.url)) // .jsonExtract(pointer: "/data")
         let startTime = CFAbsoluteTimeGetCurrent()
 
         let result = try JSONSerialization.jsonObject(with: data)
-        #expect(result is [String:Any])
+        #expect(result is [String: Any])
         let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
         print("### Time elapsed for reading all: \(String(format: "%.6f", timeElapsed)) s.")
-
     }
 
-    @Test func medium() throws {
+    @Test(.enabled(if: Json.medium.hasFile))
+    func medium() throws {
         try test(json: Json.medium)
     }
 
@@ -127,7 +135,7 @@ struct FallbackTests {
     }
 
     private func inspect(json: Json) throws -> (flows: [String], onboardings: [String], schemas: [String]) {
-        let data = try Data(contentsOf: json.url).jsonExtract(pointer: "/data")
+        let data = try Data(contentsOf: json.url!).jsonExtract(pointer: "/data")
         let decoder = JSONDecoder()
         let result = try decoder.decode([String: Placement].self, from: data)
 
@@ -153,7 +161,7 @@ struct FallbackTests {
         let (flows, onboardings, schemas) = try inspect(json: json)
 
         let startTime = CFAbsoluteTimeGetCurrent()
-        let fallback = try FallbackPlacements(fileURL: json.url)
+        let fallback = try FallbackPlacements(fileURL: json.url!)
         let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
         print("### Time elapsed for fallback: \(String(format: "%.6f", timeElapsed)) s.")
 
@@ -212,6 +220,4 @@ struct FallbackTests {
     }
 }
 
-
 #endif
-

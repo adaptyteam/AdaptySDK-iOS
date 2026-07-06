@@ -7,44 +7,44 @@
 
 import StoreKit
 
+extension StoreKit.Product.SubscriptionOffer {
+    var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier {
+        .init(offerId: id, offerType: type.asSubscriptionOfferType)
+    }
+
+    fileprivate func asAdaptySubscriptionOffer(
+        priceFormatStyle: Decimal.FormatStyle.Currency,
+        subscriptionPeriodFormatStyle: Date.ComponentsFormatStyle
+    ) -> AdaptySubscriptionOffer {
+        let period = period.asAdaptySubscriptionPeriod
+        let periodLocale = subscriptionPeriodFormatStyle.locale
+        return .init(
+            price: price,
+            currencyCode: priceFormatStyle.currencyCode,
+            localizedPrice: displayPrice,
+            offerIdentifier: subscriptionOfferIdentifier,
+            subscriptionPeriod: period,
+            numberOfPeriods: periodCount,
+            paymentMode: paymentMode.asPaymentMode,
+            localizedSubscriptionPeriod: periodLocale.localized(period: period),
+            localizedNumberOfPeriods: periodLocale.localized(period: period, numberOfPeriods: periodCount)
+        )
+    }
+}
+
 extension StoreKit.Product {
-    var introductoryOfferNotApplicable: Bool {
-        subscription?.introductoryOffer == nil
-    }
-
-    func subscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> SubscriptionOffer? {
-        switch offerIdentifier {
-        case .introductory:
-            subscription?.introductoryOffer
-        case let .promotional(offerId):
-            subscription?.promotionalOffers.first(where: { $0.id == offerId })
-        case let .winBack(offerId):
-            if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) {
-                subscription?.winBackOffers.first { $0.id == offerId }
-            } else {
-                nil
-            }
-        case .code:
-            nil
-        }
-    }
-
     func adaptySubscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {
         guard let offer: SubscriptionOffer = subscriptionOffer(by: offerIdentifier) else { return nil }
+        return offer.asAdaptySubscriptionOffer(
+            priceFormatStyle: priceFormatStyle,
+            subscriptionPeriodFormatStyle: subscriptionPeriodFormatStyle
+        )
+    }
 
-        let period = offer.period.asAdaptySubscriptionPeriod
-        let periodLocale = subscriptionPeriodFormatStyle.locale
-        return AdaptySubscriptionOffer(
-            price: offer.price,
-            currencyCode: priceFormatStyle.currencyCode,
-//            currencySymbol: priceFormatStyle.locale.currencySymbol,
-            localizedPrice: offer.displayPrice,
-            offerIdentifier: offerIdentifier,
-            subscriptionPeriod: period,
-            numberOfPeriods: offer.periodCount,
-            paymentMode: offer.paymentMode.asPaymentMode,
-            localizedSubscriptionPeriod: periodLocale.localized(period: period),
-            localizedNumberOfPeriods: periodLocale.localized(period: period, numberOfPeriods: offer.periodCount)
+    func adaptySubscriptionOffer(by offer: SubscriptionOffer) -> AdaptySubscriptionOffer {
+        offer.asAdaptySubscriptionOffer(
+            priceFormatStyle: priceFormatStyle,
+            subscriptionPeriodFormatStyle: subscriptionPeriodFormatStyle
         )
     }
 }

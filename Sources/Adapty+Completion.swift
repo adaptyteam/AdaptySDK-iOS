@@ -13,6 +13,7 @@ public typealias AdaptyErrorCompletion = @Sendable (AdaptyError?) -> Void
 public typealias AdaptyResultCompletion<Success> = @Sendable (AdaptyResult<Success>) -> Void
 
 public extension Result where Failure == AdaptyError {
+    @inlinable
     var error: AdaptyError? {
         switch self {
         case let .failure(error): error
@@ -345,6 +346,15 @@ public extension Adapty {
     ///   - completion: A result containing the ``AdaptyPurchaseResult`` object.
     nonisolated static func makePurchase(
         product: AdaptyPaywallProduct,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await makePurchase(product: product)
+        }
+    }
+
+    nonisolated static func makePurchase(
+        product: AdaptyPromotedProduct,
         _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in

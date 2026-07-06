@@ -8,13 +8,25 @@
 import StoreKit
 
 extension StoreKit.Transaction.OfferType {
-    var asSubscriptionOfferType: AdaptySubscriptionOfferType? {
+    var asSubscriptionOfferType: AdaptyTransactionOfferType {
         switch self {
         case .introductory: .introductory
         case .promotional: .promotional
-        case .winBack: .winBack
         case .code: .code
-        default: nil
+        case .winBack: .winBack
+        default: .init(rawValue: rawValue)
+        }
+    }
+}
+
+extension AdaptyTransactionOfferType {
+    var asSKTransactionOfferType: StoreKit.Transaction.OfferType {
+        switch self {
+        case .introductory: .introductory
+        case .promotional: .promotional
+        case .code: .code
+        case .winBack: .winBack
+        default: .init(rawValue: rawValue)
         }
     }
 }

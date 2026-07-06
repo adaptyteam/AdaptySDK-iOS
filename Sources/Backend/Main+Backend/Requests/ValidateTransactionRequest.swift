@@ -93,7 +93,7 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
                 try offerContainer.encode(offer.paymentMode, forKey: .paymentMode)
                 try offerContainer.encodeIfPresent(offer.period?.unit, forKey: .periodUnit)
                 try offerContainer.encodeIfPresent(offer.period?.numberOfUnits, forKey: .periodNumberOfUnits)
-                try offerContainer.encode(offer.offerType.rawValue, forKey: .offerType)
+                try offerContainer.encode(offer.offerType.stringValue, forKey: .offerType)
             }
             try container.encode(info.environment, forKey: .environment)
 
@@ -121,6 +121,7 @@ private extension Adapty.ValidatePurchaseReason {
         case .setVariation: "set_variation"
         case .observing: "observing"
         case .purchasing: "purchasing"
+        case .promotedPurchase: "promoted_purchase"
         case .unfinished: "unfinished"
         }
     }
