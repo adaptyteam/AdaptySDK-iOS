@@ -280,12 +280,6 @@ final class ImageDownloader: @unchecked Sendable {
     /// See the ``ImageDownloaderDelegate`` protocol for more information.
     weak var delegate: (any ImageDownloaderDelegate)?
 
-    /// A responder for authentication challenges.
-    ///
-    /// The downloader forwards the received authentication challenge for the downloading session to this responder.
-    /// See ``AuthenticationChallengeResponsible`` for more.
-    weak var authenticationChallengeResponder: (any AuthenticationChallengeResponsible)?
-
     // The downloader name.
     private let name: String
     
@@ -313,18 +307,17 @@ final class ImageDownloader: @unchecked Sendable {
             delegate: sessionDelegate,
             delegateQueue: nil)
 
-        authenticationChallengeResponder = self
         setupSessionHandler()
     }
 
     deinit { session.invalidateAndCancel() }
 
     private func setupSessionHandler() {
-        sessionDelegate.onReceiveSessionChallenge.delegate(on: self) { (self, invoke) in
-            await (self.authenticationChallengeResponder ?? self).downloader(self, didReceive: invoke.1)
+        sessionDelegate.onReceiveSessionChallenge.delegate(on: self) { (_, _) in
+            (.performDefaultHandling, nil)
         }
-        sessionDelegate.onReceiveSessionTaskChallenge.delegate(on: self) { (self, invoke) in
-            await (self.authenticationChallengeResponder ?? self).downloader(self, task: invoke.1, didReceive: invoke.2)
+        sessionDelegate.onReceiveSessionTaskChallenge.delegate(on: self) { (_, _) in
+            (.performDefaultHandling, nil)
         }
         sessionDelegate.onValidStatusCode.delegate(on: self) { (self, code) in
             (self.delegate ?? self).isValidStatusCode(code, for: self)
@@ -391,29 +384,7 @@ final class ImageDownloader: @unchecked Sendable {
             request.allowsConstrainedNetworkAccess = false
         }
         
-        guard let requestModifier = options.requestModifier else {
-            checkRequestAndDone(r: request)
-            return
-        }
-        
-        // Modifies request before sending.
-        // FIXME: A temporary solution for keep the sync `ImageDownloadRequestModifier` behavior as before.
-        // We should be able to combine two cases once the full async support can be introduced to Kingfisher.
-        if let m = requestModifier as? any ImageDownloadRequestModifier {
-            guard let result = m.modified(for: request) else {
-                done(.failure(KingfisherError.requestError(reason: .emptyRequest)))
-                return
-            }
-            checkRequestAndDone(r: result)
-        } else  {
-            Task { [request] in
-                guard let result = await requestModifier.modified(for: request) else {
-                    done(.failure(KingfisherError.requestError(reason: .emptyRequest)))
-                    return
-                }
-                checkRequestAndDone(r: result)
-            }
-        }
+        checkRequestAndDone(r: request)
     }
 
     private func addDownloadTask(
@@ -546,15 +517,8 @@ final class ImageDownloader: @unchecked Sendable {
             switch result {
             case .success(let context):
                 let taskCallback = self.createTaskCallback(completionHandler, options: options)
-                if let modifier = options.requestModifier {
-                    _ = self.startDownloadTask(context: context, callback: taskCallback, beforeTaskResume: { actualDownloadTask in
-                        downloadTask.linkToTask(actualDownloadTask)
-                        modifier.onDownloadTaskStarted?(downloadTask)
-                    })
-                } else {
-                    let actualDownloadTask = self.startDownloadTask(context: context, callback: taskCallback)
-                    downloadTask.linkToTask(actualDownloadTask)
-                }
+                let actualDownloadTask = self.startDownloadTask(context: context, callback: taskCallback)
+                downloadTask.linkToTask(actualDownloadTask)
             case .failure(let error):
                 options.callbackQueue.execute {
                     completionHandler?(.failure(error))
@@ -710,9 +674,6 @@ extension ImageDownloader {
         sessionDelegate.cancel(url: url)
     }
 }
-
-// Use the default implementation from extension of `AuthenticationChallengeResponsible`.
-extension ImageDownloader: AuthenticationChallengeResponsible {}
 
 // Use the default implementation from extension of `ImageDownloaderDelegate`.
 extension ImageDownloader: ImageDownloaderDelegate {}

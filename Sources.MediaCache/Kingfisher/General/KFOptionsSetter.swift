@@ -342,34 +342,6 @@ extension KFOptionSetter {
         return self
     }
 
-    /// Sets a retry strategy to be used when issues arise during image retrieval.
-    ///
-    /// - Parameter strategy: The provided strategy that defines how retry attempts should occur.
-    /// - Returns: A `Self` value with the changes applied.
-    ///
-    func retry(_ strategy: (any RetryStrategy)?) -> Self {
-        options.retryStrategy = strategy
-        return self
-    }
-
-    /// Sets a retry strategy with a maximum retry count and retry interval.
-    ///
-    /// - Parameters:
-    ///   - maxCount: The maximum number of retry attempts before the retry stops.
-    ///   - interval: The time interval between each retry attempt.
-    /// - Returns: A `Self` value with the changes applied.
-    ///
-    /// This defines a straightforward retry strategy that retries a failing request for a specified number of times 
-    /// with a designated time interval between each attempt. For example, `.retry(maxCount: 3, interval: .second(3))`
-    /// indicates a maximum of three retry attempts, with a 3-second pause between each retry if the previous attempt
-    /// fails.
-    ///
-    func retry(maxCount: Int, interval: DelayRetryStrategy.Interval = .seconds(3)) -> Self {
-        let strategy = DelayRetryStrategy(maxRetryCount: maxCount, retryInterval: interval)
-        options.retryStrategy = strategy
-        return self
-    }
-
     /// Sets the `Source` to be loaded when the user enables Low Data Mode and the original source fails with an
     ///  `NSURLErrorNetworkUnavailableReason.constrained` error.
     ///
@@ -411,59 +383,6 @@ extension KFOptionSetter {
     ///
     func onFailureImage(_ image: KFCrossPlatformImage?) -> Self {
         options.onFailureImage = .some(image)
-        return self
-    }
-}
-
-// MARK: - Request Modifier
-extension KFOptionSetter {
-    
-    /// Sets an ``ImageDownloadRequestModifier`` to alter the image download request before it is sent.
-    ///
-    /// - Parameter modifier: The modifier to be used for changing the request before it is sent.
-    /// - Returns: A `Self` value with the changes applied.
-    ///
-    /// This is your last opportunity to modify the image download request. You can use this for customization
-    /// purposes, such as adding an authentication token to the header, implementing basic HTTP authentication,
-    /// or URL mapping.
-    func requestModifier(_ modifier: any AsyncImageDownloadRequestModifier) -> Self {
-        options.requestModifier = modifier
-        return self
-    }
-
-    /// Sets a block to modify the image download request before it is sent.
-    ///
-    /// - Parameter modifyBlock: The modifying block that will be called to change the request before it is sent.
-    /// - Returns: A `Self` value with the changes applied.
-    ///
-    /// This is your last opportunity to modify the image download request. You can use this for customization purposes,
-    /// such as adding an authentication token to the header, implementing basic HTTP authentication, or URL mapping.
-    ///
-    func requestModifier(_ modifyBlock: @escaping @Sendable (inout URLRequest) -> Void) -> Self {
-        options.requestModifier = AnyModifier { r -> URLRequest? in
-            var request = r
-            modifyBlock(&request)
-            return request
-        }
-        return self
-    }
-}
-
-// MARK: - Redirect Handler
-extension KFOptionSetter {
-    
-    /// Sets an `ImageDownloadRedirectHandler` to modify the image download request during redirection.
-    ///
-    /// - Parameter handler: The handler to be used for redirection.
-    /// - Returns: A `Self` value with the changes applied.
-    ///
-    /// This provides an opportunity to modify the image download request during redirection. You can use this for 
-    /// customization purposes, such as adding an authentication token to the header, implementing basic HTTP
-    /// authentication, or URL mapping. By default, the original redirection request will be sent without any
-    /// modification.
-    ///
-    func redirectHandler(_ handler: any ImageDownloadRedirectHandler) -> Self {
-        options.redirectHandler = handler
         return self
     }
 }
@@ -689,44 +608,6 @@ extension KFOptionSetter {
         return self
     }
 }
-
-// MARK: - Image Modifier
-extension KFOptionSetter {
-
-    /// Sets an ``ImageModifier`` for the image task. Use this to modify the fetched image object's properties if needed.
-    ///
-    /// If the image was fetched directly from the downloader, the modifier will run directly after the 
-    /// ``ImageProcessor``. If the image is being fetched from a cache, the modifier will run after the 
-    /// ``CacheSerializer``.
-    ///
-    /// - Parameter modifier: The ``ImageModifier`` to be used for modifying the image object.
-    /// - Returns: A `Self` value with the changes applied.
-    ///
-    func imageModifier(_ modifier: (any ImageModifier)?) -> Self {
-        options.imageModifier = modifier
-        return self
-    }
-
-    /// Sets a block to modify the image object. Use this to modify the fetched image object's properties if needed.
-    ///
-    /// If the image was fetched directly from the downloader, the modifier block will run directly after the 
-    /// ``ImageProcessor``. If the image is being fetched from a cache, the modifier will run after the
-    /// ``CacheSerializer``.
-    ///
-    /// - Parameter block: The block used to modify the image object.
-    /// - Returns: A `Self` value with the changes applied.
-    ///
-    func imageModifier(_ block: @escaping @Sendable (inout KFCrossPlatformImage) throws -> Void) -> Self {
-        let modifier = AnyImageModifier { image -> KFCrossPlatformImage in
-            var image = image
-            try block(&image)
-            return image
-        }
-        options.imageModifier = modifier
-        return self
-    }
-}
-
 
 // MARK: - Cache Expiration
 extension KFOptionSetter {

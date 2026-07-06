@@ -149,24 +149,6 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// once, consumes more memory, but decodes image frames only once.
     case preloadAllAnimationData
     
-    /// The contained ``ImageDownloadRequestModifier`` will be used to alter the request before it is sent.
-    ///
-    /// This is the final opportunity to modify the image download request. You can customize the request for various 
-    /// purposes, such as adding an authentication token to the header, performing basic HTTP authentication, or URL
-    /// mapping.
-    ///
-    /// By default, the original request is sent without any modifications.
-    case requestModifier(any AsyncImageDownloadRequestModifier)
-
-    /// The contained ``ImageDownloadRedirectHandler`` will be used to alter the request during redirection.
-    ///
-    /// This provides an opportunity to customize the image download request during redirection. You can modify the 
-    /// request for various purposes, such as adding an authentication token to the header, performing basic HTTP
-    /// authentication, or URL mapping.
-    ///
-    /// By default, the original redirection request is sent without any modifications.
-    case redirectHandler(any ImageDownloadRedirectHandler)
-
     /// The processor used in the image retrieval task.
     ///
     /// After downloading is complete, a processor will convert the downloaded data into an image and/or apply various 
@@ -182,16 +164,6 @@ enum KingfisherOptionsInfoItem: Sendable {
     ///
     /// If not set, the ``DefaultCacheSerializer/default`` will be used.
     case cacheSerializer(any CacheSerializer)
-
-    /// An ``ImageModifier`` for making adjustments to an image right before it is used.
-    ///
-    /// If the image was directly fetched from the downloader, the modifier will be applied immediately after the 
-    /// ``ImageProcessor``. If the image is retrieved from a cache, the modifier will be applied after the
-    /// ``CacheSerializer``.
-    ///
-    /// Use the ``ImageModifier`` when you need to set properties that do not persist when caching the image with a 
-    /// specific image type. Examples include setting the `renderingMode` or `alignmentInsets` of a `UIImage`.
-    case imageModifier(any ImageModifier)
 
     /// Keep the existing image of image view while setting another image to it.
     /// By setting this option, the placeholder image parameter of image view extension method
@@ -354,17 +326,6 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// - Note: User cancellation will not trigger the loading of alternative sources.
     case alternativeSources([Source])
 
-    /// Provides a retry strategy to use when something goes wrong during the image retrieval process from
-    /// ``KingfisherManager``.
-    ///
-    /// You can define a strategy by creating a type that conforms to the ``RetryStrategy`` protocol. When Kingfisher
-    /// encounters a loading failure, it follows the defined retry strategy and retries until a ``RetryDecision/stop``
-    /// is received.
-    ///
-    /// - Note: All extension methods of Kingfisher (the `kf` extensions on `UIImageView` or `UIButton`, for example)
-    /// retrieve images through ``KingfisherManager``, so the retry strategy also applies when using them. However,
-    /// this option does not apply when passed to an ``ImageDownloader`` or an ``ImageCache`` directly.
-    case retryStrategy(any RetryStrategy)
 
     /// Specifies the `Source` to load when the user enables Low Data Mode and the original source fails due to the data
     /// constraint.
@@ -419,10 +380,7 @@ struct KingfisherParsedOptionsInfo: Sendable {
     var preloadAllAnimationData = false
     var callbackQueue: CallbackQueue = .mainCurrentOrAsync
     var scaleFactor: CGFloat = 1.0
-    var requestModifier: (any AsyncImageDownloadRequestModifier)? = nil
-    var redirectHandler: (any ImageDownloadRedirectHandler)? = nil
     var processor: any ImageProcessor = DefaultImageProcessor.default
-    var imageModifier: (any ImageModifier)? = nil
     var cacheSerializer: any CacheSerializer = DefaultCacheSerializer.default
     var keepCurrentImageWhileLoading = false
     var onlyLoadFirstFrame = false
@@ -439,7 +397,6 @@ struct KingfisherParsedOptionsInfo: Sendable {
     var processingQueue: CallbackQueue? = nil
     var progressiveJPEG: ImageProgressive? = nil
     var alternativeSources: [Source]? = nil
-    var retryStrategy: (any RetryStrategy)? = nil
     var lowDataModeSource: Source? = nil
     var forcedExtension: String? = nil
 
@@ -466,10 +423,7 @@ struct KingfisherParsedOptionsInfo: Sendable {
             case .preloadAllAnimationData: preloadAllAnimationData = true
             case .callbackQueue(let value): callbackQueue = value
             case .scaleFactor(let value): scaleFactor = value
-            case .requestModifier(let value): requestModifier = value
-            case .redirectHandler(let value): redirectHandler = value
             case .processor(let value): processor = value
-            case .imageModifier(let value): imageModifier = value
             case .cacheSerializer(let value): cacheSerializer = value
             case .keepCurrentImageWhileLoading: keepCurrentImageWhileLoading = true
             case .onlyLoadFirstFrame: onlyLoadFirstFrame = true
@@ -486,7 +440,6 @@ struct KingfisherParsedOptionsInfo: Sendable {
             case .processingQueue(let queue): processingQueue = queue
             case .progressiveJPEG(let value): progressiveJPEG = value
             case .alternativeSources(let sources): alternativeSources = sources
-            case .retryStrategy(let strategy): retryStrategy = strategy
             case .lowDataMode(let source): lowDataModeSource = source
             case .forcedCacheFileExtension(let ext): forcedExtension = ext
             }

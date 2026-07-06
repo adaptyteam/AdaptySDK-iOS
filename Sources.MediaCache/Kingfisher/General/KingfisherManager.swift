@@ -307,7 +307,6 @@ class KingfisherManager: @unchecked Sendable {
         completionHandler: (@Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)?) -> DownloadTask?
     {
         var options = options
-        let retryStrategy = options.retryStrategy
 
         let progressiveJPEG = options.progressiveJPEG
         if let provider = ImageProgressiveProvider(options: options, refresh: { image in
@@ -337,7 +336,6 @@ class KingfisherManager: @unchecked Sendable {
 
         @Sendable func startNewRetrieveTask(
             with source: Source,
-            retryContext: RetryContext?,
             downloadTaskUpdated: DownloadTaskUpdatedBlock?
         ) {
             let newTask = self.retrieveImage(
@@ -345,12 +343,12 @@ class KingfisherManager: @unchecked Sendable {
                 context: retrievingContext,
                 downloadTaskUpdated: downloadTaskUpdated
             ) { result in
-                handler(currentSource: source, retryContext: retryContext, result: result)
+                handler(currentSource: source, result: result)
             }
             downloadTaskUpdated?(newTask)
         }
 
-        @Sendable func failCurrentSource(_ source: Source, retryContext: RetryContext?, with error: KingfisherError) {
+        @Sendable func failCurrentSource(_ source: Source, with error: KingfisherError) {
             // Skip alternative sources if the user cancelled it.
             guard !error.isTaskCancelled else {
                 completionHandler?(.failure(error))
@@ -360,7 +358,7 @@ class KingfisherManager: @unchecked Sendable {
             guard !error.isLowDataModeConstrained else {
                 if let source = retrievingContext.options.lowDataModeSource {
                     retrievingContext.options.lowDataModeSource = nil
-                    startNewRetrieveTask(with: source, retryContext: retryContext, downloadTaskUpdated: downloadTaskUpdated)
+                    startNewRetrieveTask(with: source, downloadTaskUpdated: downloadTaskUpdated)
                 } else {
                     // This should not happen.
                     completionHandler?(.failure(error))
@@ -369,7 +367,7 @@ class KingfisherManager: @unchecked Sendable {
             }
             if let nextSource = retrievingContext.popAlternativeSource() {
                 retrievingContext.appendError(error, to: source)
-                startNewRetrieveTask(with: nextSource, retryContext: retryContext, downloadTaskUpdated: downloadTaskUpdated)
+                startNewRetrieveTask(with: nextSource, downloadTaskUpdated: downloadTaskUpdated)
             } else {
                 // No other alternative source. Finish with error.
                 if retrievingContext.propagationErrors.isEmpty {
@@ -386,7 +384,6 @@ class KingfisherManager: @unchecked Sendable {
 
         @Sendable func handler(
             currentSource: Source,
-            retryContext: RetryContext?,
             result: (Result<RetrieveImageResult, KingfisherError>)
         ) -> Void {
             switch result {
@@ -401,20 +398,7 @@ class KingfisherManager: @unchecked Sendable {
                     completionHandler?(result)
                     return
                 }
-                if let retryStrategy = retryStrategy {
-                    let context = retryContext?.increaseRetryCount() ?? RetryContext(source: source, error: error)
-                    retryStrategy.retry(context: context) { decision in
-                        switch decision {
-                        case .retry(let userInfo):
-                            context.userInfo = userInfo
-                            startNewRetrieveTask(with: source, retryContext: context, downloadTaskUpdated: downloadTaskUpdated)
-                        case .stop:
-                            failCurrentSource(currentSource, retryContext: context, with: error)
-                        }
-                    }
-                } else {
-                    failCurrentSource(currentSource, retryContext: retryContext, with: error)
-                }
+                failCurrentSource(currentSource, with: error)
             }
         }
 
@@ -424,7 +408,7 @@ class KingfisherManager: @unchecked Sendable {
             downloadTaskUpdated: downloadTaskUpdated)
         {
             result in
-            handler(currentSource: source, retryContext: nil, result: result)
+            handler(currentSource: source, result: result)
         }
 
     }
@@ -617,7 +601,7 @@ class KingfisherManager: @unchecked Sendable {
             let coordinator = CacheCallbackCoordinator(
                 shouldWaitForCache: options.waitForCache, shouldCacheOriginal: needToCacheOriginalImage)
             let result = RetrieveImageResult(
-                image: options.imageModifier?.modify(value.image) ?? value.image,
+                image: value.image,
                 cacheType: .none,
                 source: source,
                 originalSource: context.originalSource,
@@ -907,9 +891,6 @@ class KingfisherManager: @unchecked Sendable {
                     // https://github.com/onevcat/Kingfisher/issues/1923
                     image = options.processor.process(item: .data(data), options: options) ?? .init()
                 }
-                if let modifier = options.imageModifier {
-                    image = modifier.modify(image)
-                }
                 let value = result.map {
                     RetrieveImageResult(
                         image: image,
@@ -1008,9 +989,8 @@ class KingfisherManager: @unchecked Sendable {
                         let coordinator = CacheCallbackCoordinator(
                             shouldWaitForCache: options.waitForCache, shouldCacheOriginal: false)
 
-                        let image = options.imageModifier?.modify(processedImage) ?? processedImage
                         let result = RetrieveImageResult(
-                            image: image,
+                            image: processedImage,
                             cacheType: .none,
                             source: source,
                             originalSource: context.originalSource,

@@ -253,9 +253,7 @@ class ImagePrefetcher: CustomStringConvertible, @unchecked Sendable {
         }
     }
     
-    private func downloadAndCache(_ source: Source, retryContext: RetryContext? = nil) {
-
-        let retryStrategy = optionsInfo.retryStrategy
+    private func downloadAndCache(_ source: Source) {
 
         @Sendable func completeWithSuccess() {
             self.completedSources.append(source)
@@ -290,34 +288,8 @@ class ImagePrefetcher: CustomStringConvertible, @unchecked Sendable {
             switch result {
             case .success:
                 completeWithSuccess()
-            case .failure(let error):
-                guard let retryStrategy else {
-                    completeWithFailure()
-                    return
-                }
-
-                let context = retryContext?.increaseRetryCount() ?? RetryContext(source: source, error: error)
-                retryStrategy.retry(context: context) { decision in
-                    switch decision {
-                    case .retry(let userInfo):
-                        context.userInfo = userInfo
-                        self.prefetchQueue.async {
-                            guard !self.stopped else {
-                                completeWithFailure()
-                                return
-                            }
-                            self.downloadAndCache(source, retryContext: context)
-                        }
-                    case .stop:
-                        self.prefetchQueue.async {
-                            guard !self.stopped else {
-                                completeWithFailure()
-                                return
-                            }
-                            completeWithFailure()
-                        }
-                    }
-                }
+            case .failure:
+                completeWithFailure()
             }
         }
 

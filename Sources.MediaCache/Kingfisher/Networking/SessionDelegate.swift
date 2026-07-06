@@ -249,16 +249,7 @@ extension SessionDelegate: URLSessionDataDelegate {
         newRequest request: URLRequest
     ) async -> URLRequest?
     {
-        guard let sessionDataTask = self.task(for: task),
-              let redirectHandler = Array(sessionDataTask.callbacks).last?.options.redirectHandler else
-        {
-            return request
-        }
-        return await redirectHandler.handleHTTPRedirection(
-            for: sessionDataTask,
-            response: response,
-            newRequest: request
-        )
+        return request
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
