@@ -44,18 +44,6 @@ extension KFImageProtocol {
         Self.init(source: source)
     }
 
-    /// Creates a Kingfisher-compatible image view with a given ``Resource``.
-    ///
-    /// - Parameters:
-    ///   - resource: The ``Resource`` object that defines data information such as a key or URL.
-    /// - Returns: A Kingfisher-compatible image view for future configuration or embedding into another `SwiftUI.View`.
-    static func resource(
-        _ resource: (any Resource)?
-    ) -> Self
-    {
-        source(resource?.convertToSource())
-    }
-
     /// Creates a Kingfisher-compatible image view with a given `URL`.
     ///
     /// - Parameters:
@@ -68,36 +56,6 @@ extension KFImageProtocol {
     ) -> Self
     {
         source(url?.convertToSource(overrideCacheKey: cacheKey))
-    }
-
-    /// Creates a Kingfisher-compatible image view with a given ``ImageDataProvider``.
-    ///
-    /// - Parameters:
-    ///   - provider: The ``ImageDataProvider`` object that contains information about the data.
-    /// - Returns: A Kingfisher-compatible image view for future configuration or embedding into another `SwiftUI.View`.
-
-    static func dataProvider(
-        _ provider: (any ImageDataProvider)?
-    ) -> Self
-    {
-        source(provider?.convertToSource())
-    }
-
-    /// Creates a builder for the provided raw data and a cache key.
-    ///
-    /// - Parameters:
-    ///   - data: The data object from which the image should be created.
-    ///   - cacheKey: The key used to store the downloaded image in the cache.
-    /// - Returns: A Kingfisher-compatible image view for future configuration or embedding into another `SwiftUI.View`.
-    static func data(
-        _ data: Data?, cacheKey: String
-    ) -> Self
-    {
-        if let data = data {
-            return dataProvider(RawImageDataProvider(data: data, cacheKey: cacheKey))
-        } else {
-            return dataProvider(nil)
-        }
     }
 }
 
