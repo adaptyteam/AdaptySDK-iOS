@@ -108,7 +108,7 @@ struct AdaptyUIHeroContainerView: View {
                     if let background = screen.background {
                         AdaptyUIBackgroundElementsView(
                             backgrounds: background,
-                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                            screenHolderBuilder: { EmptyView() }
                         )
                     }
                 }
@@ -116,7 +116,7 @@ struct AdaptyUIHeroContainerView: View {
                     if let overlay = screen.overlay {
                         AdaptyUIOverlayElementsView(
                             overlays: overlay,
-                            screenHolderBuilder: { EmptyView() } // TODO: x check
+                            screenHolderBuilder: { EmptyView() }
                         )
                     }
                 }
@@ -152,7 +152,7 @@ struct AdaptyUIHeroContainerView: View {
 
             AdaptyUIElementView(
                 content,
-                screenHolderBuilder: { EmptyView() } // TODO: x check
+                screenHolderBuilder: { EmptyView() }
             )
             .frame(
                 width: p.size.width,
@@ -205,7 +205,7 @@ struct AdaptyUIHeroContainerView: View {
                 AdaptyUIElementWithoutPropertiesView(
                     element,
                     playAnimations: $playOnAppearAnimations,
-                    screenHolderBuilder: { EmptyView() } // TODO: x check
+                    screenHolderBuilder: { EmptyView() }
                 )
 
                 FooterVerticalFillerView(height: footerSize.height) { frame in
@@ -274,7 +274,7 @@ struct AdaptyUIHeroContainerView: View {
             ScrollView {
                 AdaptyUIElementView(
                     element,
-                    screenHolderBuilder: { EmptyView() }, // TODO: x check
+                    screenHolderBuilder: { EmptyView() },
                     drawDecoratorBackground: drawFooterBackground
                 )
                 .id(ScrollAnchor.footerTop)
@@ -297,7 +297,7 @@ struct AdaptyUIHeroContainerView: View {
         } else {
             AdaptyUIElementView(
                 element,
-                screenHolderBuilder: { EmptyView() }, // TODO: x check
+                screenHolderBuilder: { EmptyView() },
                 drawDecoratorBackground: drawFooterBackground
             )
             .fixedSize(horizontal: false, vertical: true)

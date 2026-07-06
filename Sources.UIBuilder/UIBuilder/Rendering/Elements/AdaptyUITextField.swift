@@ -59,7 +59,10 @@ struct AdaptyUITextField: View {
         let (richText, tagValues, _) = assetsViewModel.resolvedText(
             placeholder.value,
             screen: screen,
-            productsInfoProvider: nil // TODO: x text fields don't resolve product text in placeholders
+            // Product placeholders are intentionally unsupported in text fields:
+            // a placeholder is hint text shown while empty, so resolving dynamic
+            // product values there is out of scope (see UIBuilder docs).
+            productsInfoProvider: nil
         )
         return richText.convertToSwiftUIText(
             defaultAttributes: placeholder.defaultTextAttributes,

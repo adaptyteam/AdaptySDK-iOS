@@ -47,10 +47,9 @@ public extension KeyedEncodingContainer {
         try encodeDictionary(dict, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
     }
 
-    @inlinable
-    mutating func encodeAnyIfPresent(_ value: Any, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
-        if isNil(value) { return }
-        switch value {
+    mutating func encodeAnyIfPresent(_ unknownValue: Any, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
+        if isNil(unknownValue) { return }
+        switch unknownValue {
         case let value as [String: Any]:
             try encodeDictionary(value, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
         case let value as [Any]:
@@ -58,14 +57,18 @@ public extension KeyedEncodingContainer {
         case let value as any Encodable:
             try encode(value, forKey: k)
         default:
+            if let value = convertToEncodable(unknownValue) {
+                try encode(value, forKey: k)
+                return
+            }
             if skipNonEncodableValues {
                 return
             }
             throw EncodingError.invalidValue(
-                value,
+                unknownValue,
                 .init(
                     codingPath: codingPath + [k],
-                    debugDescription: "Unsupported non encodable value type: \(type(of: value))"
+                    debugDescription: "Unsupported non encodable value type: \(type(of: unknownValue))"
                 )
             )
         }
@@ -86,10 +89,9 @@ public extension UnkeyedEncodingContainer {
         try encodeArray(array, skipNonEncodableValues: skipNonEncodableValues)
     }
 
-    @inlinable
-    mutating func encodeAnyIfPresent(_ value: Any, skipNonEncodableValues: Bool = false) throws {
-        if isNil(value) { return }
-        switch value {
+    mutating func encodeAnyIfPresent(_ unknownValue: Any, skipNonEncodableValues: Bool = false) throws {
+        if isNil(unknownValue) { return }
+        switch unknownValue {
         case let value as [String: Any]:
             var container = nestedContainer(keyedBy: AnyCodingKey.self)
             try container.encodeDictionary(value, skipNonEncodableValues: skipNonEncodableValues)
@@ -99,17 +101,45 @@ public extension UnkeyedEncodingContainer {
         case let value as any Encodable:
             try encode(value)
         default:
+            if let value = convertToEncodable(unknownValue) {
+                try encode(value)
+                return
+            }
             if skipNonEncodableValues {
                 return
             }
             throw EncodingError.invalidValue(
-                value,
+                unknownValue,
                 .init(
                     codingPath: codingPath,
-                    debugDescription: "Unsupported non encodable value type: \(type(of: value))"
+                    debugDescription: "Unsupported non encodable value type: \(type(of: unknownValue))"
                 )
             )
         }
+    }
+}
+
+private func convertToEncodable(_ value: Any) -> (any Encodable)? {
+    switch value {
+    case let number as NSNumber:
+        if CFGetTypeID(number) == CFBooleanGetTypeID() {
+            return number.boolValue
+        }
+        let typeChar = String(cString: number.objCType)
+
+        if ["Q", "I", "L", "S", "C"].contains(typeChar) {
+            return number.uint64Value
+        }
+        if ["q", "i", "l", "s", "c"].contains(typeChar) {
+            return number.int64Value
+        }
+        return number.doubleValue
+
+    case let string as NSString:
+        return string as String
+
+    default:
+        return nil
     }
 }
 

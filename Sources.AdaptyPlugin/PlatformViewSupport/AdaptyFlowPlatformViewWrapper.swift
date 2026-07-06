@@ -217,7 +217,11 @@
             didReceiveAnalyticEvent name: String,
             params: [String: any Sendable]
         ) {
-            // TODO: forward via FlowViewEvent when cross-platform support is added
+            eventHandler.handle(event: FlowViewEvent.DidReceiveAnalyticEvent(
+                view: view.toAdaptyUIView(),
+                name: name,
+                params: params
+            ))
         }
     }
 

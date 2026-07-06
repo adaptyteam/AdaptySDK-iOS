@@ -102,12 +102,13 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         self.logic = logic
     }
 
-    nonisolated func registerState(_ state: AdaptyUIState) {
-        Task { @MainActor [weak self] in
-            self?.state = state
-            self?.screensViewModel.executeActions = { [weak state] actions, screen in
-                try? state?.execute(actions: actions, screenInstance: screen)
-            }
+    func registerState(_ state: AdaptyUIState) {
+        self.state = state
+        screensViewModel.executeActions = { [weak state] actions, screen in
+            try? state?.execute(actions: actions, screenInstance: screen)
+        }
+        screensViewModel.reportError = { [weak self] error in
+            self?.logic.reportDidReceiveError(error)
         }
     }
 
@@ -140,7 +141,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 let str = text.asString,
                 let url = URL(string: str)
             else {
-                // TODO: x warn
+                self?.logic.reportDidReceiveError(.invalidActionURL(stringId))
                 return
             }
 
@@ -190,12 +191,6 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 }
             )
         }
-    }
-
-    nonisolated func openWebPaywall(
-        openIn _: VC.Action.WebOpenInParameter
-    ) {
-        // TODO: Deperecated
     }
 
     nonisolated func restorePurchases(callback: VS.JSAction?) {

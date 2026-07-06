@@ -10,9 +10,6 @@
 
 <p align="center">
 <a href="https://go.adapty.io/subhub-community-ios-rep"><img src="https://img.shields.io/badge/Adapty-discord-purple"></a>
-<a href="http://bit.ly/3qXy7cf"><img src="https://img.shields.io/cocoapods/v/Adapty.svg?style=flat"></a>
-<a href="https://github.com/adaptyteam/AdaptySDK-iOS/blob/master/LICENSE"><img src="https://img.shields.io/cocoapods/l/Adapty.svg?style=flat"></a>
-<a href="http://bit.ly/3qXy7cf2"><img src="https://img.shields.io/cocoapods/p/Adapty.svg?style=flat"></a>
 <a href="https://adapty.io/docs/sdk-installation-ios#install-adapty-sdk?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS"><img src="https://img.shields.io/badge/SwiftPM-compatible-orange.svg"></a>
 </p>
 
@@ -24,10 +21,9 @@ Adapty SDK is an open-source framework that makes implementing in-app subscripti
 
 ## Why Adapty?
 
-- [No server code implementation](https://docs.adapty.io/v3.0/docs/ios-installation?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Integrate in-app purchases with server-side receipt validation in minutes — in your own paywall or one created in the no-code builder.
-- [No-code paywall builder](https://adapty.io/docs/adapty-paywall-builder). Create a beautiful, natively rendered paywall in the no-code editor and display it in your app to start getting paid instantly.
+- [No server code implementation](https://adapty.io/docs/sdk-installation-ios?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Integrate in-app purchases with server-side receipt validation in minutes — in your own paywall or using the no-code flow builder.
+- [No-code flow builder](https://adapty.io/docs/adapty-flow-builder?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Create beautiful, natively rendered single- or multi-screen flows in the no-code editor and display them in your app. With flows, you can start getting paid instantly or implement engaging onboardings in your app.
 - [On-the-fly paywalls price testing](https://docs.adapty.io/v3.0/docs/ab-tests?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Test different prices, duration, offers, messages, and designs simultaneously, all without new app releases.
-- [Beautiful onboardings](https://adapty.io/docs/onboardings). Design onboardings in the no-code editor and guide users through their first app experience.
 - [Full customer's payment history](https://docs.adapty.io/v3.0/docs/profiles-crm?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Explore the user's payment events from the trial start to subscription cancellation or billing issues.
 - [3rd-party integrations](https://docs.adapty.io/v3.0/docs/events?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Send subscription events to 3rd-party analytics, attribution, and ad services with no coding, even if the user uninstalls the app.
 - [Advanced analytics](https://docs.adapty.io/v3.0/docs/charts?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS). Analyze your app real-time metrics with advanced filters, such as Ad network, Ad campaign, country, A/B test, etc.
@@ -63,13 +59,17 @@ Adapty.makePurchase(product: product) { [weak self] result in
 }
 ```
 
-## Design paywalls in the no-code builder
+## Design flows in the no-code Flow Builder
 
-![No-code builder](https://adapty.io/assets/uploads/2024/09/img-builder-and-templates@2x.webp)
+![No-code Flow Builder](https://adapty-portal-media-production.s3.amazonaws.com/github/flow-cover.webp)
 
-With Adapty, you can create a complete, purchase-ready paywall in the no-code builder. 
+With the [Adapty Flow Builder](https://adapty.io/docs/adapty-flow-builder?utm_source=github&utm_medium=referral&utm_campaign=AdaptySDK-iOS), you can visually design complete user experiences — from single-screen paywalls to multi-step onboardings, surveys, and quizzes.
 
-Adapty automatically renders it and handles all the complex purchase flow, receipt validation, and subscription management behind the scenes.
+- **Flexible customizable flows**: Build any kind of flow: a single-screen paywall, a multi-step sequence, a survey, or anything in between.
+- **Native rendering**: The Adapty SDK renders flows natively without web views to ensure a seamless user experience.
+- **Update without redeploying**: Change copy, design, pricing, or logic any time. Updates reach your users without an app release.
+
+Adapty automatically renders your flow and handles all the complex purchase logic, receipt validation, and subscription management behind the scenes.
 
 ## Test paywalls & prices on iOS without app releases
 

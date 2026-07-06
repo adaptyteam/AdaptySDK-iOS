@@ -45,9 +45,7 @@ struct AdaptyUIButtonView: View {
         } label: {
             AdaptyUIElementView(
                 currentStateView,
-                screenHolderBuilder: {
-                    EmptyView() // TODO: x check if is ok
-                }
+                screenHolderBuilder: { EmptyView() }
             )
             .contentShape(Rectangle())
         }

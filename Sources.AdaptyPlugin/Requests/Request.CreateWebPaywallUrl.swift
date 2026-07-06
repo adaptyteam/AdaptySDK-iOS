@@ -9,43 +9,43 @@ import Adapty
 import Foundation
 
 extension Request {
-    enum CreateWebPaywallUrl: AdaptyPluginRequest {
+    struct CreateWebPaywallUrl: AdaptyPluginRequest {
         static let method = "create_web_paywall_url"
-        case product(AdaptyPluginPaywallProduct)
-//        case paywall(AdaptyPaywall) // TODO: x
+        let paywall: AdaptyFlowPaywall?
+        let product: AdaptyPluginPaywallProduct?
 
         enum CodingKeys: CodingKey {
-            case product
             case paywall
+            case product
         }
 
         init(from decoder: any Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-//            if container.contains(.product) {
-                self = try .product(container.decode(AdaptyPluginPaywallProduct.self, forKey: .product))
-//            } else {
-//                self = try .paywall(container.decode(AdaptyPaywall.self, forKey: .paywall))
-//            }
+            paywall = try container.decodeIfPresent(AdaptyFlowPaywall.self, forKey: .paywall)
+            product = try container.decodeIfPresent(AdaptyPluginPaywallProduct.self, forKey: .product)
         }
 
         func execute() async throws -> AdaptyJsonData {
-            switch self {
-            case .product(let product):
+            let url: URL
+            if let paywall {
+                url = try await Adapty.createWebPaywallUrl(for: paywall)
+            } else if let pluginProduct = product {
                 let product = try await Adapty.getPaywallProduct(
-                    flowProductId: product.flowProductId,
-                    adaptyProductId: product.adaptyProductId,
-                    productInfo: product.productInfo,
-                    paywallProductIndex: product.paywallProductIndex,
-                    subscriptionOfferIdentifier: product.subscriptionOfferIdentifier,
-                    variationId: product.variationId,
-                    paywallABTestName: product.paywallABTestName,
-                    paywallName: product.paywallName,
-                    webPaywallBaseUrl: product.webPaywallBaseUrl
+                    flowProductId: pluginProduct.flowProductId,
+                    adaptyProductId: pluginProduct.adaptyProductId,
+                    productInfo: pluginProduct.productInfo,
+                    paywallProductIndex: pluginProduct.paywallProductIndex,
+                    subscriptionOfferIdentifier: pluginProduct.subscriptionOfferIdentifier,
+                    variationId: pluginProduct.variationId,
+                    paywallABTestName: pluginProduct.paywallABTestName,
+                    paywallName: pluginProduct.paywallName,
+                    webPaywallBaseUrl: pluginProduct.webPaywallBaseUrl
                 )
-                return try .success(await Adapty.createWebPaywallUrl(for: product).absoluteString)
-//            case .paywall(let paywall):
-//                return try .success(await Adapty.createWebPaywallUrl(for: paywall).absoluteString)
+                url = try await Adapty.createWebPaywallUrl(for: product)
+            } else {
+                throw AdaptyPluginError.wrongParam("create_web_paywall_url requires either 'paywall' or 'product'")
             }
+            return .success(url.absoluteString)
         }
     }
 }

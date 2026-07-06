@@ -70,4 +70,12 @@ public extension AdaptyPluginError {
             detail: "AdaptyPluginError.platformView initialization Failed"
         )
     }
+
+    static func wrongParam(_ message: String) -> AdaptyPluginError {
+        return .init(
+            errorCode: AdaptyError.ErrorCode.wrongParam.rawValue,
+            message: message,
+            detail: "AdaptyPluginError.wrongParam: \(message)"
+        )
+    }
 }

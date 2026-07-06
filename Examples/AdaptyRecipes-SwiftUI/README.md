@@ -1,6 +1,6 @@
 ### AdaptyRecipes-SwiftUI Demo App
 
-AdaptyRecipes-SwiftUI demo app is designed to show you how to work with Paywall Builder paywalls in Adapty. The app have minimal functionality, serving as both a tutorial and an example. The app is built with SwiftUI using Swift Package Manager for dependency management. If you need ademo app built with UIKit using CocoaPods for dependency management, refer to [AdaptyRecipes-UIKit demo app](../AdaptyRecipes-UIKit/README.md).
+AdaptyRecipes-SwiftUI demo app is designed to show you how to work with Paywall Builder paywalls in Adapty. The app have minimal functionality, serving as both a tutorial and an example. The app is built with SwiftUI using Swift Package Manager for dependency management.
 
 The app contains two tabs:
 

@@ -14,13 +14,13 @@ import UIKit
 
 @MainActor
 public extension AdaptyFlowController {
-    var paywallPlacementId: String { configuration.paywallPlacementId }
+    var flowPlacementId: String { configuration.flowPlacementId }
 
-    var paywallVariationId: String { configuration.paywallVariationId }
+    var flowVariationId: String { configuration.flowVariationId }
 }
 
 extension AdaptyUI.FlowConfiguration {
-    var paywallPlacementId: String {
+    var flowPlacementId: String {
         guard
             let logic = flowViewModel.logic as? AdaptyUILogic
         else {
@@ -30,7 +30,7 @@ extension AdaptyUI.FlowConfiguration {
         return logic.flow.placement.id
     }
 
-    var paywallVariationId: String {
+    var flowVariationId: String {
         guard
             let logic = flowViewModel.logic as? AdaptyUILogic
         else {

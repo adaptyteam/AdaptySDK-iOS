@@ -40,16 +40,6 @@ public extension AdaptyFlowControllerDelegate {
         didStartPurchase _: AdaptyPaywallProduct
     ) {}
 
-    func flowController(
-        _ controller: AdaptyFlowController,
-        didFinishPurchase _: AdaptyPaywallProduct,
-        purchaseResult: AdaptyPurchaseResult
-    ) {
-        if !purchaseResult.isPurchaseCancelled {
-            controller.dismiss(animated: true)
-        }
-    }
-
     func flowControllerDidStartRestore(_: AdaptyFlowController) {}
 
     func flowController(

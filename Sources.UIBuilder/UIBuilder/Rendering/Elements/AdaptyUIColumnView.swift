@@ -91,13 +91,7 @@ struct AdaptyUIColumnView<ScreenHolderContent: View>: View {
                     ForEach(0 ..< column.items.count, id: \.self) { idx in
                         AdaptyUIElementView(
                             column.items[idx].content,
-                            screenHolderBuilder: {
-                                if idx == 0 {
-                                    screenHolderBuilder() // TODO: x check
-                                } else {
-                                    EmptyView()
-                                }
-                            }
+                            screenHolderBuilder: screenHolderBuilder
                         )
                     }
                 }

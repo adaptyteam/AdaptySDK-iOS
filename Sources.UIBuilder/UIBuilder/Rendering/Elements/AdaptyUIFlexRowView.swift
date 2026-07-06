@@ -89,13 +89,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
 
                 AdaptyUIElementView(
                     item.content,
-                    screenHolderBuilder: {
-                        if idx == 0 {
-                            screenHolderBuilder()
-                        } else {
-                            EmptyView()
-                        }
-                    }
+                    screenHolderBuilder: screenHolderBuilder
                 )
                 .frame(
                     width: itemWidth(
@@ -129,13 +123,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
 
                 AdaptyUIElementView(
                     item.content,
-                    screenHolderBuilder: {
-                        if idx == 0 {
-                            screenHolderBuilder()
-                        } else {
-                            EmptyView()
-                        }
-                    }
+                    screenHolderBuilder: screenHolderBuilder
                 )
                 .frame(
                     width: itemWidth(

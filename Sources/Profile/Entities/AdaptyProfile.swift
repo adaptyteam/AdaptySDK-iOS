@@ -26,7 +26,7 @@ public struct AdaptyProfile: Sendable {
     let codableCustomAttributes: AdaptyProfile.CustomAttributes?
 
     /// Identifiers of attribution sources applied to the profile and available for segmentation.
-    public let appliedAttributionSources: [AttributionSource]
+    public let appliedAttributionSources: [AdaptyAttributionSource]
 
     /// Previously set user custom attributes with `.updateProfile()` method.
     public let customAttributes: [String: any Sendable]
@@ -122,7 +122,7 @@ extension AdaptyProfile: Codable {
         accessLevels = try container.decodeIfPresent([String: AccessLevel].self, forKey: .accessLevels) ?? [:]
         subscriptions = try container.decodeIfPresent([String: Subscription].self, forKey: .subscriptions) ?? [:]
         nonSubscriptions = try container.decodeIfPresent([String: [NonSubscription]].self, forKey: .nonSubscriptions) ?? [:]
-        appliedAttributionSources = try container.decodeIfPresent([AdaptyProfile.AttributionSource].self, forKey: .appliedAttributionSources) ?? []
+        appliedAttributionSources = try container.decodeIfPresent([AdaptyAttributionSource].self, forKey: .appliedAttributionSources) ?? []
     }
 
     public func encode(to encoder: Encoder) throws {

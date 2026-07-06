@@ -22,7 +22,7 @@ extension Request {
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            flowProductId = try container.decodeIfPresent(String.self, forKey: .adaptyProductId)
+            flowProductId = try container.decodeIfPresent(String.self, forKey: .flowProductId)
             adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
             productInfo = try BackendProductInfo(
                 vendorId: container.decode(String.self, forKey: .vendorProductId),

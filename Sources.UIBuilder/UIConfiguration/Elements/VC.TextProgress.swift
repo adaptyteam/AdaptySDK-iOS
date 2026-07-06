@@ -19,15 +19,3 @@ extension VC {
     }
 }
 
-extension VC.TextProgress {
-    func normalize(_ raw: Double) -> Double {
-        let span = maxValue - minValue
-        guard span > 0 else { return 0 }
-        let clamped = min(max(raw, minValue), maxValue)
-        return (clamped - minValue) / span
-    }
-
-    func isOverflow(_ raw: Double) -> Bool {
-        raw < minValue || raw > maxValue
-    }
-}

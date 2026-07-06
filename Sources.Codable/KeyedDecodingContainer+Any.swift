@@ -62,6 +62,14 @@ public extension KeyedDecodingContainer {
         if let value = try? decode(UInt.self, forKey: k) {
             return value
         }
+        if #available(iOS 18.0, macOS 15.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
+            if let value = try? decode(Int128.self, forKey: k) {
+                return value
+            }
+            if let value = try? decode(UInt128.self, forKey: k) {
+                return value
+            }
+        }
         if let value = try? decode(Double.self, forKey: k) {
             return value
         }
@@ -108,6 +116,14 @@ public extension UnkeyedDecodingContainer {
         }
         if let value = try? decode(UInt.self) {
             return value
+        }
+        if #available(iOS 18.0, macOS 15.0, watchOS 11.0, tvOS 18.0, visionOS 2.0, *) {
+            if let value = try? decode(Int128.self) {
+                return value
+            }
+            if let value = try? decode(UInt128.self) {
+                return value
+            }
         }
         if let value = try? decode(Double.self) {
             return value

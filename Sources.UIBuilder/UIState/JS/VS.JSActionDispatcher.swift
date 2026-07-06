@@ -315,7 +315,7 @@ extension VS.JSActionDispatcher {
             return
         }
 
-        guard let name = (params[VS.AnalyticEvent.CodingKeys.name.rawValue] ?? params["name"]) as? String else {
+        guard let name = params[VS.AnalyticEvent.ParamsInternalKeys.name.rawValue] as? String else {
             Log.viewState.error(#"SDK.sendAnalyticsEvent: required parameter "name" is missing or corupted"#)
             return
         }

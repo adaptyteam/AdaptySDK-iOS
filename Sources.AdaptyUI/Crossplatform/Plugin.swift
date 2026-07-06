@@ -102,7 +102,9 @@ package extension AdaptyUI {
             preloadProducts: Bool,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
-            assetsResolver: AdaptyUIAssetsResolver?
+            assetsResolver: AdaptyUIAssetsResolver?,
+            observerModeResolver: AdaptyObserverModeResolver? = nil,
+            systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
         ) async throws -> AdaptyUI.FlowView {
             let products: [AdaptyPaywallProduct]?
             
@@ -116,10 +118,11 @@ package extension AdaptyUI {
                 forFlow: flow,
                 loadTimeout: loadTimeout,
                 products: products,
-                observerModeResolver: nil,
+                observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver,
-                assetsResolver: assetsResolver
+                assetsResolver: assetsResolver,
+                systemRequestsHandler: systemRequestsHandler
             )
             
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
@@ -284,23 +287,5 @@ package extension AdaptyUI.Plugin {
 #else
         throw AdaptyUIError.platformNotSupported
 #endif
-    }
-}
-
-// TODO: Remove
-@MainActor
-@available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
-package extension AdaptyUI.Plugin {
-    static func createOnboardingViewForTest(
-        placementId: String,
-        externalUrlsPresentation: AdaptyWebPresentation
-    ) async throws -> AdaptyUI.OnboardingView {
-        let onboarding = try await Adapty.getOnboarding(
-            placementId: placementId
-        )
-        return try await AdaptyUI.Plugin.createOnboardingView(
-            onboarding: onboarding,
-            externalUrlsPresentation: externalUrlsPresentation
-        )
     }
 }

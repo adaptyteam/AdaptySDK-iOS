@@ -19,6 +19,8 @@ struct AdaptyUIDateTimePickerView: View {
     private var stateViewModel: AdaptyUIStateViewModel
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var flowViewModel: AdaptyUIFlowViewModel
 
     private var picker: VC.DateTimePicker
 
@@ -52,10 +54,14 @@ struct AdaptyUIDateTimePickerView: View {
         return components
     }
 
+    private var flowStartedAt: Date {
+        flowViewModel.flowStartedAt ?? Date()
+    }
+
     private func resolvedClosedRange(min: VC.DateTime, max: VC.DateTime) -> ClosedRange<Date> {
-        let now = Date() // TODO: date of start flow
-        let resolvedMin = min.asDate(startAt: now)
-        let resolvedMax = max.asDate(startAt: now)
+        let startAt = flowStartedAt
+        let resolvedMin = min.asDate(startAt: startAt)
+        let resolvedMax = max.asDate(startAt: startAt)
         guard resolvedMin <= resolvedMax else {
             Log.ui.warn("DateTimePicker: min (\(resolvedMin)) is later than max (\(resolvedMax)); clamping min to max")
             return resolvedMax ... resolvedMax
@@ -77,7 +83,7 @@ struct AdaptyUIDateTimePickerView: View {
             DatePicker(
                 "",
                 selection: dateBinding,
-                in: minDate.asDate(startAt: Date())..., // TODO: date of start flow
+                in: minDate.asDate(startAt: flowStartedAt)...,
                 displayedComponents: displayedComponents
             )
             .labelsHidden()
@@ -85,7 +91,7 @@ struct AdaptyUIDateTimePickerView: View {
             DatePicker(
                 "",
                 selection: dateBinding,
-                in: ...maxDate.asDate(startAt: Date()), // TODO: date of start flow
+                in: ...maxDate.asDate(startAt: flowStartedAt),
                 displayedComponents: displayedComponents
             )
             .labelsHidden()

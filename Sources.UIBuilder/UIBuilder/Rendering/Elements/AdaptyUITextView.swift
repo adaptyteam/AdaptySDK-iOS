@@ -158,7 +158,7 @@ extension [VC.RichText.Item] {
                     tagReplacementResult =
                         switch tagValue {
                         case let .value(value):
-                            value // TODO: x
+                            value
                         case let .variable(variable):
                             stateViewModel.getTagValue(
                                 variable,

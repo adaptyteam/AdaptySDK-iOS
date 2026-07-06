@@ -19,7 +19,7 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            try await Adapty.setIntegrationIdentifiers(keyValues)
+            try await Adapty.setIntegrationIdentifiers(.fromDictionary(keyValues))
             return .success()
         }
     }

@@ -182,13 +182,9 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         let rotation = try container.decodeIfPresent(Schema.Rotation.self, forKey: .rotation)
         let scale = try container.decodeIfPresent(Schema.Scale.self, forKey: .scale)
 
-        let paddingOrNil = try container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .padding)
-        if let paddingOrNil, let error = paddingOrNil.errorStringIfLessZero {
-            throw DecodingError.dataCorruptedError(forKey: .padding, in: container, debugDescription: error)
-        }
         let value = try VC.Element.Properties(
             decorator: container.decodeIfPresent(Schema.Decorator.self, forKey: .decorator),
-            padding: paddingOrNil ?? Self.default.padding,
+            padding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .padding) ?? Self.default.padding,
             offset: offset?.isZero ?? true ? nil : offset,
             rotation: rotation?.isZero ?? true ? nil : rotation,
             scale: scale?.isEmpty ?? true ? nil : scale,

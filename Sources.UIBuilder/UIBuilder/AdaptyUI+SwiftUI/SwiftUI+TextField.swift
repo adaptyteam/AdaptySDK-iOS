@@ -175,8 +175,8 @@ private struct FocusIdModifier: ViewModifier {
     @FocusState private var isFocused: Bool
 
     private var onFocusChangeActions: [VC.Action]? {
-        navigatorViewModel.navigator.defaultScreenActions.onFocusChange
-            ?? navigatorViewModel.screens.last?.configuration.screenActions.onFocusChange
+        navigatorViewModel.screens.last?.configuration.screenActions.onFocusChange
+            ?? navigatorViewModel.navigator.defaultScreenActions.onFocusChange
     }
 
     private func handleFocusChanged(oldFocusId: String?, newFocusId: String?) {

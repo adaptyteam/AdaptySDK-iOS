@@ -48,7 +48,6 @@ struct AdaptyUIStackView<ScreenHolderContent: View>: View {
         }
     }
 
-    @ViewBuilder
     private func stackItems(usesFirstElementOnly: Bool) -> some View {
         ForEach(0 ..< stack.items.count, id: \.self) { idx in
             switch stack.items[idx] {
@@ -61,16 +60,7 @@ struct AdaptyUIStackView<ScreenHolderContent: View>: View {
             case let .element(element):
                 AdaptyUIElementView(
                     element,
-                    screenHolderBuilder: {
-// Wrong: this gates screenHolder by stack item position.
-// screenHolder must be consumed once on first actual encounter in the tree,
-// then all subsequent screenHolders should become EmptyView().
-//                        if idx == 0 {
-                            screenHolderBuilder() // TODO: x check
-//                        } else {
-//                            EmptyView()
-//                        }
-                    }
+                    screenHolderBuilder: screenHolderBuilder
                 )
             }
         }

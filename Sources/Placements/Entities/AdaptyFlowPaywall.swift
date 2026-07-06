@@ -34,13 +34,25 @@ extension AdaptyFlowPaywall: CustomStringConvertible {
     }
 }
 
-extension AdaptyFlowPaywall: Encodable, DecodableWithConfiguration {
+extension AdaptyFlowPaywall: Encodable, Decodable, DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case id = "paywall_id"
         case name = "paywall_name"
         case variationId = "variation_id"
         case webPaywallBaseUrl = "web_purchase_url"
         case products
+    }
+    
+    public init(from decoder: Decoder) throws {
+        try self.init(
+            from: decoder,
+            configuration: .init(
+                userId: nil,
+                placement: AdaptyPlacement(from: decoder),
+                requestLocale: nil,
+                variationId: nil
+            )
+        )
     }
 
     public init(from decoder: Decoder, configuration: AdaptyFlow.DecodingConfiguration) throws {
@@ -76,5 +88,6 @@ extension AdaptyFlowPaywall: Encodable, DecodableWithConfiguration {
         try container.encode(variationId, forKey: .variationId)
         try container.encode(products, forKey: .products)
         try container.encodeIfPresent(webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
+        try placement.encode(to: encoder)
     }
 }

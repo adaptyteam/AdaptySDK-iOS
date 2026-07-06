@@ -40,6 +40,13 @@ public extension Adapty {
         with configuration: AdaptyConfiguration
     ) async throws(AdaptyError) {
         let stamp = Log.stamp
+
+        #if KidsMode
+        let kidsModeEnabled = true
+        #else
+        let kidsModeEnabled = false
+        #endif
+
         let logParams: EventParameters? = [
             "observer_mode": configuration.observerMode,
             "customer_user_id": configuration.customerUserId,
@@ -47,6 +54,7 @@ public extension Adapty {
             "idfa_collection_disabled": configuration.idfaCollectionDisabled,
             "ip_address_collection_disabled": configuration.ipAddressCollectionDisabled,
             "clear_data_on_backup": configuration.clearDataOnBackup,
+            "kids_mode_enabled": kidsModeEnabled,
         ]
 
         trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: .activate, stamp: stamp, params: logParams))

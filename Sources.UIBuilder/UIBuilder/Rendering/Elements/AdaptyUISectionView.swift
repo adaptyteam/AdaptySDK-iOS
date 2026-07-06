@@ -44,13 +44,7 @@ struct AdaptyUISectionView<ScreenHolderContent: View>: View {
             if let content = section.content[safe: currentIndex] {
                 AdaptyUIElementView(
                     content,
-                    screenHolderBuilder: {
-                        if currentIndex == 0 {
-                            screenHolderBuilder() // TODO: x check
-                        } else {
-                            EmptyView()
-                        }
-                    }
+                    screenHolderBuilder: screenHolderBuilder
                 )
             }
         }
@@ -70,4 +64,3 @@ struct AdaptyUISectionView<ScreenHolderContent: View>: View {
 }
 
 #endif
-

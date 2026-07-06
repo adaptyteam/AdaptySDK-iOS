@@ -177,7 +177,7 @@ extension AdaptyPluginDelegate: AdaptyFlowControllerDelegate {
             error: error
         ))
 
-        return true
+        return false
     }
 
     func flowController(
@@ -194,6 +194,18 @@ extension AdaptyPluginDelegate: AdaptyFlowControllerDelegate {
             view: controller.toAdaptyUIView(),
             product: product.map(Response.AdaptyPluginPaywallProduct.init),
             error: error
+        ))
+    }
+
+    func flowController(
+        _ controller: AdaptyFlowController,
+        didReceiveAnalyticEvent name: String,
+        params: [String: any Sendable]
+    ) {
+        eventHandler.handle(event: FlowViewEvent.DidReceiveAnalyticEvent(
+            view: controller.toAdaptyUIView(),
+            name: name,
+            params: params
         ))
     }
 }

@@ -1,0 +1,150 @@
+//
+//  Request.AdaptyUICreateFlowView.swift
+//  AdaptyPlugin
+//
+//  Created by Aleksei Valiano on 13.11.2024.
+//
+
+#if canImport(UIKit)
+
+import Adapty
+import AdaptyUI
+import AdaptyUIBuilder
+import Foundation
+
+public extension [AdaptyCustomAsset.Identifiable] {
+    @MainActor
+    func assetsResolver() throws -> [String: AdaptyCustomAsset]? {
+        guard !isEmpty else { return nil }
+
+        var assetsResolver = [String: AdaptyCustomAsset]()
+        assetsResolver.reserveCapacity(count)
+
+        for asset in self {
+            switch asset.value {
+            case .asset(let value):
+                assetsResolver[asset.id] = value
+            case .imageFlutterAssetId(let assetId):
+                assetsResolver[asset.id] = try .image(.file(url: url(assetId)))
+            case .videoFlutterAssetId(let assetId, let resolution):
+                assetsResolver[asset.id] = try .video(.file(url: url(assetId), preview: nil, resolution: resolution))
+            }
+        }
+
+        return assetsResolver
+
+        func url(_ assetId: String) throws -> URL {
+            guard let assetIdToFileURL = AdaptyPlugin.assetIdToFileURL else {
+                throw AdaptyPluginInternalError.unregister("Unregister assetIdToFileURL in AdaptyPlugin")
+            }
+            guard let url = assetIdToFileURL(assetId) else {
+                throw AdaptyPluginInternalError.notExist("Asset \(assetId) not found")
+            }
+
+            return url
+        }
+    }
+}
+
+extension Request {
+    struct AdaptyUICreateFlowView: AdaptyPluginRequest {
+        static let method = "adapty_ui_create_flow_view"
+
+        let flow: AdaptyFlow
+        let loadTimeout: TimeInterval?
+        let preloadProducts: Bool?
+        let customTags: [String: String]?
+        let customTimers: [String: Date]?
+        let customAssets: [AdaptyUICustomAsset.Identifiable]?
+
+        enum CodingKeys: String, CodingKey {
+            case flow
+            case loadTimeout = "load_timeout"
+            case preloadProducts = "preload_products"
+            case customTags = "custom_tags"
+            case customTimers = "custom_timers"
+            case customAssets = "custom_assets"
+        }
+
+        func execute() async throws -> AdaptyJsonData {
+            try await executeInMainActor()
+        }
+
+        @MainActor
+        func executeInMainActor() async throws -> AdaptyJsonData {
+            let systemRequestsHandler = AdaptyPlugin.sharedEventHandler
+                .map(PluginSystemRequestsHandler.init(eventHandler:))
+            // Only forward an observer-mode resolver in Observer Mode. Passing one in
+            // Full Mode would make the SDK delegate every purchase to the host instead
+            // of calling Adapty.makePurchase (the SDK gates on resolver presence, not
+            // on the observer-mode flag).
+            let observerModeResolver = AdaptyUI.isObserverModeEnabled
+                ? AdaptyPlugin.sharedEventHandler.map(PluginObserverModeResolver.init(eventHandler:))
+                : nil
+            let result: AdaptyUI.FlowView = try await AdaptyUI.Plugin.createFlowView(
+                flow: flow,
+                loadTimeout: loadTimeout,
+                preloadProducts: preloadProducts ?? false,
+                tagResolver: customTags,
+                timerResolver: customTimers,
+                assetsResolver: assetsResolver(),
+                observerModeResolver: observerModeResolver,
+                systemRequestsHandler: systemRequestsHandler
+            )
+
+            // The view instance id is known only once the flow view is built;
+            // stamp the per-view resolver/handler so their host events carry the
+            // originating view.
+            let identityBox = FlowViewIdentityBox()
+            identityBox.value = result
+            observerModeResolver?.identityBox = identityBox
+            systemRequestsHandler?.identityBox = identityBox
+
+            return .success(result)
+        }
+
+        @MainActor
+        func assetsResolver() throws -> [String: AdaptyUICustomAsset]? {
+            guard let customAssets, !customAssets.isEmpty else { return nil }
+
+            var assetsResolver: [String: AdaptyUICustomAsset] = [:]
+            assetsResolver.reserveCapacity(customAssets.count)
+
+            for asset in customAssets {
+                switch asset.value {
+                case .asset(let value):
+                    assetsResolver[asset.id] = value
+                case .imageFlutterAssetId(let assetId):
+                    assetsResolver[asset.id] = try .image(.file(url: url(assetId)))
+                case .videoFlutterAssetId(let assetId, let resolution):
+                    assetsResolver[asset.id] = try .video(.file(url: url(assetId), preview: nil, resolution: resolution))
+                }
+            }
+
+            return assetsResolver
+
+            func url(_ assetId: String) throws -> URL {
+                guard let assetIdToFileURL = AdaptyPlugin.assetIdToFileURL else {
+                    throw AdaptyPluginInternalError.unregister("Unregister assetIdToFileURL in AdaptyPlugin")
+                }
+                guard let url = assetIdToFileURL(assetId) else {
+                    throw AdaptyPluginInternalError.notExist("Asset \(assetId) not found")
+                }
+
+                return url
+            }
+        }
+    }
+}
+
+public extension AdaptyPlugin {
+    @MainActor
+    fileprivate static var assetIdToFileURL: (@MainActor (String) -> URL?)?
+
+    @MainActor
+    static func register(createPaywallView: @MainActor @escaping (String) -> URL?) {
+        assetIdToFileURL = createPaywallView
+    }
+}
+
+#endif

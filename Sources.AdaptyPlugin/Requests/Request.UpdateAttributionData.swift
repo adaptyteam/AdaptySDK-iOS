@@ -13,7 +13,7 @@ extension Request {
         static let method = "update_attribution_data"
 
         let attribution: String
-        let source: String
+        let source: AdaptyAttributionSource
 
         enum CodingKeys: String, CodingKey {
             case attribution
