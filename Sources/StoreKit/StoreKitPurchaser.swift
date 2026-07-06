@@ -186,7 +186,7 @@ actor StoreKitPurchaser {
         vendorProductId: String,
         subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        let skProduct: StoreKit::Product = try await productManager.fetchProduct(id: vendorProductId)
+        let skProduct: StoreKit.Product = try await productManager.fetchProduct(id: vendorProductId)
 
         let options = try await createOptions(
             userId: userId,
