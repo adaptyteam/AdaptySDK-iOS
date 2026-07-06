@@ -1,0 +1,467 @@
+//
+//  KFOptionsSetter.swift
+//  Kingfisher
+//
+//  Created by onevcat on 2020/12/22.
+//
+//  Copyright (c) 2020 Wei Wang <onevcat@gmail.com>
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+
+import Foundation
+import CoreGraphics
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
+
+/// A protocol that Kingfisher can use to perform chained setting in builder pattern.
+@MainActor
+protocol KFOptionSetter {
+    var options: KingfisherParsedOptionsInfo { get nonmutating set }
+
+    var onFailureDelegate: Delegate<KingfisherError, Void> { get }
+    var onSuccessDelegate: Delegate<RetrieveImageResult, Void> { get }
+    var onProgressDelegate: Delegate<(Int64, Int64), Void> { get }
+}
+
+final actor KFDelegateObserver {
+    static let `default` = KFDelegateObserver()
+}
+
+// MARK: - Life cycles
+extension KFOptionSetter {
+    /// Sets the progress block to current builder.
+    ///
+    /// - Parameter block:
+    /// Called when the image downloading progress gets updated. If the response does not contain an
+    /// [`expectedContentLength`](https://developer.apple.com/documentation/foundation/urlresponse/1413507-expectedcontentlength)
+    /// in the received `URLResponse`, this block will not be called. If `block` is `nil`, the callback will be reset.
+    ///
+    /// - Returns: A `Self` value with changes applied.
+    ///
+    func onProgress(_ block: DownloadProgressBlock?) -> Self {
+        onProgressDelegate.delegate(on: KFDelegateObserver.default) { (_, result) in
+            block?(result.0, result.1)
+        }
+        return self
+    }
+
+    /// Sets the done block to current builder.
+    /// - Parameter block: Called when the image task successfully completes and the image set is done. If `block`
+    ///                    is `nil`, the callback will be reset.
+    /// - Returns: A `Self` with changes applied.
+    ///
+    func onSuccess(_ block: ((RetrieveImageResult) -> Void)?) -> Self {
+        onSuccessDelegate.delegate(on: KFDelegateObserver.default) { (_, result) in
+            block?(result)
+        }
+        return self
+    }
+
+    /// Sets the catch block to current builder.
+    /// - Parameter block: Called when an error happens during the image task. If `block`
+    ///                    is `nil`, the callback will be reset.
+    /// - Returns: A `Self` with changes applied.
+    ///
+    func onFailure(_ block: ((KingfisherError) -> Void)?) -> Self {
+        onFailureDelegate.delegate(on: KFDelegateObserver.default) { (_, error) in
+            block?(error)
+        }
+        return self
+    }
+}
+
+// MARK: - Basic options settings.
+extension KFOptionSetter {
+
+    /// Sets the target image cache for this task.
+    ///
+    /// - Parameter cache: The target cache to be used for the task.
+    /// - Returns: A `Self` value with changes applied.
+    ///
+    /// Kingfisher will utilize the associated ``ImageCache`` object when performing related operations,
+    /// such as attempting to retrieve cached images and storing downloaded images within it.
+    ///
+    func targetCache(_ cache: ImageCache) -> Self {
+        options.targetCache = cache
+        return self
+    }
+    
+    /// Sets the target image cache to store the original downloaded image for this task.
+    ///
+    /// - Parameter cache: The target cache is about to be used for storing the original downloaded image from the task.
+    /// - Returns: A `Self` value with changes applied.
+    ///
+    /// The ``ImageCache`` for storing and retrieving original images. If ``KingfisherOptionsInfoItem/originalCache(_:)``
+    /// is contained in the options, it will be preferred for storing and retrieving original images.
+    /// If there is no ``KingfisherOptionsInfoItem/originalCache(_:)`` in the options,
+    /// ``KingfisherOptionsInfoItem/targetCache(_:)`` will be used to store original images.
+    ///
+    /// When using ``KingfisherManager`` to download and store an image, if
+    /// ``KingfisherOptionsInfoItem/cacheOriginalImage`` is applied in the option, the original image will be stored to
+    /// the `cache` you pass as parameter in this method. At the same time, if a requested final image (with processor
+    /// applied) cannot be found in the cache defined by ``KingfisherOptionsInfoItem/targetCache(_:)``, Kingfisher
+    /// will try to search the original image to check whether it is already there. If found, it will be used and
+    /// applied with the given processor. It is an optimization for not downloading the same image for multiple times.
+    ///
+    func originalCache(_ cache: ImageCache) -> Self {
+        options.originalCache = cache
+        return self
+    }
+
+    /// Sets the downloader to be used for the image download task.
+    ///
+    /// - Parameter downloader: The `ImageDownloader` instance to use for downloading.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// Kingfisher will utilize the specified ``ImageDownloader`` instance to download requested images.
+    ///
+    func downloader(_ downloader: ImageDownloader) -> Self {
+        options.downloader = downloader
+        return self
+    }
+
+    /// Sets the download priority for the image task.
+    ///
+    /// - Parameter priority: The download priority of the image download task.
+    /// - Returns: A `Self` value with changes applied.
+    ///
+    /// The `priority` value will be configured as the priority of the image download task. Valid values range between 
+    /// 0.0 and 1.0. You can select a value from `URLSessionTask.defaultPriority`, `URLSessionTask.lowPriority`,
+    /// or `URLSessionTask.highPriority`. If this option is not set, the default value
+    /// (`URLSessionTask.defaultPriority`) will be used.
+    ///
+    func downloadPriority(_ priority: Float) -> Self {
+        options.downloadPriority = priority
+        return self
+    }
+
+    /// Sets whether Kingfisher should ignore the cache and attempt to initiate a download task for the image source.
+    ///
+    /// - Parameter enabled: Enable force refresh or not.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    func forceRefresh(_ enabled: Bool = true) -> Self {
+        options.forceRefresh = enabled
+        return self
+    }
+
+    /// Sets whether Kingfisher should attempt to retrieve the image from the memory cache first. If the image is not 
+    /// found in the memory cache, it bypasses the disk cache and initiates a download task for the image source.
+    ///
+    /// - Parameter enabled: Enable memory-only cache searching or not.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// This option is useful when you want to display a changeable image with the same URL during the same app session 
+    /// while avoiding multiple downloads of the same image.
+    ///
+    func fromMemoryCacheOrRefresh(_ enabled: Bool = true) -> Self {
+        options.fromMemoryCacheOrRefresh = enabled
+        return self
+    }
+
+    /// Sets whether the image should be cached only in memory and not on disk.
+    ///
+    /// - Parameter enabled: Enable memory-only caching for the image or not.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    func cacheMemoryOnly(_ enabled: Bool = true) -> Self {
+        options.cacheMemoryOnly = enabled
+        return self
+    }
+
+    /// Sets whether Kingfisher should wait for caching operations to be completed before invoking the `onSuccess` 
+    /// or `onFailure` block.
+    ///
+    /// - Parameter enabled: Enable waiting for caching operations or not.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    func waitForCache(_ enabled: Bool = true) -> Self {
+        options.waitForCache = enabled
+        return self
+    }
+
+    /// Sets whether Kingfisher should exclusively attempt to retrieve the image from the cache and not from the network.
+    ///
+    /// - Parameter enabled: Enable cache-only image retrieval or not.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// If the image is not found in the cache, the image retrieval will fail with a
+    /// ``KingfisherError/CacheErrorReason/imageNotExisting(key:)`` error.
+    ///
+    func onlyFromCache(_ enabled: Bool = true) -> Self {
+        options.onlyFromCache = enabled
+        return self
+    }
+
+    /// Sets whether the image should be decoded on a background thread before usage.
+    ///
+    /// - Parameter enabled: Enable background image decoding or not.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// When set to `true`, the downloaded image data will be decoded and undergo off-screen rendering to extract pixel 
+    /// information in the background. This can enhance display speed but may consume additional time and memory for
+    /// image preparation before usage.
+    ///
+    func backgroundDecode(_ enabled: Bool = true) -> Self {
+        options.backgroundDecode = enabled
+        return self
+    }
+
+    /// Sets the callback queue used as the target queue for dispatching callbacks when retrieving images from the 
+    /// cache. If not set, Kingfisher will use the main queue for callbacks.
+    ///
+    /// - Parameter queue: The target queue on which cache retrieval callbacks will be invoked.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// - Note: This option does not impact callbacks for UI-related extension methods or ``KFImage`` result handlers. 
+    /// Callbacks for those methods will always be executed on the main queue.
+    ///
+    func callbackQueue(_ queue: CallbackQueue) -> Self {
+        options.callbackQueue = queue
+        return self
+    }
+
+    /// Sets the scale factor value used when converting retrieved data to an image.
+    ///
+    /// - Parameter factor: The scale factor value to use.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// Specify the image scale factor, which may differ from your screen's scale. This is particularly important when 
+    /// working with 2x or 3x retina images. Failure to set the correct scale factor may result in Kingfisher
+    /// converting the data to an image object with a `scale` of 1.0.
+    ///
+    func scaleFactor(_ factor: CGFloat) -> Self {
+        options.scaleFactor = factor
+        return self
+    }
+
+    /// Sets whether the original image should be cached, even when the original image has been processed by other ``ImageProcessor``s.
+    ///
+    /// - Parameter enabled: Whether to cache the original image.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// When this option is set, and an ``ImageProcessor`` is used, Kingfisher will attempt to cache both the final 
+    /// processed image and the original image. This ensures that the original image can be reused when another
+    /// processor is applied to the same resource, without the need for redownloading. You can use
+    ///  ``KingfisherOptionsInfoItem/originalCache(_:)`` to specify a cache for the original images.
+    ///
+    /// - Note: The original image will be cached only in disk storage.
+    ///
+    func cacheOriginalImage(_ enabled: Bool = true) -> Self {
+        options.cacheOriginalImage = enabled
+        return self
+    }
+
+    /// Sets writing options for an original image on its initial write to disk storage.
+    ///
+    /// - Parameter writingOptions: Options that control the data writing operation to disk storage.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// If these options are set, they will be applied to the storage operation for new files. This can be useful if 
+    /// you want to implement features such as file encryption on the initial write, for example,
+    /// using `[.completeFileProtection]`.
+    ///
+    func diskStoreWriteOptions(_ writingOptions: Data.WritingOptions) -> Self {
+        options.diskStoreWriteOptions = writingOptions
+        return self
+    }
+
+    /// Sets whether disk storage loading should occur in the same calling queue.
+    ///
+    /// - Parameter enabled: Whether disk storage loading should happen in the same calling queue.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// By default, disk storage file loading operates in its own queue with asynchronous dispatch behavior. While this 
+    /// provides better non-blocking disk loading performance, it can result in flickering when reloading an image
+    /// from disk if the image view already has an image set.
+    ///
+    /// Enabling this option prevents flickering by performing all loading in the same queue (typically the UI queue if 
+    /// you are using Kingfisher's extension methods to set an image). However, this may come at the cost of loading
+    /// performance.
+    ///
+    /// - Note: When using SwiftUI components (e.g., `KFImage`), this option is enabled by default to prevent 
+    /// flickering during view updates. This is essential for maintaining visual consistency in SwiftUI's declarative
+    /// environment. For UIKit/AppKit usage, the default remains `false` for optimal performance.
+    ///
+    func loadDiskFileSynchronously(_ enabled: Bool = true) -> Self {
+        options.loadDiskFileSynchronously = enabled
+        return self
+    }
+
+    /// Sets the queue on which image processing should occur.
+    ///
+    /// - Parameter queue: The queue on which image processing should take place.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// By default, Kingfisher employs a pre-defined serial queue for image processing. Use this option to modify this
+    ///  behavior. For example, specify `.mainCurrentOrAsync` to process the image on the main queue, which can prevent
+    ///  potential flickering but may lead to UI blocking if the processor requires substantial time to execute.
+    ///
+    func processingQueue(_ queue: CallbackQueue?) -> Self {
+        options.processingQueue = queue
+        return self
+    }
+
+    /// Sets the alternative sources to be used when loading the original input `Source` fails.
+    ///
+    /// - Parameter sources: The alternative sources to be used.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// The values in the `sources` array will be employed to initiate a new image loading task if the previous task 
+    /// fails due to an error. The image source loading process will terminate as soon as one of the alternative
+    /// sources is successfully loaded. If all `sources` are used but loading still fails,
+    /// a ``KingfisherError/ImageSettingErrorReason/alternativeSourcesExhausted(_:)`` error will be thrown in the
+    ///  `catch` block.
+    ///
+    /// This feature is valuable when implementing a fallback solution for setting images. 
+    ///
+    /// - Note: User cancellation or calling on ``DownloadTask/cancel()`` on ``DownloadTask`` will not trigger the
+    /// loading of alternative sources.
+    ///
+    func alternativeSources(_ sources: [Source]?) -> Self {
+        options.alternativeSources = sources
+        return self
+    }
+
+    /// Sets the `Source` to be loaded when the user enables Low Data Mode and the original source fails with an
+    ///  `NSURLErrorNetworkUnavailableReason.constrained` error.
+    ///
+    /// - Parameter source: The `Source` to be loaded under low data mode.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// When this option is set, the `allowsConstrainedNetworkAccess` property of the request for the original source 
+    /// will be set to `false`, and the specified ``Source`` will be used to retrieve the image in low data mode.
+    /// Typically, you can provide a low-resolution version of your image or a local image provider to display a
+    /// placeholder.
+    ///
+    /// If this option is not set or the `source` is `nil`, the device's Low Data Mode setting will be disregarded, 
+    /// and the original source will be loaded following the system's default behavior in a regular manner.
+    ///
+    func lowDataModeSource(_ source: Source?) -> Self {
+        options.lowDataModeSource = source
+        return self
+    }
+
+    /// Sets whether the image setting for an image view should include a transition even when the image is retrieved 
+    /// from the cache.
+    ///
+    /// - Parameter enabled: Enable the use of a transition or not.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    func forceTransition(_ enabled: Bool = true) -> Self {
+        options.forceTransition = enabled
+        return self
+    }
+
+    /// Sets the image to be used in the event of a failure during image retrieval.
+    ///
+    /// - Parameter image: The image to be used when an error occurs.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    /// If this option is set and an image retrieval error occurs, Kingfisher will use the provided image (or an empty 
+    /// image) in place of the requested one. This is useful when you do not want to display a placeholder during the
+    ///  loading process but prefer to use a default image when requests fail.
+    ///
+    func onFailureImage(_ image: KFCrossPlatformImage?) -> Self {
+        options.onFailureImage = .some(image)
+        return self
+    }
+}
+
+// MARK: - Cache Serializer
+extension KFOptionSetter {
+
+    /// Uses a specified ``CacheSerializer`` to convert data to an image object for retrieval from the disk cache or
+    ///  vice versa for storage to the disk cache.
+    ///
+    /// - Parameter cacheSerializer: The ``CacheSerializer`` to be used.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    func serialize(by cacheSerializer: any CacheSerializer) -> Self {
+        options.cacheSerializer = cacheSerializer
+        return self
+    }
+}
+
+// MARK: - Cache Expiration
+extension KFOptionSetter {
+
+    /// Sets the expiration setting for the memory cache of this image task.
+    ///
+    /// By default, the underlying ``MemoryStorage/Backend`` uses the expiration in its configuration for all items. 
+    /// If set, the ``MemoryStorage/Backend`` will use this value to overwrite the configuration setting for this
+    /// caching item.
+    ///
+    /// - Parameter expiration: The expiration setting used in cache storage.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    func memoryCacheExpiration(_ expiration: StorageExpiration?) -> Self {
+        options.memoryCacheExpiration = expiration
+        return self
+    }
+
+    /// Sets the expiration extending setting for the memory cache. The item expiration time will be incremented by this 
+    /// value after access.
+    ///
+    /// By default, the underlying ``MemoryStorage/Backend`` uses the initial cache expiration as the extending value: 
+    /// ``ExpirationExtending/cacheTime``.
+    ///
+    /// To disable the extending option entirely, set `.none` to it.
+    ///
+    /// - Parameter extending: The expiration extending setting used in cache storage.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    func memoryCacheAccessExtending(_ extending: ExpirationExtending) -> Self {
+        options.memoryCacheAccessExtendingExpiration = extending
+        return self
+    }
+
+    /// Sets the expiration setting for the disk cache of this image task.
+    ///
+    /// By default, the underlying ``DiskStorage/Backend`` uses the expiration in its configuration for all items. 
+    /// If set, the ``DiskStorage/Backend`` will use this value to overwrite the configuration setting for this caching
+    /// item.
+    ///
+    /// - Parameter expiration: The expiration setting used in cache storage.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    func diskCacheExpiration(_ expiration: StorageExpiration?) -> Self {
+        options.diskCacheExpiration = expiration
+        return self
+    }
+
+    /// Sets the expiration extending setting for the disk cache. The item expiration time will be incremented by this 
+    /// value after access.
+    ///
+    /// By default, the underlying ``DiskStorage/Backend`` uses the initial cache expiration as the extending
+    ///  value: ``ExpirationExtending/cacheTime``.
+    ///
+    /// To disable the extending option entirely, set `.none` to it.
+    ///
+    /// - Parameter extending: The expiration extending setting used in cache storage.
+    /// - Returns: A `Self` value with the changes applied.
+    ///
+    func diskCacheAccessExtending(_ extending: ExpirationExtending) -> Self {
+        options.diskCacheAccessExtendingExpiration = extending
+        return self
+    }
+}
