@@ -30,6 +30,7 @@ package struct RemoteImage<Placeholder: View>: View {
         let image = KFImage
             .url(url)
             .targetCache(MediaCache.cache)
+            .downloader(MediaCache.downloader)
             .onSuccess { result in
                 onSuccess?(MediaCacheHit(result.cacheType))
             }
