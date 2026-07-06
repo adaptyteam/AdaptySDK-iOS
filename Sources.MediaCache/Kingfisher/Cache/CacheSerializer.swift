@@ -109,24 +109,16 @@ struct DefaultCacheSerializer: CacheSerializer {
     init() { }
 
     func data(with image: KFCrossPlatformImage, original: Data?) -> Data? {
-        let format: ImageFormat = {
-            if let original = original { return original.kf.imageFormat }
-
-            if let animatedData = image.kf.gifRepresentation(), animatedData.kf.imageFormat == .GIF {
-                return .GIF
-            }
-            return .unknown
-        }()
+        let format: ImageFormat = original?.kf.imageFormat ?? .unknown
 
         if preferCacheOriginalData {
             if let original = original { return original }
-            if format == .GIF { return image.kf.gifRepresentation() }
         }
 
         return image.kf.data(format: format, compressionQuality: compressionQuality)
     }
     
     func image(with data: Data, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
-        return KingfisherWrapper.image(data: data, options: options.imageCreatingOptions)
+        return KingfisherWrapper.image(data: data, scale: options.scaleFactor)
     }
 }

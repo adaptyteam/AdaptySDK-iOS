@@ -308,23 +308,6 @@ class KingfisherManager: @unchecked Sendable {
     {
         var options = options
 
-        let progressiveJPEG = options.progressiveJPEG
-        if let provider = ImageProgressiveProvider(options: options, refresh: { image in
-            guard let setter = progressiveImageSetter else {
-                return
-            }
-            guard let strategy = progressiveJPEG?.onImageUpdated(image) else {
-                setter(image)
-                return
-            }
-            switch strategy {
-            case .default: setter(image)
-            case .keepCurrent: break
-            case .replace(let newImage): setter(newImage)
-            }
-        }) {
-            options.onDataReceived = (options.onDataReceived ?? []) + [provider]
-        }
         if let checker = referenceTaskIdentifierChecker {
             options.onDataReceived?.forEach {
                 $0.onShouldApply = checker
@@ -885,12 +868,7 @@ class KingfisherManager: @unchecked Sendable {
 
             // TODO: Optimize it when we can use async across all the project.
             @Sendable func checkResultImageAndCallback(_ inputImage: KFCrossPlatformImage) {
-                var image = inputImage
-                if image.kf.imageFrameCount != nil && image.kf.imageFrameCount != 1, options.imageCreatingOptions != image.kf.imageCreatingOptions, let data = image.kf.animatedImageData {
-                    // Recreate animated image representation when loaded in different options.
-                    // https://github.com/onevcat/Kingfisher/issues/1923
-                    image = options.processor.process(item: .data(data), options: options) ?? .init()
-                }
+                let image = inputImage
                 let value = result.map {
                     RetrieveImageResult(
                         image: image,

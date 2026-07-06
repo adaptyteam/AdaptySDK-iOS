@@ -137,17 +137,6 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// 3x retina images. Otherwise, Kingfisher will convert the data to an image object with a scale of 1.0.
     case scaleFactor(CGFloat)
 
-    /// Determines whether all the animated image data should be preloaded.
-    ///
-    /// The default value is `false`, which means only the following frames will be loaded on demand. If set to `true`, 
-    /// all the animated image data will be loaded and decoded into memory.
-    ///
-    /// This option is primarily used for internal backward compatibility. It should not be set directly. Instead, you 
-    /// should choose the appropriate image view class to control the GIF data loading. Kingfisher offers two classes
-    /// for displaying GIF images: ``AnimatedImageView``, which does not preload all data, consumes less memory, but uses
-    /// more CPU during display; and a regular image view (`UIImageView` or `NSImageView`), which loads all data at
-    /// once, consumes more memory, but decodes image frames only once.
-    case preloadAllAnimationData
     
     /// The processor used in the image retrieval task.
     ///
@@ -170,12 +159,6 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// will be ignored and the current image will be kept while loading or downloading the new image.
     case keepCurrentImageWhileLoading
     
-    /// When set, Kingfisher will load only the first frame from an animated image file as a single image.
-    ///
-    /// Loading animated images can consume a significant amount of memory. This option is useful when you want to 
-    /// display a static preview of the first frame from an animated image. It will be ignored if the target image is
-    /// not animated image data.
-    case onlyLoadFirstFrame
     
     /// When set and an non-default ``ImageProcessor`` is used, Kingfisher will attempt to cache both the final result
     /// and the original image.
@@ -294,11 +277,6 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// - Note: The execution order depends on the provided queue.
     case processingQueue(CallbackQueue)
     
-    /// Enables progressive image loading.
-    ///
-    /// Kingfisher will use the associated ``ImageProgressive`` value to process progressive JPEG data and display 
-    /// it progressively, if the image supports it.
-    case progressiveJPEG(ImageProgressive)
 
     /// Sets a set of alternative sources when the original input `Source` fails to load.
     ///
@@ -377,13 +355,11 @@ struct KingfisherParsedOptionsInfo: Sendable {
     var waitForCache = false
     var onlyFromCache = false
     var backgroundDecode = false
-    var preloadAllAnimationData = false
     var callbackQueue: CallbackQueue = .mainCurrentOrAsync
     var scaleFactor: CGFloat = 1.0
     var processor: any ImageProcessor = DefaultImageProcessor.default
     var cacheSerializer: any CacheSerializer = DefaultCacheSerializer.default
     var keepCurrentImageWhileLoading = false
-    var onlyLoadFirstFrame = false
     var cacheOriginalImage = false
     var onFailureImage: Optional<KFCrossPlatformImage?> = .none
     var alsoPrefetchToMemory = false
@@ -395,7 +371,6 @@ struct KingfisherParsedOptionsInfo: Sendable {
     var diskCacheExpiration: StorageExpiration? = nil
     var diskCacheAccessExtendingExpiration: ExpirationExtending = .cacheTime
     var processingQueue: CallbackQueue? = nil
-    var progressiveJPEG: ImageProgressive? = nil
     var alternativeSources: [Source]? = nil
     var lowDataModeSource: Source? = nil
     var forcedExtension: String? = nil
@@ -420,13 +395,11 @@ struct KingfisherParsedOptionsInfo: Sendable {
             case .waitForCache: waitForCache = true
             case .onlyFromCache: onlyFromCache = true
             case .backgroundDecode: backgroundDecode = true
-            case .preloadAllAnimationData: preloadAllAnimationData = true
             case .callbackQueue(let value): callbackQueue = value
             case .scaleFactor(let value): scaleFactor = value
             case .processor(let value): processor = value
             case .cacheSerializer(let value): cacheSerializer = value
             case .keepCurrentImageWhileLoading: keepCurrentImageWhileLoading = true
-            case .onlyLoadFirstFrame: onlyLoadFirstFrame = true
             case .cacheOriginalImage: cacheOriginalImage = true
             case .onFailureImage(let value): onFailureImage = .some(value)
             case .alsoPrefetchToMemory: alsoPrefetchToMemory = true
@@ -438,7 +411,6 @@ struct KingfisherParsedOptionsInfo: Sendable {
             case .diskCacheExpiration(let expiration): diskCacheExpiration = expiration
             case .diskCacheAccessExtendingExpiration(let expirationExtending): diskCacheAccessExtendingExpiration = expirationExtending
             case .processingQueue(let queue): processingQueue = queue
-            case .progressiveJPEG(let value): progressiveJPEG = value
             case .alternativeSources(let sources): alternativeSources = sources
             case .lowDataMode(let source): lowDataModeSource = source
             case .forcedCacheFileExtension(let ext): forcedExtension = ext
@@ -448,16 +420,6 @@ struct KingfisherParsedOptionsInfo: Sendable {
         if originalCache == nil {
             originalCache = targetCache
         }
-    }
-}
-
-extension KingfisherParsedOptionsInfo {
-    var imageCreatingOptions: ImageCreatingOptions {
-        return ImageCreatingOptions(
-            scale: scaleFactor,
-            duration: 0.0,
-            preloadAll: preloadAllAnimationData,
-            onlyFirstFrame: onlyLoadFirstFrame)
     }
 }
 
