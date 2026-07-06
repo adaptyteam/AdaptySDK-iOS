@@ -42,8 +42,6 @@ protocol KFOptionSetter {
     var onProgressDelegate: Delegate<(Int64, Int64), Void> { get }
 }
 
-extension KF.Builder: KFOptionSetter { }
-
 final actor KFDelegateObserver {
     static let `default` = KFDelegateObserver()
 }
@@ -466,27 +464,6 @@ extension KFOptionSetter {
     ///
     func redirectHandler(_ handler: any ImageDownloadRedirectHandler) -> Self {
         options.redirectHandler = handler
-        return self
-    }
-
-    /// Sets a block to modify the image download request during redirection.
-    ///
-    /// - Parameter block: The block to be used for redirection.
-    /// - Returns: A `Self` value with the changes applied.
-    ///
-    /// This provides an opportunity to modify the image download request during redirection. You can use this for 
-    /// customization purposes, such as adding an authentication token to the header, implementing basic HTTP
-    /// authentication, or URL mapping. By default, the original redirection request will be sent without any
-    /// modification.
-    ///
-    func redirectHandler(_ block: @escaping @Sendable (KF.RedirectPayload) -> Void) -> Self {
-        let redirectHandler = AnyRedirectHandler { (task, response, request, handler) in
-            let payload = KF.RedirectPayload(
-                task: task, response: response, newRequest: request, completionHandler: handler
-            )
-            block(payload)
-        }
-        options.redirectHandler = redirectHandler
         return self
     }
 }

@@ -52,43 +52,37 @@ extension Resource {
         let key = overrideCacheKey ?? cacheKey
         return downloadURL.isFileURL ?
             .provider(LocalFileImageDataProvider(fileURL: downloadURL, cacheKey: key)) :
-            .network(KF.ImageResource(downloadURL: downloadURL, cacheKey: key))
+            .network(ImageResource(downloadURL: downloadURL, cacheKey: key))
     }
 }
 
-@available(*, deprecated, message: "This type conflicts with `GeneratedAssetSymbols.ImageResource` in Swift 5.9. Renamed to avoid issues in the future.", renamed: "KF.ImageResource")
-typealias ImageResource = KF.ImageResource
+/// ``ImageResource`` is a simple combination of ``downloadURL`` and ``cacheKey``.
+/// When passed to image view set methods, Kingfisher will try to download the target
+/// image from the ``downloadURL``, and then store it with the ``cacheKey`` as the key in cache.
+struct ImageResource: Resource {
 
+    // MARK: - Initializers
 
-extension KF {
-    /// ``ImageResource`` is a simple combination of ``downloadURL`` and ``cacheKey``.
-    /// When passed to image view set methods, Kingfisher will try to download the target
-    /// image from the ``downloadURL``, and then store it with the ``cacheKey`` as the key in cache.
-    struct ImageResource: Resource {
-
-        // MARK: - Initializers
-
-        /// Creates an image resource.
-        ///
-        /// - Parameters:
-        ///   - downloadURL: The target image URL from where the image can be downloaded.
-        ///   - cacheKey: 
-        ///   The cache key. If `nil`, Kingfisher will use the `absoluteString` of ``ImageResource/downloadURL`` as
-        ///   the key. Default is `nil`.
-        ///   
-        init(downloadURL: URL, cacheKey: String? = nil) {
-            self.downloadURL = downloadURL
-            self.cacheKey = cacheKey ?? downloadURL.cacheKey
-        }
-
-        // MARK: Protocol Conforming
-        
-        /// The key used in cache.
-        let cacheKey: String
-
-        /// The target image URL.
-        let downloadURL: URL
+    /// Creates an image resource.
+    ///
+    /// - Parameters:
+    ///   - downloadURL: The target image URL from where the image can be downloaded.
+    ///   - cacheKey:
+    ///   The cache key. If `nil`, Kingfisher will use the `absoluteString` of ``ImageResource/downloadURL`` as
+    ///   the key. Default is `nil`.
+    ///
+    init(downloadURL: URL, cacheKey: String? = nil) {
+        self.downloadURL = downloadURL
+        self.cacheKey = cacheKey ?? downloadURL.cacheKey
     }
+
+    // MARK: Protocol Conforming
+
+    /// The key used in cache.
+    let cacheKey: String
+
+    /// The target image URL.
+    let downloadURL: URL
 }
 
 /// URL conforms to ``Resource`` in Kingfisher.
