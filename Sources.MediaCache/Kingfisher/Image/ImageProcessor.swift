@@ -475,7 +475,7 @@ struct Border: Sendable {
 /// Processor for creating bordered images.
 struct BorderImageProcessor: ImageProcessor {
     
-    var identifier: String { "com.onevcat.Kingfisher.RoundCornerImageProcessor(\(border)" }
+    var identifier: String { "com.onevcat.Kingfisher.BorderImageProcessor(\(border)" }
     
     /// The border to be added to the image.
     let border: Border
@@ -814,6 +814,25 @@ struct DownsamplingImageProcessor: ImageProcessor {
             return KingfisherWrapper.downsampledImage(data: data, to: size, scale: options.scaleFactor)
         case .data(let data):
             return KingfisherWrapper.downsampledImage(data: data, to: size, scale: options.scaleFactor)
+        }
+    }
+}
+
+// This is an internal processor to provide the same interface for Live Photos.
+// It is not intended to be open and used from external.
+struct LivePhotoImageProcessor: ImageProcessor {
+    
+    static let `default` = LivePhotoImageProcessor()
+    private init() { }
+    
+    let identifier = "com.onevcat.Kingfisher.LivePhotoImageProcessor"
+    
+    func process(item: ImageProcessItem, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
+        switch item {
+        case .image(let image):
+            return image
+        case .data:
+            return KFCrossPlatformImage()
         }
     }
 }

@@ -26,7 +26,7 @@
 
 import Foundation
 
-// These helper methods are not since we do not want them to be exposed or cause any conflicting.
+// These helper methods are not public since we do not want them to be exposed or cause any conflicting.
 // However, they are just wrapper of `ResultUtil` static methods.
 extension Result where Failure: Error {
 

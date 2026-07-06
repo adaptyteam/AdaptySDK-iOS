@@ -40,8 +40,19 @@ class SessionDataTask: @unchecked Sendable {
         let options: KingfisherParsedOptionsInfo
     }
 
+    private var _mutableData: Data
     /// The downloaded raw data of the current task.
-    private(set) var mutableData: Data
+    var mutableData: Data {
+        lock.lock()
+        defer { lock.unlock() }
+        return Data(_mutableData)
+    }
+
+    var mutableDataCount: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return _mutableData.count
+    }
 
     // This is a copy of `task.originalRequest?.url`. It is for obtaining race-safe behavior for a pitfall on iOS 13.
     // Ref: https://github.com/onevcat/Kingfisher/issues/1511
@@ -54,6 +65,7 @@ class SessionDataTask: @unchecked Sendable {
     let task: URLSessionDataTask
     
     private var callbacksStore = [CancelToken: TaskCallback]()
+    private var completed = false
 
     var callbacks: [SessionDataTask.TaskCallback] {
         lock.lock()
@@ -63,6 +75,14 @@ class SessionDataTask: @unchecked Sendable {
 
     private var currentToken = 0
     private let lock = NSLock()
+    
+    private var _metrics: NetworkMetrics?
+    /// The network metrics collected during the download task.
+    var metrics: NetworkMetrics? {
+        lock.lock()
+        defer { lock.unlock() }
+        return _metrics
+    }
 
     let onTaskDone = Delegate<(Result<(Data, URLResponse?), KingfisherError>, [TaskCallback]), Void>()
     let onCallbackCancelled = Delegate<(CancelToken, TaskCallback), Void>()
@@ -80,12 +100,14 @@ class SessionDataTask: @unchecked Sendable {
     init(task: URLSessionDataTask) {
         self.task = task
         self.originalURL = task.originalRequest?.url
-        mutableData = Data()
+        _mutableData = Data()
     }
 
-    func addCallback(_ callback: TaskCallback) -> CancelToken {
+    func addCallback(_ callback: TaskCallback) -> CancelToken? {
         lock.lock()
         defer { lock.unlock() }
+        guard !completed else { return nil }
+
         callbacksStore[currentToken] = callback
         defer { currentToken += 1 }
         return currentToken
@@ -101,10 +123,23 @@ class SessionDataTask: @unchecked Sendable {
         return nil
     }
     
-    func removeAllCallbacks() -> Void {
+    @discardableResult
+    func removeAllCallbacks() -> [TaskCallback] {
         lock.lock()
         defer { lock.unlock() }
+        let callbacks = callbacksStore.values
         callbacksStore.removeAll()
+        return Array(callbacks)
+    }
+
+    @discardableResult
+    func completeAndRemoveAllCallbacks() -> [TaskCallback] {
+        lock.lock()
+        defer { lock.unlock() }
+        completed = true
+        let callbacks = callbacksStore.values
+        callbacksStore.removeAll()
+        return Array(callbacks)
     }
 
     func resume() {
@@ -127,6 +162,14 @@ class SessionDataTask: @unchecked Sendable {
     }
 
     func didReceiveData(_ data: Data) {
-        mutableData.append(data)
+        lock.lock()
+        defer { lock.unlock() }
+        _mutableData.append(data)
+    }
+    
+    func didCollectMetrics(_ metrics: NetworkMetrics) {
+        lock.lock()
+        defer { lock.unlock() }
+        _metrics = metrics
     }
 }

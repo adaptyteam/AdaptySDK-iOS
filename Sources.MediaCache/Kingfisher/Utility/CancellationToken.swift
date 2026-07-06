@@ -1,9 +1,10 @@
 //
-//  Box.swift
+//  CancellationToken.swift
 //  Kingfisher
 //
-//  Created by Wei Wang on 2018/3/17.
-//  Copyright (c) 2019 Wei Wang <onevcat@gmail.com>
+//  Created for issue #2495 - Thread-safe cancellation for background checks.
+//
+//  Copyright (c) 2024 Wei Wang <onevcat@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -25,10 +26,24 @@
 
 import Foundation
 
-class Box<T> {
-    var value: T
-    
-    init(_ value: T) {
-        self.value = value
+/// A thread-safe token for cooperative cancellation of background tasks.
+///
+/// Used by view extensions to signal that a previously issued image retrieval
+/// is no longer needed. The token can be safely read from any thread (e.g.,
+/// the disk cache I/O queue) without accessing UI-associated state directly.
+final class CancellationToken: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _isCancelled = false
+
+    var isCancelled: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return _isCancelled
+    }
+
+    func cancel() {
+        lock.lock()
+        _isCancelled = true
+        lock.unlock()
     }
 }

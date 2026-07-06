@@ -51,7 +51,7 @@ enum MemoryStorage {
     /// The `MemoryStorage` also includes a scheduled self-cleaning task to evict expired items from memory.
     ///
     /// > This class is thready safe.
-    class Backend<T: CacheCostCalculable>: @unchecked Sendable {
+    final class Backend<T: CacheCostCalculable>: @unchecked Sendable where T: Sendable {
         
         let storage = NSCache<NSString, StorageObject<T>>()
 
@@ -75,6 +75,11 @@ enum MemoryStorage {
             didSet {
                 storage.totalCostLimit = config.totalCostLimit
                 storage.countLimit = config.countLimit
+                cleanTimer?.invalidate()
+                cleanTimer = .scheduledTimer(withTimeInterval: config.cleanInterval, repeats: true) { [weak self] _ in
+                    guard let self = self else { return }
+                    self.removeExpired()
+                }
             }
         }
 
@@ -194,6 +199,29 @@ enum MemoryStorage {
             defer { lock.unlock() }
             storage.removeAllObjects()
             keys.removeAll()
+        }
+
+        /// Calculates the total ``CacheCostCalculable/cacheCost`` of all resident values, including
+        /// expired-but-not-yet-evicted ones.
+        ///
+        /// The result approximates the cost currently managed by the underlying cache against
+        /// ``MemoryStorage/Config/totalCostLimit``. Values already evicted by the system are not counted, since
+        /// they no longer occupy memory. Reading a value here does not extend its expiration.
+        ///
+        /// This method iterates over every cached item, so it can be expensive and should be used sparingly.
+        /// - Returns: The total cost in bytes for all resident cached values.
+        func totalCacheCost() -> Int {
+            let allKeys: [String] = {
+                lock.lock()
+                defer { lock.unlock() }
+                return Array(keys)
+            }()
+            return allKeys.reduce(0) { cost, key in
+                guard let value = storage.object(forKey: key as NSString)?.value else {
+                    return cost
+                }
+                return cost + value.cacheCost
+            }
         }
     }
 }

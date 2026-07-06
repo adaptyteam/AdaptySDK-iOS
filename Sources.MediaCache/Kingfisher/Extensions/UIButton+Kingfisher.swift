@@ -124,7 +124,9 @@ extension KingfisherWrapper where Base: UIButton {
             taskAccessor: TaskPropertyAccessor(
                 setTaskIdentifier: { setTaskIdentifier($0, for: state) },
                 getTaskIdentifier: { taskIdentifier(for: state) },
-                setTask: { mutatingSelf.imageTask = $0 }
+                setTask: { mutatingSelf.imageTask = $0 },
+                getCancellationToken: { imageCancellationToken },
+                setCancellationToken: { mutatingSelf.imageCancellationToken = $0 }
             ),
             placeholder: placeholder,
             parsedOptions: parsedOptions,
@@ -139,6 +141,7 @@ extension KingfisherWrapper where Base: UIButton {
     /// Nothing will happen if the downloading has already finished.
     func cancelImageDownloadTask() {
         imageTask?.cancel()
+        imageCancellationToken?.cancel()
     }
 
     // MARK: Setting Background Image
@@ -237,7 +240,9 @@ extension KingfisherWrapper where Base: UIButton {
             taskAccessor: TaskPropertyAccessor(
                 setTaskIdentifier: { setBackgroundTaskIdentifier($0, for: state) },
                 getTaskIdentifier: { backgroundTaskIdentifier(for: state) },
-                setTask: { mutatingSelf.backgroundImageTask = $0 }
+                setTask: { mutatingSelf.backgroundImageTask = $0 },
+                getCancellationToken: { backgroundImageCancellationToken },
+                setCancellationToken: { mutatingSelf.backgroundImageCancellationToken = $0 }
             ),
             placeholder: placeholder,
             parsedOptions: parsedOptions,
@@ -252,12 +257,14 @@ extension KingfisherWrapper where Base: UIButton {
     /// Nothing will happen if the downloading has already finished.
     func cancelBackgroundImageDownloadTask() {
         backgroundImageTask?.cancel()
+        backgroundImageCancellationToken?.cancel()
     }
 }
 
 // MARK: - Associated Object
 @MainActor private var taskIdentifierKey: Void?
 @MainActor private var imageTaskKey: Void?
+@MainActor private var imageCancellationTokenKey: Void?
 
 // MARK: Properties
 @MainActor
@@ -284,11 +291,17 @@ extension KingfisherWrapper where Base: UIButton {
         get { return getAssociatedObject(base, &imageTaskKey) }
         set { setRetainedAssociatedObject(base, &imageTaskKey, newValue)}
     }
+
+    private var imageCancellationToken: CancellationToken? {
+        get { getAssociatedObject(base, &imageCancellationTokenKey) }
+        set { setRetainedAssociatedObject(base, &imageCancellationTokenKey, newValue) }
+    }
 }
 
 
 @MainActor private var backgroundTaskIdentifierKey: Void?
 @MainActor private var backgroundImageTaskKey: Void?
+@MainActor private var backgroundImageCancellationTokenKey: Void?
 
 // MARK: Background Properties
 @MainActor
@@ -312,6 +325,11 @@ extension KingfisherWrapper where Base: UIButton {
     private var backgroundImageTask: DownloadTask? {
         get { return getAssociatedObject(base, &backgroundImageTaskKey) }
         mutating set { setRetainedAssociatedObject(base, &backgroundImageTaskKey, newValue) }
+    }
+
+    private var backgroundImageCancellationToken: CancellationToken? {
+        get { getAssociatedObject(base, &backgroundImageCancellationTokenKey) }
+        set { setRetainedAssociatedObject(base, &backgroundImageCancellationTokenKey, newValue) }
     }
 }
 #endif

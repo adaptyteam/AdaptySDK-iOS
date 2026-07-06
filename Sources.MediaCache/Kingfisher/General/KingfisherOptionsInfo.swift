@@ -72,6 +72,9 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// By default, the transition does not occur when the image is retrieved from either memory or disk cache. To
     /// force the transition even when the image is retrieved from the cache, also set
     /// ``KingfisherOptionsInfoItem/forceTransition``.
+    ///
+    /// - Important: This option is designed for UIKit/AppKit transitions. For SwiftUI applications, use the
+    /// ``KFImageProtocol/loadTransition(_:animation:)`` method instead, which provides native SwiftUI transition support.
     case transition(ImageTransition)
     
     /// The associated `Float` value to be set as the priority of the image download task.
@@ -228,14 +231,32 @@ enum KingfisherOptionsInfoItem: Sendable {
     
     /// When set, disk storage loading will occur in the same calling queue.
     ///
-    /// By default, disk storage file loading operates on its own queue with asynchronous dispatch behavior. While this 
+    /// By default, disk storage file loading operates on its own queue with asynchronous dispatch behavior. While this
     /// provides improved non-blocking disk loading performance, it can lead to flickering when you reload an image from
     /// disk if the image view already has an image set.
     ///
-    /// Setting this option will eliminate that flickering by keeping all loading in the same queue (typically the UI 
+    /// Setting this option will eliminate that flickering by keeping all loading in the same queue (typically the UI
     /// queue if you are using Kingfisher's extension methods to set an image). However, this comes with a tradeoff in
     /// loading performance.
     case loadDiskFileSynchronously
+
+    /// When set, the cache existence probe that decides whether an image is already cached is dispatched onto the cache's
+    /// I/O queue instead of running synchronously on the caller thread.
+    ///
+    /// By default, ``KingfisherManager`` calls ``ImageCache/imageCachedType(forKey:processorIdentifier:forcedExtension:)``
+    /// before deciding between a cache read and a network download. That call performs file-system `stat` syscalls on
+    /// whatever thread invoked `setImage`. When `setImage` is called from UIKit layout callbacks such as
+    /// `tableView(_:cellForRowAt:)` or `collectionView(_:cellForItemAt:)` on a device under disk pressure, those syscalls
+    /// can hang the main thread.
+    ///
+    /// Opt in to this flag to move the probe onto the cache's I/O queue via
+    /// ``ImageCache/imageCachedTypeAsync(forKey:processorIdentifier:forcedExtension:callbackQueue:completionHandler:)``.
+    /// The ``DownloadTask`` returned from `setImage` is still delivered synchronously; if the probe discovers a cache
+    /// miss, the resulting network task is linked to the returned shell via ``DownloadTask/linkToTask(_:)``.
+    ///
+    /// - Note: If ``KingfisherOptionsInfoItem/loadDiskFileSynchronously`` is set, that option continues to govern the
+    ///   actual disk read. This flag only affects the existence probe that precedes the read.
+    case asyncCacheTypeCheck
 
     /// Options for controlling the data writing process to disk storage.
     ///
@@ -283,9 +304,22 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// Determines the queue on which image processing should occur.
     ///
     /// By default, Kingfisher uses an internal pre-defined serial queue to process images. Use this option to modify
-    /// this behavior. For instance, you can specify ``CallbackQueue/mainCurrentOrAsync`` to process the image on the
-    /// main queue, preventing potential flickering (but with the risk of blocking the UI, especially if the processor
-    /// is time-consuming).
+    /// this behavior.
+    ///
+    /// For instance, you can specify ``CallbackQueue/mainCurrentOrAsync`` to process the image on the main queue,
+    /// preventing potential flickering (but with the risk of blocking the UI, especially if the processor is
+    /// time-consuming).
+    ///
+    /// If you need more control over scheduling (such as limiting concurrency, changing priority, or using a LIFO
+    /// strategy), you can provide an operation queue by using ``CallbackQueue/operationQueue(_:)``.
+    ///
+    /// ```swift
+    /// let queue = OperationQueue()
+    /// // Configure `queue` as needed.
+    /// options = [.processingQueue(.operationQueue(queue))]
+    /// ```
+    ///
+    /// - Note: The execution order depends on the provided queue.
     case processingQueue(CallbackQueue)
     
     /// Enables progressive image loading.
@@ -347,6 +381,15 @@ enum KingfisherOptionsInfoItem: Sendable {
     /// If not set or if the associated optional ``Source`` value is `nil`, the device's Low Data Mode will be ignored,
     /// and the original source will be loaded following the system default behavior.
     case lowDataMode(Source?)
+
+    /// Forces the disk cache to use a specific file extension when persisting the image.
+    ///
+    /// By default, Kingfisher determines the file extension based on the disk storage configuration. When this option
+    /// is set, the associated `String` value is used verbatim as the extension for the cached file instead.
+    ///
+    /// If the associated value is `nil`, the behavior is the same as not setting this option: the file extension is
+    /// determined by the disk storage configuration.
+    case forcedCacheFileExtension(String?)
 }
 
 // MARK: - KingfisherParsedOptionsInfo
@@ -387,6 +430,7 @@ struct KingfisherParsedOptionsInfo: Sendable {
     var onFailureImage: Optional<KFCrossPlatformImage?> = .none
     var alsoPrefetchToMemory = false
     var loadDiskFileSynchronously = false
+    var asyncCacheTypeCheck = false
     var diskStoreWriteOptions: Data.WritingOptions = []
     var memoryCacheExpiration: StorageExpiration? = nil
     var memoryCacheAccessExtendingExpiration: ExpirationExtending = .cacheTime
@@ -397,9 +441,12 @@ struct KingfisherParsedOptionsInfo: Sendable {
     var alternativeSources: [Source]? = nil
     var retryStrategy: (any RetryStrategy)? = nil
     var lowDataModeSource: Source? = nil
+    var forcedExtension: String? = nil
 
     var onDataReceived: [any DataReceivingSideEffect]? = nil
-    
+    var sourceTaskIdentifierChecker: (@Sendable () -> Bool)? = nil
+    var isSourceTaskStale: Bool { sourceTaskIdentifierChecker.map { !$0() } ?? false }
+
     init(_ info: KingfisherOptionsInfo?) {
         guard let info = info else { return }
         for option in info {
@@ -430,6 +477,7 @@ struct KingfisherParsedOptionsInfo: Sendable {
             case .onFailureImage(let value): onFailureImage = .some(value)
             case .alsoPrefetchToMemory: alsoPrefetchToMemory = true
             case .loadDiskFileSynchronously: loadDiskFileSynchronously = true
+            case .asyncCacheTypeCheck: asyncCacheTypeCheck = true
             case .diskStoreWriteOptions(let options): diskStoreWriteOptions = options
             case .memoryCacheExpiration(let expiration): memoryCacheExpiration = expiration
             case .memoryCacheAccessExtendingExpiration(let expirationExtending): memoryCacheAccessExtendingExpiration = expirationExtending
@@ -440,6 +488,7 @@ struct KingfisherParsedOptionsInfo: Sendable {
             case .alternativeSources(let sources): alternativeSources = sources
             case .retryStrategy(let strategy): retryStrategy = strategy
             case .lowDataMode(let source): lowDataModeSource = source
+            case .forcedCacheFileExtension(let ext): forcedExtension = ext
             }
         }
 
@@ -490,7 +539,7 @@ class ImageLoadingProgressSideEffect: DataReceivingSideEffect, @unchecked Sendab
                 return
             }
 
-            let dataLength = Int64(task.mutableData.count)
+            let dataLength = Int64(task.mutableDataCount)
             self.block(dataLength, expectedContentLength)
         }
     }

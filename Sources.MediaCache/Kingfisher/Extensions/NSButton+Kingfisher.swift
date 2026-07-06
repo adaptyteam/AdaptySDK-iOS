@@ -118,8 +118,10 @@ extension KingfisherWrapper where Base: NSButton {
                 }),
             taskAccessor: TaskPropertyAccessor(
                 setTaskIdentifier: { mutatingSelf.taskIdentifier = $0 },
-                getTaskIdentifier: { mutatingSelf.taskIdentifier }, 
-                setTask: { mutatingSelf.imageTask = $0 }),
+                getTaskIdentifier: { mutatingSelf.taskIdentifier },
+                setTask: { mutatingSelf.imageTask = $0 },
+                getCancellationToken: { mutatingSelf.imageCancellationToken },
+                setCancellationToken: { mutatingSelf.imageCancellationToken = $0 }),
             placeholder: placeholder,
             parsedOptions: parsedOptions,
             progressBlock: progressBlock,
@@ -133,6 +135,7 @@ extension KingfisherWrapper where Base: NSButton {
     /// Nothing will happen if the downloading has already finished.
     func cancelImageDownloadTask() {
         imageTask?.cancel()
+        imageCancellationToken?.cancel()
     }
 
     // MARK: Setting Alternate Image
@@ -208,7 +211,9 @@ extension KingfisherWrapper where Base: NSButton {
             taskAccessor: TaskPropertyAccessor(
                 setTaskIdentifier: { mutatingSelf.alternateTaskIdentifier = $0 },
                 getTaskIdentifier: { mutatingSelf.alternateTaskIdentifier },
-                setTask: { mutatingSelf.alternateImageTask = $0 }
+                setTask: { mutatingSelf.alternateImageTask = $0 },
+                getCancellationToken: { mutatingSelf.alternateImageCancellationToken },
+                setCancellationToken: { mutatingSelf.alternateImageCancellationToken = $0 }
             ),
             placeholder: placeholder,
             parsedOptions: parsedOptions,
@@ -224,6 +229,7 @@ extension KingfisherWrapper where Base: NSButton {
     /// Nothing will happen if the downloading has already finished.
     func cancelAlternateImageDownloadTask() {
         alternateImageTask?.cancel()
+        alternateImageCancellationToken?.cancel()
     }
 }
 
@@ -231,9 +237,11 @@ extension KingfisherWrapper where Base: NSButton {
 // MARK: - Associated Object
 @MainActor private var taskIdentifierKey: Void?
 @MainActor private var imageTaskKey: Void?
+@MainActor private var imageCancellationTokenKey: Void?
 
 @MainActor private var alternateTaskIdentifierKey: Void?
 @MainActor private var alternateImageTaskKey: Void?
+@MainActor private var alternateImageCancellationTokenKey: Void?
 
 @MainActor
 extension KingfisherWrapper where Base: NSButton {
@@ -256,6 +264,11 @@ extension KingfisherWrapper where Base: NSButton {
         set { setRetainedAssociatedObject(base, &imageTaskKey, newValue)}
     }
 
+    private var imageCancellationToken: CancellationToken? {
+        get { getAssociatedObject(base, &imageCancellationTokenKey) }
+        set { setRetainedAssociatedObject(base, &imageCancellationTokenKey, newValue) }
+    }
+
     private(set) var alternateTaskIdentifier: Source.Identifier.Value? {
         get {
             let box: Box<Source.Identifier.Value>? = getAssociatedObject(base, &alternateTaskIdentifierKey)
@@ -270,6 +283,11 @@ extension KingfisherWrapper where Base: NSButton {
     private var alternateImageTask: DownloadTask? {
         get { return getAssociatedObject(base, &alternateImageTaskKey) }
         set { setRetainedAssociatedObject(base, &alternateImageTaskKey, newValue)}
+    }
+
+    private var alternateImageCancellationToken: CancellationToken? {
+        get { getAssociatedObject(base, &alternateImageCancellationTokenKey) }
+        set { setRetainedAssociatedObject(base, &alternateImageCancellationTokenKey, newValue) }
     }
 }
 #endif

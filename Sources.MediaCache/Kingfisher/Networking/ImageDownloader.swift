@@ -43,6 +43,9 @@ struct ImageLoadingResult: Sendable {
 
     /// The raw data received from the downloader.
     let originalData: Data
+    
+    /// The network metrics collected during the download process.
+    let metrics: NetworkMetrics?
 
     /// Creates an `ImageDownloadResult` object.
     ///
@@ -50,10 +53,12 @@ struct ImageLoadingResult: Sendable {
     ///   - image: The image of the download result.
     ///   - url: The URL from which the image was downloaded.
     ///   - originalData: The binary data of the image.
-    init(image: KFCrossPlatformImage, url: URL? = nil, originalData: Data) {
+    ///   - metrics: The network metrics collected during the download.
+    init(image: KFCrossPlatformImage, url: URL? = nil, originalData: Data, metrics: NetworkMetrics? = nil) {
         self.image = image
         self.url = url
         self.originalData = originalData
+        self.metrics = metrics
     }
 }
 
@@ -70,8 +75,26 @@ final class DownloadTask: @unchecked Sendable {
         _sessionTask = sessionTask
         _cancelToken = cancelToken
     }
-    
+
     init() { }
+
+    /// Internal initializer used for non-network sources backed by an
+    /// ``ImageDataProvider``. The returned task carries the `Task` that drives the
+    /// provider load; calling ``cancel()`` cancels that `Task`.
+    init(providerTask: Task<Void, Never>) {
+        _providerTask = providerTask
+    }
+
+    private var _linkedTask: DownloadTask? = nil
+
+    private var _providerTask: Task<Void, Never>? = nil
+
+    /// The Swift concurrency `Task` driving an ``ImageDataProvider`` load, if this
+    /// `DownloadTask` represents a provider-backed load.
+    var providerTask: Task<Void, Never>? {
+        get { propertyQueue.sync { _providerTask ?? _linkedTask?.providerTask } }
+        set { propertyQueue.sync { _providerTask = newValue } }
+    }
 
     private var _sessionTask: SessionDataTask? = nil
     
@@ -82,7 +105,7 @@ final class DownloadTask: @unchecked Sendable {
     /// When you call ``DownloadTask/cancel()``, this ``SessionDataTask`` and its cancellation token will be passed
     /// along. You can use them to identify the cancelled task.
     private(set) var sessionTask: SessionDataTask? {
-        get { propertyQueue.sync { _sessionTask! } }
+        get { propertyQueue.sync { _sessionTask ?? _linkedTask?.sessionTask } }
         set { propertyQueue.sync { _sessionTask = newValue } }
     }
 
@@ -93,7 +116,7 @@ final class DownloadTask: @unchecked Sendable {
     /// This is solely for identifying the task when it is cancelled. To cancel a ``DownloadTask``, call
     ///  ``DownloadTask/cancelToken``.
     private(set) var cancelToken: SessionDataTask.CancelToken? {
-        get { propertyQueue.sync { _cancelToken } }
+        get { propertyQueue.sync { _cancelToken ?? _linkedTask?.cancelToken } }
         set { propertyQueue.sync { _cancelToken = newValue } }
     }
 
@@ -114,45 +137,71 @@ final class DownloadTask: @unchecked Sendable {
     /// ``ImageDownloader/cancel(url:)``. If you need to cancel all downloading tasks of an ``ImageDownloader``, 
     /// use ``ImageDownloader/cancelAll()``.
     func cancel() {
+        if let providerTask {
+            providerTask.cancel()
+            return
+        }
         guard let sessionTask, let cancelToken else { return }
         sessionTask.cancel(token: cancelToken)
     }
     
     var isInitialized: Bool {
         propertyQueue.sync {
-            _sessionTask != nil && _cancelToken != nil
+            (_sessionTask != nil && _cancelToken != nil) ||
+            _providerTask != nil ||
+            (_linkedTask?.isInitialized ?? false)
         }
     }
     
     func linkToTask(_ task: DownloadTask) {
-        self.sessionTask = task.sessionTask
-        self.cancelToken = task.cancelToken
+        propertyQueue.sync {
+            _linkedTask = task
+        }
     }
 }
 
-actor CancellationDownloadTask {
-    var task: DownloadTask?
+final class CancellationDownloadTask: @unchecked Sendable {
+    private let lock = NSLock()
+    private var task: DownloadTask?
+    private var isCancelled = false
+
     func setTask(_ task: DownloadTask?) {
+        guard let task else { return }
+
+        lock.lock()
         self.task = task
+        let shouldCancel = isCancelled
+        lock.unlock()
+
+        if shouldCancel { task.cancel() }
+    }
+
+    func cancel() {
+        lock.lock()
+        isCancelled = true
+        let task = task
+        lock.unlock()
+
+        task?.cancel()
     }
 }
 
 extension DownloadTask {
     enum WrappedTask {
         case download(DownloadTask)
-        case dataProviding
+        case dataProviding(DownloadTask?)
 
         func cancel() {
             switch self {
             case .download(let task): task.cancel()
-            case .dataProviding: break
+            case .dataProviding(let task): task?.cancel()
             }
         }
 
         var value: DownloadTask? {
             switch self {
             case .download(let task): return task
-            case .dataProviding: return nil
+            case .dataProviding(let task): return task
             }
         }
     }
@@ -168,7 +217,7 @@ final class ImageDownloader: @unchecked Sendable {
 
     private let propertyQueue = DispatchQueue(label: "com.onevcat.Kingfisher.ImageDownloaderPropertyQueue")
     
-    // MARK: Properties
+    // MARK: Public Properties
     
     private var _downloadTimeout: TimeInterval = 15.0
     
@@ -242,6 +291,8 @@ final class ImageDownloader: @unchecked Sendable {
     
     // The session bound to the downloader.
     private var session: URLSession
+
+    private let lock = NSLock()
 
     // MARK: Initializers
 
@@ -370,10 +421,15 @@ final class ImageDownloader: @unchecked Sendable {
         callback: SessionDataTask.TaskCallback
     ) -> DownloadTask
     {
+        lock.lock()
+        defer { lock.unlock() }
+
         // Ready to start download. Add it to session task manager (`sessionHandler`)
         let downloadTask: DownloadTask
-        if let existingTask = sessionDelegate.task(for: context.url) {
-            downloadTask = sessionDelegate.append(existingTask, callback: callback)
+        if let existingTask = sessionDelegate.task(for: context.url),
+           let existingDownloadTask = sessionDelegate.append(existingTask, callback: callback)
+        {
+            downloadTask = existingDownloadTask
         } else {
             let sessionDataTask = session.dataTask(with: context.request)
             sessionDataTask.priority = context.options.downloadPriority
@@ -413,16 +469,18 @@ final class ImageDownloader: @unchecked Sendable {
 
     private func startDownloadTask(
         context: DownloadingContext,
-        callback: SessionDataTask.TaskCallback
+        callback: SessionDataTask.TaskCallback,
+        beforeTaskResume: ((DownloadTask) -> Void)? = nil
     ) -> DownloadTask
     {
         let downloadTask = addDownloadTask(context: context, callback: callback)
 
         guard let sessionTask = downloadTask.sessionTask, !sessionTask.started else {
+            beforeTaskResume?(downloadTask)
             return downloadTask
         }
 
-        sessionTask.onTaskDone.delegate(on: self) { (self, done) in
+        sessionTask.onTaskDone.delegate(on: self) { [weak sessionTask] (self, done) in
             // Underlying downloading finishes.
             // result: Result<(Data, URLResponse?)>, callbacks: [TaskCallback]
             let (result, callbacks) = done
@@ -444,7 +502,7 @@ final class ImageDownloader: @unchecked Sendable {
 
                     self.reportDidProcessImage(result: result, url: context.url, response: response)
 
-                    let imageResult = result.map { ImageLoadingResult(image: $0, url: context.url, originalData: data) }
+                    let imageResult = result.map { ImageLoadingResult(image: $0, url: context.url, originalData: data, metrics: sessionTask?.metrics) }
                     let queue = callback.options.callbackQueue
                     queue.execute { callback.onCompleted?.call(imageResult) }
                 }
@@ -457,6 +515,10 @@ final class ImageDownloader: @unchecked Sendable {
                 }
             }
         }
+
+        // Ensure `beforeTaskResume` runs before `resume()`. Some stubbing layers may complete the request
+        // synchronously during `resume()`, so any "task started" callback should be invoked before that.
+        beforeTaskResume?(downloadTask)
 
         reportWillDownloadImage(url: context.url, request: context.request)
         sessionTask.resume()
@@ -483,18 +545,15 @@ final class ImageDownloader: @unchecked Sendable {
         createDownloadContext(with: url, options: options) { result in
             switch result {
             case .success(let context):
-                // `downloadTask` will be set if the downloading started immediately. This is the case when no request
-                // modifier or a sync modifier (`ImageDownloadRequestModifier`) is used. Otherwise, when an
-                // `AsyncImageDownloadRequestModifier` is used the returned `downloadTask` of this method will be `nil`
-                // and the actual "delayed" task is given in `AsyncImageDownloadRequestModifier.onDownloadTaskStarted`
-                // callback.
-                let actualDownloadTask = self.startDownloadTask(
-                    context: context,
-                    callback: self.createTaskCallback(completionHandler, options: options)
-                )
-                downloadTask.linkToTask(actualDownloadTask)
+                let taskCallback = self.createTaskCallback(completionHandler, options: options)
                 if let modifier = options.requestModifier {
-                    modifier.onDownloadTaskStarted?(downloadTask)
+                    _ = self.startDownloadTask(context: context, callback: taskCallback, beforeTaskResume: { actualDownloadTask in
+                        downloadTask.linkToTask(actualDownloadTask)
+                        modifier.onDownloadTaskStarted?(downloadTask)
+                    })
+                } else {
+                    let actualDownloadTask = self.startDownloadTask(context: context, callback: taskCallback)
+                    downloadTask.linkToTask(actualDownloadTask)
                 }
             case .failure(let error):
                 options.callbackQueue.execute {
@@ -580,15 +639,11 @@ extension ImageDownloader {
                 if Task.isCancelled {
                     downloadTask.cancel()
                 } else {
-                    Task {
-                        await task.setTask(downloadTask)
-                    }
+                    task.setTask(downloadTask)
                 }
             }
         } onCancel: {
-            Task {
-                await task.task?.cancel()
-            }
+            task.cancel()
         }
     }
     

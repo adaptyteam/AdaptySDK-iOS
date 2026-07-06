@@ -31,13 +31,13 @@ import Combine
 
 /// Represents a view that is compatible with Kingfisher in SwiftUI.
 ///
-/// As a framework user, you do not need to know the details of this protocol. As the types, ``KFImage`` and
+/// As a framework user, you do not need to know the details of this protocol. As the public types, ``KFImage`` and
 /// ``KFAnimatedImage`` conform this type and should be used in your app to represent an image view with network and
 /// cache support in SwiftUI.
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @MainActor
 protocol KFImageProtocol: View, KFOptionSetter {
-    associatedtype HoldingView: KFImageHoldingView
+    associatedtype HoldingView: KFImageHoldingView & Sendable
     var context: KFImage.Context<HoldingView> { get set }
     init(context: KFImage.Context<HoldingView>)
 }

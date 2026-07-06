@@ -29,6 +29,7 @@ import Foundation
 /// Represents the delegate object of the downloader session.
 ///
 /// It also behaves like a task manager for downloading.
+@objc(KFSessionDelegate) // Fix for ObjC header name conflicting. https://github.com/onevcat/Kingfisher/issues/1530
 final class SessionDelegate: NSObject, @unchecked Sendable {
 
     typealias SessionChallengeFunc = (
@@ -78,7 +79,7 @@ final class SessionDelegate: NSObject, @unchecked Sendable {
                 self.remove(task)
             }
         }
-        let token = task.addCallback(callback)
+        let token = task.addCallback(callback)!
         tasks[url] = task
         return DownloadTask(sessionTask: task, cancelToken: token)
     }
@@ -91,9 +92,9 @@ final class SessionDelegate: NSObject, @unchecked Sendable {
 
     func append(
         _ task: SessionDataTask,
-        callback: SessionDataTask.TaskCallback) -> DownloadTask
+        callback: SessionDataTask.TaskCallback) -> DownloadTask?
     {
-        let token = task.addCallback(callback)
+        guard let token = task.addCallback(callback) else { return nil }
         return DownloadTask(sessionTask: task, cancelToken: token)
     }
 
@@ -105,7 +106,9 @@ final class SessionDelegate: NSObject, @unchecked Sendable {
             return
         }
         task.removeAllCallbacks()
-        tasks[url] = nil
+        if tasks[url] === task {
+            tasks[url] = nil
+        }
     }
 
     private func task(for task: URLSessionTask) -> SessionDataTask? {
@@ -257,12 +260,22 @@ extension SessionDelegate: URLSessionDataDelegate {
             newRequest: request
         )
     }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+        guard let sessionTask = self.task(for: task) else { return }
+        
+        // Collect network metrics for the completed task
+        if let networkMetrics = NetworkMetrics(from: metrics) {
+            sessionTask.didCollectMetrics(networkMetrics)
+        }
+    }
 
     private func onCompleted(task: URLSessionTask, result: Result<(Data, URLResponse?), KingfisherError>) {
         guard let sessionTask = self.task(for: task) else {
             return
         }
-        sessionTask.onTaskDone.call((result, sessionTask.callbacks))
+        let callbacks = sessionTask.completeAndRemoveAllCallbacks()
+        sessionTask.onTaskDone.call((result, callbacks))
         remove(sessionTask)
     }
 }

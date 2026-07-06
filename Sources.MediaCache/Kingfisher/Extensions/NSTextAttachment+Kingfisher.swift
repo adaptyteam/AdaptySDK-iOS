@@ -172,10 +172,9 @@ extension KingfisherWrapper where Base: NSTextAttachment {
         completionHandler: (@MainActor @Sendable (Result<RetrieveImageResult, KingfisherError>) -> Void)? = nil
     ) -> DownloadTask?
     {
-        var mutatingSelf = self
         guard let source = source else {
             base.image = placeholder
-            mutatingSelf.taskIdentifier = nil
+            setTaskIdentifierValue(nil)
             completionHandler?(.failure(KingfisherError.imageSettingError(reason: .emptySource)))
             return nil
         }
@@ -186,21 +185,24 @@ extension KingfisherWrapper where Base: NSTextAttachment {
         }
 
         let issuedIdentifier = Source.Identifier.next()
-        mutatingSelf.taskIdentifier = issuedIdentifier
+        setTaskIdentifierValue(issuedIdentifier)
+
+        let token = CancellationToken()
+        cancellationToken?.cancel()
+        setCancellationTokenValue(token)
 
         if let block = progressBlock {
             options.onDataReceived = (options.onDataReceived ?? []) + [ImageLoadingProgressSideEffect(block)]
         }
-        let resolvedOptions = options
+        let finalOptions = options
 
         let task = KingfisherManager.shared.retrieveImage(
             with: source,
-            options: resolvedOptions,
+            options: finalOptions,
             progressiveImageSetter: { self.base.image = $0 },
-            referenceTaskIdentifierChecker: { issuedIdentifier == self.taskIdentifier },
+            referenceTaskIdentifierChecker: { !token.isCancelled },
             completionHandler: { result in
                 CallbackQueueMain.currentOrAsync {
-                    var mutatingSelf = self
                     guard issuedIdentifier == self.taskIdentifier else {
                         let reason: KingfisherError.ImageSettingErrorReason
                         do {
@@ -214,8 +216,8 @@ extension KingfisherWrapper where Base: NSTextAttachment {
                         return
                     }
 
-                    mutatingSelf.imageTask = nil
-                    mutatingSelf.taskIdentifier = nil
+                    self.setImageTaskValue(nil)
+                    self.setTaskIdentifierValue(nil)
 
                     switch result {
                     case .success(let value):
@@ -227,7 +229,7 @@ extension KingfisherWrapper where Base: NSTextAttachment {
                         view.setNeedsDisplay(view.bounds)
                         #endif
                     case .failure:
-                        if let image = resolvedOptions.onFailureImage {
+                        if let image = finalOptions.onFailureImage {
                             self.base.image = image
                         }
                     }
@@ -236,7 +238,7 @@ extension KingfisherWrapper where Base: NSTextAttachment {
         }
         )
 
-        mutatingSelf.imageTask = task
+        setImageTaskValue(task)
         return task
     }
 
@@ -247,10 +249,12 @@ extension KingfisherWrapper where Base: NSTextAttachment {
     /// Nothing will happen if the downloading has already finished.
     func cancelDownloadTask() {
         imageTask?.cancel()
+        cancellationToken?.cancel()
     }
 }
 
 @MainActor private var taskIdentifierKey: Void?
+@MainActor private var cancellationTokenKey: Void?
 @MainActor private var imageTaskKey: Void?
 
 // MARK: Properties
@@ -268,9 +272,27 @@ extension KingfisherWrapper where Base: NSTextAttachment {
         }
     }
 
+    var cancellationToken: CancellationToken? {
+        get { getAssociatedObject(base, &cancellationTokenKey) }
+        set { setRetainedAssociatedObject(base, &cancellationTokenKey, newValue) }
+    }
+
     private var imageTask: DownloadTask? {
         get { return getAssociatedObject(base, &imageTaskKey) }
         set { setRetainedAssociatedObject(base, &imageTaskKey, newValue)}
+    }
+
+    private func setTaskIdentifierValue(_ value: Source.Identifier.Value?) {
+        let box = value.map { Box($0) }
+        setRetainedAssociatedObject(base, &taskIdentifierKey, box)
+    }
+
+    private func setCancellationTokenValue(_ value: CancellationToken?) {
+        setRetainedAssociatedObject(base, &cancellationTokenKey, value)
+    }
+
+    private func setImageTaskValue(_ value: DownloadTask?) {
+        setRetainedAssociatedObject(base, &imageTaskKey, value)
     }
 }
 

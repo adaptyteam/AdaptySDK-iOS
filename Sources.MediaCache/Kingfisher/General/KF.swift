@@ -344,7 +344,8 @@ extension KF.Builder {
     #endif
 
     /// Sets a placeholder image which is used while retrieving the image.
-    /// - Parameter placeholder: An image to show while retrieving the image from its source.
+    /// - Parameters:
+    ///   - image: An image to show while retrieving the image from its source.
     /// - Returns: A ``KF/Builder`` with changes applied.
     func placeholder(_ image: KFCrossPlatformImage?) -> Self {
         self.placeholder = image
@@ -406,15 +407,6 @@ extension KF.Builder {
     ///
     func onlyLoadFirstFrame(_ enabled: Bool = true) -> Self {
         options.onlyLoadFirstFrame = enabled
-        return self
-    }
-
-    /// Enables progressive image loading with a specified `ImageProgressive` setting to process the
-    /// progressive JPEG data and display it in a progressive way.
-    /// - Parameter progressive: The progressive settings which is used while loading.
-    /// - Returns: A ``KF/Builder`` with changes applied.
-    func progressiveJPEG(_ progressive: ImageProgressive? = .init()) -> Self {
-        options.progressiveJPEG = progressive
         return self
     }
 }

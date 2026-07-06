@@ -47,6 +47,7 @@ import UniformTypeIdentifiers
 nonisolated(unsafe) private let animatedImageDataKey = malloc(1)!
 nonisolated(unsafe) private let imageFrameCountKey = malloc(1)!
 nonisolated(unsafe) private let imageSourceKey = malloc(1)!
+nonisolated(unsafe) private let imageCreatingOptionsKey = malloc(1)!
 #if os(macOS)
 nonisolated(unsafe) private let imagesKey = malloc(1)!
 nonisolated(unsafe) private let durationKey = malloc(1)!
@@ -55,6 +56,7 @@ nonisolated(unsafe) private let durationKey = malloc(1)!
 private let animatedImageDataKey = malloc(1)!
 private let imageFrameCountKey = malloc(1)!
 private let imageSourceKey = malloc(1)!
+private let imageCreatingOptionsKey = malloc(1)!
 #if os(macOS)
 private let imagesKey = malloc(1)!
 private let durationKey = malloc(1)!
@@ -66,6 +68,11 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     private(set) var animatedImageData: Data? {
         get { return getAssociatedObject(base, animatedImageDataKey) }
         set { setRetainedAssociatedObject(base, animatedImageDataKey, newValue) }
+    }
+    
+    private(set) var imageCreatingOptions: ImageCreatingOptions? {
+        get { return getAssociatedObject(base, imageCreatingOptionsKey) }
+        set { setRetainedAssociatedObject(base, imageCreatingOptionsKey, newValue) }
     }
     
     var imageFrameCount: Int? {
@@ -93,11 +100,20 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
     }
     
     var size: CGSize {
-        return base.representations.reduce(.zero) { size, rep in
-            let width = max(size.width, CGFloat(rep.pixelsWide))
-            let height = max(size.height, CGFloat(rep.pixelsHigh))
-            return CGSize(width: width, height: height)
+        // Prefer to use pixel size of the image
+        let pixelSize = base.representations.reduce(.zero) { size, rep in
+            CGSize(
+                width: max(size.width, CGFloat(rep.pixelsWide)),
+                height: max(size.height, CGFloat(rep.pixelsHigh))
+            )
         }
+        // If the pixel size is zero (SVG or PDF, for example), use the size of the image.
+        return pixelSize == .zero ? base.representations.reduce(.zero) { size, rep in
+            CGSize(
+                width: max(size.width, CGFloat(rep.size.width)),
+                height: max(size.height, CGFloat(rep.size.height))
+            )
+        } : pixelSize
     }
     #else
     var cgImage: CGImage? { return base.cgImage }
@@ -121,17 +137,42 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
         set { setRetainedAssociatedObject(base, imageSourceKey, newValue) }
     }
 
+    /// Copies Kingfisher internal image states from `base` to a `target` image.
+    ///
+    /// This includes the embedded animated image data and related metadata that are used by Kingfisher for caching and
+    /// animated image rendering. It is useful when a custom processor creates and returns a new image instance from
+    /// an animated image in `.image` branch.
+    ///
+    /// - Important: This method does not make the `target` image animated by itself. It only propagates Kingfisher's
+    ///   internal metadata so the cache can preserve the original animated bytes when possible.
+    ///
+    /// - Parameter target: The target image to which the internal states will be copied.
+    func copyKingfisherState(to target: KFCrossPlatformImage) {
+        target.kf.animatedImageData = animatedImageData
+        target.kf.imageFrameCount = imageFrameCount
+        target.kf.frameSource = frameSource
+        target.kf.imageCreatingOptions = imageCreatingOptions
+        #if os(macOS)
+        target.kf.images = images
+        target.kf.duration = duration
+        #endif
+    }
+
     // Bitmap memory cost with bytes.
     var cost: Int {
-        let pixel = Int(size.width * size.height * scale * scale)
+        let pixels = Int(size.width * size.height * scale * scale)
         guard let cgImage = cgImage else {
-            return pixel * 4
+            return pixels * 4
         }
         let bytesPerPixel = cgImage.bitsPerPixel / 8
-        guard let imageCount = images?.count else {
-            return pixel * bytesPerPixel
+        let bytesPerFrame = pixels * bytesPerPixel
+
+        if let images {
+            let uniqueFrameCount = Set(images.map { ObjectIdentifier($0) }).count
+            return bytesPerFrame * uniqueFrameCount
+        } else {
+            return bytesPerFrame
         }
-        return pixel * bytesPerPixel * imageCount
     }
 }
 
@@ -350,6 +391,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
         image?.kf.animatedImageData = source.data
         image?.kf.imageFrameCount = source.frameCount
         image?.kf.frameSource = source
+        image?.kf.imageCreatingOptions = options
         return image
         #else
         
@@ -381,6 +423,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImage {
         }
         
         image?.kf.imageFrameCount = source.frameCount
+        image?.kf.imageCreatingOptions = options
         return image
         #endif
     }
