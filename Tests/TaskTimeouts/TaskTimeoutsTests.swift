@@ -12,40 +12,56 @@ import Foundation
 import Testing
 
 struct TaskTimeoutsTests {
-    let duration: TaskDuration = .milliseconds(500)
+    let duration: AdaptyDuration = .milliseconds(500)
 
     @Test func task() async {
-        let start = Date()
+        let start = AdaptyContinuousClock.now
         await #expect(throws: TimeoutError.self) {
             try await withThrowingTimeout(duration) {
-                try await Task.sleep(nanoseconds: 2 * duration.asNanoseconds)
+                try await Task.sleep(duration: duration * 2)
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < (1.3 * duration.asTimeInterval))
+        #expect(AdaptyContinuousClock.now - start < duration * 1.3)
+    }
+
+    @Test func zeroTimeoutThrowsTimeout() async {
+        await #expect(throws: TimeoutError.self) {
+            try await withThrowingTimeout(.zero) {
+                try await Task.sleep(duration: .milliseconds(1))
+            }
+        }
+    }
+
+    @Test func completedOperationReturnsValue() async throws {
+        let value = try await withThrowingTimeout(.seconds(1)) {
+            42
+        }
+
+        #expect(value == 42)
     }
 
     @Test func taskWithoutCancellationHandler() async {
-        let start = Date()
+        let start = AdaptyContinuousClock.now
         await #expect(throws: TimeoutError.self) {
             try await withThrowingTimeout(duration) {
                 let nestedTask = Task {
-                    try await Task.sleep(nanoseconds: 2 * duration.asNanoseconds)
+                    try await Task.sleep(duration: duration * 2)
                 }
 
                 try await nestedTask.value
             }
         }
 
-        #expect(Date().timeIntervalSince(start) > 2 * duration.asTimeInterval)
+        #expect(AdaptyContinuousClock.now - start > duration * 2)
     }
 
     @Test func taskWithCancellationHandler() async {
-        let start = Date()
+        let start = AdaptyContinuousClock.now
         await #expect(throws: TimeoutError.self) {
             try await withThrowingTimeout(duration) {
                 let nestedTask = Task {
-                    try await Task.sleep(nanoseconds: 2 * duration.asNanoseconds)
+                    try await Task.sleep(duration: duration * 2)
                 }
 
                 // Add cleanup to ensure the task is cancelled if timeout occurs
@@ -57,7 +73,19 @@ struct TaskTimeoutsTests {
             }
         }
 
-        #expect(Date().timeIntervalSince(start) < 1.3 * duration.asTimeInterval)
+        #expect(AdaptyContinuousClock.now - start < duration * 1.3)
+    }
+
+    private actor Flag {
+        private var _value = false
+
+        var value: Bool {
+            _value
+        }
+
+        func set() {
+            _value = true
+        }
     }
 }
 

@@ -25,7 +25,7 @@ extension Adapty {
         fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         loadTimeout: TimeInterval? = nil
     ) async throws(AdaptyError) -> AdaptyFlow {
-        let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
+        let loadTimeout = (loadTimeout.map(AdaptyDuration.seconds) ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
 
@@ -50,7 +50,7 @@ extension Adapty {
         fetchPolicy: AdaptyPlacementFetchPolicy = .default,
         loadTimeout: TimeInterval? = nil
     ) async throws(AdaptyError) -> AdaptyOnboarding {
-        let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
+        let loadTimeout = (loadTimeout.map(AdaptyDuration.seconds) ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
         let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale
         let placementId = placementId.trimmed
         // TODO: throw error if placementId isEmpty
@@ -78,7 +78,7 @@ extension Adapty {
         placementId: String,
         locale: AdaptyLocale? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy,
-        loadTimeout: TaskDuration
+        loadTimeout: AdaptyDuration
     ) async throws(AdaptyError) -> Content {
         var (userId, isTestUser) = {
             let manager = profileManager
@@ -88,7 +88,7 @@ extension Adapty {
             )
         }()
 
-        let startTaskTime = Date()
+        let startTaskTime = AdaptyContinuousClock.now
 
         var fetchBackendError: AdaptyError?
         do {
@@ -128,7 +128,7 @@ extension Adapty {
                 locale,
                 forUserId: userId,
                 isTestUser,
-                withTimeout: loadTimeout.asTimeInterval + startTaskTime.timeIntervalSinceNow
+                withTimeout: loadTimeout - (AdaptyContinuousClock.now - startTaskTime)
             )
 
         } catch {
@@ -276,7 +276,7 @@ extension Adapty {
         _ locale: AdaptyLocale?,
         forUserId userId: AdaptyUserId,
         _ isTestUser: Bool,
-        withTimeout timeoutInterval: TimeInterval?
+        withTimeout timeoutInterval: AdaptyDuration?
     ) async throws(AdaptyError) -> Content {
         var lastError: AdaptyError
         repeat {
@@ -327,15 +327,15 @@ extension Adapty {
     }
 }
 
-extension TimeInterval {
-    static let defaultLoadPlacementTimeout: TimeInterval = 5.0
-    static let minimumLoadPaywallTimeout: TimeInterval = 1.0
+extension AdaptyDuration {
+    static let defaultLoadPlacementTimeout: AdaptyDuration = .seconds(5)
+    static let minimumLoadPaywallTimeout: AdaptyDuration = .seconds(1)
 
-    var allowedLoadPlacementTimeout: TaskDuration {
-        let minimum: TimeInterval = .minimumLoadPaywallTimeout
-        guard self < minimum else { return TaskDuration(self) }
-        log.warn("The  paywall load timeout parameter cannot be less than \(minimum)s")
-        return TaskDuration(minimum)
+    var allowedLoadPlacementTimeout: AdaptyDuration {
+        let minimum: AdaptyDuration = .minimumLoadPaywallTimeout
+        guard self < minimum else { return self }
+        log.warn("The  paywall load timeout parameter cannot be less than \(minimum.asTimeInterval)s")
+        return minimum
     }
 }
 

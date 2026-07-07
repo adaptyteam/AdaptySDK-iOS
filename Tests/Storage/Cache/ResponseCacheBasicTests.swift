@@ -140,8 +140,8 @@ extension ResponseCacheTests {
             let originalLastAccessed = await readMetaFromDisk(for: key)?.lastAccessedAt
             #expect(originalLastAccessed != nil)
 
-            // sleep 1ms so Date() is guaranteed to differ
-            try await Task.sleep(nanoseconds: 10_000_000)
+            // sleep 10ms so Date() is guaranteed to differ
+            try await Task.sleep(duration: .milliseconds(10))
 
             let value: TestPayload? = await Cache.read(
                 key,
@@ -207,7 +207,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 10_000_000) // 10ms
+            try await Task.sleep(duration: .milliseconds(10))
 
             _ = await Cache.read(
                 key,
@@ -230,7 +230,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 10_000_000)
+            try await Task.sleep(duration: .milliseconds(10))
 
             let touched = await Cache.touch(key) { _ in true }
             #expect(touched)
@@ -248,7 +248,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 10_000_000)
+            try await Task.sleep(duration: .milliseconds(10))
 
             let touched = await Cache.touch(key) { _ in false }
             #expect(!touched)
@@ -317,7 +317,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 10_000_000)
+            try await Task.sleep(duration: .milliseconds(10))
 
             _ = try await Cache.writeOrRead(
                 altPayload.encoded(),

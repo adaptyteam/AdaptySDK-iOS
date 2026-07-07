@@ -94,7 +94,7 @@ public extension Adapty {
         _ locale: AdaptyLocale?,
         _ userId: AdaptyUserId,
         _ isTestUser: Bool,
-        _ timeoutInterval: TimeInterval? = nil
+        _ timeoutInterval: AdaptyDuration? = nil
     ) async -> [String: HTTPError?] {
         guard placementIds.isNotEmpty else { return [:] }
         let apiKeyPrefix = apiKeyPrefix

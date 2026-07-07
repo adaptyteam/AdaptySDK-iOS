@@ -62,7 +62,7 @@ extension ResponseCacheTests {
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
             #expect(before != nil)
 
-            try await Task.sleep(nanoseconds: 10_000_000)
+            try await Task.sleep(duration: .milliseconds(10))
 
             let data: Data? = await Cache.read(key, accept: { _ in false })
             #expect(data == nil)
@@ -86,7 +86,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 10_000_000)
+            try await Task.sleep(duration: .milliseconds(10))
 
             _ = await Cache.read(key)
 
@@ -204,7 +204,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: key, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: key)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 10_000_000)
+            try await Task.sleep(duration: .milliseconds(10))
 
             _ = try await Cache.writeOrRead(
                 altPayload.encoded(),
@@ -324,4 +324,3 @@ extension ResponseCacheTests {
 }
 
 #endif
-

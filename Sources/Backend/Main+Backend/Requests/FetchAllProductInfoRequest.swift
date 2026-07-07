@@ -42,7 +42,7 @@ extension Backend.MainExecutor {
                     throw error
                 }
                 attempt += 1
-                try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+                try? await Task.sleep(duration: .seconds(2))
             }
         }
 

@@ -82,11 +82,11 @@ struct FallbackTests {
     @Test(.enabled(if: Json.medium.hasFile))
     func read_all() throws {
         let data = try Data(contentsOf: #require(Json.medium.url)) // .jsonExtract(pointer: "/data")
-        let startTime = CFAbsoluteTimeGetCurrent()
+        let startTime = AdaptyContinuousClock.now
 
         let result = try JSONSerialization.jsonObject(with: data)
         #expect(result is [String: Any])
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+        let timeElapsed = elapsedSeconds(since: startTime)
         print("### Time elapsed for reading all: \(String(format: "%.6f", timeElapsed)) s.")
     }
 
@@ -160,15 +160,15 @@ struct FallbackTests {
     private func test(json: Json) throws {
         let (flows, onboardings, schemas) = try inspect(json: json)
 
-        let startTime = CFAbsoluteTimeGetCurrent()
+        let startTime = AdaptyContinuousClock.now
         let fallback = try FallbackPlacements(fileURL: json.url!)
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+        let timeElapsed = elapsedSeconds(since: startTime)
         print("### Time elapsed for fallback: \(String(format: "%.6f", timeElapsed)) s.")
 
         print("### start testing onboardings")
 
         for placementId in onboardings {
-            let startTime = CFAbsoluteTimeGetCurrent()
+            let startTime = AdaptyContinuousClock.now
             do {
                 let _: AdaptyPlacementChosen<AdaptyOnboarding>? = try fallback.getPlacement(
                     byPlacementId: placementId,
@@ -179,14 +179,14 @@ struct FallbackTests {
             } catch {
                 Issue.record("flow[\(placementId)]: \(error)")
             }
-            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            let timeElapsed = elapsedSeconds(since: startTime)
             print("### Time elapsed for onboarding[\(placementId)]: \(String(format: "%.6f", timeElapsed)) s.")
         }
 
         print("### start testing flows")
 
         for placementId in flows {
-            let startTime = CFAbsoluteTimeGetCurrent()
+            let startTime = AdaptyContinuousClock.now
             do {
                 let _: AdaptyPlacementChosen<AdaptyFlow>? = try fallback.getPlacement(
                     byPlacementId: placementId,
@@ -197,7 +197,7 @@ struct FallbackTests {
             } catch {
                 Issue.record("flow[\(placementId)]: \(error)")
             }
-            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            let timeElapsed = elapsedSeconds(since: startTime)
 
             print("### Time elapsed for flow[\(placementId)]: \(String(format: "%.6f", timeElapsed)) s.")
         }
@@ -205,7 +205,7 @@ struct FallbackTests {
         print("### start testing schemas")
 
         for schemaId in schemas {
-            let startTime = CFAbsoluteTimeGetCurrent()
+            let startTime = AdaptyContinuousClock.now
             do {
                 _ = try fallback.getUISchema(
                     byFlowLayoutId: schemaId,
@@ -214,9 +214,13 @@ struct FallbackTests {
             } catch {
                 Issue.record("schema[\(schemaId)]: \(error)")
             }
-            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            let timeElapsed = elapsedSeconds(since: startTime)
             print("### schema[\(schemaId)]: \(String(format: "%.3f", timeElapsed))s")
         }
+    }
+
+    private func elapsedSeconds(since startTime: AdaptyContinuousClock.Instant) -> TimeInterval {
+        (AdaptyContinuousClock.now - startTime).asTimeInterval
     }
 }
 

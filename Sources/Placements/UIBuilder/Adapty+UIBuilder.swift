@@ -19,7 +19,7 @@ extension Adapty {
         locale: String?,
         loadTimeout: TimeInterval? = nil
     ) async throws -> (flowLayout: AdaptyFlow.Layout, configuration: AdaptyUIConfiguration) {
-        let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
+        let loadTimeout = (loadTimeout.map(AdaptyDuration.seconds) ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
         return try await activatedSDK.getUIConfiguration(
             flow: flow,
             device: device,
@@ -34,7 +34,7 @@ extension Adapty {
         device: DeviceInfo,
         customLayoutId: String?,
         locale: AdaptyLocale,
-        loadTimeout: TaskDuration
+        loadTimeout: AdaptyDuration
     ) async throws(AdaptyError) -> (flowLayout: AdaptyFlow.Layout, configuration: AdaptyUIConfiguration) {
         guard
             let layoutsConfiguration = flow.layoutsConfiguration,
@@ -71,7 +71,7 @@ extension Adapty {
     private func getUISchema(
         flowId: String,
         flowLayout: AdaptyFlow.Layout,
-        loadTimeout: TaskDuration,
+        loadTimeout: AdaptyDuration,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(AdaptyError) -> AdaptyUISchema {
         let isTestUser = profileManager?.isTestUser ?? false
@@ -143,7 +143,7 @@ extension Adapty {
     private func fetchBackendUISchema(
         flowId: String,
         flowLayout: AdaptyFlow.Layout,
-        loadTimeout: TaskDuration,
+        loadTimeout: AdaptyDuration,
         disableServerCache: Bool,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(AdaptyError) -> (schema: AdaptyUISchema, data: Data) {

@@ -9,12 +9,12 @@ import Foundation
 
 extension Task where Success == Never, Failure == Never {
     @inlinable
-    static func sleep(duration value: TaskDuration) async throws {
-        try await Task.sleep(nanoseconds: value.asNanoseconds)
-    }
+    static func sleep(duration value: AdaptyDuration) async throws {
+        guard value > .zero else {
+            try Task.checkCancellation()
+            return
+        }
 
-    @inlinable
-    static func sleep(seconds: TimeInterval) async throws {
-        try await Task.sleep(duration: TaskDuration(seconds))
+        try await Task.sleep(nanoseconds: UInt64(value.nanoseconds))
     }
 }

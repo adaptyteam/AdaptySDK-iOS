@@ -21,7 +21,7 @@ private struct FetchPlacementVariationsForDefaultAudienceRequest: BackendRequest
         placementId: String,
         locale: AdaptyLocale,
         disableServerCache: Bool,
-        timeoutInterval: TimeInterval?
+        timeoutInterval: AdaptyDuration?
     ) throws(HTTPError) {
         if type == AdaptyFlow.self {
             endpoint = HTTPEndpoint(
@@ -57,7 +57,7 @@ private struct FetchPlacementVariationsForDefaultAudienceRequest: BackendRequest
 
         self.timeoutInterval =
             if let timeoutInterval {
-                min(max(0.5, timeoutInterval), 60)
+                min(max(.milliseconds(500), timeoutInterval), .seconds(60)).asTimeInterval
             } else {
                 nil
             }
@@ -74,7 +74,7 @@ extension Backend.DefaultAudienceExecutor {
         placementId: String,
         locale: AdaptyLocale? = nil,
         disableServerCache: Bool,
-        timeoutInterval: TimeInterval?
+        timeoutInterval: AdaptyDuration?
     ) async throws(HTTPError) -> AdaptyPlacement.Draw<Content> {
         let locale = locale ?? .defaultPlacementLocale
         return try await _fetchPlacementVariationsForDefaultAudience(
@@ -100,7 +100,7 @@ extension Backend.DefaultAudienceExecutor {
         placementId: String,
         locale: AdaptyLocale? = nil,
         disableServerCache: Bool,
-        timeoutInterval: TimeInterval?
+        timeoutInterval: AdaptyDuration?
     ) async throws(HTTPError) {
         let locale = locale ?? .defaultPlacementLocale
         _ = try await _fetchPlacementVariationsForDefaultAudience(
@@ -125,7 +125,7 @@ extension Backend.DefaultAudienceExecutor {
         _ placementId: String,
         _ requestLocale: AdaptyLocale?,
         _ disableServerCache: Bool,
-        _ timeoutInterval: TimeInterval?,
+        _ timeoutInterval: AdaptyDuration?,
         withDecoder decoder: @escaping HTTPDecoder<ResponseBody>
     ) async throws(HTTPError) -> ResponseBody {
         var locale = requestLocale ?? .defaultPlacementLocale
@@ -141,7 +141,7 @@ extension Backend.DefaultAudienceExecutor {
                 timeoutInterval: timeoutInterval
             )
 
-            let startRequestTime = Date()
+            let startRequestTime = AdaptyContinuousClock.now
 
             do throws(HTTPError) {
                 let response = try await perform(request, withDecoder: decoder)
@@ -152,7 +152,7 @@ extension Backend.DefaultAudienceExecutor {
                    !locale.equalLanguageCode(AdaptyLocale.defaultPlacementLocale)
                 {
                     locale = .defaultPlacementLocale
-                    timeoutInterval = timeoutInterval?.added(startRequestTime.timeIntervalSinceNow)
+                    timeoutInterval = timeoutInterval.map { $0 - (AdaptyContinuousClock.now - startRequestTime) }
                     lastError = error
                     continue
                 } else {

@@ -62,7 +62,7 @@ final class EventsManager {
         Task.detached(priority: .utility) { @EventsManagerActor @Sendable [weak self] in
             defer { self?.sending = false }
             while !Task.isCancelled {
-                let interval: TaskDuration
+                let interval: AdaptyDuration
                 do throws(EventsError) {
                     try await self?.sendEvents(backendSession)
 

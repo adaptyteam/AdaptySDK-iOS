@@ -19,7 +19,7 @@ public extension Adapty {
             let placementId = $0.trimmed
             return placementId.isEmpty ? nil : placementId
         })
-        let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
+        let loadTimeout = (loadTimeout.map(AdaptyDuration.seconds) ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
 
         let logParams: EventParameters = [
             "placement_ids": placementIds,
@@ -44,7 +44,7 @@ public extension Adapty {
             return placementId.isEmpty ? nil : placementId
         })
         let locale = locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) }
-        let loadTimeout = (loadTimeout ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
+        let loadTimeout = (loadTimeout.map(AdaptyDuration.seconds) ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
 
         let logParams: EventParameters = [
             "placement_ids": placementIds,
@@ -65,7 +65,7 @@ public extension Adapty {
         _ type: (some PlacementContent).Type,
         placementIds: Set<String>,
         locale: AdaptyLocale? = nil,
-        loadTimeout: TaskDuration
+        loadTimeout: AdaptyDuration
     ) async throws(AdaptyError) {
         guard placementIds.isNotEmpty else { return }
 
@@ -78,7 +78,7 @@ public extension Adapty {
         }()
 
         let preloaded: [String: HTTPError?]
-        let startTaskTime = Date()
+        let startTaskTime = AdaptyContinuousClock.now
 
         do {
             preloaded = try await withThrowingTimeout(max(loadTimeout - .milliseconds(500), .milliseconds(500))) {
@@ -133,7 +133,7 @@ public extension Adapty {
                 locale,
                 userId,
                 isTestUser,
-                max(loadTimeout.asTimeInterval + startTaskTime.timeIntervalSinceNow, 0.5)
+                max(loadTimeout - (AdaptyContinuousClock.now - startTaskTime), .milliseconds(500))
             )
         }
 

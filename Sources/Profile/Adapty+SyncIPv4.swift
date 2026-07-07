@@ -55,7 +55,7 @@ extension Adapty {
             } catch {
                 guard let error = error as? URLError, error.shouldRetry else { throw error }
                 attemptsCount += 1
-                try await Task.sleep(duration: .seconds(min(attemptsCount, 10)))
+                try await Task.sleep(duration: min(.seconds(attemptsCount), .seconds(10)))
             }
         }
         throw CancellationError()

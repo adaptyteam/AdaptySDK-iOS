@@ -38,7 +38,7 @@ extension ResponseCacheTests {
             _ = try await Cache.write(payload.encoded(), key: sharedKey, dataVersion: 0) { _, _ in true }
             let before = await readMetaFromDisk(for: sharedKey)?.lastAccessedAt
 
-            try await Task.sleep(nanoseconds: 10_000_000) // 10ms
+            try await Task.sleep(duration: .milliseconds(10))
 
             let touched = await Cache.touch(sharedKey) { _ in true }
             #expect(touched)

@@ -43,11 +43,19 @@ private typealias ResponseBody = Backend.Response.OptionalData<RegistrationInsta
 extension Backend.UAExecutor {
     private func exponentialBackoffDelay(
         _ attempt: Int,
-        base: TimeInterval = 1.0,
-        maxDelay: TimeInterval = 30.0
-    ) -> TimeInterval {
-        let delay = Double.random(in: 0 ... min(base * pow(2.0, Double(attempt)), maxDelay))
-        return max(0.5, delay)
+        base: AdaptyDuration = .seconds(1),
+        min minDelay: AdaptyDuration = .milliseconds(500),
+        max maxDelay: AdaptyDuration = .seconds(30)
+    ) -> AdaptyDuration {
+        let upperBound =
+            if attempt <= 0 {
+                base
+            } else if attempt < Int.bitWidth - 1 {
+                min(base * (1 << attempt), maxDelay)
+            } else {
+                maxDelay
+            }
+        return max(minDelay, upperBound * Double.random(in: 0 ... 1))
     }
 
     func registerInstall(
@@ -72,7 +80,7 @@ extension Backend.UAExecutor {
                       canRetryRequest(error)
                 else { throw error }
                 attempt += 1
-                try? await Task.sleep(nanoseconds: UInt64(exponentialBackoffDelay(attempt) * 1_000_000_000))
+                try? await Task.sleep(duration: exponentialBackoffDelay(attempt))
             }
         }
         throw HTTPError.cancelled(request.endpoint)
