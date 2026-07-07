@@ -5,7 +5,6 @@
 //  Created by Aleksey Goncharov on 11.3.24..
 //
 
-import AdaptyMediaCache
 import Foundation
 
 public extension AdaptyUIBuilder {

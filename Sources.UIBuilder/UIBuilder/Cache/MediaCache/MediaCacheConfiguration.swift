@@ -1,11 +1,11 @@
 import Foundation
 
-package struct MediaCacheConfiguration: Sendable {
-    package var memoryStorageTotalCostLimit: Int
-    package var memoryStorageCountLimit: Int
-    package var diskStorageSizeLimit: UInt
+struct MediaCacheConfiguration: Sendable {
+    var memoryStorageTotalCostLimit: Int
+    var memoryStorageCountLimit: Int
+    var diskStorageSizeLimit: UInt
 
-    package init(
+    init(
         memoryStorageTotalCostLimit: Int,
         memoryStorageCountLimit: Int,
         diskStorageSizeLimit: UInt
@@ -15,7 +15,7 @@ package struct MediaCacheConfiguration: Sendable {
         self.diskStorageSizeLimit = diskStorageSizeLimit
     }
 
-    package static let `default` = MediaCacheConfiguration(
+    static let `default` = MediaCacheConfiguration(
         memoryStorageTotalCostLimit: 100 * 1024 * 1024,
         memoryStorageCountLimit: .max,
         diskStorageSizeLimit: 100 * 1024 * 1024

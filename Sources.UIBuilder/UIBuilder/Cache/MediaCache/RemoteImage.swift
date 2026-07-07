@@ -1,14 +1,14 @@
 import SwiftUI
 
 @MainActor
-package struct RemoteImage<Placeholder: View>: View {
+struct RemoteImage<Placeholder: View>: View {
     private let url: URL
     private let placeholder: () -> Placeholder
     private let onSuccess: (@MainActor (MediaCacheHit) -> Void)?
     private let onFailure: (@MainActor (Error) -> Void)?
     private var isResizable: Bool = false
 
-    package init(
+    init(
         url: URL,
         @ViewBuilder placeholder: @escaping () -> Placeholder,
         onSuccess: (@MainActor (MediaCacheHit) -> Void)? = nil,
@@ -20,13 +20,13 @@ package struct RemoteImage<Placeholder: View>: View {
         self.onFailure = onFailure
     }
 
-    package func resizable() -> Self {
+    func resizable() -> Self {
         var copy = self
         copy.isResizable = true
         return copy
     }
 
-    package var body: some View {
+    var body: some View {
         let image = KFImage
             .url(url)
             .targetCache(MediaCache.cache)

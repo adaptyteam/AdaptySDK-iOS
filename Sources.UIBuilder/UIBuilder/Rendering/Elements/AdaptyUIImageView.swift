@@ -7,7 +7,6 @@
 
 #if canImport(UIKit)
 
-import AdaptyMediaCache
 import SwiftUI
 import UIKit
 

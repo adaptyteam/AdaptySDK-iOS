@@ -1,6 +1,6 @@
 import Foundation
 
-package enum MediaCacheHit: Sendable {
+enum MediaCacheHit: Sendable {
     case memory
     case disk
     case none

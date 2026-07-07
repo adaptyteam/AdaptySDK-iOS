@@ -17,10 +17,6 @@ let package = Package(
             targets: ["AdaptyLogger"]
         ),
         .library(
-            name: "AdaptyMediaCache",
-            targets: ["AdaptyMediaCache"]
-        ),
-        .library(
             name: "AdaptyCodable",
             targets: ["AdaptyCodable"]
         ),
@@ -65,14 +61,6 @@ let package = Package(
             ]
         ),
         .target(
-            name: "AdaptyMediaCache",
-            dependencies: [],
-            path: "Sources.MediaCache",
-            swiftSettings: [
-                .swiftLanguageMode(.v6),
-            ]
-        ),
-        .target(
             name: "CSimdjson",
             path: "Sources.Codable/CSimdjson",
             sources: [
@@ -102,7 +90,7 @@ let package = Package(
         ),
         .target(
             name: "AdaptyUIBuilder",
-            dependencies: ["AdaptyLogger", "AdaptyMediaCache", "AdaptyCodable"],
+            dependencies: ["AdaptyLogger", "AdaptyCodable"],
             path: "Sources.UIBuilder",
             exclude: [
                 "adapty.uibuilder.schema.yaml",

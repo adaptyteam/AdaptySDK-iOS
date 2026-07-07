@@ -1,10 +1,10 @@
 import Foundation
 
 @MainActor
-package final class MediaCachePrefetcher {
-    package init() {}
+final class MediaCachePrefetcher {
+    init() {}
 
-    package func prefetch(
+    func prefetch(
         urls: Set<URL>,
         completion: (@Sendable (_ skipped: Int, _ failed: Int, _ completed: Int) -> Void)? = nil
     ) {
