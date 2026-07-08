@@ -18,8 +18,8 @@ extension Schema {
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
         let pageIndex: Schema.Variable?
-        let firstPageInset: VC.Unit?
-        let lastPageInset: VC.Unit?
+        let firstPageInset: Length?
+        let lastPageInset: Length?
     }
 }
 
@@ -107,8 +107,8 @@ extension Schema.Pager: DecodableWithConfiguration {
             interactionBehavior: container.decodeIfPresent(InteractionBehavior.self, forKey: .interactionBehavior)
                 ?? Self.default.interactionBehavior,
             pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex),
-            firstPageInset: container.decodeIfPresent(VC.Unit.self, forKey: .firstPageInset),
-            lastPageInset: container.decodeIfPresent(VC.Unit.self, forKey: .lastPageInset)
+            firstPageInset: container.decodeIfPresent(Length.self, forKey: .firstPageInset),
+            lastPageInset: container.decodeIfPresent(Length.self, forKey: .lastPageInset)
         )
     }
 }

@@ -228,13 +228,15 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 - pagePaddingTop
                 - pagePaddingBottom
 
-            let firstPageInset = pager.firstPageInset?.points(
+            let firstPageInset = pager.firstPageInset?.valueWith(
+                parent: proxy.size.width,
                 screenSize: screenSize.width,
                 safeAreaStart: safeArea.leading,
                 safeAreaEnd: safeArea.trailing
             )
 
-            let lastPageInset = pager.lastPageInset?.points(
+            let lastPageInset = pager.lastPageInset?.valueWith(
+                parent: proxy.size.width,
                 screenSize: screenSize.width,
                 safeAreaStart: safeArea.leading,
                 safeAreaEnd: safeArea.trailing
@@ -260,8 +262,8 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 pageWidth: width,
                 spacing: pager.spacing,
                 viewportWidth: proxy.size.width,
-                firstPageInset: firstPageInset.map { CGFloat($0) },
-                lastPageInset: lastPageInset.map { CGFloat($0) },
+                firstPageInset: firstPageInset,
+                lastPageInset: lastPageInset,
                 pagePaddingLeading: pagePaddingLeading
             ) + offset)
             .dragGesture(
