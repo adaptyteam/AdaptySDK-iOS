@@ -18,5 +18,7 @@ extension VC {
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
         let pageIndex: Variable?
+        let firstPageInset: Unit?
+        let lastPageInset: Unit?
     }
 }

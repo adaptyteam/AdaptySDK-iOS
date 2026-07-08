@@ -18,6 +18,8 @@ extension Schema {
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
         let pageIndex: Schema.Variable?
+        let firstPageInset: VC.Unit?
+        let lastPageInset: VC.Unit?
     }
 }
 
@@ -31,7 +33,9 @@ extension Schema.Pager {
         pageControl: nil,
         animation: nil,
         interactionBehavior: .default,
-        pageIndex: nil
+        pageIndex: nil,
+        firstPageInset: nil,
+        lastPageInset: nil
     )
 }
 
@@ -59,7 +63,9 @@ extension Schema.Pager: Schema.CompositeElement {
                 pageControl: pageControl,
                 animation: animation,
                 interactionBehavior: interactionBehavior,
-                pageIndex: pageIndex
+                pageIndex: pageIndex,
+                firstPageInset: firstPageInset,
+                lastPageInset: lastPageInset
             ),
             properties
         )
@@ -77,6 +83,8 @@ extension Schema.Pager: DecodableWithConfiguration {
         case animation
         case interactionBehavior = "interaction"
         case pageIndex = "page_index"
+        case firstPageInset = "first_page_inset"
+        case lastPageInset = "last_page_inset"
     }
 
     init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
@@ -98,7 +106,9 @@ extension Schema.Pager: DecodableWithConfiguration {
 
             interactionBehavior: container.decodeIfPresent(InteractionBehavior.self, forKey: .interactionBehavior)
                 ?? Self.default.interactionBehavior,
-            pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex)
+            pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex),
+            firstPageInset: container.decodeIfPresent(VC.Unit.self, forKey: .firstPageInset),
+            lastPageInset: container.decodeIfPresent(VC.Unit.self, forKey: .lastPageInset)
         )
     }
 }
