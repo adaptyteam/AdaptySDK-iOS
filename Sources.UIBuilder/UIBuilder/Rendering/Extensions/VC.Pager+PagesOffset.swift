@@ -9,31 +9,37 @@ extension VC.Pager {
     /// Horizontal base offset (X) of the pages stack for `currentPage`, before
     /// the live drag translation is added.
     ///
-    /// When `clampTrailingGap` is `false` the active page is leading-snapped
+    /// By default every page rests leading-snapped at `pagePaddingLeading`
     /// (legacy behaviour, may leave an empty trailing gap on the last page).
-    /// When `true` the scroll is clamped so the content never reveals empty
-    /// space past its trailing edge, pinning the last page to the trailing edge
-    /// of the viewport.
+    ///
+    /// `firstPageInset` overrides `pagePaddingLeading` for the rest position
+    /// of the first page only. `lastPageInset` clamps the scroll so the last
+    /// page rests with its trailing edge `lastPageInset` away from the
+    /// viewport trailing edge instead of leading-snapping. A `nil` inset
+    /// keeps the legacy behaviour for its edge.
     static func pagesOffsetX(
-        clampTrailingGap: Bool,
         currentPage: Int,
         pageCount: Int,
         pageWidth: CGFloat,
         spacing: CGFloat,
         viewportWidth: CGFloat,
-        pagePaddingLeading: CGFloat,
-        pagePaddingTrailing: CGFloat
+        firstPageInset: CGFloat?,
+        lastPageInset: CGFloat?,
+        pagePaddingLeading: CGFloat
     ) -> CGFloat {
         let step = pageWidth + spacing
-        let unclamped = -CGFloat(currentPage) * step
+        let firstPageRest = firstPageInset.map { $0 - pagePaddingLeading } ?? 0
+        let rest = currentPage == 0 ? firstPageRest : -CGFloat(currentPage) * step
 
-        guard clampTrailingGap else { return unclamped }
+        guard let lastPageInset else { return rest }
 
+        // The stack is laid out with `pagePaddingLeading` before the first
+        // page, so the clamp uses it regardless of `firstPageInset`.
         let contentWidth = pagePaddingLeading
             + CGFloat(pageCount) * pageWidth
             + CGFloat(max(0, pageCount - 1)) * spacing
-            + pagePaddingTrailing
-        let minOffset = min(0, viewportWidth - contentWidth)
-        return max(minOffset, unclamped)
+            + lastPageInset
+        let minOffset = min(firstPageRest, viewportWidth - contentWidth)
+        return max(minOffset, rest)
     }
 }

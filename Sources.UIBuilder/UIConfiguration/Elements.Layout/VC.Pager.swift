@@ -18,6 +18,7 @@ extension VC {
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
         let pageIndex: Variable?
-        let clampTrailingGap: Bool
+        let firstPageInset: Unit?
+        let lastPageInset: Unit?
     }
 }

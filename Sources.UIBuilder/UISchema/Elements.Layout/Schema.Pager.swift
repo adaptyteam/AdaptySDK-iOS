@@ -18,7 +18,8 @@ extension Schema {
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
         let pageIndex: Schema.Variable?
-        let clampTrailingGap: Bool
+        let firstPageInset: VC.Unit?
+        let lastPageInset: VC.Unit?
     }
 }
 
@@ -33,7 +34,8 @@ extension Schema.Pager {
         animation: nil,
         interactionBehavior: .default,
         pageIndex: nil,
-        clampTrailingGap: false
+        firstPageInset: nil,
+        lastPageInset: nil
     )
 }
 
@@ -62,7 +64,8 @@ extension Schema.Pager: Schema.CompositeElement {
                 animation: animation,
                 interactionBehavior: interactionBehavior,
                 pageIndex: pageIndex,
-                clampTrailingGap: clampTrailingGap
+                firstPageInset: firstPageInset,
+                lastPageInset: lastPageInset
             ),
             properties
         )
@@ -80,7 +83,8 @@ extension Schema.Pager: DecodableWithConfiguration {
         case animation
         case interactionBehavior = "interaction"
         case pageIndex = "page_index"
-        case clampTrailingGap = "clamp_trailing_gap"
+        case firstPageInset = "first_page_inset"
+        case lastPageInset = "last_page_inset"
     }
 
     init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
@@ -103,8 +107,8 @@ extension Schema.Pager: DecodableWithConfiguration {
             interactionBehavior: container.decodeIfPresent(InteractionBehavior.self, forKey: .interactionBehavior)
                 ?? Self.default.interactionBehavior,
             pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex),
-            clampTrailingGap: container.decodeIfPresent(Bool.self, forKey: .clampTrailingGap)
-                ?? Self.default.clampTrailingGap
+            firstPageInset: container.decodeIfPresent(VC.Unit.self, forKey: .firstPageInset),
+            lastPageInset: container.decodeIfPresent(VC.Unit.self, forKey: .lastPageInset)
         )
     }
 }
