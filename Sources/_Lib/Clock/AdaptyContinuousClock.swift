@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import Dispatch
+import Darwin
 
 @usableFromInline
 struct AdaptyContinuousClock: Sendable {
@@ -43,7 +43,7 @@ extension AdaptyContinuousClock {
 
         @inlinable
         static var now: AdaptyContinuousClock.Instant {
-            .init(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds)
+            .init(uptimeNanoseconds: clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW))
         }
 
         @inlinable
