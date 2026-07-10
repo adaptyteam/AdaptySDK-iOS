@@ -12,14 +12,13 @@ extension Schema {
         let pageWidth: Length
         let pageHeight: Length
         let pagePadding: EdgeInsets
+        let edgePageOverrides: EdgePageOverrides?
         let spacing: Double
         let content: [Element]
         let pageControl: PageControl?
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
         let pageIndex: Schema.Variable?
-        let firstPageInset: Length?
-        let lastPageInset: Length?
     }
 }
 
@@ -28,14 +27,13 @@ extension Schema.Pager {
         pageWidth: .default,
         pageHeight: .default,
         pagePadding: .zero,
+        edgePageOverrides: nil,
         spacing: 0,
         content: [],
         pageControl: nil,
         animation: nil,
         interactionBehavior: .default,
-        pageIndex: nil,
-        firstPageInset: nil,
-        lastPageInset: nil
+        pageIndex: nil
     )
 }
 
@@ -58,14 +56,13 @@ extension Schema.Pager: Schema.CompositeElement {
                 pageWidth: pageWidth,
                 pageHeight: pageHeight,
                 pagePadding: pagePadding,
+                edgePageOverrides: edgePageOverrides,
                 spacing: spacing,
                 content: elementIndices.pop(content.count),
                 pageControl: pageControl,
                 animation: animation,
                 interactionBehavior: interactionBehavior,
-                pageIndex: pageIndex,
-                firstPageInset: firstPageInset,
-                lastPageInset: lastPageInset
+                pageIndex: pageIndex
             ),
             properties
         )
@@ -77,18 +74,18 @@ extension Schema.Pager: DecodableWithConfiguration {
         case pageWidth = "page_width"
         case pageHeight = "page_height"
         case pagePadding = "page_padding"
+        case edgePageOverrides = "edge_page_overrides"
         case spacing
         case content
         case pageControl = "page_control"
         case animation
         case interactionBehavior = "interaction"
         case pageIndex = "page_index"
-        case firstPageInset = "first_page_inset"
-        case lastPageInset = "last_page_inset"
     }
 
     init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let edgePageOverrides = try container.decodeIfPresent(Schema.Pager.EdgePageOverrides.self, forKey: .edgePageOverrides)
         try self.init(
             pageWidth: container.decodeIfPresent(Length.self, forKey: .pageWidth)
                 ?? Self.default.pageWidth,
@@ -96,6 +93,7 @@ extension Schema.Pager: DecodableWithConfiguration {
                 ?? Self.default.pageHeight,
             pagePadding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .pagePadding)
                 ?? Self.default.pagePadding,
+            edgePageOverrides: !(edgePageOverrides?.isEmpty ?? true) ? edgePageOverrides : Self.default.edgePageOverrides,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing)
                 ?? Self.default.spacing,
             content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),
@@ -106,9 +104,7 @@ extension Schema.Pager: DecodableWithConfiguration {
 
             interactionBehavior: container.decodeIfPresent(InteractionBehavior.self, forKey: .interactionBehavior)
                 ?? Self.default.interactionBehavior,
-            pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex),
-            firstPageInset: container.decodeIfPresent(Length.self, forKey: .firstPageInset),
-            lastPageInset: container.decodeIfPresent(Length.self, forKey: .lastPageInset)
+            pageIndex: container.decodeIfPresent(Schema.Variable.self, forKey: .pageIndex)
         )
     }
 }

@@ -1428,6 +1428,12 @@ UI:
                 $ref: "#/UI/Pager/Length"
                 default: { parent: 1 }
             page_padding: { $ref: "#/Entities/EdgeInsets" }
+            edge_page_overrides:
+                type: object
+                properties:
+                    leading_padding: { $ref: "#/Entities/Unit" }
+                    trailing_padding: { $ref: "#/Entities/Unit" }
+                additionalProperties: false
             spacing: { type: number, default: 0 }
             content:
                 type: array
