@@ -5,7 +5,6 @@
 //  Created by Alex Goncharov on 15/01/2026.
 //
 
-
 #if canImport(UIKit)
 
 import SwiftUI
@@ -27,19 +26,26 @@ struct AdaptyUISliderView: View {
     init(_ slider: VC.Slider) {
         self.slider = slider
     }
-    
-    @State var value = 0.0
 
     var body: some View {
-        Slider(
-            value: stateViewModel.createBinding(
-                slider.value,
-                defaultValue: 0.0,
-                screen: screen
-            ),
-            in: slider.minValue ... slider.maxValue,
-            step: slider.stepValue
+        let value = stateViewModel.createBinding(
+            slider.value,
+            defaultValue: 0.0,
+            screen: screen
         )
+
+        if slider.minValue < slider.maxValue {
+            Slider(
+                value: value,
+                in: slider.minValue ... slider.maxValue,
+                step: slider.stepValue
+            )
+        } else {
+            Slider(
+                value: value,
+                in: slider.maxValue ... slider.maxValue
+            )
+        }
     }
 }
 
