@@ -13,4 +13,5 @@ public enum AdaptyUIBuilderError: Error {
     case jsException(String)
     case navigatorNotFound(String)
     case invalidActionURL(String)
+    case unsupportedURLScheme(String)
 }

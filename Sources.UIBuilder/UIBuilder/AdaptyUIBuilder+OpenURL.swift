@@ -22,7 +22,9 @@ package extension URL {
             UIApplication.shared.open(self, options: [:])
         case .inAppBrowser:
             #if canImport(SafariServices) && os(iOS)
-            guard let topViewController = UIApplication.shared.topPresentedController else {
+            // SFSafariViewController supports only http/https; for any other scheme
+            // fall back to the external handler instead of crashing on its init.
+            guard isWebLink, let topViewController = UIApplication.shared.topPresentedController else {
                 UIApplication.shared.open(self, options: [:])
                 return
             }

@@ -23,6 +23,7 @@ public enum AdaptyUIError: Error {
 
     case navigatorNotFound(String)
     case invalidActionURL(String)
+    case unsupportedURLScheme(String)
 }
 
 public extension AdaptyUIError {
@@ -42,6 +43,7 @@ public extension AdaptyUIError {
         case jsException = 4105
         case navigatorNotFound = 4106
         case invalidActionURL = 4107
+        case unsupportedURLScheme = 4108
 
         case platformView = 4300
     }
@@ -62,6 +64,7 @@ extension AdaptyUIError: CustomNSError {
         case .jsException: Code.jsException.rawValue
         case .navigatorNotFound: Code.navigatorNotFound.rawValue
         case .invalidActionURL: Code.invalidActionURL.rawValue
+        case .unsupportedURLScheme: Code.unsupportedURLScheme.rawValue
         }
     }
 }
@@ -109,6 +112,8 @@ extension AdaptyUIBuilderError {
             .navigatorNotFound(v)
         case .invalidActionURL(let v):
             .invalidActionURL(v)
+        case .unsupportedURLScheme(let v):
+            .unsupportedURLScheme(v)
         }
     }
 }

@@ -5,6 +5,7 @@
 //  Created by Aleksei Valiano on 01.06.2025
 //
 
+import AdaptyUIBuilder
 import Foundation
 
 #if os(iOS)
@@ -156,7 +157,11 @@ extension URL {
         case .externalBrowser:
             return await UIApplication.shared.open(self, options: [:])
         case .inAppBrowser:
-            guard let topViewController = UIApplication.shared.topPresentedController else {
+            // `SFSafariViewController` supports only http/https; for any other scheme
+            // (mailto, tel, sms, …) fall back to the external handler instead of
+            // handing it to SFSafariViewController, whose initializer raises an
+            // uncatchable NSInvalidArgumentException for unsupported schemes.
+            guard isWebLink, let topViewController = UIApplication.shared.topPresentedController else {
                 return await UIApplication.shared.open(self, options: [:])
             }
 
