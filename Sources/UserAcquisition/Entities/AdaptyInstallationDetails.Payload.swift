@@ -20,7 +20,9 @@ public extension AdaptyInstallationDetails {
 }
 
 extension AdaptyInstallationDetails.Payload: CustomStringConvertible {
-    public var description: String { jsonString }
+    public var description: String {
+        jsonString
+    }
 }
 
 extension AdaptyInstallationDetails.Payload: Codable {

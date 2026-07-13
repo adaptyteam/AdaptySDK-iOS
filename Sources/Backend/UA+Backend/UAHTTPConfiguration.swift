@@ -12,8 +12,13 @@ struct UAHTTPConfiguration: HTTPCodableConfiguration {
 
     let defaultEncodedContentType = "application/json"
 
-    func configure(jsonDecoder: JSONDecoder) { Backend.configure(jsonDecoder: jsonDecoder) }
-    func configure(jsonEncoder: JSONEncoder) { Backend.configure(jsonEncoder: jsonEncoder) }
+    func configure(jsonDecoder: JSONDecoder) {
+        Backend.configure(jsonDecoder: jsonDecoder)
+    }
+
+    func configure(jsonEncoder: JSONEncoder) {
+        Backend.configure(jsonEncoder: jsonEncoder)
+    }
 
     init(with configuration: AdaptyConfiguration, environment: Environment) {
         let backend = configuration.backend

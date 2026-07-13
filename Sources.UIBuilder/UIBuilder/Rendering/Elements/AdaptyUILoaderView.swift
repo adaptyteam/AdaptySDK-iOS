@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUILoaderView: View {
     var body: some View {
         ZStack {
@@ -24,7 +23,6 @@ struct AdaptyUILoaderView: View {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 #Preview {
     AdaptyUILoaderView()
 }

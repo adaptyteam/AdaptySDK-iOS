@@ -7,12 +7,10 @@
 
 import Foundation
 
-package extension VC {
-    enum AspectRatio: String {
+extension VC {
+    enum AspectRatio: Sendable {
         case fit
         case fill
         case stretch
     }
 }
-
-extension VC.AspectRatio: Codable {}

@@ -35,7 +35,9 @@ extension Environment {
             }
         }
 
-        var appTrackingTransparencyStatus: UInt? { Device.appTrackingTransparencyStatus }
+        var appTrackingTransparencyStatus: UInt? {
+            Device.appTrackingTransparencyStatus
+        }
 
         enum CodingKeys: String, CodingKey {
             case appInstallId = "device_id"

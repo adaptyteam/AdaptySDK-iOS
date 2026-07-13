@@ -2,27 +2,29 @@
 //  AdaptyStorefront+updates.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 23.09.2024
+//  Created by Aleksei Valiano on 23.11.2025.
 //
 
-import Foundation
+import StoreKit
+
+private let log = Log.storeFront
 
 public extension AdaptyStorefront {
     static var current: AdaptyStorefront? {
         get async {
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-                await AdaptyStorefront.StoreKit2.current
-            } else {
-                await AdaptyStorefront.StoreKit1.current
-            }
+            await StoreKit.Storefront.current?.asAdaptyStorefront
         }
     }
 
     static var updates: AsyncStream<AdaptyStorefront> {
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            AdaptyStorefront.StoreKit2.updates
-        } else {
-            AdaptyStorefront.StoreKit1.updates
+        AsyncStream<AdaptyStorefront> { continuation in
+            Task {
+                for await storefront in StoreKit.Storefront.updates {
+                    log.verbose("StoreKit.Storefront.updates new value: \(storefront)")
+                    continuation.yield(storefront.asAdaptyStorefront)
+                }
+                continuation.finish()
+            }
         }
     }
 }

@@ -23,7 +23,7 @@ public extension Adapty {
 
         try await withActivatedSDK(methodName: .identify, logParams: [
             "customerUserId": customerUserId,
-            "app_account_token": appAccountToken?.uuidString
+            "app_account_token": appAccountToken?.uuidString,
         ]) { sdk throws(AdaptyError) in
             try await sdk.identify(toCustomerUserId: customerUserId, withAppAccountToken: appAccountToken)
         }

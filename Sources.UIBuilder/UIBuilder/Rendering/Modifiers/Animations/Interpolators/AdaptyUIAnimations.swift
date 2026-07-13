@@ -9,7 +9,6 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Animation.Interpolator {
     func createAnimation(duration: TimeInterval) -> Animation {
         if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, visionOS 1.0, *) {
@@ -35,6 +34,20 @@ extension VC.Animation.Interpolator {
             case .linear: .linear(duration: duration)
             default: .easeInOut(duration: duration)
             }
+        }
+    }
+
+    // SwiftUI's `.repeatForever` / `.repeatCount` don't compose with
+    // `Animation(CustomAnimation)` — the custom curve is dropped and the
+    // animation degrades to default easing. These cases must use the
+    // manual loop path instead of `animateWithNativeRepeat`.
+    var usesCustomCurve: Bool {
+        switch self {
+        case .easeInElastic, .easeOutElastic, .easeInOutElastic,
+             .easeInBounce, .easeOutBounce, .easeInOutBounce:
+            true
+        default:
+            false
         }
     }
 }

@@ -6,12 +6,19 @@
 //
 
 package extension Adapty {
-    nonisolated static func logShowPaywallViaAdaptyUI(_ paywall: AdaptyPaywall) async throws(AdaptyError) {
+    nonisolated static func logFlowAnalyticsViaAdaptyUI(
+        variationId: String,
+        viewConfigurationId: String,
+        params: AdaptyFlowAnalyticsPayload
+    ) async throws(AdaptyError) {
         try await trackEvent(
-            .paywallShowed(.init(
-                variationId: paywall.variationId,
-                viewConfigurationId: paywall.viewConfiguration?.id
-            ))
+            .flowAnalytics(
+                .init(
+                    variationId: variationId,
+                    viewConfigurationId: viewConfigurationId,
+                    payload: params
+                )
+            )
         )
     }
 
@@ -21,3 +28,4 @@ package extension Adapty {
         )
     }
 }
+

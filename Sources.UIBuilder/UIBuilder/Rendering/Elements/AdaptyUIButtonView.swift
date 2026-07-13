@@ -9,130 +9,47 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIButtonView: View {
-    @Environment(\.adaptyScreenId)
-    private var screenId: String
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
     private var button: VC.Button
 
-    @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
-    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
-    @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
-    @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
-    @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
 
     init(_ button: VC.Button) {
         self.button = button
     }
 
-    private var currentStateView: VC.Element {
-        guard let selectedCondition = button.selectedCondition else {
-            return button.normalState
+    private var currentStateView: VC.ElementIndex {
+        guard let isSelectedVariable = button.legacyIsSelected,
+              stateViewModel.getValue(
+                  isSelectedVariable,
+                  defaultValue: false,
+                  screen: screen
+              )
+        else {
+            return button.content
         }
 
-        switch selectedCondition {
-        case let .selectedSection(sectionId, sectionIndex):
-            if sectionIndex == sectionsViewModel.selectedIndex(for: sectionId) {
-                return button.selectedState ?? button.normalState
-            } else {
-                return button.normalState
-            }
-        case let .selectedProduct(productId, productsGroupId):
-            if productId == productsViewModel.selectedProductId(by: productsGroupId) {
-                return button.selectedState ?? button.normalState
-            } else {
-                return button.normalState
-            }
-        }
+        return button.legacySelectedContent ?? button.content
     }
 
-    public var body: some View {
+    var body: some View {
         Button {
-            for action in button.actions {
-                action.fire(
-                    screenId: screenId,
-                    paywallViewModel: paywallViewModel,
-                    productsViewModel: productsViewModel,
-                    actionsViewModel: actionsViewModel,
-                    sectionsViewModel: sectionsViewModel,
-                    screensViewModel: screensViewModel
-                )
-            }
+            stateViewModel.execute(
+                actions: button.actions,
+                screen: screen
+            )
         } label: {
-            AdaptyUIElementView(currentStateView)
+            AdaptyUIElementView(
+                currentStateView,
+                screenHolderBuilder: { EmptyView() }
+            )
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-extension [VC.Action] {
-    func fire(
-        screenId: String,
-        paywallViewModel: AdaptyUIPaywallViewModel,
-        productsViewModel: AdaptyUIProductsViewModel,
-        actionsViewModel: AdaptyUIActionsViewModel,
-        sectionsViewModel: AdaptyUISectionsViewModel,
-        screensViewModel: AdaptyUIScreensViewModel
-    ) {
-        forEach {
-            $0.fire(
-                screenId: screenId,
-                paywallViewModel: paywallViewModel,
-                productsViewModel: productsViewModel,
-                actionsViewModel: actionsViewModel,
-                sectionsViewModel: sectionsViewModel,
-                screensViewModel: screensViewModel
-            )
-        }
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-@MainActor
-extension VC.Action {
-    func fire(
-        screenId: String,
-        paywallViewModel: AdaptyUIPaywallViewModel,
-        productsViewModel: AdaptyUIProductsViewModel,
-        actionsViewModel: AdaptyUIActionsViewModel,
-        sectionsViewModel: AdaptyUISectionsViewModel,
-        screensViewModel: AdaptyUIScreensViewModel
-    ) {
-        switch self {
-        case let .selectProduct(id, groupId):
-            withAnimation(.linear(duration: 0.0)) {
-                productsViewModel.selectProduct(id: id, forGroupId: groupId)
-            }
-        case let .unselectProduct(groupId):
-            productsViewModel.unselectProduct(forGroupId: groupId)
-        case let .purchaseSelectedProduct(groupId, service):
-            productsViewModel.purchaseSelectedProduct(fromGroupId: groupId, service: service)
-        case let .purchaseProduct(productId, service):
-            productsViewModel.purchaseProduct(id: productId, service: service)
-        case .openWebPaywall:
-            break
-        case .restore:
-            productsViewModel.restorePurchases()
-        case let .switchSection(sectionId, index):
-            withAnimation(.linear(duration: 0.0)) {
-                sectionsViewModel.updateSelection(for: sectionId, index: index)
-            }
-        case let .openScreen(id):
-            withAnimation(.linear(duration: 0.3)) {
-                screensViewModel.presentScreen(id: id)
-            }
-        case .closeScreen:
-            screensViewModel.dismissScreen(id: screenId)
-        case .close:
-            actionsViewModel.closeActionOccurred()
-        case let .openUrl(url, openIn):
-            actionsViewModel.openUrlActionOccurred(url: url, openIn: openIn)
-        case let .custom(id):
-            actionsViewModel.customActionOccurred(id: id)
-        }
     }
 }
 

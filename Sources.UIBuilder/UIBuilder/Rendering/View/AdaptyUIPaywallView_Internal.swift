@@ -9,30 +9,37 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package struct AdaptyUIPaywallView_Internal: View {
     @EnvironmentObject private var productsViewModel: AdaptyUIProductsViewModel
 
     private let showDebugOverlay: Bool
+    private let displayMissingTags: Bool
+    private let safeAreaOverride: EdgeInsets?
 
     package init(
-        showDebugOverlay: Bool
+        showDebugOverlay: Bool,
+        displayMissingTags: Bool,
+        safeAreaOverride: EdgeInsets? = nil
     ) {
         self.showDebugOverlay = showDebugOverlay
+        self.displayMissingTags = displayMissingTags
+        self.safeAreaOverride = safeAreaOverride
     }
 
     package var body: some View {
         GeometryReader { proxy in
-            AdaptyUIPaywallRendererView()
+            let safeArea = safeAreaOverride ?? proxy.safeAreaInsets
+            AdaptyUIFlowRendererView()
                 .withScreenSize(
                     CGSize(
-                        width: proxy.size.width + proxy.safeAreaInsets.leading + proxy.safeAreaInsets.trailing,
-                        height: proxy.size.height + proxy.safeAreaInsets.top + proxy.safeAreaInsets.bottom
+                        width: proxy.size.width + safeArea.leading + safeArea.trailing,
+                        height: proxy.size.height + safeArea.top + safeArea.bottom
                     )
                 )
-                .withSafeArea(proxy.safeAreaInsets)
+                .withSafeArea(safeArea)
                 .withDebugOverlayEnabled(showDebugOverlay)
+                .withDisplayMissingTags(displayMissingTags)
         }
         .onAppear {
             productsViewModel.loadProductsIfNeeded()

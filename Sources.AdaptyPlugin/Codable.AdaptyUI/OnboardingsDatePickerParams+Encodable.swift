@@ -8,6 +8,7 @@
 import AdaptyUI
 import Foundation
 
+@available(*, deprecated, message: "Onboarding Feature is deprecated.")
 extension OnboardingsDatePickerParams: Encodable {
     enum CodingKeys: String, CodingKey {
         case day

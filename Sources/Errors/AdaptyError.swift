@@ -111,18 +111,34 @@ public struct AdaptyError: CustomNSError, CustomStringConvertible, CustomDebugSt
 
     let wrapped: CustomAdaptyError
 
-    public var description: String { wrapped.description }
-    public var debugDescription: String { wrapped.debugDescription }
+    public var description: String {
+        wrapped.description
+    }
 
-    public var originalError: Error? { wrapped.originalError }
+    public var debugDescription: String {
+        wrapped.debugDescription
+    }
+
+    public var originalError: Error? {
+        wrapped.originalError
+    }
+
     public var originalNSError: NSError? {
         guard let originalError = wrapped.originalError else { return nil }
         return originalError as NSError
     }
 
-    public var adaptyErrorCode: ErrorCode { wrapped.adaptyErrorCode }
-    public var errorCode: Int { wrapped.errorCode }
-    public var errorUserInfo: [String: Any] { wrapped.errorUserInfo }
+    public var adaptyErrorCode: ErrorCode {
+        wrapped.adaptyErrorCode
+    }
+
+    public var errorCode: Int {
+        wrapped.errorCode
+    }
+
+    public var errorUserInfo: [String: Any] {
+        wrapped.errorUserInfo
+    }
 
     package init(_ wrapped: CustomAdaptyError) {
         self.wrapped = wrapped

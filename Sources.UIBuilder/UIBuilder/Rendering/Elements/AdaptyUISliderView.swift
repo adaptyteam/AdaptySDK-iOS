@@ -1,0 +1,52 @@
+//
+//  AdaptyUISliderView.swift
+//  Adapty
+//
+//  Created by Alex Goncharov on 15/01/2026.
+//
+
+#if canImport(UIKit)
+
+import SwiftUI
+
+struct AdaptyUISliderView: View {
+    @Environment(\.colorScheme)
+    private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
+
+    @EnvironmentObject var stateViewModel: AdaptyUIStateViewModel
+    @EnvironmentObject var flowViewModel: AdaptyUIFlowViewModel
+    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
+    @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
+    @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
+
+    private var slider: VC.Slider
+
+    init(_ slider: VC.Slider) {
+        self.slider = slider
+    }
+
+    var body: some View {
+        let value = stateViewModel.createBinding(
+            slider.value,
+            defaultValue: 0.0,
+            screen: screen
+        )
+
+        if slider.minValue < slider.maxValue {
+            Slider(
+                value: value,
+                in: slider.minValue ... slider.maxValue,
+                step: slider.stepValue
+            )
+        } else {
+            Slider(
+                value: value,
+                in: slider.maxValue ... slider.maxValue
+            )
+        }
+    }
+}
+
+#endif

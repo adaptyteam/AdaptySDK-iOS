@@ -25,7 +25,7 @@ final class UserAcquisitionManager {
         else { return nil }
 
         self.storage = storage
-        self.executor = sdk.backend.createUAExecutor()
+        executor = sdk.backend.createUAExecutor()
         self.installTime = installTime
         self.appLaunchCount = appLaunchCount
 
@@ -106,7 +106,9 @@ final class UserAcquisitionManager {
 @AdaptyActor
 extension UserAcquisitionManager {
     static var shared: UserAcquisitionManager?
-    static func activate(_ sdk: Adapty) { shared = .init(sdk) }
+    static func activate(_ sdk: Adapty) {
+        shared = .init(sdk)
+    }
 }
 
 private extension RegistrationInstallResponse? {

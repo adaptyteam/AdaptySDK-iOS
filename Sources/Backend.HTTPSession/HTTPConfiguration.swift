@@ -12,5 +12,7 @@ protocol HTTPConfiguration: Sendable {
 }
 
 extension HTTPConfiguration {
-    var sessionConfiguration: URLSessionConfiguration { .ephemeral }
+    var sessionConfiguration: URLSessionConfiguration {
+        .ephemeral
+    }
 }

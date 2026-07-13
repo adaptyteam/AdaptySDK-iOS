@@ -27,7 +27,7 @@ extension Environment.Device {
             #if os(macOS) || targetEnvironment(macCatalyst)
             let result: String? = await MainActor.run {
                 let matchingDict = IOServiceMatching("IOPlatformExpertDevice")
-                let platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault, matchingDict)
+                let platformExpert = IOServiceGetMatchingService(kIOMainPortDefault, matchingDict)
                 defer { IOObjectRelease(platformExpert) }
 
                 guard platformExpert != 0 else { return nil }

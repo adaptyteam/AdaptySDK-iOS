@@ -9,18 +9,17 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIShadowModifier: ViewModifier {
-    private let filling: VC.Mode<VC.Filling>
+    private let color: AdaptyUIResolvedColorAsset?
     private let blurRadius: Double
     private let offset: CGSize
 
     init(
-        filling: VC.Mode<VC.Filling>,
+        color: AdaptyUIResolvedColorAsset?,
         blurRadius: Double,
         offset: CGSize
     ) {
-        self.filling = filling
+        self.color = color
         self.blurRadius = blurRadius
         self.offset = offset
     }
@@ -37,12 +36,7 @@ struct AdaptyUIShadowModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .shadow(
-                color: self.filling
-                    .asSolidColor?
-                    .resolve(
-                        with: self.assetsViewModel.assetsResolver,
-                        colorScheme: self.colorScheme
-                    ) ?? .clear,
+                color: self.color ?? .clear,
                 radius: self.blurRadius,
                 x: self.offset.width,
                 y: self.offset.height
@@ -50,18 +44,17 @@ struct AdaptyUIShadowModifier: ViewModifier {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func shadow(
-        filling: VC.Mode<VC.Filling>?,
+        color: AdaptyUIResolvedColorAsset?,
         blurRadius: Double?,
         offset: CGSize?
     ) -> some View {
-        if let filling, let blurRadius, let offset {
+        if let color, let blurRadius, let offset {
             self.modifier(
                 AdaptyUIShadowModifier(
-                    filling: filling,
+                    color: color,
                     blurRadius: blurRadius,
                     offset: offset
                 )

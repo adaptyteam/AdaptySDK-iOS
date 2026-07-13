@@ -34,7 +34,7 @@ package extension AdaptySubscriptionOffer {
     }
 }
 
-private extension AdaptySubscriptionOffer.Identifier {
+extension AdaptySubscriptionOffer.Identifier {
     init?(offerId: String?, offerType: AdaptySubscriptionOfferType) {
         switch offerType {
         case .introductory:
@@ -48,21 +48,5 @@ private extension AdaptySubscriptionOffer.Identifier {
         case .code:
             self = .code(offerId)
         }
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-extension SK2Transaction {
-    var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier? {
-        guard let offerType = subscriptionOfferType else { return nil }
-        return .init(offerId: unfOfferId, offerType: offerType)
-    }
-}
-
-@available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
-extension SK2Transaction.Offer {
-    var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier? {
-        guard let offerType = type.asSubscriptionOfferType else { return nil }
-        return .init(offerId: id, offerType: offerType)
     }
 }

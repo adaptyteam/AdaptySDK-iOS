@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AdaptyCodable
 
 struct BackendState: Sendable {
     let eventBlacklist: Set<String>
@@ -21,7 +22,7 @@ extension BackendState {
             mainBaseUrls: [
                 .default: [Backend.defaultBaseUrl(kind: .main, by: .default)],
                 .eu: [Backend.defaultBaseUrl(kind: .main, by: .eu)],
-                .cn: [Backend.defaultBaseUrl(kind: .main, by: .cn)]
+                .cn: [Backend.defaultBaseUrl(kind: .main, by: .cn)],
             ],
             expiresAt: Date(timeIntervalSince1970: 0),
             extendSeconds: 1800
@@ -90,7 +91,7 @@ extension BackendState: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         eventBlacklist = try container.decode(Set<String>.self, forKey: .eventBlacklist)
 
-        let mainBaseUrlsContainer = try container.nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .mainBaseUrls)
+        let mainBaseUrlsContainer = try container.nestedContainer(keyedBy: AnyCodingKey.self, forKey: .mainBaseUrls)
         mainBaseUrls = try mainBaseUrlsContainer
             .allKeys
             .reduce(into: [:]) { result, key in
@@ -110,9 +111,9 @@ extension BackendState: Codable {
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(eventBlacklist, forKey: .eventBlacklist)
-        var mainBaseUrlsContainer = container.nestedContainer(keyedBy: AnyCodingKeys.self, forKey: .mainBaseUrls)
+        var mainBaseUrlsContainer = container.nestedContainer(keyedBy: AnyCodingKey.self, forKey: .mainBaseUrls)
         for (cluster, urls) in mainBaseUrls {
-            let key = AnyCodingKeys(stringValue: cluster.rawValue)
+            let key = AnyCodingKey(stringValue: cluster.rawValue)
             let urlStrings = urls.map(\.absoluteString)
             try mainBaseUrlsContainer.encode(urlStrings, forKey: key)
         }

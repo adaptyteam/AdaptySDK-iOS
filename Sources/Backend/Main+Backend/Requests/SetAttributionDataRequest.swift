@@ -18,11 +18,11 @@ private struct SetAttributionDataRequest: BackendEncodableRequest {
     let requestName = BackendRequestName.setAttributionData
     let logParams: EventParameters?
 
-    let source: String
+    let source: AdaptyAttributionSource
     let attributionJson: String
     let userId: AdaptyUserId
 
-    init(userId: AdaptyUserId, source: String, attributionJson: String, responseHash: String?) {
+    init(userId: AdaptyUserId, source: AdaptyAttributionSource, attributionJson: String, responseHash: String?) {
         headers = HTTPHeaders()
             .setUserProfileId(userId)
             .setBackendResponseHash(responseHash)
@@ -32,7 +32,7 @@ private struct SetAttributionDataRequest: BackendEncodableRequest {
         self.userId = userId
 
         logParams = [
-            "source": source
+            "source": source,
         ]
     }
 
@@ -55,7 +55,7 @@ private typealias ResponseBody = AdaptyProfile?
 extension Backend.MainExecutor {
     func setAttributionData(
         userId: AdaptyUserId,
-        source: String,
+        source: AdaptyAttributionSource,
         attributionJson: String,
         responseHash: String?
     ) async throws(HTTPError) -> VH<AdaptyProfile>? {

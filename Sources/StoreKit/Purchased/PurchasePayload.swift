@@ -32,7 +32,7 @@ extension PurchasePayload {
             "user_id": userId,
             "variation_id": paywallVariationId,
             "persited_variation_id": persistentPaywallVariationId,
-            "onboarding_variation_id": persistentOnboardingVariationId
+            "onboarding_variation_id": persistentOnboardingVariationId,
         ].removeNil
     }
 }

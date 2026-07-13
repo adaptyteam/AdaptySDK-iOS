@@ -42,7 +42,9 @@ struct HTTPMetrics: Sendable, Hashable {
         let bytesSent: Int64
         let bytesReceived: Int64
 
-        fileprivate var total: UInt64 { queue + dns + connect + sent + wait + wait }
+        fileprivate var total: UInt64 {
+            queue + dns + connect + sent + wait + wait
+        }
 
         init(_ metrics: URLSessionTaskTransactionMetrics) {
             // https://developer.apple.com/documentation/foundation/urlsessiontasktransactionmetrics
@@ -145,7 +147,7 @@ extension HTTPMetrics: CustomDebugStringConvertible {
             result += "\tredirects: \(redirectCount)"
         }
         if transactions.isNotEmpty {
-            result += "\t\t " + transactions.map { $0.debugDescription }.joined(separator: ", ")
+            result += "\t\t " + transactions.map(\.debugDescription).joined(separator: ", ")
         }
         if decoding > 1 {
             result += "\tdecoding: \(decoding)"

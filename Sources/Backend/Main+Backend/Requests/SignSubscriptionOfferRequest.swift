@@ -30,7 +30,7 @@ private struct SignSubscriptionOfferRequest: BackendRequest {
 
         logParams = [
             "product_id": vendorProductId,
-            "discount_id": offerId
+            "discount_id": offerId,
         ]
     }
 }

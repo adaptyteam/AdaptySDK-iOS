@@ -16,8 +16,14 @@ public enum AdaptyUIError: Error {
 
     case webKit(Error)
 
-    case unsupportedTemplate(String)
     case wrongComponentType(String)
+    case wrongAssetType(String)
+
+    case jsException(String)
+
+    case navigatorNotFound(String)
+    case invalidActionURL(String)
+    case unsupportedURLScheme(String)
 }
 
 public extension AdaptyUIError {
@@ -32,9 +38,13 @@ public extension AdaptyUIError {
 
         case webKit = 4200
 
-        case unsupportedTemplate = 4100
         case wrongComponentType = 4103
-        
+        case wrongAssetType = 4104
+        case jsException = 4105
+        case navigatorNotFound = 4106
+        case invalidActionURL = 4107
+        case unsupportedURLScheme = 4108
+
         case platformView = 4300
     }
 }
@@ -49,8 +59,12 @@ extension AdaptyUIError: CustomNSError {
         case .adaptyUINotActivated: Code.adaptyUINotActivated.rawValue
         case .activateOnce: Code.activateOnce.rawValue
         case .webKit: Code.webKit.rawValue
-        case .unsupportedTemplate: Code.unsupportedTemplate.rawValue
         case .wrongComponentType: Code.wrongComponentType.rawValue
+        case .wrongAssetType: Code.wrongAssetType.rawValue
+        case .jsException: Code.jsException.rawValue
+        case .navigatorNotFound: Code.navigatorNotFound.rawValue
+        case .invalidActionURL: Code.invalidActionURL.rawValue
+        case .unsupportedURLScheme: Code.unsupportedURLScheme.rawValue
         }
     }
 }
@@ -88,10 +102,18 @@ import AdaptyUIBuilder
 extension AdaptyUIBuilderError {
     var toAdaptyUIError: AdaptyUIError {
         switch self {
-        case .unsupportedTemplate(let v):
-            .unsupportedTemplate(v)
         case .wrongComponentType(let v):
             .wrongComponentType(v)
+        case .wrongAssetType(let v):
+            .wrongAssetType(v)
+        case .jsException(let v):
+            .jsException(v)
+        case .navigatorNotFound(let v):
+            .navigatorNotFound(v)
+        case .invalidActionURL(let v):
+            .invalidActionURL(v)
+        case .unsupportedURLScheme(let v):
+            .unsupportedURLScheme(v)
         }
     }
 }

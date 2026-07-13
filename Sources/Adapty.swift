@@ -21,10 +21,9 @@ public final class Adapty {
     let httpConfigsSession: Backend.ConfigsExecutor
 
     let receiptManager: StoreKitReceiptManager
-    let transactionManager: StoreKitTransactionManager
-    let productsManager: StoreKitProductsManager
-    var purchaser: StorekitPurchaser?
-    var sk1QueueManager: SK1QueueManager?
+    let transactionManager: TransactionManager
+    let productsManager: ProductsManager
+    var purchaser: StoreKitPurchaser?
 
     package let observerMode: Bool
 
@@ -34,86 +33,49 @@ public final class Adapty {
         configuration: AdaptyConfiguration,
         backend: Backend
     ) async {
-        self.observerMode = configuration.observerMode
-        self.apiKeyPrefix = configuration.apiKeyPrefix
+        observerMode = configuration.observerMode
+        apiKeyPrefix = configuration.apiKeyPrefix
         self.backend = backend
-        self.profileStorage = ProfileStorage()
-        self.httpSession = backend.createDefaultExecutor()
-        self.httpFallbackSession = backend.createFallbackExecutor()
-        self.httpConfigsSession = backend.createConfigsExecutor()
+        profileStorage = ProfileStorage()
+        httpSession = backend.createDefaultExecutor()
+        httpFallbackSession = backend.createFallbackExecutor()
+        httpConfigsSession = backend.createConfigsExecutor()
 
         let productVendorIdsStorage = BackendProductInfoStorage()
         await PurchasePayloadStorage.migration(for: ProfileStorage.userId)
-        self.purchasePayloadStorage = PurchasePayloadStorage()
+        purchasePayloadStorage = PurchasePayloadStorage()
 
         if configuration.transactionFinishBehavior != .manual {
             _ = await PurchasePayloadStorage.removeAllUnfinishedTransactionState()
         }
 
-        if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
-            self.receiptManager = StoreKitReceiptManager(
-                httpSession: httpSession,
-                refreshIfEmpty: false
-            )
-            self.transactionManager = SK2TransactionManager(
-                httpSession: httpSession,
+        receiptManager = StoreKitReceiptManager(
+            httpSession: httpSession
+        )
+
+        transactionManager = TransactionManager(
+            httpSession: httpSession,
+            storage: purchasePayloadStorage
+        )
+
+        let productsManager = ProductsManager(
+            apiKeyPrefix: apiKeyPrefix,
+            session: httpSession,
+            storage: productVendorIdsStorage
+        )
+        self.productsManager = productsManager
+
+        sharedProfileManager = restoreProfileManager(configuration)
+
+        if !observerMode {
+            purchaser = StoreKitPurchaser.startObserving(
+                transactionSynchronizer: self,
+                subscriptionOfferSigner: self,
+                productsManager: productsManager,
                 storage: purchasePayloadStorage
             )
-            let sk2ProductsManager = SK2ProductsManager(
-                apiKeyPrefix: apiKeyPrefix,
-                session: httpSession,
-                storage: productVendorIdsStorage
-            )
-            self.productsManager = sk2ProductsManager
-
-            self.sharedProfileManager = restoreProfileManager(configuration)
-            if !observerMode {
-                self.purchaser = SK2Purchaser.startObserving(
-                    transactionSynchronizer: self,
-                    subscriptionOfferSigner: self,
-                    sk2ProductsManager: sk2ProductsManager,
-                    storage: purchasePayloadStorage
-                )
-
-                self.sk1QueueManager = SK1QueueManager.startObserving(
-                    transactionSynchronizer: self,
-                    subscriptionOfferSigner: self,
-                    productsManager: sk2ProductsManager,
-                    storage: purchasePayloadStorage
-                )
-            }
-
-        } else {
-            self.receiptManager = StoreKitReceiptManager(
-                httpSession: httpSession,
-                refreshIfEmpty: true
-            )
-            self.transactionManager = receiptManager
-            let sk1ProductsManager = SK1ProductsManager(
-                apiKeyPrefix: apiKeyPrefix,
-                session: httpSession,
-                storage: productVendorIdsStorage
-            )
-
-            self.productsManager = sk1ProductsManager
-
-            self.sharedProfileManager = restoreProfileManager(configuration)
-
-            if observerMode {
-                SK1TransactionObserver.startObserving(
-                    transactionSynchronizer: self,
-                    sk1ProductsManager: sk1ProductsManager
-                )
-            } else {
-                self.sk1QueueManager = SK1QueueManager.startObserving(
-                    transactionSynchronizer: self,
-                    subscriptionOfferSigner: self,
-                    productsManager: sk1ProductsManager,
-                    storage: purchasePayloadStorage
-                )
-                self.purchaser = sk1QueueManager
-            }
         }
+
         startSyncIPv4OnceIfNeeded()
     }
 
@@ -207,6 +169,10 @@ public final class Adapty {
                         profile: createdProfile,
                         sentEnvironment: meta.sentEnvironment
                     )
+                    let profileId = createdProfile.profileId
+                    Task.detached(priority: .background) {
+                        await Cache.removeOtherProfiles(profileId)
+                    }
                     self.sharedProfileManager = .current(manager)
                     manager.saveCrossPlacementState(crossPlacementState)
                     return manager

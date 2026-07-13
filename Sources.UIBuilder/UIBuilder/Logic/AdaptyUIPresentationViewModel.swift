@@ -9,7 +9,6 @@
 
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package final class AdaptyUIPresentationViewModel: ObservableObject {
     enum PresentationState {
@@ -39,6 +38,11 @@ package final class AdaptyUIPresentationViewModel: ObservableObject {
     func viewDidDisappear() {
         presentationState = .disappeared
         logic.reportViewDidDisappear()
+    }
+
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        presentationState = .initial
     }
 }
 

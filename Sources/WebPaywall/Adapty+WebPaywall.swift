@@ -5,13 +5,14 @@
 //  Created by Aleksei Valiano on 01.06.2025
 //
 
+import AdaptyUIBuilder
 import Foundation
 
 #if os(iOS)
-    import SafariServices
-    import UIKit
+import SafariServices
+import UIKit
 #elseif os(macOS)
-    import AppKit
+import AppKit
 #endif
 
 public extension Adapty {
@@ -25,7 +26,7 @@ public extension Adapty {
                 "paywall_name": product.paywallName,
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
-                "web_purchase_url": (product as? WebPaywallURLProviding)?.webPaywallBaseUrl,
+                "web_purchase_url": product.webPaywallBaseUrl,
                 "paywall_product_index": product.paywallProductIndex,
                 "presentation": presentation.rawValue,
             ]
@@ -43,7 +44,7 @@ public extension Adapty {
                 "paywall_name": product.paywallName,
                 "variation_id": product.variationId,
                 "product_id": product.vendorProductId,
-                "web_purchase_url": (product as? WebPaywallURLProviding)?.webPaywallBaseUrl,
+                "web_purchase_url": product.webPaywallBaseUrl,
                 "paywall_product_index": product.paywallProductIndex,
                 "product_locale": product.localizedPrice,
             ]
@@ -53,7 +54,7 @@ public extension Adapty {
     }
 
     nonisolated static func openWebPaywall(
-        for paywall: AdaptyPaywall,
+        for paywall: AdaptyFlowPaywall,
         in presentation: AdaptyWebPresentation = .externalBrowser
     ) async throws(AdaptyError) {
         try await withActivatedSDK(
@@ -70,7 +71,7 @@ public extension Adapty {
     }
 
     nonisolated static func createWebPaywallUrl(
-        for paywall: AdaptyPaywall
+        for paywall: AdaptyFlowPaywall
     ) async throws(AdaptyError) -> URL {
         try await withActivatedSDK(
             methodName: .createWebPaywallUrl,
@@ -96,7 +97,7 @@ public extension Adapty {
     }
 
     private func openWebPaywall(
-        for paywall: AdaptyPaywall,
+        for paywall: AdaptyFlowPaywall,
         presentation: AdaptyWebPresentation
     ) async throws(AdaptyError) {
         let url = try createWebPaywallUrl(for: paywall)
@@ -107,7 +108,7 @@ public extension Adapty {
     }
 
     private func createWebPaywallUrl(
-        for paywall: AdaptyPaywall
+        for paywall: AdaptyFlowPaywall
     ) throws(AdaptyError) -> URL {
         guard let webPaywallBaseUrl = paywall.webPaywallBaseUrl else {
             throw .paywallWithoutPurchaseUrl(paywall: paywall)
@@ -124,7 +125,7 @@ public extension Adapty {
     private func createWebPaywallUrl(
         for product: AdaptyPaywallProduct
     ) throws(AdaptyError) -> URL {
-        guard let webPaywallBaseUrl = (product as? WebPaywallURLProviding)?.webPaywallBaseUrl else {
+        guard let webPaywallBaseUrl = product.webPaywallBaseUrl else {
             throw .productWithoutPurchaseUrl(adaptyProductId: product.adaptyProductId)
         }
 
@@ -152,21 +153,25 @@ extension URL {
     @MainActor
     package func open(presentation: AdaptyWebPresentation) async -> Bool {
         #if os(iOS)
-            switch presentation {
-            case .externalBrowser:
+        switch presentation {
+        case .externalBrowser:
+            return await UIApplication.shared.open(self, options: [:])
+        case .inAppBrowser:
+            // `SFSafariViewController` supports only http/https; for any other scheme
+            // (mailto, tel, sms, …) fall back to the external handler instead of
+            // handing it to SFSafariViewController, whose initializer raises an
+            // uncatchable NSInvalidArgumentException for unsupported schemes.
+            guard isWebLink, let topViewController = UIApplication.shared.topPresentedController else {
                 return await UIApplication.shared.open(self, options: [:])
-            case .inAppBrowser:
-                guard let topViewController = UIApplication.shared.topPresentedController else {
-                    return await UIApplication.shared.open(self, options: [:])
-                }
-
-                let safariViewController = SFSafariViewController(url: self)
-                topViewController.present(safariViewController, animated: true)
-                return true
             }
-        #elseif os(macOS)
-            NSWorkspace.shared.open(self)
+
+            let safariViewController = SFSafariViewController(url: self)
+            topViewController.present(safariViewController, animated: true)
             return true
+        }
+        #elseif os(macOS)
+        NSWorkspace.shared.open(self)
+        return true
         #endif
     }
 

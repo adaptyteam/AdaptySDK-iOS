@@ -8,7 +8,6 @@
 import AdaptyUI
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension Request {
     struct AdaptyUIDismissOnboardingView: AdaptyPluginRequest {
         static let method = "adapty_ui_dismiss_onboarding_view"
@@ -21,6 +20,13 @@ extension Request {
             case destroy
         }
 
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            viewId = try container.decode(String.self, forKey: .viewId)
+            destroy = try container.decodeIfPresent(Bool.self, forKey: .destroy) ?? false
+        }
+
+        @available(*, deprecated, message: "Onboarding Feature is deprecated.")
         func execute() async throws -> AdaptyJsonData {
             try await AdaptyUI.Plugin.dismissOnboardingView(
                 viewId: viewId,

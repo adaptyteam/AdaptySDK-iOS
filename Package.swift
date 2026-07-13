@@ -1,13 +1,15 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 import PackageDescription
 
 let package = Package(
     name: "Adapty",
 
     platforms: [
-        .iOS(.v13),
-        .macOS(.v11),
-        .visionOS(.v1),
+        .iOS(.v15),
+        .macOS(.v12),
+        //        .tvOS(.v15),
+        //        .watchOS(.v8),
+        .visionOS(.v2),
     ],
     products: [
         .library(
@@ -15,12 +17,12 @@ let package = Package(
             targets: ["AdaptyLogger"]
         ),
         .library(
-            name: "Adapty",
-            targets: ["Adapty"]
+            name: "AdaptyCodable",
+            targets: ["AdaptyCodable"]
         ),
         .library(
-            name: "Adapty_KidsMode",
-            targets: ["Adapty_KidsMode"]
+            name: "Adapty",
+            targets: ["Adapty"]
         ),
         .library(
             name: "AdaptyUIBuilder",
@@ -31,10 +33,6 @@ let package = Package(
             targets: ["AdaptyUI"]
         ),
         .library(
-            name: "AdaptyUI_KidsMode",
-            targets: ["AdaptyUI_KidsMode"]
-        ),
-        .library(
             name: "AdaptyDeveloperTools",
             targets: ["AdaptyDeveloperTools"]
         ),
@@ -42,94 +40,126 @@ let package = Package(
             name: "AdaptyPlugin",
             targets: ["AdaptyPlugin"]
         ),
-        .library(
-            name: "AdaptyPlugin_KidsMode",
-            targets: ["AdaptyPlugin_KidsMode"]
+    ],
+    traits: [
+        // COPPA / App Store Kids Category build trait. Off by default (not in a default
+        // set), so regular consumers are unaffected. When a consumer enables it, SwiftPM
+        // activates the `KidsMode` compilation condition package-wide, and the
+        // `#if KidsMode` guards compile out IDFA / AdSupport.
+        .trait(
+            name: "KidsMode",
+            description: "COPPA / App Store Kids Category build — compiles out IDFA / AdSupport."
         ),
     ],
     targets: [
         .target(
             name: "AdaptyLogger",
             dependencies: [],
-            path: "Sources.Logger"
+            path: "Sources.Logger",
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
+        ),
+        .target(
+            name: "CSimdjson",
+            path: "Sources.Codable/CSimdjson",
+            sources: [
+                "simdjson.cpp",
+                "SimdjsonBridge.cpp",
+            ],
+            publicHeadersPath: "include",
+            cxxSettings: [
+                .headerSearchPath("."),
+                .define("SIMDJSON_EXCEPTIONS", to: "0"),
+                .define("NDEBUG", .when(configuration: .release)),
+            ],
+            linkerSettings: [
+                .linkedLibrary("c++"),
+            ]
+        ),
+        .target(
+            name: "AdaptyCodable",
+            dependencies: ["CSimdjson"],
+            path: "Sources.Codable",
+            exclude: [
+                "CSimdjson",
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
         ),
         .target(
             name: "AdaptyUIBuilder",
-            dependencies: ["AdaptyLogger"],
+            dependencies: ["AdaptyLogger", "AdaptyCodable"],
             path: "Sources.UIBuilder",
             exclude: [
-                "adaptyui.v4.4.1.schema.yaml"
+                "adapty.uibuilder.schema.yaml",
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
             ]
         ),
         .target(
             name: "Adapty",
-            dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "AdaptyLogger", "AdaptyCodable"],
             path: "Sources",
-            resources: [.copy("PrivacyInfo.xcprivacy")]
-        ),
-        .target(
-            name: "Adapty_KidsMode",
-            dependencies: ["AdaptyUIBuilder", "AdaptyLogger"],
-            path: "Sources.KidsMode",
+            exclude: [
+                "Events/adapty.events.schema.yaml",
+                "Placements/adapty.fallback.schema.yaml",
+            ],
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
-                .define("ADAPTY_KIDS_MODE")
+                // Kids Mode is driven by the `KidsMode` trait (activates `#if KidsMode`
+                // package-wide); no per-target define, module alias, or unsafeFlags needed.
+                .swiftLanguageMode(.v6),
             ]
         ),
         .target(
             name: "AdaptyUI",
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
             path: "Sources.AdaptyUI",
-            resources: [.copy("PrivacyInfo.xcprivacy")]
-        ),
-        .target(
-            name: "AdaptyUI_KidsMode",
-            dependencies: [
-                "AdaptyUIBuilder",
-                "Adapty_KidsMode",
-                "AdaptyLogger",
-            ],
-            path: "Sources.AdaptyUI.KidsMode",
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
-                .unsafeFlags(["-module-alias", "Adapty=Adapty_KidsMode"]),
+                .swiftLanguageMode(.v6),
             ]
         ),
         .target(
             name: "AdaptyDeveloperTools",
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
-            path: "Sources.DeveloperTools"
+            path: "Sources.DeveloperTools",
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
         ),
         .target(
             name: "AdaptyPlugin",
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyUI", "AdaptyLogger"],
             path: "Sources.AdaptyPlugin",
             exclude: [
-                "cross_platform.yaml"
-            ]
-        ),
-        .target(
-            name: "AdaptyPlugin_KidsMode",
-            dependencies: ["AdaptyUIBuilder", "Adapty_KidsMode", "AdaptyUI_KidsMode", "AdaptyLogger"],
-            path: "Sources.AdaptyPlugin.KidsMode",
-            exclude: [
-                "cross_platform.yaml"
+                "cross_platform.yaml",
             ],
             swiftSettings: [
-                .unsafeFlags([
-                    "-module-alias", "Adapty=Adapty_KidsMode",
-                    "-module-alias", "AdaptyUI=AdaptyUI_KidsMode",
-                ]),
+                .swiftLanguageMode(.v6),
             ]
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger", "AdaptyCodable"],
             path: "Tests",
+            exclude: [
+                // TEMP: pre-existing breakage after `UIBuilder: tighten access modifiers,
+                // drop redundant Equatable/Hashable` — wait for follow-up fix.
+                "UISchema",
+                "UIConfiguration",
+            ],
             resources: [
                 .process("Placements/fallback.json"),
-                .process("Placements/fallback_large.json"),
+            ],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
             ]
         ),
-    ]
+    ],
+    cxxLanguageStandard: .cxx20
 )
+

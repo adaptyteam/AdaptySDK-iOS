@@ -9,9 +9,13 @@ import Foundation
 
 public struct AdaptySubscriptionOffer: Sendable, Hashable {
     /// Unique identifier of a discount offer for a product.
-    public var identifier: String? { offerIdentifier.offerId }
+    public var identifier: String? {
+        offerIdentifier.offerId
+    }
 
-    public var offerType: AdaptySubscriptionOfferType { offerIdentifier.offerType }
+    public var offerType: AdaptySubscriptionOfferType {
+        offerIdentifier.offerType
+    }
 
     package let offerIdentifier: Identifier
 

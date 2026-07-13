@@ -22,6 +22,7 @@ extension Request {
             case fetchPolicy = "fetch_policy"
         }
 
+        @available(*, deprecated, message: "Onboarding Feature is deprecated.")
         func execute() async throws -> AdaptyJsonData {
             try .success(await Adapty.getOnboardingForDefaultAudience(
                 placementId: placementId,

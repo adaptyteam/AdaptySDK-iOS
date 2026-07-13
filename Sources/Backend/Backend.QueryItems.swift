@@ -47,7 +47,7 @@ extension [HTTPRequest.QueryItems.Element] {
         var queryItems = filter { $0.name != Backend.Request.appAccountTokenItemName }
 
         if let appAccountToken {
-            queryItems.append(URLQueryItem(name: Backend.Request.appAccountTokenItemName, value: appAccountToken.uuidString.lowercased()))
+            queryItems.append(URLQueryItem(name: Backend.Request.appAccountTokenItemName, value: appAccountToken.lowercased))
         }
         return queryItems
     }

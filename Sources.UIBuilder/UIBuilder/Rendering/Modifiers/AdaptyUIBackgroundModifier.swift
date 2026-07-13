@@ -9,37 +9,50 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIBackgroundModifier: ViewModifier {
-    var background: VC.Background?
+    var background: VC.AssetReference?
+    var defaultValue: VC.Asset?
 
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
     func body(content: Content) -> some View {
-        switch self.background {
-        case let .image(imageData):
-            content
-                .background {
-                    AdaptyUIImageView(
-                        asset: imageData.usedColorScheme(self.colorScheme),
-                        aspect: .fill,
-                        tint: nil
-                    )
-                    .ignoresSafeArea()
-                }
-        case let .filling(filling):
+        let asset = assetsViewModel.resolvedAsset(
+            background,
+            mode: colorScheme.toVCMode,
+            screen: screen
+        ).asColorOrGradientOrImageAsset
+
+        switch asset {
+        case .color(let color):
             content
                 .background {
                     Rectangle()
-                        .fill(
-                            filling,
-                            colorScheme: self.colorScheme,
-                            assetsResolver: self.assetsViewModel.assetsResolver
-                        )
+                        .fillSolidColor(color)
                         .ignoresSafeArea()
+                }
+        case .colorGradient(let gradient):
+            content
+                .background {
+                    Rectangle()
+                        .fillColorGradient(gradient)
+                        .ignoresSafeArea()
+                }
+        case .image(let image):
+            content
+                .background {
+                    AdaptyUIImageView(
+                        .resolvedImageAsset(
+                            asset: image,
+                            aspect: .fill,
+                            tint: nil
+                        )
+                    )
+                    .ignoresSafeArea()
                 }
         case .none:
             content
@@ -47,12 +60,19 @@ struct AdaptyUIBackgroundModifier: ViewModifier {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
-    func staticBackground(_ background: VC.Background?) -> some View {
+    func staticBackground(
+        _ background: VC.AssetReference?,
+        defaultValue: VC.Asset?
+    ) -> some View {
         if let background {
-            modifier(AdaptyUIBackgroundModifier(background: background))
+            modifier(
+                AdaptyUIBackgroundModifier(
+                    background: background,
+                    defaultValue: defaultValue
+                )
+            )
         } else {
             self
         }

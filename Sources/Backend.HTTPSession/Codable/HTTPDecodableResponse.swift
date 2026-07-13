@@ -13,7 +13,7 @@ extension HTTPDecodableResponse {
     static func decodableBodyDecoder(
         _ response: HTTPDataResponse,
         _ configuration: HTTPCodableConfiguration?,
-        _ request: HTTPRequest
+        _: HTTPRequest
     ) async throws -> HTTPResponse<Body> {
         try response.replaceBody(response.decodeBody(Body.self, with: configuration))
     }

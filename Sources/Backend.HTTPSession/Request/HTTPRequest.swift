@@ -17,10 +17,27 @@ protocol HTTPRequest: Sendable {
 }
 
 extension HTTPRequest {
-    var path: HTTPEndpoint.Path { endpoint.path }
-    var method: HTTPMethod { endpoint.method }
-    var headers: HTTPHeaders { [:] }
-    var queryItems: QueryItems { [] }
-    var cachePolicy: URLRequest.CachePolicy? { nil }
-    var timeoutInterval: TimeInterval? { nil }
+    var path: HTTPEndpoint.Path {
+        endpoint.path
+    }
+
+    var method: HTTPMethod {
+        endpoint.method
+    }
+
+    var headers: HTTPHeaders {
+        [:]
+    }
+
+    var queryItems: QueryItems {
+        []
+    }
+
+    var cachePolicy: URLRequest.CachePolicy? {
+        nil
+    }
+
+    var timeoutInterval: TimeInterval? {
+        nil
+    }
 }

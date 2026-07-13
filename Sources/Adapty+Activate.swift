@@ -41,7 +41,7 @@ public extension Adapty {
     ) async throws(AdaptyError) {
         let stamp = Log.stamp
 
-        #if ADAPTY_KIDS_MODE
+        #if KidsMode
         let kidsModeEnabled = true
         #else
         let kidsModeEnabled = false
@@ -80,6 +80,10 @@ public extension Adapty {
             AdaptyConfiguration.idfaCollectionDisabled = configuration.idfaCollectionDisabled // TODO: Refactoring
             AdaptyConfiguration.ipAddressCollectionDisabled = configuration.ipAddressCollectionDisabled // TODO: Refactoring
 
+            Task.detached(priority: .background) {
+                await Cache.cleanup()
+            }
+
             let environment = await Environment.instance
 
             let backend = await Backend(with: configuration, environment: environment)
@@ -97,7 +101,6 @@ public extension Adapty {
             set(shared: sdk)
 
             UserAcquisitionManager.activate(sdk)
-
             LifecycleManager.shared.initialize()
             return sdk
         }

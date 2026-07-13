@@ -14,7 +14,6 @@ import UIKit
 import SafariServices
 #endif
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package extension URL {
     func open(in presentation: AdaptyUIBuilder.WebPresentation) {
@@ -23,7 +22,9 @@ package extension URL {
             UIApplication.shared.open(self, options: [:])
         case .inAppBrowser:
             #if canImport(SafariServices) && os(iOS)
-            guard let topViewController = UIApplication.shared.topPresentedController else {
+            // SFSafariViewController supports only http/https; for any other scheme
+            // fall back to the external handler instead of crashing on its init.
+            guard isWebLink, let topViewController = UIApplication.shared.topPresentedController else {
                 UIApplication.shared.open(self, options: [:])
                 return
             }
@@ -35,7 +36,6 @@ package extension URL {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 private extension UIApplication {
     var topPresentedController: UIViewController? {
@@ -51,7 +51,6 @@ private extension UIApplication {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 private extension UIViewController {
     func topPresentedController() -> UIViewController {

@@ -10,7 +10,6 @@
 import AVKit
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     enum PlayerState {
@@ -41,38 +40,41 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
     @Published var playerState: PlayerState = .invalid
     @Published var player: AVPlayer?
 
-    private let onStateUpdated: (PlayerState) -> Void
-
     private var playerStatusObservation: NSKeyValueObservation?
-    private nonisolated(unsafe) var loopObserver: (any NSObjectProtocol)?
+    private nonisolated(unsafe) var endObserver: (any NSObjectProtocol)?
+    var onPlayToEnd: (() -> Void)?
 
     init(
-        video: VC.VideoData,
-        loop: Bool,
-        assetsResolver: AdaptyUIAssetsResolver,
-        onStateUpdated: @escaping (PlayerState) -> Void
+        asset: AVAsset,
+        loop: Bool
     ) {
-        let video = video.resolve(with: assetsResolver)
-        player = video.player
-        self.onStateUpdated = onStateUpdated
+        let newItem = AVPlayerItem(asset: asset)
+        let newPlayer = AVPlayer(playerItem: newItem)
+        newPlayer.isMuted = true
+
+        player = newPlayer
 
         super.init()
 
         if loop {
-            video.player.actionAtItemEnd = .none
-            loopObserver = NotificationCenter.default.addObserver(
-                forName: .AVPlayerItemDidPlayToEndTime,
-                object: video.item,
-                queue: .main
-            ) { [weak self] _ in
-                MainActor.assumeIsolated {
+            newPlayer.actionAtItemEnd = .none
+        }
+
+        endObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: newItem,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                if loop {
                     self?.player?.seek(to: .zero)
                     self?.player?.play()
                 }
+                self?.onPlayToEnd?()
             }
         }
 
-        playerStatusObservation = video.item.observe(
+        playerStatusObservation = newItem.observe(
             \.status,
             options: [.new, .initial],
             changeHandler: { [weak self] item, _ in
@@ -84,7 +86,10 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         player?.play()
     }
 
-    private func playerStatusDidChange(_ status: AVPlayerItem.Status, item: AVPlayerItem) {
+    private func playerStatusDidChange(
+        _ status: AVPlayerItem.Status,
+        item: AVPlayerItem
+    ) {
         switch status {
         case .unknown:
             Log.ui.verbose("#AdaptyUIVideoPlayerManager# playerStatusDidChange = unknown")
@@ -103,15 +108,13 @@ class AdaptyUIVideoPlayerManager: NSObject, ObservableObject {
         @unknown default:
             break
         }
-
-        onStateUpdated(playerState)
     }
 
     deinit {
         playerStatusObservation?.invalidate()
         playerStatusObservation = nil
-        if let loopObserver {
-            NotificationCenter.default.removeObserver(loopObserver)
+        if let endObserver {
+            NotificationCenter.default.removeObserver(endObserver)
         }
     }
 }

@@ -13,7 +13,7 @@ final class MockURLProtocol: URLProtocol {
         static let handledKey = "MockURLProtocol.Handled"
         static let allowedSchemes: [String?] = ["http", "https"]
     }
-    
+
     override class func canInit(with request: URLRequest) -> Bool {
         guard let url = request.url,
               Constants.allowedSchemes.contains(url.scheme),
@@ -21,35 +21,35 @@ final class MockURLProtocol: URLProtocol {
         else { return false }
         return true
     }
-    
+
     override class func canInit(with task: URLSessionTask) -> Bool {
         guard let request = task.currentRequest else { return false }
-        return self.canInit(with: request)
+        return canInit(with: request)
     }
-    
+
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        return request
+        request
     }
-    
+
     override func startLoading() {
         guard let url = request.url else {
             client?.urlProtocol(self, didFailWithError: URLError(.badURL))
             return
         }
-        
+
         // Пример оригинального JSON
         let original = [
             "user": "Alice",
             "role": "user",
-            "features": ["read", "comment"]
+            "features": ["read", "comment"],
         ] as [String: Any]
-        
+
         // Меняем поле
         var modified = original
         modified["role"] = "admin"
         // Можно добавить или удалить поля
         modified["injectedBy"] = "URLProtocol"
-        
+
         do {
             let body = try JSONSerialization.data(withJSONObject: modified, options: [])
             let headers = ["Content-Type": "application/json; charset=utf-8"]

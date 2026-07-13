@@ -71,7 +71,7 @@ struct ApplicationMainView: View {
             didFailPurchase: { _, _ in },
             didFinishRestore: { _ in },
             didFailRestore: { _ in },
-            didFailRendering: { _ in }
+            didReceiveError: { _ in }
         )
     }
 

@@ -10,15 +10,14 @@
 import Adapty
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUI {
-    public static var universalDelegate: (AdaptyPaywallControllerDelegate & AdaptyOnboardingControllerDelegate)?
+    public static var universalDelegate: (AdaptyFlowControllerDelegate & AdaptyOnboardingControllerDelegate)?
 
     package static func paywallControllerWithUniversalDelegate(
-        _ paywallConfiguration: PaywallConfiguration,
+        _ paywallConfiguration: FlowConfiguration,
         showDebugOverlay: Bool = false
-    ) throws -> AdaptyPaywallController {
+    ) throws -> AdaptyFlowController {
         guard AdaptyUI.isActivated else {
             let err = AdaptyUIError.adaptyNotActivated
             Log.ui.error("AdaptyUI paywallController(for:) error: \(err)")
@@ -30,7 +29,7 @@ extension AdaptyUI {
             throw AdaptyError(AdaptyUI.PluginError.delegateIsNotRegestired)
         }
 
-        return AdaptyPaywallController(
+        return AdaptyFlowController(
             paywallConfiguration: paywallConfiguration,
             delegate: delegate,
             showDebugOverlay: showDebugOverlay
@@ -38,9 +37,9 @@ extension AdaptyUI {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 extension AdaptyUI {
+    @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
     package static func onboardingControllerWithUniversalDelegate(
         _ onboardingConfiguration: OnboardingConfiguration
     ) throws -> AdaptyOnboardingController {

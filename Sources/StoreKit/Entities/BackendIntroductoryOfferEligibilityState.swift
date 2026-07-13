@@ -14,7 +14,7 @@ struct BackendIntroductoryOfferEligibilityState: Sendable, Hashable {
 }
 
 extension BackendIntroductoryOfferEligibilityState: CustomStringConvertible {
-    public var description: String {
+    var description: String {
         "(vendorId: \(vendorId), value: \(value), version: \(version))"
     }
 }

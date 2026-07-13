@@ -33,10 +33,9 @@ extension Request {
             }
             self.configuration = builder.build()
 
-            if #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *),
-               try container
-               .nestedContainer(keyedBy: ConfigurationCodingKeys.self, forKey: .configuration)
-               .decodeIfPresent(Bool.self, forKey: .activateUI) ?? false
+            if try container
+                .nestedContainer(keyedBy: ConfigurationCodingKeys.self, forKey: .configuration)
+                .decodeIfPresent(Bool.self, forKey: .activateUI) ?? false
             {
                 self.activateUI = true
                 self.uiConfiguration = try container.decode(AdaptyUI.Configuration.self, forKey: .configuration)
@@ -48,7 +47,7 @@ extension Request {
 
         func execute() async throws -> AdaptyJsonData {
             try await Adapty.activate(with: configuration)
-            if activateUI, #available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *) {
+            if activateUI {
                 try await AdaptyUI.activate(configuration: uiConfiguration)
             }
             return .success()

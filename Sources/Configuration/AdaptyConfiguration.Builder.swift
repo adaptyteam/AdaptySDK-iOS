@@ -158,7 +158,7 @@ public extension AdaptyConfiguration.Builder {
         ipAddressCollectionDisabled = value
         return self
     }
-    
+
     @discardableResult
     func with(clearDataOnBackup value: Bool) -> Self {
         clearDataOnBackup = value

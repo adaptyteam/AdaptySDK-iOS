@@ -9,7 +9,6 @@
 
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension UIAlertController {
     static func create(
         _ configuration: AdaptyUI.DialogConfiguration,
@@ -42,7 +41,6 @@ extension UIAlertController {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension UIViewController {
     func showDialog(
         _ configuration: AdaptyUI.DialogConfiguration,

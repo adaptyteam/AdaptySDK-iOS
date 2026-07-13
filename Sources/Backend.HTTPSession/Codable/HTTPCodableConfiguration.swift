@@ -14,7 +14,9 @@ protocol HTTPCodableConfiguration: HTTPConfiguration {
 }
 
 extension HTTPCodableConfiguration {
-    var defaultEncodedContentType: String { "application/json" }
+    var defaultEncodedContentType: String {
+        "application/json"
+    }
 
     func configure(jsonDecoder: JSONDecoder) {
         jsonDecoder.dateDecodingStrategy = .millisecondsSince1970

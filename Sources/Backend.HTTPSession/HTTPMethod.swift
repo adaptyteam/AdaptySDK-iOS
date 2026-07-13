@@ -20,11 +20,13 @@ enum HTTPMethod: String, Sendable, Hashable {
 }
 
 extension HTTPMethod: ExpressibleByStringLiteral {
-    public init(stringLiteral value: String) {
+    init(stringLiteral value: String) {
         self = HTTPMethod(rawValue: value.uppercased()) ?? .get
     }
 }
 
 extension HTTPMethod: CustomStringConvertible {
-    var description: String { rawValue }
+    var description: String {
+        rawValue
+    }
 }

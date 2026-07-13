@@ -26,7 +26,9 @@ final class CrossPlacementStorage {
         }
     }()
 
-    var state: CrossPlacementState? { Self.crossPlacementState }
+    var state: CrossPlacementState? {
+        Self.crossPlacementState
+    }
 
     func setState(_ value: CrossPlacementState) {
         do {

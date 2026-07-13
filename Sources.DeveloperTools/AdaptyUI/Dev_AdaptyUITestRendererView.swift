@@ -10,23 +10,22 @@ import AdaptyUI
 import AdaptyUIBuilder
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public extension AdaptyUI {
     @MainActor
-    final class Dev_GalleryPreviewConfiguration {
-        package let eventsHandler: AdaptyEventsHandler
+    final class Dev_GalleryPreviewConfiguration: ObservableObject {
+        package let eventsHandler: AdaptyUIEventsHandler
 
         package let presentationViewModel: AdaptyUIPresentationViewModel
-        package let paywallViewModel: AdaptyUIPaywallViewModel
+        package let stateViewModel: AdaptyUIStateViewModel
+        package let actionHandler: AdaptyUIStateActionHandler
+        package let flowViewModel: AdaptyUIFlowViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
-        package let actionsViewModel: AdaptyUIActionsViewModel
-        package let sectionsViewModel: AdaptyUISectionsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
         package let timerViewModel: AdaptyUITimerViewModel
         package let screensViewModel: AdaptyUIScreensViewModel
         package let assetsViewModel: AdaptyUIAssetsViewModel
 
-        private let logic = Dev_AdaptyUILogic()
+        private let logic: AdaptyUIBuilderLogic
 
         fileprivate let logId: String
         fileprivate let observerModeResolver: AdaptyObserverModeResolver?
@@ -37,10 +36,13 @@ public extension AdaptyUI {
         package init(
             logId: String,
             viewConfiguration: AdaptyUIConfiguration,
+            previewProducts: [Dev_PreviewProduct],
             observerModeResolver: AdaptyObserverModeResolver?,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
-            assetsResolver: AdaptyUIAssetsResolver?
+            assetsResolver: AdaptyUIAssetsResolver?,
+            systemRequestsHandler: AdaptyUISystemRequestsHandler?,
+            rtlOverride: Bool?
         ) {
             self.logId = logId
             self.observerModeResolver = observerModeResolver
@@ -48,12 +50,16 @@ public extension AdaptyUI {
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
 
-            eventsHandler = AdaptyEventsHandler(logId: logId)
+            eventsHandler = AdaptyUIEventsHandler(logId: logId)
+            logic = Dev_AdaptyUILogic(
+                logId: logId,
+                events: eventsHandler,
+                products: previewProducts.map(Dev_MockProduct.init(from:))
+            )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
-            actionsViewModel = AdaptyUIActionsViewModel(logId: logId, logic: logic)
-            sectionsViewModel = AdaptyUISectionsViewModel(logId: logId)
-            paywallViewModel = AdaptyUIPaywallViewModel(
+
+            flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
                 logic: logic,
                 viewConfiguration: viewConfiguration
@@ -62,61 +68,166 @@ public extension AdaptyUI {
                 logId: logId,
                 logic: logic,
                 presentationViewModel: presentationViewModel,
-                paywallViewModel: paywallViewModel,
+                flowViewModel: flowViewModel,
                 products: nil
             )
             screensViewModel = AdaptyUIScreensViewModel(
                 logId: logId,
-                viewConfiguration: viewConfiguration
+                viewConfiguration: viewConfiguration,
+                rtlOverride: rtlOverride
             )
-            timerViewModel = AdaptyUITimerViewModel(
+            actionHandler = AdaptyUIStateActionHandler(
+                productsViewModel: productsViewModel,
+                screensViewModel: screensViewModel,
+                logic: logic
+            )
+            let stateHolder = AdaptyUIStateHolder(
+                logId: logId,
+                actionHandler: actionHandler,
+                viewConfiguration: viewConfiguration,
+                isInspectable: true
+            )
+            stateViewModel = AdaptyUIStateViewModel(
+                logId: logId,
+                logic: logic,
+                stateHolder: stateHolder
+            )
+            actionHandler.stateViewModel = stateViewModel
+            actionHandler.systemRequestsHandler = systemRequestsHandler
+            let timerViewModel = AdaptyUITimerViewModel(
                 logId: logId,
                 timerResolver: timerResolver ?? AdaptyUIDefaultTimerResolver(),
-                paywallViewModel: paywallViewModel,
+                stateViewModel: stateViewModel,
+                flowViewModel: flowViewModel,
                 productsViewModel: productsViewModel,
-                actionsViewModel: actionsViewModel,
-                sectionsViewModel: sectionsViewModel,
                 screensViewModel: screensViewModel
             )
+            self.timerViewModel = timerViewModel
+            actionHandler.timerViewModel = timerViewModel
+            timerViewModel.callbackHandler = actionHandler
             assetsViewModel = AdaptyUIAssetsViewModel(
-                assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver()
+                logId: logId,
+                assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
+                stateHolder: stateHolder
             )
+
+            productsViewModel.onProductsLoaded = { [weak stateHolder, previewProducts] _ in
+                stateHolder?.setProducts(previewProducts.asProductConstants())
+            }
+
+            stateHolder.start()
+            productsViewModel.loadProductsIfNeeded()
         }
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 public struct Dev_AdaptyUIRendererView: View {
     let viewConfiguration: AdaptyUIConfiguration
-    let galleryConfiguration: AdaptyUI.Dev_GalleryPreviewConfiguration
+    @StateObject private var galleryConfiguration: AdaptyUI.Dev_GalleryPreviewConfiguration
+
+    private let didAppear: () -> Void
+    private let didDisappear: () -> Void
+    private let didPerformAction: (AdaptyUIBuilder.Action) -> Void
+    private let didSelectProduct: (String) -> Void
+    private let didStartPurchase: (String) -> Void
+    private let didFinishPurchase: (String, String) -> Void
+    private let didStartRestore: () -> Void
+    private let didFinishRestore: (String) -> Void
+    private let didReceiveError: (AdaptyUIBuilderError) -> Void
+    private let didReceiveAnalyticEvent: (String, [String: any Sendable]) -> Void
+
+    private let safeAreaOverride: EdgeInsets?
+    private let showDebugOverlay: Bool
+    private let displayMissingTags: Bool
 
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
-        assetsResolver: AdaptyUIAssetsResolver?
+        assetsResolver: AdaptyUIAssetsResolver?,
+        systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
+        showDebugOverlay: Bool = false,
+        displayMissingTags: Bool = true,
+        safeAreaOverride: EdgeInsets? = nil,
+        rtlOverride: Bool? = nil,
+        didAppear: @escaping () -> Void,
+        didDisappear: @escaping () -> Void,
+        didPerformAction: @escaping (AdaptyUIBuilder.Action) -> Void,
+        didSelectProduct: @escaping (String) -> Void,
+        didStartPurchase: @escaping (String) -> Void,
+        didFinishPurchase: @escaping (String, String) -> Void,
+        didStartRestore: @escaping () -> Void,
+        didFinishRestore: @escaping (String) -> Void,
+        didReceiveError: @escaping (AdaptyUIBuilderError) -> Void,
+        didReceiveAnalyticEvent: @escaping (String, [String: any Sendable]) -> Void
     ) {
+        self.safeAreaOverride = safeAreaOverride
+        self.showDebugOverlay = showDebugOverlay
+        self.displayMissingTags = displayMissingTags
         self.viewConfiguration = viewConfiguration.wrapped
-        galleryConfiguration = .init(
-            logId: "test",
-            viewConfiguration: viewConfiguration.wrapped,
-            observerModeResolver: nil,
-            tagResolver: ["TEST_TAG": "Adapty"],
-            timerResolver: nil,
-            assetsResolver: assetsResolver
+        // @StateObject so the configuration (and its JS state) survives
+        // parent body recomputes. Use `.id(...)` at the call site to force a
+        // fresh configuration when the bundle changes.
+        let previewProducts = viewConfiguration.previewProducts
+        let wrapped = viewConfiguration.wrapped
+        _galleryConfiguration = StateObject(
+            wrappedValue: AdaptyUI.Dev_GalleryPreviewConfiguration(
+                logId: "test",
+                viewConfiguration: wrapped,
+                previewProducts: previewProducts,
+                observerModeResolver: nil,
+                tagResolver: ["TEST_TAG": "Adapty"],
+                timerResolver: nil,
+                assetsResolver: assetsResolver,
+                systemRequestsHandler: systemRequestsHandler,
+                rtlOverride: rtlOverride
+            )
         )
+
+        self.didAppear = didAppear
+        self.didDisappear = didDisappear
+        self.didPerformAction = didPerformAction
+        self.didSelectProduct = didSelectProduct
+        self.didStartPurchase = didStartPurchase
+        self.didFinishPurchase = didFinishPurchase
+        self.didStartRestore = didStartRestore
+        self.didFinishRestore = didFinishRestore
+        self.didReceiveError = didReceiveError
+        self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
     }
 
     public var body: some View {
-        AdaptyUIElementView(viewConfiguration.screen.content)
-            .environmentObject(galleryConfiguration.eventsHandler)
-            .environmentObject(galleryConfiguration.paywallViewModel)
-            .environmentObject(galleryConfiguration.actionsViewModel)
-            .environmentObject(galleryConfiguration.sectionsViewModel)
-            .environmentObject(galleryConfiguration.productsViewModel)
-            .environmentObject(galleryConfiguration.tagResolverViewModel)
-            .environmentObject(galleryConfiguration.timerViewModel)
-            .environmentObject(galleryConfiguration.screensViewModel)
-            .environmentObject(galleryConfiguration.assetsViewModel)
-            .environment(\.layoutDirection, viewConfiguration.isRightToLeft ? .rightToLeft : .leftToRight)
+        galleryConfiguration.eventsHandler.didAppear = didAppear
+        galleryConfiguration.eventsHandler.didDisappear = didDisappear
+        galleryConfiguration.eventsHandler.didPerformAction = didPerformAction
+        galleryConfiguration.eventsHandler.didSelectProduct = { [didSelectProduct] product in
+            didSelectProduct(product.flowId)
+        }
+        galleryConfiguration.eventsHandler.didStartPurchase = { [didStartPurchase] product in
+            didStartPurchase(product.flowId)
+        }
+        galleryConfiguration.eventsHandler.didFinishPurchase = { [didFinishPurchase] product, result in
+            didFinishPurchase(product.flowId, result.rawValue)
+        }
+        galleryConfiguration.eventsHandler.didStartRestore = didStartRestore
+        galleryConfiguration.eventsHandler.didFinishRestore = { [didFinishRestore] result in
+            didFinishRestore(result.rawValue)
+        }
+        galleryConfiguration.eventsHandler.didReceiveError = didReceiveError
+        galleryConfiguration.eventsHandler.didReceiveAnalyticEvent = didReceiveAnalyticEvent
+
+        return AdaptyUIPaywallView_Internal(
+            showDebugOverlay: showDebugOverlay,
+            displayMissingTags: displayMissingTags,
+            safeAreaOverride: safeAreaOverride
+        )
+        .environmentObjects(
+            stateViewModel: galleryConfiguration.stateViewModel,
+            flowViewModel: galleryConfiguration.flowViewModel,
+            productsViewModel: galleryConfiguration.productsViewModel,
+            tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
+            timerViewModel: galleryConfiguration.timerViewModel,
+            screensViewModel: galleryConfiguration.screensViewModel,
+            assetsViewModel: galleryConfiguration.assetsViewModel
+        )
     }
 }
 

@@ -29,11 +29,17 @@ struct SendEventsRequest: BackendEncodableRequest {
 
     private enum Constants {
         static let prefix = [
-            "{", Backend.CodingKeys.data.stringValue,
-            ":{", Backend.CodingKeys.type.stringValue,
-            ":", "sdk_background_event",
-            ",", Backend.CodingKeys.attributes.stringValue,
-            ":{", CodingKeys.events.stringValue, ":[",
+            "{",
+            Backend.CodingKeys.data.stringValue,
+            ":{",
+            Backend.CodingKeys.type.stringValue,
+            ":",
+            "sdk_background_event",
+            ",",
+            Backend.CodingKeys.attributes.stringValue,
+            ":{",
+            CodingKeys.events.stringValue,
+            ":[",
         ].joined(separator: "\"").data(using: .utf8)!
 
         static let separator = ",".data(using: .utf8)!

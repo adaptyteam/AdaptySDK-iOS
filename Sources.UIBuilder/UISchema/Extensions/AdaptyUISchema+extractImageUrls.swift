@@ -1,5 +1,5 @@
 //
-//  AdaptyUISchema+ImageUrls.swift
+//  AdaptyUISchema+extractImageUrls.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 06.03.2024
@@ -8,9 +8,9 @@
 import Foundation
 
 package extension AdaptyUISchema {
-    func extractImageUrls(forLocalId localeId: LocaleId) -> Set<URL> {
+    func extractImageUrls(forLocalId localeId: LocaleId?) -> Set<URL> {
         let assets: [String: Asset] =
-            if let localAssets = localization(by: localeId)?.assets {
+            if let localeId, let localAssets = localization(by: localeId)?.assets {
                 localAssets.merging(self.assets, uniquingKeysWith: { current, _ in current })
             } else {
                 self.assets
@@ -18,9 +18,9 @@ package extension AdaptyUISchema {
 
         return Set(assets.values.compactMap {
             switch $0 {
-            case let .image(image):
+            case let .asset(.image(image)):
                 image.url
-            case let .video(video):
+            case let .asset(.video(video)):
                 video.image.url
             default:
                 nil

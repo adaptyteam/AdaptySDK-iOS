@@ -13,7 +13,7 @@ struct RegistrationInstallResponse: Sendable, Hashable, Identifiable {
 }
 
 extension RegistrationInstallResponse: CustomStringConvertible {
-    public var description: String {
+    var description: String {
         "(id: \(id), payload: \(payload?.jsonString ?? "nil")"
     }
 }

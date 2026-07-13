@@ -8,6 +8,10 @@
 import Foundation
 
 public enum AdaptyUIBuilderError: Error {
-    case unsupportedTemplate(String)
     case wrongComponentType(String)
+    case wrongAssetType(String)
+    case jsException(String)
+    case navigatorNotFound(String)
+    case invalidActionURL(String)
+    case unsupportedURLScheme(String)
 }

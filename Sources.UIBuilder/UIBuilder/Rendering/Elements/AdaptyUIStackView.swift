@@ -9,15 +9,19 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
-struct AdaptyUIStackView: View {
+struct AdaptyUIStackView<ScreenHolderContent: View>: View {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
 
-    private var stack: VC.Stack
+    private let stack: VC.Stack
+    private let screenHolderBuilder: () -> ScreenHolderContent
 
-    init(_ stack: VC.Stack) {
+    init(
+        _ stack: VC.Stack,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
+    ) {
         self.stack = stack
+        self.screenHolderBuilder = screenHolderBuilder
     }
 
     var body: some View {
@@ -26,15 +30,11 @@ struct AdaptyUIStackView: View {
             VStack(alignment: stack.horizontalAlignment.swiftuiValue(with: layoutDirection),
                    spacing: stack.spacing)
             {
-                ForEach(0 ..< stack.content.count, id: \.self) {
-                    AdaptyUIElementView(stack.content[$0])
-                }
+                stackItems(usesFirstElementOnly: false)
             }
         case .horizontal:
             HStack(alignment: stack.verticalAlignment.swiftuiValue, spacing: stack.spacing) {
-                ForEach(0 ..< stack.content.count, id: \.self) {
-                    AdaptyUIElementView(stack.content[$0])
-                }
+                stackItems(usesFirstElementOnly: true)
             }
         case .z:
             ZStack(
@@ -43,9 +43,25 @@ struct AdaptyUIStackView: View {
                     vertical: stack.verticalAlignment.swiftuiValue
                 )
             ) {
-                ForEach(0 ..< stack.content.count, id: \.self) {
-                    AdaptyUIElementView(stack.content[$0])
+                stackItems(usesFirstElementOnly: true)
+            }
+        }
+    }
+
+    private func stackItems(usesFirstElementOnly: Bool) -> some View {
+        ForEach(0 ..< stack.items.count, id: \.self) { idx in
+            switch stack.items[idx] {
+            case let .space(count):
+                if count > 0 {
+                    ForEach(0 ..< count, id: \.self) { _ in
+                        Spacer()
+                    }
                 }
+            case let .element(element):
+                AdaptyUIElementView(
+                    element,
+                    screenHolderBuilder: screenHolderBuilder
+                )
             }
         }
     }

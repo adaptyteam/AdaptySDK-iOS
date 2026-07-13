@@ -37,9 +37,6 @@ public extension AdaptyProfile {
 
         /// `true` if the product is consumable (should only be processed once).
         public let isConsumable: Bool
-
-        @available(*, deprecated, renamed: "isConsumable")
-        public var isOneTime: Bool { isConsumable }
     }
 }
 

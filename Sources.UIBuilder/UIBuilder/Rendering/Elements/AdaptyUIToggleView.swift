@@ -9,19 +9,16 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 struct AdaptyUIToggleView: View {
-    @Environment(\.adaptyScreenId)
-    private var screenId: String
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
+    @Environment(\.adaptyScreenInstance)
+    private var screen: VS.ScreenInstance
 
-    @EnvironmentObject var paywallViewModel: AdaptyUIPaywallViewModel
-    @EnvironmentObject var productsViewModel: AdaptyUIProductsViewModel
-    @EnvironmentObject var actionsViewModel: AdaptyUIActionsViewModel
-    @EnvironmentObject var sectionsViewModel: AdaptyUISectionsViewModel
-    @EnvironmentObject var screensViewModel: AdaptyUIScreensViewModel
-    @EnvironmentObject var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyUIAssetsViewModel
 
     private var toggle: VC.Toggle
 
@@ -30,30 +27,21 @@ struct AdaptyUIToggleView: View {
     }
 
     var body: some View {
-        Toggle(isOn: .init(get: {
-            switch toggle.onCondition {
-            case let .selectedSection(sectionId, sectionIndex):
-                sectionIndex == sectionsViewModel.selectedIndex(for: sectionId)
-            default: false
-            }
-        }, set: { value in
-            (value ? toggle.onActions : toggle.offActions)
-                .fire(
-                    screenId: screenId,
-                    paywallViewModel: paywallViewModel,
-                    productsViewModel: productsViewModel,
-                    actionsViewModel: actionsViewModel,
-                    sectionsViewModel: sectionsViewModel,
-                    screensViewModel: screensViewModel
-                )
-        })) {
+        Toggle(
+            isOn: stateViewModel.createBinding(
+                toggle.value,
+                defaultValue: false,
+                screen: screen
+            )
+        ) {
             EmptyView()
         }
         .tint(
-            toggle.color?.resolve(
-                with: assetsViewModel.assetsResolver,
-                colorScheme: colorScheme
-            )
+            assetsViewModel.resolvedAsset(
+                toggle.color,
+                mode: colorScheme.toVCMode,
+                screen: screen
+            ).asColorAsset
         )
     }
 }

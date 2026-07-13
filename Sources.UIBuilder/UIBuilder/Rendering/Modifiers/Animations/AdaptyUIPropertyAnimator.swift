@@ -9,8 +9,21 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 extension VC.Animation.Timeline {
+    // Native SwiftUI `repeatCount` snaps the property to the target value after the
+    // last segment. For finite ping-pong that produces a visible jump to `end` instead
+    // of resting on `start`, so we only allow native repeat where it lands correctly:
+    // any normal loop without per-iteration gaps, or an infinite ping-pong where the
+    // snap is never observed.
+    fileprivate var canUseNativeRepeat: Bool {
+        guard loopDelay == 0, !interpolator.usesCustomCurve else { return false }
+        switch loop {
+        case .pingPong: return loopCount == nil && pingPongDelay == 0
+        case .normal: return true
+        case .none: return false
+        }
+    }
+
     @MainActor
     func animate<Value>(
         from start: Value,
@@ -18,26 +31,50 @@ extension VC.Animation.Timeline {
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
         switch loop {
-        case .normal: // reset value and repeat
-            AdaptyUIPropertyAnimator.animateBasicLoop(
-                token: nil,
-                timeline: self,
-                startDelay: startDelay,
-                loopCount: loopCount,
-                from: start,
-                to: end,
-                updateBlock: updateBlock
-            )
-        case .pingPong: // animate back and repeat
-            AdaptyUIPropertyAnimator.animatePingPongLoop(
-                token: nil,
-                timeline: self,
-                startDelay: startDelay,
-                loopCount: loopCount,
-                from: start,
-                to: end,
-                updateBlock: updateBlock
-            )
+        case .normal:
+            if canUseNativeRepeat {
+                AdaptyUIPropertyAnimator.animateWithNativeRepeat(
+                    timeline: self,
+                    startDelay: startDelay,
+                    loopCount: loopCount,
+                    autoreverses: false,
+                    from: start,
+                    to: end,
+                    updateBlock: updateBlock
+                )
+            } else {
+                AdaptyUIPropertyAnimator.animateBasicLoop(
+                    token: nil,
+                    timeline: self,
+                    startDelay: startDelay,
+                    loopCount: loopCount,
+                    from: start,
+                    to: end,
+                    updateBlock: updateBlock
+                )
+            }
+        case .pingPong:
+            if canUseNativeRepeat {
+                AdaptyUIPropertyAnimator.animateWithNativeRepeat(
+                    timeline: self,
+                    startDelay: startDelay,
+                    loopCount: nil,
+                    autoreverses: true,
+                    from: start,
+                    to: end,
+                    updateBlock: updateBlock
+                )
+            } else {
+                AdaptyUIPropertyAnimator.animatePingPongLoop(
+                    token: nil,
+                    timeline: self,
+                    startDelay: startDelay,
+                    loopCount: loopCount,
+                    from: start,
+                    to: end,
+                    updateBlock: updateBlock
+                )
+            }
         default: // no repeat
             AdaptyUIPropertyAnimator.animateOnce(
                 token: nil,
@@ -73,9 +110,9 @@ extension VC.Animation.Timeline {
             onBeforeAnimation?()
 
             if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
-                try withAnimation(animation, body, completion: { completion(token) })
+                withAnimation(animation, body, completion: { completion(token) })
             } else {
-                try withAnimation(animation, body)
+                withAnimation(animation, body)
                 try await Task.sleep(seconds: duration)
                 completion(token)
             }
@@ -106,9 +143,9 @@ extension AdaptyUIAnimationToken {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 enum AdaptyUIPropertyAnimator {
+    @discardableResult
     static func animatePingPongLoop<Value>(
         token: AdaptyUIAnimationToken?,
         timeline: VC.Animation.Timeline,
@@ -118,7 +155,6 @@ enum AdaptyUIPropertyAnimator {
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        let duration = timeline.duration
         let loopDelay = timeline.loopDelay
         let pingPongDelay = timeline.pingPongDelay
 
@@ -161,6 +197,7 @@ enum AdaptyUIPropertyAnimator {
         )
     }
 
+    @discardableResult
     static func animateBasicLoop<Value>(
         token: AdaptyUIAnimationToken?,
         timeline: VC.Animation.Timeline,
@@ -170,9 +207,7 @@ enum AdaptyUIPropertyAnimator {
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        let duration = timeline.duration
-
-        return timeline.withAsyncAnimation(
+        timeline.withAsyncAnimation(
             token: token,
             delay: startDelay,
             onBeforeAnimation: { updateBlock(start) },
@@ -201,6 +236,62 @@ enum AdaptyUIPropertyAnimator {
                 }
             }
         )
+    }
+
+    @discardableResult
+    static func animateWithNativeRepeat<Value>(
+        timeline: VC.Animation.Timeline,
+        startDelay: TimeInterval,
+        loopCount: Int?,
+        autoreverses: Bool,
+        from start: Value,
+        to end: Value,
+        updateBlock: @escaping (Value) -> Void
+    ) -> AdaptyUIAnimationToken {
+        let token = AdaptyUIAnimationToken.create()
+        let baseAnimation = timeline.interpolator.createAnimation(duration: timeline.duration)
+
+        let animation: Animation
+        if let loopCount {
+            let count = autoreverses ? loopCount * 2 : loopCount
+            animation = baseAnimation.repeatCount(count, autoreverses: autoreverses)
+        } else {
+            animation = baseAnimation.repeatForever(autoreverses: autoreverses)
+        }
+
+        Task { @MainActor in
+            if startDelay > 0 {
+                try await Task.sleep(seconds: startDelay)
+                guard token.isActive else { return }
+            }
+
+            updateBlock(start)
+
+            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) {
+                if loopCount != nil {
+                    withAnimation(animation) {
+                        updateBlock(end)
+                    } completion: {
+                        token.invalidate()
+                    }
+                } else {
+                    withAnimation(animation) {
+                        updateBlock(end)
+                    }
+                }
+            } else {
+                withAnimation(animation) {
+                    updateBlock(end)
+                }
+                if let loopCount {
+                    let totalSegments = autoreverses ? loopCount * 2 : loopCount
+                    try await Task.sleep(seconds: timeline.duration * Double(totalSegments))
+                    token.invalidate()
+                }
+            }
+        }
+
+        return token
     }
 
     static func animateOnce<Value>(

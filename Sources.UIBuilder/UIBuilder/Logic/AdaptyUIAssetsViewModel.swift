@@ -7,52 +7,165 @@
 
 #if canImport(UIKit)
 
+import Combine
+import SwiftUI
 import UIKit
 
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, visionOS 1.0, *)
 @MainActor
 package class AdaptyUIAssetsViewModel: ObservableObject {
+    let logId: String
     let assetsResolver: AdaptyUIAssetsResolver
+    let cache: AdaptyUIAssetsCache
+    let stateHolder: AdaptyUIStateHolder
+
+    private var cancellables = Set<AnyCancellable>()
 
     package init(
-        assetsResolver: AdaptyUIAssetsResolver
+        logId: String,
+        assetsResolver: AdaptyUIAssetsResolver,
+        stateHolder: AdaptyUIStateHolder
     ) {
+        self.logId = logId
         self.assetsResolver = assetsResolver
+        self.stateHolder = stateHolder
+        cache = AdaptyUIAssetsCache(
+            state: stateHolder.state,
+            customAssetsResolver: assetsResolver
+        )
+
+        stateHolder.state.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
 
-    @Published var playerStates = [String: AdaptyUIVideoPlayerManager.PlayerState]()
-    @Published var playerManagers = [String: AdaptyUIVideoPlayerManager]()
+    func resolvedAsset(
+        _ ref: AdaptyUIConfiguration.AssetReference?,
+        mode: VC.Mode,
+        screen: VS.ScreenInstance
+    ) -> AdaptyUICachedAsset {
+        cache.cachedAsset(ref, mode: mode, screen: screen)
+    }
+
+    // MARK: - Strings Assets Logic
+
+    enum ProductInfoContainer {
+        case notApplicable
+        case notFound
+        case found(ProductResolver)
+    }
+
+    func resolvedText(
+        _ ref: VC.StringReference,
+        screen: VS.ScreenInstance,
+        productsInfoProvider: ProductsInfoProvider?
+    ) -> (
+        richText: VC.RichText,
+        tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
+        productInfo: ProductInfoContainer
+    ) {
+        switch ref {
+        case let .stringId(stringId, tagValues):
+            let text = try? stateHolder.state.richText(stringId)
+            return (
+                richText: text ?? .empty,
+                tagValues: tagValues,
+                productInfo: .notApplicable
+            )
+        case let .variable(variable):
+            if let stringId = try? stateHolder.state.getValue(
+                String.self,
+                variable: variable,
+                screenInstance: screen
+            ) {
+                let text = try? stateHolder.state.richText(stringId)
+                return (
+                    richText: text ?? .empty,
+                    tagValues: nil,
+                    productInfo: .notApplicable
+                )
+            } else {
+                return (
+                    richText: .empty,
+                    tagValues: nil,
+                    productInfo: .notApplicable
+                )
+            }
+        case let .product(product):
+            switch product {
+            case let .id(productId, sufix):
+                let productResolver = productsInfoProvider?.productInfo(by: productId)
+                let text = try? stateHolder.state.richText(
+                    adaptyProductId: productId,
+                    byPaymentMode: productResolver?.paymentMode,
+                    suffix: sufix
+                )
+                return (
+                    richText: text ?? .empty,
+                    tagValues: nil,
+                    productInfo: productResolver.map { .found($0) } ?? .notFound
+                )
+            case let .variable(variable, sufix):
+                guard let productId = try? stateHolder.state.getValue(
+                    String.self,
+                    variable: variable,
+                    screenInstance: screen
+                ) else {
+                    let text = try? stateHolder.state.richTextForNonSelectedProduct(suffix: sufix)
+                    return (
+                        richText: text ?? .empty,
+                        tagValues: nil,
+                        productInfo: .notApplicable
+                    )
+                }
+
+                let productResolver = productsInfoProvider?.productInfo(by: productId)
+                let text = try? stateHolder.state.richText(
+                    adaptyProductId: productId,
+                    byPaymentMode: productResolver?.paymentMode,
+                    suffix: sufix
+                )
+                return (
+                    richText: text ?? .empty,
+                    tagValues: nil,
+                    productInfo: productResolver.map { .found($0) } ?? .notFound
+                )
+            }
+        }
+    }
+
+    // MARK: - Video Player Logic
+
+    private var playerManagers = [String: AdaptyUIVideoPlayerManager]()
+
+    package func prepareForReuse() {
+        Log.ui.verbose("#\(logId)# prepareForReuse")
+        playerManagers.removeAll()
+    }
 
     func getOrCreatePlayerManager(
-        for video: VC.VideoData,
+        for video: AdaptyUIResolvedVideoAsset,
+        assetRef: VC.AssetReference,
         loop: Bool,
-        id: String
+        onPlayToEnd: (() -> Void)?
     ) -> AdaptyUIVideoPlayerManager {
-        if let manager = playerManagers[id] {
+        if let manager = playerManagers[video.id] {
+            manager.onPlayToEnd = onPlayToEnd
             return manager
         }
 
         let manager = AdaptyUIVideoPlayerManager(
-            video: video,
-            loop: loop,
-            assetsResolver: assetsResolver
-        ) { [weak self] state in
-            DispatchQueue.main.async { [weak self] in
-                self?.playerStates[id] = state
-            }
-        }
+            asset: video.asset,
+            loop: loop
+        )
+        manager.onPlayToEnd = onPlayToEnd
 
-        DispatchQueue.main.async { [weak self] in
-            self?.playerManagers[id] = manager
-            self?.playerStates[id] = .loading
-        }
+        playerManagers[video.id] = manager
 
         return manager
-    }
-
-    func dismissPlayerManager(id: String) {
-        playerManagers.removeValue(forKey: id)
     }
 }
 
 #endif
+

@@ -10,7 +10,10 @@ import Foundation
 public struct AdaptyRemoteConfig: Sendable {
     let adaptyLocale: AdaptyLocale
 
-    public var locale: String { adaptyLocale.id }
+    public var locale: String {
+        adaptyLocale.id
+    }
+
     /// A custom JSON string configured in Adapty Dashboard for this paywall.
     public let jsonString: String
     /// A custom dictionary configured in Adapty Dashboard for this paywall (same as `jsonString`)
@@ -38,5 +41,11 @@ extension AdaptyRemoteConfig: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         adaptyLocale = try container.decode(AdaptyLocale.self, forKey: .adaptyLocale)
         jsonString = try container.decode(String.self, forKey: .jsonString)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(adaptyLocale, forKey: .adaptyLocale)
+        try container.encode(jsonString, forKey: .jsonString)
     }
 }

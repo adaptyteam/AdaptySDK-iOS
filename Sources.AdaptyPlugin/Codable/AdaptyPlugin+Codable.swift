@@ -13,7 +13,6 @@ public extension AdaptyPlugin {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .formatted(Backend.inUTCDateFormatter)
         encoder.dataEncodingStrategy = .base64
-        encoder.userInfo.enableEncodingViewConfiguration()
         return encoder
     }()
 

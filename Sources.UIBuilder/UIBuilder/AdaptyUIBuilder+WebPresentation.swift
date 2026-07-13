@@ -9,7 +9,7 @@
 
 import Foundation
 
-extension VC.WebOpenInParameter {
+extension VC.Action.WebOpenInParameter {
     var toWebPresentation: AdaptyUIBuilder.WebPresentation {
         switch self {
         case .browserOutApp: .externalBrowser

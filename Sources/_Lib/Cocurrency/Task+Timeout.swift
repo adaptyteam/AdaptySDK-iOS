@@ -10,7 +10,7 @@ import Foundation
 func withThrowingTimeout<T: Sendable>(
     _ timeout: TaskDuration,
     operation: sending @escaping @isolated(any) () async throws -> T,
-    isolation: isolated (any Actor)? = #isolation
+    isolation _: isolated (any Actor)? = #isolation
 ) async throws -> T {
     let task = Task(operation: operation)
 

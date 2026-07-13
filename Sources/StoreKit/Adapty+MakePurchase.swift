@@ -44,28 +44,6 @@ public extension Adapty {
         }
     }
 
-    /// To make the purchase, you have to call this method.
-    ///
-    /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases)
-    ///
-    /// - Parameters:
-    ///   - product: a ``AdaptyDeferredProduct`` object retrieved from the delegate.
-    /// - Returns: The ``AdaptyPurchaseResult`` object.
-    /// - Throws: An ``AdaptyError`` object
-    nonisolated static func makePurchase(
-        product: AdaptyDeferredProduct
-    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        try await withActivatedSDK(
-            methodName: .makePurchase,
-            logParams: [
-                "product_id": product.vendorProductId,
-            ]
-        ) { sdk throws(AdaptyError) in
-            guard let manager = sdk.sk1QueueManager else { throw .cantMakePayments() }
-            return try await manager.makePurchase(product: product)
-        }
-    }
-
     /// To restore purchases, you have to call this method.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)

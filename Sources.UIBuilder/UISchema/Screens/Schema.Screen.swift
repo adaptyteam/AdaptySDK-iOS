@@ -1,0 +1,169 @@
+//
+//  Schema.Screen.swift
+//  AdaptyUIBuilder
+//
+//  Created by Aleksei Valiano on 28.03.2024
+//
+
+import Foundation
+
+extension Schema {
+    struct Screen: Sendable {
+        let id: String
+        let layoutBehaviour: LayoutBehaviour
+        let cover: Box?
+        let content: Element
+        let footer: Element?
+        let background: [AlignedElement]?
+        let overlay: [AlignedElement]?
+        let screenActions: ScreenActions
+
+        let contentScrollValue: Variable?
+        let footerScrollValue: Variable?
+    }
+}
+
+extension Schema.ConfigurationBuilder {
+    @inlinable
+    func convertScreen(_ from: Schema.Screen) throws(Schema.Error) -> VC.Screen {
+        var taskStack: TasksStack = []
+        if let boxContent = from.cover?.content {
+            taskStack.append(.planElement(boxContent))
+        }
+        taskStack.append(.planElement(from.content))
+        if let footer = from.footer {
+            taskStack.append(.planElement(footer))
+        }
+
+        if let array = from.background {
+            for overlay in array.reversed() {
+                taskStack.append(.planElement(overlay.content))
+            }
+        }
+
+        if let array = from.overlay {
+            for overlay in array.reversed() {
+                taskStack.append(.planElement(overlay.content))
+            }
+        }
+        var result = try startTasks(&taskStack)
+        return try buildScreen(from, &result)
+    }
+
+    private func buildScreen(
+        _ from: Schema.Screen,
+        _ result: inout BuildResult
+    ) throws(Schema.Error) -> VC.Screen {
+        var elementIndices = result.elementIndices
+
+        var cover: VC.Box?
+        if let box = from.cover {
+            cover = try buildBox(box, &elementIndices)
+        }
+        let content = try elementIndices.pop()
+        let footer = try elementIndices.pop(from.footer != nil)
+
+        var background: [VC.AlignedElement]?
+        if let from = from.background, from.isNotEmpty {
+            background = try convertAlignedElements(
+                from,
+                elementIndices.pop(from.count)
+            )
+            if background.isEmpty {
+                background = nil
+            }
+        }
+
+        var overlay: [VC.AlignedElement]?
+        if let from = from.overlay, from.isNotEmpty {
+            overlay = try convertAlignedElements(
+                from,
+                elementIndices.pop(from.count)
+            )
+            if overlay.isEmpty {
+                overlay = nil
+            }
+        }
+
+        return .init(
+            id: from.id,
+            poolElements: result.poolElements,
+            layoutBehaviour: from.layoutBehaviour,
+            cover: cover,
+            content: content,
+            footer: footer,
+            background: background,
+            overlay: overlay,
+            screenActions: from.screenActions,
+            contentScrollValue: from.contentScrollValue,
+            footerScrollValue: from.footerScrollValue
+        )
+    }
+}
+
+extension Schema.Screen: DecodableWithConfiguration {
+    enum CodingKeys: String, CodingKey {
+        case layoutBehaviour = "layout_behaviour"
+        case cover
+        case content
+        case footer
+        case background
+        case overlay
+
+        case contentScrollValue = "content_scroll_value"
+        case footerScrollValue = "footer_scroll_value"
+    }
+
+    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        let layoutBehaviour =
+            if let value = configuration.screenLayoutBehaviourFromLegacy {
+                value
+            } else {
+                try container.decodeIfPresent(LayoutBehaviour.self, forKey: .layoutBehaviour) ?? .default
+            }
+
+        let screenId =
+            if let value = configuration.insideScreenId {
+                value
+            } else {
+                throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Unknown screen id"))
+            }
+
+        let background: [Schema.AlignedElement]? =
+            if configuration.isLegacy {
+                nil
+            } else {
+                try container.decodeIfExist([Schema.AlignedElement].self, forKey: .background, configuration: configuration)
+            }
+
+        let overlay: [Schema.AlignedElement]? =
+            if configuration.isLegacy {
+                if let one = try container.decodeIfExist(Schema.Element.self, forKey: .overlay, configuration: configuration) {
+                    [Schema.AlignedElement(
+                        horizontalAlignment: Schema.AlignedElement.default.horizontalAlignment,
+                        verticalAlignment: Schema.AlignedElement.default.verticalAlignment,
+                        content: one
+                    )]
+                } else {
+                    nil
+                }
+            } else {
+                try container.decodeIfExist([Schema.AlignedElement].self, forKey: .overlay, configuration: configuration)
+            }
+
+        try self.init(
+            id: screenId,
+            layoutBehaviour: layoutBehaviour,
+            cover: layoutBehaviour == .hero ? container.decodeIfExist(Schema.Box.self, forKey: .cover, configuration: configuration) : nil,
+            content: container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
+            footer: layoutBehaviour != .default ? container.decodeIfExist(Schema.Element.self, forKey: .footer, configuration: configuration) : nil,
+            background: background,
+            overlay: overlay,
+            screenActions: Schema.ScreenActions(from: decoder),
+            contentScrollValue: container.decodeIfPresent(Schema.Variable.self, forKey: .contentScrollValue),
+            footerScrollValue: container.decodeIfPresent(Schema.Variable.self, forKey: .footerScrollValue)
+        )
+    }
+}
