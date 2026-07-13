@@ -31,6 +31,8 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "Navigator with ID '\(navigatorId)' was not found in the view configuration. Please contact support."
         case let .invalidActionURL(stringId):
             "Could not resolve a valid URL for the open-url action's string ID '\(stringId)'. Please contact support."
+        case let .unsupportedURLScheme(url):
+            "The open-url action requested the in-app browser for URL '\(url)', whose scheme is not supported. Only http and https can open in the in-app browser; use the external browser for schemes like mailto, tel or sms."
         }
     }
 
@@ -56,6 +58,8 @@ extension AdaptyUIError: CustomDebugStringConvertible, CustomStringConvertible {
             "AdaptyUIError.navigatorNotFound (Code: 4106): Navigator with ID '\(navigatorId)' was not found in the view configuration, and no 'default' navigator is available as a fallback. This typically indicates a template structure issue or a script referencing a navigator that does not exist. Please contact support."
         case let .invalidActionURL(stringId):
             "AdaptyUIError.invalidActionURL (Code: 4107): An open-url action referenced string ID '\(stringId)', which did not resolve to a parseable URL (the string is missing, empty, or not a valid URL). This typically indicates a template content issue or a script/runtime mismatch. Please contact support."
+        case let .unsupportedURLScheme(url):
+            "AdaptyUIError.unsupportedURLScheme (Code: 4108): An open-url action requested the in-app browser (browser_in_app) for URL '\(url)', whose scheme is not http or https. SFSafariViewController supports only http/https and raises an uncatchable NSInvalidArgumentException for other schemes (mailto, tel, sms, …), so the SDK reports this error instead of opening. Use the external browser (browser_out_app) for such schemes."
         }
     }
 }

@@ -66,14 +66,24 @@ final class AdaptyUIEventBus: ObservableObject {
     }
 
     /// Returns pending events matching the given context, newer than afterSequence.
+    ///
+    /// - Parameter includeCustom: when `false`, transient `.custom` events are
+    ///   filtered out. Consumers pass `false` on their "arming" paths (first
+    ///   mount / section-index re-arm), where only sticky lifecycle events
+    ///   should be replayed. A `.custom` event still buffered at that point was
+    ///   published while a different subtree was mounted and must not be
+    ///   replayed to one that mounts afterward — its eviction is merely deferred
+    ///   to the next `publish()`. See SDK-1088 (bottom-sheet overlay re-show).
     func consumePending(
         afterSequence: UInt,
         screenInstanceId: String?,
-        currentTopScreenInstanceId: String?
+        currentTopScreenInstanceId: String?,
+        includeCustom: Bool = true
     ) -> [Event] {
         pendingEvents.filter { event in
-            event.sequence > afterSequence
-                && matchesScope(event, screenInstanceId: screenInstanceId, currentTopScreenInstanceId: currentTopScreenInstanceId)
+            guard event.sequence > afterSequence else { return false }
+            if !includeCustom, case .custom = event.eventId { return false }
+            return matchesScope(event, screenInstanceId: screenInstanceId, currentTopScreenInstanceId: currentTopScreenInstanceId)
         }
     }
 

@@ -67,8 +67,39 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
         Double(navigator.order)
     }
 
-    var initialBackground: VC.AssetReference? {
-        appearTransition?.background?.initialBackground ?? navigator.background
+    /// True once this navigator's appear transition has completed. Held on the
+    /// view model so it survives SwiftUI view remounts, unlike the transient
+    /// `@State` animation values in the render layer. When a navigator is
+    /// presented again from a reused `FlowConfiguration` — e.g. a persisted
+    /// bottom sheet shown on a repeat flow present — the render layer remounts
+    /// and its one-shot appear animation is already spent; without this flag it
+    /// would re-seed the pre-appear (off-screen / transparent) state and render
+    /// the navigator hidden even though it is logically presented. See SDK-1088.
+    private(set) var hasAppeared = false
+
+    /// Background to seed the navigator's background view with when no
+    /// background animation is mid-flight: the appear transition's initial
+    /// (pre-appear) value until the navigator has appeared, its settled
+    /// (post-appear) value afterwards.
+    var backgroundSeed: VC.AssetReference? {
+        if hasAppeared {
+            return appearTransition?.background?.range.end ?? navigator.background
+        }
+        return appearTransition?.background?.initialBackground ?? navigator.background
+    }
+
+    /// Initial content opacity for the appear transition, collapsing to the
+    /// resting value once the navigator has appeared so a remount does not
+    /// re-seed the pre-appear (transparent) state.
+    var contentSeedOpacity: Double {
+        hasAppeared ? 1.0 : (appearTransition?.initialContentOpacity ?? 1.0)
+    }
+
+    /// Initial content offset for the appear transition, collapsing to the
+    /// resting value once the navigator has appeared so a remount does not
+    /// re-seed the pre-appear (off-screen) state.
+    var contentSeedOffset: VC.Offset {
+        hasAppeared ? .zero : (appearTransition?.initialContentOffset ?? .zero)
     }
 
     var appearTransition: VC.Navigator.AppearanceTransition? {
@@ -267,6 +298,8 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             Log.ui.verbose("#\(logId)# navigator:\(navigator.id) - no transition found")
             completion?()
 
+            hasAppeared = true
+
             // Defer onDidAppear to AdaptyScreenView's .onAppear (see
             // startScreenTransition for the rationale).
             if let screen = screens.first {
@@ -302,6 +335,7 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
 
             self.backgroundAnimation = nil
             self.contentAnimations = nil
+            self.hasAppeared = true
 
             completion?()
 

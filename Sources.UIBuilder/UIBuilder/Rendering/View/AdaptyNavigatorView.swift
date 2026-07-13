@@ -107,7 +107,7 @@ struct AdaptyNavigatorView: View {
     var body: some View {
         ZStack {
             AdaptyUIAnimatedBackgroundView(
-                initialBackground: navigatorViewModel.initialBackground,
+                initialBackground: navigatorViewModel.backgroundSeed,
                 defaultColor: .defaultNavigatorColor
             )
             .onTapGesture {
@@ -150,8 +150,8 @@ struct AdaptyNavigatorView: View {
             .withElementPool(navigatorViewModel.navigator.poolElements)
             .animatablePropertiesTransition(
                 play: $contentAnimations,
-                initialOpacity: navigatorViewModel.appearTransition?.initialContentOpacity ?? 1.0,
-                initialOffset: navigatorViewModel.appearTransition?.initialContentOffset ?? .zero
+                initialOpacity: navigatorViewModel.contentSeedOpacity,
+                initialOffset: navigatorViewModel.contentSeedOffset
             )
             .overrideOpenUrl { url in
                 stateViewModel.handle(

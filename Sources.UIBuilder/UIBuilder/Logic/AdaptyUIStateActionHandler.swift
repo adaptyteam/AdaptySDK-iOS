@@ -126,7 +126,12 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         openIn: VC.Action.WebOpenInParameter
     ) {
         Task { @MainActor [weak self] in
-            self?.logic.reportDidPerformAction(.openURL(url: url, in: openIn.toWebPresentation))
+            guard let self else { return }
+            if case .browserInApp = openIn, !url.isWebLink {
+                self.logic.reportDidReceiveError(.unsupportedURLScheme(url.absoluteString))
+                return
+            }
+            self.logic.reportDidPerformAction(.openURL(url: url, in: openIn.toWebPresentation))
         }
     }
 
@@ -145,6 +150,11 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 let url = URL(string: str)
             else {
                 self?.logic.reportDidReceiveError(.invalidActionURL(stringId))
+                return
+            }
+
+            if case .browserInApp = openIn, !url.isWebLink {
+                self?.logic.reportDidReceiveError(.unsupportedURLScheme(url.absoluteString))
                 return
             }
 

@@ -188,9 +188,14 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             .modifier(ElementInteractionEnabledModifier(element.properties?.interactionEnabled))
             .modifier(DebugOverlayModifier())
             .onAppear {
-                consumeAndProcessPendingEvents(properties: element.properties)
+                // Arming path: only sticky lifecycle events should replay onto a
+                // freshly-mounted element — a lingering `.custom` event was not
+                // aimed at it (see consumePending(includeCustom:)).
+                consumeAndProcessPendingEvents(properties: element.properties, includeCustom: false)
             }
             .onChange(of: eventBus.revision) { _ in
+                // Live path: the element is already mounted; deliver everything
+                // published since it last processed, custom events included.
                 consumeAndProcessPendingEvents(properties: element.properties)
             }
             .onChange(of: elementIndex) { newIndex in
@@ -198,10 +203,12 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
                 // (same structural position, same View type), so .onAppear doesn't
                 // re-fire on the new content. Re-arm sticky lifecycle events for
                 // the new subtree by replaying pending events against the new
-                // element's properties.
+                // element's properties. This is an arming path too, so custom
+                // events published before the swap must not replay onto the new
+                // subtree (SDK-1088 bottom-sheet overlay re-show).
                 lastProcessedSequence = 0
                 if let element = elementPool[safe: newIndex] {
-                    consumeAndProcessPendingEvents(properties: element.properties)
+                    consumeAndProcessPendingEvents(properties: element.properties, includeCustom: false)
                 }
             }
         } else {
@@ -209,14 +216,18 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
         }
     }
 
-    private func consumeAndProcessPendingEvents(properties: VC.Element.Properties?) {
+    private func consumeAndProcessPendingEvents(
+        properties: VC.Element.Properties?,
+        includeCustom: Bool = true
+    ) {
         guard let properties,
               properties.eventHandlers.isNotEmpty else { return }
 
         let pending = eventBus.consumePending(
             afterSequence: lastProcessedSequence,
             screenInstanceId: screenInstanceId,
-            currentTopScreenInstanceId: navigatorViewModel.currentScreenInstanceIfSingle?.id
+            currentTopScreenInstanceId: navigatorViewModel.currentScreenInstanceIfSingle?.id,
+            includeCustom: includeCustom
         )
 
         guard !pending.isEmpty else { return }
