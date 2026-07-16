@@ -25,7 +25,15 @@ extension Schema {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             let device = configuration.device
 
-            var result = try container.decodeIfPresent(String.self, forKey: .platform).map { $0 == Schema.platform } ?? true
+            var result = true
+            if (try? container.decodeNil(forKey: .platform)) ?? true {
+                result = true
+            } else if let platform = try? container.decode(String.self, forKey: .platform) {
+                result = platform == Schema.platform
+            } else {
+                let platforms = try container.decode([String].self, forKey: .platform)
+                result = platforms.contains(Schema.platform)
+            }
 
             if result, let devices = try container.decodeIfPresent([String].self, forKey: .devices) {
                 result = devices.contains(device.rawValue)
@@ -47,3 +55,4 @@ extension Schema {
         }
     }
 }
+
