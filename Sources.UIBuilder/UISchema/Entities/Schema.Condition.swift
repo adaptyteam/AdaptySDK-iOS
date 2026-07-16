@@ -110,7 +110,7 @@ extension Schema.Condition: DecodableWithConfiguration {
                 result = Schema.formatVersion.isSameOrNewerVersion(than: startVersion)
             }
             if result, let endVersion = try container.decodeIfPresent(String.self, forKey: .endVersion) {
-                result = !endVersion.isSameOrNewerVersion(than: Schema.formatVersion)
+                result = !Schema.formatVersion.isSameOrNewerVersion(than: endVersion)
             }
             self = result ? .true : .false
         } else if container.contains(.available) {
@@ -173,4 +173,3 @@ extension [Schema.Condition.AvailableEntry] {
         return ProcessInfo.processInfo.isOperatingSystemAtLeast(version)
     }
 }
-

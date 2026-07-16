@@ -48,11 +48,10 @@ extension Schema {
             }
 
             if result, let endVersion = try container.decodeIfPresent(String.self, forKey: .endVersion) {
-                result = !endVersion.isSameOrNewerVersion(than: Schema.formatVersion)
+                result = !Schema.formatVersion.isSameOrNewerVersion(than: endVersion)
             }
 
             content = try container.decode(Schema.Element.self, forKey: result ? .then : .else, configuration: configuration)
         }
     }
 }
-
