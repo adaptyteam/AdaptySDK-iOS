@@ -70,14 +70,6 @@ public extension Adapty {
         let manager = profileManager
         let userId = manager?.userId ?? profileStorage.userId
 
-        async let remote = await Result.from { () async throws(AdaptyError) -> Content in
-            try await self.fetchPlacementForDefaultAudience(
-                userId,
-                placementId,
-                locale
-            )
-        }
-
         let cached: Content? = manager?
             .placementStorage
             .getPlacementById(
@@ -89,12 +81,13 @@ public extension Adapty {
             .withFetchPolicy(fetchPolicy)?
             .value
 
-        if let cached {
-            return cached
-        } else {
-            let result = await remote
-            return try result.get()
-        }
+        if let cached { return cached }
+
+        return try await self.fetchPlacementForDefaultAudience(
+            userId,
+            placementId,
+            locale
+        )
     }
 
     private func fetchPlacementForDefaultAudience<Content: PlacementContent>(
@@ -147,4 +140,3 @@ public extension Adapty {
         }
     }
 }
-

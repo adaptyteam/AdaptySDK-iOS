@@ -9,7 +9,7 @@ import AdaptyUIBuilder
 import Foundation
 
 extension Adapty {
-    public nonisolated static let SDKVersion = "4.0.0"
+    public nonisolated static let SDKVersion = "4.0.1"
     nonisolated static let fallbackFormatVersion = 10
     nonisolated static let userAcquisitionVersion = 1
 
