@@ -161,14 +161,6 @@ extension Adapty {
     ) async throws(AdaptyError) -> Content {
         let manager = try profileManager(withProfileId: userId).orThrows
 
-        async let remote = await Result.from { () async throws(AdaptyError) -> Content in
-            try await self.fetchPlacement(
-                placementId,
-                locale,
-                forUserId: userId
-            )
-        }
-
         let cached: Content? = manager
             .placementStorage
             .getPlacementById(
@@ -180,12 +172,13 @@ extension Adapty {
             .withFetchPolicy(fetchPolicy)?
             .value
 
-        if let cached {
-            return cached
-        } else {
-            let result = await remote
-            return try result.get()
-        }
+        if let cached { return cached }
+
+        return try await self.fetchPlacement(
+            placementId,
+            locale,
+            forUserId: userId
+        )
     }
 
     private func fetchPlacement<Content: PlacementContent>(
