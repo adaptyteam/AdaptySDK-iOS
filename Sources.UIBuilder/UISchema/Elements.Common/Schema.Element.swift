@@ -109,6 +109,7 @@ extension Schema.Element: DecodableWithConfiguration {
         case textEditor = "text_editor"
         case image
         case video
+        case lottie
         case button
         case box
         case vStack = "v_stack"
@@ -214,6 +215,11 @@ extension Schema.Element: DecodableWithConfiguration {
             try self.init(
                 properties: propertyOrNil(),
                 node: .simpleElement(Schema.VideoPlayer(from: decoder))
+            )
+        case .lottie:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .simpleElement(Schema.Lottie(from: decoder))
             )
         case .flex:
             try self.init(

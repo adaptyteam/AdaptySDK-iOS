@@ -33,6 +33,10 @@ let package = Package(
             targets: ["AdaptyUI"]
         ),
         .library(
+            name: "AdaptyLottie",
+            targets: ["AdaptyLottie"]
+        ),
+        .library(
             name: "AdaptyDeveloperTools",
             targets: ["AdaptyDeveloperTools"]
         ),
@@ -50,6 +54,10 @@ let package = Package(
             name: "KidsMode",
             description: "COPPA / App Store Kids Category build — compiles out IDFA / AdSupport."
         ),
+    ],
+    dependencies: [
+        // PoC: Lottie is a dependency of the optional AdaptyLottie target only.
+        .package(url: "https://github.com/airbnb/lottie-ios.git", from: "4.5.0"),
     ],
     targets: [
         .target(
@@ -119,6 +127,17 @@ let package = Package(
             dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger"],
             path: "Sources.AdaptyUI",
             resources: [.copy("PrivacyInfo.xcprivacy")],
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
+        ),
+        .target(
+            name: "AdaptyLottie",
+            dependencies: [
+                "AdaptyUIBuilder",
+                .product(name: "Lottie", package: "lottie-ios"),
+            ],
+            path: "Sources.AdaptyLottie",
             swiftSettings: [
                 .swiftLanguageMode(.v6),
             ]

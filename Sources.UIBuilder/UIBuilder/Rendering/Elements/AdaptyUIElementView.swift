@@ -49,6 +49,8 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             AdaptyUIImageView(.unresolvedAsset(image))
         case let .video(video, _):
             AdaptyUIVideoView(video: video)
+        case let .lottie(lottie, _):
+            AdaptyUILottieView(lottie)
         case let .button(button, _):
             AdaptyUIButtonView(button)
         case let .row(row, _):
