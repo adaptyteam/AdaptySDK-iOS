@@ -16,15 +16,18 @@ package struct AdaptyUIPaywallView_Internal: View {
     private let showDebugOverlay: Bool
     private let displayMissingTags: Bool
     private let safeAreaOverride: EdgeInsets?
+    private let interfaceOrientationOverride: VC.Orientation?
 
     package init(
         showDebugOverlay: Bool,
         displayMissingTags: Bool,
-        safeAreaOverride: EdgeInsets? = nil
+        safeAreaOverride: EdgeInsets? = nil,
+        interfaceOrientationOverride: VC.Orientation? = nil
     ) {
         self.showDebugOverlay = showDebugOverlay
         self.displayMissingTags = displayMissingTags
         self.safeAreaOverride = safeAreaOverride
+        self.interfaceOrientationOverride = interfaceOrientationOverride
     }
 
     package var body: some View {
@@ -37,7 +40,7 @@ package struct AdaptyUIPaywallView_Internal: View {
                         height: proxy.size.height + safeArea.top + safeArea.bottom
                     )
                 )
-                .withInterfaceOrientation(.currentInterface)
+                .withInterfaceOrientation(interfaceOrientationOverride ?? .currentInterface)
                 .withSafeArea(safeArea)
                 .withDebugOverlayEnabled(showDebugOverlay)
                 .withDisplayMissingTags(displayMissingTags)

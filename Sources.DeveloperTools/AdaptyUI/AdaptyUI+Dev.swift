@@ -27,6 +27,14 @@ public struct Dev_DeviceOverride: Sendable {
     }
 }
 
+/// Public mirror of the internal interface-orientation used by render-time
+/// conditions (`switch` / `flex` / `flex_stack` `orientation`). Lets a preview
+/// host force the orientation instead of following the real device scene.
+public enum Dev_InterfaceOrientation: Sendable {
+    case portrait
+    case landscape
+}
+
 @MainActor
 public extension AdaptyUI {
     static func dev_getOnboardingConfiguration(

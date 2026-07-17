@@ -17,7 +17,7 @@ extension Schema.Orientation: RawRepresentable {
         static let landscape = "landscape"
     }
 
-    init?(rawValue value: String) {
+    package init?(rawValue value: String) {
         switch value {
         case Key.portrait: self = .portrait
         case Key.landscape: self = .landscape
@@ -25,7 +25,7 @@ extension Schema.Orientation: RawRepresentable {
         }
     }
 
-    var rawValue: String {
+    package var rawValue: String {
         switch self {
         case .portrait: Key.portrait
         case .landscape: Key.landscape

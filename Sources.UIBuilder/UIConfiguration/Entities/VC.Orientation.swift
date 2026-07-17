@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum Orientation: Sendable {
+    package enum Orientation: Sendable {
         case portrait
         case landscape
     }
