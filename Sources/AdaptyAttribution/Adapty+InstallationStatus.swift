@@ -1,5 +1,5 @@
 //
-//  Adapty+UserAcquisition.swift
+//  Adapty+InstallationStatus.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 18.06.2025.
@@ -12,13 +12,13 @@ public extension Adapty {
         try await withActivatedSDK(
             methodName: .getCurrentInstallationStatus
         ) { _ in
-            guard let manager = UserAcquisitionManager.shared
+            guard let manager = AdaptyAttributionManager.shared
             else { return .notAvailable }
             return await manager.getCurrentInstallationStatus()
         }
     }
 
     internal static func applicationDidBecomeActive() {
-        UserAcquisitionManager.shared?.startRegisterInstallTaskIfNeeded()
+        AdaptyAttributionManager.shared?.startRegisterInstallTaskIfNeeded()
     }
 }

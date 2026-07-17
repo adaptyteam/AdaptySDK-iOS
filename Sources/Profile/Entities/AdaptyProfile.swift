@@ -25,8 +25,8 @@ public struct AdaptyProfile: Sendable {
 
     let codableCustomAttributes: AdaptyProfile.CustomAttributes?
 
-    /// Identifiers of attribution sources applied to the profile and available for segmentation.
-    public let appliedAttributionSources: [AdaptyAttributionSource]
+    /// External attribution providers applied to the profile and available for segmentation.
+    public let appliedExternalAttributionProviders: [AdaptyExternalAttributionProvider]
 
     /// Previously set user custom attributes with `.updateProfile()` method.
     public let customAttributes: [String: any Sendable]
@@ -101,7 +101,7 @@ extension AdaptyProfile: Codable {
         case version = "timestamp"
         case isTestUser = "is_test_user"
         case attributes
-        case appliedAttributionSources = "applied_attribution_sources"
+        case appliedExternalAttributionProviders = "applied_attribution_sources"
     }
 
     public init(from decoder: Decoder) throws {
@@ -122,7 +122,7 @@ extension AdaptyProfile: Codable {
         accessLevels = try container.decodeIfPresent([String: AccessLevel].self, forKey: .accessLevels) ?? [:]
         subscriptions = try container.decodeIfPresent([String: Subscription].self, forKey: .subscriptions) ?? [:]
         nonSubscriptions = try container.decodeIfPresent([String: [NonSubscription]].self, forKey: .nonSubscriptions) ?? [:]
-        appliedAttributionSources = try container.decodeIfPresent([AdaptyAttributionSource].self, forKey: .appliedAttributionSources) ?? []
+        appliedExternalAttributionProviders = try container.decodeIfPresent([AdaptyExternalAttributionProvider].self, forKey: .appliedExternalAttributionProviders) ?? []
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -142,8 +142,8 @@ extension AdaptyProfile: Codable {
         if nonSubscriptions.isNotEmpty {
             try container.encode(nonSubscriptions, forKey: .nonSubscriptions)
         }
-        if appliedAttributionSources.isNotEmpty {
-            try container.encode(appliedAttributionSources, forKey: .appliedAttributionSources)
+        if appliedExternalAttributionProviders.isNotEmpty {
+            try container.encode(appliedExternalAttributionProviders, forKey: .appliedExternalAttributionProviders)
         }
     }
 }

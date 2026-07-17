@@ -76,7 +76,7 @@ extension Backend {
             for serverKind: AdaptyServerKind
         ) throws(BackendUnavailableError) {
             switch serverKind {
-            case .ua:
+            case .adaptyAttribution:
                 guard !serverBlockedByKind.contains(.main),
                       !serverBlockedByKind.contains(serverKind)
                 else { throw .unauthorized }

@@ -11,7 +11,7 @@ package struct Backend {
     let networkManager: StateManager
 
     let defaultHTTPConfiguration: HTTPCodableConfiguration
-    let uaHTTPConfiguration: HTTPCodableConfiguration
+    let adaptyAttributionHTTPConfiguration: HTTPCodableConfiguration
     let fallbackHTTPConfiguration: HTTPCodableConfiguration
     var configsHTTPConfiguration: HTTPCodableConfiguration {
         fallbackHTTPConfiguration
@@ -23,7 +23,7 @@ package struct Backend {
     ) async {
         defaultHTTPConfiguration = MainHTTPConfiguration(with: configuration, environment: environment)
         fallbackHTTPConfiguration = FallbackHTTPConfiguration(with: configuration)
-        uaHTTPConfiguration = UAHTTPConfiguration(with: configuration, environment: environment)
+        adaptyAttributionHTTPConfiguration = AdaptyAttributionHTTPConfiguration(with: configuration, environment: environment)
 
         networkManager = await Backend.StateManager(with: configuration)
     }

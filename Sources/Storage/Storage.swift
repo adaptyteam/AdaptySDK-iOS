@@ -97,7 +97,7 @@ enum Storage {
         await EventsStorage.clearAll()
         await BackendProductInfoStorage.clear()
         await PurchasePayloadStorage.clear()
-        UserAcquisitionStorage.clear()
+        AdaptyAttributionStorage.clear()
         await Cache.removeAll()
         userDefaults.set(hash, forKey: Constants.appKeyHash)
         log.verbose("changing apiKeyHash = \(hash).")

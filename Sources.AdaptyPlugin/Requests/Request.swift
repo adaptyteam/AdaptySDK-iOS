@@ -31,7 +31,7 @@ enum Request {
             CreateWebPaywallUrl.self,
             PresentCodeRedemptionSheet.self,
             RestorePurchases.self,
-            UpdateAttributionData.self,
+            UpdateExternalAttributionData.self,
             SetIntegrationIdentifier.self,
             ReportTransaction.self,
             UpdateProfile.self,

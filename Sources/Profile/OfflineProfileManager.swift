@@ -25,7 +25,7 @@ final class OfflineProfileManager {
             segmentId: "", // TODO: The user hasn't been created on the server; the segmentID is unknown. This user is created when a purchase is made in the Xcode environment, and the server hasn't created the user yet.
             isTestUser: false,
             codableCustomAttributes: nil,
-            appliedAttributionSources: [],
+            appliedExternalAttributionProviders: [],
             customAttributes: [:],
             accessLevels: [:],
             subscriptions: [:],
@@ -80,7 +80,7 @@ private extension AdaptyProfile {
             segmentId: segmentId,
             isTestUser: isTestUser,
             codableCustomAttributes: codableCustomAttributes,
-            appliedAttributionSources: appliedAttributionSources,
+            appliedExternalAttributionProviders: appliedExternalAttributionProviders,
             customAttributes: customAttributes,
             accessLevels: accessLevels,
             subscriptions: subscriptions,

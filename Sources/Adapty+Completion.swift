@@ -117,16 +117,16 @@ public extension Adapty {
         }
     }
 
-    /// To set attribution data for the profile, use this method.
+    /// Updates external attribution data associated with the profile.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
     ///
-    /// - Parameter attribution: a dictionary containing attribution (conversion) data.
-    /// - Parameter source: a source of attribution.
+    /// - Parameter attribution: Attribution data supplied by the provider.
+    /// - Parameter provider: The external attribution provider.
     /// - Parameter completion: A result containing an optional error.
-    nonisolated static func updateAttribution(
+    nonisolated static func updateExternalAttribution(
         _ attribution: [AnyHashable: Any],
-        source: AdaptyAttributionSource,
+        provider: AdaptyExternalAttributionProvider,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         let attributionJson: String
@@ -139,7 +139,7 @@ public extension Adapty {
         }
 
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await updateAttribution(attributionJson, source: source)
+            try await updateExternalAttribution(attributionJson, provider: provider)
         }
     }
 

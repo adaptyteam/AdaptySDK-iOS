@@ -48,7 +48,7 @@ enum BackendRequestName: String {
     case validateReceipt = "validate_receipt"
 
     case sendASAToken = "set_asa_token"
-    case setAttributionData = "set_attribution_data"
+    case setExternalAttributionData = "set_external_attribution_data"
     case setIntegrationIdentifier = "set_integration_identifier"
     case signSubscriptionOffer = "sign_offer"
 

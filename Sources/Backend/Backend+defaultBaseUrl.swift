@@ -25,7 +25,7 @@ extension Backend {
             case .cn: URL(string: "https://configs-cdn-cn.adapty.io\(basePath)")!
             default: URL(string: "https://configs-cdn.adapty.io\(basePath)")!
             }
-        case .ua: switch cluster {
+        case .adaptyAttribution: switch cluster {
             case .cn: URL(string: "https://api-ua-cn.adapty.io\(basePath)")!
             default: URL(string: "https://api-ua.adapty.io\(basePath)")!
             }

@@ -1,5 +1,5 @@
 //
-//  SetAttributionDataRequest.swift
+//  SetExternalAttributionDataRequest.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 23.09.2022.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-private struct SetAttributionDataRequest: BackendEncodableRequest {
+struct SetExternalAttributionDataRequest: BackendEncodableRequest {
     let endpoint = HTTPEndpoint(
         method: .post,
         path: "/sdk/attribution/profile/set/data/"
@@ -15,36 +15,36 @@ private struct SetAttributionDataRequest: BackendEncodableRequest {
     let headers: HTTPHeaders
     let contentType: String? = "application/json"
     let stamp = Log.stamp
-    let requestName = BackendRequestName.setAttributionData
+    let requestName = BackendRequestName.setExternalAttributionData
     let logParams: EventParameters?
 
-    let source: AdaptyAttributionSource
+    let provider: AdaptyExternalAttributionProvider
     let attributionJson: String
     let userId: AdaptyUserId
 
-    init(userId: AdaptyUserId, source: AdaptyAttributionSource, attributionJson: String, responseHash: String?) {
+    init(userId: AdaptyUserId, provider: AdaptyExternalAttributionProvider, attributionJson: String, responseHash: String?) {
         headers = HTTPHeaders()
             .setUserProfileId(userId)
             .setBackendResponseHash(responseHash)
 
-        self.source = source
+        self.provider = provider
         self.attributionJson = attributionJson
         self.userId = userId
 
         logParams = [
-            "source": source,
+            "provider": provider,
         ]
     }
 
     enum CodingKeys: String, CodingKey {
-        case source
+        case provider = "source"
         case attributionJson = "attribution_json"
         case profileId = "profile_id"
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(source, forKey: .source)
+        try container.encode(provider, forKey: .provider)
         try container.encode(attributionJson, forKey: .attributionJson)
         try container.encode(userId.profileId, forKey: .profileId)
     }
@@ -53,15 +53,15 @@ private struct SetAttributionDataRequest: BackendEncodableRequest {
 private typealias ResponseBody = AdaptyProfile?
 
 extension Backend.MainExecutor {
-    func setAttributionData(
+    func setExternalAttributionData(
         userId: AdaptyUserId,
-        source: AdaptyAttributionSource,
+        provider: AdaptyExternalAttributionProvider,
         attributionJson: String,
         responseHash: String?
     ) async throws(HTTPError) -> VH<AdaptyProfile>? {
-        let request = SetAttributionDataRequest(
+        let request = SetExternalAttributionDataRequest(
             userId: userId,
-            source: source,
+            provider: provider,
             attributionJson: attributionJson,
             responseHash: responseHash
         )

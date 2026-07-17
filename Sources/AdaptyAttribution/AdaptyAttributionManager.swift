@@ -1,5 +1,5 @@
 //
-//  UserAcquisitionManager.swift
+//  AdaptyAttributionManager.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 16.06.2025.
@@ -8,16 +8,16 @@
 import Foundation
 
 @AdaptyActor
-final class UserAcquisitionManager {
-    private let storage: UserAcquisitionStorage
-    private let executor: Backend.UAExecutor
+final class AdaptyAttributionManager {
+    private let storage: AdaptyAttributionStorage
+    private let executor: Backend.AdaptyAttributionExecutor
     private let installTime: Date
     private let appLaunchCount: Int
 
     private var registerInstallStarted = false
 
     private init?(_ sdk: Adapty) {
-        let storage = UserAcquisitionStorage()
+        let storage = AdaptyAttributionStorage()
         guard
             let installTime = Environment.Application.installationTime,
             let appLaunchCount = Environment.Application.appLaunchCount,
@@ -25,7 +25,7 @@ final class UserAcquisitionManager {
         else { return nil }
 
         self.storage = storage
-        executor = sdk.backend.createUAExecutor()
+        executor = sdk.backend.createAdaptyAttributionExecutor()
         self.installTime = installTime
         self.appLaunchCount = appLaunchCount
 
@@ -104,8 +104,8 @@ final class UserAcquisitionManager {
 }
 
 @AdaptyActor
-extension UserAcquisitionManager {
-    static var shared: UserAcquisitionManager?
+extension AdaptyAttributionManager {
+    static var shared: AdaptyAttributionManager?
     static func activate(_ sdk: Adapty) {
         shared = .init(sdk)
     }
