@@ -27,7 +27,7 @@ struct AdaptyUISwitchView<ScreenHolderContent: View>: View {
     /// Index of the selected case; -1 → default.
     @State private var selection: Int = -1
 
-    private var computedSelection: Int {
+    private func computedSelection(orientation: VC.Orientation) -> Int {
         for (index, item) in switchElement.cases.enumerated() {
             if VC.Condition.evaluate(
                 item.condition,
@@ -54,18 +54,18 @@ struct AdaptyUISwitchView<ScreenHolderContent: View>: View {
             selectedElement,
             screenHolderBuilder: screenHolderBuilder
         )
-        .onAppear { selection = computedSelection }
+        .onAppear { selection = computedSelection(orientation: orientation) }
         .onGeometrySizeChange { newSize in
             guard newSize != availableSize else { return }
             availableSize = newSize
-            recompute()
+            recompute(orientation: orientation)
         }
-        .onChange(of: screenSize) { _ in recompute() }
-        .onChange(of: orientation) { _ in recompute() }
+        .onChange(of: screenSize) { _ in recompute(orientation: orientation) }
+        .onChange(of: orientation) { newOrientation in recompute(orientation: newOrientation) }
     }
 
-    private func recompute() {
-        let newSelection = computedSelection
+    private func recompute(orientation: VC.Orientation) {
+        let newSelection = computedSelection(orientation: orientation)
         guard newSelection != selection else { return }
         if let transition = switchElement.transition {
             withAnimation(transition.swiftUIAnimation) { selection = newSelection }

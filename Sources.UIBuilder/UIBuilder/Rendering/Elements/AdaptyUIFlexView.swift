@@ -26,7 +26,7 @@ struct AdaptyUIFlexView<ScreenHolderContent: View>: View {
     @State private var availableSize: CGSize = .zero
     @State private var direction: VC.Flex.Direction = .vertical
 
-    private var computedDirection: VC.Flex.Direction {
+    private func computedDirection(orientation: VC.Orientation) -> VC.Flex.Direction {
         let match = VC.Condition.evaluate(
             flex.condition,
             available: availableSize,
@@ -41,15 +41,15 @@ struct AdaptyUIFlexView<ScreenHolderContent: View>: View {
             content(available: proxy.size)
                 .onAppear {
                     availableSize = proxy.size
-                    direction = computedDirection
+                    direction = computedDirection(orientation: orientation)
                 }
                 .onChange(of: proxy.size) { newSize in
                     guard newSize != availableSize else { return }
                     availableSize = newSize
-                    recompute()
+                    recompute(orientation: orientation)
                 }
-                .onChange(of: screenSize) { _ in recompute() }
-                .onChange(of: orientation) { _ in recompute() }
+                .onChange(of: screenSize) { _ in recompute(orientation: orientation) }
+                .onChange(of: orientation) { newOrientation in recompute(orientation: newOrientation) }
         }
     }
 
@@ -75,8 +75,8 @@ struct AdaptyUIFlexView<ScreenHolderContent: View>: View {
         }
     }
 
-    private func recompute() {
-        let newDirection = computedDirection
+    private func recompute(orientation: VC.Orientation) {
+        let newDirection = computedDirection(orientation: orientation)
         guard newDirection != direction else { return }
         if let transition = flex.transition {
             withAnimation(transition.swiftUIAnimation) { direction = newDirection }

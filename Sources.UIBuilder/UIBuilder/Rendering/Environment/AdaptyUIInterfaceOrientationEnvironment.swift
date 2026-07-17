@@ -20,16 +20,35 @@ extension EnvironmentValues {
 }
 
 extension VC.Orientation {
-    /// Real interface orientation of the active scene.
+    /// Interface orientation of a specific window scene.
     /// Unlike `UIDevice.current.orientation`, it never reports `faceUp/unknown`.
     @MainActor
-    static var currentInterface: VC.Orientation {
-        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+    static func of(_ scene: UIWindowScene?) -> VC.Orientation {
         switch scene?.interfaceOrientation {
-        case .landscapeLeft, .landscapeRight: return .landscape
-        default: return .portrait
+        case .landscapeLeft, .landscapeRight: .landscape
+        default: .portrait
         }
+    }
+
+    /// The active foreground window scene — fallback when a view is not yet
+    /// attached to a specific window.
+    @MainActor
+    static var activeWindowScene: UIWindowScene? {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        return scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+    }
+
+    /// Best-effort initial value used before the paywall is attached to its
+    /// window. Platforms without a rotatable interface (Mac Catalyst, tvOS,
+    /// visionOS) have no meaningful interface orientation, so they are fixed to
+    /// `.landscape`; iOS/iPadOS read the active scene.
+    @MainActor
+    static var platformInitialGuess: VC.Orientation {
+        #if os(iOS) && !targetEnvironment(macCatalyst)
+        of(activeWindowScene)
+        #else
+        .landscape
+        #endif
     }
 }
 

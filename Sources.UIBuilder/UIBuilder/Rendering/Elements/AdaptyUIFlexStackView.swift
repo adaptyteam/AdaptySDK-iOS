@@ -26,7 +26,7 @@ struct AdaptyUIFlexStackView<ScreenHolderContent: View>: View {
     @State private var availableSize: CGSize = .zero
     @State private var direction: VC.Flex.Direction = .vertical
 
-    private var computedDirection: VC.Flex.Direction {
+    private func computedDirection(orientation: VC.Orientation) -> VC.Flex.Direction {
         let match = VC.Condition.evaluate(
             flexStack.condition,
             available: availableSize,
@@ -41,18 +41,18 @@ struct AdaptyUIFlexStackView<ScreenHolderContent: View>: View {
             flexStack.asStack(direction: direction),
             screenHolderBuilder: screenHolderBuilder
         )
-        .onAppear { direction = computedDirection }
+        .onAppear { direction = computedDirection(orientation: orientation) }
         .onGeometrySizeChange { newSize in
             guard newSize != availableSize else { return }
             availableSize = newSize
-            recompute()
+            recompute(orientation: orientation)
         }
-        .onChange(of: screenSize) { _ in recompute() }
-        .onChange(of: orientation) { _ in recompute() }
+        .onChange(of: screenSize) { _ in recompute(orientation: orientation) }
+        .onChange(of: orientation) { newOrientation in recompute(orientation: newOrientation) }
     }
 
-    private func recompute() {
-        let newDirection = computedDirection
+    private func recompute(orientation: VC.Orientation) {
+        let newDirection = computedDirection(orientation: orientation)
         guard newDirection != direction else { return }
         if let transition = flexStack.transition {
             withAnimation(transition.swiftUIAnimation) { direction = newDirection }
