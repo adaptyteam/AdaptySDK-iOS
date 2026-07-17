@@ -128,7 +128,7 @@ extension AdaptyProfileParameters.Builder: Decodable {
     }
 }
 
-#if canImport(AppTrackingTransparency)
+#if !KidsMode && canImport(AppTrackingTransparency)
 import AppTrackingTransparency
 
 public extension AdaptyProfileParameters.Builder {
