@@ -55,7 +55,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Podspecs in dependency order (must be published in this order)
-PODSPECS=("Adapty.podspec" "AdaptyUI.podspec" "AdaptyPlugin.podspec")
+PODSPECS=("AdaptyLogger.podspec" "AdaptyUIBuilder.podspec" "Adapty.podspec" "AdaptyUI.podspec" "AdaptyPlugin.podspec")
 
 # Function to extract pod name from podspec
 get_pod_name() {
