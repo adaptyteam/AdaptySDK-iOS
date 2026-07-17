@@ -57,9 +57,4 @@ public struct AdaptyUILottieContext: Sendable {
     }
 }
 
-/// Registry of injected addons. Populated once at init via `AdaptyUI.registerLottieAddon(_:)`.
-public enum AdaptyUIAddons {
-    @MainActor public static var lottie: (any AdaptyUILottieAddon)?
-}
-
 #endif

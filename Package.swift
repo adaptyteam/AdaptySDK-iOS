@@ -37,6 +37,10 @@ let package = Package(
             targets: ["AdaptyLottie"]
         ),
         .library(
+            name: "AdaptyRive",
+            targets: ["AdaptyRive"]
+        ),
+        .library(
             name: "AdaptyDeveloperTools",
             targets: ["AdaptyDeveloperTools"]
         ),
@@ -58,6 +62,9 @@ let package = Package(
     dependencies: [
         // PoC: Lottie is a dependency of the optional AdaptyLottie target only.
         .package(url: "https://github.com/airbnb/lottie-ios.git", from: "4.5.0"),
+        // PoC: Rive is a dependency of the optional AdaptyRive target only.
+        // Ships as a remote binaryTarget (xcframework), not source, unlike lottie-ios.
+        .package(url: "https://github.com/rive-app/rive-ios", from: "6.21.1"),
     ],
     targets: [
         .target(
@@ -138,6 +145,17 @@ let package = Package(
                 .product(name: "Lottie", package: "lottie-ios"),
             ],
             path: "Sources.AdaptyLottie",
+            swiftSettings: [
+                .swiftLanguageMode(.v6),
+            ]
+        ),
+        .target(
+            name: "AdaptyRive",
+            dependencies: [
+                "AdaptyUIBuilder",
+                .product(name: "RiveRuntime", package: "rive-ios"),
+            ],
+            path: "Sources.AdaptyRive",
             swiftSettings: [
                 .swiftLanguageMode(.v6),
             ]

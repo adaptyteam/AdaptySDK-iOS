@@ -110,6 +110,7 @@ extension Schema.Element: DecodableWithConfiguration {
         case image
         case video
         case lottie
+        case rive
         case button
         case box
         case vStack = "v_stack"
@@ -220,6 +221,11 @@ extension Schema.Element: DecodableWithConfiguration {
             try self.init(
                 properties: propertyOrNil(),
                 node: .simpleElement(Schema.Lottie(from: decoder))
+            )
+        case .rive:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .simpleElement(Schema.Rive(from: decoder))
             )
         case .flex:
             try self.init(

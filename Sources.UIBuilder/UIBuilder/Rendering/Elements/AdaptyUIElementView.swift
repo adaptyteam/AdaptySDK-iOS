@@ -51,6 +51,8 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             AdaptyUIVideoView(video: video)
         case let .lottie(lottie, _):
             AdaptyUILottieView(lottie)
+        case let .rive(rive, _):
+            AdaptyUIRiveView(rive)
         case let .button(button, _):
             AdaptyUIButtonView(button)
         case let .row(row, _):

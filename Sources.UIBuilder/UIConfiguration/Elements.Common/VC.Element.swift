@@ -17,6 +17,7 @@ extension VC {
         indirect case image(Image, Properties?)
         indirect case video(VideoPlayer, Properties?)
         indirect case lottie(Lottie, Properties?)
+        indirect case rive(Rive, Properties?)
         indirect case button(Button, Properties?)
         indirect case box(Box, Properties?)
         indirect case row(Row, Properties?)
@@ -62,6 +63,7 @@ extension VC.Element {
              let .pager(_, properties),
              let .video(_, properties),
              let .lottie(_, properties),
+             let .rive(_, properties),
              let .dateTimePicker(_, properties),
              let .wheelItemsPicker(_, properties),
              let .wheelRangePicker(_, properties),
