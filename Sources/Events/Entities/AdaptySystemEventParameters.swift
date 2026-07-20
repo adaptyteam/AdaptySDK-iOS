@@ -129,8 +129,8 @@ enum MethodName: String {
 
     case getProfile = "get_profile"
     case updateProfile = "update_profile"
-    case updateAttribution = "update_attribution"
-    case updateAttributionData = "update_attribution_data"
+    case updateExternalAttribution = "update_external_attribution"
+    case updateExternalAttributionData = "update_external_attribution_data"
     case setIntegrationIdentifiers = "set_integration_identifiers"
 
     case setVariationId = "set_variation_id"

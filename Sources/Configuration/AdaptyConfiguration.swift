@@ -13,7 +13,7 @@ public struct AdaptyConfiguration: Sendable {
         observerMode: false,
         idfaCollectionDisabled: false,
         ipAddressCollectionDisabled: false,
-        userAcquisitionEnabled: false,
+        adaptyAttributionEnabled: false,
         transactionFinishBehavior: TransactionFinishBehavior.default,
         clearDataOnBackup: false
     )
@@ -24,7 +24,7 @@ public struct AdaptyConfiguration: Sendable {
     let observerMode: Bool
     let idfaCollectionDisabled: Bool
     let ipAddressCollectionDisabled: Bool
-    let userAcquisitionEnabled: Bool
+    let adaptyAttributionEnabled: Bool
     let callbackDispatchQueue: DispatchQueue?
     let backend: Backend.Configuration
     let logLevel: AdaptyLog.Level?

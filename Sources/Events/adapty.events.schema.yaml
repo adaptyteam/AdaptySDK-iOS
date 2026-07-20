@@ -269,7 +269,7 @@ $events:
 #         - validate_receipt
 
 #         - set_asa_token
-#         - set_attribution_data
+#         - set_external_attribution_data
 #         - set_integration_identifier
 #         - sign_offer
 
@@ -299,4 +299,3 @@ $events:
   #   EventQueueHandlerParameters:
 
   # InternalEventParameters:
-

@@ -28,7 +28,7 @@ extension Adapty {
             )
             handleProfileResponse(response)
 
-            // mark appleSearchAds attribution data as synced
+            // Mark Apple Ads external attribution data as synced.
             try? profileStorage.setAppleSearchAdsSyncDate(for: userId)
         }
     }

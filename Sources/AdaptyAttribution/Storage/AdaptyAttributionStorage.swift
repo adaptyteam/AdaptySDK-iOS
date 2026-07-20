@@ -1,5 +1,5 @@
 //
-//  UserAcquisitionStorage.swift
+//  AdaptyAttributionStorage.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 18.06.2025.
@@ -10,7 +10,7 @@ import Foundation
 private let log = Log.storage
 
 @AdaptyActor
-final class UserAcquisitionStorage {
+final class AdaptyAttributionStorage {
     private enum Constants {
         static let version = "AdaptySDK_User_Acquisition_Version"
         static let registrationInstallSaved = "AdaptySDK_User_Acquisition_saved"
@@ -25,8 +25,8 @@ final class UserAcquisitionStorage {
         guard version == 0, let installTime = Environment.Application.installationTime else {
             return version
         }
-        userDefaults.set(Adapty.userAcquisitionVersion, forKey: Constants.version)
-        return Adapty.userAcquisitionVersion
+        userDefaults.set(Adapty.adaptyAttributionVersion, forKey: Constants.version)
+        return Adapty.adaptyAttributionVersion
     }()
 
     private static var hasRegistrationInstallResponse: Bool = userDefaults.bool(forKey: Constants.registrationInstallSaved)
@@ -68,7 +68,7 @@ final class UserAcquisitionStorage {
 }
 
 @AdaptyActor
-extension UserAcquisitionStorage {
+extension AdaptyAttributionStorage {
     var version: Int {
         Self.version
     }

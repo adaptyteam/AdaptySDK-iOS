@@ -1,5 +1,5 @@
 //
-//  Adapty+UpdateAttributionData.swift
+//  Adapty+UpdateExternalAttributionData.swift
 //  AdaptySDK
 //
 //  Created by Andrey Kyashkin on 28.10.2019.
@@ -8,15 +8,15 @@
 import Foundation
 
 public extension Adapty {
-    /// To set attribution data for the profile, use this method.
+    /// Updates external attribution data associated with the profile.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
     ///
-    /// - Parameter attribution: a dictionary containing attribution (conversion) data.
-    /// - Parameter source: a source of attribution.
-    nonisolated static func updateAttribution(
+    /// - Parameter attribution: Attribution data supplied by the provider.
+    /// - Parameter provider: The external attribution provider.
+    nonisolated static func updateExternalAttribution(
         _ attribution: [AnyHashable: Any],
-        source: AdaptyAttributionSource
+        provider: AdaptyExternalAttributionProvider
     ) async throws(AdaptyError) {
         let attributionJson: String
         do {
@@ -26,30 +26,30 @@ public extension Adapty {
             throw .wrongAttributeData(error)
         }
 
-        try await updateAttribution(
+        try await updateExternalAttribution(
             attributionJson,
-            source: source
+            provider: provider
         )
     }
 
-    nonisolated static func updateAttribution(
+    nonisolated static func updateExternalAttribution(
         _ attributionJson: String,
-        source: AdaptyAttributionSource
+        provider: AdaptyExternalAttributionProvider
     ) async throws(AdaptyError) {
         let logParams: EventParameters = [
-            "source": source,
+            "provider": provider,
         ]
 
-        try await withActivatedSDK(methodName: .updateAttributionData, logParams: logParams) { sdk throws(AdaptyError) in
-            try await sdk.setAttributionData(
-                source: source,
+        try await withActivatedSDK(methodName: .updateExternalAttributionData, logParams: logParams) { sdk throws(AdaptyError) in
+            try await sdk.setExternalAttributionData(
+                provider: provider,
                 attributionJson: attributionJson
             )
         }
     }
 
-    private func setAttributionData(
-        source: AdaptyAttributionSource,
+    private func setExternalAttributionData(
+        provider: AdaptyExternalAttributionProvider,
         attributionJson: String
     ) async throws(AdaptyError) {
         let (userId, oldResponseHash) = try await { () async throws(AdaptyError) in
@@ -58,9 +58,9 @@ public extension Adapty {
         }()
 
         do {
-            let response = try await httpSession.setAttributionData(
+            let response = try await httpSession.setExternalAttributionData(
                 userId: userId,
-                source: source,
+                provider: provider,
                 attributionJson: attributionJson,
                 responseHash: oldResponseHash
             )

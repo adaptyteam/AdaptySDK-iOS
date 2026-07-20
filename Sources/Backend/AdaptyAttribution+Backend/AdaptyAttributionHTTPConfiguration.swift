@@ -1,5 +1,5 @@
 //
-//  UAHTTPConfiguration.swift
+//  AdaptyAttributionHTTPConfiguration.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 09.06.2025.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UAHTTPConfiguration: HTTPCodableConfiguration {
+struct AdaptyAttributionHTTPConfiguration: HTTPCodableConfiguration {
     let sessionConfiguration: URLSessionConfiguration
 
     let defaultEncodedContentType = "application/json"

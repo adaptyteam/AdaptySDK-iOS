@@ -40,7 +40,7 @@ private struct RegisterInstallRequest: BackendEncodableRequest {
 
 private typealias ResponseBody = Backend.Response.OptionalData<RegistrationInstallResponse>
 
-extension Backend.UAExecutor {
+extension Backend.AdaptyAttributionExecutor {
     private func exponentialBackoffDelay(
         _ attempt: Int,
         base: AdaptyDuration = .seconds(1),

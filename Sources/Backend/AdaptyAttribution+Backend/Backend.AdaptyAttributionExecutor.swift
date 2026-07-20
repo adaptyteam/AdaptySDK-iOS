@@ -1,5 +1,5 @@
 //
-//  Backend.UAExecuter.swift
+//  Backend.AdaptyAttributionExecutor.swift
 //  AdaptySDK
 //
 //  Created by Aleksei Valiano on 09.06.2025.
@@ -8,21 +8,21 @@
 import Foundation
 
 extension Backend {
-    struct UAExecutor: BackendExecutor {
+    struct AdaptyAttributionExecutor: BackendExecutor {
         let manager: StateManager
         let session: HTTPSession
-        let kind = AdaptyServerKind.ua
+        let kind = AdaptyServerKind.adaptyAttribution
     }
 
-    func createUAExecutor() -> UAExecutor {
-        UAExecutor(
+    func createAdaptyAttributionExecutor() -> AdaptyAttributionExecutor {
+        AdaptyAttributionExecutor(
             manager: networkManager,
-            session: HTTPSession(configuration: uaHTTPConfiguration, responseValidator: validator)
+            session: HTTPSession(configuration: adaptyAttributionHTTPConfiguration, responseValidator: validator)
         )
     }
 }
 
-extension Backend.UAExecutor {
+extension Backend.AdaptyAttributionExecutor {
     func canRetryRequest(_ error: HTTPError) -> Bool {
         switch error {
         case .perform:

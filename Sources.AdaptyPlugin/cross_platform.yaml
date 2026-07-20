@@ -621,16 +621,16 @@ $requests:
         properties:
           success: { const: true }
 
-  ### updateAttributionData ###
-  UpdateAttributionData.Request: #request
+  ### updateExternalAttributionData ###
+  UpdateExternalAttributionData.Request: #request
     type: object
-    required: [method, attribution, source]
+    required: [method, attribution, provider]
     properties:
-      method: { const: "update_attribution_data" }
+      method: { const: "update_external_attribution_data" }
       attribution: { type: string }
-      source: { type: string }
+      provider: { type: string }
 
-  UpdateAttributionData.Response: #response
+  UpdateExternalAttributionData.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -1127,7 +1127,7 @@ $defs:
       google_enable_pending_prepaid_plans: { type: boolean, default: false }
       google_local_access_level_allowed: { type: boolean, default: false }
       ip_address_collection_disabled: { type: boolean, default: false }
-      user_acquisition_enabled: { type: boolean, default: false }
+      adapty_attribution_enabled: { type: boolean, default: false }
       clear_data_on_backup: { type: boolean, default: false }
       server_cluster: { type: string, enum: ["default", "eu", "cn"] }
       backend_proxy_host: { type: string }
