@@ -58,6 +58,10 @@ actor StoreKitPurchaser {
                     log.debug("Transaction \(transaction.id) (originalId: \(transaction.originalID),  productId: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
                     Task.detached {
+                        if await AdaptyConfiguration.transactionFinishBehavior == .manual {
+                            await storage.addUnfinishedTransaction(transaction.id)
+                        }
+
                         await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(signedTransaction: signedTransaction)) }
 
                         guard !transaction.isXcodeEnvironment else {
@@ -302,6 +306,10 @@ actor StoreKitPurchaser {
         }
 
         let transaction = signedTransaction.unsafePayloadValue
+
+        if await AdaptyConfiguration.transactionFinishBehavior == .manual {
+            await storage.addUnfinishedTransaction(transaction.id)
+        }
 
         await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(signedTransaction: signedTransaction)) }
 

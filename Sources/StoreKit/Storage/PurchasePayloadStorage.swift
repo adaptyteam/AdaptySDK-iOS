@@ -94,7 +94,7 @@ final class PurchasePayloadStorage {
 
     private static func removeUnfinishedTransactionState(forTransactionId transactionId: UInt64) -> Bool {
         guard unfinishedTransactionState.removeValue(forKey: transactionId) != nil else { return false }
-        userDefaults.set(unfinishedTransactionState, forKey: Constants.unfinishedTransactionState)
+        userDefaults.set(unfinishedTransactionState.mapKeys(String.init), forKey: Constants.unfinishedTransactionState)
         log.debug("Remove state for transactionId: \(transactionId)")
         return true
     }
