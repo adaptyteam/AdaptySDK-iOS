@@ -116,6 +116,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
                 )
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     private var weightedBody: some View {
@@ -155,6 +156,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
                 )
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .onGeometrySizeChange { measuredSize = $0 }
     }

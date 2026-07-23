@@ -25,6 +25,11 @@ struct AdaptyUIFlexView<ScreenHolderContent: View>: View {
 
     @State private var availableSize: CGSize = .zero
     @State private var direction: VC.Flex.Direction = .vertical
+    /// Intrinsic height of the content in row mode (FlexRowView reports it via
+    /// fixedSize). Pinned onto the greedy GeometryReader so a horizontal flex hugs
+    /// its content height instead of collapsing to ~10pt when the parent proposes
+    /// nil height (a ScrollView scroll axis). Column mode stays greedy.
+    @State private var contentHeight: CGFloat = 0
 
     private func computedDirection(orientation: VC.Orientation) -> VC.Flex.Direction {
         let match = VC.Condition.evaluate(
@@ -39,6 +44,7 @@ struct AdaptyUIFlexView<ScreenHolderContent: View>: View {
     var body: some View {
         GeometryReader { proxy in
             content(available: proxy.size)
+                .onGeometrySizeChange { contentHeight = $0.height }
                 .onAppear {
                     availableSize = proxy.size
                     direction = computedDirection(orientation: orientation)
@@ -51,6 +57,11 @@ struct AdaptyUIFlexView<ScreenHolderContent: View>: View {
                 .onChange(of: screenSize) { _ in recompute(orientation: orientation) }
                 .onChange(of: orientation) { newOrientation in recompute(orientation: newOrientation) }
         }
+        // Row mode hugs its cross axis (height): FlexRowView reports an intrinsic
+        // height via fixedSize, pinned here so the greedy GeometryReader's slot
+        // matches the content instead of collapsing to ~10pt inside a ScrollView.
+        // Column mode stays greedy (nil height) — its weights need the proposal.
+        .frame(height: direction == .horizontal ? contentHeight : nil)
     }
 
     @ViewBuilder
