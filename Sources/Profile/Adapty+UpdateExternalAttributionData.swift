@@ -5,6 +5,7 @@
 //  Created by Andrey Kyashkin on 28.10.2019.
 //
 
+import AdaptyCodable
 import Foundation
 
 public extension Adapty {
@@ -20,8 +21,7 @@ public extension Adapty {
     ) async throws(AdaptyError) {
         let attributionJson: String
         do {
-            let data = try JSONSerialization.data(withJSONObject: attribution)
-            attributionJson = String(decoding: data, as: UTF8.self)
+            attributionJson = try JSONSerialization.jsonString(from: attribution)
         } catch {
             throw .wrongAttributeData(error)
         }

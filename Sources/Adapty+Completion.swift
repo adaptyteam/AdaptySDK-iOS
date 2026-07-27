@@ -5,6 +5,7 @@
 //  Created by Aleksei Valiano on 19.09.2024
 //
 
+import AdaptyCodable
 import StoreKit
 
 public typealias AdaptyResult<Success> = Swift.Result<Success, AdaptyError>
@@ -130,9 +131,9 @@ public extension Adapty {
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         let attributionJson: String
+
         do {
-            let data = try JSONSerialization.data(withJSONObject: attribution)
-            attributionJson = String(decoding: data, as: UTF8.self)
+            attributionJson = try JSONSerialization.jsonString(from: attribution)
         } catch {
             completion?(.wrongAttributeData(error))
             return
