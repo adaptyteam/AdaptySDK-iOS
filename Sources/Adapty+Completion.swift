@@ -120,6 +120,10 @@ public extension Adapty {
 
     /// Updates external attribution data associated with the profile.
     ///
+    /// The completion handler is called after the backend accepts the data for
+    /// asynchronous processing. A successful completion does not mean that the
+    /// data has already been processed or that the profile has already been updated.
+    ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
     ///
     /// - Parameter attribution: Attribution data supplied by the provider.

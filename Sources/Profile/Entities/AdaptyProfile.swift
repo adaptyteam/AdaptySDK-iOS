@@ -25,7 +25,8 @@ public struct AdaptyProfile: Sendable {
 
     let codableCustomAttributes: AdaptyProfile.CustomAttributes?
 
-    /// External attribution providers applied to the profile and available for segmentation.
+    /// External attribution providers whose data has been processed by the
+    /// backend and is used for profile segmentation.
     public let appliedExternalAttributionProviders: [AdaptyExternalAttributionProvider]
 
     /// Previously set user custom attributes with `.updateProfile()` method.
