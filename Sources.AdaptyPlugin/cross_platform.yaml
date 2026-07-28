@@ -1623,6 +1623,11 @@ $defs:
       id: { type: string }
       placement_id: { type: string }
       variation_id: { type: string }
+      locale:
+        {
+          $ref: "#/$defs/AdaptyLocale",
+          description: "Localization the view was built with; the flow default when none was requested",
+        }
 
   AdaptyUI.OnboardingView: #response #event
     type: object
