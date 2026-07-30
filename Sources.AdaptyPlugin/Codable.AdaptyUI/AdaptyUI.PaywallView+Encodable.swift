@@ -13,6 +13,7 @@ extension AdaptyUI.FlowView: Encodable {
         case id
         case placementId = "placement_id"
         case variationId = "variation_id"
+        case locale
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -20,6 +21,7 @@ extension AdaptyUI.FlowView: Encodable {
         try container.encode(id, forKey: .id)
         try container.encode(placementId, forKey: .placementId)
         try container.encode(variationId, forKey: .variationId)
+        try container.encodeIfPresent(locale, forKey: .locale)
     }
 
     @inlinable

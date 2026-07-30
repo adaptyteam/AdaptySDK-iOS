@@ -98,6 +98,7 @@ package extension AdaptyUI {
 #if canImport(UIKit)
         package static func createFlowView(
             flow: AdaptyFlow,
+            locale: String?,
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyUITagResolver?,
@@ -116,6 +117,7 @@ package extension AdaptyUI {
             
             let configuration = try await AdaptyUI.getFlowConfiguration(
                 forFlow: flow,
+                locale: locale,
                 loadTimeout: loadTimeout,
                 products: products,
                 observerModeResolver: observerModeResolver,
