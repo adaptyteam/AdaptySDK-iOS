@@ -12,11 +12,16 @@ public extension AdaptyUI {
         package let id: String
         package let placementId: String
         package let variationId: String
+        /// The localization the view was actually built with. It is the requested
+        /// locale when one was passed and resolved, and the flow's default
+        /// localization otherwise.
+        package let locale: String?
 
-        package init(id: String, placementId: String, variationId: String) {
+        package init(id: String, placementId: String, variationId: String, locale: String? = nil) {
             self.id = id
             self.placementId = placementId
             self.variationId = variationId
+            self.locale = locale
         }
     }
 
@@ -34,7 +39,8 @@ package extension AdaptyFlowUIView {
         AdaptyUI.FlowView(
             id: id,
             placementId: configuration.flowPlacementId,
-            variationId: configuration.flowVariationId
+            variationId: configuration.flowVariationId,
+            locale: configuration.locale
         )
     }
 }
@@ -44,7 +50,8 @@ public extension AdaptyFlowController {
         AdaptyUI.FlowView(
             id: id,
             placementId: configuration.flowPlacementId,
-            variationId: configuration.flowVariationId
+            variationId: configuration.flowVariationId,
+            locale: configuration.locale
         )
     }
 }

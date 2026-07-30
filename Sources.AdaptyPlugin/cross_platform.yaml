@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/4.0.1/schema"
+$id: "https://adapty.io/crossPlatform/4.0.2/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -30,13 +30,17 @@ $requests:
     properties:
       method: { const: "adapty_ui_create_flow_view" }
       flow: { $ref: "#/$defs/AdaptyFlow" }
+      locale: { $ref: "#/$defs/AdaptyLocale" }
       load_timeout: { type: number, description: "seconds" }
       preload_products: { type: boolean, default: false }
       custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
       custom_timers: { $ref: "#/$defs/AdaptyUI.CustomTimersValues" }
       custom_assets: { $ref: "#/$defs/AdaptyUI.CustomAssets" }
       product_purchase_parameters:
-        { $ref: "#/$defs/AdaptyUI.ProductPurchaseParameters" }
+        {
+          $ref: "#/$defs/AdaptyUI.ProductPurchaseParameters",
+          description: "Android Only",
+        }
       enable_safe_area_paddings: { type: boolean, default: true, description: "Android Only" }
 
   AdaptyUICreateFlowView.Response: #response
@@ -421,7 +425,11 @@ $requests:
     properties:
       method: { const: "make_purchase" }
       product: { $ref: "#/$defs/AdaptyPaywallProduct.Request" }
-      parameters:  { $ref: "#/$defs/AdaptyPurchaseParameters" }
+      parameters:
+        {
+          $ref: "#/$defs/AdaptyPurchaseParameters",
+          description: "Android Only",
+        }
 
   MakePurchase.Response: #response
     type: object
@@ -1615,6 +1623,11 @@ $defs:
       id: { type: string }
       placement_id: { type: string }
       variation_id: { type: string }
+      locale:
+        {
+          $ref: "#/$defs/AdaptyLocale",
+          description: "Localization the view was built with; the flow default when none was requested",
+        }
 
   AdaptyUI.OnboardingView: #response #event
     type: object
