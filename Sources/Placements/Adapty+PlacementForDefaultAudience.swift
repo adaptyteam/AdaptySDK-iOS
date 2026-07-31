@@ -118,43 +118,43 @@ public extension Adapty {
         repeat {
             let crossPlacementState = await CrossPlacementStorage.state(for: userId)
             let variationId = crossPlacementState?.variationId(placementId: placementId)
-            let requestWithSpecialVariation = variationId != nil
-
-            do throws(HTTPError) {
-                let draw: AdaptyPlacement.Draw<Content> =
-                    if let variationId {
-                        try await httpConfigsSession.fetchPlacementForDefaultAudience(
-                            Content.self,
-                            apiKeyPrefix: apiKeyPrefix,
-                            userId: userId,
-                            placementId: placementId,
-                            variationId: variationId,
-                            locale: locale,
-                            disableServerCache: isTestUser,
-                            timeoutInterval: nil
-                        )
-                    } else {
-                        try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
-                            Content.self,
-                            apiKeyPrefix: apiKeyPrefix,
-                            userId: userId,
-                            placementId: placementId,
-                            locale: locale,
-                            disableServerCache: isTestUser,
-                            timeoutInterval: nil
-                        )
-                    }
-                Adapty.trackEventIfNeed(draw)
-                return draw.content
-
-            } catch {
-                if !requestWithSpecialVariation,
-                   error.has(placementDecodingError: [.notFoundVariationId])
-                {
-                    lastError = error.asAdaptyError
-                    continue
-                } else {
+            if let variationId {
+                do throws(HTTPError) {
+                    let draw = try await httpConfigsSession.fetchPlacementForDefaultAudience(
+                        Content.self,
+                        apiKeyPrefix: apiKeyPrefix,
+                        userId: userId,
+                        placementId: placementId,
+                        variationId: variationId,
+                        locale: locale,
+                        disableServerCache: isTestUser,
+                        timeoutInterval: nil
+                    )
+                    Adapty.trackEventIfNeed(draw)
+                    return draw.content
+                } catch {
                     throw error.asAdaptyError
+                }
+            } else {
+                do throws(HTTPError) {
+                    let draw = try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
+                        Content.self,
+                        apiKeyPrefix: apiKeyPrefix,
+                        userId: userId,
+                        placementId: placementId,
+                        locale: locale,
+                        disableServerCache: isTestUser,
+                        timeoutInterval: nil
+                    )
+                    Adapty.trackEventIfNeed(draw)
+                    return draw.content
+                } catch {
+                    if error.has(placementDecodingError: [.notFoundVariationId]) {
+                        lastError = error.asAdaptyError
+                        continue
+                    } else {
+                        throw error.asAdaptyError
+                    }
                 }
             }
         } while !Task.isCancelled
@@ -162,3 +162,4 @@ public extension Adapty {
         throw lastError
     }
 }
+
