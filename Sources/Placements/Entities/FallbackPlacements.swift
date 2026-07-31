@@ -41,12 +41,42 @@ struct FallbackPlacements: Sendable {
         head.placementIds?.contains(id)
     }
 
+//    func existPlacement(
+//        _: (some PlacementContent).Type,
+//        byPlacementId id: String,
+//        withVariationId variationId: String?
+//    ) -> Bool {
+//        do {
+//            guard let data = try Data(contentsOf: fileURL).jsonExtractIfPresent(pointer: "/data/\(id)") else {
+//                Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: nil")
+//
+//                return nil
+//            }
+//            draw = try FallbackPlacements.decodePlacementVariationFromData(
+//                data,
+//                withUserId: userId,
+//                withVariationId: variationId,
+//                withRequestLocale: requestLocale,
+//                withFallbackVersion: version
+//            )
+//        } catch {
+//            log.error(String(describing: error))
+//            Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") error: \(error)")
+//            throw error
+//        }
+//
+//        Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: variationId = \(draw.content.variationId)")
+//
+//        return draw
+//    }
+
     func getPlacement<Content: PlacementContent>(
+        _: Content.Type,
         byPlacementId id: String,
         withVariationId variationId: String?,
         userId: AdaptyUserId,
         requestLocale: AdaptyLocale?
-    ) throws -> AdaptyPlacementChosen<Content>? {
+    ) throws -> AdaptyPlacement.Draw<Content>? {
         let draw: AdaptyPlacement.Draw<Content>
 
         do {
@@ -70,7 +100,7 @@ struct FallbackPlacements: Sendable {
 
         Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: variationId = \(draw.content.variationId)")
 
-        return .draw(draw)
+        return draw
     }
 
     func getUISchema(
@@ -155,9 +185,10 @@ private extension FallbackPlacements {
             with: .init(
                 userId: userId,
                 placement: placement,
-                requestLocale: requestLocale,
+                onboardingRequestLocale: requestLocale,
                 variationId: variationId
             )
         ).value
     }
 }
+

@@ -40,8 +40,6 @@ package extension AdaptyFlow {
 }
 
 extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
-    public typealias DecodingConfiguration = AdaptyPlacement.DecodingConfiguration
-
     enum CodingKeys: String, CodingKey {
         case id = "flow_id"
         case variationId = "variation_id"
@@ -55,10 +53,7 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
         try self.init(
             from: decoder,
             configuration: .init(
-                userId: nil,
-                placement: AdaptyPlacement(from: decoder),
-                requestLocale: nil,
-                variationId: nil
+                placement: .init(from: decoder)
             )
         )
     }
@@ -97,3 +92,4 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
         try placement.encode(to: encoder)
     }
 }
+

@@ -18,12 +18,31 @@ extension AdaptyPlacement {
 }
 
 extension AdaptyPlacement.Draw: DecodableWithConfiguration {
+    struct DecodingConfiguration: Sendable {
+        let userId: AdaptyUserId
+        let placement: AdaptyPlacement
+        let onboardingRequestLocale: AdaptyLocale?
+        var variationId: String?
+
+        init(
+            userId: AdaptyUserId,
+            placement: AdaptyPlacement,
+            onboardingRequestLocale: AdaptyLocale? = nil,
+            variationId: String? = nil
+        ) {
+            self.userId = userId
+            self.placement = placement
+            self.onboardingRequestLocale = onboardingRequestLocale
+            self.variationId = variationId
+        }
+    }
+
     var participatesInCrossPlacementABTest: Bool {
         variationIdByPlacements.isNotEmpty
     }
 
-    init(from decoder: Decoder, configuration: AdaptyPlacement.DecodingConfiguration) throws {
-        let userId = try configuration.userIdOrThrow
+    init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
+        let userId = configuration.userId
         let placement = configuration.placement
         let placementAudienceVersionId = placement.audienceVersionId
 
@@ -52,7 +71,10 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
 
         let variation = variations[index]
 
-        let content = try Self.content(from: decoder, index: index, configuration: configuration)
+        let content = try Self.content(from: decoder, index: index, configuration: .init(
+            placement: configuration.placement,
+            onboardingRequestLocale: configuration.onboardingRequestLocale
+        ))
 
         self.init(
             date: Date(),
@@ -76,3 +98,4 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placement content with index \(index) not found"))
     }
 }
+

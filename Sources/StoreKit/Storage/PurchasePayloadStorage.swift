@@ -263,6 +263,7 @@ extension PurchasePayloadStorage {
         Self.unfinishedTransactionState[transactionId] ?? false
     }
 
+    @discardableResult
     func addUnfinishedTransaction(_ transactionId: UInt64) -> Bool {
         let added = Self.setUnfinishedTransactionState(synced: false, forTransactionId: transactionId)
         if added {

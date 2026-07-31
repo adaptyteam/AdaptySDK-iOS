@@ -170,7 +170,8 @@ struct FallbackTests {
         for placementId in onboardings {
             let startTime = AdaptyContinuousClock.now
             do {
-                let _: AdaptyPlacementChosen<AdaptyOnboarding>? = try fallback.getPlacement(
+                let _: AdaptyPlacement.Draw<AdaptyOnboarding>? = try fallback.getPlacement(
+                    AdaptyOnboarding.self,
                     byPlacementId: placementId,
                     withVariationId: nil,
                     userId: .init(profileId: "test_profile", customerId: nil),
@@ -188,7 +189,8 @@ struct FallbackTests {
         for placementId in flows {
             let startTime = AdaptyContinuousClock.now
             do {
-                let _: AdaptyPlacementChosen<AdaptyFlow>? = try fallback.getPlacement(
+                let _: AdaptyPlacement.Draw<AdaptyFlow>? = try fallback.getPlacement(
+                    AdaptyFlow.self,
                     byPlacementId: placementId,
                     withVariationId: nil,
                     userId: .init(profileId: "test_profile", customerId: nil),

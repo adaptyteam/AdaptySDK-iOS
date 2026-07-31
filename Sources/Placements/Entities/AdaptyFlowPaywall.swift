@@ -42,15 +42,12 @@ extension AdaptyFlowPaywall: Encodable, Decodable, DecodableWithConfiguration {
         case webPaywallBaseUrl = "web_purchase_url"
         case products
     }
-    
+
     public init(from decoder: Decoder) throws {
         try self.init(
             from: decoder,
             configuration: .init(
-                userId: nil,
-                placement: AdaptyPlacement(from: decoder),
-                requestLocale: nil,
-                variationId: nil
+                placement: .init(from: decoder)
             )
         )
     }
@@ -91,3 +88,4 @@ extension AdaptyFlowPaywall: Encodable, Decodable, DecodableWithConfiguration {
         try placement.encode(to: encoder)
     }
 }
+

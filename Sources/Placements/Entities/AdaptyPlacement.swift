@@ -38,18 +38,15 @@ extension AdaptyPlacement: CustomStringConvertible {
 
 extension AdaptyPlacement: Codable {
     public struct DecodingConfiguration: Sendable {
-        let userId: AdaptyUserId?
         let placement: AdaptyPlacement
-        let requestLocale: AdaptyLocale?
-        var variationId: String?
+        let onboardingRequestLocale: AdaptyLocale?
 
-        var userIdOrThrow: AdaptyUserId {
-            get throws {
-                if let userId {
-                    return userId
-                }
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the userId value in configuration"))
-            }
+        init(
+            placement: AdaptyPlacement,
+            onboardingRequestLocale: AdaptyLocale? = nil
+        ) {
+            self.placement = placement
+            self.onboardingRequestLocale = onboardingRequestLocale
         }
     }
 
@@ -92,3 +89,4 @@ extension AdaptyPlacement: Codable {
         try container.encode(version, forKey: .version)
     }
 }
+
