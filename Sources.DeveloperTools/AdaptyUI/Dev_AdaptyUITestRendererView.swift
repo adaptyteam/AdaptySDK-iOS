@@ -141,6 +141,7 @@ public struct Dev_AdaptyUIRendererView: View {
     private let showDebugOverlay: Bool
     private let displayMissingTags: Bool
     private let interfaceOrientationOverride: Dev_InterfaceOrientation?
+    private let legacyLayout: Bool
 
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
@@ -148,6 +149,7 @@ public struct Dev_AdaptyUIRendererView: View {
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
         showDebugOverlay: Bool = false,
         displayMissingTags: Bool = true,
+        legacyLayout: Bool = false,
         safeAreaOverride: EdgeInsets? = nil,
         interfaceOrientationOverride: Dev_InterfaceOrientation? = nil,
         rtlOverride: Bool? = nil,
@@ -165,6 +167,7 @@ public struct Dev_AdaptyUIRendererView: View {
         self.safeAreaOverride = safeAreaOverride
         self.showDebugOverlay = showDebugOverlay
         self.displayMissingTags = displayMissingTags
+        self.legacyLayout = legacyLayout
         self.interfaceOrientationOverride = interfaceOrientationOverride
         self.viewConfiguration = viewConfiguration.wrapped
         // @StateObject so the configuration (and its JS state) survives
@@ -221,6 +224,7 @@ public struct Dev_AdaptyUIRendererView: View {
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: showDebugOverlay,
             displayMissingTags: displayMissingTags,
+            legacyLayout: legacyLayout,
             safeAreaOverride: safeAreaOverride,
             interfaceOrientationOverride: interfaceOrientationOverride.map { override in
                 switch override {

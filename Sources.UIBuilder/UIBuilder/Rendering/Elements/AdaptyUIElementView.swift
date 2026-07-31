@@ -11,6 +11,19 @@ import SwiftUI
 
 @MainActor
 struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
+    /// Debug escape hatch that keeps the pre-`Layout` implementation on every OS
+    /// version, so both paths can be compared on one device.
+    @Environment(\.debugLegacyLayoutEnabled)
+    private var debugLegacyLayoutEnabled: Bool
+
+    /// True when Row / Column / Flex should render through
+    /// `AdaptyUIWeightedStackLayout` instead of the `GeometryReader`-based views.
+    private var usesLayoutRendering: Bool {
+        guard !debugLegacyLayoutEnabled else { return false }
+        if #available(iOS 16.0, macOS 13.0, *) { return true }
+        return false
+    }
+
     private let element: VC.Element
     private let screenHolderBuilder: () -> ScreenHolderContent
     private var playAnimations: Binding<[VC.Animation]>
@@ -59,10 +72,17 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     screenHolderBuilder: screenHolderBuilder
                 )
             case .hug, .fill:
-                AdaptyUIFlexRowView(
-                    row,
-                    screenHolderBuilder: screenHolderBuilder
-                )
+                if usesLayoutRendering, #available(iOS 16.0, macOS 13.0, *) {
+                    AdaptyUIFlexRowView_Layout(
+                        row,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                } else {
+                    AdaptyUIFlexRowView(
+                        row,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                }
             }
         case let .column(column, _):
             switch column.height {
@@ -72,10 +92,17 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     screenHolderBuilder: screenHolderBuilder
                 )
             case .hug, .fill:
-                AdaptyUIFlexColumnView(
-                    column,
-                    screenHolderBuilder: screenHolderBuilder
-                )
+                if usesLayoutRendering, #available(iOS 16.0, macOS 13.0, *) {
+                    AdaptyUIFlexColumnView_Layout(
+                        column,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                } else {
+                    AdaptyUIFlexColumnView(
+                        column,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                }
             }
         case let .section(section, _):
             AdaptyUISectionView(
@@ -83,20 +110,41 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                 screenHolderBuilder: screenHolderBuilder
             )
         case let .switch(`switch`, _):
-            AdaptyUISwitchView(
-                `switch`,
-                screenHolderBuilder: screenHolderBuilder
-            )
+            if usesLayoutRendering, #available(iOS 16.0, macOS 13.0, *) {
+                AdaptyUISwitchView_Layout(
+                    `switch`,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            } else {
+                AdaptyUISwitchView(
+                    `switch`,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            }
         case let .flex(flex, _):
-            AdaptyUIFlexView(
-                flex,
-                screenHolderBuilder: screenHolderBuilder
-            )
+            if usesLayoutRendering, #available(iOS 16.0, macOS 13.0, *) {
+                AdaptyUIFlexView_Layout(
+                    flex,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            } else {
+                AdaptyUIFlexView(
+                    flex,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            }
         case let .flexStack(flexStack, _):
-            AdaptyUIFlexStackView(
-                flexStack,
-                screenHolderBuilder: screenHolderBuilder
-            )
+            if usesLayoutRendering, #available(iOS 16.0, macOS 13.0, *) {
+                AdaptyUIFlexStackView_Layout(
+                    flexStack,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            } else {
+                AdaptyUIFlexStackView(
+                    flexStack,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            }
         case let .toggle(toggle, _):
             AdaptyUIToggleView(toggle)
         case let .timer(timer, _):

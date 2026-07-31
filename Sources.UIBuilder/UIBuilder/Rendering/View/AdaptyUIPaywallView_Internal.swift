@@ -15,6 +15,9 @@ package struct AdaptyUIPaywallView_Internal: View {
 
     private let showDebugOverlay: Bool
     private let displayMissingTags: Bool
+    /// Developer-tools switch: render the adaptive containers through the
+    /// pre-`Layout` implementation regardless of OS version.
+    private let legacyLayout: Bool
     private let safeAreaOverride: EdgeInsets?
     private let interfaceOrientationOverride: VC.Orientation?
 
@@ -25,11 +28,13 @@ package struct AdaptyUIPaywallView_Internal: View {
     package init(
         showDebugOverlay: Bool,
         displayMissingTags: Bool,
+        legacyLayout: Bool = false,
         safeAreaOverride: EdgeInsets? = nil,
         interfaceOrientationOverride: VC.Orientation? = nil
     ) {
         self.showDebugOverlay = showDebugOverlay
         self.displayMissingTags = displayMissingTags
+        self.legacyLayout = legacyLayout
         self.safeAreaOverride = safeAreaOverride
         self.interfaceOrientationOverride = interfaceOrientationOverride
     }
@@ -48,6 +53,7 @@ package struct AdaptyUIPaywallView_Internal: View {
                 .withSafeArea(safeArea)
                 .withDebugOverlayEnabled(showDebugOverlay)
                 .withDisplayMissingTags(displayMissingTags)
+                .withLegacyLayoutEnabled(legacyLayout)
         }
         .background {
             // Only track live orientation when there is no explicit override.
