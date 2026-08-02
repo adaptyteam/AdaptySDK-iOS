@@ -41,12 +41,16 @@ final class CrossPlacementStorage {
         statesByProfileId[userId.profileId]
     }
 
-    static func set(draw: AdaptyPlacement.Draw<some PlacementContent>) {
+    @discardableResult
+    static func set(draw: AdaptyPlacement.Draw<some PlacementContent>) -> Bool {
         guard
             let currentValue = statesByProfileId[draw.userId.profileId],
             currentValue.canParticipateInABTest,
             draw.participatesInCrossPlacementABTest
-        else { return }
+        else { return false }
+
+        log.verbose("BEGIN CROSS-AB placementId = \(draw.content.placement.id) -> variationId = \(draw.content.variationId), DRAW, new state = \(draw.variationIdByPlacements)")
+
         save(
             crossPlacementState: .init(
                 variationIdByPlacements: draw.variationIdByPlacements,
@@ -54,15 +58,18 @@ final class CrossPlacementStorage {
             ),
             for: draw.userId
         )
+        return true
     }
 
-    static func set(crossPlacementState newValue: CrossPlacementState, for userId: AdaptyUserId) {
+    @discardableResult
+    static func set(crossPlacementState newValue: CrossPlacementState, for userId: AdaptyUserId) -> Bool {
         let oldValue = statesByProfileId[userId.profileId]
-        guard newValue.isNewerThan(oldValue) else { return }
+        guard newValue.isNewerThan(oldValue) else { return false }
 
         log.verbose("update crossPlacementState \(userId) to version = \(newValue.version), newValue = \(newValue.variationIdByPlacements), oldValue = \(oldValue?.variationIdByPlacements.description ?? "DISABLED")")
 
         save(crossPlacementState: newValue, for: userId)
+        return true
     }
 
     private static func save(crossPlacementState newValue: CrossPlacementState, for userId: AdaptyUserId) {
@@ -91,3 +98,42 @@ final class CrossPlacementStorage {
         log.verbose("clear cross-placement state of other profiles")
     }
 }
+
+extension Log {
+    static func verboseCrosABDrawResult(
+        draw: AdaptyPlacement.Draw<some PlacementContent>,
+        variationId: String?,
+        crossPlacmentState: CrossPlacementState?
+    ) {
+        guard Log.isLevel(.verbose) else { return }
+
+        let placementId = draw.content.placement.id
+        guard let crossPlacmentState else {
+            Log.crossAB.verbose("PlacementId = \(placementId), DISABLED CROSS-AB -> variationId = \(draw.content.variationId) DRAW")
+            return
+        }
+
+        if crossPlacmentState.canParticipateInABTest {
+            if variationId != nil {
+                Log.crossAB.verbose("PlacementId = \(placementId), EMPTY CROSS-AB    -> variationId = \(draw.content.variationId) IMPOSSIBLE")
+            } else if draw.participatesInCrossPlacementABTest {
+                return
+            } else {
+                Log.crossAB.verbose("PlacementId = \(placementId), EMPTY CROSS-AB    -> variationId = \(draw.content.variationId) DRAW (ab-test)")
+            }
+        } else {
+            if let variationId {
+                if variationId == draw.content.variationId {
+                    Log.crossAB.verbose("PlacementId = \(placementId), CONTINUE CROSS-AB -> variationId = \(draw.content.variationId)")
+                } else {
+                    Log.crossAB.verbose("PlacementId = \(placementId), CONTINUE CROSS-AB -> variationId = \(draw.content.variationId) WRONG (expected: \(variationId))")
+                }
+            } else if draw.participatesInCrossPlacementABTest {
+                Log.crossAB.verbose("PlacementId = \(placementId), OTHER CROSS-AB    -> variationId = \(draw.content.variationId) DRAW (ab-test)")
+            } else {
+                Log.crossAB.verbose("PlacementId = \(placementId), OTHER AB-TEST     -> variationId = \(draw.content.variationId) DRAW (ab-test)")
+            }
+        }
+    }
+}
+

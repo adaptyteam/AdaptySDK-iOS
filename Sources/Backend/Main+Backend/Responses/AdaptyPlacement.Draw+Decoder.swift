@@ -27,6 +27,8 @@ extension AdaptyPlacement.Draw {
             let body = response.body ?? Data()
             let jsonDecoder = JSONDecoder()
             configuration?.configure(jsonDecoder: jsonDecoder)
+            let crossPlacementState = CrossPlacementStorage.state(for: userId)
+            let variationId = crossPlacementState?.variationId(placementId: placementId)
 
             let draw: AdaptyPlacement.Draw<Content> = try Cache.writeOrRead(
                 body,
@@ -38,13 +40,23 @@ extension AdaptyPlacement.Draw {
                 accept: Content.shouldUseNew,
                 decode: { meta, data in
                     try jsonDecoder.decodePlacementVariations(
+                        crossPlacementEligible: meta.eligibleCrossABtest,
+                        variationId: variationId,
                         withUserId: userId,
                         withRequestLocale: requestLocale,
-                        crossPlacementEligible: meta.eligibleCrossABtest,
                         from: data
                     )
                 }
             )
+
+            if !CrossPlacementStorage.set(draw: draw) {
+                Log.verboseCrosABDrawResult(
+                    draw: draw,
+                    variationId: variationId,
+                    crossPlacmentState: crossPlacementState
+                )
+            }
+
             return response.replaceBody(draw)
         }
     }
@@ -165,3 +177,4 @@ private extension JSONDecoder {
         ).value.version
     }
 }
+

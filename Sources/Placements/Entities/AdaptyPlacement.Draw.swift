@@ -21,20 +21,9 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
     struct DecodingConfiguration: Sendable {
         let userId: AdaptyUserId
         let placement: AdaptyPlacement
+        let crossPlacementEligible: Bool
         let onboardingRequestLocale: AdaptyLocale?
-        var variationId: String?
-
-        init(
-            userId: AdaptyUserId,
-            placement: AdaptyPlacement,
-            onboardingRequestLocale: AdaptyLocale? = nil,
-            variationId: String? = nil
-        ) {
-            self.userId = userId
-            self.placement = placement
-            self.onboardingRequestLocale = onboardingRequestLocale
-            self.variationId = variationId
-        }
+        let variationId: String?
     }
 
     var participatesInCrossPlacementABTest: Bool {
@@ -44,6 +33,7 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
     init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
         let userId = configuration.userId
         let placement = configuration.placement
+        let crossPlacementEligible = configuration.crossPlacementEligible
         let placementAudienceVersionId = placement.audienceVersionId
 
         let variations = try [AdaptyPlacement.Variation](from: decoder)
@@ -69,7 +59,9 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placement content with index \(index) not found"))
         }
 
-        let variation = variations[index]
+        let variationIdByPlacements = crossPlacementEligible
+            ? variations[index].variationIdByPlacements
+            : [:]
 
         let content = try Self.content(from: decoder, index: index, configuration: .init(
             placement: configuration.placement,
@@ -81,7 +73,7 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
             userId: userId,
             content: content,
             placementAudienceVersionId: placementAudienceVersionId,
-            variationIdByPlacements: variation.variationIdByPlacements
+            variationIdByPlacements: variationIdByPlacements
         )
     }
 

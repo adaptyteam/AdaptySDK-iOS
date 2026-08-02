@@ -17,14 +17,14 @@ extension Cache {
     ) async -> AdaptyPlacement.Draw<Content>? {
         let crossPlacementState = CrossPlacementStorage.state(for: userId)
         if let variationId = crossPlacementState?.variationId(placementId: placementId) {
-            return await Cache.readPlacement(
+            return Cache.readPlacement(
                 placementId: placementId,
                 variationId: variationId,
                 locale: locale,
                 for: userId
             )
         } else {
-            return await Cache.readPlacementVariations(
+            return Cache.readPlacementVariations(
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy,
@@ -38,19 +38,20 @@ extension Cache {
         locale: AdaptyLocale?,
         fetchPolicy: AdaptyPlacementFetchPolicy,
         for userId: AdaptyUserId
-    ) async -> AdaptyPlacement.Draw<Content>? {
+    ) -> AdaptyPlacement.Draw<Content>? {
         let jsonDecoder = JSONDecoder()
         Backend.configure(jsonDecoder: jsonDecoder)
 
-        return Cache.read(
+        let draw: AdaptyPlacement.Draw<Content>? = Cache.read(
             Content.cacheKey(placementId: placementId, for: userId),
             accept: Content.shouldUseExisting(with: fetchPolicy, locale: locale),
             decode: { meta, data in
                 do {
                     return try jsonDecoder.decodePlacementVariations(
+                        crossPlacementEligible: meta.eligibleCrossABtest,
+                        variationId: nil,
                         withUserId: userId,
                         withRequestLocale: locale,
-                        crossPlacementEligible: meta.eligibleCrossABtest,
                         from: data
                     )
                 } catch {
@@ -61,14 +62,28 @@ extension Cache {
                 }
             }
         )
+
+        guard let draw else { return nil }
+
+        if !CrossPlacementStorage.set(draw: draw) {
+            Log.verboseCrosABDrawResult(
+                draw: draw,
+                variationId: nil,
+                crossPlacmentState: CrossPlacementStorage.state(for: userId)
+            )
+        }
+
+        return draw
     }
+
+
 
     private static func readPlacement<Content: PlacementContent>(
         placementId: String,
         variationId: String,
         locale: AdaptyLocale?,
         for userId: AdaptyUserId
-    ) async -> AdaptyPlacement.Draw<Content>? {
+    ) -> AdaptyPlacement.Draw<Content>? {
         let jsonDecoder = JSONDecoder()
         Backend.configure(jsonDecoder: jsonDecoder)
 
@@ -89,9 +104,10 @@ extension Cache {
         return Cache.read(
             Content.cacheKey(placementId: placementId, for: userId),
             accept: Content.shouldUseExisting(with: .returnCacheDataElseLoad, locale: locale),
-            decode: { _, data in
+            decode: { meta, data in
                 do {
                     return try jsonDecoder.decodePlacementVariations(
+                        crossPlacementEligible: meta.eligibleCrossABtest,
                         variationId: variationId,
                         withUserId: userId,
                         withRequestLocale: locale,
@@ -104,3 +120,4 @@ extension Cache {
         )
     }
 }
+

@@ -185,6 +185,7 @@ private extension FallbackPlacements {
             with: .init(
                 userId: userId,
                 placement: placement,
+                crossPlacementEligible: false,
                 onboardingRequestLocale: requestLocale,
                 variationId: variationId
             )
