@@ -33,7 +33,6 @@ extension FallbackPlacements {
     func read<Content: PlacementContent>(
         placementId: String,
         locale: AdaptyLocale?,
-        fetchPolicy _: AdaptyPlacementFetchPolicy,
         for userId: AdaptyUserId
     ) async -> AdaptyPlacement.Draw<Content>? {
         let crossPlacementState = await CrossPlacementStorage.state(for: userId)

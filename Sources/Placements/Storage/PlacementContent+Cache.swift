@@ -40,16 +40,15 @@ extension Cache {
     }
 
     private static func readPlacementVariations<Content: PlacementContent>(
-        _: Content.Type,
+        _ type: Content.Type,
         placementId: String,
         locale: AdaptyLocale?,
         fetchPolicy: AdaptyPlacementFetchPolicy,
         for userId: AdaptyUserId,
         fallbackFile: FallbackPlacements?
     ) -> AdaptyPlacement.Draw<Content>? {
-
         let fallbackFileVersion: Int? =
-        if let fallbackFile, fallbackFile.contains(placementId: placementId, variationId: nil) {
+            if let fallbackFile, fallbackFile.contains(placementId: placementId, variationId: nil) {
                 fallbackFile.version
             } else {
                 nil
@@ -58,7 +57,9 @@ extension Cache {
         let jsonDecoder = JSONDecoder()
         Backend.configure(jsonDecoder: jsonDecoder)
 
-        let draw: AdaptyPlacement.Draw<Content>? = Cache.read(
+        var draw: AdaptyPlacement.Draw<Content>?
+
+        draw = Cache.read(
             Content.cacheKey(placementId: placementId, for: userId),
             accept: Content.shouldUseExisting(with: fetchPolicy, locale: locale),
             decode: { meta, data in
@@ -79,6 +80,16 @@ extension Cache {
             }
         )
 
+        if draw == nil, let fallbackFile {
+            draw = try? fallbackFile.getPlacement(
+                type,
+                byPlacementId: placementId,
+                withVariationId: nil,
+                userId: userId,
+                requestLocale: locale
+            )
+        }
+
         guard let draw else { return nil }
 
         if !CrossPlacementStorage.set(draw: draw) {
@@ -93,16 +104,15 @@ extension Cache {
     }
 
     private static func readPlacement<Content: PlacementContent>(
-        _: Content.Type,
+        _ type: Content.Type,
         placementId: String,
         variationId: String,
         locale: AdaptyLocale?,
         for userId: AdaptyUserId,
         fallbackFile: FallbackPlacements?
     ) -> AdaptyPlacement.Draw<Content>? {
-
         let fallbackFileVersion: Int? =
-        if let fallbackFile, fallbackFile.contains(placementId: placementId, variationId: variationId) {
+            if let fallbackFile, fallbackFile.contains(placementId: placementId, variationId: variationId) {
                 fallbackFile.version
             } else {
                 nil
@@ -111,7 +121,9 @@ extension Cache {
         let jsonDecoder = JSONDecoder()
         Backend.configure(jsonDecoder: jsonDecoder)
 
-        let cached: AdaptyPlacement.Draw<Content>? = Cache.read(
+        var draw: AdaptyPlacement.Draw<Content>?
+
+        draw = Cache.read(
             Content.cacheKey(variationId: variationId),
             accept: Content.shouldUseExisting(with: .returnCacheDataElseLoad, locale: locale),
             decode: { _, data in
@@ -123,9 +135,9 @@ extension Cache {
             }
         )
 
-        guard cached == nil else { return cached }
+        guard draw == nil else { return draw }
 
-        return Cache.read(
+        draw = Cache.read(
             Content.cacheKey(placementId: placementId, for: userId),
             accept: Content.shouldUseExisting(with: .returnCacheDataElseLoad, locale: locale),
             decode: { meta, data in
@@ -141,6 +153,16 @@ extension Cache {
                     throw Cache.DecodeRejected(underlying: error)
                 }
             }
+        )
+
+        guard draw == nil, let fallbackFile else { return draw }
+
+        return try? fallbackFile.getPlacement(
+            type,
+            byPlacementId: placementId,
+            withVariationId: variationId,
+            userId: userId,
+            requestLocale: locale
         )
     }
 }
