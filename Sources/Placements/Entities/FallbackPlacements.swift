@@ -93,6 +93,9 @@ struct FallbackPlacements: Sendable {
                 withRequestLocale: requestLocale,
                 withFallbackVersion: version
             )
+        } catch let error as PlacementDecodingError where error == .notFoundVariationId {
+            Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: nil")
+            return nil
         } catch {
             log.error(String(describing: error))
             Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") error: \(error)")
