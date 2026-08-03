@@ -28,8 +28,6 @@ extension Adapty {
     }
 }
 
-private let log = Log.fallbackPlacements
-
 extension FallbackPlacements {
     @inlinable
     func read<Content: PlacementContent>(
@@ -48,4 +46,3 @@ extension FallbackPlacements {
         )
     }
 }
-

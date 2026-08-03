@@ -27,6 +27,54 @@ struct FallbackTests {
         }
     }
 
+    @Test func contains_placement_and_optionally_variation() throws {
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("json")
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let json = """
+        {
+          "meta": {
+            "version": \(Adapty.fallbackFormatVersion),
+            "response_created_at": 1,
+            "developer_ids": ["placement", "metadata-only"]
+          },
+          "data": {
+            "placement": {
+              "data": [
+                { "variation_id": "variation-1" },
+                { "variation_id": "variation-2" }
+              ]
+            },
+            "data-only": {
+              "data": [
+                { "variation_id": "variation-3" }
+              ]
+            },
+            "path/to~placement": {
+              "data": [
+                { "variation_id": "variation-4" }
+              ]
+            }
+          }
+        }
+        """
+        try Data(json.utf8).write(to: fileURL)
+
+        let fallback = try FallbackPlacements(fileURL: fileURL)
+
+        #expect(fallback.contains(placementId: "placement", variationId: nil) == true)
+        #expect(fallback.contains(placementId: "data-only", variationId: nil) == true)
+        #expect(fallback.contains(placementId: "metadata-only", variationId: nil) == false)
+        #expect(fallback.contains(placementId: "missing", variationId: nil) == false)
+        #expect(fallback.contains(placementId: "placement", variationId: "variation-2") == true)
+        #expect(fallback.contains(placementId: "data-only", variationId: "variation-3") == true)
+        #expect(fallback.contains(placementId: "path/to~placement", variationId: "variation-4") == true)
+        #expect(fallback.contains(placementId: "placement", variationId: "missing") == false)
+        #expect(fallback.contains(placementId: "missing", variationId: "variation-1") == false)
+    }
+
     @Test func json_serialization_does_not_use_call_stack() throws {
         // 200_000 уровней. Даже при «тонком» кадре в 80 байт это ~16 МБ —
         // в дефолтный стек потока (512 КБ на background, 8 МБ на main) не лезет ни при каком раскладе.

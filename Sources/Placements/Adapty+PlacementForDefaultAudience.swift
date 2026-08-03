@@ -77,6 +77,7 @@ public extension Adapty {
 
         if !isTestUser {
             if let draw: AdaptyPlacement.Draw<Content> = await Cache.read(
+                Content.self,
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy,

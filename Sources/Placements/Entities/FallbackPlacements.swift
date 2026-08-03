@@ -37,38 +37,38 @@ struct FallbackPlacements: Sendable {
         fileURL = url
     }
 
-    func contains(placementId id: String) -> Bool? {
-        head.placementIds?.contains(id)
-    }
+    func contains(
+        placementId id: String,
+        variationId: String?
+    ) -> Bool {
+        struct Variation: Decodable {
+            let id: String
 
-//    func existPlacement(
-//        _: (some PlacementContent).Type,
-//        byPlacementId id: String,
-//        withVariationId variationId: String?
-//    ) -> Bool {
-//        do {
-//            guard let data = try Data(contentsOf: fileURL).jsonExtractIfPresent(pointer: "/data/\(id)") else {
-//                Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: nil")
-//
-//                return nil
-//            }
-//            draw = try FallbackPlacements.decodePlacementVariationFromData(
-//                data,
-//                withUserId: userId,
-//                withVariationId: variationId,
-//                withRequestLocale: requestLocale,
-//                withFallbackVersion: version
-//            )
-//        } catch {
-//            log.error(String(describing: error))
-//            Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") error: \(error)")
-//            throw error
-//        }
-//
-//        Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: variationId = \(draw.content.variationId)")
-//
-//        return draw
-//    }
+            enum CodingKeys: String, CodingKey {
+                case id = "variation_id"
+            }
+        }
+
+        do {
+            let data = try Data(contentsOf: fileURL)
+            let placementPointer = "/data/\(id.jsonPointerSegment)"
+
+            guard let variationId else {
+                return try data.jsonExtractIfPresent(pointer: placementPointer) != nil
+            }
+
+            guard let variations = try data.jsonExtractIfPresent(pointer: "\(placementPointer)/data") else {
+                return false
+            }
+
+            return try FallbackPlacements.decoder()
+                .decode([Variation].self, from: variations)
+                .contains { $0.id == variationId }
+        } catch {
+            log.error(String(describing: error))
+            return false
+        }
+    }
 
     func getPlacement<Content: PlacementContent>(
         _: Content.Type,
@@ -192,4 +192,3 @@ private extension FallbackPlacements {
         ).value
     }
 }
-

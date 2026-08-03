@@ -10,35 +10,51 @@ import Foundation
 extension Cache {
     @inlinable
     static func read<Content: PlacementContent>(
+        _ type: Content.Type,
         placementId: String,
         locale: AdaptyLocale?,
         fetchPolicy: AdaptyPlacementFetchPolicy,
-        for userId: AdaptyUserId
+        for userId: AdaptyUserId,
+        fallbackFile: FallbackPlacements? = nil
     ) async -> AdaptyPlacement.Draw<Content>? {
         let crossPlacementState = CrossPlacementStorage.state(for: userId)
         if let variationId = crossPlacementState?.variationId(placementId: placementId) {
             return Cache.readPlacement(
+                type,
                 placementId: placementId,
                 variationId: variationId,
                 locale: locale,
-                for: userId
+                for: userId,
+                fallbackFile: fallbackFile
             )
         } else {
             return Cache.readPlacementVariations(
+                type,
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy,
-                for: userId
+                for: userId,
+                fallbackFile: fallbackFile
             )
         }
     }
 
     private static func readPlacementVariations<Content: PlacementContent>(
+        _: Content.Type,
         placementId: String,
         locale: AdaptyLocale?,
         fetchPolicy: AdaptyPlacementFetchPolicy,
-        for userId: AdaptyUserId
+        for userId: AdaptyUserId,
+        fallbackFile: FallbackPlacements?
     ) -> AdaptyPlacement.Draw<Content>? {
+
+        let fallbackFileVersion: Int? =
+        if let fallbackFile, fallbackFile.contains(placementId: placementId, variationId: nil) {
+                fallbackFile.version
+            } else {
+                nil
+            }
+
         let jsonDecoder = JSONDecoder()
         Backend.configure(jsonDecoder: jsonDecoder)
 
@@ -76,14 +92,22 @@ extension Cache {
         return draw
     }
 
-
-
     private static func readPlacement<Content: PlacementContent>(
+        _: Content.Type,
         placementId: String,
         variationId: String,
         locale: AdaptyLocale?,
-        for userId: AdaptyUserId
+        for userId: AdaptyUserId,
+        fallbackFile: FallbackPlacements?
     ) -> AdaptyPlacement.Draw<Content>? {
+
+        let fallbackFileVersion: Int? =
+        if let fallbackFile, fallbackFile.contains(placementId: placementId, variationId: variationId) {
+                fallbackFile.version
+            } else {
+                nil
+            }
+
         let jsonDecoder = JSONDecoder()
         Backend.configure(jsonDecoder: jsonDecoder)
 

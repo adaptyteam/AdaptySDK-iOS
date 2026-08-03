@@ -154,6 +154,7 @@ extension Adapty {
     ) async throws(AdaptyError) -> Content {
         if !isTestUser {
             if let draw: AdaptyPlacement.Draw<Content> = await Cache.read(
+                Content.self,
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy,
@@ -233,42 +234,18 @@ extension Adapty {
         _ placementId: String,
         _ locale: AdaptyLocale?
     ) async -> Content? {
-        // TODO: need implement (Search in Fallback)
         if let draw: AdaptyPlacement.Draw<Content> = await Cache.read(
+            Content.self,
             placementId: placementId,
             locale: locale,
             fetchPolicy: .returnCacheDataElseLoad,
-            for: userId
+            for: userId,
+            fallbackFile: Adapty.fallbackPlacements
         ) {
             Adapty.trackEventIfNeed(draw)
             return draw.content
         }
         return nil
-
-//        let crossPlacementState = await CrossPlacementStorage.state(for: userId)
-//
-//
-//        let chosen: AdaptyPlacementChosen<Content>? =
-//            if let manager = try? profileManager(withProfileId: userId) {
-//                manager.placementStorage.getPlacementWithFallback(
-//                    byPlacementId: placementId,
-//                    withVariationId: withCrossPlacmentABTest ? manager.crossPlacmentStorage.state?.variationId(placementId: placementId) : nil,
-//                    userId: userId,
-//                    locale: locale
-//                )
-//            } else {
-//                try? Adapty.fallbackPlacements?.getPlacement(
-//                    byPlacementId: placementId,
-//                    withVariationId: nil,
-//                    userId: userId,
-//                    requestLocale: locale
-//                )
-//            }
-//
-//        guard let chosen else { return nil }
-//
-//        Adapty.trackEventIfNeed(chosen)
-//        return chosen.content
     }
 
     private func fetchFallbackBackendPlacement<Content: PlacementContent>(
