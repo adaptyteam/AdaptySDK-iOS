@@ -39,16 +39,24 @@ extension Cache {
         let existing = fm.readValidatedCacheMeta(for: key)
         if let existing, let accept {
             guard accept(newMeta, existing) else {
+                log.verbose("cache.write[skip]: \(newMeta), persisted: \(existing)")
                 return false
             }
         }
 
-        try fm.writeCacheItem(
-            data: data,
-            meta: newMeta,
-            oldDataSize: existing?.size ?? 0
-        )
-        return true
+        do {
+            try fm.writeCacheItem(
+                data: data,
+                meta: newMeta,
+                oldDataSize: existing?.size ?? 0
+            )
+            log.verbose("cache.write[complete]: \(newMeta)")
+            return true
+        } catch {
+            log.verbose("cache.write[error]: \(newMeta), error:\(error)")
+            throw error
+        }
+
     }
 }
 

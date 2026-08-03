@@ -47,6 +47,14 @@ extension Cache {
     }
 }
 
+extension Cache.Meta: CustomStringConvertible {
+    var description: String {
+        let segmentId = self.segmentId.map { ", segmentId: \($0)" } ?? ""
+        let locale = self.locale.map { ", locale: \($0.id)" } ?? ""
+        return "\(key.description), dataVersion: \(dataVersion), eligible_ab: \(eligibleCrossABtest)\(segmentId)\(locale),  [schema: \(schemaVersion)]"
+    }
+}
+
 extension Cache.Meta: Codable {
     private enum CodingKeys: String, CodingKey {
         case profileId = "profile"

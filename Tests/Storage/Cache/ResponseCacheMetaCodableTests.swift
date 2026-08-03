@@ -14,6 +14,29 @@ import Testing
 extension ResponseCacheTests {
     @Suite("Meta codable + backwards-compat")
     struct MetaCodableTests {
+        @Test func item_key_description_matches_log_format() {
+            let key = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "obj1")
+            let sharedKey = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "layout1")
+
+            #expect(key.description == "p1\\flow\\<obj1>")
+            #expect(sharedKey.description == "flow_layout\\<layout1>")
+        }
+
+        @Test func meta_description_matches_log_format() {
+            let meta = Cache.Meta(
+                key: .init(profileId: "p1", itemType: .flow, itemId: "obj1"),
+                size: 42,
+                locale: "en",
+                eligibleCrossABtest: true,
+                segmentId: "segment1",
+                dataVersion: 7,
+                storedAt: Date(timeIntervalSince1970: 1_700_000_000),
+                lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
+            )
+
+            #expect(meta.description == "p1\\flow\\<obj1>, dataVersion: 7, eligible_ab: true, segmentId: segment1, locale: en,  [schema: 1]")
+        }
+
         @Test func decode_meta_with_profile_field() async throws {
             let json = """
             {

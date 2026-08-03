@@ -80,9 +80,10 @@ private extension FileManager {
 
         if let data = try? Data(contentsOf: dataFileURL) {
             existingMeta.syncLastAccessed()
+            log.verbose("cache.write[skip]: \(newMeta), return-persisted: \(existingMeta)")
             return data
         } else {
-            log.warn("Cached data read failed. Remove invalid data. Self-heal + try new.")
+            log.warn("cache.write[persisted-failed]: \(newMeta),  description: Cached data read failed. Remove invalid data. Self-heal + try new.")
             removeCacheItem(metaFileURL: metaFileURL, dataFileURL: dataFileURL)
         }
 
@@ -91,7 +92,6 @@ private extension FileManager {
             newMeta: newMeta,
             existingMeta: existingMeta
         )
-
         return newData
     }
 
@@ -106,8 +106,9 @@ private extension FileManager {
                 meta: newMeta,
                 oldDataSize: existingMeta?.size ?? 0
             )
+            log.verbose("cache.write[complete]: \(newMeta)")
         } catch {
-            log.warn("Write data failed (new data still returned): \(error)")
+            log.warn("cache.write[error]: \(newMeta) Write data failed (new data still returned): \(error)")
         }
     }
 }

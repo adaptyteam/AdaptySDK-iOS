@@ -18,22 +18,27 @@ extension Cache {
     ) -> Data? {
         let fm = fileManager
         guard let meta = fm.readValidatedCacheMeta(for: key) else {
+            log.verbose("cache.read[absent]: \(key)")
             return nil
         }
 
         if let accept {
-            guard accept(meta) else { return nil }
+            guard accept(meta) else {
+                log.verbose("cache.read[skip]: \(meta)")
+                return nil
+            }
         }
 
         let dataFileURL = key.dataFileURL
 
         guard let data = try? Data(contentsOf: dataFileURL) else {
-            log.warn("Cached data read failed. Self-heal pair. Remove invalid data.")
+            log.warn("cache.read[failed]: \(meta), description: Cached data read failed. Self-heal pair. Remove invalid data.")
             fm.removeCacheItem(key: key)
             return nil
         }
 
         meta.syncLastAccessed()
+        log.verbose("cache.read[complete]: \(meta)")
         return data
     }
 
@@ -44,14 +49,19 @@ extension Cache {
         accept: (@Sendable (_ existing: Meta) -> Bool)? = nil
     ) -> Bool {
         guard let meta = fileManager.readValidatedCacheMeta(for: key) else {
+            log.verbose("cache.touch[absent]: \(key)")
             return false
         }
 
         if let accept {
-            guard accept(meta) else { return false }
+            guard accept(meta) else {
+                log.verbose("cache.touch[skip]: \(meta)")
+                return false
+            }
         }
 
         meta.syncLastAccessed()
+        log.verbose("cache.touch[complete]: \(meta)")
         return true
     }
 }

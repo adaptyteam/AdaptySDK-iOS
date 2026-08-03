@@ -7,11 +7,20 @@
 
 import Foundation
 
+private let log = Log.cache
+
 @StorageActor
 extension Cache {
     @inlinable
     static func removeAll() {
-        try? fileManager.removeItem(at: rootDirectory)
+        do {
+            try fileManager.removeItem(at: rootDirectory)
+            log.verbose("cache.removeAll[complete]")
+        } catch let error as CocoaError where error.code == .fileNoSuchFile {
+            log.verbose("cache.removeAll[complete]: directory did not exist")
+        } catch {
+            log.verbose("cache.removeAll[error]: \(error)")
+        }
         totalBytesUpperBound = 0
         nextEvictionScanAllowedAt = nil
     }
@@ -30,7 +39,12 @@ extension Cache {
         for name in subdirectories
             where name != currentProfileDirectoryName && name != sharedDirectoryName
         {
-            try? fm.removeItem(at: rootDirectory.appendingPathComponent(name, isDirectory: true))
+            do {
+                try fm.removeItem(at: rootDirectory.appendingPathComponent(name, isDirectory: true))
+                log.verbose("cache.removeOtherProfile[complete]: *\(name)*")
+            } catch {
+                log.verbose("cache.removeOtherProfile[error]: *\(name)*, error: \(error)")
+            }
         }
     }
 }

@@ -28,17 +28,21 @@ extension Cache {
     ) -> T? {
         let fm = fileManager
         guard let meta = fm.readValidatedCacheMeta(for: key) else {
+            log.verbose("cache.read[absent]: \(key)")
             return nil
         }
 
         if let accept {
-            guard accept(meta) else { return nil }
+            guard accept(meta) else {
+                log.verbose("cache.read[skip]: \(meta)")
+                return nil
+            }
         }
 
         let dataFileURL = key.dataFileURL
 
         guard let data = try? Data(contentsOf: dataFileURL) else {
-            log.warn("Cached data read failed. Self-heal pair. Remove invalid data.")
+            log.warn("cache.read[failed]: \(meta), description: Cached data read failed. Self-heal pair. Remove invalid data.")
             fm.removeCacheItem(key: key)
             return nil
         }
@@ -47,15 +51,16 @@ extension Cache {
         do {
             decoded = try decode(meta, data)
         } catch let error as DecodeRejected {
-            log.warn("Cached data decode failed: \(error.underlying). Keep existing data.")
+            log.warn("cache.read[rejected]: \(meta), description: Cached data decode failed: \(error.underlying). Keep existing data.")
             return nil
         } catch {
-            log.warn("Cached data decode failed: \(error). Self-heal pair. Remove invalid data.")
+            log.warn("cache.read[failed]: \(meta), description: Cached data decode failed: \(error). Self-heal pair. Remove invalid data.")
             fm.removeCacheItem(key: key)
             return nil
         }
 
         meta.syncLastAccessed()
+        log.verbose("cache.read[complete]: \(meta)")
         return decoded
     }
 
@@ -132,13 +137,14 @@ private extension FileManager {
             do {
                 let decoded = try decode(existingMeta, existingData)
                 existingMeta.syncLastAccessed()
+                log.verbose("cache.write[skip]: \(newMeta), return-persisted: \(existingMeta)")
                 return decoded
             } catch {
-                log.warn("Cached data decode failed: \(error). Remove invalid data. Self-heal + try new.")
+                log.warn("cache.write[skip-failed]: \(newMeta), persisted: \(existingMeta), description: Cached data decode failed. Remove invalid data. Self-heal + try new. error: \(error)")
                 removeCacheItem(metaFileURL: metaFileURL, dataFileURL: dataFileURL)
             }
         } else {
-            log.warn("Cached data read failed. Remove invalid data. Self-heal + try new.")
+            log.warn("cache.write[skip-failed]: \(newMeta), persisted: \(existingMeta) , description: Cached data read failed. Remove invalid data. Self-heal + try new.")
             removeCacheItem(metaFileURL: metaFileURL, dataFileURL: dataFileURL)
         }
 
@@ -160,11 +166,11 @@ private extension FileManager {
             decodedNew = try decode(newMeta, newData)
         } catch {
             guard let existingMeta else {
-                log.warn("New data decode failed: \(error)")
+                log.verbose("cache.write[decode-error]: \(newMeta), error: \(error)")
                 throw error
             }
-            log.warn("New data decode failed: \(error) Self-heal + try existing.")
             return try readExistingElseFallbackError(
+                newMeta: newMeta,
                 existingMeta: existingMeta,
                 fallbackError: error,
                 decode: decode
@@ -177,13 +183,15 @@ private extension FileManager {
                 meta: newMeta,
                 oldDataSize: existingMeta?.size ?? 0
             )
+            log.verbose("cache.write[complete]: \(newMeta)")
         } catch {
-            log.warn("Write data failed (new data still returned): \(error)")
+            log.warn("cache.write[error]: \(newMeta), description: Write data failed (new data still returned): \(error)")
         }
         return decodedNew
     }
 
     private func readExistingElseFallbackError<T: Sendable>(
+        newMeta: Cache.Meta,
         existingMeta: Cache.Meta,
         fallbackError: Error,
         decode: @StorageActor (Cache.Meta, Data) throws -> T
@@ -192,7 +200,7 @@ private extension FileManager {
         let dataFileURL = existingMeta.key.dataFileURL
 
         guard let existingData = try? Data(contentsOf: dataFileURL) else {
-            log.warn("Cached data read failed. Remove invalid data. Return previous error.")
+            log.warn("cache.write[decode-error]: \(newMeta), description: Cached data read failed. Remove invalid data. Return error: \(fallbackError)")
             removeCacheItem(metaFileURL: metaFileURL, dataFileURL: dataFileURL)
             throw fallbackError
         }
@@ -201,12 +209,13 @@ private extension FileManager {
         do {
             decodedCached = try decode(existingMeta, existingData)
         } catch {
-            log.warn("Cached data decode failed: \(error). Remove invalid data. Return previous error.")
+            log.warn("cache.write[decode-error]: \(newMeta), persisted: \(existingMeta), description: Cached data decode failed. Remove invalid data. Return new data decode error: \(fallbackError)")
             removeCacheItem(metaFileURL: metaFileURL, dataFileURL: dataFileURL)
             throw fallbackError
         }
 
         existingMeta.syncLastAccessed()
+        log.warn("cache.write[skip-decode-error]: \(newMeta), return-persisted: \(existingMeta) error: \(fallbackError)")
         return decodedCached
     }
 
@@ -219,7 +228,7 @@ private extension FileManager {
         do {
             decodedNew = try decode(newMeta, newData)
         } catch {
-            log.warn("New data decode failed: \(error)")
+            log.warn("cache.write[failed]: \(newMeta), error: \(error)")
             throw error
         }
 
@@ -229,8 +238,10 @@ private extension FileManager {
                 meta: newMeta,
                 oldDataSize: 0
             )
+            log.verbose("cache.write[complete]: \(newMeta)")
+
         } catch {
-            log.warn("Write data failed (new data still returned): \(error)")
+            log.warn("cache.write[error]: \(newMeta), description: Write data failed (new data still returned): \(error)")
         }
         return decodedNew
     }
