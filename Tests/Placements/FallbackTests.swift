@@ -52,14 +52,20 @@ struct FallbackTests {
                 { "variation_id": "variation-3" }
               ]
             },
-            "path/to~placement": {
+            "плейсмент-€-👍": {
               "data": [
-                { "variation_id": "variation-4" }
+                { "variation_id": "вариант-€-👍" }
+              ]
+            },
+            "путь/to~плейсмент-€-👍": {
+              "data": [
+                { "variation_id": "вариант-special" }
               ]
             }
           }
         }
         """
+        #expect(!json.contains("\\u"))
         try Data(json.utf8).write(to: fileURL)
 
         let fallback = try FallbackPlacements(fileURL: fileURL)
@@ -70,7 +76,10 @@ struct FallbackTests {
         #expect(fallback.contains(placementId: "missing", variationId: nil) == false)
         #expect(fallback.contains(placementId: "placement", variationId: "variation-2") == true)
         #expect(fallback.contains(placementId: "data-only", variationId: "variation-3") == true)
-        #expect(fallback.contains(placementId: "path/to~placement", variationId: "variation-4") == true)
+        #expect(fallback.contains(placementId: "плейсмент-€-👍", variationId: nil) == true)
+        #expect(fallback.contains(placementId: "плейсмент-€-👍", variationId: "вариант-€-👍") == true)
+        #expect(fallback.contains(placementId: "путь/to~плейсмент-€-👍", variationId: nil) == true)
+        #expect(fallback.contains(placementId: "путь/to~плейсмент-€-👍", variationId: "вариант-special") == true)
         #expect(fallback.contains(placementId: "placement", variationId: "missing") == false)
         #expect(fallback.contains(placementId: "missing", variationId: "variation-1") == false)
     }

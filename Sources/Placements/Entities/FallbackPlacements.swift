@@ -51,7 +51,7 @@ struct FallbackPlacements: Sendable {
 
         do {
             let data = try Data(contentsOf: fileURL)
-            let placementPointer = "/data/\(id.jsonPointerSegment)"
+            let placementPointer = "/data/\(id.jsonPointerSegment())"
 
             guard let variationId else {
                 return try data.jsonExtractIfPresent(pointer: placementPointer) != nil
@@ -80,7 +80,8 @@ struct FallbackPlacements: Sendable {
         let draw: AdaptyPlacement.Draw<Content>
 
         do {
-            guard let data = try Data(contentsOf: fileURL).jsonExtractIfPresent(pointer: "/data/\(id)") else {
+            let placementPointer = "/data/\(id.jsonPointerSegment())"
+            guard let data = try Data(contentsOf: fileURL).jsonExtractIfPresent(pointer: placementPointer) else {
                 Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: nil")
 
                 return nil
@@ -110,7 +111,8 @@ struct FallbackPlacements: Sendable {
         let schema: AdaptyUISchema?
         do {
             let file = try Data(contentsOf: fileURL)
-            guard let data = try file.jsonExtractIfPresent(pointer: "/ui_builder/\(id)") else {
+            let layoutPointer = "/ui_builder/\(id.jsonPointerSegment())"
+            guard let data = try file.jsonExtractIfPresent(pointer: layoutPointer) else {
                 return nil
             }
             schema = try AdaptyUISchema(from: data, configuration: decodingConfiguration)

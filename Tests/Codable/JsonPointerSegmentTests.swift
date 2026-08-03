@@ -29,86 +29,86 @@ struct JsonPointerSegmentTests {
     // MARK: - ASCII pass-through
 
     @Test func emptyString() {
-        #expect("".jsonPointerSegment == "")
+        #expect("".jsonPointerSegment(escapingNonASCII: true) == "")
     }
 
     @Test func plainAsciiPassesThrough() {
-        #expect("name".jsonPointerSegment == "name")
-        #expect("placement_id_42".jsonPointerSegment == "placement_id_42")
-        #expect("AbcXYZ012".jsonPointerSegment == "AbcXYZ012")
+        #expect("name".jsonPointerSegment(escapingNonASCII: true) == "name")
+        #expect("placement_id_42".jsonPointerSegment(escapingNonASCII: true) == "placement_id_42")
+        #expect("AbcXYZ012".jsonPointerSegment(escapingNonASCII: true) == "AbcXYZ012")
     }
 
     @Test func asciiPunctuationPassesThrough() {
         // Everything ASCII except '/' and '~'
-        #expect(" !\"#$%&'()*+,-.".jsonPointerSegment == " !\"#$%&'()*+,-.")
-        #expect("0123456789:;<=>?".jsonPointerSegment == "0123456789:;<=>?")
-        #expect("[\\]^_`".jsonPointerSegment == "[\\]^_`")
-        #expect("{|}".jsonPointerSegment == "{|}")
+        #expect(" !\"#$%&'()*+,-.".jsonPointerSegment(escapingNonASCII: true) == " !\"#$%&'()*+,-.")
+        #expect("0123456789:;<=>?".jsonPointerSegment(escapingNonASCII: true) == "0123456789:;<=>?")
+        #expect("[\\]^_`".jsonPointerSegment(escapingNonASCII: true) == "[\\]^_`")
+        #expect("{|}".jsonPointerSegment(escapingNonASCII: true) == "{|}")
     }
 
     // MARK: - RFC 6901 escapes
 
     @Test func slashIsEscapedToTilde1() {
-        #expect("/".jsonPointerSegment == "~1")
-        #expect("a/b".jsonPointerSegment == "a~1b")
-        #expect("///".jsonPointerSegment == "~1~1~1")
+        #expect("/".jsonPointerSegment(escapingNonASCII: true) == "~1")
+        #expect("a/b".jsonPointerSegment(escapingNonASCII: true) == "a~1b")
+        #expect("///".jsonPointerSegment(escapingNonASCII: true) == "~1~1~1")
     }
 
     @Test func tildeIsEscapedToTilde0() {
-        #expect("~".jsonPointerSegment == "~0")
-        #expect("a~b".jsonPointerSegment == "a~0b")
-        #expect("~~".jsonPointerSegment == "~0~0")
+        #expect("~".jsonPointerSegment(escapingNonASCII: true) == "~0")
+        #expect("a~b".jsonPointerSegment(escapingNonASCII: true) == "a~0b")
+        #expect("~~".jsonPointerSegment(escapingNonASCII: true) == "~0~0")
     }
 
     @Test func slashAndTildeOrderPreserved() {
         // RFC 6901 says encode tilde first when escaping; the result must be
         // unambiguous either way at decode time. We verify both inputs come
         // out as expected.
-        #expect("~/".jsonPointerSegment == "~0~1")
-        #expect("/~".jsonPointerSegment == "~1~0")
-        #expect("a~1b/c".jsonPointerSegment == "a~01b~1c") // literal ~1 in name
+        #expect("~/".jsonPointerSegment(escapingNonASCII: true) == "~0~1")
+        #expect("/~".jsonPointerSegment(escapingNonASCII: true) == "~1~0")
+        #expect("a~1b/c".jsonPointerSegment(escapingNonASCII: true) == "a~01b~1c") // literal ~1 in name
     }
 
     // MARK: - BMP non-ASCII -> single \uXXXX
 
     @Test func euroSign() {
-        #expect("\u{20ac}".jsonPointerSegment == Self.u(0x20ac))
+        #expect("\u{20ac}".jsonPointerSegment(escapingNonASCII: true) == Self.u(0x20ac))
     }
 
     @Test func trademark() {
-        #expect("\u{2122}".jsonPointerSegment == Self.u(0x2122))
+        #expect("\u{2122}".jsonPointerSegment(escapingNonASCII: true) == Self.u(0x2122))
     }
 
     @Test func arrow() {
-        #expect("\u{2192}".jsonPointerSegment == Self.u(0x2192))
+        #expect("\u{2192}".jsonPointerSegment(escapingNonASCII: true) == Self.u(0x2192))
     }
 
     @Test func cyrillic() {
         // "имя"
-        #expect("имя".jsonPointerSegment == Self.us(0x0438, 0x043c, 0x044f))
+        #expect("имя".jsonPointerSegment(escapingNonASCII: true) == Self.us(0x0438, 0x043c, 0x044f))
     }
 
     @Test func greek() {
-        #expect("αβγ".jsonPointerSegment == Self.us(0x03b1, 0x03b2, 0x03b3))
+        #expect("αβγ".jsonPointerSegment(escapingNonASCII: true) == Self.us(0x03b1, 0x03b2, 0x03b3))
     }
 
     @Test func japaneseHiragana() {
-        #expect("こんにちは".jsonPointerSegment == Self.us(0x3053, 0x3093, 0x306b, 0x3061, 0x306f))
+        #expect("こんにちは".jsonPointerSegment(escapingNonASCII: true) == Self.us(0x3053, 0x3093, 0x306b, 0x3061, 0x306f))
     }
 
     @Test func chinese() {
-        #expect("你好".jsonPointerSegment == Self.us(0x4f60, 0x597d))
+        #expect("你好".jsonPointerSegment(escapingNonASCII: true) == Self.us(0x4f60, 0x597d))
     }
 
     @Test func korean() {
-        #expect("안녕".jsonPointerSegment == Self.us(0xc548, 0xb155))
+        #expect("안녕".jsonPointerSegment(escapingNonASCII: true) == Self.us(0xc548, 0xb155))
     }
 
     // MARK: - Supplementary plane -> UTF-16 surrogate pair
 
     @Test func thumbsUpAsSurrogatePair() {
         // 👍 = U+1F44D -> 👍
-        #expect("\u{1f44d}".jsonPointerSegment == Self.us(0xd83d, 0xdc4d))
+        #expect("\u{1f44d}".jsonPointerSegment(escapingNonASCII: true) == Self.us(0xd83d, 0xdc4d))
     }
 
     @Test func emojiPerCodePoint() {
@@ -135,7 +135,7 @@ struct JsonPointerSegmentTests {
         ]
 
         for (input, expected) in cases {
-            #expect(input.jsonPointerSegment == expected,
+            #expect(input.jsonPointerSegment(escapingNonASCII: true) == expected,
                     "input=\(input)")
         }
     }
@@ -144,13 +144,13 @@ struct JsonPointerSegmentTests {
 
     @Test func boundaries() {
         // U+0080 — smallest non-ASCII, just above ASCII range.
-        #expect("\u{0080}".jsonPointerSegment == Self.u(0x0080))
+        #expect("\u{0080}".jsonPointerSegment(escapingNonASCII: true) == Self.u(0x0080))
         // U+FFFF — largest single-unit BMP value.
-        #expect("\u{ffff}".jsonPointerSegment == Self.u(0xffff))
+        #expect("\u{ffff}".jsonPointerSegment(escapingNonASCII: true) == Self.u(0xffff))
         // U+10000 — smallest supplementary, becomes 𐀀.
-        #expect("\u{10000}".jsonPointerSegment == Self.us(0xd800, 0xdc00))
+        #expect("\u{10000}".jsonPointerSegment(escapingNonASCII: true) == Self.us(0xd800, 0xdc00))
         // U+10FFFF — largest valid code point, becomes 􏿿.
-        #expect("\u{10ffff}".jsonPointerSegment == Self.us(0xdbff, 0xdfff))
+        #expect("\u{10ffff}".jsonPointerSegment(escapingNonASCII: true) == Self.us(0xdbff, 0xdfff))
     }
 
     // MARK: - Mixed strings
@@ -158,19 +158,19 @@ struct JsonPointerSegmentTests {
     @Test func mixedAsciiAndUnicode() {
         // "price_€_99" -> "price_€_99"
         let expected = "price_" + Self.u(0x20ac) + "_99"
-        #expect("price_\u{20ac}_99".jsonPointerSegment == expected)
+        #expect("price_\u{20ac}_99".jsonPointerSegment(escapingNonASCII: true) == expected)
     }
 
     @Test func mixedRfcAndUnicode() {
         // "a/€~b" -> "a~1€~0b"
         let expected = "a~1" + Self.u(0x20ac) + "~0b"
-        #expect("a/\u{20ac}~b".jsonPointerSegment == expected)
+        #expect("a/\u{20ac}~b".jsonPointerSegment(escapingNonASCII: true) == expected)
     }
 
     @Test func mixedAsciiBmpAndSurrogate() {
         // "Hi 👍 ™" -> "Hi 👍 ™"
         let expected = "Hi " + Self.us(0xd83d, 0xdc4d) + " " + Self.u(0x2122)
-        #expect("Hi \u{1f44d} \u{2122}".jsonPointerSegment == expected)
+        #expect("Hi \u{1f44d} \u{2122}".jsonPointerSegment(escapingNonASCII: true) == expected)
     }
 
     // MARK: - Round-trip: build pointer, extract value from escape-form JSON
@@ -183,7 +183,7 @@ struct JsonPointerSegmentTests {
         let json = try #require(jsonStr.data(using: .utf8))
 
         let userKey = "\u{20ac}" // €
-        let pointer = "/" + userKey.jsonPointerSegment
+        let pointer = "/" + userKey.jsonPointerSegment(escapingNonASCII: true)
         let value = try Self.decodeString(json.jsonExtract(pointer: pointer))
         #expect(value == "euro")
     }
@@ -194,7 +194,7 @@ struct JsonPointerSegmentTests {
         let json = try #require(jsonStr.data(using: .utf8))
 
         let userKey = "\u{1f44d}" // 👍
-        let pointer = "/" + userKey.jsonPointerSegment
+        let pointer = "/" + userKey.jsonPointerSegment(escapingNonASCII: true)
         let value = try Self.decodeString(json.jsonExtract(pointer: pointer))
         #expect(value == "liked")
     }
@@ -206,7 +206,7 @@ struct JsonPointerSegmentTests {
         let jsonStr = #"{"outer":{""# + middle + #"":{"items":["a",""# + item + #""]}}}"#
         let json = try #require(jsonStr.data(using: .utf8))
 
-        let pointer = "/outer/" + "\u{20ac}".jsonPointerSegment + "/items/1"
+        let pointer = "/outer/" + "\u{20ac}".jsonPointerSegment(escapingNonASCII: true) + "/items/1"
         let value = try Self.decodeString(json.jsonExtract(pointer: pointer))
         #expect(value == "\u{1f496}")
     }
@@ -218,9 +218,25 @@ struct JsonPointerSegmentTests {
         let jsonStr = #"{"path/to/key":"value"}"#
         let json = try #require(jsonStr.data(using: .utf8))
 
-        let pointer = "/" + "path/to/key".jsonPointerSegment
+        let pointer = "/" + "path/to/key".jsonPointerSegment(escapingNonASCII: true)
         #expect(pointer == "/path~1to~1key")
         let value = try Self.decodeString(json.jsonExtract(pointer: pointer))
         #expect(value == "value")
+    }
+
+    @Test func rawUtf8ModePreservesUnicodeAndEscapesRfc6901Characters() throws {
+        let key = "путь/€~👍"
+        let json = try #require(#"{"путь/€~👍":"value"}"#.data(using: .utf8))
+
+        let segment = key.jsonPointerSegment()
+        #expect(segment == "путь~1€~0👍")
+        let value = try Self.decodeString(json.jsonExtract(pointer: "/" + segment))
+        #expect(value == "value")
+    }
+
+    @Test func escapedNonAsciiModeStillEscapesUnicodeAndRfc6901Characters() {
+        let expected = "path~1" + Self.u(0x20ac) + "~0" + Self.us(0xd83d, 0xdc4d)
+        let segment = "path/€~👍".jsonPointerSegment(escapingNonASCII: true)
+        #expect(segment == expected)
     }
 }
