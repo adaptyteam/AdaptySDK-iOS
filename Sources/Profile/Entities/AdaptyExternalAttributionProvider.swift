@@ -24,7 +24,6 @@ public struct AdaptyExternalAttributionProvider: RawRepresentable, Hashable, Sen
     public static let appsflyer = AdaptyExternalAttributionProvider(rawValue: "appsflyer")
     public static let branch = AdaptyExternalAttributionProvider(rawValue: "branch")
     public static let tenjin = AdaptyExternalAttributionProvider(rawValue: "tenjin")
-    public static let googleODM = AdaptyExternalAttributionProvider(rawValue: "google_odm_token")
     public static let custom = AdaptyExternalAttributionProvider(rawValue: "custom")
 }
 

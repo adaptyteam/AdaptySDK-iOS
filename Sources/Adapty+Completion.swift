@@ -405,7 +405,7 @@ public extension Adapty {
         }
     }
 
-    static func getUnfinishedTransactions(
+    nonisolated static func getUnfinishedTransactions(
         _ completion: @escaping AdaptyResultCompletion<[AdaptyUnfinishedTransaction]>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in
@@ -605,3 +605,4 @@ private func withCompletion<T: Sendable>(
         }
     }
 }
+
