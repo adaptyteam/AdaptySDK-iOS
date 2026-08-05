@@ -43,6 +43,7 @@ extension Environment {
             case appInstallId = "device_id"
             case SDKVersion = "adapty_sdk_version"
             case appBuild = "app_build"
+            case appMinimumOSVersion = "app_minimum_os_version"
             case appVersion = "app_version"
             case webUserAgent = "user_agent"
             case device
@@ -59,6 +60,7 @@ extension Environment {
             try container.encode(environment.application.installationIdentifier, forKey: .appInstallId)
             try container.encode(Adapty.SDKVersion, forKey: .SDKVersion)
             try container.encodeIfPresent(environment.application.build, forKey: .appBuild)
+            try container.encodeIfPresent(environment.application.minimumOSVersion, forKey: .appMinimumOSVersion)
             try container.encodeIfPresent(environment.application.version, forKey: .appVersion)
             try container.encodeIfPresent(webUserAgent, forKey: .webUserAgent)
             try container.encode(Device.model, forKey: .device)
