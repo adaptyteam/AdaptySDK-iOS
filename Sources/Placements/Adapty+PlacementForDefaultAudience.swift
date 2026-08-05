@@ -30,6 +30,7 @@ public extension Adapty {
 
         return try await withActivatedSDK(methodName: .getFlowForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
             try await sdk.getPlacementForDefaultAudience(
+                AdaptyFlow.self,
                 placementId,
                 fetchPolicy
             )
@@ -52,17 +53,18 @@ public extension Adapty {
         ]
 
         return try await withActivatedSDK(methodName: .getOnboardingForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
-            let onboarding: AdaptyOnboarding = try await sdk.getPlacementForDefaultAudience(
+            try await sdk.getPlacementForDefaultAudience(
+                AdaptyOnboarding.self,
                 placementId,
                 locale: locale,
                 fetchPolicy
             )
-
-            return onboarding
         }
     }
 
     private func getPlacementForDefaultAudience<Content: PlacementContent>(
+        _ type: Content.Type,
+
         _ placementId: String,
         locale: AdaptyLocale? = nil,
         _ fetchPolicy: AdaptyPlacementFetchPolicy
@@ -75,45 +77,54 @@ public extension Adapty {
             )
         }()
 
-        if !isTestUser {
-            if let draw: AdaptyPlacement.Draw<Content> = await Cache.read(
-                Content.self,
-                placementId: placementId,
-                locale: locale,
-                fetchPolicy: fetchPolicy,
-                for: userId
-            ) {
-                Adapty.trackEventIfNeed(draw)
-                return draw.content
-            }
+        if !isTestUser, let draw = await Cache.read(
+            type,
+            placementId: placementId,
+            locale: locale,
+            fetchPolicy: fetchPolicy,
+            for: userId
+        ) {
+            Adapty.trackEventIfNeed(draw)
+            return draw.content
         }
 
+        var lastError: AdaptyError
         do {
-            return try await fetchBackendPlacementForDefaultAudience(
+            let draw = try await fetchBackendPlacementForDefaultAudience(
+                type,
                 userId,
                 isTestUser,
                 placementId,
                 locale
             )
+            Adapty.trackEventIfNeed(draw)
+            return draw.content
         } catch {
-            if let content: Content = await fetchLocalPlacement(
-                userId,
-                placementId,
-                locale
-            ) {
-                return content
-            }
-
-            throw error
+            lastError = error
         }
+
+        if let draw = await Cache.read(
+            type,
+            placementId: placementId,
+            locale: locale,
+            fetchPolicy: .returnCacheDataElseLoad,
+            for: userId,
+            fallbackFile: Adapty.fallbackPlacements
+        ) {
+            Adapty.trackEventIfNeed(draw)
+            return draw.content
+        }
+
+        throw lastError
     }
 
     private func fetchBackendPlacementForDefaultAudience<Content: PlacementContent>(
+        _ type: Content.Type,
         _ userId: AdaptyUserId,
         _ isTestUser: Bool,
         _ placementId: String,
         _ locale: AdaptyLocale?
-    ) async throws(AdaptyError) -> Content {
+    ) async throws(AdaptyError) -> AdaptyPlacement.Draw<Content> {
         var lastError: AdaptyError
 
         repeat {
@@ -121,8 +132,8 @@ public extension Adapty {
             let variationId = crossPlacementState?.variationId(placementId: placementId)
             if let variationId {
                 do throws(HTTPError) {
-                    let draw = try await httpConfigsSession.fetchPlacementForDefaultAudience(
-                        Content.self,
+                    return try await httpConfigsSession.fetchPlacementForDefaultAudience(
+                        type,
                         apiKeyPrefix: apiKeyPrefix,
                         userId: userId,
                         placementId: placementId,
@@ -131,15 +142,13 @@ public extension Adapty {
                         disableServerCache: isTestUser,
                         timeoutInterval: nil
                     )
-                    Adapty.trackEventIfNeed(draw)
-                    return draw.content
                 } catch {
                     throw error.asAdaptyError
                 }
             } else {
                 do throws(HTTPError) {
-                    let draw = try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
-                        Content.self,
+                    return try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
+                        type,
                         apiKeyPrefix: apiKeyPrefix,
                         userId: userId,
                         placementId: placementId,
@@ -147,8 +156,6 @@ public extension Adapty {
                         disableServerCache: isTestUser,
                         timeoutInterval: nil
                     )
-                    Adapty.trackEventIfNeed(draw)
-                    return draw.content
                 } catch {
                     if error.has(placementDecodingError: [.notFoundVariationId]) {
                         lastError = error.asAdaptyError

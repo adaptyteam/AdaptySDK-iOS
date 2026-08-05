@@ -27,17 +27,17 @@ extension Adapty {
         }
     }
 }
-
 extension FallbackPlacements {
     @inlinable
     func read<Content: PlacementContent>(
+        _ type: Content.Type,
         placementId: String,
         locale: AdaptyLocale?,
         for userId: AdaptyUserId
     ) async -> AdaptyPlacement.Draw<Content>? {
         let crossPlacementState = await CrossPlacementStorage.state(for: userId)
         return try? getPlacement(
-            Content.self,
+            type,
             byPlacementId: placementId,
             withVariationId: crossPlacementState?.variationId(placementId: placementId),
             userId: userId,

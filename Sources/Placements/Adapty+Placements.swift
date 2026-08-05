@@ -37,6 +37,7 @@ extension Adapty {
 
         return try await withActivatedSDK(methodName: .getFlow, logParams: logParams) { sdk throws(AdaptyError) in
             try await sdk.getPlacement(
+                AdaptyFlow.self,
                 placementId: placementId,
                 fetchPolicy: fetchPolicy,
                 loadTimeout: loadTimeout
@@ -63,18 +64,18 @@ extension Adapty {
         ]
 
         return try await withActivatedSDK(methodName: .getOnboarding, logParams: logParams) { sdk throws(AdaptyError) in
-            let onboarding: AdaptyOnboarding = try await sdk.getPlacement(
+            try await sdk.getPlacement(
+                AdaptyOnboarding.self,
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy,
                 loadTimeout: loadTimeout
             )
-
-            return onboarding
         }
     }
 
     private func getPlacement<Content: PlacementContent>(
+        _ type: Content.Type,
         placementId: String,
         locale: AdaptyLocale? = nil,
         fetchPolicy: AdaptyPlacementFetchPolicy,
@@ -90,7 +91,8 @@ extension Adapty {
 
         let startTaskTime = AdaptyContinuousClock.now
 
-        var fetchBackendError: AdaptyError?
+        var lastError: AdaptyError
+        let canUseFallbackServer: Bool
         do {
             return try await withThrowingTimeout(max(loadTimeout - .milliseconds(500), .milliseconds(500))) {
                 let manager = try await self.createdProfileManager
@@ -102,71 +104,90 @@ extension Adapty {
                     userId = createdUserId
                 }
 
-                return try await self.fetchBackendPlacement(
+                if !isTestUser, let draw = await Cache.read(
+                    type,
+                    placementId: placementId,
+                    locale: locale,
+                    fetchPolicy: fetchPolicy,
+                    for: userId
+                ) {
+                    Adapty.trackEventIfNeed(draw)
+                    return draw.content
+                }
+
+                let draw = try await self.fetchBackendPlacement(
+                    type,
                     placementId,
                     locale,
-                    withPolicy: fetchPolicy,
                     forUserId: userId,
                     isTestUser
                 )
-            }
-
-        } catch let error as AdaptyError {
-            fetchBackendError =
-                if error.canUseFallbackServer { nil } else { error }
-        } catch {
-            fetchBackendError =
-                if error is TimeoutError { nil } else { .unknown(error) }
-        }
-
-        do throws(AdaptyError) {
-            if let fetchBackendError {
-                throw fetchBackendError
-            }
-            return try await fetchFallbackBackendPlacement(
-                placementId,
-                locale,
-                forUserId: userId,
-                isTestUser,
-                withTimeout: loadTimeout - (AdaptyContinuousClock.now - startTaskTime)
-            )
-
-        } catch {
-            if error.isProfileWasChanged { throw error }
-            if let content: Content = await fetchLocalPlacement(
-                userId,
-                placementId,
-                locale
-            ) {
-                return content
-            } else {
-                throw error
-            }
-        }
-    }
-
-    private func fetchBackendPlacement<Content: PlacementContent>(
-        _ placementId: String,
-        _ locale: AdaptyLocale?,
-        withPolicy fetchPolicy: AdaptyPlacementFetchPolicy,
-        forUserId userId: AdaptyUserId,
-        _ isTestUser: Bool
-    ) async throws(AdaptyError) -> Content {
-        if !isTestUser {
-            if let draw: AdaptyPlacement.Draw<Content> = await Cache.read(
-                Content.self,
-                placementId: placementId,
-                locale: locale,
-                fetchPolicy: fetchPolicy,
-                for: userId
-            ) {
                 Adapty.trackEventIfNeed(draw)
                 return draw.content
             }
+        } catch let error as AdaptyError {
+            if error.isProfileWasChanged {
+                throw error
+            }
+            lastError = error
+            canUseFallbackServer = error.canUseFallbackServer
+        } catch {
+            lastError = .unknown(error)
+            canUseFallbackServer = error is TimeoutError
         }
 
-        var lastError: AdaptyError
+        if let draw = await Cache.read(
+            type,
+            placementId: placementId,
+            locale: locale,
+            fetchPolicy: .returnCacheDataElseLoad,
+            for: userId
+        ) {
+            Adapty.trackEventIfNeed(draw)
+            return draw.content
+        }
 
+        if canUseFallbackServer {
+            do throws(AdaptyError) {
+                let draw = try await fetchFallbackBackendPlacement(
+                    type,
+                    placementId,
+                    locale,
+                    forUserId: userId,
+                    isTestUser,
+                    withTimeout: loadTimeout - (AdaptyContinuousClock.now - startTaskTime)
+                )
+                Adapty.trackEventIfNeed(draw)
+                return draw.content
+            } catch {
+                if error.isProfileWasChanged {
+                    throw error
+                }
+                lastError = error
+            }
+        }
+
+        if let draw = await Adapty.fallbackPlacements?.read(
+            type,
+            placementId: placementId,
+            locale: locale,
+            for: userId
+        ) {
+            Adapty.trackEventIfNeed(draw)
+            return draw.content
+        }
+
+        throw lastError
+    }
+
+    private func fetchBackendPlacement<Content: PlacementContent>(
+        _ type: Content.Type,
+        _ placementId: String,
+        _ locale: AdaptyLocale?,
+        forUserId userId: AdaptyUserId,
+        _ isTestUser: Bool
+    ) async throws(AdaptyError) -> AdaptyPlacement.Draw<Content> {
+        var lastError: AdaptyError
         repeat {
             let crossPlacementState = await CrossPlacementStorage.state(for: userId)
             let segmentId = try profileManager(withProfileId: userId).orThrows().segmentId
@@ -174,32 +195,28 @@ extension Adapty {
             let requestWithSpecialVariation = variationId != nil
 
             do throws(HTTPError) {
-                let draw: AdaptyPlacement.Draw<Content> =
-                    if let variationId {
-                        try await httpSession.fetchPlacement(
-                            Content.self,
-                            apiKeyPrefix: apiKeyPrefix,
-                            userId: userId,
-                            placementId: placementId,
-                            variationId: variationId,
-                            locale: locale,
-                            disableServerCache: isTestUser
-                        )
-                    } else {
-                        try await httpSession.fetchPlacementVariations(
-                            Content.self,
-                            apiKeyPrefix: apiKeyPrefix,
-                            userId: userId,
-                            placementId: placementId,
-                            locale: locale,
-                            segmentId: segmentId,
-                            crossPlacementEligible: crossPlacementState?.canParticipateInABTest ?? false,
-                            disableServerCache: isTestUser
-                        )
-                    }
-                Adapty.trackEventIfNeed(draw)
-                return draw.content
-
+                return if let variationId {
+                    try await httpSession.fetchPlacement(
+                        type,
+                        apiKeyPrefix: apiKeyPrefix,
+                        userId: userId,
+                        placementId: placementId,
+                        variationId: variationId,
+                        locale: locale,
+                        disableServerCache: isTestUser
+                    )
+                } else {
+                    try await httpSession.fetchPlacementVariations(
+                        type,
+                        apiKeyPrefix: apiKeyPrefix,
+                        userId: userId,
+                        placementId: placementId,
+                        locale: locale,
+                        segmentId: segmentId,
+                        crossPlacementEligible: crossPlacementState?.canParticipateInABTest ?? false,
+                        disableServerCache: isTestUser
+                    )
+                }
             } catch {
                 guard !requestWithSpecialVariation else {
                     throw error.asAdaptyError
@@ -229,32 +246,14 @@ extension Adapty {
         }
     }
 
-    func fetchLocalPlacement<Content: PlacementContent>(
-        _ userId: AdaptyUserId,
-        _ placementId: String,
-        _ locale: AdaptyLocale?
-    ) async -> Content? {
-        if let draw: AdaptyPlacement.Draw<Content> = await Cache.read(
-            Content.self,
-            placementId: placementId,
-            locale: locale,
-            fetchPolicy: .returnCacheDataElseLoad,
-            for: userId,
-            fallbackFile: Adapty.fallbackPlacements
-        ) {
-            Adapty.trackEventIfNeed(draw)
-            return draw.content
-        }
-        return nil
-    }
-
     private func fetchFallbackBackendPlacement<Content: PlacementContent>(
+        _ type: Content.Type,
         _ placementId: String,
         _ locale: AdaptyLocale?,
         forUserId userId: AdaptyUserId,
         _ isTestUser: Bool,
         withTimeout timeoutInterval: AdaptyDuration?
-    ) async throws(AdaptyError) -> Content {
+    ) async throws(AdaptyError) -> AdaptyPlacement.Draw<Content> {
         var lastError: AdaptyError
         repeat {
             let crossPlacementState = await CrossPlacementStorage.state(for: userId)
@@ -262,32 +261,28 @@ extension Adapty {
             let requestWithSpecialVariation = variationId != nil
 
             do throws(HTTPError) {
-                let draw: AdaptyPlacement.Draw<Content> =
-                    if let variationId {
-                        try await httpFallbackSession.fetchPlacementForDefaultAudience(
-                            Content.self,
-                            apiKeyPrefix: apiKeyPrefix,
-                            userId: userId,
-                            placementId: placementId,
-                            variationId: variationId,
-                            locale: locale,
-                            disableServerCache: isTestUser,
-                            timeoutInterval: timeoutInterval
-                        )
-                    } else {
-                        try await httpFallbackSession.fetchPlacementVariationsForDefaultAudience(
-                            Content.self,
-                            apiKeyPrefix: apiKeyPrefix,
-                            userId: userId,
-                            placementId: placementId,
-                            locale: locale,
-                            disableServerCache: isTestUser,
-                            timeoutInterval: timeoutInterval
-                        )
-                    }
-                Adapty.trackEventIfNeed(draw)
-                return draw.content
-
+                return if let variationId {
+                    try await httpFallbackSession.fetchPlacementForDefaultAudience(
+                        type,
+                        apiKeyPrefix: apiKeyPrefix,
+                        userId: userId,
+                        placementId: placementId,
+                        variationId: variationId,
+                        locale: locale,
+                        disableServerCache: isTestUser,
+                        timeoutInterval: timeoutInterval
+                    )
+                } else {
+                    try await httpFallbackSession.fetchPlacementVariationsForDefaultAudience(
+                        type,
+                        apiKeyPrefix: apiKeyPrefix,
+                        userId: userId,
+                        placementId: placementId,
+                        locale: locale,
+                        disableServerCache: isTestUser,
+                        timeoutInterval: timeoutInterval
+                    )
+                }
             } catch {
                 if !requestWithSpecialVariation,
                    error.has(placementDecodingError: [.notFoundVariationId])
@@ -303,7 +298,6 @@ extension Adapty {
         throw lastError
     }
 }
-
 extension AdaptyDuration {
     static let defaultLoadPlacementTimeout: AdaptyDuration = .seconds(5)
     static let minimumLoadPaywallTimeout: AdaptyDuration = .seconds(1)
