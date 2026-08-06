@@ -42,9 +42,13 @@ public extension Adapty {
     /// processing. A successful return does not mean that the data has already
     /// been processed or that the profile has already been updated.
     ///
+    /// Intended for the cross-platform bridge, which already holds the
+    /// attribution as a JSON string. Application code should use the
+    /// `[AnyHashable: Any]` overload instead.
+    ///
     /// - Parameter attributionJson: Attribution data supplied by the provider as a JSON string.
     /// - Parameter provider: The external attribution provider.
-    nonisolated static func updateExternalAttribution(
+    package nonisolated static func updateExternalAttribution(
         _ attributionJson: String,
         provider: AdaptyExternalAttributionProvider
     ) async throws(AdaptyError) {
