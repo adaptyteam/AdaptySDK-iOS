@@ -75,7 +75,7 @@ final class AdaptyUIAssetsCache {
         return .init(
             fontAssetId: attr.fontAssetId?.getAssetIdentifier(state: state, screen: screen),
             size: attr.size,
-            txtColor: attr.txtColor?.getAssetId(state: state, screen: screen),
+            txtColor: attr.color?.getAssetId(state: state, screen: screen),
             imageTintColor: attr.imageTintColor?.getAssetId(state: state, screen: screen),
             background: attr.background?.getAssetId(state: state, screen: screen),
             strike: attr.strike,
