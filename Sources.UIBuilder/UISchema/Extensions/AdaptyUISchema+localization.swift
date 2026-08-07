@@ -8,6 +8,10 @@
 import Foundation
 
 extension AdaptyUISchema {
+    func resolvedLocaleId(_ localeId: LocaleId?) -> LocaleId {
+        localeId ?? defaultLocalization?.id ?? AdaptyUISchema.defaultLocaleId
+    }
+
     func localization(by localeId: LocaleId) -> Localization? {
         if let value = localizations[localeId] {
             value.add(defaultLocalization: defaultLocalization)

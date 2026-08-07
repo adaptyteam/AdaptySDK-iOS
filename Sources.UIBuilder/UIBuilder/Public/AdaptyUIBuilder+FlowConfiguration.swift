@@ -11,7 +11,7 @@ import Foundation
 
 @MainActor
 public extension AdaptyUIBuilder {
-    static func getPaywallConfiguration(
+    static func getFlowConfiguration(
         forSchema schema: AdaptyUISchema,
         localeId: LocaleId?,
         products: [ProductResolver],
@@ -19,6 +19,10 @@ public extension AdaptyUIBuilder {
         timerResolver: AdaptyUITimerResolver?,
         assetsResolver: AdaptyUIAssetsResolver?
     ) async throws -> FlowConfiguration {
+        // Mirrors the placement path in `Adapty.getUIConfiguration`: media is
+        // prefetched from the schema before the configuration is built.
+        sendImageUrlsToObserver(schema, forLocalId: localeId)
+
         let viewConfiguration = try schema.extractUIConfiguration(
             id: UUID().uuidString,
             withLocaleId: localeId,
