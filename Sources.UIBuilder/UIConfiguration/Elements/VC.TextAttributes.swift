@@ -11,7 +11,7 @@ extension VC {
     struct TextAttributes: Sendable {
         let fontAssetId: VC.AssetReference? // default?
         let size: Double? // default?
-        let txtColor: VC.AssetReference? // default?
+        let color: VC.AssetReference? // default?
         let imageTintColor: VC.AssetReference?
         let background: VC.AssetReference?
         let strike: Bool? // default: false
@@ -26,7 +26,7 @@ extension VC.TextAttributes {
     var isEmpty: Bool {
         fontAssetId == nil
             && size == nil
-            && txtColor == nil
+            && color == nil
             && imageTintColor == nil
             && background == nil
             && (strike ?? false) == false
@@ -52,7 +52,7 @@ extension VC.TextAttributes {
         return VC.TextAttributes(
             fontAssetId: fontAssetId,
             size: overide.size ?? size,
-            txtColor: overide.txtColor?.asAssetReference ?? txtColor,
+            color: overide.txtColor?.asAssetReference ?? color,
             imageTintColor: overide.imageTintColor?.asAssetReference ?? imageTintColor,
             background: overide.background?.asAssetReference ?? background,
             strike: overide.strike ?? strike,
