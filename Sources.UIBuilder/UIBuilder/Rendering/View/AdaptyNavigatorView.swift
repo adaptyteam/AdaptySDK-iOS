@@ -129,21 +129,21 @@ struct AdaptyNavigatorView: View {
             AdaptyUIElementView(
                 navigatorViewModel.navigator.content,
                 screenHolderBuilder: {
-                    ZStack {
-                        ForEach(navigatorViewModel.screens, id: \.id) { screenInstance in
-                            AdaptyScreenView(
-                                screen: screenInstance.configuration
-                            )
-                            .overrideOpenUrl { url in
-                                stateViewModel.handle(
-                                    url: url,
-                                    screen: screenInstance.instance
-                                ) ? .handled : .discarded
-                            }
-                            .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
-                            .environmentObject(screenInstance)
-                            .environment(\.adaptyScreenInstanceId, screenInstance.instance.id)
+                    AdaptyUIScreenHolderView(
+                        screens: navigatorViewModel.screens
+                    ) { screenInstance in
+                        AdaptyScreenView(
+                            screen: screenInstance.configuration
+                        )
+                        .overrideOpenUrl { url in
+                            stateViewModel.handle(
+                                url: url,
+                                screen: screenInstance.instance
+                            ) ? .handled : .discarded
                         }
+                        .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
+                        .environmentObject(screenInstance)
+                        .environment(\.adaptyScreenInstanceId, screenInstance.instance.id)
                     }
                 }
             )
