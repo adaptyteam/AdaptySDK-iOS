@@ -54,6 +54,17 @@ public extension AdaptyUIBuilder {
     }
 }
 
+package extension AdaptyUISchema {
+    @available(*, deprecated,  message: "Don't use optional localeId")
+    func extractUIConfiguration(id: String, withLocaleId localeId: LocaleId?, envoriment: VC.EnvironmentConstants) throws -> AdaptyUIConfiguration {
+        try extractUIConfiguration(
+            id: id,
+            withLocaleId: localeId ?? defaultLocalId ?? "en",
+            envoriment: envoriment
+        )
+    }
+}
+
 public extension AdaptyUIBuilder {
     @MainActor
     final class FlowConfiguration {
