@@ -349,6 +349,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
             content
                 .background {
                     self.backgroundFill(for: background)
+                        .opacity(includeBackground ? 1.0 : 0.0)
                 }
         } else {
             content
