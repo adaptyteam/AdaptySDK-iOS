@@ -8,45 +8,43 @@
 import Foundation
 
 package extension AdaptySubscriptionOffer {
-    enum Identifier: Sendable, Hashable {
-        case introductory
-        case promotional(String)
-        case winBack(String)
-        case code(String?)
+    struct Identifier: Hashable {
+        package let offerId: String?
+        package let offerType: AdaptySubscriptionOfferType
 
-        package var offerId: String? {
-            switch self {
-            case .introductory: nil
-            case let .promotional(value),
-                 let .winBack(value): value
-            case let .code(value): value
-            }
-        }
-
-        package var offerType: AdaptySubscriptionOfferType {
-            switch self {
-            case .introductory: .introductory
-            case .promotional: .promotional
-            case .winBack: .winBack
-            case .code: .code
-            }
+        package init(
+            offerId: String?,
+            offerType: AdaptySubscriptionOfferType
+        ) {
+            self.offerId = offerId
+            self.offerType = offerType
         }
     }
 }
 
 extension AdaptySubscriptionOffer.Identifier {
-    init?(offerId: String?, offerType: AdaptySubscriptionOfferType) {
-        switch offerType {
-        case .introductory:
-            self = .introductory
-        case .promotional:
-            guard let offerId else { return nil }
-            self = .promotional(offerId)
-        case .winBack:
-            guard let offerId else { return nil }
-            self = .winBack(offerId)
-        case .code:
-            self = .code(offerId)
-        }
+    @inlinable
+    static var introductory: Self {
+        .init(offerId: nil, offerType: .introductory)
+    }
+
+    @inlinable
+    static func promotional(_ offerId: String) -> Self {
+        .init(offerId: offerId, offerType: .promotional)
+    }
+
+    @inlinable
+    static func winBack(_ offerId: String) -> Self {
+        .init(offerId: offerId, offerType: .winBack)
+    }
+
+    @inlinable
+    var promotionalOfferId: String? {
+        offerType == .promotional ? offerId : nil
+    }
+
+    @inlinable
+    var winBackOfferId: String? {
+        offerType == .winBack ? offerId : nil
     }
 }

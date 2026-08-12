@@ -11,6 +11,8 @@ public protocol AdaptyDelegate: AnyObject, Sendable {
     /// Implement this delegate method to receive automatic profile updates
     func didLoadLatestProfile(_ profile: AdaptyProfile)
 
+    func didReceivePromotedPurchase(_ product: AdaptyPromotedProduct)
+
     func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails)
 
     func onInstallationDetailsFail(error: AdaptyError)
@@ -19,6 +21,13 @@ public protocol AdaptyDelegate: AnyObject, Sendable {
 }
 
 public extension AdaptyDelegate {
+    @inlinable
+    func didReceivePromotedPurchase(_ product: AdaptyPromotedProduct) {
+        Task {
+            _ = try? await Adapty.makePurchase(product: product)
+        }
+    }
+
     func onInstallationDetailsSuccess(_: AdaptyInstallationDetails) {}
     func onInstallationDetailsFail(error _: AdaptyError) {}
 
@@ -29,11 +38,13 @@ extension Adapty {
     /// Set the delegate to listen for `AdaptyProfile` updates and user initiated an in-app purchases
     public nonisolated(unsafe) static var delegate: AdaptyDelegate?
 
-    static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) {
-        guard let delegate = Adapty.delegate else { return }
+    @discardableResult
+    static func callDelegate(_ call: @Sendable @escaping (AdaptyDelegate) -> Void) -> Bool {
+        guard let delegate = Adapty.delegate else { return false }
         let queue = AdaptyConfiguration.callbackDispatchQueue ?? .main
         queue.async {
             call(delegate)
         }
+        return true
     }
 }

@@ -68,4 +68,3 @@ public enum AdaptyPurchaseResult: Sendable {
         signedTransaction?.jwsRepresentation
     }
 }
-

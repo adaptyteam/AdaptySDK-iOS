@@ -8,23 +8,24 @@
 import Foundation
 import StoreKit
 
-struct PurchasedSubscriptionOfferInfo: Sendable {
+struct PurchasedSubscriptionOfferInfo {
     let id: String?
+    let offerType: AdaptyTransactionOfferType
     let period: AdaptySubscriptionPeriod?
     let paymentMode: AdaptySubscriptionOffer.PaymentMode
-    let offerType: AdaptySubscriptionOfferType
     let price: Decimal?
 
-    fileprivate init(
-        identifier: AdaptySubscriptionOffer.Identifier,
-        period: AdaptySubscriptionPeriod? = nil,
-        paymentMode: AdaptySubscriptionOffer.PaymentMode = .unknown,
-        price: Decimal? = nil
+    private init(
+        id: String?,
+        offerType: AdaptyTransactionOfferType,
+        period: AdaptySubscriptionPeriod?,
+        paymentMode: AdaptySubscriptionOffer.PaymentMode,
+        price: Decimal?
     ) {
-        id = identifier.offerId
+        self.id = id
+        self.offerType = offerType
         self.period = period
         self.paymentMode = paymentMode
-        offerType = identifier.offerType
         self.price = price
     }
 }
@@ -41,65 +42,39 @@ extension PurchasedSubscriptionOfferInfo {
         transaction: StoreKit.Transaction,
         product: StoreKit.Product?
     ) {
-        guard let offerIdentifier = transaction.subscriptionOfferIdentifier else { return nil }
-        let subscriptionOffer = product?.subscriptionOffer(by: offerIdentifier)
-        self.init(
-            identifier: offerIdentifier,
-            period: subscriptionOffer?.period.asAdaptySubscriptionPeriod,
-            paymentMode: subscriptionOffer?.paymentMode.asPaymentMode ?? .unknown,
-            price: subscriptionOffer?.price,
-            for: transaction
+        guard let offerType = transaction.unfOfferType else { return nil }
+
+        let subscriptionOffer = product?.subscriptionOffer(
+            by: transaction.unfOfferId,
+            for: offerType
         )
-    }
 
-    private init?(
-        identifier: AdaptySubscriptionOffer.Identifier,
-        period: AdaptySubscriptionPeriod?,
-        paymentMode: AdaptySubscriptionOffer.PaymentMode,
-        price: Decimal?,
-        for transaction: StoreKit.Transaction
-    ) {
-        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *),
-           let offer = transaction.offer
-        {
+        guard #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *),
+              let transactionOffer = transaction.offer
+        else {
             self.init(
-                identifier: identifier,
-                productOfferPeriod: period,
-                price: price,
-                for: offer
+                id: transaction.unfOfferId,
+                offerType: offerType,
+                period: subscriptionOffer?.period.asAdaptySubscriptionPeriod,
+                paymentMode: subscriptionOffer?.paymentMode.asPaymentMode ?? .unknown,
+                price: subscriptionOffer?.price
             )
-        } else {
-            self.init(
-                identifier: identifier,
-                period: period,
-                paymentMode: paymentMode,
-                price: price
-            )
+            return
         }
-    }
 
-    @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
-    private init?(
-        identifier: AdaptySubscriptionOffer.Identifier,
-        productOfferPeriod: AdaptySubscriptionPeriod?,
-        price: Decimal?,
-        for transactionOffer: StoreKit.Transaction.Offer
-    ) {
-        var period: AdaptySubscriptionPeriod?
-
-        #if compiler(>=6.1)
-        if #available(iOS 18.4, macOS 15.4, tvOS 18.4, watchOS 11.4, visionOS 2.4, *) {
-            period = transactionOffer.period?.asAdaptySubscriptionPeriod
-        }
-        #else
-        period = productOfferPeriod
-        #endif
+        let period: AdaptySubscriptionPeriod? =
+            if #available(iOS 18.4, macOS 15.4, tvOS 18.4, watchOS 11.4, visionOS 2.4, *) {
+                transactionOffer.period?.asAdaptySubscriptionPeriod ?? subscriptionOffer?.period.asAdaptySubscriptionPeriod
+            } else {
+                subscriptionOffer?.period.asAdaptySubscriptionPeriod
+            }
 
         self.init(
-            identifier: transactionOffer.subscriptionOfferIdentifier ?? identifier,
-            period: period ?? productOfferPeriod,
+            id: transaction.unfOfferId,
+            offerType: offerType,
+            period: period,
             paymentMode: transactionOffer.paymentMode?.asPaymentMode ?? .unknown,
-            price: price
+            price: subscriptionOffer?.price
         )
     }
 }

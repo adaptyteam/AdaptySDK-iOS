@@ -26,11 +26,12 @@ enum Request {
             Logout.self,
             LogShowFlow.self,
             MakePurchase.self,
+            MakePromotedPurchase.self,
             OpenWebPaywall.self,
             CreateWebPaywallUrl.self,
             PresentCodeRedemptionSheet.self,
             RestorePurchases.self,
-            UpdateAttributionData.self,
+            UpdateExternalAttributionData.self,
             SetIntegrationIdentifier.self,
             ReportTransaction.self,
             UpdateProfile.self,
@@ -45,7 +46,7 @@ enum Request {
             ObserverRestoreDidFinish.self,
         ]
 
-#if canImport(UIKit)
+        #if canImport(UIKit)
         let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
             AdaptyUICreateFlowView.self,
             AdaptyUIDismissFlowView.self,
@@ -62,7 +63,7 @@ enum Request {
         ]
         allRequests.append(contentsOf: adaptyUiRequests)
 
-#endif
+        #endif
 
         return Dictionary(allRequests.map { ($0.method, $0) }) { _, last in last }
     }()

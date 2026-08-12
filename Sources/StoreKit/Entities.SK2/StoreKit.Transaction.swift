@@ -22,7 +22,7 @@ extension StoreKit.Transaction {
         ]
     }
 
-    var subscriptionOfferType: AdaptySubscriptionOfferType? {
+    var unfOfferType: AdaptyTransactionOfferType? {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
             (offer?.type ?? offerType)?.asSubscriptionOfferType
         } else {
@@ -66,11 +66,4 @@ extension StoreKit.Transaction {
     static let productionEnvironment = "production"
     static let sandboxEnvironment = "sandbox"
     static let xcodeEnvironment = "xcode"
-}
-
-extension StoreKit.Transaction {
-    var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier? {
-        guard let offerType = subscriptionOfferType else { return nil }
-        return .init(offerId: unfOfferId, offerType: offerType)
-    }
 }

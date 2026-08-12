@@ -14,17 +14,20 @@ actor StoreKitPurchaser {
     private let subscriptionOfferSigner: StoreKitSubscriptionOfferSigner
     private let storage: PurchasePayloadStorage
     private let productManager: ProductsManager
+    private let promotedPurchaseIntentObserver: PromotedPurchaseIntentObserver
 
     private init(
         transactionSynchronizer: StoreKitTransactionSynchronizer,
         subscriptionOfferSigner: StoreKitSubscriptionOfferSigner,
         storage: PurchasePayloadStorage,
-        productManager: ProductsManager
+        productManager: ProductsManager,
+        promotedPurchaseIntentObserver: PromotedPurchaseIntentObserver
     ) {
         self.transactionSynchronizer = transactionSynchronizer
         self.subscriptionOfferSigner = subscriptionOfferSigner
         self.storage = storage
         self.productManager = productManager
+        self.promotedPurchaseIntentObserver = promotedPurchaseIntentObserver
     }
 
     @AdaptyActor
@@ -55,6 +58,10 @@ actor StoreKitPurchaser {
                     log.debug("Transaction \(transaction.id) (originalId: \(transaction.originalID),  productId: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
                     Task.detached {
+                        if await AdaptyConfiguration.transactionFinishBehavior == .manual {
+                            await storage.addUnfinishedTransaction(transaction.id)
+                        }
+
                         await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(signedTransaction: signedTransaction)) }
 
                         guard !transaction.isXcodeEnvironment else {
@@ -92,20 +99,23 @@ actor StoreKitPurchaser {
             }
         }
         isObservingStarted = true
+        let promotedPurchaseIntentObserver = PromotedPurchaseIntentObserver()
 
         return StoreKitPurchaser(
             transactionSynchronizer: transactionSynchronizer,
             subscriptionOfferSigner: subscriptionOfferSigner,
             storage: storage,
-            productManager: productsManager
+            productManager: productsManager,
+            promotedPurchaseIntentObserver: promotedPurchaseIntentObserver
         )
     }
 
-    func makePurchase(
+    func createOptions(
         userId: AdaptyUserId,
         appAccountToken: UUID?,
-        product: AdaptyPaywallProduct
-    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
+        skProduct: StoreKit.Product,
+        subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
+    ) async throws(AdaptyError) -> Set<Product.PurchaseOption> {
         var options = Set<Product.PurchaseOption>()
 
         // options.insert(.simulatesAskToBuyInSandbox(true))
@@ -114,12 +124,11 @@ actor StoreKitPurchaser {
             options.insert(.appAccountToken(uuid))
         }
 
-        if let offer = product.subscriptionOffer {
-            switch offer.offerIdentifier {
-            case let .promotional(offerId):
+        if let offerIdentifier = subscriptionOfferIdentifier {
+            if let offerId = offerIdentifier.promotionalOfferId {
                 let response = try await subscriptionOfferSigner.sign(
                     offerId: offerId,
-                    subscriptionVendorId: product.vendorProductId,
+                    subscriptionVendorId: skProduct.id,
                     for: userId,
                     with: appAccountToken
                 )
@@ -133,37 +142,81 @@ actor StoreKitPurchaser {
                         timestamp: response.timestamp
                     )
                 )
-
-            case let .winBack(offerId):
+            } else if let offerId = offerIdentifier.winBackOfferId {
                 if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
-                   let winBackOffer = product.skProduct.subscriptionOffer(by: .winBack(offerId))
+                   let winBackOffer = skProduct.subscriptionOffer(by: .winBack(offerId))
                 {
                     options.insert(.winBackOffer(winBackOffer))
                 } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit Not found winBackOfferId:\(offerId) for productId: \(product.vendorProductId)").asAdaptyError
+                    throw StoreKitManagerError.invalidOffer("StoreKit Not found winBackOfferId:\(offerId) for productId: \(skProduct.id)").asAdaptyError
                 }
-
-            default:
-                break
             }
         }
+        return options
+    }
+
+    func makePurchase(
+        userId: AdaptyUserId,
+        appAccountToken: UUID?,
+        product: AdaptyPaywallProduct
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
+        let options = try await createOptions(
+            userId: userId,
+            appAccountToken: appAccountToken,
+            skProduct: product.skProduct,
+            subscriptionOfferIdentifier: product.subscriptionOffer?.offerIdentifier
+        )
 
         await productManager.storeProductInfo(productInfo: [product.productInfo])
         await storage.setPaywallVariationId(product.variationId, productId: product.vendorProductId, userId: userId)
+
         let payload = await PurchasePayload(
             userId: userId,
             paywallVariationId: product.variationId,
             persistentPaywallVariationId: product.variationId,
             persistentOnboardingVariationId: storage.onboardingVariationId()
         )
-        return try await makePurchase(product.skProduct, options, payload, for: userId)
+        return try await makePurchase(
+            product.skProduct,
+            options,
+            payload,
+            reason: .purchasing
+        )
+    }
+
+    func makePromotedPurchase(
+        userId: AdaptyUserId,
+        appAccountToken: UUID?,
+        vendorProductId: String,
+        subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
+        let skProduct: StoreKit.Product = try await productManager.fetchProduct(id: vendorProductId)
+
+        let options = try await createOptions(
+            userId: userId,
+            appAccountToken: appAccountToken,
+            skProduct: skProduct,
+            subscriptionOfferIdentifier: subscriptionOfferIdentifier
+        )
+
+        let payload = await PurchasePayload(
+            userId: userId,
+            persistentOnboardingVariationId: storage.onboardingVariationId()
+        )
+
+        return try await makePurchase(
+            skProduct,
+            options,
+            payload,
+            reason: .promotedPurchase
+        )
     }
 
     private func makePurchase(
         _ product: StoreKit.Product,
         _ options: Set<Product.PurchaseOption>,
         _ payload: PurchasePayload,
-        for _: AdaptyUserId
+        reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         let stamp = Log.stamp
 
@@ -254,6 +307,10 @@ actor StoreKitPurchaser {
 
         let transaction = signedTransaction.unsafePayloadValue
 
+        if await AdaptyConfiguration.transactionFinishBehavior == .manual {
+            await storage.addUnfinishedTransaction(transaction.id)
+        }
+
         await Adapty.callDelegate { $0.onUnfinishedTransaction(AdaptyUnfinishedTransaction(signedTransaction: signedTransaction)) }
 
         guard !transaction.isXcodeEnvironment else {
@@ -269,7 +326,8 @@ actor StoreKitPurchaser {
                     product: product.asAdaptyProduct,
                     transaction: transaction
                 ),
-                payload: payload
+                payload: payload,
+                reason: reason
             )
             await transactionSynchronizer.attemptToFinish(transaction: transaction, logSource: "purchased")
             return .success(profile: profile, transaction: signedTransaction)
@@ -280,4 +338,3 @@ actor StoreKitPurchaser {
         }
     }
 }
-

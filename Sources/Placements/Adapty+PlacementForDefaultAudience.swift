@@ -30,6 +30,7 @@ public extension Adapty {
 
         return try await withActivatedSDK(methodName: .getFlowForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
             try await sdk.getPlacementForDefaultAudience(
+                AdaptyFlow.self,
                 placementId,
                 fetchPolicy
             )
@@ -52,91 +53,121 @@ public extension Adapty {
         ]
 
         return try await withActivatedSDK(methodName: .getOnboardingForDefaultAudience, logParams: logParams) { sdk throws(AdaptyError) in
-            let onboarding: AdaptyOnboarding = try await sdk.getPlacementForDefaultAudience(
+            try await sdk.getPlacementForDefaultAudience(
+                AdaptyOnboarding.self,
                 placementId,
                 locale: locale,
                 fetchPolicy
             )
-
-            return onboarding
         }
     }
 
     private func getPlacementForDefaultAudience<Content: PlacementContent>(
+        _ type: Content.Type,
+
         _ placementId: String,
         locale: AdaptyLocale? = nil,
         _ fetchPolicy: AdaptyPlacementFetchPolicy
     ) async throws(AdaptyError) -> Content {
-        let manager = profileManager
-        let userId = manager?.userId ?? profileStorage.userId
-
-        let cached: Content? = manager?
-            .placementStorage
-            .getPlacementById(
-                placementId,
-                withLocale: locale,
-                orDefaultLocale: true,
-                withVariationId: nil
-            )?
-            .withFetchPolicy(fetchPolicy)?
-            .value
-
-        if let cached { return cached }
-
-        return try await self.fetchPlacementForDefaultAudience(
-            userId,
-            placementId,
-            locale
-        )
-    }
-
-    private func fetchPlacementForDefaultAudience<Content: PlacementContent>(
-        _ userId: AdaptyUserId,
-        _ placementId: String,
-        _ locale: AdaptyLocale?
-    ) async throws(AdaptyError) -> Content {
-        let (cached, isTestUser): (Content?, Bool) = {
-            guard let manager = try? profileManager(withProfileId: userId) else { return (nil, false) }
+        let (userId, isTestUser) = {
+            let manager = profileManager
             return (
-                manager.placementStorage.getPlacementById(
-                    placementId,
-                    withLocale: locale,
-                    orDefaultLocale: false,
-                    withVariationId: nil
-                )?.value,
-                manager.isTestUser
+                userId: manager?.userId ?? profileStorage.userId,
+                isTestUser: manager?.isTestUser ?? false
             )
         }()
 
-        do {
-            var chosen: AdaptyPlacementChosen<Content> = try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
-                apiKeyPrefix: apiKeyPrefix,
-                userId: userId,
-                placementId: placementId,
-                locale: locale,
-                cached: cached,
-                variationIdResolver: nil,
-                disableServerCache: isTestUser,
-                timeoutInterval: nil
-            )
-
-            if let manager = try? profileManager(withProfileId: userId) {
-                chosen = manager.placementStorage.savedPlacementChosen(chosen)
-            }
-
-            Adapty.trackEventIfNeed(chosen)
-            return chosen.content
-
-        } catch {
-            guard let content: Content = getCacheOrFallbackFilePlacement(
-                userId,
-                placementId,
-                locale,
-                withCrossPlacmentABTest: false
-            ) else {
-                throw error.asAdaptyError
-            }
-            return content
+        if !isTestUser, let draw = await Cache.read(
+            type,
+            placementId: placementId,
+            locale: locale,
+            fetchPolicy: fetchPolicy,
+            for: userId
+        ) {
+            Adapty.trackEventIfNeed(draw)
+            return draw.content
         }
+
+        var lastError: AdaptyError
+        do {
+            let draw = try await fetchBackendPlacementForDefaultAudience(
+                type,
+                userId,
+                isTestUser,
+                placementId,
+                locale
+            )
+            Adapty.trackEventIfNeed(draw)
+            return draw.content
+        } catch {
+            lastError = error
+        }
+
+        if let draw = await Cache.read(
+            type,
+            placementId: placementId,
+            locale: locale,
+            fetchPolicy: .returnCacheDataElseLoad,
+            for: userId,
+            fallbackFile: Adapty.fallbackPlacements
+        ) {
+            Adapty.trackEventIfNeed(draw)
+            return draw.content
+        }
+
+        throw lastError
+    }
+
+    private func fetchBackendPlacementForDefaultAudience<Content: PlacementContent>(
+        _ type: Content.Type,
+        _ userId: AdaptyUserId,
+        _ isTestUser: Bool,
+        _ placementId: String,
+        _ locale: AdaptyLocale?
+    ) async throws(AdaptyError) -> AdaptyPlacement.Draw<Content> {
+        var lastError: AdaptyError
+
+        repeat {
+            let crossPlacementState = await CrossPlacementStorage.state(for: userId)
+            let variationId = crossPlacementState?.variationId(placementId: placementId)
+            if let variationId {
+                do throws(HTTPError) {
+                    return try await httpConfigsSession.fetchPlacementForDefaultAudience(
+                        type,
+                        apiKeyPrefix: apiKeyPrefix,
+                        userId: userId,
+                        placementId: placementId,
+                        variationId: variationId,
+                        locale: locale,
+                        disableServerCache: isTestUser,
+                        timeoutInterval: nil
+                    )
+                } catch {
+                    throw error.asAdaptyError
+                }
+            } else {
+                do throws(HTTPError) {
+                    return try await httpConfigsSession.fetchPlacementVariationsForDefaultAudience(
+                        type,
+                        apiKeyPrefix: apiKeyPrefix,
+                        userId: userId,
+                        placementId: placementId,
+                        locale: locale,
+                        disableServerCache: isTestUser,
+                        timeoutInterval: nil
+                    )
+                } catch {
+                    if error.has(placementDecodingError: [.notFoundVariationId]) {
+                        lastError = error.asAdaptyError
+                        continue
+                    } else {
+                        throw error.asAdaptyError
+                    }
+                }
+            }
+        } while !Task.isCancelled
+
+        throw lastError
     }
 }
+

@@ -80,4 +80,3 @@ public extension Adapty {
         await Adapty.optionalSDK?.purchasePayloadStorage.setOnboardingVariationId(variationId)
     }
 }
-

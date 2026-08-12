@@ -105,7 +105,7 @@ let package = Package(
             path: "Sources",
             exclude: [
                 "Events/adapty.events.schema.yaml",
-                "Placements/adapty.fallback.schema.yaml",
+                "Placements/adapty.fallback_file.cue",
             ],
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
@@ -152,9 +152,6 @@ let package = Package(
                 "UISchema",
                 "UIConfiguration",
             ],
-            resources: [
-                .process("Placements/fallback.json"),
-            ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
             ]
@@ -162,4 +159,3 @@ let package = Package(
     ],
     cxxLanguageStandard: .cxx20
 )
-

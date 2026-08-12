@@ -67,7 +67,7 @@ extension Schema.Navigator: DecodableWithConfiguration {
         case defaultScreenActions = "default_screen_actions"
     }
 
-    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: any Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let navigatorId =
             if let value = configuration.insideNavigatorId {

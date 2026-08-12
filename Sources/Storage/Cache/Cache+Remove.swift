@@ -7,17 +7,26 @@
 
 import Foundation
 
-@Cache.Actor
+private let log = Log.cache
+
+@StorageActor
 extension Cache {
     @inlinable
     static func removeAll() {
-        try? fileManager.removeItem(at: rootDirectory)
+        do {
+            try fileManager.removeItem(at: rootDirectory)
+            log.verbose("cache.removeAll[complete]")
+        } catch let error as CocoaError where error.code == .fileNoSuchFile {
+            log.verbose("cache.removeAll[complete]: directory did not exist")
+        } catch {
+            log.verbose("cache.removeAll[error]: \(error)")
+        }
         totalBytesUpperBound = 0
         nextEvictionScanAllowedAt = nil
     }
 
     @inlinable
-    static func removeOtherProfiles(_ profileId: String) {
+    static func removeOtherProfiles(_ userId: AdaptyUserId) {
         let fm = fileManager
         let rootDirectoryPath = rootDirectory.path
         guard
@@ -26,15 +35,21 @@ extension Cache {
             !subdirectories.isEmpty
         else { return }
 
-        let currentProfileDirectoryName = directoryName(forProfileId: profileId)
+        let currentProfileDirectoryName = directoryName(forProfileId: userId.profileId)
         for name in subdirectories
-            where name != currentProfileDirectoryName && name != sharedDirectoryName {
-            try? fm.removeItem(at: rootDirectory.appendingPathComponent(name, isDirectory: true))
+            where name != currentProfileDirectoryName && name != sharedDirectoryName
+        {
+            do {
+                try fm.removeItem(at: rootDirectory.appendingPathComponent(name, isDirectory: true))
+                log.verbose("cache.removeOtherProfile[complete]: *\(name)*")
+            } catch {
+                log.verbose("cache.removeOtherProfile[error]: *\(name)*, error: \(error)")
+            }
         }
     }
 }
 
-@Cache.Actor
+@StorageActor
 extension FileManager {
     func removeCacheItem(key: Cache.ItemKey) {
         removeCacheItem(

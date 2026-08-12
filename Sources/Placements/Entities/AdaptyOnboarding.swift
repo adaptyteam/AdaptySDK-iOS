@@ -8,7 +8,6 @@
 import Foundation
 
 public struct AdaptyOnboarding: PlacementContent, Identifiable {
-
     public let placement: AdaptyPlacement
 
     public let id: String
@@ -58,10 +57,7 @@ extension AdaptyOnboarding: Codable, DecodableWithConfiguration {
         try self.init(
             from: decoder,
             configuration: .init(
-                userId: nil,
-                placement: AdaptyPlacement(from: decoder),
-                requestLocale: nil,
-                variationId: nil
+                placement: .init(from: decoder)
             )
         )
     }
@@ -76,7 +72,7 @@ extension AdaptyOnboarding: Codable, DecodableWithConfiguration {
             name: container.decode(String.self, forKey: .name),
             remoteConfig: container.decodeIfPresent(AdaptyRemoteConfig.self, forKey: .remoteConfig),
             viewConfigurationUrl: viewConfiguration.decode(URL.self, forKey: .viewConfigurationUrl),
-            requestLocale: configuration.requestLocale ?? container.decode(AdaptyLocale.self, forKey: .requestLocale)
+            requestLocale: configuration.onboardingRequestLocale ?? container.decode(AdaptyLocale.self, forKey: .requestLocale)
         )
     }
 

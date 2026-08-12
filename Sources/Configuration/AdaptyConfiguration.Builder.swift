@@ -22,6 +22,7 @@ extension AdaptyConfiguration {
             observerMode: builder.observerMode ?? defaultValue.observerMode,
             idfaCollectionDisabled: builder.idfaCollectionDisabled ?? defaultValue.idfaCollectionDisabled,
             ipAddressCollectionDisabled: builder.ipAddressCollectionDisabled ?? defaultValue.ipAddressCollectionDisabled,
+            adaptyAttributionEnabled: builder.adaptyAttributionEnabled ?? defaultValue.adaptyAttributionEnabled,
             callbackDispatchQueue: builder.callbackDispatchQueue,
             backend: Backend.Configuration(
                 cluster: builder.serverCluster ?? .default,
@@ -46,6 +47,7 @@ extension AdaptyConfiguration {
             observerMode: nil,
             idfaCollectionDisabled: nil,
             ipAddressCollectionDisabled: nil,
+            adaptyAttributionEnabled: nil,
             callbackDispatchQueue: nil,
             clearDataOnBackup: nil,
             serverCluster: nil,
@@ -67,6 +69,7 @@ public extension AdaptyConfiguration {
         public private(set) var observerMode: Bool?
         public private(set) var idfaCollectionDisabled: Bool?
         public private(set) var ipAddressCollectionDisabled: Bool?
+        public private(set) var adaptyAttributionEnabled: Bool?
         public private(set) var callbackDispatchQueue: DispatchQueue?
 
         public private(set) var clearDataOnBackup: Bool?
@@ -88,6 +91,7 @@ public extension AdaptyConfiguration {
             observerMode: Bool?,
             idfaCollectionDisabled: Bool?,
             ipAddressCollectionDisabled: Bool?,
+            adaptyAttributionEnabled: Bool?,
             callbackDispatchQueue: DispatchQueue?,
             clearDataOnBackup: Bool?,
             serverCluster: AdaptyServerCluster?,
@@ -104,6 +108,7 @@ public extension AdaptyConfiguration {
             self.observerMode = observerMode
             self.idfaCollectionDisabled = idfaCollectionDisabled
             self.ipAddressCollectionDisabled = ipAddressCollectionDisabled
+            self.adaptyAttributionEnabled = adaptyAttributionEnabled
             self.callbackDispatchQueue = callbackDispatchQueue
             self.clearDataOnBackup = clearDataOnBackup
             self.serverCluster = serverCluster ?? .default
@@ -156,6 +161,15 @@ public extension AdaptyConfiguration.Builder {
     @discardableResult
     func with(ipAddressCollectionDisabled value: Bool) -> Self {
         ipAddressCollectionDisabled = value
+        return self
+    }
+
+    /// Enables the Adapty Attribution service. Disabled by default.
+    ///
+    /// - Parameter value: Whether Adapty Attribution install registration is enabled.
+    @discardableResult
+    func with(adaptyAttributionEnabled value: Bool) -> Self {
+        adaptyAttributionEnabled = value
         return self
     }
 

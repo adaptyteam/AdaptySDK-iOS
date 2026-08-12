@@ -18,13 +18,16 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     private var layoutDirection: LayoutDirection
 
     private let row: VC.Row
+    private let externalSize: CGSize?
     private let screenHolderBuilder: () -> ScreenHolderContent
 
     init(
         _ row: VC.Row,
+        externalSize: CGSize? = nil,
         @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
     ) {
         self.row = row
+        self.externalSize = externalSize
         self.screenHolderBuilder = screenHolderBuilder
     }
 
@@ -113,16 +116,17 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
                 )
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     private var weightedBody: some View {
         let (totalWeight, reservedLength) = calculateTotalWeight(for: row.items)
         // nil until the first measurement lands: for that frame weighted items keep
         // their natural width instead of collapsing to width 0, where texts vanish
-        // and their ideal height explodes.
-        let weightsAvailableLength: CGFloat? = measuredSize == .zero
-            ? nil
-            : max(0, measuredSize.width - reservedLength)
+        // and their ideal height explodes. An externally provided size counts as
+        // a measurement.
+        let availableWidth: CGFloat? = externalSize?.width ?? (measuredSize == .zero ? nil : measuredSize.width)
+        let weightsAvailableLength: CGFloat? = availableWidth.map { max(0, $0 - reservedLength) }
 
         return HStack(spacing: row.spacing) {
             ForEach(0 ..< row.items.count, id: \.self) { idx in
@@ -152,6 +156,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
                 )
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .onGeometrySizeChange { measuredSize = $0 }
     }

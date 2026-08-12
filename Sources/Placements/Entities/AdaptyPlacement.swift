@@ -19,18 +19,14 @@ public struct AdaptyPlacement: Sendable, Identifiable {
 
     let shouldTrackOnboardingShown: Bool
 
-    var version: Int64
+    var version: Int
 }
 
 extension AdaptyPlacement {
-    func replace(version: Int64) -> Self {
+    func replace(version: Int) -> Self {
         var placement = self
         placement.version = version
         return placement
-    }
-
-    func isNewerThan(_ other: AdaptyPlacement) -> Bool {
-        version > other.version
     }
 }
 
@@ -42,18 +38,15 @@ extension AdaptyPlacement: CustomStringConvertible {
 
 extension AdaptyPlacement: Codable {
     public struct DecodingConfiguration: Sendable {
-        let userId: AdaptyUserId?
         let placement: AdaptyPlacement
-        let requestLocale: AdaptyLocale?
-        var variationId: String?
-        
-        var userIdOrThrow: AdaptyUserId {
-            get throws {
-                if let userId {
-                    return userId
-                }
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The decoder does not have the userId value in configuration"))
-            }
+        let onboardingRequestLocale: AdaptyLocale?
+
+        init(
+            placement: AdaptyPlacement,
+            onboardingRequestLocale: AdaptyLocale? = nil
+        ) {
+            self.placement = placement
+            self.onboardingRequestLocale = onboardingRequestLocale
         }
     }
 
@@ -78,7 +71,7 @@ extension AdaptyPlacement: Codable {
         abTestName = try placement.decode(String.self, forKey: .abTestName)
         audienceVersionId = try placement.decode(String.self, forKey: .audienceVersionId)
         shouldTrackOnboardingShown = try placement.decodeIfPresent(Bool.self, forKey: .shouldTrackOnboardingShown) ?? false
-        version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
+        version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 0
     }
 
     public func encode(to encoder: Encoder) throws {

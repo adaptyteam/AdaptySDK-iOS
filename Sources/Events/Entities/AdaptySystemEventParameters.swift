@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 29.03.2023
 //
 
-import Foundation
 import AdaptyCodable
+import Foundation
 
 package protocol AdaptySystemEventParameters: Sendable, Encodable {}
 
@@ -129,8 +129,8 @@ enum MethodName: String {
 
     case getProfile = "get_profile"
     case updateProfile = "update_profile"
-    case updateAttribution = "update_attribution"
-    case updateAttributionData = "update_attribution_data"
+    case updateExternalAttribution = "update_external_attribution"
+    case updateExternalAttributionData = "update_external_attribution_data"
     case setIntegrationIdentifiers = "set_integration_identifiers"
 
     case setVariationId = "set_variation_id"
@@ -141,12 +141,19 @@ enum MethodName: String {
     case getProductsIntroductoryOfferEligibilityByStrings = "get_products_introductory_offer_eligibility_by_strings"
     case getReceipt = "get_receipt"
     case makePurchase = "make_purchase"
+    case makePromotedPurchase = "make_promoted_purchase"
+
     case openWebPaywall = "open_web_paywall"
     case createWebPaywallUrl = "create_web_paywall_url"
     case getUnfinishedTransactions = "get_unfinished_transactions"
 
     case getCurrentInstallationStatus = "get_current_installation_status"
     case restorePurchases = "restore_purchases"
+
+    case preloadFlows = "preload_flows"
+    case preloadFlowsForDefaultAudience = "preload_flows_for_default_audience"
+    case preloadOnboardings = "preload_onboardings"
+    case preloadOnboardingsForDefaultAudience = "preload_onboardings_for_default_audience"
 
     case getFlow = "get_flow"
     case getOnboarding = "get_onboarding"

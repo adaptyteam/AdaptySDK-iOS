@@ -38,33 +38,22 @@ public extension AdaptyUIBuilder {
 
 @MainActor
 extension AdaptyUIBuilder {
-    static let imageCache = ImageCache(name: "Adapty")
-    static let imageDownloader = ImageDownloader(name: "Adapty")
-
-    static var currentCacheConfiguration: MediaCacheConfiguration?
-
     package static func configureMediaCache(_ configuration: MediaCacheConfiguration) {
         Log.cache.verbose("""
         configure: memoryStorageTotalCostLimit = \(configuration.memoryStorageTotalCostLimit), memoryStorageCountLimit = \(configuration.memoryStorageCountLimit), diskStorageSizeLimit = \(configuration.diskStorageSizeLimit)
         """)
 
-        imageCache.memoryStorage.config.totalCostLimit = configuration.memoryStorageTotalCostLimit
-        imageCache.memoryStorage.config.countLimit = configuration.memoryStorageCountLimit
-        imageCache.diskStorage.config.sizeLimit = configuration.diskStorageSizeLimit
-
-        imageCache.memoryStorage.config.expiration = .never
-        imageCache.diskStorage.config.expiration = .never
-
-        currentCacheConfiguration = configuration
+        MediaCache.configure(.init(
+            memoryStorageTotalCostLimit: configuration.memoryStorageTotalCostLimit,
+            memoryStorageCountLimit: configuration.memoryStorageCountLimit,
+            diskStorageSizeLimit: configuration.diskStorageSizeLimit
+        ))
     }
 
     /// Clears the memory storage and the disk storage of this cache. This is an async operation.
-    /// - Parameter completion: A closure which is invoked when the cache clearing operation finishes.
     public static func clearMediaCache() async {
         Log.cache.verbose("clearMediaCache")
-
-        imageCache.clearMemoryCache()
-        await imageCache.clearDiskCache()
+        await MediaCache.clear()
     }
 
     /// Clears the memory storage and the disk storage of this cache. This is an async operation.
@@ -83,6 +72,7 @@ package extension AdaptyUIBuilder {
     final class ImageUrlPrefetcher: AdaptyUIImageUrlObserver {
         package static let shared = ImageUrlPrefetcher()
 
+        private let prefetcher = MediaCachePrefetcher()
         private var initialized = false
 
         package func initialize() {
@@ -99,20 +89,10 @@ package extension AdaptyUIBuilder {
 
                 Log.prefetcher.verbose("cacheImagesIfNeeded: \(urls) [\(logId)]")
 
-                let prefetcher = ImagePrefetcher(
-                    sources: urls.map { .network($0) },
-                    options: [
-                        .targetCache(imageCache),
-                        .downloader(imageDownloader),
-                    ],
-                    completionHandler: { skipped, failed, completed in
-                        Log.prefetcher.verbose("cacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
-                    }
-                )
-
-                prefetcher.start()
+                prefetcher.prefetch(urls: urls) { skipped, failed, completed in
+                    Log.prefetcher.verbose("cacheImagesIfNeeded: skipped = \(skipped), failed = \(failed), completed = \(completed) [\(logId)]")
+                }
             }
         }
     }
 }
-

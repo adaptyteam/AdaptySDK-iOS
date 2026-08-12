@@ -14,20 +14,20 @@ import Foundation
 struct AdaptyUILogic: AdaptyUIBuilderLogic {
     let logId: String
     let flow: AdaptyFlow
-    let viewConfigurationId: String
+    let flowLayout: AdaptyFlow.Layout
     let events: AdaptyEventsHandler
     let observerModeResolver: AdaptyObserverModeResolver?
 
     package init(
         logId: String,
         flow: AdaptyFlow,
-        viewConfigurationId: String,
+        flowLayout: AdaptyFlow.Layout,
         events: AdaptyEventsHandler,
         observerModeResolver: AdaptyObserverModeResolver?
     ) {
         self.logId = logId
         self.flow = flow
-        self.viewConfigurationId = viewConfigurationId
+        self.flowLayout = flowLayout
         self.events = events
         self.observerModeResolver = observerModeResolver
     }
@@ -211,11 +211,12 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didReceiveAnalyticEvent(name: name, params: params)
     }
 
-    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent) {
+    func reportBackendAnalyticEvent(_ event: VS.AnalyticEvent, sessionId: UUID) {
         Task {
             try? await Adapty.logFlowAnalyticsViaAdaptyUI(
                 variationId: flow.variationId,
-                viewConfigurationId: viewConfigurationId,
+                sessionId: sessionId,
+                flowLayout: flowLayout,
                 params: event
             )
         }

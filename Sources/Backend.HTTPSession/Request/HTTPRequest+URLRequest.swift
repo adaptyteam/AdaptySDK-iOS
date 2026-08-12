@@ -30,7 +30,7 @@ extension HTTPRequest {
         var request = URLRequest(
             url: url,
             cachePolicy: cachePolicy ?? .useProtocolCachePolicy,
-            timeoutInterval: timeoutInterval ?? 60.0
+            timeoutInterval: max(0.5, timeoutInterval ?? 60.0)
         )
 
         request.httpMethod = endpoint.method.rawValue

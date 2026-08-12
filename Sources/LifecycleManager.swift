@@ -17,21 +17,21 @@ private let log = Log.Category(name: "LifecycleManager")
 @AdaptyActor
 final class LifecycleManager {
     private enum Constants {
-        static let appOpenedSendInterval: TimeInterval = 60.0
-        static let profileUpdateInterval: TimeInterval = 60.0
-        static let profileUpdateShortInterval: TimeInterval = 10.0
+        static let appOpenedSendInterval: AdaptyDuration = .seconds(60)
+        static let profileUpdateInterval: AdaptyDuration = .seconds(60)
+        static let profileUpdateShortInterval: AdaptyDuration = .seconds(10)
 
-        static let profileUpdateAcceleratedInterval: TimeInterval = 3.0
-        static let profileUpdateAcceleratedMaxCooldownAfterOpenWeb: TimeInterval = 60.0 * 20.0
-        static let profileUpdateAcceleratedDuration: TimeInterval = 60.0 * 5.0
+        static let profileUpdateAcceleratedInterval: AdaptyDuration = .seconds(3)
+        static let profileUpdateAcceleratedMaxCooldownAfterOpenWeb: AdaptyDuration = .minutes(20)
+        static let profileUpdateAcceleratedDuration: AdaptyDuration = .minutes(5)
 
-        static let idfaStatusCheckDuration: TimeInterval = 600.0
-        static let idfaStatusCheckInterval: TimeInterval = 5.0
+        static let idfaStatusCheckDuration: AdaptyDuration = .minutes(10)
+        static let idfaStatusCheckInterval: AdaptyDuration = .seconds(5)
     }
 
     static let shared = LifecycleManager()
 
-    private var appOpenedSentAt: Date?
+    private var appOpenedSentAt: AdaptyContinuousClock.Instant?
     private var newStorefrontCountryAvailable: String?
 
     private var profileUpdateRegularTask: Task<Void, Error>?
@@ -57,10 +57,10 @@ final class LifecycleManager {
 
     private var profileIsSyncing = false
 
-    private static func calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: TimeInterval, logStamp stamp: String) -> TimeInterval {
+    private static func calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: AdaptyDuration, logStamp stamp: String) -> AdaptyDuration {
         guard let storage = Adapty.optionalSDK?.profileStorage else { return defaultValue }
 
-        let now = Date()
+        let now = AdaptyContinuousClock.now
 
         guard let lastOpenedWebPaywallAt = storage.lastOpenedWebPaywallDate() else {
             log.debug("LifecycleManager: \(stamp) calculateInterval: NO WEB PAYWALL")
@@ -68,7 +68,7 @@ final class LifecycleManager {
         }
 
         if let lastStartAcceleratedSyncAt = storage.lastStartAcceleratedSyncProfileDate(), lastStartAcceleratedSyncAt > lastOpenedWebPaywallAt {
-            let timeLeft = now.timeIntervalSince(lastStartAcceleratedSyncAt)
+            let timeLeft = now - lastStartAcceleratedSyncAt
 
             if timeLeft < Constants.profileUpdateAcceleratedDuration {
                 log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeft) < \(Constants.profileUpdateAcceleratedDuration) (last start)")
@@ -78,7 +78,7 @@ final class LifecycleManager {
                 return defaultValue
             }
         } else {
-            let timeLeftFromLastOpenedWebPaywall = now.timeIntervalSince(lastOpenedWebPaywallAt)
+            let timeLeftFromLastOpenedWebPaywall = now - lastOpenedWebPaywallAt
 
             guard timeLeftFromLastOpenedWebPaywall < Constants.profileUpdateAcceleratedMaxCooldownAfterOpenWeb else {
                 log.debug("LifecycleManager: \(stamp) calculateInterval: HAS WEB PAYWALL \(timeLeftFromLastOpenedWebPaywall) >= \(Constants.profileUpdateAcceleratedMaxCooldownAfterOpenWeb) (cooldown)")
@@ -99,11 +99,11 @@ final class LifecycleManager {
 
         return Task { @AdaptyActor [weak self] in
             if !skipFirstSleep {
-                try await Task.sleep(seconds: Constants.profileUpdateInterval)
+                try await Task.sleep(duration: Constants.profileUpdateInterval)
             }
 
             while !Task.isCancelled {
-                let defaultUpdateInterval: TimeInterval
+                let defaultUpdateInterval: AdaptyDuration
 
                 do {
                     try await self?.syncProfile(logStamp: stamp)
@@ -114,8 +114,8 @@ final class LifecycleManager {
                 }
 
                 let updateInterval = Self.calculateProfileUpdateIntervalAndSetLastStartIfNeeded(defaultValue: defaultUpdateInterval, logStamp: stamp)
-                log.debug("LifecycleManager: \(stamp) update after: \(updateInterval) sec.")
-                try await Task.sleep(seconds: updateInterval)
+                log.debug("LifecycleManager: \(stamp) update after: \(updateInterval.asTimeInterval) sec.")
+                try await Task.sleep(duration: updateInterval)
             }
             throw CancellationError()
         }
@@ -151,7 +151,7 @@ final class LifecycleManager {
 
         for attempt in 0 ..< 3 {
             if attempt > 0 {
-                try await Task.sleep(nanoseconds: 1_000_000)
+                try await Task.sleep(duration: .milliseconds(1))
             }
 
             guard let profileManager = Adapty.optionalSDK?.profileManager else {
@@ -196,11 +196,11 @@ final class LifecycleManager {
 
             Adapty.applicationDidBecomeActive()
 
-            if let appOpenedSentAt, Date().timeIntervalSince(appOpenedSentAt) < Constants.appOpenedSendInterval {
+            if let appOpenedSentAt, AdaptyContinuousClock.now - appOpenedSentAt < Constants.appOpenedSendInterval {
                 log.verbose("handleDidBecomeActiveNotification SKIP")
                 return
             }
-            appOpenedSentAt = Date()
+            appOpenedSentAt = AdaptyContinuousClock.now
 
             Task.detached(priority: .utility) {
                 try? await Adapty.trackEvent(.appOpened)
@@ -215,11 +215,10 @@ final class LifecycleManager {
 
     private func scheduleIDFAUpdate() {
         Task { @AdaptyActor in
-            let timerStartedAt = Date()
+            let timerStartedAt = AdaptyContinuousClock.now
 
             while true {
-                let now = Date()
-                if now.timeIntervalSince1970 - timerStartedAt.timeIntervalSince1970 > Constants.idfaStatusCheckDuration {
+                if AdaptyContinuousClock.now - timerStartedAt > Constants.idfaStatusCheckDuration {
                     log.verbose("stop IdfaUpdateTimer")
                     return
                 }
@@ -232,7 +231,7 @@ final class LifecycleManager {
                     _ = try? await Adapty.getProfile()
                     return
                 case .notDetermined:
-                    try await Task.sleep(seconds: Constants.idfaStatusCheckInterval)
+                    try await Task.sleep(duration: Constants.idfaStatusCheckInterval)
                 case .denied, .notAvailable:
                     return
                 }

@@ -126,22 +126,34 @@ final class ProfileStorage {
         log.debug("set appleSearchAdsSyncDate = \(value).")
     }
 
-    private static var lastOpenedWebPaywallDate: Date? = userDefaults.object(forKey: Constants.lastOpenedWebPaywallKey) as? Date
+    private static var lastOpenedWebPaywallDate: AdaptyContinuousClock.Instant? = {
+        guard let date = userDefaults.object(forKey: Constants.lastOpenedWebPaywallKey) as? Date else {
+            return nil
+        }
 
-    private static func setLastOpenedWebPaywallDate(_ value: Date) {
-        guard lastOpenedWebPaywallDate != value else { return }
-        lastOpenedWebPaywallDate = value
-        userDefaults.set(value, forKey: Constants.lastOpenedWebPaywallKey)
-        log.debug("set lastOpenedWebPaywallDate = \(value).")
+        return AdaptyContinuousClock.now - max(.zero, .seconds(Date().timeIntervalSince(date)))
+    }()
+
+    private static func setLastOpenedWebPaywallDate() {
+        lastOpenedWebPaywallDate = AdaptyContinuousClock.now
+        let now = Date()
+        userDefaults.set(now, forKey: Constants.lastOpenedWebPaywallKey)
+        log.debug("set lastOpenedWebPaywallDate = \(now).")
     }
 
-    private static var lastStartAcceleratedSyncProfileDate: Date? = userDefaults.object(forKey: Constants.lastStartAcceleratedSyncProfileKey) as? Date
+    private static var lastStartAcceleratedSyncProfileDate: AdaptyContinuousClock.Instant? = {
+        guard let date = userDefaults.object(forKey: Constants.lastStartAcceleratedSyncProfileKey) as? Date else {
+            return nil
+        }
 
-    private static func setLastStartAcceleratedSyncProfileDate(_ value: Date) {
-        guard lastStartAcceleratedSyncProfileDate != value else { return }
-        lastStartAcceleratedSyncProfileDate = value
-        userDefaults.set(value, forKey: Constants.lastStartAcceleratedSyncProfileKey)
-        log.debug("set setLastStartAcceleratedSyncProfileDate = \(value).")
+        return AdaptyContinuousClock.now - max(.zero, .seconds(Date().timeIntervalSince(date)))
+    }()
+
+    private static func setLastStartAcceleratedSyncProfileDate() {
+        lastStartAcceleratedSyncProfileDate = AdaptyContinuousClock.now
+        let now = Date()
+        userDefaults.set(now, forKey: Constants.lastStartAcceleratedSyncProfileKey)
+        log.debug("set setLastStartAcceleratedSyncProfileDate = \(now).")
     }
 
     static func clearProfile(newProfile: VH<AdaptyProfile>? = nil) {
@@ -167,8 +179,11 @@ final class ProfileStorage {
         userDefaults.removeObject(forKey: Constants.lastStartAcceleratedSyncProfileKey)
         lastStartAcceleratedSyncProfileDate = nil
 
-        CrossPlacementStorage.clear()
-        PlacementStorage.clear()
+        Task { @StorageActor in
+            let userId = await ProfileStorage.userId
+            Cache.removeOtherProfiles(userId)
+            CrossPlacementStorage.removeOtherProfiles(userId)
+        }
     }
 }
 
@@ -252,19 +267,19 @@ extension ProfileStorage {
 }
 
 extension ProfileStorage { // TODO: need checkProfileId
-    func lastOpenedWebPaywallDate() -> Date? {
+    func lastOpenedWebPaywallDate() -> AdaptyContinuousClock.Instant? {
         Self.lastOpenedWebPaywallDate
     }
 
     func setLastOpenedWebPaywallDate() {
-        Self.setLastOpenedWebPaywallDate(Date())
+        Self.setLastOpenedWebPaywallDate()
     }
 
-    func lastStartAcceleratedSyncProfileDate() -> Date? {
+    func lastStartAcceleratedSyncProfileDate() -> AdaptyContinuousClock.Instant? {
         Self.lastStartAcceleratedSyncProfileDate
     }
 
     func setLastStartAcceleratedSyncProfileDate() {
-        Self.setLastStartAcceleratedSyncProfileDate(Date())
+        Self.setLastStartAcceleratedSyncProfileDate()
     }
 }

@@ -27,7 +27,7 @@ extension AdaptyLogger.Record: Codable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(Int64(date.timeIntervalSince1970 * 1000), forKey: .date)
+        try container.encode(Int(date.timeIntervalSince1970 * 1000), forKey: .date)
         try container.encode(level, forKey: .level)
         try container.encode(message, forKey: .message)
         try container.encode(category, forKey: .category)

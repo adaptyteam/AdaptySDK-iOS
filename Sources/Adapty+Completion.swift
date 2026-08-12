@@ -5,6 +5,7 @@
 //  Created by Aleksei Valiano on 19.09.2024
 //
 
+import AdaptyCodable
 import StoreKit
 
 public typealias AdaptyResult<Success> = Swift.Result<Success, AdaptyError>
@@ -13,6 +14,7 @@ public typealias AdaptyErrorCompletion = @Sendable (AdaptyError?) -> Void
 public typealias AdaptyResultCompletion<Success> = @Sendable (AdaptyResult<Success>) -> Void
 
 public extension Result where Failure == AdaptyError {
+    @inlinable
     var error: AdaptyError? {
         switch self {
         case let .failure(error): error
@@ -116,29 +118,33 @@ public extension Adapty {
         }
     }
 
-    /// To set attribution data for the profile, use this method.
+    /// Updates external attribution data associated with the profile.
+    ///
+    /// The completion handler is called after the backend accepts the data for
+    /// asynchronous processing. A successful completion does not mean that the
+    /// data has already been processed or that the profile has already been updated.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/docs/attribution-integration)
     ///
-    /// - Parameter attribution: a dictionary containing attribution (conversion) data.
-    /// - Parameter source: a source of attribution.
+    /// - Parameter attribution: Attribution data supplied by the provider.
+    /// - Parameter provider: The external attribution provider.
     /// - Parameter completion: A result containing an optional error.
-    nonisolated static func updateAttribution(
+    nonisolated static func updateExternalAttribution(
         _ attribution: [AnyHashable: Any],
-        source: AdaptyAttributionSource,
+        provider: AdaptyExternalAttributionProvider,
         _ completion: AdaptyErrorCompletion? = nil
     ) {
         let attributionJson: String
+
         do {
-            let data = try JSONSerialization.data(withJSONObject: attribution)
-            attributionJson = String(decoding: data, as: UTF8.self)
+            attributionJson = try JSONSerialization.jsonString(from: attribution)
         } catch {
             completion?(.wrongAttributeData(error))
             return
         }
 
         withCompletion(completion) { () async throws(AdaptyError) in
-            try await updateAttribution(attributionJson, source: source)
+            try await updateExternalAttribution(attributionJson, provider: provider)
         }
     }
 
@@ -200,6 +206,34 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func preloadFlows(
+        placementIds: [String],
+        loadTimeout: TimeInterval? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await preloadFlows(
+                placementIds: placementIds,
+                loadTimeout: loadTimeout
+            )
+        }
+    }
+
+    nonisolated static func preloadOnboardings(
+        placementIds: [String],
+        locale: String? = nil,
+        loadTimeout: TimeInterval? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await preloadOnboardings(
+                placementIds: placementIds,
+                locale: locale,
+                loadTimeout: loadTimeout
+            )
+        }
+    }
+
     /// This method enables you to retrieve the paywall from the Default Audience without having to wait for the Adapty SDK to send all the user information required for segmentation to the server.
     ///
     /// - Parameters:
@@ -230,6 +264,30 @@ public extension Adapty {
                 placementId: placementId,
                 locale: locale,
                 fetchPolicy: fetchPolicy
+            )
+        }
+    }
+
+    nonisolated static func preloadFlowsForDefaultAudience(
+        placementIds: [String],
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await preloadFlowsForDefaultAudience(
+                placementIds: placementIds
+            )
+        }
+    }
+
+    nonisolated static func preloadOnboardingsForDefaultAudience(
+        placementIds: [String],
+        locale: String? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await preloadOnboardingsForDefaultAudience(
+                placementIds: placementIds,
+                locale: locale
             )
         }
     }
@@ -300,6 +358,15 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func makePurchase(
+        product: AdaptyPromotedProduct,
+        _ completion: @escaping AdaptyResultCompletion<AdaptyPurchaseResult>
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await makePurchase(product: product)
+        }
+    }
+
     nonisolated static func openWebPaywall(
         for product: AdaptyPaywallProduct,
         in presentation: AdaptyWebPresentation = .externalBrowser,
@@ -338,7 +405,7 @@ public extension Adapty {
         }
     }
 
-    static func getUnfinishedTransactions(
+    nonisolated static func getUnfinishedTransactions(
         _ completion: @escaping AdaptyResultCompletion<[AdaptyUnfinishedTransaction]>
     ) {
         withCompletion(completion) { () async throws(AdaptyError) in

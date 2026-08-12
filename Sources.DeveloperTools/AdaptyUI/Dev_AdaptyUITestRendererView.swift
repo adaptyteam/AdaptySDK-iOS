@@ -79,6 +79,7 @@ public extension AdaptyUI {
             actionHandler = AdaptyUIStateActionHandler(
                 productsViewModel: productsViewModel,
                 screensViewModel: screensViewModel,
+                flowViewModel: flowViewModel,
                 logic: logic
             )
             let stateHolder = AdaptyUIStateHolder(
@@ -139,6 +140,7 @@ public struct Dev_AdaptyUIRendererView: View {
     private let safeAreaOverride: EdgeInsets?
     private let showDebugOverlay: Bool
     private let displayMissingTags: Bool
+    private let interfaceOrientationOverride: Dev_InterfaceOrientation?
 
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
@@ -147,6 +149,7 @@ public struct Dev_AdaptyUIRendererView: View {
         showDebugOverlay: Bool = false,
         displayMissingTags: Bool = true,
         safeAreaOverride: EdgeInsets? = nil,
+        interfaceOrientationOverride: Dev_InterfaceOrientation? = nil,
         rtlOverride: Bool? = nil,
         didAppear: @escaping () -> Void,
         didDisappear: @escaping () -> Void,
@@ -162,6 +165,7 @@ public struct Dev_AdaptyUIRendererView: View {
         self.safeAreaOverride = safeAreaOverride
         self.showDebugOverlay = showDebugOverlay
         self.displayMissingTags = displayMissingTags
+        self.interfaceOrientationOverride = interfaceOrientationOverride
         self.viewConfiguration = viewConfiguration.wrapped
         // @StateObject so the configuration (and its JS state) survives
         // parent body recomputes. Use `.id(...)` at the call site to force a
@@ -217,7 +221,13 @@ public struct Dev_AdaptyUIRendererView: View {
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: showDebugOverlay,
             displayMissingTags: displayMissingTags,
-            safeAreaOverride: safeAreaOverride
+            safeAreaOverride: safeAreaOverride,
+            interfaceOrientationOverride: interfaceOrientationOverride.map { override in
+                switch override {
+                case .portrait: .portrait
+                case .landscape: .landscape
+                }
+            }
         )
         .environmentObjects(
             stateViewModel: galleryConfiguration.stateViewModel,

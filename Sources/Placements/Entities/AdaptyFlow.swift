@@ -16,10 +16,10 @@ public struct AdaptyFlow: PlacementContent, Identifiable {
     public let remoteConfigs: [AdaptyRemoteConfig]
 
     public var hasViewConfiguration: Bool {
-        viewConfigurationId != nil
+        layoutsConfiguration != nil
     }
 
-    let viewConfigurationId: String?
+    let layoutsConfiguration: LayoutsConfiguration?
 
     public let paywalls: [AdaptyFlowPaywall]
 }
@@ -40,38 +40,39 @@ package extension AdaptyFlow {
 }
 
 extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
-    public typealias DecodingConfiguration = AdaptyPlacement.DecodingConfiguration
-
     enum CodingKeys: String, CodingKey {
         case id = "flow_id"
         case variationId = "variation_id"
         case name = "flow_name"
         case remoteConfigs = "remote_configs"
         case paywalls = "variations"
-        case viewConfigurationId = "flow_version_id"
+        case layoutsConfiguration = "ui_schema"
     }
 
     public init(from decoder: Decoder) throws {
         try self.init(
             from: decoder,
             configuration: .init(
-                userId: nil,
-                placement: AdaptyPlacement(from: decoder),
-                requestLocale: nil,
-                variationId: nil
+                placement: .init(from: decoder)
             )
         )
     }
 
     public init(from decoder: Decoder, configuration: AdaptyPlacement.DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let layoutsConfiguration: LayoutsConfiguration? =
+            if container.exist(.layoutsConfiguration) {
+                try LayoutsConfiguration(from: decoder)
+            } else {
+                nil
+            }
         try self.init(
             placement: configuration.placement,
             id: container.decode(String.self, forKey: .id),
             variationId: container.decode(String.self, forKey: .variationId),
             name: container.decode(String.self, forKey: .name),
             remoteConfigs: container.decodeIfPresent([AdaptyRemoteConfig].self, forKey: .remoteConfigs) ?? [],
-            viewConfigurationId: container.decodeIfPresent(String.self, forKey: .viewConfigurationId),
+            layoutsConfiguration: layoutsConfiguration,
             paywalls: container.decodeIfExist([AdaptyFlowPaywall].self, forKey: .paywalls, configuration: configuration) ?? []
         )
     }
@@ -84,8 +85,11 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
         if remoteConfigs.isNotEmpty {
             try container.encode(remoteConfigs, forKey: .remoteConfigs)
         }
-        try container.encodeIfPresent(viewConfigurationId, forKey: .viewConfigurationId)
         try container.encode(paywalls, forKey: .paywalls)
+        if let layoutsConfiguration {
+            try layoutsConfiguration.encode(to: encoder)
+        }
         try placement.encode(to: encoder)
     }
 }
+

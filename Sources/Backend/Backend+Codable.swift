@@ -89,4 +89,3 @@ extension Backend.Response.Data: DecodableWithConfiguration where Value: Decodab
             .decode(Value.self, forKey: .data, configuration: configuration)
     }
 }
-

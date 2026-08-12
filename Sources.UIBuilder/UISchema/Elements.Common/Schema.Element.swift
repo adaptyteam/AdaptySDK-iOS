@@ -56,7 +56,9 @@ extension Schema.ConfigurationBuilder {
             try planTemplateInstance(value, in: &taskStack)
         case .screenHolder:
             taskStack.append(.buildElement(from))
-        case .unknown, .simpleElement:
+        case .unknown:
+            taskStack.append(.buildElement(from))
+        case .simpleElement:
             taskStack.append(.buildElement(from))
             planElementProperties(from.properties, in: &taskStack)
         case let .compositeElement(element):
@@ -112,9 +114,12 @@ extension Schema.Element: DecodableWithConfiguration {
         case vStack = "v_stack"
         case hStack = "h_stack"
         case zStack = "z_stack"
+        case flexStack = "flex_stack"
         case row
         case column
+        case flex
         case section
+        case `switch`
         case toggle
         case slider
         case timer
@@ -133,19 +138,19 @@ extension Schema.Element: DecodableWithConfiguration {
         case radialProgress = "radial_progress"
     }
 
-    init(from decoder: any Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: any Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
 
         guard let contentType = ContentType(rawValue: type) else {
-            if configuration.isLegacy, type.hasPrefix(Schema.Template.keyPrefix) {
+            if configuration.isLegacy || !type.hasPrefix(Schema.Template.keyPrefix) {
                 self.init(
-                    properties: propertyOrNil(),
+                    properties: nil,
                     node: .unknown(type)
                 )
             } else {
                 try self.init(
-                    properties: propertyOrNil(),
+                    properties: nil,
                     node: .templateInstance(Schema.TemplateInstance(from: decoder, configuration: configuration))
                 )
             }
@@ -180,6 +185,11 @@ extension Schema.Element: DecodableWithConfiguration {
                 properties: propertyOrNil(),
                 node: .compositeElement(Schema.Stack(from: decoder, configuration: configuration))
             )
+        case .flexStack:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.FlexStack(from: decoder, configuration: configuration))
+            )
         case .button:
             try self.init(
                 properties: propertyOrNil(),
@@ -205,6 +215,11 @@ extension Schema.Element: DecodableWithConfiguration {
                 properties: propertyOrNil(),
                 node: .simpleElement(Schema.VideoPlayer(from: decoder))
             )
+        case .flex:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.Flex(from: decoder, configuration: configuration))
+            )
         case .row:
             try self.init(
                 properties: propertyOrNil(),
@@ -219,6 +234,11 @@ extension Schema.Element: DecodableWithConfiguration {
             try self.init(
                 properties: propertyOrNil(),
                 node: .compositeElement(Schema.Section(from: decoder, configuration: configuration))
+            )
+        case .switch:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.Switch(from: decoder, configuration: configuration))
             )
         case .toggle:
             try self.init(
@@ -272,9 +292,10 @@ extension Schema.Element: DecodableWithConfiguration {
             )
         }
 
-        func propertyOrNil() -> Schema.ElementProperties? {
-            guard let properties = try? Schema.ElementProperties(from: decoder, configuration: configuration) else { return nil }
+        func propertyOrNil() throws -> Schema.ElementProperties? {
+            let properties = try Schema.ElementProperties(from: decoder, configuration: configuration)
             return properties.isEmpty ? nil : properties
         }
     }
 }
+

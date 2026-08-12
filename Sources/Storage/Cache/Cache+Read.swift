@@ -9,55 +9,64 @@ import Foundation
 
 private let log = Log.cache
 
-@Cache.Actor
+@StorageActor
 extension Cache {
     @inlinable
-    static func read<T: Sendable>(
+    static func read(
         _ key: ItemKey,
-        accept: @Sendable (_ existing: Meta) -> Bool,
-        decode: @Sendable (Data) throws -> T
-    ) -> T? {
+        accept: (@Sendable (_ existing: Meta) -> Bool)? = nil
+    ) -> Data? {
         let fm = fileManager
-        guard let meta = fm.readValidatedCacheMeta(for: key), accept(meta) else {
+        guard let meta = fm.readValidatedCacheMeta(for: key) else {
+            log.verbose("cache.read[absent]: \(key)")
             return nil
+        }
+
+        if let accept {
+            guard accept(meta) else {
+                log.verbose("cache.read[skip]: \(meta)")
+                return nil
+            }
         }
 
         let dataFileURL = key.dataFileURL
 
         guard let data = try? Data(contentsOf: dataFileURL) else {
-            fm.removeCacheItem(key: key)
-            return nil
-        }
-
-        let decoded: T
-        do {
-            decoded = try decode(data)
-        } catch {
-            log.warn("Cached data decode failed: \(error). Self-heal pair. Remove invalid data.")
+            log.warn("cache.read[failed]: \(meta), description: Cached data read failed. Self-heal pair. Remove invalid data.")
             fm.removeCacheItem(key: key)
             return nil
         }
 
         meta.syncLastAccessed()
-        return decoded
+        log.verbose("cache.read[complete]: \(meta)")
+        return data
     }
 
     @discardableResult
     @inlinable
     static func touch(
         _ key: ItemKey,
-        accept: @Sendable (_ existing: Meta) -> Bool
+        accept: (@Sendable (_ existing: Meta) -> Bool)? = nil
     ) -> Bool {
-        guard let meta = fileManager.readValidatedCacheMeta(for: key), accept(meta) else {
+        guard let meta = fileManager.readValidatedCacheMeta(for: key) else {
+            log.verbose("cache.touch[absent]: \(key)")
             return false
         }
 
+        if let accept {
+            guard accept(meta) else {
+                log.verbose("cache.touch[skip]: \(meta)")
+                return false
+            }
+        }
+
         meta.syncLastAccessed()
+        log.verbose("cache.touch[complete]: \(meta)")
         return true
     }
 }
 
-@Cache.Actor
+@StorageActor
 extension FileManager {
     func readValidatedCacheMeta(for key: Cache.ItemKey) -> Cache.Meta? {
         let metaFileURL = key.metaFileURL

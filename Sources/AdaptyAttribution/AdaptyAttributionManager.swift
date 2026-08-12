@@ -1,0 +1,124 @@
+//
+//  AdaptyAttributionManager.swift
+//  AdaptySDK
+//
+//  Created by Aleksei Valiano on 16.06.2025.
+//
+
+import Foundation
+
+@AdaptyActor
+final class AdaptyAttributionManager {
+    private let storage: AdaptyAttributionStorage
+    private let executor: Backend.AdaptyAttributionExecutor
+    private let installTime: Date
+    private let appLaunchCount: Int
+
+    private var registerInstallStarted = false
+
+    private init?(_ sdk: Adapty) {
+        let storage = AdaptyAttributionStorage()
+        guard
+            let installTime = Environment.Application.installationTime,
+            let appLaunchCount = Environment.Application.appLaunchCount,
+            storage.version > 0
+        else { return nil }
+
+        self.storage = storage
+        executor = sdk.backend.createAdaptyAttributionExecutor()
+        self.installTime = installTime
+        self.appLaunchCount = appLaunchCount
+
+        if storage.hasRegistrationInstallResponse {
+            let response = storage.registrationInstallResponse
+            let details = response.asAdaptyInstallationDetails(
+                installTime: installTime,
+                appLaunchCount: appLaunchCount
+            )
+            Adapty.callDelegate { $0.onInstallationDetailsSuccess(details) }
+
+        } else {
+            startRegisterInstallTaskIfNeeded()
+        }
+    }
+
+    func startRegisterInstallTaskIfNeeded(maxRetries: Int = 10) {
+        guard
+            !storage.hasRegistrationInstallResponse,
+            !registerInstallStarted,
+            let sdk = Adapty.optionalSDK
+        else { return }
+
+        registerInstallStarted = true
+
+        let installTime = installTime
+        let appLaunchCount = appLaunchCount
+
+        Task { @AdaptyActor in
+            defer { registerInstallStarted = false }
+
+            let installInfo = await Environment.InstallInfo(
+                installTime: installTime,
+                appLaunchCount: appLaunchCount,
+                includedAnalyticIds: true
+            )
+
+            do throws(HTTPError) {
+                let response = try await executor.registerInstall(
+                    userId: sdk.profileStorage.userId,
+                    installInfo: installInfo,
+                    maxRetries: maxRetries
+                )
+                storage.setRegistrationInstallResponse(response)
+
+                let details = response.asAdaptyInstallationDetails(
+                    installTime: installInfo.installTime,
+                    appLaunchCount: installInfo.appLaunchCount
+                )
+
+                Adapty.callDelegate { $0.onInstallationDetailsSuccess(details) }
+
+            } catch {
+                guard !error.isCancelled else { return }
+                Adapty.callDelegate { $0.onInstallationDetailsFail(error: error.asAdaptyError) }
+            }
+        }
+    }
+
+    func getCurrentInstallationStatus() async -> AdaptyInstallationStatus {
+        guard
+            let installTime = Environment.Application.installationTime,
+            let appLaunchCount = Environment.Application.appLaunchCount
+        else { return .notAvailable }
+
+        guard storage.hasRegistrationInstallResponse
+        else { return .notDetermined }
+
+        let response = storage.registrationInstallResponse
+
+        return .determined(response.asAdaptyInstallationDetails(
+            installTime: installTime,
+            appLaunchCount: appLaunchCount
+        ))
+    }
+}
+
+@AdaptyActor
+extension AdaptyAttributionManager {
+    static var shared: AdaptyAttributionManager?
+    static func activate(_ sdk: Adapty) {
+        shared = .init(sdk)
+    }
+}
+
+private extension RegistrationInstallResponse? {
+    func asAdaptyInstallationDetails(installTime: Date, appLaunchCount: Int) -> AdaptyInstallationDetails {
+        let response = self
+        return .init(
+            id: response?.id,
+            installTime: installTime,
+            appLaunchCount: appLaunchCount,
+            payload: response?.payload
+        )
+    }
+}

@@ -18,6 +18,11 @@ package final class AdaptyUIFlowViewModel: ObservableObject {
 
     @Published package private(set) var flowStartedAt: Date?
 
+    /// Identifies a single presentation ("session") of this flow. Created when
+    /// the view model is initialized and rotated on `prepareForReuse()` so a
+    /// reused configuration reports analytics under a fresh session.
+    package private(set) var sessionId = UUID()
+
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,
@@ -63,6 +68,7 @@ package final class AdaptyUIFlowViewModel: ObservableObject {
         Log.ui.verbose("#\(logId)# prepareForReuse")
         logShowFlowCalled = false
         flowStartedAt = nil
+        sessionId = UUID()
     }
 }
 

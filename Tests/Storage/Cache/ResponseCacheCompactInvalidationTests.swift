@@ -57,12 +57,12 @@ extension ResponseCacheTests {
 
             let kCurrent = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "a")
             let kOther = Cache.ItemKey(profileId: "p2", itemType: .flow, itemId: "a")
-            let kShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "s")
+            let kShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "s")
             _ = try await Cache.write(payload.encoded(), key: kCurrent, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kOther, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kShared, dataVersion: 0) { _, _ in true }
 
-            await Cache.removeOtherProfiles("p1")
+            await Cache.removeOtherProfiles(userId("p1"))
 
             let current = await filesExist(for: kCurrent)
             let other = await filesExist(for: kOther)
@@ -80,7 +80,7 @@ extension ResponseCacheTests {
             let root = await prepareCacheTest()
             defer { cleanupCacheTest(root) }
             // root not created yet (no writes). Must not crash.
-            await Cache.removeOtherProfiles("p1")
+            await Cache.removeOtherProfiles(userId("p1"))
             #expect(!FileManager.default.fileExists(atPath: root.path))
         }
 
@@ -89,11 +89,11 @@ extension ResponseCacheTests {
             defer { cleanupCacheTest(root) }
 
             let kCurrent = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "a")
-            let kShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "s")
+            let kShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "s")
             _ = try await Cache.write(payload.encoded(), key: kCurrent, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kShared, dataVersion: 0) { _, _ in true }
 
-            await Cache.removeOtherProfiles("p1")
+            await Cache.removeOtherProfiles(userId("p1"))
 
             // Nothing removed; both entries intact.
             let current = await filesExist(for: kCurrent)
@@ -108,13 +108,13 @@ extension ResponseCacheTests {
 
             let k1 = Cache.ItemKey(profileId: "p1", itemType: .flow, itemId: "a")
             let k2 = Cache.ItemKey(profileId: "p2", itemType: .flow, itemId: "a")
-            let kShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "s")
+            let kShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "s")
             _ = try await Cache.write(payload.encoded(), key: k1, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: k2, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: kShared, dataVersion: 0) { _, _ in true }
 
             // Profile "p3" has no directory; both p1 and p2 are "other".
-            await Cache.removeOtherProfiles("p3")
+            await Cache.removeOtherProfiles(userId("p3"))
 
             let f1 = await filesExist(for: k1)
             let f2 = await filesExist(for: k2)
@@ -214,8 +214,7 @@ extension ResponseCacheTests {
             // And the entry is still readable.
             let value: TestPayload? = await Cache.read(
                 key,
-                accept: { _ in true },
-                decode: TestPayload.decode(_:)
+                decode: TestPayload.decode(_:_:)
             )
             #expect(value == payload)
         }
@@ -258,8 +257,8 @@ extension ResponseCacheTests {
             defer { cleanupCacheTest(root) }
 
             // Valid shared entry + orphan body in shared + stray unknown dir in shared.
-            let validShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "ok")
-            let orphanShared = Cache.ItemKey(profileId: nil, itemType: .uischema, itemId: "orphan")
+            let validShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "ok")
+            let orphanShared = Cache.ItemKey(profileId: nil, itemType: .flowLayout, itemId: "orphan")
             _ = try await Cache.write(payload.encoded(), key: validShared, dataVersion: 0) { _, _ in true }
             _ = try await Cache.write(payload.encoded(), key: orphanShared, dataVersion: 0) { _, _ in true }
             await removeMetaOnly(for: orphanShared)

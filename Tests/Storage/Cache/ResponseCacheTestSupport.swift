@@ -13,7 +13,7 @@ import Foundation
 /// Creates a unique tmp-root and overrides `Cache.rootDirectory`. Returns the
 /// root URL where this test's cache lives. Tests are responsible for cleanup
 /// via `cleanupCacheTest(_:)` (typically through `defer`).
-@Cache.Actor
+@StorageActor
 func prepareCacheTest(testName: String = #function) -> URL {
     let safeName = testName
         .replacingOccurrences(of: "(", with: "_")
@@ -34,7 +34,7 @@ func cleanupCacheTest(_ root: URL) {
 }
 
 /// Sets the limits used by eviction tests.
-@Cache.Actor
+@StorageActor
 func configureCache(maxBytes: Int, evictionGracePeriod: TimeInterval) {
     Cache.maxBytes = maxBytes
     Cache.evictionGracePeriod = evictionGracePeriod
@@ -42,7 +42,7 @@ func configureCache(maxBytes: Int, evictionGracePeriod: TimeInterval) {
 
 /// Forces `enforceCacheSizeLimit` to do a full disk scan on the next write
 /// (otherwise the in-memory counter may short-circuit eviction).
-@Cache.Actor
+@StorageActor
 func resetCacheCounters() {
     Cache.totalBytesUpperBound = nil
     Cache.nextEvictionScanAllowedAt = nil
@@ -62,12 +62,22 @@ extension TestPayload {
     static func decode(_ data: Data) throws -> TestPayload {
         try JSONDecoder().decode(TestPayload.self, from: data)
     }
+
+    /// `decode` for `Cache.read` / `Cache.writeOrRead` — `meta` corresponds to `data`; ignored here.
+    static func decode(_ meta: Cache.Meta, _ data: Data) throws -> TestPayload {
+        try decode(data)
+    }
 }
 
 /// Marker error for decoders, to distinguish "intentional failure from our code" from any other.
 struct TestDecodeError: Error {}
 
-/// Thread-unsafe (but safe inside `@Cache.Actor`) container for side-effect
+/// Convenience for tests: build an `AdaptyUserId` from a profileId.
+func userId(_ profileId: String) -> AdaptyUserId {
+    AdaptyUserId(profileId: profileId, customerId: nil)
+}
+
+/// Thread-unsafe (but safe inside `@StorageActor`) container for side-effect
 /// capture from accept-closures.
 final class Box<T>: @unchecked Sendable {
     var value: T
@@ -77,19 +87,19 @@ final class Box<T>: @unchecked Sendable {
 }
 
 /// Reads `.meta` directly (to inspect stored fields in tests).
-@Cache.Actor
+@StorageActor
 func readMetaFromDisk(for key: Cache.ItemKey) -> Cache.Meta? {
     try? Cache.Meta(from: key.metaFileURL)
 }
 
 /// Reads `.data` directly.
-@Cache.Actor
+@StorageActor
 func readBodyFromDisk(for key: Cache.ItemKey) -> Data? {
     try? Data(contentsOf: key.dataFileURL)
 }
 
 /// Checks the existence of the pair (meta + data) on disk.
-@Cache.Actor
+@StorageActor
 func filesExist(for key: Cache.ItemKey) -> (meta: Bool, body: Bool) {
     let fm = FileManager.default
     return (
@@ -99,7 +109,7 @@ func filesExist(for key: Cache.ItemKey) -> (meta: Bool, body: Bool) {
 }
 
 /// Overwrites the `.meta` file with arbitrary bytes (to simulate corrupted meta).
-@Cache.Actor
+@StorageActor
 func writeRawMeta(_ data: Data, for key: Cache.ItemKey) throws {
     try FileManager.default.createDirectory(
         at: key.directory,
@@ -109,7 +119,7 @@ func writeRawMeta(_ data: Data, for key: Cache.ItemKey) throws {
 }
 
 /// Overwrites the `.data` file with arbitrary bytes (to simulate corrupted body).
-@Cache.Actor
+@StorageActor
 func writeRawBody(_ data: Data, for key: Cache.ItemKey) throws {
     try FileManager.default.createDirectory(
         at: key.directory,
@@ -119,20 +129,20 @@ func writeRawBody(_ data: Data, for key: Cache.ItemKey) throws {
 }
 
 /// Removes the body file, keeping the meta (simulates a crash / external tampering).
-@Cache.Actor
+@StorageActor
 func removeBodyOnly(for key: Cache.ItemKey) {
     try? FileManager.default.removeItem(at: key.dataFileURL)
 }
 
 /// Removes the meta file, keeping the body (simulates a crash between write steps).
-@Cache.Actor
+@StorageActor
 func removeMetaOnly(for key: Cache.ItemKey) {
     try? FileManager.default.removeItem(at: key.metaFileURL)
 }
 
 /// Writes a `Cache.Meta` directly (used to override `lastAccessedAt`/`storedAt`
 /// in eviction tests).
-@Cache.Actor
+@StorageActor
 func overwriteMeta(_ meta: Cache.Meta, for key: Cache.ItemKey) throws {
     let data = try JSONEncoder().encode(meta)
     try writeRawMeta(data, for: key)
@@ -140,7 +150,7 @@ func overwriteMeta(_ meta: Cache.Meta, for key: Cache.ItemKey) throws {
 
 /// Overwrites the `schemaVersion` field in an existing `.meta` (used to test
 /// schema mismatch — the public API does not allow changing schemaVersion directly).
-@Cache.Actor
+@StorageActor
 func overwriteMetaSchemaVersion(_ schemaVersion: Int, for key: Cache.ItemKey) throws {
     let original = try Data(contentsOf: key.metaFileURL)
     guard
@@ -154,13 +164,13 @@ func overwriteMetaSchemaVersion(_ schemaVersion: Int, for key: Cache.ItemKey) th
 }
 
 /// Removes the (meta + data) pair for the given key.
-@Cache.Actor
+@StorageActor
 func removeCacheItem(for key: Cache.ItemKey) {
     FileManager.default.removeCacheItem(key: key)
 }
 
 /// Collects all valid `Meta` under `Cache.rootDirectory` (replacement for a deprecated API).
-@Cache.Actor
+@StorageActor
 func collectAllMeta() -> [Cache.Meta] {
     let fm = FileManager.default
     guard fm.fileExists(atPath: Cache.rootDirectory.path) else { return [] }
@@ -180,3 +190,4 @@ func collectAllMeta() -> [Cache.Meta] {
 }
 
 #endif
+

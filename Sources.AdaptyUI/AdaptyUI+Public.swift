@@ -1,5 +1,5 @@
 //
-//  AdaptyFlowControllerDelegate.swift
+//  AdaptyUI+Public.swift
 //
 //
 //  Created by Alexey Goncharov on 27.1.23..
@@ -297,6 +297,35 @@ public extension AdaptyUI {
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         locale: String? = nil,
+        customLayoutId: String? = nil,
+        loadTimeout: TimeInterval? = nil,
+        products: [AdaptyPaywallProduct]? = nil,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
+        tagResolver: AdaptyUITagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil,
+        assetsResolver: AdaptyUIAssetsResolver? = nil,
+        systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
+    ) async throws -> FlowConfiguration {
+        try await getFlowConfiguration(
+            forFlow: flow,
+            device: .current,
+            locale: locale,
+            customLayoutId: customLayoutId,
+            loadTimeout: loadTimeout,
+            products: products,
+            observerModeResolver: observerModeResolver,
+            tagResolver: tagResolver,
+            timerResolver: timerResolver,
+            assetsResolver: assetsResolver,
+            systemRequestsHandler: systemRequestsHandler
+        )
+    }
+
+    package static func getFlowConfiguration(
+        forFlow flow: AdaptyFlow,
+        device: Adapty.DeviceInfo,
+        locale: String? = nil,
+        customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
@@ -312,8 +341,10 @@ public extension AdaptyUI {
             throw err
         }
 
-        let viewConfiguration = try await Adapty.getUIConfiguration(
+        let (flowLayout, viewConfiguration) = try await Adapty.getUIConfiguration(
             flow: flow,
+            device: device,
+            customLayoutId: customLayoutId,
             locale: locale,
             loadTimeout: loadTimeout
         )
@@ -321,6 +352,7 @@ public extension AdaptyUI {
         return FlowConfiguration(
             logId: Log.stamp,
             flow: flow,
+            flowLayout: flowLayout,
             viewConfiguration: viewConfiguration,
             products: products,
             observerModeResolver: observerModeResolver,
@@ -331,7 +363,7 @@ public extension AdaptyUI {
         )
     }
 
-    /// Right after receiving ``AdaptyUI.ViewConfiguration``, you can create the corresponding ``AdaptyFlowController`` to present it afterwards.
+    /// Right after receiving ``AdaptyUI.FlowConfiguration``, you can create the corresponding ``AdaptyFlowController`` to present it afterwards.
     ///
     /// - Parameters:
     ///   - viewConfiguration: an ``AdaptyUI.LocalizedViewConfiguration`` object containing information about the visual part of the paywall. To load it, use the ``AdaptyUI.getViewConfiguration(paywall:locale:)`` method.
@@ -352,6 +384,22 @@ public extension AdaptyUI {
             paywallConfiguration: flowConfiguration,
             delegate: delegate,
             showDebugOverlay: showDebugOverlay
+        )
+    }
+}
+
+package extension Adapty.DeviceInfo {
+    /// Device descriptor used to pick the matching flow layout: logical points
+    /// in the screen orientation at the moment of the request (not native
+    /// pixels, and not orientation-fixed — so it must be read fresh, never
+    /// cached).
+    @MainActor
+    static var current: Self {
+        let size = UIScreen.main.bounds.size
+        return .init(
+            kind: UIDevice.current.userInterfaceIdiom == .phone ? .phone : .tab,
+            vertical: Int(size.height),
+            horizontal: Int(size.width)
         )
     }
 }

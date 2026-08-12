@@ -26,6 +26,13 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
         ))
     }
 
+    // TODO: Uncomment to stop using the default implementation
+    // func didReceivePromotedPurchase(_ product: AdaptyPromotedProduct) {
+    //     eventHandler.handle(event: Event.DidReceivePromotedPurchase(
+    //         product: .init(product)
+    //     ))
+    // }
+
     func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails) {
         eventHandler.handle(event: Event.OnInstallationDetailsSuccess(
             details: details
@@ -181,8 +188,8 @@ extension AdaptyPluginDelegate: AdaptyFlowControllerDelegate {
     }
 
     func flowController(
-        _ controller: AdaptyFlowController,
-        didPartiallyLoadProducts failedIds: [String]
+        _: AdaptyFlowController,
+        didPartiallyLoadProducts _: [String]
     ) {}
 
     func flowController(
@@ -297,7 +304,7 @@ extension AdaptyPluginDelegate: AdaptyOnboardingControllerDelegate {
     }
 
     func onboardingsControllerLoadingPlaceholder(
-        _ controller: AdaptyOnboardingController
+        _: AdaptyOnboardingController
     ) -> UIView? {
         AdaptyPlugin.instantiateOnboardingPlaceholderView() ?? AdaptyOnboardingPlacehoderView()
     }

@@ -228,6 +228,20 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 - pagePaddingTop
                 - pagePaddingBottom
 
+            let firstPageInset = pager.firstPageInset?.valueWith(
+                parent: proxy.size.width,
+                screenSize: screenSize.width,
+                safeAreaStart: safeArea.leading,
+                safeAreaEnd: safeArea.trailing
+            )
+
+            let lastPageInset = pager.lastPageInset?.valueWith(
+                parent: proxy.size.width,
+                screenSize: screenSize.width,
+                safeAreaStart: safeArea.leading,
+                safeAreaEnd: safeArea.trailing
+            )
+
             let pages = pager.content
             HStack(spacing: pager.spacing) {
                 ForEach(0 ..< pages.count, id: \.self) { idx in
@@ -242,7 +256,16 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 }
             }
             .padding(.top, pagePaddingTop)
-            .offset(x: CGFloat(-currentPage) * (width + pager.spacing) + offset)
+            .offset(x: VC.Pager.pagesOffsetX(
+                currentPage: currentPage,
+                pageCount: pages.count,
+                pageWidth: width,
+                spacing: pager.spacing,
+                viewportWidth: proxy.size.width,
+                firstPageInset: firstPageInset,
+                lastPageInset: lastPageInset,
+                pagePaddingLeading: pagePaddingLeading
+            ) + offset)
             .dragGesture(
                 condition: pager.interactionBehavior != .none,
                 onChanged: { value in

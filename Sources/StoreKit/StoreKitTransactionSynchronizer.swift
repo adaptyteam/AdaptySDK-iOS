@@ -18,7 +18,8 @@ protocol StoreKitTransactionSynchronizer: AnyObject, Sendable {
 
     func validate(
         _: PurchasedTransactionInfo,
-        payload: PurchasePayload
+        payload: PurchasePayload,
+        reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) -> AdaptyProfile
 
     func attemptToFinish(transaction: StoreKit.Transaction, logSource: String) async
@@ -33,6 +34,7 @@ extension Adapty: StoreKitTransactionSynchronizer {
         case setVariation
         case observing
         case purchasing
+        case promotedPurchase
         case unfinished
     }
 
@@ -91,13 +93,14 @@ extension Adapty: StoreKitTransactionSynchronizer {
 
     func validate(
         _ transactionInfo: PurchasedTransactionInfo,
-        payload: PurchasePayload
+        payload: PurchasePayload,
+        reason: Adapty.ValidatePurchaseReason
     ) async throws(AdaptyError) -> AdaptyProfile {
         do {
             let response = try await httpSession.validateTransaction(
                 transactionInfo: transactionInfo,
                 payload: payload,
-                reason: .purchasing
+                reason: reason
             )
             handleTransactionResponse(response)
             return await profileWithOfflineAccessLevels(response.value)

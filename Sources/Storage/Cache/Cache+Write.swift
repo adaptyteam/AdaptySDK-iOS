@@ -9,16 +9,18 @@ import Foundation
 
 private let log = Log.cache
 
-@Cache.Actor
+@StorageActor
 extension Cache {
     @discardableResult
     @inlinable
     static func write(
         _ data: Data,
         key: ItemKey,
-        locale: String? = nil,
+        locale: AdaptyLocale? = nil,
+        eligibleCrossABtest: Bool = false,
+        segmentId: String? = nil,
         dataVersion: Int,
-        accept: @Sendable (_ new: Meta, _ existing: Meta) -> Bool
+        accept: (@Sendable (_ new: Meta, _ existing: Meta) -> Bool)? = nil
     ) throws -> Bool {
         let now = Date()
 
@@ -26,6 +28,8 @@ extension Cache {
             key: key,
             size: data.count,
             locale: locale,
+            eligibleCrossABtest: eligibleCrossABtest,
+            segmentId: segmentId,
             dataVersion: dataVersion,
             storedAt: now,
             lastAccessedAt: now
@@ -33,20 +37,30 @@ extension Cache {
 
         let fm = fileManager
         let existing = fm.readValidatedCacheMeta(for: key)
-        if let existing, !accept(newMeta, existing) {
-            return false
+        if let existing, let accept {
+            guard accept(newMeta, existing) else {
+                log.verbose("cache.write[skip]: \(newMeta), persisted: \(existing)")
+                return false
+            }
         }
 
-        try fm.writeCacheItem(
-            data: data,
-            meta: newMeta,
-            oldDataSize: existing?.size ?? 0
-        )
-        return true
+        do {
+            try fm.writeCacheItem(
+                data: data,
+                meta: newMeta,
+                oldDataSize: existing?.size ?? 0
+            )
+            log.verbose("cache.write[complete]: \(newMeta)")
+            return true
+        } catch {
+            log.verbose("cache.write[error]: \(newMeta), error:\(error)")
+            throw error
+        }
+
     }
 }
 
-@Cache.Actor
+@StorageActor
 extension FileManager {
     func writeCacheItem(
         data: Data,

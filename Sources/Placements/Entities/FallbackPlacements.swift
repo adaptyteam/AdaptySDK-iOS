@@ -18,7 +18,7 @@ struct FallbackPlacements: Sendable {
         head.formatVersion
     }
 
-    var version: Int64 {
+    var version: Int {
         head.version
     }
 
@@ -37,20 +37,51 @@ struct FallbackPlacements: Sendable {
         fileURL = url
     }
 
-    func contains(placementId id: String) -> Bool? {
-        head.placementIds?.contains(id)
+    func contains(
+        placementId id: String,
+        variationId: String?
+    ) -> Bool {
+        struct Variation: Decodable {
+            let id: String
+
+            enum CodingKeys: String, CodingKey {
+                case id = "variation_id"
+            }
+        }
+
+        do {
+            let data = try Data(contentsOf: fileURL)
+            let placementPointer = "/data/\(id.jsonPointerSegment())"
+
+            guard let variationId else {
+                return try data.jsonExtractIfPresent(pointer: placementPointer) != nil
+            }
+
+            guard let variations = try data.jsonExtractIfPresent(pointer: "\(placementPointer)/data") else {
+                return false
+            }
+
+            return try FallbackPlacements.decoder()
+                .decode([Variation].self, from: variations)
+                .contains { $0.id == variationId }
+        } catch {
+            log.error(String(describing: error))
+            return false
+        }
     }
 
     func getPlacement<Content: PlacementContent>(
+        _: Content.Type,
         byPlacementId id: String,
         withVariationId variationId: String?,
         userId: AdaptyUserId,
         requestLocale: AdaptyLocale?
-    ) throws -> AdaptyPlacementChosen<Content>? {
+    ) throws -> AdaptyPlacement.Draw<Content>? {
         let draw: AdaptyPlacement.Draw<Content>
 
         do {
-            guard let data = try Data(contentsOf: fileURL).jsonExtractIfPresent(pointer: "/data/\(id)") else {
+            let placementPointer = "/data/\(id.jsonPointerSegment())"
+            guard let data = try Data(contentsOf: fileURL).jsonExtractIfPresent(pointer: placementPointer) else {
                 Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: nil")
 
                 return nil
@@ -62,6 +93,9 @@ struct FallbackPlacements: Sendable {
                 withRequestLocale: requestLocale,
                 withFallbackVersion: version
             )
+        } catch let error as PlacementDecodingError where error == .notFoundVariationId {
+            Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: nil")
+            return nil
         } catch {
             log.error(String(describing: error))
             Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") error: \(error)")
@@ -70,19 +104,21 @@ struct FallbackPlacements: Sendable {
 
         Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: variationId = \(draw.content.variationId)")
 
-        return .draw(draw)
+        return draw
     }
 
     func getUISchema(
-        byViewConfigurationId id: String
+        byFlowLayoutId id: String,
+        decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) throws -> AdaptyUISchema? {
         let schema: AdaptyUISchema?
         do {
             let file = try Data(contentsOf: fileURL)
-            guard let data = try file.jsonExtractIfPresent(pointer: "/ui_builder/\(id)") else {
+            let layoutPointer = "/ui_builder/\(id.jsonPointerSegment())"
+            guard let data = try file.jsonExtractIfPresent(pointer: layoutPointer) else {
                 return nil
             }
-            schema = try AdaptyUISchema(from: data)
+            schema = try AdaptyUISchema(from: data, configuration: decodingConfiguration)
         } catch {
             log.error(String(describing: error))
             throw error
@@ -100,7 +136,7 @@ private extension FallbackPlacements {
 
     struct Head: Sendable, Decodable {
         var placementIds: Set<String>?
-        let version: Int64
+        let version: Int
         let formatVersion: Int
 
         enum CodingKeys: String, CodingKey {
@@ -113,8 +149,6 @@ private extension FallbackPlacements {
             let container = try decoder.container(keyedBy: CodingKeys.self)
 
             let formatVersion = try container.decode(Int.self, forKey: .formatVersion)
-
-            print(formatVersion)
 
             guard formatVersion == Adapty.fallbackFormatVersion else {
                 let error = Adapty.fallbackFormatVersion > formatVersion
@@ -131,7 +165,7 @@ private extension FallbackPlacements {
             }
 
             self.formatVersion = formatVersion
-            version = try container.decode(Int64.self, forKey: .version)
+            version = try container.decode(Int.self, forKey: .version)
             placementIds = try container.decodeIfPresent(Set<String>.self, forKey: .placementIds)
         }
     }
@@ -141,7 +175,7 @@ private extension FallbackPlacements {
         withUserId userId: AdaptyUserId,
         withVariationId variationId: String?,
         withRequestLocale requestLocale: AdaptyLocale?,
-        withFallbackVersion fallbackVersion: Int64
+        withFallbackVersion fallbackVersion: Int
     ) throws -> AdaptyPlacement.Draw<Content> {
         let jsonDecoder = FallbackPlacements.decoder()
 
@@ -156,10 +190,10 @@ private extension FallbackPlacements {
             with: .init(
                 userId: userId,
                 placement: placement,
-                requestLocale: requestLocale,
+                crossPlacementEligible: false,
+                onboardingRequestLocale: requestLocale,
                 variationId: variationId
             )
         ).value
     }
 }
-

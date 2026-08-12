@@ -12,6 +12,7 @@ extension Schema {
         let pageWidth: Length
         let pageHeight: Length
         let pagePadding: EdgeInsets
+        let edgePageOverrides: EdgePageOverrides?
         let spacing: Double
         let content: [Element]
         let pageControl: PageControl?
@@ -26,6 +27,7 @@ extension Schema.Pager {
         pageWidth: .default,
         pageHeight: .default,
         pagePadding: .zero,
+        edgePageOverrides: nil,
         spacing: 0,
         content: [],
         pageControl: nil,
@@ -54,6 +56,7 @@ extension Schema.Pager: Schema.CompositeElement {
                 pageWidth: pageWidth,
                 pageHeight: pageHeight,
                 pagePadding: pagePadding,
+                edgePageOverrides: edgePageOverrides,
                 spacing: spacing,
                 content: elementIndices.pop(content.count),
                 pageControl: pageControl,
@@ -71,6 +74,7 @@ extension Schema.Pager: DecodableWithConfiguration {
         case pageWidth = "page_width"
         case pageHeight = "page_height"
         case pagePadding = "page_padding"
+        case edgePageOverrides = "edge_page_overrides"
         case spacing
         case content
         case pageControl = "page_control"
@@ -79,8 +83,9 @@ extension Schema.Pager: DecodableWithConfiguration {
         case pageIndex = "page_index"
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        let edgePageOverrides = try container.decodeIfPresent(Schema.Pager.EdgePageOverrides.self, forKey: .edgePageOverrides)
         try self.init(
             pageWidth: container.decodeIfPresent(Length.self, forKey: .pageWidth)
                 ?? Self.default.pageWidth,
@@ -88,6 +93,7 @@ extension Schema.Pager: DecodableWithConfiguration {
                 ?? Self.default.pageHeight,
             pagePadding: container.decodeIfPresent(Schema.EdgeInsets.self, forKey: .pagePadding)
                 ?? Self.default.pagePadding,
+            edgePageOverrides: !(edgePageOverrides?.isEmpty ?? true) ? edgePageOverrides : Self.default.edgePageOverrides,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing)
                 ?? Self.default.spacing,
             content: container.decode([Schema.Element].self, forKey: .content, configuration: configuration),

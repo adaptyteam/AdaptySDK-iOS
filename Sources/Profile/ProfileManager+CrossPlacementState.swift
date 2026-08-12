@@ -15,25 +15,16 @@ private extension Adapty {
             throw error.asAdaptyError
         }
 
-        guard let manager = try profileManager(withProfileId: userId) else {
+        guard try profileManager(withProfileId: userId) != nil else {
             throw .profileWasChanged()
         }
-        manager.saveCrossPlacementState(state)
+
+        await CrossPlacementStorage.set(crossPlacementState: state, for: userId)
     }
 }
 
 extension ProfileManager {
     func syncCrossPlacementState() async throws(AdaptyError) {
         try await Adapty.activatedSDK.syncCrossPlacementState(userId: userId)
-    }
-
-    func saveCrossPlacementState(_ newState: CrossPlacementState) {
-        let oldState = crossPlacmentStorage.state
-
-        guard newState.isNewerThan(oldState) else { return }
-
-        Log.crossAB.verbose("updateProfile version = \(newState.version), newValue = \(newState.variationIdByPlacements), oldValue = \(oldState?.variationIdByPlacements.description ?? "DISABLED")")
-
-        crossPlacmentStorage.setState(newState)
     }
 }

@@ -25,8 +25,9 @@ public struct AdaptyProfile: Sendable {
 
     let codableCustomAttributes: AdaptyProfile.CustomAttributes?
 
-    /// Identifiers of attribution sources applied to the profile and available for segmentation.
-    public let appliedAttributionSources: [AdaptyAttributionSource]
+    /// External attribution providers whose data has been processed by the
+    /// backend and is used for profile segmentation.
+    public let appliedExternalAttributionProviders: [AdaptyExternalAttributionProvider]
 
     /// Previously set user custom attributes with `.updateProfile()` method.
     public let customAttributes: [String: any Sendable]
@@ -40,7 +41,7 @@ public struct AdaptyProfile: Sendable {
     /// The keys are product ids from the store. The values are arrays of information about consumables. Can be null if the customer has no purchases.
     public let nonSubscriptions: [String: [NonSubscription]]
 
-    package let version: Int64
+    package let version: Int
 }
 
 extension AdaptyProfile {
@@ -101,7 +102,7 @@ extension AdaptyProfile: Codable {
         case version = "timestamp"
         case isTestUser = "is_test_user"
         case attributes
-        case appliedAttributionSources = "applied_attribution_sources"
+        case appliedExternalAttributionProviders = "applied_attribution_sources"
     }
 
     public init(from decoder: Decoder) throws {
@@ -116,13 +117,13 @@ extension AdaptyProfile: Codable {
         )
         segmentId = try container.decode(String.self, forKey: .segmentId)
         isTestUser = try container.decodeIfPresent(Bool.self, forKey: .isTestUser) ?? false
-        version = try container.decodeIfPresent(Int64.self, forKey: .version) ?? 0
+        version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 0
         codableCustomAttributes = try container.decodeIfPresent(AdaptyProfile.CustomAttributes.self, forKey: .customAttributes)
         customAttributes = codableCustomAttributes?.convertToSimpleDictionary() ?? [:]
         accessLevels = try container.decodeIfPresent([String: AccessLevel].self, forKey: .accessLevels) ?? [:]
         subscriptions = try container.decodeIfPresent([String: Subscription].self, forKey: .subscriptions) ?? [:]
         nonSubscriptions = try container.decodeIfPresent([String: [NonSubscription]].self, forKey: .nonSubscriptions) ?? [:]
-        appliedAttributionSources = try container.decodeIfPresent([AdaptyAttributionSource].self, forKey: .appliedAttributionSources) ?? []
+        appliedExternalAttributionProviders = try container.decodeIfPresent([AdaptyExternalAttributionProvider].self, forKey: .appliedExternalAttributionProviders) ?? []
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -142,9 +143,8 @@ extension AdaptyProfile: Codable {
         if nonSubscriptions.isNotEmpty {
             try container.encode(nonSubscriptions, forKey: .nonSubscriptions)
         }
-        if appliedAttributionSources.isNotEmpty {
-            try container.encode(appliedAttributionSources, forKey: .appliedAttributionSources)
+        if appliedExternalAttributionProviders.isNotEmpty {
+            try container.encode(appliedExternalAttributionProviders, forKey: .appliedExternalAttributionProviders)
         }
-
     }
 }

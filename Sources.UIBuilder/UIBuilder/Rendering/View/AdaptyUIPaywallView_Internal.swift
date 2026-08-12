@@ -16,15 +16,22 @@ package struct AdaptyUIPaywallView_Internal: View {
     private let showDebugOverlay: Bool
     private let displayMissingTags: Bool
     private let safeAreaOverride: EdgeInsets?
+    private let interfaceOrientationOverride: VC.Orientation?
+
+    /// Live interface orientation, kept up to date by
+    /// `AdaptyUIInterfaceOrientationReader` (unless an override is provided).
+    @State private var liveOrientation: VC.Orientation = .platformInitialGuess
 
     package init(
         showDebugOverlay: Bool,
         displayMissingTags: Bool,
-        safeAreaOverride: EdgeInsets? = nil
+        safeAreaOverride: EdgeInsets? = nil,
+        interfaceOrientationOverride: VC.Orientation? = nil
     ) {
         self.showDebugOverlay = showDebugOverlay
         self.displayMissingTags = displayMissingTags
         self.safeAreaOverride = safeAreaOverride
+        self.interfaceOrientationOverride = interfaceOrientationOverride
     }
 
     package var body: some View {
@@ -37,9 +44,16 @@ package struct AdaptyUIPaywallView_Internal: View {
                         height: proxy.size.height + safeArea.top + safeArea.bottom
                     )
                 )
+                .withInterfaceOrientation(interfaceOrientationOverride ?? liveOrientation)
                 .withSafeArea(safeArea)
                 .withDebugOverlayEnabled(showDebugOverlay)
                 .withDisplayMissingTags(displayMissingTags)
+        }
+        .background {
+            // Only track live orientation when there is no explicit override.
+            if interfaceOrientationOverride == nil {
+                AdaptyUIInterfaceOrientationReader(orientation: $liveOrientation)
+            }
         }
         .onAppear {
             productsViewModel.loadProductsIfNeeded()

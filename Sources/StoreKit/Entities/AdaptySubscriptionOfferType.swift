@@ -6,12 +6,17 @@
 //
 
 import Foundation
+import StoreKit
 
-public enum AdaptySubscriptionOfferType: String, Sendable {
-    case introductory
-    case promotional
-    case winBack = "win_back"
-    case code
+public struct AdaptySubscriptionOfferType: Sendable, RawRepresentable, Equatable, Hashable {
+    public let rawValue: String
+
+    @inlinable
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+
+    public static let introductory = AdaptySubscriptionOfferType(rawValue: "introductory")
+    public static let promotional = AdaptySubscriptionOfferType(rawValue: "promotional")
+    public static let winBack = AdaptySubscriptionOfferType(rawValue: "win_back")
 }
-
-extension AdaptySubscriptionOfferType: Codable {}

@@ -9,23 +9,31 @@ import Foundation
 
 extension AdaptyPlacement {
     struct Draw<Content: PlacementContent>: Sendable {
+        let date: Date
         let userId: AdaptyUserId
-        var content: Content
+        let content: Content
         let placementAudienceVersionId: String
         let variationIdByPlacements: [String: String]
     }
 }
 
-extension AdaptyPlacement.Draw {
+extension AdaptyPlacement.Draw: DecodableWithConfiguration {
+    struct DecodingConfiguration: Sendable {
+        let userId: AdaptyUserId
+        let placement: AdaptyPlacement
+        let crossPlacementEligible: Bool
+        let onboardingRequestLocale: AdaptyLocale?
+        let variationId: String?
+    }
+
     var participatesInCrossPlacementABTest: Bool {
         variationIdByPlacements.isNotEmpty
     }
-}
 
-extension AdaptyPlacement.Draw: DecodableWithConfiguration {
-    init(from decoder: Decoder, configuration: AdaptyPlacement.DecodingConfiguration) throws {
-        let userId = try configuration.userIdOrThrow
+    init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
+        let userId = configuration.userId
         let placement = configuration.placement
+        let crossPlacementEligible = configuration.crossPlacementEligible
         let placementAudienceVersionId = placement.audienceVersionId
 
         let variations = try [AdaptyPlacement.Variation](from: decoder)
@@ -51,15 +59,21 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placement content with index \(index) not found"))
         }
 
-        let variation = variations[index]
+        let variationIdByPlacements = crossPlacementEligible
+            ? variations[index].variationIdByPlacements
+            : [:]
 
-        let content = try Self.content(from: decoder, index: index, configuration: configuration)
+        let content = try Self.content(from: decoder, index: index, configuration: .init(
+            placement: configuration.placement,
+            onboardingRequestLocale: configuration.onboardingRequestLocale
+        ))
 
         self.init(
+            date: Date(),
             userId: userId,
             content: content,
             placementAudienceVersionId: placementAudienceVersionId,
-            variationIdByPlacements: variation.variationIdByPlacements
+            variationIdByPlacements: variationIdByPlacements
         )
     }
 
@@ -76,3 +90,4 @@ extension AdaptyPlacement.Draw: DecodableWithConfiguration {
         throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Placement content with index \(index) not found"))
     }
 }
+

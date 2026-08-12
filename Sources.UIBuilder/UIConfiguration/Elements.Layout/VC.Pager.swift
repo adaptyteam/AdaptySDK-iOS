@@ -12,11 +12,24 @@ extension VC {
         let pageWidth: Length
         let pageHeight: Length
         let pagePadding: EdgeInsets
+        let edgePageOverrides: EdgePageOverrides?
         let spacing: Double
         let content: [ElementIndex]
         let pageControl: PageControl?
         let animation: Animation?
         let interactionBehavior: InteractionBehavior
         let pageIndex: Variable?
+    }
+}
+
+extension VC.Pager {
+    @available(*, deprecated, renamed: "edgePageOverrides.leadingPadding")
+    var firstPageInset: Length? {
+        edgePageOverrides?.leadingPadding.map { Length.fixed($0) }
+    }
+
+    @available(*, deprecated, renamed: "edgePageOverrides.trailingPadding")
+    var lastPageInset: Length? {
+        edgePageOverrides?.trailingPadding.map { Length.fixed($0) }
     }
 }

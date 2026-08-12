@@ -12,9 +12,9 @@ public extension AdaptyConfiguration.Builder {
     @discardableResult
     func dev_with(
         mainBaseUrl: URL,
-        uaBaseUrl: URL
+        adaptyAttributionBaseUrl: URL
     ) -> Self {
         with(backendBaseUrl: mainBaseUrl, for: .main)
-            .with(backendBaseUrl: uaBaseUrl, for: .ua)
+            .with(backendBaseUrl: adaptyAttributionBaseUrl, for: .adaptyAttribution)
     }
 }

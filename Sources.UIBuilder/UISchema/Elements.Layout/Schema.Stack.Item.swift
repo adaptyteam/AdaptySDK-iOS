@@ -22,7 +22,7 @@ extension Schema.Stack.Item: DecodableWithConfiguration {
         case count
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
 

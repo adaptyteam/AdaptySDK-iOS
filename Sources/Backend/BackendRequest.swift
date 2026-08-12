@@ -21,37 +21,38 @@ protocol BackendEncodableRequest: BackendRequest, HTTPEncodableRequest {}
 
 enum BackendRequestName: String {
     case fetchProductStates = "get_products"
+    case fetchAllProductInfo = "get_all_products_info"
+
+    case sendEvents = "send_events"
+
     case createProfile = "create_profile"
     case fetchProfile = "get_profile"
     case updateProfile = "update_profile"
-    case fetchPaywallVariations = "get_paywall_variations"
-    case fetchOnboardingVariations = "get_onboarding_variations"
-    case fetchFallbackPaywallVariations = "get_fallback_paywall_variations"
-    case fetchFallbackOnboardingVariations = "get_fallback_onboarding_variations"
-    case fetchPaywallVariationsForDefaultAudience = "get_paywall_variations_for_default_audience"
-    case fetchOnboardingVariationsForDefaultAudience = "get_onboarding_variations_for_default_audience"
 
-    case fetchFallBackUISchema = "get_fallback_ui_schema"
-    case fetchUISchema = "get_ui_schema"
     case fetchCrossPlacementState = "get_cross_placement_state"
-    case fetchOnboarding = "get_onboarding"
-    case fetchPaywall = "get_paywall"
 
-    case fetchFallbackFlow = "get_fallback_flow"
-    case fetchFallbackOnbording = "get_fallback_onbording"
+    case fetchFlow = "get_flow"
+    case fetchFlowVariations = "get_flow_variations"
+    case fetchFlowForDefaultAudience = "get_flow_default_audience"
+    case fetchFlowVariationsForDefaultAudience = "get_flow_variations_default_audience"
+
+    case fetchOnboarding = "get_onboarding"
+    case fetchOnboardingVariations = "get_onboarding_variations"
+    case fetchOnbordingForDefaultAudience = "get_onbording_default_audience"
+    case fetchOnboardingVariationsForDefaultAudience = "get_onboarding_variations_default_audience"
+
+    case fetchUISchema = "get_ui_schema"
+    case fetchFallBackUISchema = "get_fallback_ui_schema"
 
     case validateTransaction = "validate_transaction"
     case validateReceipt = "validate_receipt"
 
     case sendASAToken = "set_asa_token"
-    case setAttributionData = "set_attribution_data"
+    case setExternalAttributionData = "set_external_attribution_data"
     case setIntegrationIdentifier = "set_integration_identifier"
     case signSubscriptionOffer = "sign_offer"
 
     case fetchNetworkConfig = "get_net_config"
 
-    case fetchAllProductInfo = "get_all_products_info"
-
     case reqisterInstall = "reqister_install"
-    case sendEvents = "send_events"
 }

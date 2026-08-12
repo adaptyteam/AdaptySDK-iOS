@@ -5,17 +5,22 @@
 //  Created by Aleksei Valiano on 22.10.2025.
 //
 
+import Foundation
+
 package extension Adapty {
     nonisolated static func logFlowAnalyticsViaAdaptyUI(
         variationId: String,
-        viewConfigurationId: String,
+        sessionId: UUID,
+        flowLayout: AdaptyFlow.Layout,
         params: AdaptyFlowAnalyticsPayload
     ) async throws(AdaptyError) {
         try await trackEvent(
             .flowAnalytics(
                 .init(
                     variationId: variationId,
-                    viewConfigurationId: viewConfigurationId,
+                    sessionId: sessionId,
+                    flowVersionId: flowLayout.versionId,
+                    flowLayoutId: flowLayout.id,
                     payload: params
                 )
             )
@@ -28,4 +33,3 @@ package extension Adapty {
         )
     }
 }
-

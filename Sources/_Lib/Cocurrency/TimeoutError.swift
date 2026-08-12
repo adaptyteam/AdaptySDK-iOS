@@ -15,12 +15,12 @@ package struct TimeoutError: LocalizedError {
     package let source: Source
 
     init(
-        _ seconds: TimeInterval,
+        _ duration: AdaptyDuration,
         file: String = #fileID,
         function: String = #function,
         line: UInt = #line
     ) {
-        errorDescription = "Task timed out before completion. Timeout: \(seconds) seconds."
+        errorDescription = "Task timed out before completion. Timeout: \(duration.asMilliseconds) milliseconds."
         source = Source(
             file: file,
             function: function,

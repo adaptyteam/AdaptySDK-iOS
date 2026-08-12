@@ -15,9 +15,73 @@ import Testing
 struct FallbackTests {
     enum Json: String {
         case medium = "fallback.json"
-        var url: URL {
-            Bundle.module.url(forResource: rawValue, withExtension: nil)!
+        var url: URL? {
+            let url = URL(fileURLWithPath: #filePath)
+                .deletingLastPathComponent()
+                .appendingPathComponent(rawValue)
+            return FileManager.default.fileExists(atPath: url.path) ? url : nil
         }
+
+        var hasFile: Bool {
+            url != nil
+        }
+    }
+
+    @Test func contains_placement_and_optionally_variation() throws {
+        let fileURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("json")
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        let json = """
+        {
+          "meta": {
+            "version": \(Adapty.fallbackFormatVersion),
+            "response_created_at": 1,
+            "developer_ids": ["placement", "metadata-only"]
+          },
+          "data": {
+            "placement": {
+              "data": [
+                { "variation_id": "variation-1" },
+                { "variation_id": "variation-2" }
+              ]
+            },
+            "data-only": {
+              "data": [
+                { "variation_id": "variation-3" }
+              ]
+            },
+            "плейсмент-€-👍": {
+              "data": [
+                { "variation_id": "вариант-€-👍" }
+              ]
+            },
+            "путь/to~плейсмент-€-👍": {
+              "data": [
+                { "variation_id": "вариант-special" }
+              ]
+            }
+          }
+        }
+        """
+        #expect(!json.contains("\\u"))
+        try Data(json.utf8).write(to: fileURL)
+
+        let fallback = try FallbackPlacements(fileURL: fileURL)
+
+        #expect(fallback.contains(placementId: "placement", variationId: nil) == true)
+        #expect(fallback.contains(placementId: "data-only", variationId: nil) == true)
+        #expect(fallback.contains(placementId: "metadata-only", variationId: nil) == false)
+        #expect(fallback.contains(placementId: "missing", variationId: nil) == false)
+        #expect(fallback.contains(placementId: "placement", variationId: "variation-2") == true)
+        #expect(fallback.contains(placementId: "data-only", variationId: "variation-3") == true)
+        #expect(fallback.contains(placementId: "плейсмент-€-👍", variationId: nil) == true)
+        #expect(fallback.contains(placementId: "плейсмент-€-👍", variationId: "вариант-€-👍") == true)
+        #expect(fallback.contains(placementId: "путь/to~плейсмент-€-👍", variationId: nil) == true)
+        #expect(fallback.contains(placementId: "путь/to~плейсмент-€-👍", variationId: "вариант-special") == true)
+        #expect(fallback.contains(placementId: "placement", variationId: "missing") == false)
+        #expect(fallback.contains(placementId: "missing", variationId: "variation-1") == false)
     }
 
     @Test func json_serialization_does_not_use_call_stack() throws {
@@ -72,18 +136,19 @@ struct FallbackTests {
         #expect(ok)
     }
 
-    @Test func read_all() throws {
-        let data = try Data(contentsOf: Json.medium.url)//.jsonExtract(pointer: "/data")
-        let startTime = CFAbsoluteTimeGetCurrent()
+    @Test(.enabled(if: Json.medium.hasFile))
+    func read_all() throws {
+        let data = try Data(contentsOf: #require(Json.medium.url)) // .jsonExtract(pointer: "/data")
+        let startTime = AdaptyContinuousClock.now
 
         let result = try JSONSerialization.jsonObject(with: data)
-        #expect(result is [String:Any])
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+        #expect(result is [String: Any])
+        let timeElapsed = elapsedSeconds(since: startTime)
         print("### Time elapsed for reading all: \(String(format: "%.6f", timeElapsed)) s.")
-
     }
 
-    @Test func medium() throws {
+    @Test(.enabled(if: Json.medium.hasFile))
+    func medium() throws {
         try test(json: Json.medium)
     }
 
@@ -127,7 +192,7 @@ struct FallbackTests {
     }
 
     private func inspect(json: Json) throws -> (flows: [String], onboardings: [String], schemas: [String]) {
-        let data = try Data(contentsOf: json.url).jsonExtract(pointer: "/data")
+        let data = try Data(contentsOf: json.url!).jsonExtract(pointer: "/data")
         let decoder = JSONDecoder()
         let result = try decoder.decode([String: Placement].self, from: data)
 
@@ -152,17 +217,18 @@ struct FallbackTests {
     private func test(json: Json) throws {
         let (flows, onboardings, schemas) = try inspect(json: json)
 
-        let startTime = CFAbsoluteTimeGetCurrent()
-        let fallback = try FallbackPlacements(fileURL: json.url)
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+        let startTime = AdaptyContinuousClock.now
+        let fallback = try FallbackPlacements(fileURL: json.url!)
+        let timeElapsed = elapsedSeconds(since: startTime)
         print("### Time elapsed for fallback: \(String(format: "%.6f", timeElapsed)) s.")
 
         print("### start testing onboardings")
 
         for placementId in onboardings {
-            let startTime = CFAbsoluteTimeGetCurrent()
+            let startTime = AdaptyContinuousClock.now
             do {
-                let _: AdaptyPlacementChosen<AdaptyOnboarding>? = try fallback.getPlacement(
+                let _: AdaptyPlacement.Draw<AdaptyOnboarding>? = try fallback.getPlacement(
+                    AdaptyOnboarding.self,
                     byPlacementId: placementId,
                     withVariationId: nil,
                     userId: .init(profileId: "test_profile", customerId: nil),
@@ -171,16 +237,17 @@ struct FallbackTests {
             } catch {
                 Issue.record("flow[\(placementId)]: \(error)")
             }
-            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            let timeElapsed = elapsedSeconds(since: startTime)
             print("### Time elapsed for onboarding[\(placementId)]: \(String(format: "%.6f", timeElapsed)) s.")
         }
 
         print("### start testing flows")
 
         for placementId in flows {
-            let startTime = CFAbsoluteTimeGetCurrent()
+            let startTime = AdaptyContinuousClock.now
             do {
-                let _: AdaptyPlacementChosen<AdaptyFlow>? = try fallback.getPlacement(
+                let _: AdaptyPlacement.Draw<AdaptyFlow>? = try fallback.getPlacement(
+                    AdaptyFlow.self,
                     byPlacementId: placementId,
                     withVariationId: nil,
                     userId: .init(profileId: "test_profile", customerId: nil),
@@ -189,7 +256,7 @@ struct FallbackTests {
             } catch {
                 Issue.record("flow[\(placementId)]: \(error)")
             }
-            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            let timeElapsed = elapsedSeconds(since: startTime)
 
             print("### Time elapsed for flow[\(placementId)]: \(String(format: "%.6f", timeElapsed)) s.")
         }
@@ -197,18 +264,23 @@ struct FallbackTests {
         print("### start testing schemas")
 
         for schemaId in schemas {
-            let startTime = CFAbsoluteTimeGetCurrent()
+            let startTime = AdaptyContinuousClock.now
             do {
-                _ = try fallback.getUISchema(byViewConfigurationId: schemaId)
+                _ = try fallback.getUISchema(
+                    byFlowLayoutId: schemaId,
+                    decodingConfiguration: .init(device: .phone)
+                )
             } catch {
                 Issue.record("schema[\(schemaId)]: \(error)")
             }
-            let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+            let timeElapsed = elapsedSeconds(since: startTime)
             print("### schema[\(schemaId)]: \(String(format: "%.3f", timeElapsed))s")
         }
     }
+
+    private func elapsedSeconds(since startTime: AdaptyContinuousClock.Instant) -> TimeInterval {
+        (AdaptyContinuousClock.now - startTime).asTimeInterval
+    }
 }
 
-
 #endif
-

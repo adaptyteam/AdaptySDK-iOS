@@ -11,6 +11,19 @@ import AdaptyCodable
 import Foundation
 import Testing
 
+private enum TestResources {
+    static var fallbackURL: URL? {
+        let url = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .appendingPathComponent("fallback.json")
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+    }
+
+    static var hasFallbackJSON: Bool {
+        fallbackURL != nil
+    }
+}
+
 /// Locks in the backend serialisation contract observed in fallback.json:
 /// every placementId key under `/data` is stored as raw UTF-8 bytes, not as
 /// a `\uXXXX` escape sequence. Production code (FallbackPlacements) builds
@@ -19,12 +32,9 @@ import Testing
 /// pointer lookup for non-ASCII placementIds will silently start returning
 /// nil. This test catches that change at build time.
 struct FallbackJsonFormatTests {
-    private static var fallbackURL: URL {
-        Bundle.module.url(forResource: "fallback.json", withExtension: nil)!
-    }
-
-    @Test func dataKeysDoNotUseUnicodeEscapes() throws {
-        let data = try Data(contentsOf: Self.fallbackURL)
+    @Test(.enabled(if: TestResources.hasFallbackJSON))
+    func dataKeysDoNotUseUnicodeEscapes() throws {
+        let data = try Data(contentsOf: #require(TestResources.fallbackURL))
 
         let info = try data.jsonInspect(pointer: "/data")
         guard case let .object(rawKeys) = info else {
@@ -52,12 +62,13 @@ struct FallbackJsonFormatTests {
         #expect(offending.isEmpty)
     }
 
-    @Test func dataContainsNonAsciiKeys() throws {
+    @Test(.enabled(if: TestResources.hasFallbackJSON))
+    func dataContainsNonAsciiKeys() throws {
         // Sanity-check companion to `dataKeysDoNotUseUnicodeEscapes`: if the
         // file ever lost its non-ASCII placementIds entirely, the escape-free
         // assertion would pass trivially. This test guarantees we keep
         // exercising real non-ASCII inputs against the contract.
-        let data = try Data(contentsOf: Self.fallbackURL)
+        let data = try Data(contentsOf: #require(TestResources.fallbackURL))
 
         let info = try data.jsonInspect(pointer: "/data")
         guard case let .object(rawKeys) = info else {

@@ -49,7 +49,7 @@ extension Schema.Section: DecodableWithConfiguration {
         case interpolator
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         guard configuration.isLegacy else {
             let transition: Schema.Transition? =

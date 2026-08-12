@@ -12,78 +12,70 @@ protocol PlacementContent: Sendable, Encodable, DecodableWithConfiguration where
     var id: String { get }
     var variationId: String { get }
     var name: String { get }
+
+    static func cacheKey(variationId: String) -> Cache.ItemKey
+    static func cacheKey(placementId: String, for userId: AdaptyUserId) -> Cache.ItemKey
+
+    static func shouldUseNew(new: Cache.Meta, existing: Cache.Meta) -> Bool
+    static func shouldUseExisting(with fetchPolicy: AdaptyPlacementFetchPolicy, locale: AdaptyLocale?) -> @Sendable (Cache.Meta) -> Bool
 }
 
-extension PlacementContent {
-    func equalAllLocales(_ other: some PlacementContent) -> Bool {
-        if let onbording = self as? AdaptyOnboarding, let other = other as? AdaptyOnboarding {
-            onbording.remoteConfig?.adaptyLocale == other.remoteConfig?.adaptyLocale
-        } else if let flow = self as? AdaptyFlow, let other = other as? AdaptyFlow {
-            Set(flow.remoteConfigs.map(\.adaptyLocale)) == Set(other.remoteConfigs.map(\.adaptyLocale))
-        } else {
-            false
-        }
+extension JSONDecoder {
+    func decodePlacement<Content: PlacementContent>(
+        withUserId userId: AdaptyUserId,
+        withRequestLocale onboardingRequestLocale: AdaptyLocale? = nil,
+        from body: Data
+    ) throws -> AdaptyPlacement.Draw<Content> {
+        let placement = try decode(
+            Backend.Response.Meta<AdaptyPlacement>.self,
+            from: body
+        ).value
+
+        let content = try decode(
+            Backend.Response.Data<Content>.self,
+            from: body,
+            with: .init(
+                placement: placement,
+                onboardingRequestLocale: onboardingRequestLocale
+            )
+        ).value
+
+        let variation = try decode(
+            Backend.Response.Data<AdaptyPlacement.Variation>.self,
+            from: body
+        ).value
+
+        return AdaptyPlacement.Draw<Content>(
+            date: Date(),
+            userId: userId,
+            content: content,
+            placementAudienceVersionId: placement.audienceVersionId,
+            variationIdByPlacements: variation.variationIdByPlacements
+        )
     }
 
-    @inlinable
-    func has(languageCode otherLocale: AdaptyLocale?, orDefault: Bool = false) -> Bool {
-        if let onbording = self as? AdaptyOnboarding {
-            onbording.onbordingHas(languageCode: otherLocale, orDefault: orDefault)
-        } else if self is AdaptyFlow {
-            true
-        } else {
-            false
-        }
-    }
+    func decodePlacementVariations<Content: PlacementContent>(
+        crossPlacementEligible: Bool,
+        variationId: String?,
+        withUserId userId: AdaptyUserId,
+        withRequestLocale onboardingRequestLocale: AdaptyLocale? = nil,
+        from body: Data
+    ) throws -> AdaptyPlacement.Draw<Content> {
+        let placement = try decode(
+            Backend.Response.Meta<AdaptyPlacement>.self,
+            from: body
+        ).value
 
-    @inlinable
-    func has(variationId: String?) -> Bool {
-        guard let variationId else { return true }
-        return self.variationId == variationId
-    }
-}
-
-extension AdaptyOnboarding {
-    func onbordingHas(languageCode otherLocale: AdaptyLocale?, orDefault: Bool = false) -> Bool {
-        let otherLocale = otherLocale ?? .defaultPlacementLocale
-        let orDefault = otherLocale.equalLanguageCode(.defaultPlacementLocale) ? false : orDefault
-
-        return switch remoteConfig?.adaptyLocale {
-        case .none:
-            if orDefault {
-                true
-            } else {
-                otherLocale.equalLanguageCode(.defaultPlacementLocale)
-            }
-
-        case let .some(locale):
-            if locale.equalLanguageCode(otherLocale) {
-                true
-            } else if orDefault {
-                locale.equalLanguageCode(.defaultPlacementLocale)
-            } else {
-                false
-            }
-        }
-    }
-}
-
-extension VH where Value: PlacementContent {
-    @inlinable
-    func has(languageCode locale: AdaptyLocale?, orDefault: Bool = false) -> Bool {
-        value.has(languageCode: locale, orDefault: orDefault)
-    }
-
-    @inlinable
-    func has(variationId: String?) -> Bool {
-        value.has(variationId: variationId)
-    }
-}
-
-extension Sequence {
-    func asContentByPlacementId<T: PlacementContent>() -> [String: VH<T>] where Element == VH<T> {
-        Dictionary(map { ($0.value.placement.id, $0) }, uniquingKeysWith: { first, second in
-            first.value.placement.isNewerThan(second.value.placement) ? first : second
-        })
+        return try decode(
+            Backend.Response.Data<AdaptyPlacement.Draw<Content>>.self,
+            from: body,
+            with: .init(
+                userId: userId,
+                placement: placement,
+                crossPlacementEligible: crossPlacementEligible,
+                onboardingRequestLocale: onboardingRequestLocale,
+                variationId: variationId
+            )
+        ).value
     }
 }

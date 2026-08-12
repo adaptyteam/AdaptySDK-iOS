@@ -48,7 +48,7 @@ extension Schema.AlignedElement: DecodableWithConfiguration {
         case content
     }
 
-    init(from decoder: Decoder, configuration: Schema.DecodingConfiguration) throws {
+    init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
             horizontalAlignment: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? Self.default.horizontalAlignment,

@@ -46,10 +46,7 @@ extension AdaptyFlowPaywall.ProductReference: Encodable {
             accessLevelId: container.decode(String.self, forKey: .accessLevelId),
             period: container.decode(BackendProductInfo.Period.self, forKey: .backendProductPeriod)
         )
-        // `promotional_offer_eligibility` is part of the backend payload but not
-        // of the cross-platform wire contract (the resolved `promotional_offer_id`
-        // is what round-trips). Default to `true` when absent so a ProductReference
-        // re-encoded by a cross-platform host preserves its offer id on re-decode.
+
         let promotionalOfferEligibility = try container.decodeIfPresent(Bool.self, forKey: .promotionalOfferEligibility) ?? true
         promotionalOfferId =
             if promotionalOfferEligibility {

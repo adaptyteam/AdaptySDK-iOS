@@ -10,6 +10,7 @@ import Foundation
 extension VC {
     enum Element: Sendable {
         indirect case stack(Stack, Properties?)
+        indirect case flexStack(FlexStack, Properties?)
         indirect case text(Text, Properties?)
         indirect case textField(TextField, Properties?)
         indirect case slider(Slider, Properties?)
@@ -19,7 +20,9 @@ extension VC {
         indirect case box(Box, Properties?)
         indirect case row(Row, Properties?)
         indirect case column(Column, Properties?)
+        indirect case flex(Flex, Properties?)
         indirect case section(Section, Properties?)
+        indirect case `switch`(Switch, Properties?)
         indirect case toggle(Toggle, Properties?)
         indirect case timer(Timer, Properties?)
         indirect case pager(Pager, Properties?)
@@ -42,13 +45,16 @@ extension VC.Element {
             nil
         case let .box(_, properties),
              let .stack(_, properties),
+             let .flexStack(_, properties),
              let .text(_, properties),
              let .image(_, properties),
              let .textField(_, properties),
              let .button(_, properties),
              let .row(_, properties),
              let .column(_, properties),
+             let .flex(_, properties),
              let .section(_, properties),
+             let .switch(_, properties),
              let .toggle(_, properties),
              let .timer(_, properties),
              let .slider(_, properties),

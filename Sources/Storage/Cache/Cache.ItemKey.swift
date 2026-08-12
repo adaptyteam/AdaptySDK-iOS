@@ -15,6 +15,16 @@ extension Cache {
     }
 }
 
+extension Cache.ItemKey: CustomStringConvertible {
+    var description: String {
+        if let profileId {
+            "\(profileId)\\\(itemType.rawValue)\\<\(itemId)>"
+        } else {
+            "\(itemType.rawValue)\\<\(itemId)>"
+        }
+    }
+}
+
 extension Cache.ItemKey {
     @inlinable
     var filename: String {
@@ -22,7 +32,7 @@ extension Cache.ItemKey {
     }
 }
 
-@Cache.Actor
+@StorageActor
 extension Cache.ItemKey {
     @inlinable
     var directory: URL {

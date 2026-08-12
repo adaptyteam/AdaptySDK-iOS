@@ -14,27 +14,6 @@ public enum AdaptyPlacementFetchPolicy: Sendable, Hashable {
     case returnCacheDataIfNotExpiredElseLoad(maxAge: TimeInterval)
 }
 
-extension AdaptyPlacementFetchPolicy {
-    func canReturn(_ data: VH<some PlacementContent>) -> Bool {
-        switch self {
-        case .reloadRevalidatingCacheData: return false
-        case .returnCacheDataElseLoad: return true
-        case let .returnCacheDataIfNotExpiredElseLoad(maxAge: maxAge):
-            guard let time = data.time,
-                  time.addingTimeInterval(maxAge) > Date()
-            else { return false }
-            return true
-        }
-    }
-}
-
-extension VH where Value: PlacementContent {
-    @inlinable
-    func withFetchPolicy(_ fetchPolicy: AdaptyPlacementFetchPolicy) -> Self? {
-        fetchPolicy.canReturn(self) ? self : nil
-    }
-}
-
 extension AdaptyPlacementFetchPolicy: Codable {
     enum CodingKeys: String, CodingKey {
         case type

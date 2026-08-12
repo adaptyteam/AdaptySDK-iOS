@@ -36,16 +36,18 @@ struct AdaptyUIFlatContainerView: View {
     ) -> some View {
         if footerSize.height >= globalProxy.size.height {
             ScrollView {
-                AdaptyUIElementView(
-                    element,
-                    screenHolderBuilder: { EmptyView() },
-                    drawDecoratorBackground: drawFooterBackground
-                )
-                .id(ScrollAnchor.footerTop)
-                .keyboardBottomPadding()
-                .scrollProgressTracker(kind: .footer, coordinateSpaceName: CoordinateSpace.adaptyGlobalName, viewportHeight: globalProxy.size.height)
+                VStack(spacing: 0) {
+                    AdaptyUIElementView(
+                        element,
+                        screenHolderBuilder: { EmptyView() },
+                        drawDecoratorBackground: drawFooterBackground
+                    )
+                    .id(ScrollAnchor.footerTop)
+                    .keyboardBottomPadding()
+                    .scrollProgressTracker(kind: .footer, coordinateSpaceName: CoordinateSpace.adaptyGlobalName, viewportHeight: globalProxy.size.height)
 
-                Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
+                    Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
+                }
             }
             .scrollIndicatorsHidden_compatible()
             .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
@@ -73,7 +75,7 @@ struct AdaptyUIFlatContainerView: View {
             ScrollViewReader { scrollProxy in
                 ZStack(alignment: .bottom) {
                     ScrollView {
-                        VStack {
+                        VStack(spacing: 0) {
                             AdaptyUIElementView(
                                 screen.content,
                                 screenHolderBuilder: { EmptyView() }
@@ -108,7 +110,6 @@ struct AdaptyUIFlatContainerView: View {
                         footerView(footer, globalProxy: globalProxy, scrollProxy: scrollProxy)
                             .onGeometrySizeChange { footerSize = $0 }
                     }
-
                 }
                 .ignoresSafeArea()
                 .background {

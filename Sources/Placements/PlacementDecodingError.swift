@@ -6,6 +6,15 @@
 //
 
 enum PlacementDecodingError: Error, Hashable, Codable {
-    case crossPlacementABTestDisabled
     case notFoundVariationId
+}
+
+extension HTTPError {
+    func has(placementDecodingError: Set<PlacementDecodingError>) -> Bool {
+        guard case let .decoding(_, _, _, _, _, value) = self,
+              let value = value as? PlacementDecodingError
+        else { return false }
+
+        return placementDecodingError.contains(value)
+    }
 }

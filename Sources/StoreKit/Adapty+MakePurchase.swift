@@ -44,6 +44,44 @@ public extension Adapty {
         }
     }
 
+    nonisolated static func makePurchase(
+        product: AdaptyPromotedProduct
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
+        try await makePromotedPurchase(
+            vendorProductId: product.vendorProductId,
+            subscriptionOfferIdentifier: product.subscriptionOffer?.offerIdentifier
+        )
+    }
+
+    package nonisolated static func makePromotedPurchase(
+        vendorProductId: String,
+        subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
+    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
+        try await withActivatedSDK(
+            methodName: .makePromotedPurchase,
+            logParams: [
+                "product_id": vendorProductId,
+                "purchase_source": "app_store_promoted",
+            ]
+        ) { sdk throws(AdaptyError) in
+            guard let purchaser = sdk.purchaser else { throw .cantMakePayments() }
+            let userId = sdk.userId ?? sdk.profileStorage.userId
+            let appAccountToken: UUID? =
+                if let customerUserId = userId.customerId {
+                    sdk.profileStorage.appAccountToken() ?? UUID(uuidString: customerUserId)
+                } else {
+                    nil
+                }
+
+            return try await purchaser.makePromotedPurchase(
+                userId: userId,
+                appAccountToken: appAccountToken,
+                vendorProductId: vendorProductId,
+                subscriptionOfferIdentifier: subscriptionOfferIdentifier
+            )
+        }
+    }
+
     /// To restore purchases, you have to call this method.
     ///
     /// Read more on the [Adapty Documentation](https://docs.adapty.io/v2.0.0/docs/ios-making-purchases#restoring-purchases)

@@ -10,7 +10,7 @@ import Foundation
 struct CrossPlacementState: Sendable, Hashable {
     static let defaultForNewUser = CrossPlacementState(variationIdByPlacements: [:], version: 0)
     let variationIdByPlacements: [String: String]
-    let version: Int64
+    let version: Int
 }
 
 extension CrossPlacementState {
@@ -51,6 +51,6 @@ extension CrossPlacementState: Codable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         variationIdByPlacements = try container.decode([String: String].self, forKey: .variationIdByPlacements)
-        version = try container.decode(Int64.self, forKey: .version)
+        version = try container.decode(Int.self, forKey: .version)
     }
 }

@@ -30,26 +30,35 @@ public extension AdaptyUI {
     ///
     /// - Parameters:
     ///   - forFlow: the ``AdaptyFlow`` for which you want to get a configuration.
+    ///   - locale: the locale to use when resolving the flow's localized content. Pass `nil` to use the default locale.
+    ///   - customLayoutId: the identifier of a custom layout to use instead of the one resolved automatically for the current device.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exceeds.
-    ///   - completion: A result containing the ``AdaptyUI.ViewConfiguration>`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
+    ///   - assetsResolver: if you are going to use custom assets functionality, pass the resolver function here.
+    ///   - completion: A result containing the ``AdaptyUI.FlowConfiguration`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
-        loadTimeout: TimeInterval = 5.0,
+        locale: String? = nil,
+        customLayoutId: String? = nil,
+        loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
         observerModeResolver: AdaptyObserverModeResolver? = nil,
         tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
+        assetsResolver: AdaptyUIAssetsResolver? = nil,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
         _ completion: @escaping AdaptyResultCompletion<FlowConfiguration>
     ) {
         withCompletion(completion) {
             try await AdaptyUI.getFlowConfiguration(
                 forFlow: flow,
+                locale: locale,
+                customLayoutId: customLayoutId,
                 loadTimeout: loadTimeout,
                 products: products,
                 observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver,
+                assetsResolver: assetsResolver,
                 systemRequestsHandler: systemRequestsHandler
             )
         }
