@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
+$schema: "https://json-schema.org/draft/2020-12/schema"
 $id: "https://adapty.io/uibuilder/5.0.0-draft/schema"
 title: "AdaptyUI Configuration"
 type: object
@@ -31,7 +32,7 @@ properties:
                 title: "Show default loading indicator during SDK.restorePurchases"
                 type: boolean
                 default: true
-        additionalProperties: false
+        unevaluatedProperties: false
     templates:
         title: "Templates"
         type: object
@@ -57,7 +58,7 @@ properties:
         type: array
         items: { $ref: "#/Script" }
         uniqueItems: true
-additionalProperties: false
+unevaluatedProperties: false
 
 ###### Entities ######
 
@@ -119,7 +120,7 @@ Entities:
                       title: "Bottom leading corner radius"
                       type: number
                       default: 0
-              additionalProperties: false
+              unevaluatedProperties: false
 
     EdgeInsets:
         title: "Edge Insets"
@@ -134,7 +135,7 @@ Entities:
                   leading: { $ref: "#/Entities/Unit", default: 0 }
                   bottom: { $ref: "#/Entities/Unit", default: 0 }
                   trailing: { $ref: "#/Entities/Unit", default: 0 }
-              additionalProperties: false
+              unevaluatedProperties: false
 
     Point:
         title: Point
@@ -146,7 +147,7 @@ Entities:
               properties:
                   y: { type: number, default: 0 }
                   x: { type: number, default: 0 }
-              additionalProperties: false
+              unevaluatedProperties: false
 
     Offset:
         title: Offset
@@ -159,7 +160,7 @@ Entities:
               properties:
                   y: { $ref: "#/Entities/Unit", default: 0 }
                   x: { $ref: "#/Entities/Unit", default: 0 }
-              additionalProperties: false
+              unevaluatedProperties: false
 
     Rotation:
         title: Rotation
@@ -168,7 +169,7 @@ Entities:
         properties:
             angle: { type: number, default: 0 }
             anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
-        additionalProperties: false
+        unevaluatedProperties: false
 
     Scale:
         title: Scale
@@ -177,7 +178,7 @@ Entities:
         properties:
             scale: { $ref: "#/Entities/Point" }
             anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
-        additionalProperties: false
+        unevaluatedProperties: false
 
     Unit:
         title: Unit
@@ -188,24 +189,24 @@ Entities:
               required: [point]
               properties:
                   point: { type: number, title: "Value in points" }
-              additionalProperties: false
+              unevaluatedProperties: false
             - type: object
               required: [screen]
               properties:
                   screen:
                       { type: number, title: "Value in parts of the screen" }
-              additionalProperties: false
+              unevaluatedProperties: false
             - type: object
               required: [safe_area]
               properties:
                   safe_area: { enum: [start, end] }
-              additionalProperties: false
+              unevaluatedProperties: false
             - type: object
               required: [value]
               properties:
                   value: { type: number }
                   unit: { enum: [point, screen], default: point }
-              additionalProperties: false
+              unevaluatedProperties: false
 
     Format:
         oneOf:
@@ -218,7 +219,8 @@ Entities:
                   required: [from, string_id]
                   properties:
                       from: { type: number }
-                      string_id: { type: string, title: Localization string id }
+                      string_id: { $ref: "#/Localization/StringId" }
+                  unevaluatedProperties: false
 
 ###### Animations ######
 
@@ -257,7 +259,7 @@ Animation:
               - $ref: "#/Animation/Border"
               - $ref: "#/Animation/Shadow"
               - $ref: "#/Animation/Blur"
-    additionalProperties: false
+    unevaluatedProperties: false
 
     Interpolator:
         oneOf:
@@ -292,8 +294,7 @@ Animation:
                     start: { type: number }
                     end: { type: number }
                 default: { "start": 0, "end": 1 }
-                additionalProperties: false
-        additionalProperties: false
+                unevaluatedProperties: false
 
     Offset:
         type: object
@@ -306,8 +307,7 @@ Animation:
                 properties:
                     start: { $ref: "#/Entities/Offset" }
                     end: { $ref: "#/Entities/Offset" }
-                additionalProperties: false
-        additionalProperties: false
+                unevaluatedProperties: false
 
     Rotation:
         type: object
@@ -320,9 +320,8 @@ Animation:
                 properties:
                     start: { type: number, description: "degrees" }
                     end: { type: number, description: "degrees" }
-                additionalProperties: false
+                unevaluatedProperties: false
             anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
-        additionalProperties: false
 
     Scale:
         type: object
@@ -335,9 +334,8 @@ Animation:
                 properties:
                     start: { $ref: "#/Entities/Point" }
                     end: { $ref: "#/Entities/Point" }
-                additionalProperties: false
+                unevaluatedProperties: false
             anchor: { $ref: "#/Entities/Point", default: [0.5, 0.5] }
-        additionalProperties: false
 
     Box:
         type: object
@@ -353,7 +351,7 @@ Animation:
                       properties:
                           start: { $ref: "#/Entities/Unit" }
                           end: { $ref: "#/Entities/Unit" }
-                      additionalProperties: false
+                      unevaluatedProperties: false
             - required: [height]
               properties:
                   height:
@@ -362,8 +360,7 @@ Animation:
                       properties:
                           start: { $ref: "#/Entities/Unit" }
                           end: { $ref: "#/Entities/Unit" }
-                      additionalProperties: false
-        additionalProperties: false
+                      unevaluatedProperties: false
 
     Background:
         type: object
@@ -376,8 +373,7 @@ Animation:
                 properties:
                     start: { $ref: "#/AssetIdOrColor/Binding" }
                     end: { $ref: "#/AssetIdOrColor/Binding" }
-                additionalProperties: false
-        additionalProperties: false
+                unevaluatedProperties: false
 
     Border:
         type: object
@@ -393,7 +389,7 @@ Animation:
                       properties:
                           start: { $ref: "#/AssetIdOrColor/Binding" }
                           end: { $ref: "#/AssetIdOrColor/Binding" }
-                      additionalProperties: false
+                      unevaluatedProperties: false
             - required: [thickness]
               properties:
                   thickness:
@@ -402,8 +398,7 @@ Animation:
                       properties:
                           start: { type: number }
                           end: { type: number }
-                      additionalProperties: false
-        additionalProperties: false
+                      unevaluatedProperties: false
 
     Shadow:
         type: object
@@ -419,7 +414,7 @@ Animation:
                       properties:
                           start: { $ref: "#/AssetIdOrColor/Binding" }
                           end: { $ref: "#/AssetIdOrColor/Binding" }
-                      additionalProperties: false
+                      unevaluatedProperties: false
             - required: [blur_radius]
               properties:
                   blur_radius:
@@ -428,7 +423,7 @@ Animation:
                       properties:
                           start: { type: number }
                           end: { type: number }
-                      additionalProperties: false
+                      unevaluatedProperties: false
             - required: [offset]
               properties:
                   offset:
@@ -437,8 +432,7 @@ Animation:
                       properties:
                           start: { $ref: "#/Entities/Offset" }
                           end: { $ref: "#/Entities/Offset" }
-                      additionalProperties: false
-        additionalProperties: false
+                      unevaluatedProperties: false
 
     Blur:
         type: object
@@ -451,8 +445,7 @@ Animation:
                 properties:
                     start: { type: number }
                     end: { type: number }
-                additionalProperties: false
-        additionalProperties: false
+                unevaluatedProperties: false
 
 ###### Common ######
 
@@ -490,7 +483,7 @@ Navigator:
                 on_will_disappear: { $ref: "#/Script/ActionOrArray" }
                 on_did_appear: { $ref: "#/Script/ActionOrArray" }
                 on_did_disappear: { $ref: "#/Script/ActionOrArray" }
-            additionalProperties: false
+            unevaluatedProperties: false
         appearances:
             type: object
             properties:
@@ -503,18 +496,18 @@ Navigator:
                 forward: { $ref: "#/Navigator/ScreenTransition" }
                 backward: { $ref: "#/Navigator/ScreenTransition" }
             additionalProperties: { $ref: "#/Navigator/ScreenTransition" }
-    additionalProperties: false
+    unevaluatedProperties: false
 
     Appearance:
         type: object
         properties:
-            background: { $ref: "#/Animation/Background" }
+            background: { $ref: "#/Animation/Background", unevaluatedProperties: false }
             content:
                 type: array
                 items: { $ref: "#/Animation" }
                 uniqueItems: true
                 minItems: 1
-        additionalProperties: false
+        unevaluatedProperties: false
 
     ScreenTransition:
         type: object
@@ -531,7 +524,7 @@ Navigator:
                 uniqueItems: true
                 minItems: 1
             is_incoming_on_top: { type: boolean }
-        additionalProperties: false
+        unevaluatedProperties: false
 
 ###### Screens ######
 
@@ -546,7 +539,7 @@ Screen:
 #            minItems: 1
 #            items: { $ref: "#/UI/Element" }
 #            default: []
-        cover: { $ref: "#/UI/Box" } # { $ref: "#/pool_index", description: "Must reference a `box` element" }
+        cover: { $ref: "#/UI/Box", unevaluatedProperties: false } # { $ref: "#/pool_index", description: "Must reference a `box` element" }
         content: { $ref: "#/UI/Element" } # { $ref: "#/pool_index" }
         footer: { $ref: "#/UI/Element" }
         background:
@@ -572,7 +565,7 @@ Screen:
         on_will_disappear: { $ref: "#/Script/ActionOrArray" }
         on_did_appear: { $ref: "#/Script/ActionOrArray" }
         on_did_disappear: { $ref: "#/Script/ActionOrArray" }
-    additionalProperties: false
+    unevaluatedProperties: false
 
     Holder:
         title: "Placeholder for screen content inside navigator"
@@ -580,7 +573,7 @@ Screen:
         required: [type]
         properties:
             type: { const: "screen_holder" }
-        additionalProperties: false
+        unevaluatedProperties: false
 
 ###### Templates ######
 
@@ -596,7 +589,7 @@ Template:
 #            items: { $ref: "#/UI/Element" }
 #            default: []
         content: { $ref: "#/UI/Element" }
-    additionalProperties: false
+    unevaluatedProperties: false
 
     Child:
         title: "Template child placeholder"
@@ -605,7 +598,7 @@ Template:
         properties:
             type: { const: "child" }
             name: { type: string }
-        additionalProperties: false
+        unevaluatedProperties: false
 
     Reference:
         title: "Template reference"
@@ -613,7 +606,7 @@ Template:
         required: [type]
         properties:
             type: { type: string, pattern: "^#" }
-        additionalProperties: false
+        unevaluatedProperties: false
 
 ###### UI Components ######
 
@@ -687,7 +680,7 @@ UI:
                                                 events:
                                                     type: array
                                                     items:
-                                                        oneOf:
+                                                        anyOf:
                                                             - const: "on_will_appear"
                                                             - const: "on_will_disappear"
                                                             - const: "on_did_appear"
@@ -702,7 +695,7 @@ UI:
                                                 transitions:
                                                     type: array
                                                     items: { type: string }
-                                            additionalProperties: false
+                                            unevaluatedProperties: false
                                         uniqueItems: true
                                         minItems: 1
                                     animations:
@@ -712,7 +705,7 @@ UI:
                                         minItems: 1
                                     on_animations_finish:
                                         { $ref: "#/Script/ActionOrArray" }
-                                additionalProperties: false
+                                unevaluatedProperties: false
                             uniqueItems: true
                             minItems: 1
                         focus_id:
@@ -721,7 +714,7 @@ UI:
                         ui_enabled:
                             $ref: "#/Script/DataBinding"
                             title: One-way data binding to boolean
-              additionalProperties: false
+              unevaluatedProperties: false
 
         Decorator:
             title: "Decorator for any element"
@@ -745,7 +738,7 @@ UI:
                 properties:
                     rect_corner_radius:
                         { $ref: "#/Entities/CornerRadius", default: 0 }
-            additionalProperties: false
+            unevaluatedProperties: false
 
             ShapeType:
                 title: "Shape type"
@@ -767,7 +760,7 @@ UI:
                         default: 0
                         description: "A measure of how much to blur the shadow. Larger values result in more blur."
                     offset: { $ref: "#/Entities/Offset", default: [0, 0] }
-                additionalProperties: false
+                unevaluatedProperties: false
 
     AlignedElement:
         type: object
@@ -783,6 +776,7 @@ UI:
                 $ref: "#/Entities/VerticalAlignment"
                 default: center
             content: { $ref: "#/UI/Element" }
+        unevaluatedProperties: false
 
     If.Then.Else:
         type: object
@@ -819,7 +813,7 @@ UI:
                             type: string
                             pattern: "^[0-9]+\\.[0-9]+$"
                             description: "Minimum runtime OS version (inclusive) required for this os_name."
-                    additionalProperties: false
+                    unevaluatedProperties: false
                 uniqueItems: true
                 minItems: 1
             version:
@@ -834,7 +828,7 @@ UI:
                 }
             then: { $ref: "#/UI/Element" } # { $ref: "#/pool_index" }
             else: { $ref: "#/UI/Element" } # { $ref: "#/pool_index" }
-        additionalProperties: false
+        unevaluatedProperties: false
 
     Box:
         type: object
@@ -860,21 +854,21 @@ UI:
                   required: [fill_max]
                   properties:
                       fill_max: { type: boolean, const: true }
-                  additionalProperties: false
+                  unevaluatedProperties: false
                 - title: Set min, and optional max
                   type: object
                   required: [min]
                   properties:
                       min: { $ref: "#/Entities/Unit" }
                       max: { $ref: "#/Entities/Unit" }
-                  additionalProperties: false
+                  unevaluatedProperties: false
                 - title: Set shrink, and optional max
                   type: object
                   required: [shrink]
                   properties:
                       shrink: { $ref: "#/Entities/Unit" }
                       max: { $ref: "#/Entities/Unit" }
-                  additionalProperties: false
+                  unevaluatedProperties: false
 
     Image:
         type: object
@@ -942,26 +936,51 @@ UI:
                     type: boolean
                 underline:
                     type: boolean
-                color:
+                text_color:
                     title: "Text color[-gradient] Asset identifier"
+                    description: "Takes precedence over the legacy `color` property when both are provided."
                     $ref: "#/AssetIdOrColor/Binding"
-                background:
+                text_background:
                     title: Background color of text
+                    description: "Takes precedence over the legacy `background` property when both are provided."
                     $ref: "#/AssetIdOrColor/Binding"
+                color:
+                    title: "Legacy text color[-gradient] Asset identifier"
+                    description: "Used as a fallback when `text_color` is not provided."
+                background:
+                    title: Legacy background color of text
+                    description: "Used as a fallback when `text_background` is not provided."
                 tint:
                     title: Tint color of image
                     $ref: "#/AssetIdOrColor/Binding"
                 letter_spacing: { type: number }
                 line_height: { type: number }
-            additionalProperties: false
+            allOf:
+                - if:
+                      not: { required: [text_color] }
+                  then:
+                      properties:
+                          color: { $ref: "#/AssetIdOrColor/Binding" }
+                - if:
+                      not: { required: [text_background] }
+                  then:
+                      properties:
+                          background: { $ref: "#/AssetIdOrColor/Binding" }
 
     TextField:
         type: object
         allOf:
-            - $ref: "#/UI/Text/Attributes"
-            - required: [type, value]
+            - $ref: "#/UI/TextFieldCommon"
+            - required: [type]
               properties:
                   type: { const: "text_field" }
+
+    TextFieldCommon:
+        type: object
+        allOf:
+            - $ref: "#/UI/Text/Attributes"
+            - required: [value]
+              properties:
                   value: { $ref: "#/Script/DataBinding" }
                   placeholder:
                       type: object
@@ -972,7 +991,7 @@ UI:
                                 string_id:
                                     { $ref: "#/Localization/StringId/Binding" }
                                 on_overflow: { $ref: "#/UI/Text/OverflowMode" }
-                      additionalProperties: false
+                      unevaluatedProperties: false
                   secure_entry: { type: boolean, default: false }
                   align:
                       {
@@ -984,9 +1003,9 @@ UI:
                       properties:
                           regex: { type: string }
                           max_length: { type: integer }
-                      additionalProperties: false
+                      unevaluatedProperties: false
                   validation: { $ref: "#/Script/DataBinding" }
-                  invalid_attributes: { $ref: "#/UI/Text/Attributes" }
+                  invalid_attributes: { $ref: "#/UI/Text/Attributes", unevaluatedProperties: false }
                   submit_action: { $ref: "#/Script/ActionOrArray" }
                   keyboard_options:
                       type: object
@@ -1043,12 +1062,12 @@ UI:
                                   - send
                                   - next
                                   - return
-                      additionalProperties: false
+                      unevaluatedProperties: false
 
     TextEditor:
         type: object
         allOf:
-            - $ref: "#/UI/TextField"
+            - $ref: "#/UI/TextFieldCommon"
             - required: [type]
               properties:
                   type: { const: "text_editor" }
@@ -1109,7 +1128,7 @@ UI:
         properties:
             type: { const: space }
             count: { type: integer, default: 1, minimum: 1 }
-        additionalProperties: false
+        unevaluatedProperties: false
 
     Section:
         type: object
@@ -1178,7 +1197,7 @@ UI:
                   v_align:
                       { $ref: "#/Entities/VerticalAlignment", default: center }
                   content: { $ref: "#/UI/Element" } # { $ref: "#/pool_index" }
-        additionalProperties: false
+        unevaluatedProperties: false
 
     Timer:
         type: object
@@ -1230,7 +1249,7 @@ UI:
                     spacing: { type: number, default: 6 }
                     color: { $ref: "#/AssetIdOrColor/Binding", default: "#FFFFFFFF" }
                     selected_color: { $ref: "#/AssetIdOrColor/Binding", default: "#D3D3D3FF" }
-                additionalProperties: false
+                unevaluatedProperties: false
             animation:
                 type: object
                 properties:
@@ -1240,7 +1259,7 @@ UI:
                         default: { type: slide }
                     repeat_transition: { $ref: "#/UI/Pager/Transition" }
                     after_interaction_delay: { type: number, default: 3000 }
-                additionalProperties: false
+                unevaluatedProperties: false
             interaction:
                 type: string
                 enum:
@@ -1255,7 +1274,7 @@ UI:
                   description: "Fixed length"
                 - type: object
                   required: [parent]
-                  additionalProperties: false
+                  unevaluatedProperties: false
                   properties:
                       parent: { type: number }
 
@@ -1266,7 +1285,7 @@ UI:
                 duration: { type: number, default: 300 }
                 interpolator:
                     { $ref: "#/Animation/Interpolator", default: ease_in_out }
-            additionalProperties: false
+            unevaluatedProperties: false
 
     DateTimePicker:
         type: object
@@ -1320,12 +1339,13 @@ UI:
                     type: object
                     required: [value, string_id]
                     properties:
-                        string_id: { type: string }
+                        string_id: { $ref: "#/Localization/StringId" }
                         value:
                             oneOf:
                                 - type: string
                                 - type: number
                                 - type: boolean
+                    unevaluatedProperties: false
                 uniqueItems: true
                 minItems: 1
 
@@ -1428,7 +1448,7 @@ RichText:
                   text: { title: Text, type: string }
                   attributes: { $ref: "#/RichText/Attributes" }
                   action: { $ref: "#/Script/Action" }
-              additionalProperties: false
+              unevaluatedProperties: false
 
     Tag:
         title: Tag item in RichText
@@ -1448,6 +1468,7 @@ RichText:
             - $ref: "#/Converters/PercentConverter"
             - $ref: "#/Converters/DateTimeConverter"
             - $ref: "#/Converters/TimerConverter"
+        unevaluatedProperties: false
 
     Image:
         title: Image item in RichText
@@ -1456,7 +1477,7 @@ RichText:
         properties:
             image: { type: string, title: "Image asset identifier" }
             attributes: { $ref: "#/RichText/Attributes" }
-        additionalProperties: false
+        unevaluatedProperties: false
 
     Attributes:
         title: Attributes for RichText
@@ -1482,7 +1503,7 @@ RichText:
                 title: Tint color of image
                 $ref: "#/AssetIdOrColor"
             letter_spacing: { type: number }
-        additionalProperties: false
+        unevaluatedProperties: false
 
 ###### Localization ######
 
@@ -1499,7 +1520,7 @@ Localization:
             items: { $ref: "#/Localization/String" }
             uniqueItems: true
             minItems: 1
-    additionalProperties: false
+    unevaluatedProperties: false
 
     Identifier:
         type: string
@@ -1514,16 +1535,19 @@ Localization:
         properties:
             id:
                 title: Localized string identifier
-                type: string
+                $ref: "#/Localization/StringId"
             value: { $ref: "#/RichText" }
             fallback: { $ref: "#/RichText" }
-        additionalProperties: false
+        unevaluatedProperties: false
 
     StringId:
+        title: Localization string id
+        type: string
+        not: { pattern: "^#" }
+
         Binding:
             oneOf:
-                - title: Localization string id
-                  type: string
+                - $ref: "#/Localization/StringId"
                 - title: Localization string id with values tags
                   $ref: "#/Localization/StringIdWithTagValues/Binding"
                 - title: One way binding to localization string id
@@ -1536,7 +1560,7 @@ Localization:
             type: object
             required: [string_id]
             properties:
-                string_id: { type: string }
+                string_id: { $ref: "#/Localization/StringId" }
             additionalProperties:
                 oneOf:
                     - title: String value
@@ -1556,7 +1580,7 @@ Localization:
                         - title: One way binding to Adapty product id
                           $ref: "#/Script/DataBinding"
                 suffix: { type: string }
-            additionalProperties: false
+            unevaluatedProperties: false
 
 ###### Assets ######
 
@@ -1573,20 +1597,20 @@ Assets:
         properties:
             id:
                 title: Asset identifier
-                type: string
+                $ref: "#/AssetId"
             custom_id:
                 title: User asset identifier
                 type: string
             fallback_asset_id:
                 title: fallback asset identifier
-                type: string
+                $ref: "#/AssetId"
         oneOf:
             - $ref: "#/Assets/Color"
             - $ref: "#/Assets/ColorGradient"
             - $ref: "#/Assets/Font"
             - $ref: "#/Assets/Image"
             - $ref: "#/Assets/Video"
-        additionalProperties: false
+        unevaluatedProperties: false
 
     Color:
         title: Color asset
@@ -1595,7 +1619,6 @@ Assets:
         properties:
             type: { const: color }
             value: { $ref: "#/Assets/Color/HexString" }
-        additionalProperties: false
 
         HexString:
             title: "Color #RRGGBBAA"
@@ -1621,6 +1644,7 @@ Assets:
                     properties:
                         color: { $ref: "#/Assets/Color/HexString" }
                         p: { type: number }
+                    unevaluatedProperties: false
                 minItems: 1
             points:
                 type: object
@@ -1630,7 +1654,7 @@ Assets:
                     y0: { type: number }
                     x1: { type: number }
                     y1: { type: number }
-        additionalProperties: false
+                unevaluatedProperties: false
 
     Font:
         title: Font asset
@@ -1666,7 +1690,6 @@ Assets:
             color: { $ref: "#/Assets/Color/HexString", default: "#000000FF" }
             letter_spacing: { type: number }
             line_height: { type: number }
-        additionalProperties: false
 
     Image:
         title: Image asset
@@ -1676,7 +1699,6 @@ Assets:
               properties:
                   type: { const: image }
             - $ref: "#/Assets/Image/Data"
-        additionalProperties: false
 
         Data:
             type: object
@@ -1698,14 +1720,14 @@ Assets:
         properties:
             type: { const: video }
             url: { type: string }
-            image: { $ref: "#/Assets/Image/Data" }
+            image: { $ref: "#/Assets/Image/Data", unevaluatedProperties: false }
             v_res: { type: integer }
             h_res: { type: integer }
-        additionalProperties: false
 
 AssetId:
     title: Asset identifier
     type: string
+    not: { pattern: "^#" }
 
     Binding:
         oneOf:
@@ -1715,13 +1737,13 @@ AssetId:
 
 AssetIdOrColor:
     oneOf:
-        - $ref: "#/AssetId"
         - $ref: "#/Assets/Color/HexString"
+        - $ref: "#/AssetId"
 
     Binding:
         oneOf:
-            - $ref: "#/AssetId"
             - $ref: "#/Assets/Color/HexString"
+            - $ref: "#/AssetId"
             - title: One way binding to asset identifier or color hex string
               $ref: "#/Script/DataBinding"
 
@@ -1734,7 +1756,7 @@ Script:
     properties:
         type: { type: string, default: "js" }
         content: { type: string }
-    additionalProperties: false
+    unevaluatedProperties: false
 
     Action:
         title: "Action calling a Script method"
@@ -1753,7 +1775,7 @@ Script:
                 enum: [global, screen]
                 default: screen
 
-        additionalProperties: false
+        unevaluatedProperties: false
 
     ActionOrArray:
         title: "Single action or array of actions"
@@ -1784,7 +1806,7 @@ Script:
                 - not: { required: [converter] }
                 - $ref: "#/Converters/MapConverter"
                 - $ref: "#/Converters/IsEqualConverter"
-        additionalProperties: false
+        unevaluatedProperties: false
 
 ###### DateTime ######
 #
@@ -1828,7 +1850,7 @@ DateTime:
                   type: integer
                   description: Год.
                   minimum: 1
-                  example: 2026
+                  examples: [2026]
 
               month:
                   type: integer
@@ -1863,7 +1885,7 @@ DateTime:
                   minimum: 0
                   maximum: 59
 
-          additionalProperties: false
+          unevaluatedProperties: false
 
         - $ref: "#/DateTime/Relative"
 
@@ -1985,7 +2007,7 @@ DateTime:
                     Смещение от опорной точки.
                     When null: смещение не применяется, результат = anchor.
 
-        additionalProperties: false
+        unevaluatedProperties: false
 
         examples:
             # --- now ---
@@ -2115,33 +2137,33 @@ DateTime:
                       type: integer
                       default: 0
                       description: Количество лет. Отрицательное = назад.
-                      example: 1
+                      examples: [1]
                   month:
                       type: integer
                       default: 0
                       description: Количество месяцев. Отрицательное = назад.
-                      example: -3
+                      examples: [-3]
                   day:
                       type: integer
                       default: 0
                       description: Количество дней. Отрицательное = назад.
-                      example: 5
+                      examples: [5]
                   hour:
                       type: integer
                       default: 0
                       description: Количество часов. Отрицательное = назад.
-                      example: 3
+                      examples: [3]
                   minute:
                       type: integer
                       default: 0
                       description: Количество минут. Отрицательное = назад.
-                      example: 30
+                      examples: [30]
                   second:
                       type: integer
                       default: 0
                       description: Количество секунд. Отрицательное = назад.
-                      example: -90
-              additionalProperties: false
+                      examples: [-90]
+              unevaluatedProperties: false
 
             - title: Milliseconds
               type: number
@@ -2177,16 +2199,16 @@ Converters:
     NumberFormat:
         type: string
         # pattern: ^%[+\-0 ]*(\d+)?(\.\d+)?[df]$
-        example: "%f"
+        examples: ["%f"]
 
     IntegerFormat:
         type: string
         # pattern: ^%[+\-0 ]*(\d+)?(\.\d+)?d$
-        example: "%d"
+        examples: ["%d"]
     
     DateTimeFormat:
         type: string
-        example: "YYYY-MM-DD HH:mm:ss"
+        examples: ["YYYY-MM-DD HH:mm:ss"]
 
     MapConverter:
         title: Map converter 
@@ -2238,6 +2260,7 @@ Converters:
                   converter: { const: date_time }
                   format: { $ref: "#/Converters/DateTimeFormat" }
             - required: [converter]
+              not: { required: [format] }
               properties:
                   converter: { const: date_time }
                   date_style: { enum: ["none", "short", "medium", "long", "full"] , default: "none"}

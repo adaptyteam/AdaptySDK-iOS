@@ -197,7 +197,15 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         )
 
         let overlay = try container.decodeIfExist([Schema.AlignedElement].self, forKey: .overlay, configuration: configuration)
-        let background = try container.decodeIfExist([Schema.AlignedElement].self, forKey: .background, configuration: configuration)
+
+        // `background` conflicts with `Schema.TextAttributes.legacyBackground`, which uses
+        // the same JSON key for an asset/color binding. Decode it here only when it is an
+        // array of aligned elements.
+        let background: [Schema.AlignedElement]? = if container.isArray(.background) {
+            try container.decode([Schema.AlignedElement].self, forKey: .background, configuration: configuration)
+        } else {
+            nil
+        }
 
         try self.init(
             legacyElementId: container.decodeIfPresent(String.self, forKey: .legacyElementId),
