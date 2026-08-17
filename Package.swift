@@ -144,13 +144,12 @@ let package = Package(
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger", "AdaptyCodable"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyCodable"],
             path: "Tests",
             exclude: [
                 // TEMP: pre-existing breakage after `UIBuilder: tighten access modifiers,
                 // drop redundant Equatable/Hashable` — wait for follow-up fix.
-                "UISchema",
-                "UIConfiguration",
+                "AdaptyUIBuilder",
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
@@ -159,3 +158,4 @@ let package = Package(
     ],
     cxxLanguageStandard: .cxx20
 )
+
