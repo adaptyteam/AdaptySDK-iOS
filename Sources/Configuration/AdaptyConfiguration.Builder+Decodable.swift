@@ -21,6 +21,7 @@ extension AdaptyConfiguration.Builder: Decodable {
         case backendProxyHost = "backend_proxy_host"
         case backendProxyPort = "backend_proxy_port"
 
+        case storeMessagesHandling = "store_messages_handling"
         case transactionFinishBehavior = "transaction_finish_behavior"
         case logLevel = "log_level"
 
@@ -56,6 +57,7 @@ extension AdaptyConfiguration.Builder: Decodable {
             customerUserId: container.decodeIfPresent(String.self, forKey: .customerUserId),
             appAccountToken: customerIdentityParameters?.appAccountToken,
             observerMode: container.decodeIfPresent(Bool.self, forKey: .observerMode),
+            storeMessagesHandling: container.decodeIfPresent(AdaptyConfiguration.StoreMessagesHandling.self, forKey: .storeMessagesHandling),
             idfaCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .idfaCollectionDisabled),
             ipAddressCollectionDisabled: container.decodeIfPresent(Bool.self, forKey: .ipAddressCollectionDisabled),
             adaptyAttributionEnabled: container.decodeIfPresent(Bool.self, forKey: .adaptyAttributionEnabled),

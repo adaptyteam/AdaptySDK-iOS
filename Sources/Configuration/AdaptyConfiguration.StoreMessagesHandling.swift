@@ -1,19 +1,23 @@
 //
-//  AdaptyConfiguration.TransactionFinishBehavior.swift
-//  AdaptySD
-//
-//  Created by Aleksei Valiano on 07.09.2025.
+//  AdaptyConfiguration.StoreMessagesHandling.swift
+//  AdaptySDK
 //
 
 public extension AdaptyConfiguration {
-    enum TransactionFinishBehavior: Sendable {
-        public static let `default` = TransactionFinishBehavior.auto
+    /// Controls whether StoreKit or the application owns the presentation timing of App Store messages.
+    enum StoreMessagesHandling: Sendable {
+        /// The default mode. Adapty does not subscribe to StoreKit messages.
+        public static let `default` = StoreMessagesHandling.auto
+
+        /// Leaves automatic message presentation under StoreKit control.
         case auto
+
+        /// Captures StoreKit messages so the application can choose when to display them.
         case manual
     }
 }
 
-extension AdaptyConfiguration.TransactionFinishBehavior: CustomStringConvertible {
+extension AdaptyConfiguration.StoreMessagesHandling: CustomStringConvertible {
     var rawValue: String {
         switch self {
         case .auto:
@@ -28,7 +32,7 @@ extension AdaptyConfiguration.TransactionFinishBehavior: CustomStringConvertible
     }
 }
 
-extension AdaptyConfiguration.TransactionFinishBehavior: Codable {
+extension AdaptyConfiguration.StoreMessagesHandling: Codable {
     public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let value = try container.decode(String.self)

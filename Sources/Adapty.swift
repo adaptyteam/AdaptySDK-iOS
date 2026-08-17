@@ -24,6 +24,7 @@ public final class Adapty {
     let transactionManager: TransactionManager
     let productsManager: ProductsManager
     var purchaser: StoreKitPurchaser?
+    var skMessageManager: AnyObject?
 
     package let observerMode: Bool
 
@@ -48,6 +49,14 @@ public final class Adapty {
         if configuration.transactionFinishBehavior != .manual {
             _ = await PurchasePayloadStorage.removeAllUnfinishedTransactionState()
         }
+
+        #if os(iOS) || os(visionOS)
+        if #available(iOS 16.0, macCatalyst 16.0, visionOS 1.0, *),
+           configuration.storeMessagesHandling == .manual
+        {
+            skMessageManager = await StoreKitMessageManager()
+        }
+        #endif
 
         receiptManager = StoreKitReceiptManager(
             httpSession: httpSession

@@ -46,6 +46,15 @@ enum Request {
             ObserverRestoreDidFinish.self,
         ]
 
+        #if os(iOS) || os(visionOS)
+        if #available(iOS 16.0, macCatalyst 16.0, visionOS 1.0, *) {
+            allRequests.append(contentsOf: [
+                GetPendingStoreMessageTypes.self,
+                ShowStoreMessage.self,
+            ])
+        }
+        #endif
+
         #if canImport(UIKit)
         let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
             AdaptyUICreateFlowView.self,

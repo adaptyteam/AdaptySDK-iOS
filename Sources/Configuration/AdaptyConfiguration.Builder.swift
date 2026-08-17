@@ -20,6 +20,7 @@ extension AdaptyConfiguration {
             customerUserId: builder.customerUserId.trimmed.nonEmptyOrNil,
             appAccountToken: builder.appAccountToken,
             observerMode: builder.observerMode ?? defaultValue.observerMode,
+            storeMessagesHandling: builder.storeMessagesHandling ?? StoreMessagesHandling.default,
             idfaCollectionDisabled: builder.idfaCollectionDisabled ?? defaultValue.idfaCollectionDisabled,
             ipAddressCollectionDisabled: builder.ipAddressCollectionDisabled ?? defaultValue.ipAddressCollectionDisabled,
             adaptyAttributionEnabled: builder.adaptyAttributionEnabled ?? defaultValue.adaptyAttributionEnabled,
@@ -34,7 +35,7 @@ extension AdaptyConfiguration {
             crossPlatformSDK: builder.crossPlatformSDK.map {
                 (name: $0.name.trimmed, version: $0.version.trimmed)
             },
-            transactionFinishBehavior: builder.transactionFinishBehavior ?? defaultValue.transactionFinishBehavior,
+            transactionFinishBehavior: builder.transactionFinishBehavior ?? TransactionFinishBehavior.default,
             clearDataOnBackup: builder.clearDataOnBackup ?? defaultValue.clearDataOnBackup
         )
     }
@@ -45,6 +46,7 @@ extension AdaptyConfiguration {
             customerUserId: nil,
             appAccountToken: nil,
             observerMode: nil,
+            storeMessagesHandling: nil,
             idfaCollectionDisabled: nil,
             ipAddressCollectionDisabled: nil,
             adaptyAttributionEnabled: nil,
@@ -67,6 +69,7 @@ public extension AdaptyConfiguration {
         public private(set) var customerUserId: String?
         public private(set) var appAccountToken: UUID?
         public private(set) var observerMode: Bool?
+        public private(set) var storeMessagesHandling: StoreMessagesHandling?
         public private(set) var idfaCollectionDisabled: Bool?
         public private(set) var ipAddressCollectionDisabled: Bool?
         public private(set) var adaptyAttributionEnabled: Bool?
@@ -89,6 +92,7 @@ public extension AdaptyConfiguration {
             customerUserId: String?,
             appAccountToken: UUID?,
             observerMode: Bool?,
+            storeMessagesHandling: StoreMessagesHandling?,
             idfaCollectionDisabled: Bool?,
             ipAddressCollectionDisabled: Bool?,
             adaptyAttributionEnabled: Bool?,
@@ -106,6 +110,7 @@ public extension AdaptyConfiguration {
             self.customerUserId = customerUserId
             self.appAccountToken = appAccountToken
             self.observerMode = observerMode
+            self.storeMessagesHandling = storeMessagesHandling
             self.idfaCollectionDisabled = idfaCollectionDisabled
             self.ipAddressCollectionDisabled = ipAddressCollectionDisabled
             self.adaptyAttributionEnabled = adaptyAttributionEnabled
@@ -147,6 +152,16 @@ public extension AdaptyConfiguration.Builder {
     @discardableResult
     func with(observerMode mode: Bool) -> Self {
         observerMode = mode
+        return self
+    }
+
+    /// Selects how App Store messages are handled after the first SDK activation.
+    ///
+    /// - Parameter handling: `.auto` leaves presentation under StoreKit control. `.manual`
+    ///   captures messages for the Store Message runtime APIs.
+    @discardableResult
+    func with(storeMessagesHandling handling: AdaptyConfiguration.StoreMessagesHandling) -> Self {
+        storeMessagesHandling = handling
         return self
     }
 

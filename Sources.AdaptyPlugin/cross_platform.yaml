@@ -303,10 +303,10 @@ $requests:
       - required: [success]
         properties:
           success:
-            {
-              type: array,
-              items: { $ref: "#/$defs/AdaptyPaywallProduct.Response" },
-            }
+            type: array
+            items: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
+
+
 
   ### getProfile ###
   GetProfile.Request: #request
@@ -460,6 +460,44 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
+  ### getPendingStoreMessageTypes ###
+  GetPendingStoreMessageTypes.Request: #request
+    type: object
+    required: [method]
+    properties:
+      method: { const: "get_pending_store_message_types" }
+
+  GetPendingStoreMessageTypes.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success:
+            type: array
+            items: { $ref: "#/$defs/AdaptyStoreMessageType" }
+
+  ### showStoreMessage ###
+  ShowStoreMessage.Request: #request
+    type: object
+    required: [method]
+    properties:
+      method: { const: "show_store_messages" }
+      filter:
+        type: array
+        items: { $ref: "#/$defs/AdaptyStoreMessageType" }
+
+  ShowStoreMessage.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
   OpenWebPaywall.Request: #request
     type: object
     required: [method]
@@ -1130,6 +1168,7 @@ $defs:
       customer_identity_parameters:
         { $ref: "#/$defs/CustomerIdentityParameters" }
       observer_mode: { type: boolean, default: false }
+      store_messages_handling: { $ref: "#/$defs/StoreMessagesHandling" }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
       google_enable_pending_prepaid_plans: { type: boolean, default: false }
@@ -1151,6 +1190,20 @@ $defs:
             { type: integer, description: "bytes" }
           memory_storage_count_limit: { type: integer }
           disk_storage_size_limit: { type: integer, description: "bytes" }
+
+  StoreMessagesHandling: #request
+    type: string
+    enum: ["auto", "manual", "default"]
+
+  AdaptyStoreMessageType: #request #response
+    type: string
+    anyOf:
+      - enum:
+          - generic
+          - price_increase_consent
+          - billing_issue
+          - win_back_offer
+      - pattern: "^storekit_-?[0-9]+$"
 
   CustomerIdentityParameters: #request
     type: object
