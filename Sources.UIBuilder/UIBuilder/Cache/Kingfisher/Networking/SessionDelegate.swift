@@ -29,7 +29,15 @@ import Foundation
 /// Represents the delegate object of the downloader session.
 ///
 /// It also behaves like a task manager for downloading.
-@objc(KFSessionDelegate) // Fix for ObjC header name conflicting. https://github.com/onevcat/Kingfisher/issues/1530
+//
+// Local patch: upstream gives this class an explicit Objective-C name,
+// KFSessionDelegate. That annotation is deliberately dropped here. It produces
+// an unmangled Objective-C runtime symbol, which collides at link time with the
+// official Kingfisher whenever an app links both it and this vendored copy
+// ("duplicate symbol _OBJC_CLASS_$_KFSessionDelegate"). The class is internal,
+// so it never reaches the generated Objective-C header and the upstream
+// rationale (https://github.com/onevcat/Kingfisher/issues/1530) does not apply.
+// Do not restore it when refreshing the vendored copy.
 final class SessionDelegate: NSObject, @unchecked Sendable {
 
     typealias SessionChallengeFunc = (
