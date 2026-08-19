@@ -24,7 +24,7 @@ struct AdaptyUIGeometryFramePreferenceKey: PreferenceKey {
 
 struct FooterVerticalFillerView: View {
     var height: Double
-    var onFrameChange: (CGRect) -> Void
+    var onFrameChange: @MainActor @Sendable (CGRect) -> Void
 
     var body: some View {
         GeometryReader { proxy in
@@ -34,7 +34,7 @@ struct FooterVerticalFillerView: View {
                     key: AdaptyUIGeometryFramePreferenceKey.self,
                     value: proxy.frame(in: .named(CoordinateSpace.adaptyGlobalName))
                 )
-                .onPreferenceChange(AdaptyUIGeometryFramePreferenceKey.self) { v in
+                .onPreferenceChange(AdaptyUIGeometryFramePreferenceKey.self) { @Sendable v in
                     Task { @MainActor in
                         // ~1 frame wait hack to get rid of updating the UI multiple times per frame.
                         try await Task.sleep(seconds: 0.0084)
