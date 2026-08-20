@@ -17,7 +17,7 @@ extension VC.Color {
 }
 
 extension VC.ColorGradient {
-    private var stops: [Gradient.Stop] {
+    var stops: [Gradient.Stop] {
         let result = items
             .map { Gradient.Stop(color: $0.color.resolvedColor, location: $0.p) }
             .sorted(by: { $0.location < $1.location })
