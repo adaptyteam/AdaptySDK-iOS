@@ -40,7 +40,7 @@ extension StoreKit.Product {
 @MainActor
 extension UIApplication {
     /// Returns the key `UIWindowScene` for the current application
-    private var activeScene: UIWindowScene? {
+    fileprivate var activeScene: UIWindowScene? {
         connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .first(where: { $0.activationState == .foregroundActive })

@@ -144,7 +144,7 @@ let package = Package(
         ),
         .testTarget(
             name: "AdaptyTests",
-            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyLogger", "AdaptyCodable"],
+            dependencies: ["AdaptyUIBuilder", "Adapty", "AdaptyPlugin", "AdaptyLogger", "AdaptyCodable"],
             path: "Tests",
             exclude: [
                 // TEMP: pre-existing breakage after `UIBuilder: tighten access modifiers,

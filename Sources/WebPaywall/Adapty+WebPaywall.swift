@@ -11,6 +11,8 @@ import Foundation
 #if os(iOS)
 import SafariServices
 import UIKit
+#elseif os(visionOS)
+import UIKit
 #elseif os(macOS)
 import AppKit
 #endif
@@ -169,6 +171,10 @@ extension URL {
             topViewController.present(safariViewController, animated: true)
             return true
         }
+        #elseif os(visionOS)
+        // `SFSafariViewController` is unavailable on visionOS, so `.inAppBrowser`
+        // falls back to the system handler as well.
+        return await UIApplication.shared.open(self, options: [:])
         #elseif os(macOS)
         NSWorkspace.shared.open(self)
         return true
