@@ -26,12 +26,11 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
         ))
     }
 
-    // TODO: Uncomment to stop using the default implementation
-    // func didReceivePromotedPurchase(_ product: AdaptyPromotedProduct) {
-    //     eventHandler.handle(event: Event.DidReceivePromotedPurchase(
-    //         product: .init(product)
-    //     ))
-    // }
+    func didReceivePromotedPurchase(_ product: AdaptyPromotedProduct) {
+        eventHandler.handle(event: Event.DidReceivePromotedPurchase(
+            product: .init(product)
+        ))
+    }
 
     func onInstallationDetailsSuccess(_ details: AdaptyInstallationDetails) {
         eventHandler.handle(event: Event.OnInstallationDetailsSuccess(

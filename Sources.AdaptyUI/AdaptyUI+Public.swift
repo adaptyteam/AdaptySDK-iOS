@@ -395,7 +395,18 @@ package extension Adapty.DeviceInfo {
     /// cached).
     @MainActor
     static var current: Self {
+        #if os(visionOS)
+        // visionOS has no `UIScreen`: the paywall is sized by the window it is
+        // presented in, so measure the active scene and fall back to the default
+        // window size when no scene is foreground-active yet.
+        let size = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first { $0.activationState == .foregroundActive }?
+            .coordinateSpace.bounds.size
+            ?? CGSize(width: 1280, height: 720)
+        #else
         let size = UIScreen.main.bounds.size
+        #endif
         return .init(
             kind: UIDevice.current.userInterfaceIdiom == .phone ? .phone : .tab,
             vertical: Int(size.height),

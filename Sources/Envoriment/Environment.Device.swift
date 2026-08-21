@@ -59,7 +59,9 @@ extension Environment {
                 if let result = _mainScreenInfo { return result }
 
                 let result: ScreenInfo? = await MainActor.run {
-                    #if canImport(UIKit)
+                    // `UIScreen` is unavailable on visionOS, which has no device
+                    // screen geometry to report — the field stays absent there.
+                    #if canImport(UIKit) && !os(visionOS)
                     let mainScreen = UIScreen.main
                     let nativeBounds = mainScreen.nativeBounds
                     return ScreenInfo(
