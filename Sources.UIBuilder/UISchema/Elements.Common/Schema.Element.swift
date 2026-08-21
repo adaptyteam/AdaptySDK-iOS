@@ -111,6 +111,7 @@ extension Schema.Element: DecodableWithConfiguration {
         case video
         case button
         case box
+        case deck
         case vStack = "v_stack"
         case hStack = "h_stack"
         case zStack = "z_stack"
@@ -179,6 +180,11 @@ extension Schema.Element: DecodableWithConfiguration {
             try self.init(
                 properties: propertyOrNil(),
                 node: .compositeElement(Schema.Box(from: decoder, configuration: configuration))
+            )
+        case .deck:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.Deck(from: decoder, configuration: configuration))
             )
         case .vStack, .hStack, .zStack:
             try self.init(
@@ -298,4 +304,3 @@ extension Schema.Element: DecodableWithConfiguration {
         }
     }
 }
-

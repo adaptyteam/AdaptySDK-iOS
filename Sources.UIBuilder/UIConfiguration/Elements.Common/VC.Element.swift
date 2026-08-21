@@ -18,6 +18,7 @@ extension VC {
         indirect case video(VideoPlayer, Properties?)
         indirect case button(Button, Properties?)
         indirect case box(Box, Properties?)
+        indirect case deck(Deck, Properties?)
         indirect case row(Row, Properties?)
         indirect case column(Column, Properties?)
         indirect case flex(Flex, Properties?)
@@ -44,6 +45,7 @@ extension VC.Element {
         case .screenHolder, .unknown:
             nil
         case let .box(_, properties),
+             let .deck(_, properties),
              let .stack(_, properties),
              let .flexStack(_, properties),
              let .text(_, properties),

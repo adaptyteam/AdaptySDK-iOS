@@ -1,13 +1,13 @@
 # yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/uibuilder/5.1.0/schema"
+$id: "https://adapty.io/uibuilder/5.2.0/schema"
 title: "AdaptyUI Configuration"
 type: object
 required: [format, screens, scripts]
 properties:
     format:
         type: string
-        const: "5.1.0"
+        const: "5.2.0"
     assets:
         title: "Default assets"
         $ref: "#/Assets"
@@ -326,40 +326,42 @@ Entities:
 
 Animation:
     type: object
-    allOf:
-        - properties:
-              interpolator:
-                  $ref: "#/Animation/Interpolator"
-                  default: ease_in_out
-              start_delay:
-                  type: integer
-                  default: 0
-                  description: milliseconds
-              duration:
-                  type: integer
-                  default: 300
-                  description: milliseconds
-              loop: { enum: [normal, ping_pong] }
-              loop_delay:
-                  type: integer
-                  default: 0
-                  description: milliseconds
-              ping_pong_delay:
-                  type: integer
-                  default: 0
-                  description: milliseconds
-              loop_count: { type: integer }
-        - oneOf:
-              - $ref: "#/Animation/Opacity"
-              - $ref: "#/Animation/Offset"
-              - $ref: "#/Animation/Rotation"
-              - $ref: "#/Animation/Scale"
-              - $ref: "#/Animation/Box"
-              - $ref: "#/Animation/Background"
-              - $ref: "#/Animation/Border"
-              - $ref: "#/Animation/Shadow"
-              - $ref: "#/Animation/Blur"
+    oneOf:
+      - $ref: "#/Animation/Opacity"
+      - $ref: "#/Animation/Offset"
+      - $ref: "#/Animation/Rotation"
+      - $ref: "#/Animation/Scale"
+      - $ref: "#/Animation/Box"
+      - $ref: "#/Animation/Background"
+      - $ref: "#/Animation/Border"
+      - $ref: "#/Animation/Shadow"
+      - $ref: "#/Animation/Blur"
     unevaluatedProperties: false
+
+    Timeline:
+        type: object
+        properties:
+            interpolator:
+                $ref: "#/Animation/Interpolator"
+                default: ease_in_out
+            start_delay:
+                type: integer
+                default: 0
+                description: milliseconds
+            duration:
+                type: integer
+                default: 300
+                description: milliseconds
+            loop: { enum: [normal, ping_pong] }
+            loop_delay:
+                type: integer
+                default: 0
+                description: milliseconds
+            ping_pong_delay:
+                type: integer
+                default: 0
+                description: milliseconds
+            loop_count: { type: integer }
 
     Interpolator:
         oneOf:
@@ -384,6 +386,8 @@ Animation:
 
     Opacity:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type]
         properties:
             type: { const: opacity }
@@ -398,6 +402,8 @@ Animation:
 
     Offset:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, offset]
         properties:
             type: { const: offset }
@@ -411,6 +417,8 @@ Animation:
 
     Rotation:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, angle]
         properties:
             type: { const: rotation }
@@ -425,6 +433,8 @@ Animation:
 
     Scale:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, scale]
         properties:
             type: { const: scale }
@@ -439,6 +449,8 @@ Animation:
 
     Box:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type]
         properties:
             type: { const: box }
@@ -464,6 +476,8 @@ Animation:
 
     Background:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, color]
         properties:
             type: { const: background }
@@ -477,6 +491,8 @@ Animation:
 
     Border:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type]
         properties:
             type: { const: border }
@@ -502,6 +518,8 @@ Animation:
 
     Shadow:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type]
         properties:
             type: { enum: [shadow, inner_shadow] }
@@ -536,6 +554,8 @@ Animation:
 
     Blur:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, blur_radius]
         properties:
             type: { const: blur }
@@ -735,6 +755,7 @@ UI:
                         - $ref: "#/UI/Slider"
                         - $ref: "#/UI/Button"
                         - $ref: "#/UI/Stack"
+                        - $ref: "#/UI/Deck"
                         - $ref: "#/UI/FlexStack"
                         - $ref: "#/UI/Box"
                         - $ref: "#/UI/Section"
@@ -1244,6 +1265,41 @@ UI:
             count: { type: integer, default: 1, minimum: 1 }
         unevaluatedProperties: false
 
+    Deck:
+        type: object
+        required: [type, items]
+        properties:
+            type: { const: deck }
+            width: { $ref: "#/Entities/AutoSizeMode", default: fill }
+            height: { $ref: "#/Entities/AutoSizeMode", default: fill }
+            items:
+                type: array
+                minItems: 1
+                items: { $ref: "#/UI/DeckItem" }
+
+    DeckItem:
+        type: object
+        required: [type, content]
+        properties:
+            type: { const: deck_item }
+            width: { $ref: "#/UI/DeckItemLength" }
+            height: { $ref: "#/UI/DeckItemLength" }
+            h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
+            v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
+            content: { $ref: "#/UI/Element" }
+        unevaluatedProperties: false
+
+    DeckItemLength:
+        oneOf:
+            - title: "Fixed length"
+              $ref: "#/Entities/Unit"
+            - title: "Parent-relative length"
+              type: object
+              required: [parent]
+              properties:
+                  parent: { type: number, minimum: 0 }
+              unevaluatedProperties: false
+
     FlexStack:
         type: object
         required: [type, condition, direction, content]
@@ -1590,7 +1646,7 @@ UI:
             min: { type: number, default: 0 }
             max: { type: number, default: 1 }
             skip_animation_on_overflow: { type: boolean, default: false }
-            
+
     VerticalProgress:
         type: object
         required: [type, align, asset_id, value, duration]
@@ -1644,8 +1700,8 @@ UI:
                   max: { type: number, default: 1 }
                   skip_animation_on_overflow: { type: boolean, default: false }
             - $ref: "#/UI/Text/Attributes"
-    
-            
+
+
 ###### Rich Text ######
 
 RichText:
@@ -2340,7 +2396,7 @@ DateTime:
 
     Interval:
         description: >
-            Длительность или смещение. 
+            Длительность или смещение.
             Два формата:
             1) Объект с календарными/временными компонентами - учитывает календарь (месяц = 28–31 день,
             DST и т.д.).
@@ -2429,32 +2485,32 @@ Converters:
         type: string
         # pattern: ^%[+\-0 ]*(\d+)?(\.\d+)?d$
         examples: ["%d"]
-    
+
     DateTimeFormat:
         type: string
         examples: ["YYYY-MM-DD HH:mm:ss"]
 
     MapConverter:
-        title: Map converter 
+        title: Map converter
         description: return some value from array if input value equals index
         type: object
         required: [converter, converter_params]
         properties:
             converter: { const: map }
-            converter_params: 
+            converter_params:
                 type: array
                 items:
                     type: [string, number, boolean]
                 description: "Array of values to map"
-        
+
     IsEqualConverter:
-        title: Is equal converter 
+        title: Is equal converter
         description: return boolean value if input value equal to converter_param
         type: object
         required: [converter, converter_params]
         properties:
             converter: { const: is_equal }
-            converter_params: 
+            converter_params:
                 type: [string, number, boolean]
 
     NumberConverter:
@@ -2467,7 +2523,7 @@ Converters:
             format: { $ref: "#/Converters/NumberFormat", default: "%d"}
 
     PercentConverter:
-        title: Percent converter for value in range 0..1 
+        title: Percent converter for value in range 0..1
         description: convert number from range 0..1 to percentage string
         type: object
         required: [converter]
@@ -2504,4 +2560,3 @@ Converters:
             - properties:
                     converter: { enum: [total_days, total_hours, total_minutes, total_seconds, total_milliseconds] }
                     format: { $ref: "#/Converters/IntegerFormat", default: "%d"}
-        

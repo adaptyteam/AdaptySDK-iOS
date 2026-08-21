@@ -1,14 +1,16 @@
 //
-//  VC.AlignedElement.swift
+//  VC.DeckItem.swift
 //  AdaptyUIBuilder
 //
-//  Created by Aleksei Valiano on 12.03.2026.
+//  Created by Aleksei Valiano on 21.08.2026.
 //
 
 import Foundation
 
 extension VC {
-    struct AlignedElement: Sendable {
+    struct DeckItem: Sendable {
+        let width: Length
+        let height: Length
         let horizontalAlignment: HorizontalAlignment
         let verticalAlignment: VerticalAlignment
         let content: ElementIndex

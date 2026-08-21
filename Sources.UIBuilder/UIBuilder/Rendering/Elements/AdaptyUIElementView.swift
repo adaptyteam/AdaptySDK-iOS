@@ -34,6 +34,8 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     play: playAnimations
                 )
                 .rangedFrame(box: box)
+        case .deck:
+            AdaptyUIUnknownElementView(value: "deck")
         case let .stack(stack, _):
             AdaptyUIStackView(
                 stack,

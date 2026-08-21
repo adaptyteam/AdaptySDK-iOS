@@ -12,7 +12,8 @@ import Testing
     .component("AdaptyCodable"),
     .owner("Aleksei Valiano"),
     .risk(.critical),
-    .layer(.unit)
+    .layer(.unit),
+    .tags(.codable)
 )
 enum AdaptyCodableTests {}
 
