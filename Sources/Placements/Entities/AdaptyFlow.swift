@@ -12,6 +12,7 @@ public struct AdaptyFlow: PlacementContent, Identifiable {
     public let placement: AdaptyPlacement
     public let id: String
     public let variationId: String
+    public let variationName: String?
     public let name: String
     public let remoteConfigs: [AdaptyRemoteConfig]
 
@@ -26,7 +27,9 @@ public struct AdaptyFlow: PlacementContent, Identifiable {
 
 extension AdaptyFlow: CustomStringConvertible {
     public var description: String {
-        "(flow, placement:\(placement), id: \(id), name: \(name), variationId: \(variationId), hasViewConfiguration: \(hasViewConfiguration))"
+        let variationName = self.variationName.map({ ", variationName: \($0)" }) ?? ""
+
+        return "(flow, placement:\(placement), id: \(id), name: \(name), variationId: \(variationId)\(variationName), hasViewConfiguration: \(hasViewConfiguration))"
     }
 }
 
@@ -43,6 +46,7 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case id = "flow_id"
         case variationId = "variation_id"
+        case variationName = "variation_name"
         case name = "flow_name"
         case remoteConfigs = "remote_configs"
         case paywalls = "variations"
@@ -70,6 +74,7 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
             placement: configuration.placement,
             id: container.decode(String.self, forKey: .id),
             variationId: container.decode(String.self, forKey: .variationId),
+            variationName: container.decodeIfPresent(String.self, forKey: .variationName),
             name: container.decode(String.self, forKey: .name),
             remoteConfigs: container.decodeIfPresent([AdaptyRemoteConfig].self, forKey: .remoteConfigs) ?? [],
             layoutsConfiguration: layoutsConfiguration,
@@ -82,6 +87,7 @@ extension AdaptyFlow: Encodable, Decodable, DecodableWithConfiguration {
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(variationId, forKey: .variationId)
+        try container.encodeIfPresent(variationName, forKey: .variationName)
         if remoteConfigs.isNotEmpty {
             try container.encode(remoteConfigs, forKey: .remoteConfigs)
         }

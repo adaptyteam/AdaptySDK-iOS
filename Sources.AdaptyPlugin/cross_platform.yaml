@@ -31,6 +31,11 @@ $requests:
       method: { const: "adapty_ui_create_flow_view" }
       flow: { $ref: "#/$defs/AdaptyFlow" }
       locale: { $ref: "#/$defs/AdaptyLocale" }
+      custom_layout_id:
+        {
+          type: string,
+          description: "the id of a custom layout to render instead of the one resolved automatically for the current device",
+        }
       load_timeout: { type: number, description: "seconds" }
       preload_products: { type: boolean, default: false }
       custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
@@ -1157,7 +1162,34 @@ $defs:
 
   Date: #response #request
     type: string
-    format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    description: |
+      UTC timestamp in ISO 8601 format.
+    
+      Requirements:
+      - Fractional seconds are required and must contain between 1 and 9 digits. In the `format` property, they are represented by `SSS`; the exact accepted length is defined by the `pattern` property.
+      - The time zone must be either `Z` or `+0000`.
+      - `+00:00` and non-zero UTC offsets are not allowed.
+      
+      format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      Format components:
+      - `yyyy`: Four-digit year.
+      - `MM`: Two-digit month (`01`–`12`).
+      - `dd`: Two-digit day of the month (`01`–`31`).
+      - `'T'`: Literal separator between the date and time.
+      - `HH`: Two-digit hour in 24-hour format (`00`–`23`).
+      - `mm`: Two-digit minute (`00`–`59`).
+      - `ss`: Two-digit second (`00`–`59`).
+      - `SSS`: Fractional-seconds field. The accepted value contains between 1 and 9 digits.
+      - `Z`: Time-zone field. Only `Z` and `+0000` are accepted.
+      
+      Format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      
+      Examples:
+      - 2026-08-24T09:34:24.727Z
+      - 2026-08-24T09:34:24.727000+0000
+    
+    pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\.[0-9]{1,9}(Z|\+0000)$'
+    example: '2026-08-24T09:34:24.727000+0000'
 
   AdaptyConfiguration: #request
     type: object

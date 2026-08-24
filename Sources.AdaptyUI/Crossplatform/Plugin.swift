@@ -99,6 +99,7 @@ package extension AdaptyUI {
         package static func createFlowView(
             flow: AdaptyFlow,
             locale: String?,
+            customLayoutId: String?,
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
             tagResolver: AdaptyUITagResolver?,
@@ -109,15 +110,24 @@ package extension AdaptyUI {
         ) async throws -> AdaptyUI.FlowView {
             let products: [AdaptyPaywallProduct]?
             
-//            if preloadProducts {
-//                products = try await Adapty.getPaywallProducts(paywall: paywall)
-//            } else {
+            if preloadProducts {
+                do {
+                    products = try await Adapty.getPaywallProducts(flow: flow)
+                } catch {
+                    // A failed preload must not break view creation: the products
+                    // view model loads them on its own once the configuration is
+                    // built. Same contract as the Android plugin.
+                    Log.ui.error("createFlowView preloadProducts error: \(error)")
+                    products = nil
+                }
+            } else {
                 products = nil
-//            }
+            }
             
             let configuration = try await AdaptyUI.getFlowConfiguration(
                 forFlow: flow,
                 locale: locale,
+                customLayoutId: customLayoutId,
                 loadTimeout: loadTimeout,
                 products: products,
                 observerModeResolver: observerModeResolver,
