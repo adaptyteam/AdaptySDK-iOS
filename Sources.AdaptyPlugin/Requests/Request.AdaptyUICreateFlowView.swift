@@ -52,6 +52,7 @@ extension Request {
 
         let flow: AdaptyFlow
         let locale: String?
+        let customLayoutId: String?
         let loadTimeout: TimeInterval?
         let preloadProducts: Bool?
         let customTags: [String: String]?
@@ -61,6 +62,7 @@ extension Request {
         enum CodingKeys: String, CodingKey {
             case flow
             case locale
+            case customLayoutId = "custom_layout_id"
             case loadTimeout = "load_timeout"
             case preloadProducts = "preload_products"
             case customTags = "custom_tags"
@@ -86,6 +88,7 @@ extension Request {
             let result: AdaptyUI.FlowView = try await AdaptyUI.Plugin.createFlowView(
                 flow: flow,
                 locale: locale,
+                customLayoutId: customLayoutId,
                 loadTimeout: loadTimeout,
                 preloadProducts: preloadProducts ?? false,
                 tagResolver: customTags,
