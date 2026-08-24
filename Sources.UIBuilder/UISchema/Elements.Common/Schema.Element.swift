@@ -137,6 +137,7 @@ extension Schema.Element: DecodableWithConfiguration {
         case horizontalProgress = "horizontal_progress"
         case verticalProgress = "vertical_progress"
         case radialProgress = "radial_progress"
+        case custom
     }
 
     init(from decoder: any Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
@@ -295,6 +296,11 @@ extension Schema.Element: DecodableWithConfiguration {
             try self.init(
                 properties: propertyOrNil(),
                 node: .simpleElement(Schema.RadialProgress(from: decoder))
+            )
+        case .custom:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .simpleElement(Schema.CustomElement(from: decoder))
             )
         }
 

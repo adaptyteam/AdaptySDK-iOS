@@ -33,6 +33,7 @@ extension VC {
         indirect case linearProgress(LinearProgress, Properties?)
         indirect case radialProgress(RadialProgress, Properties?)
         indirect case textProgress(TextProgress, Properties?)
+        indirect case custom(CustomElement, Properties?)
 
         case screenHolder
         indirect case unknown(String)
@@ -67,7 +68,8 @@ extension VC.Element {
              let .wheelRangePicker(_, properties),
              let .linearProgress(_, properties),
              let .radialProgress(_, properties),
-             let .textProgress(_, properties)
+             let .textProgress(_, properties),
+             let .custom(_, properties)
              :
             properties
         }
