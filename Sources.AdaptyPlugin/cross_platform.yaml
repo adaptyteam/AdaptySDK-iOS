@@ -1164,7 +1164,8 @@ $defs:
       - Fractional seconds are required and must contain between 1 and 9 digits. In the `format` property, they are represented by `SSS`; the exact accepted length is defined by the `pattern` property.
       - The time zone must be either `Z` or `+0000`.
       - `+00:00` and non-zero UTC offsets are not allowed.
-    
+      
+      format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
       Format components:
       - `yyyy`: Four-digit year.
       - `MM`: Two-digit month (`01`–`12`).
@@ -1175,12 +1176,13 @@ $defs:
       - `ss`: Two-digit second (`00`–`59`).
       - `SSS`: Fractional-seconds field. The accepted value contains between 1 and 9 digits.
       - `Z`: Time-zone field. Only `Z` and `+0000` are accepted.
-    
+      
+      Format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      
       Examples:
       - 2026-08-24T09:34:24.727Z
       - 2026-08-24T09:34:24.727000+0000
     
-    format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
     pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\.[0-9]{1,9}(Z|\+0000)$'
     example: '2026-08-24T09:34:24.727000+0000'
 
