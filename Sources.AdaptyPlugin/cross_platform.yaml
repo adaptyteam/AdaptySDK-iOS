@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/4.1.1/schema"
+$id: "https://adapty.io/crossPlatform/4.1.2/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -31,6 +31,11 @@ $requests:
       method: { const: "adapty_ui_create_flow_view" }
       flow: { $ref: "#/$defs/AdaptyFlow" }
       locale: { $ref: "#/$defs/AdaptyLocale" }
+      custom_layout_id:
+        {
+          type: string,
+          description: "the id of a custom layout to render instead of the one resolved automatically for the current device",
+        }
       load_timeout: { type: number, description: "seconds" }
       preload_products: { type: boolean, default: false }
       custom_tags: { $ref: "#/$defs/AdaptyUI.CustomTagsValues" }
