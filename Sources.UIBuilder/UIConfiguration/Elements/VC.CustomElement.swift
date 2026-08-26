@@ -11,6 +11,9 @@ extension VC {
     struct CustomElement: Sendable, Identifiable {
         let id: String
         let type: String
-        let data: Data?
+        let assets: [String: AssetReference]?
+        let strings: [String: StringReference]?
+        let bindings: [String: Variable]?
+        let properties: VC.AnyValue?
     }
 }

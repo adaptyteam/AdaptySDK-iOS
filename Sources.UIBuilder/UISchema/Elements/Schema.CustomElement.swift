@@ -26,6 +26,10 @@ extension Schema.CustomElement: Decodable {
     enum CodingKeys: String, CodingKey {
         case id = "custom_id"
         case type = "custom_type"
+        case assets
+        case strings
+        case bindings
+        case properties
     }
 
     init(from decoder: Decoder) throws {
@@ -33,7 +37,10 @@ extension Schema.CustomElement: Decodable {
         try self.init(
             id: container.decode(String.self, forKey: .id),
             type: container.decode(String.self, forKey: .type),
-            data: nil
+            assets: container.decodeIfPresent([String: Schema.AssetReference].self, forKey: .assets),
+            strings: container.decodeIfPresent([String: Schema.StringReference].self, forKey: .strings),
+            bindings: container.decodeIfPresent([String: Schema.Variable].self, forKey: .bindings),
+            properties: container.decodeIfPresent(Schema.AnyValue.self, forKey: .properties)
         )
     }
 }

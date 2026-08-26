@@ -772,6 +772,7 @@ UI:
                         - $ref: "#/UI/VerticalProgress"
                         - $ref: "#/UI/RadialProgress"
                         - $ref: "#/UI/TextProgress"
+                        - $ref: "#/UI/Custom"
                   - properties:
                         decorator: { $ref: "#/UI/Element/Decorator" }
                         padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
@@ -885,6 +886,27 @@ UI:
                         description: "A measure of how much to blur the shadow. Larger values result in more blur."
                     offset: { $ref: "#/Entities/Offset", default: [0, 0] }
                 unevaluatedProperties: false
+
+    Custom:
+        type: object
+        required: [type, custom_id, custom_type]
+        properties:
+            type: { const: custom }
+            custom_id: { type: string }
+            custom_type: { type: string }
+            assets:
+                type: object
+                additionalProperties: { $ref: "#/AssetIdOrColor/Binding" }
+            strings:
+                type: object
+                additionalProperties: { $ref: "#/Localization/StringId/Binding" }
+            bindings:
+                type: object
+                additionalProperties: { $ref: "#/Script/DataBinding" }
+            properties:
+                type: object
+                default: {}
+                description: "Custom element properties"
 
     AlignedElement:
         type: object
