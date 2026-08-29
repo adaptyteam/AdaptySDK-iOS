@@ -291,6 +291,90 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyFlow" }
 
+  ### preloadFlows ###
+  PreloadFlows.Request: #request
+    type: object
+    required: [method, placement_ids]
+    properties:
+      method: { const: "preload_flows" }
+      placement_ids:
+        type: array
+        items: { type: string }
+      load_timeout: { type: number, description: "seconds" }
+
+  PreloadFlows.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### preloadFlowsForDefaultAudience ###
+  PreloadFlowsForDefaultAudience.Request: #request
+    type: object
+    required: [method, placement_ids]
+    properties:
+      method: { const: "preload_flows_for_default_audience" }
+      placement_ids:
+        type: array
+        items: { type: string }
+
+  PreloadFlowsForDefaultAudience.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### preloadOnboardings ###
+  PreloadOnboardings.Request: #request
+    type: object
+    required: [method, placement_ids]
+    properties:
+      method: { const: "preload_onboardings" }
+      placement_ids:
+        type: array
+        items: { type: string }
+      locale: { $ref: "#/$defs/AdaptyLocale" }
+      load_timeout: { type: number, description: "seconds" }
+
+  PreloadOnboardings.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### preloadOnboardingsForDefaultAudience ###
+  PreloadOnboardingsForDefaultAudience.Request: #request
+    type: object
+    required: [method, placement_ids]
+    properties:
+      method: { const: "preload_onboardings_for_default_audience" }
+      placement_ids:
+        type: array
+        items: { type: string }
+      locale: { $ref: "#/$defs/AdaptyLocale" }
+
+  PreloadOnboardingsForDefaultAudience.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### getPaywallProducts ###
   GetPaywallProducts.Request: #request
     type: object

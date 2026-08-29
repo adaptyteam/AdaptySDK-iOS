@@ -339,16 +339,15 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
 
     @ViewBuilder
     private func bodyWithBackground(content: Content) -> some View {
-        if let animatedBackgroundFilling {
+        // One gate, not one per branch: 4.0.0 merged the image and filling
+        // branches into backgroundFill(for:) and lost the includeBackground
+        // modifier on the way, which is how the footer background came back
+        // unconditionally (SDK-1169).
+        if let filling = animatedBackgroundFilling ?? self.decorator.background {
             content
                 .background {
-                    self.backgroundFill(for: animatedBackgroundFilling)
+                    self.backgroundFill(for: filling)
                         .opacity(includeBackground ? 1.0 : 0.0)
-                }
-        } else if let background = self.decorator.background {
-            content
-                .background {
-                    self.backgroundFill(for: background)
                 }
         } else {
             content
