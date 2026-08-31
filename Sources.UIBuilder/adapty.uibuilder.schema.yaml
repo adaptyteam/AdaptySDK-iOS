@@ -1912,6 +1912,7 @@ Assets:
             - $ref: "#/Assets/Font"
             - $ref: "#/Assets/Image"
             - $ref: "#/Assets/Video"
+            - $ref: "#/Assets/Data"
         unevaluatedProperties: false
 
     Color:
@@ -2025,6 +2026,28 @@ Assets:
             image: { $ref: "#/Assets/Image/Data", unevaluatedProperties: false }
             v_res: { type: integer }
             h_res: { type: integer }
+
+    Data:
+        title: Custom data asset
+        type: object
+        required: [type, format]
+        properties:
+            type: { const: data }
+            format:
+                title: User-defined data format
+                type: string
+                minLength: 1
+        oneOf:
+            - title: Base64 encoded data
+              required: [value]
+              properties:
+                  value: { type: string, contentEncoding: base64 }
+              not: { required: [url] }
+            - title: URL to data
+              required: [url]
+              properties:
+                  url: { type: string, minLength: 1 }
+              not: { required: [value] }
 
 AssetId:
     title: Asset identifier
