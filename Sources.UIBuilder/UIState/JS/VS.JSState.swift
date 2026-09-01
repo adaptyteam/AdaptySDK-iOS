@@ -330,6 +330,19 @@ extension VS.JSState {
 
         objectWillChange.send()
     }
+
+    func execute(
+        appMessageAction action: VC.StaticAction,
+        message: VS.AppMessage
+    ) throws(VS.Error) {
+    
+        _ = try invokeMethod(
+            Bool.self,
+            path: action.path,
+            args: [message]
+        )
+        objectWillChange.send()
+    }
 }
 
 private extension String {

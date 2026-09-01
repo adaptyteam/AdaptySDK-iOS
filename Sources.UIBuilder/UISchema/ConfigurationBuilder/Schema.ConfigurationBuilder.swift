@@ -100,10 +100,10 @@ extension Schema.ConfigurationBuilder {
             navigators: source.navigators.mapValues(convertNavigator),
             screens: source.screens.mapValues(convertScreen),
             scripts: source.scripts,
+            onAppMessage: source.onAppMessage,
             showPurchaseLoader: source.showPurchaseLoader,
             showRestoreLoader: source.showRestoreLoader,
             legacySelectedProducts: source.legacySelectedProducts
         )
     }
 }
-

@@ -58,6 +58,10 @@ properties:
         type: array
         items: { $ref: "#/Script" }
         uniqueItems: true
+    on_app_message:
+        title: "Path to the global Script method handling application messages"
+        type: string
+        minLength: 1
 unevaluatedProperties: false
 
 ###### Entities ######

@@ -118,4 +118,15 @@ package final class AdaptyUIState: ObservableObject {
     func execute(action: VS.JSAction, response: some JSValueConvertable) throws(VS.Error) {
         try jsState.execute(action: action, response: response)
     }
+
+    func send( message: AppMessage ) throws(VS.Error) {
+        guard let action = configuration.onAppMessage else {
+            throw .jsMethodNotFound("on_app_message")
+        }
+
+        try jsState.execute(
+            appMessageAction: action,
+            message: message
+        )
+    }
 }
