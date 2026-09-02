@@ -61,9 +61,17 @@ extension VC.NumberConverter {
     @inlinable
     func toString(number: Double, locale: Locale) -> String {
         if format.hasSuffix("d") {
-            String(format: format, Int(number))
+            guard !number.isNaN else { return "nan" }
+
+            if let integer = Int(exactly: number.rounded(.towardZero)) {
+                return String(format: format, integer)
+            } else if number.sign == .minus {
+                return String(format: format, Int.min)
+            } else {
+                return String(format: format, Int.max)
+            }
         } else {
-            String(format: format, number, separator: locale.decimalSeparator)
+            return String(format: format, number, separator: locale.decimalSeparator)
         }
     }
 }
