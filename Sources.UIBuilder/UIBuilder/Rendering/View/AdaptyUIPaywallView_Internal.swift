@@ -14,7 +14,7 @@ package struct AdaptyUIPaywallView_Internal: View {
     @EnvironmentObject private var productsViewModel: AdaptyUIProductsViewModel
 
     private let showDebugOverlay: Bool
-    private let displayMissingTags: Bool
+    private let showsDebugPlaceholders: Bool
     private let safeAreaOverride: EdgeInsets?
     private let interfaceOrientationOverride: VC.Orientation?
 
@@ -24,12 +24,12 @@ package struct AdaptyUIPaywallView_Internal: View {
 
     package init(
         showDebugOverlay: Bool,
-        displayMissingTags: Bool,
+        showsDebugPlaceholders: Bool,
         safeAreaOverride: EdgeInsets? = nil,
         interfaceOrientationOverride: VC.Orientation? = nil
     ) {
         self.showDebugOverlay = showDebugOverlay
-        self.displayMissingTags = displayMissingTags
+        self.showsDebugPlaceholders = showsDebugPlaceholders
         self.safeAreaOverride = safeAreaOverride
         self.interfaceOrientationOverride = interfaceOrientationOverride
     }
@@ -47,7 +47,7 @@ package struct AdaptyUIPaywallView_Internal: View {
                 .withInterfaceOrientation(interfaceOrientationOverride ?? liveOrientation)
                 .withSafeArea(safeArea)
                 .withDebugOverlayEnabled(showDebugOverlay)
-                .withDisplayMissingTags(displayMissingTags)
+                .withShowsDebugPlaceholders(showsDebugPlaceholders)
         }
         .background {
             // Only track live orientation when there is no explicit override.

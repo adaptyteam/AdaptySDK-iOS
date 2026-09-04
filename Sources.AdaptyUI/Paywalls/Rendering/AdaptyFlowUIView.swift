@@ -163,7 +163,7 @@ package final class AdaptyFlowUIView: UIView {
         parentVC.addSubSwiftUIView(
             AdaptyUIPaywallView_Internal(
                 showDebugOverlay: showDebugOverlay,
-                displayMissingTags: false
+                showsDebugPlaceholders: false
             )
             .environmentObjects(
                 stateViewModel: configuration.stateViewModel,

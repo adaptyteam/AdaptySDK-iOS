@@ -106,7 +106,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false,
-            displayMissingTags: false
+            showsDebugPlaceholders: false
         )
         .environmentObjects(
             stateViewModel: flowConfiguration.stateViewModel,

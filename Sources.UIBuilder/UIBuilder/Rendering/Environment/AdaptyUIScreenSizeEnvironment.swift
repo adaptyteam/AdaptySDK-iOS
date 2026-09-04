@@ -38,7 +38,7 @@ struct AdaptyUIScreenInstanceIdKey: EnvironmentKey {
     static let defaultValue: String? = nil
 }
 
-struct AdaptyUIDisplayMissingTagsKey: EnvironmentKey {
+struct AdaptyUIShowsDebugPlaceholdersKey: EnvironmentKey {
     static let defaultValue: Bool = false
 }
 
@@ -58,9 +58,9 @@ extension EnvironmentValues {
         set { self[AdaptyUIScreenInstanceIdKey.self] = newValue }
     }
 
-    var adaptyDisplayMissingTags: Bool {
-        get { self[AdaptyUIDisplayMissingTagsKey.self] }
-        set { self[AdaptyUIDisplayMissingTagsKey.self] = newValue }
+    var adaptyShowsDebugPlaceholders: Bool {
+        get { self[AdaptyUIShowsDebugPlaceholdersKey.self] }
+        set { self[AdaptyUIShowsDebugPlaceholdersKey.self] = newValue }
     }
 }
 
@@ -73,8 +73,8 @@ extension View {
         environment(\.adaptyScreenInstance, value)
     }
 
-    func withDisplayMissingTags(_ value: Bool) -> some View {
-        environment(\.adaptyDisplayMissingTags, value)
+    func withShowsDebugPlaceholders(_ value: Bool) -> some View {
+        environment(\.adaptyShowsDebugPlaceholders, value)
     }
 }
 

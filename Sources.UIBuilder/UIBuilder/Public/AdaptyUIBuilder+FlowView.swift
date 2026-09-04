@@ -188,7 +188,7 @@ public struct AdaptyUIFlowView: View {
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false,
-            displayMissingTags: false
+            showsDebugPlaceholders: false
         )
         .environmentObjects(
             stateViewModel: flowConfiguration.stateViewModel,

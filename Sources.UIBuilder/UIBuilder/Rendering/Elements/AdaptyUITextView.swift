@@ -25,8 +25,8 @@ struct AdaptyUITextView: View {
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
-    @Environment(\.adaptyDisplayMissingTags)
-    private var displayMissingTags: Bool
+    @Environment(\.adaptyShowsDebugPlaceholders)
+    private var showsDebugPlaceholders: Bool
 
     init(_ text: VC.Text) {
         self.text = text
@@ -62,7 +62,7 @@ struct AdaptyUITextView: View {
                     productInfo: nil,
                     colorScheme: colorScheme,
                     screen: screen,
-                    displayMissingTags: displayMissingTags
+                    showsDebugPlaceholders: showsDebugPlaceholders
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -81,7 +81,7 @@ struct AdaptyUITextView: View {
                     colorScheme: colorScheme,
                     screen: screen,
                     placeholder: true,
-                    displayMissingTags: displayMissingTags
+                    showsDebugPlaceholders: showsDebugPlaceholders
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -100,7 +100,7 @@ struct AdaptyUITextView: View {
                     productInfo: productInfoModel,
                     colorScheme: colorScheme,
                     screen: screen,
-                    displayMissingTags: displayMissingTags
+                    showsDebugPlaceholders: showsDebugPlaceholders
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -127,7 +127,7 @@ extension [VC.RichText.Item] {
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
         screen: VS.ScreenInstance,
-        displayMissingTags: Bool
+        showsDebugPlaceholders: Bool
     ) throws -> Text {
         try reduce(Text("")) {
             partialResult,
@@ -163,7 +163,7 @@ extension [VC.RichText.Item] {
                             stateViewModel.getTagValue(
                                 variable,
                                 converter: converter?.asTagConverter,
-                                defaultValue: displayMissingTags ? "<var:\(variable.path.joined(separator: "."))}>" : "",
+                                defaultValue: showsDebugPlaceholders ? "<var:\(variable.path.joined(separator: "."))}>" : "",
                                 screen: screen
                             )
                         }
@@ -178,7 +178,7 @@ extension [VC.RichText.Item] {
                     }
 
                 } else {
-                    if displayMissingTags {
+                    if showsDebugPlaceholders {
                         tagReplacementResult = "<tag:\(value)>"
                     } else {
                         throw AdaptyUIBuilder.RichTextError.tagReplacementNotFound
@@ -245,7 +245,7 @@ extension VC.RichText {
         colorScheme: ColorScheme,
         screen: VS.ScreenInstance,
         placeholder: Bool = false,
-        displayMissingTags: Bool = false
+        showsDebugPlaceholders: Bool = false
     ) -> Text {
         if placeholder {
             let reducedString = items.reduce("") { partialResult, item in
@@ -276,7 +276,7 @@ extension VC.RichText {
                         productInfo: productInfo,
                         colorScheme: colorScheme,
                         screen: screen,
-                        displayMissingTags: displayMissingTags
+                        showsDebugPlaceholders: showsDebugPlaceholders
                     )
             } catch {
                 if let fallback, let fallbackText = try? fallback
@@ -290,7 +290,7 @@ extension VC.RichText {
                         productInfo: productInfo,
                         colorScheme: colorScheme,
                         screen: screen,
-                        displayMissingTags: displayMissingTags
+                        showsDebugPlaceholders: showsDebugPlaceholders
                     )
                 {
                     result = fallbackText
