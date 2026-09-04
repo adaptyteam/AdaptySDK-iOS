@@ -17,7 +17,8 @@ package extension View {
         tagResolverViewModel: AdaptyUITagResolverViewModel,
         timerViewModel: AdaptyUITimerViewModel,
         screensViewModel: AdaptyUIScreensViewModel,
-        assetsViewModel: AdaptyUIAssetsViewModel
+        assetsViewModel: AdaptyUIAssetsViewModel,
+        customElementsViewModel: AdaptyUICustomElementsViewModel
     ) -> some View {
         environmentObject(stateViewModel)
             .environmentObject(flowViewModel)
@@ -26,6 +27,7 @@ package extension View {
             .environmentObject(timerViewModel)
             .environmentObject(screensViewModel)
             .environmentObject(assetsViewModel)
+            .environmentObject(customElementsViewModel)
     }
 }
 

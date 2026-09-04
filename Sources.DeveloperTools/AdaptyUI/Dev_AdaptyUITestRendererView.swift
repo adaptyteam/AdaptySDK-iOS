@@ -21,6 +21,7 @@ public extension AdaptyUI {
         package let flowViewModel: AdaptyUIFlowViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
+        package let customElementsViewModel: AdaptyUICustomElementsViewModel
         package let timerViewModel: AdaptyUITimerViewModel
         package let screensViewModel: AdaptyUIScreensViewModel
         package let assetsViewModel: AdaptyUIAssetsViewModel
@@ -32,6 +33,7 @@ public extension AdaptyUI {
         fileprivate let tagResolver: AdaptyUITagResolver?
         fileprivate let timerResolver: AdaptyTimerResolver?
         fileprivate let assetsResolver: AdaptyUIAssetsResolver?
+        fileprivate let customElementsResolver: (any AdaptyUICustomElementsResolver)?
 
         package init(
             logId: String,
@@ -41,6 +43,7 @@ public extension AdaptyUI {
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyUIAssetsResolver?,
+            customElementsResolver: (any AdaptyUICustomElementsResolver)?,
             systemRequestsHandler: AdaptyUISystemRequestsHandler?,
             rtlOverride: Bool?
         ) {
@@ -49,6 +52,7 @@ public extension AdaptyUI {
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
+            self.customElementsResolver = customElementsResolver
 
             eventsHandler = AdaptyUIEventsHandler(logId: logId)
             logic = Dev_AdaptyUILogic(
@@ -58,6 +62,7 @@ public extension AdaptyUI {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
+            customElementsViewModel = AdaptyUICustomElementsViewModel(customElementsResolver: customElementsResolver)
 
             flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
@@ -145,6 +150,7 @@ public struct Dev_AdaptyUIRendererView: View {
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
         assetsResolver: AdaptyUIAssetsResolver?,
+        customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
         showDebugOverlay: Bool = false,
         showsDebugPlaceholders: Bool = true,
@@ -181,6 +187,7 @@ public struct Dev_AdaptyUIRendererView: View {
                 tagResolver: ["TEST_TAG": "Adapty"],
                 timerResolver: nil,
                 assetsResolver: assetsResolver,
+                customElementsResolver: customElementsResolver,
                 systemRequestsHandler: systemRequestsHandler,
                 rtlOverride: rtlOverride
             )
@@ -236,7 +243,8 @@ public struct Dev_AdaptyUIRendererView: View {
             tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
             timerViewModel: galleryConfiguration.timerViewModel,
             screensViewModel: galleryConfiguration.screensViewModel,
-            assetsViewModel: galleryConfiguration.assetsViewModel
+            assetsViewModel: galleryConfiguration.assetsViewModel,
+            customElementsViewModel: galleryConfiguration.customElementsViewModel
         )
     }
 }

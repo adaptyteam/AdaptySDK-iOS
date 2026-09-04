@@ -21,6 +21,15 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    /// Monotonic counter of flow state updates.
+    ///
+    /// Values read through the custom element context are read lazily from the
+    /// state, so a context built from the same models and the same element is
+    /// indistinguishable from the previous one. SwiftUI compares the app view
+    /// built around it, finds it unchanged and never re-evaluates its body.
+    /// Carrying this counter in the context is what makes an update visible.
+    private(set) var stateRevision: UInt = 0
+
     @Published var focusedId: String?
     var isAutoScrollingToFocus = false
     @Published var scrollCommand: ScrollCommand?
@@ -48,6 +57,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
         stateHolder.state.objectWillChange
             .sink { [weak self] _ in
+                self?.stateRevision &+= 1
                 self?.objectWillChange.send()
             }
             .store(in: &cancellables)

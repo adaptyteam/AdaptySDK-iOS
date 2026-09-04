@@ -172,7 +172,8 @@ package final class AdaptyFlowUIView: UIView {
                 tagResolverViewModel: configuration.tagResolverViewModel,
                 timerViewModel: configuration.timerViewModel,
                 screensViewModel: configuration.screensViewModel,
-                assetsViewModel: configuration.assetsViewModel
+                assetsViewModel: configuration.assetsViewModel,
+                customElementsViewModel: configuration.customElementsViewModel
             ),
             to: self
         )

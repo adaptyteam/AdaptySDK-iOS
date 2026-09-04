@@ -17,7 +17,8 @@ public extension AdaptyUIBuilder {
         products: [ProductResolver],
         tagResolver: AdaptyUITagResolver?,
         timerResolver: AdaptyUITimerResolver?,
-        assetsResolver: AdaptyUIAssetsResolver?
+        assetsResolver: AdaptyUIAssetsResolver?,
+        customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil
     ) async throws -> FlowConfiguration {
         let viewConfiguration = try schema.extractUIConfiguration(
             id: UUID().uuidString,
@@ -49,7 +50,8 @@ public extension AdaptyUIBuilder {
             products: products,
             tagResolver: tagResolver,
             timerResolver: timerResolver,
-            assetsResolver: assetsResolver
+            assetsResolver: assetsResolver,
+            customElementsResolver: customElementsResolver
         )
     }
 }
@@ -76,6 +78,7 @@ public extension AdaptyUIBuilder {
         let flowViewModel: AdaptyUIFlowViewModel
         let productsViewModel: AdaptyUIProductsViewModel
         let tagResolverViewModel: AdaptyUITagResolverViewModel
+        let customElementsViewModel: AdaptyUICustomElementsViewModel
         let timerViewModel: AdaptyUITimerViewModel
         let screensViewModel: AdaptyUIScreensViewModel
         let assetsViewModel: AdaptyUIAssetsViewModel
@@ -86,6 +89,7 @@ public extension AdaptyUIBuilder {
         fileprivate let tagResolver: AdaptyUITagResolver?
         fileprivate let timerResolver: AdaptyUITimerResolver?
         fileprivate let assetsResolver: AdaptyUIAssetsResolver?
+        fileprivate let customElementsResolver: (any AdaptyUICustomElementsResolver)?
 
         init(
             logId: String,
@@ -93,12 +97,14 @@ public extension AdaptyUIBuilder {
             products: [ProductResolver],
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyUITimerResolver?,
-            assetsResolver: AdaptyUIAssetsResolver?
+            assetsResolver: AdaptyUIAssetsResolver?,
+            customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil
         ) {
             self.logId = logId
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
+            self.customElementsResolver = customElementsResolver
             
             eventsHandler = AdaptyUIEventsHandler(logId: logId)
             logic = AdaptyUIBuilderAppLogic(
@@ -108,6 +114,7 @@ public extension AdaptyUIBuilder {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
+            customElementsViewModel = AdaptyUICustomElementsViewModel(customElementsResolver: customElementsResolver)
             flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
                 logic: logic,

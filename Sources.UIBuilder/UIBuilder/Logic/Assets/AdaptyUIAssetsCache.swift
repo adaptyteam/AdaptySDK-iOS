@@ -120,6 +120,31 @@ final class AdaptyUIAssetsCache {
         }
     }
 
+    /// Asset behind the reference in the public asset type, preferring the one
+    /// supplied by the app over the one from the configuration.
+    func asset(
+        _ ref: AdaptyUIConfiguration.AssetReference?,
+        mode: VC.Mode,
+        screen: VS.ScreenInstance
+    ) -> AdaptyUIAsset? {
+        guard let assetIdOrColor = ref?.getAssetId(state: state, screen: screen) else { return nil }
+
+        switch assetIdOrColor {
+        case let .color(color):
+            return .color(color.resolvedColor)
+        case let .assetId(assetId):
+            guard let stateAsset = try? state.asset(assetId, for: mode) else { return nil }
+
+            if let customId = stateAsset.customId,
+               let customAsset = customAssetsResolver.asset(for: customId)
+            {
+                return customAsset.asAsset
+            }
+
+            return stateAsset.asAsset
+        }
+    }
+
     func cachedAsset(
         _ assetId: AdaptyUIConfiguration.AssetIdentifier?,
         mode: VC.Mode

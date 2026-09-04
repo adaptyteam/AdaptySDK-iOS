@@ -35,6 +35,7 @@ public extension AdaptyUI {
         package let flowViewModel: AdaptyUIFlowViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
+        package let customElementsViewModel: AdaptyUICustomElementsViewModel
         package let timerViewModel: AdaptyUITimerViewModel
         package let screensViewModel: AdaptyUIScreensViewModel
         package let assetsViewModel: AdaptyUIAssetsViewModel
@@ -47,6 +48,7 @@ public extension AdaptyUI {
         fileprivate let tagResolver: AdaptyUITagResolver?
         fileprivate let timerResolver: AdaptyTimerResolver?
         fileprivate let assetsResolver: AdaptyUIAssetsResolver?
+        fileprivate let customElementsResolver: (any AdaptyUICustomElementsResolver)?
         fileprivate let systemRequestsHandler: AdaptyUISystemRequestsHandler?
 
         private var appeared = false
@@ -62,6 +64,7 @@ public extension AdaptyUI {
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyUIAssetsResolver?,
+            customElementsResolver: (any AdaptyUICustomElementsResolver)?,
             systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
         ) {
             Log.ui.verbose("#\(logId)# init products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
@@ -77,6 +80,7 @@ public extension AdaptyUI {
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
+            self.customElementsResolver = customElementsResolver
             self.systemRequestsHandler = systemRequestsHandler
 
             let flowViewIdentityBox = FlowViewIdentityBox()
@@ -92,6 +96,7 @@ public extension AdaptyUI {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
+            customElementsViewModel = AdaptyUICustomElementsViewModel(customElementsResolver: customElementsResolver)
             flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
                 logic: logic,

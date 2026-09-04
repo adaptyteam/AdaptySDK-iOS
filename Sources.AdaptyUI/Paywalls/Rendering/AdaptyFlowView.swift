@@ -115,7 +115,8 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
             tagResolverViewModel: flowConfiguration.tagResolverViewModel,
             timerViewModel: flowConfiguration.timerViewModel,
             screensViewModel: flowConfiguration.screensViewModel,
-            assetsViewModel: flowConfiguration.assetsViewModel
+            assetsViewModel: flowConfiguration.assetsViewModel,
+            customElementsViewModel: flowConfiguration.customElementsViewModel
         )
         .onAppear {
             flowConfiguration.reportOnAppear()

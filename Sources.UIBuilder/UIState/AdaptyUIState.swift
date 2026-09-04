@@ -100,6 +100,16 @@ package final class AdaptyUIState: ObservableObject {
         return T.fromJSValue(jsValue)
     }
 
+    /// Untyped value behind the variable, as JavaScriptCore hands it over:
+    /// `NSNumber`, `NSString`, `NSDictionary`, `NSArray`. Used where the value
+    /// goes to the app instead of into one of the scalar types the renderer
+    /// knows. A JavaScript `null` or `undefined` yields no value.
+    func getAnyValue(variable: VC.Variable, screenInstance: VS.ScreenInstance) throws(VS.Error) -> Any? {
+        let jsValue = try jsState.getValue(variable: variable, screenInstance: screenInstance)
+        guard !jsValue.isUndefined, !jsValue.isNull else { return nil }
+        return jsValue.toObject()
+    }
+
     func getTagValue(variable: VC.Variable, screenInstance: VS.ScreenInstance, converter: VC.TagConverter?) throws(VS.Error) -> String? {
         let jsValue = try jsState.getValue(variable: variable, screenInstance: screenInstance)
         guard let converter, !jsValue.isString else { return String.fromJSValue(jsValue) }
