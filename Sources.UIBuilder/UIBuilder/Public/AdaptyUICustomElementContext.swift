@@ -142,26 +142,27 @@ public struct AdaptyUICustomElementContext {
 
     // MARK: - Bindings and properties
 
-    /// Current value of the read-only binding declared under `id` in the
-    /// `bindings` of the element, as the flow holds it.
-    ///
-    /// The value arrives from JavaScript through Foundation, so a number is an
-    /// `NSNumber` and casts to `Int`, `Double` or `Bool` alike, a string is an
-    /// `NSString`, and an object or an array is an `NSDictionary` or an
-    /// `NSArray`. A JavaScript `null` yields no value, exactly as a missing key
-    /// does: for a single value there is nothing a null would add that `nil`
-    /// does not already say.
+    /// Current value of the read-only binding declared under `id`, converted
+    /// to the requested type. Unsupported types, missing bindings, JavaScript
+    /// null/undefined and read errors return nil.
+    /// Supported types are Bool, Int32, UInt32, Double and String; values use
+    /// the corresponding JavaScript conversion.
     ///
     /// Bindings are read-only here: writing back and executing flow actions are
     /// not part of this contract.
-    public func variableValue(byKey id: String) -> Any? {
+    public func variableValue<T>(_: T.Type, byKey id: String) -> T? {
         guard let variable = element.bindings?[id] else { return nil }
+        guard let type = T.self as? any JSValueRepresentable.Type else {
+            Log.ui.error("custom element \(element.type):\(element.id) binding \(id) read error: unsupported type \(String(reflecting: T.self))")
+            return nil
+        }
 
         do {
-            return try stateViewModel.stateHolder.state.getAnyValue(
+            return try stateViewModel.stateHolder.state.getValue(
+                type,
                 variable: variable,
                 screenInstance: screen
-            )
+            ) as? T
         } catch {
             Log.ui.error("custom element \(element.type):\(element.id) binding \(id) read error: \(error)")
             return nil
