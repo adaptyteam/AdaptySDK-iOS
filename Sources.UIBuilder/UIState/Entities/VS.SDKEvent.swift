@@ -41,7 +41,7 @@ extension VS.SDKEvent {
         case let .didRestorePurchases(id, result):
             "{\(id)  event: \(Name.didRestorePurchases.rawValue), result:\(result.rawValue) }"
         case let .appMessage(message):
-            "{\(message.id)  event: \(message.type.rawValue) \(message.debugString)}"
+            message.debugString
         }
     }
 }

@@ -68,18 +68,15 @@ extension VS {
         }
 
         var debugString: String {
-            var fields = [String]()
+            var fields = ["\(id) event: \(type.rawValue)"]
             if let screen = screenInstance {
                 fields.append("screen: \(screen.debugString)")
             }
             if let element = elementInstance {
                 fields.append("element: \(element.debugString)")
             }
-            let message = payload.sorted { $0.key < $1.key }
-                .map { "\(String(reflecting: $0.key)): \(String(reflecting: $0.value))" }
-                .joined(separator: ", ")
-            fields.append("message: {\(message)}")
-            return fields.joined(separator: ", ")
+
+            return "{\(fields.joined(separator: ", "))}"
         }
     }
 }

@@ -89,7 +89,7 @@ struct SDKEventHandlerTests {
                 flow: .init(placementId: "test", variationId: "test", abTestName: "test", name: "test", products: [])
             ),
             assets: [:], strings: [:], navigators: [:], screens: [:], scripts: [],
-            onAppMessage: nil, showPurchaseLoader: false, showRestoreLoader: false,
+            showPurchaseLoader: false, showRestoreLoader: false,
             legacySelectedProducts: nil
         )
         return VS.JSState(configuration: configuration, actionHandler: nil, isInspectable: false)

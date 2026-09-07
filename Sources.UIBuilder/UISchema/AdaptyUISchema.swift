@@ -19,7 +19,6 @@ public struct AdaptyUISchema: Sendable {
     let screens: [ScreenType: Screen]
     let templates: any AdaptyUISchemaTemplateSystem
     let scripts: [String]
-    let onAppMessage: StaticAction?
     let showPurchaseLoader: Bool
     let showRestoreLoader: Bool
 
@@ -49,7 +48,6 @@ extension AdaptyUISchema: DecodableWithConfiguration {
         case screens
         case navigators
         case scripts
-        case onAppMessage = "on_app_message"
         case behavior
     }
 
@@ -130,8 +128,6 @@ extension AdaptyUISchema: DecodableWithConfiguration {
             scripts = try decoder.decodeScript(configuration: configuration)
             legacySelectedProducts = [:]
         }
-
-        onAppMessage = try container.decodeIfPresent(StaticAction.self, forKey: .onAppMessage)
 
         if let behavior = try? container.nestedContainer(keyedBy: BehaviorKeys.self, forKey: .behavior) {
             showRestoreLoader = try behavior.decodeIfPresent(Bool.self, forKey: .showRestoreLoader) ?? true

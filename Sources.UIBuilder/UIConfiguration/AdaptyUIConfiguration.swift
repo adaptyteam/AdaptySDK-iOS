@@ -23,7 +23,6 @@ package struct AdaptyUIConfiguration: Sendable {
     let navigators: [NavigatorIdentifier: Navigator]
     let screens: [ScreenType: Screen]
     let scripts: [String]
-    let onAppMessage: StaticAction?
     let showPurchaseLoader: Bool
     let showRestoreLoader: Bool
     

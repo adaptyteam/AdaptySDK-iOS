@@ -176,15 +176,7 @@ public struct AdaptyUICustomElementContext {
 
     /// Sends a message from this element to the flow.
     ///
-    /// - Warning: Not delivered yet. The public surface is fixed here, but the
-    ///   delivery path is the flow-level app message action, which lands with
-    ///   the `add-uibuilder-app-message-action` change. Until then this call
-    ///   only writes to the log.
-    ///
-    /// Once implemented the message reaches the script of the flow together
-    /// with the screen instance and with `custom_id` / `custom_type` of this
-    /// element, and the script decides what to do with it — set a variable,
-    /// fire flow events, anything else.
+    /// - Warning: Message delivery is not implemented yet. This method only logs the call.
     public func send(message: some Encodable) {
         Log.ui.warn(
             "custom element \(element.type):\(element.id) send(message:) is not implemented yet"

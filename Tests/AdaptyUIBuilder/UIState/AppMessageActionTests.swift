@@ -14,7 +14,7 @@ import Testing
     "AdaptyUIBuilder Tests",
     .component("AdaptyUIBuilder"),
     .epic("App Message"),
-    .feature("App Message Action"),
+    .feature("App Message Delivery"),
     .risk(.critical),
     .owner("Aleksei Valiano"),
     .layer(.unit),
@@ -26,36 +26,11 @@ enum AppMessageActionTests {
         .story("App Message Configuration")
     )
     struct AppMessageConfigurationTests {
-        /// A UIBuilder configuration omits on_app_message. Parsing succeeds and the runtime configuration keeps no action.
-        @Test("Configuration without an action remains valid")
-        func configurationWithoutActionRemainsValid() throws {
-            let configuration = try AppMessageActionTests.configuration(action: nil)
-
-            #expect(configuration.onAppMessage == nil)
-        }
-
-        /// A UIBuilder configuration contains a global method path. Parsing preserves every path component in the runtime action.
-        @Test("A method path string is preserved")
-        func methodPathIsPreserved() throws {
-            let configuration = try AppMessageActionTests.configuration(
-                action: ##""App.onMessage""##
-            )
-            let action = try #require(configuration.onAppMessage)
-
-            #expect(action.path == ["App", "onMessage"])
-        }
-
-        /// A UIBuilder configuration contains a non-string or empty on_app_message value. Schema decoding rejects the configuration.
-        @Test("Structurally invalid app-message actions are rejected by the parser", arguments: [
-            ##"["App.onMessage"]"##,
-            ##"{}"##,
-            ##"42"##,
-            ##""""##,
-        ])
-        func invalidActionFormsAreRejected(action: String) {
-            #expect(throws: (any Error).self, "Expected invalid action: \(action)") {
-                try AppMessageActionTests.configuration(action: action)
-            }
+        @Test("Configuration preserves the shared SDK handler script")
+        func configurationPreservesScript() throws {
+            let script = "function handleSDKEvent(event) { globalThis.received = event; }"
+            let configuration = try AppMessageActionTests.configuration(script: script)
+            #expect(configuration.scripts == [script])
         }
     }
 
@@ -87,7 +62,6 @@ enum AppMessageActionTests {
         @Test("Simple delivery uses SDKEvent and preserves caller fields")
         func simpleDelivery() throws {
             let state = try AppMessageActionTests.state(
-                action: nil,
                 script: "function handleSDKEvent(event) { globalThis.received = event; globalThis.calls = (globalThis.calls || 0) + 1; }"
             )
             let message = try VS.AppMessage(id: "caller-id", payload: [
@@ -115,7 +89,6 @@ enum AppMessageActionTests {
         @Test("Contextual delivery includes screen and element", arguments: [false, true])
         func contextualDelivery(useConfigurationElement: Bool) throws {
             let state = try AppMessageActionTests.state(
-                action: nil,
                 script: "function handleSDKEvent(event) { globalThis.received = event; }"
             )
             let screen = try #require(state.configuration.screens["main"])
@@ -162,7 +135,6 @@ enum AppMessageActionTests {
         func handlerCanCallSDK() throws {
             let handler = MockActionHandler()
             let state = try AppMessageActionTests.state(
-                action: nil,
                 script: "function handleSDKEvent(event) { SDK.sendAnalyticsEvent(event.payload); }",
                 actionHandler: handler
             )
@@ -181,25 +153,21 @@ enum AppMessageActionTests {
         @Test("Unavailable SDK handler does not throw", arguments: ["undefined", "null", "42"])
         func unavailableHandler(value: String) throws {
             let state = try AppMessageActionTests.state(
-                action: nil, script: "globalThis.handleSDKEvent = \(value);"
+                script: "globalThis.handleSDKEvent = \(value);"
             )
             try state.send(message: .init(id: "empty", payload: [:]))
         }
 
-        /// Legacy configuration does not select the message handler or create an additional call.
-        @Test("Delivery always uses the shared SDK handler")
-        func sharedHandlerIsTheOnlyTarget() throws {
+        /// An empty payload remains an object and is delivered exactly once.
+        @Test("Empty payload reaches the shared SDK handler")
+        func emptyPayload() throws {
             let state = try AppMessageActionTests.state(
-                action: ##""App.onMessage""##,
                 script: """
-                globalThis.legacyCalls = 0;
                 globalThis.calls = 0;
-                globalThis.App = { onMessage() { legacyCalls++; } };
                 function handleSDKEvent(event) { calls++; globalThis.received = event; }
                 """
             )
             try state.send(message: .init(id: "empty", payload: [:]))
-            #expect(state.debug(path: "legacyCalls") == "legacyCalls: 0")
             #expect(state.debug(path: "calls") == "calls: 1")
             let event = try AppMessageActionTests.javascriptObject(in: state, path: "received")
             let payload = try #require(event["payload"] as? [String: Any])
@@ -211,7 +179,6 @@ enum AppMessageActionTests {
         func synchronousJavaScriptExceptionUsesErrorHandler() throws {
             let handler = MockActionHandler()
             let state = try AppMessageActionTests.state(
-                action: nil,
                 script: "function handleSDKEvent() { throw new Error('boom'); }",
                 actionHandler: handler
             )
@@ -224,7 +191,6 @@ enum AppMessageActionTests {
         @Test("Rejected Promise is not converted into a synchronous throw")
         func rejectedPromiseIsNotSynchronousThrow() throws {
             let state = try AppMessageActionTests.state(
-                action: nil,
                 script: """
                 function handleSDKEvent() {
                   globalThis.promiseCallCount = (globalThis.promiseCallCount || 0) + 1;
@@ -240,10 +206,8 @@ enum AppMessageActionTests {
 
 private extension AppMessageActionTests {
     static func configuration(
-        action: String?,
         script: String = ""
     ) throws -> AdaptyUIConfiguration {
-        let actionProperty = action.map { #", "on_app_message": \#($0)"# } ?? ""
         let script = Json(deserilized: script)
 
         let schema = try AdaptyUISchema(
@@ -265,7 +229,6 @@ private extension AppMessageActionTests {
                   "content": \(script)
                 }
               ]
-              \(actionProperty)
             }
             """,
             configuration: .init(device: .phone)
@@ -279,12 +242,11 @@ private extension AppMessageActionTests {
 
     @MainActor
     static func state(
-        action: String?,
         script: String = "",
         actionHandler: AdaptyUIActionHandler? = nil
     ) throws -> AdaptyUIState {
         let state = try AdaptyUIState(
-            configuration: configuration(action: action, script: script),
+            configuration: configuration(script: script),
             actionHandler: actionHandler
         )
         state.startOnce()
