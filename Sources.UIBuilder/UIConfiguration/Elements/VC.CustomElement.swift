@@ -14,7 +14,7 @@ extension VC {
         let assets: [String: AssetReference]? 
         let strings: [String: StringReference]?
         let bindings: [String: Variable]? 
-        let properties: VC.AnyValue?
+        let properties: [String: any Sendable]?
 
     }
 }

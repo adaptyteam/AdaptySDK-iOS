@@ -5,8 +5,8 @@
 //  Created by Aleksei Valiano on 25.08.2026.
 //
 
-
 import Foundation
+import AdaptyCodable
 
 extension Schema {
     typealias CustomElement = VC.CustomElement
@@ -40,7 +40,7 @@ extension Schema.CustomElement: Decodable {
             assets: container.decodeIfPresent([String: Schema.AssetReference].self, forKey: .assets),
             strings: container.decodeIfPresent([String: Schema.StringReference].self, forKey: .strings),
             bindings: container.decodeIfPresent([String: Schema.Variable].self, forKey: .bindings),
-            properties: container.decodeIfPresent(Schema.AnyValue.self, forKey: .properties)
+            properties: container.decodeDictionaryIfPresent(forKey: .properties)
         )
     }
 }

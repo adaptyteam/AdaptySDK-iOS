@@ -79,7 +79,7 @@ enum CustomElementTests {
             #expect(custom.assets?.isEmpty == true)
             #expect(custom.strings?.isEmpty == true)
             #expect(custom.bindings?.isEmpty == true)
-            let customProperties = try #require(custom.properties?.wrapped as? [String: VC.AnyValue])
+            let customProperties = try #require(custom.properties)
             #expect(customProperties.isEmpty)
             #expect(properties?.opacity == 0.5)
             #expect(properties?.focusId == "hero-focus")
@@ -207,7 +207,7 @@ enum CustomElementTests {
             let (empty, _) = try CustomElementTests.custom(content: ##"{"type":"custom","custom_id":"empty","custom_type":"raw","properties":{}}"##)
 
             #expect(absent.properties == nil)
-            let emptyObject = try #require(empty.properties?.wrapped as? [String: VC.AnyValue])
+            let emptyObject = try #require(empty.properties)
             #expect(emptyObject.isEmpty)
         }
 
@@ -237,28 +237,28 @@ enum CustomElementTests {
             }
             """)
 
-            let object = try #require(custom.properties?.wrapped as? [String: VC.AnyValue])
+            let object = try #require(custom.properties)
 
-            #expect(object["null"]?.isNil == true)
-            #expect(object["boolean"]?.wrapped as? Bool == true)
-            #expect(object["integer"]?.wrapped as? Int == 42)
-            #expect(object["number"]?.wrapped as? Double == 1.5)
-            #expect(object["string"]?.wrapped as? String == "value")
+            #expect(object["null"] is NSNull)
+            #expect(object["boolean"] as? Bool == true)
+            #expect(object["integer"] as? Int == 42)
+            #expect(object["number"] as? Double == 1.5)
+            #expect(object["string"] as? String == "value")
 
-            let array = try #require(object["array"]?.wrapped as? [VC.AnyValue])
+            let array = try #require(object["array"] as? [any Sendable])
             #expect(array.count == 5)
-            #expect(array[0].isNil)
-            #expect(array[1].wrapped as? Bool == false)
-            #expect(array[2].wrapped as? Int == 2)
-            #expect(array[3].wrapped as? Double == 3.5)
-            #expect(array[4].wrapped as? String == "item")
+            #expect(array[0] is NSNull)
+            #expect(array[1] as? Bool == false)
+            #expect(array[2] as? Int == 2)
+            #expect(array[3] as? Double == 3.5)
+            #expect(array[4] as? String == "item")
 
-            let special = try #require(object["special"]?.wrapped as? [String: VC.AnyValue])
-            #expect(special["var"]?.wrapped as? String == "state.value")
-            #expect(special["setter"]?.wrapped as? String == "setValue")
-            #expect(special["string_id"]?.wrapped as? String == "title")
-            #expect(special["product"]?.wrapped as? String == "product_id")
-            #expect(special["func"]?.wrapped as? String == "submit")
+            let special = try #require(object["special"] as? [String: any Sendable])
+            #expect(special["var"] as? String == "state.value")
+            #expect(special["setter"] as? String == "setValue")
+            #expect(special["string_id"] as? String == "title")
+            #expect(special["product"] as? String == "product_id")
+            #expect(special["func"] as? String == "submit")
         }
     }
 }
