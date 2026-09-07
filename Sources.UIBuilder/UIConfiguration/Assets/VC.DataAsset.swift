@@ -9,13 +9,9 @@ import Foundation
 
 extension VC {
     struct DataAsset: Sendable {
-        enum Source: Sendable {
-            case value(Data)
-            case url(URL)
-        }
-
+        let url: URL?
+        let value: Data?
         let customId: String?
         let format: String
-        let source: Source
     }
 }

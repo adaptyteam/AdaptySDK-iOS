@@ -50,12 +50,7 @@ package extension VC.ColorGradient {
 
 extension VC.DataAsset {
     var asDataAsset: AdaptyUIDataAsset {
-        switch source {
-        case let .value(data):
-            .init(format: format, value: data)
-        case let .url(url):
-            .init(format: format, url: url)
-        }
+        .init(format: format, value: value,  url: url)
     }
 }
 
