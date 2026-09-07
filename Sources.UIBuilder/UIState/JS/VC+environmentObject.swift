@@ -39,7 +39,7 @@ extension VC {
 
         for key in VS.EnvironmentConstantsKey.allCases {
             guard let value = value(for: key) else { continue }
-            env.setObject(value.toJSValue(in: context), forKeyedSubscript: key.rawValue as NSString)
+            env.setValue(value.toJSValue(in: context), forProperty: key.rawValue)
         }
 
         return env

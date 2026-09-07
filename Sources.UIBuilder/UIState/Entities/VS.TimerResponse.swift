@@ -17,7 +17,7 @@ extension VS {
 extension VS.TimerResponse: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-        object.setObject(timerId?.toJSValue(in: context), forKeyedSubscript: "timerId" as NSString)
+        object.setValue(timerId.toJSValue(in: context), forProperty: "timerId")
         return object
     }
 }

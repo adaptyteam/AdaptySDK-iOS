@@ -14,7 +14,7 @@ package extension VS {
         let result: PurchaseResult
     }
 
-    enum PurchaseResult: String, VC.Value {
+    enum PurchaseResult: String {
         case fail
         case userCanceled
         case success
@@ -22,17 +22,11 @@ package extension VS {
     }
 }
 
-extension VS.PurchaseResult: JSValueConvertable {
-    func toJSValue(in context: JSContext) -> JSValue {
-        rawValue.toJSValue(in: context)
-    }
-}
-
 extension VS.PurchaseResponse: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-        object.setObject(productId.toJSValue(in: context), forKeyedSubscript: "productId" as NSString)
-        object.setObject(result.toJSValue(in: context), forKeyedSubscript: "result" as NSString)
+        object.setValue(productId, forProperty: "productId")
+        object.setValue(result.rawValue, forProperty: "result")
         return object
     }
 }

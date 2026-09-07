@@ -23,7 +23,7 @@ extension VS.ActionParameters: JSValueConvertable {
             } else {
                 JSValue(newObjectIn: context)!
             }
-        object.setObject(screenInstance.toJSValue(in: context), forKeyedSubscript: "_screen" as NSString)
+        object.setValue(screenInstance.toJSValue(in: context), forProperty: "_screen")
         return object
     }
 }

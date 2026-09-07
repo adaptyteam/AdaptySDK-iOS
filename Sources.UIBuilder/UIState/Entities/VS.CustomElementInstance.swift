@@ -12,14 +12,18 @@ extension VS {
     struct CustomElementInstance: Identifiable {
         let id: String
         let type: String
+
+        var debugString: String {
+            "{id: \(String(reflecting: id)), type: \(String(reflecting: type))}"
+        }
     }
 }
 
 extension VS.CustomElementInstance: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-        object.setObject(id, forKeyedSubscript: "id" as NSString)
-        object.setObject(type, forKeyedSubscript: "type" as NSString)
+        object.setValue(id, forProperty: "id")
+        object.setValue(type, forProperty: "type")
         return object
     }
 }

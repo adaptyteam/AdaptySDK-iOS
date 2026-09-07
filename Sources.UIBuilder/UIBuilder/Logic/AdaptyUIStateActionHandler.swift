@@ -53,7 +53,7 @@ package final class AdaptyUIStateHolder {
 
     package func setProducts(_ products: [VC.FlowConstants.ProductConstants]) {
         lastProducts = products
-        state.setProductsConstants(products)
+        state.setProductsConstants(eveentId: logId + ".set", products)
     }
 
     package func prepareForReuse() {
@@ -61,7 +61,7 @@ package final class AdaptyUIStateHolder {
         actionHandler.clearPendingCallbacks()
         state.prepareForReuse()
         if let lastProducts {
-            state.setProductsConstants(lastProducts)
+            state.setProductsConstants(eveentId: logId + ".prepareForReuse", lastProducts)
         }
     }
 }
@@ -181,7 +181,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
         Task { @MainActor [weak self] in
             guard let self else { return }
-            self.state?.sendSDKEvent(.willPurchase(productId: productId))
+            self.state?.sendSDKEvent(.willPurchase(id: token ,productId: productId))
 
             self.productsViewModel.purchaseProduct(
                 id: productId,
@@ -189,7 +189,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 onFinish: { [weak self] result in
                     guard let self else { return }
 
-                    self.state?.sendSDKEvent(.didPurchase(productId: productId, result: result))
+                    self.state?.sendSDKEvent(.didPurchase(id: token, productId: productId, result: result))
 
                     guard let callback = self.pendingPurchaseCallbacks.removeValue(forKey: token) else { return }
 
@@ -213,13 +213,13 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
         Task { @MainActor [weak self] in
             guard let self else { return }
-            self.state?.sendSDKEvent(.willRestorePurchases)
+            self.state?.sendSDKEvent(.willRestorePurchases(id: token))
 
             self.productsViewModel.restorePurchases(
                 onFinish: { [weak self] result in
                     guard let self else { return }
 
-                    self.state?.sendSDKEvent(.didRestorePurchases(result: result))
+                    self.state?.sendSDKEvent(.didRestorePurchases(id: token, result: result))
 
                     guard let callback = self.pendingRestoreCallbacks.removeValue(forKey: token) else { return }
 

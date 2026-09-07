@@ -13,6 +13,12 @@ protocol JSValueConvertable {
     func toJSValue(in: JSContext) -> JSValue
 }
 
+extension NSNull: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        .init(nullIn: context)
+    }
+}
+
 extension Bool: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         .init(bool: self, in: context)
@@ -118,9 +124,17 @@ extension Dictionary: JSValueConvertable where Key == String, Value: JSValueConv
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
         for (key, value) in self {
-            let jsValue = value.toJSValue(in: context)
-            object.setObject(jsValue, forKeyedSubscript: key as NSString)
+            // Defining an own data property also preserves the literal "__proto__" key.
+            object.defineProperty(key, descriptor: [
+                JSPropertyDescriptorValueKey: value.toJSValue(in: context),
+                JSPropertyDescriptorWritableKey: true,
+                JSPropertyDescriptorEnumerableKey: true,
+                JSPropertyDescriptorConfigurableKey: true,
+            ])
         }
         return object
     }
 }
+
+
+

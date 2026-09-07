@@ -74,9 +74,9 @@ package final class AdaptyUIState: ObservableObject {
         objectWillChange.send()
     }
 
-    package func setProductsConstants(_ products: [VC.FlowConstants.ProductConstants]) {
+    package func setProductsConstants(eveentId: String, _ products: [VC.FlowConstants.ProductConstants]) {
         jsState.setProductConstants(products)
-        jsState.sendSDKEvent(.productsLoaded)
+        jsState.sendSDKEvent(.productsLoaded(id: eveentId))
     }
 
     func sendSDKEvent(_ event: VS.SDKEvent) {
@@ -129,14 +129,7 @@ package final class AdaptyUIState: ObservableObject {
         try jsState.execute(action: action, response: response)
     }
 
-    func send( message: AppMessage ) throws(VS.Error) {
-        guard let action = configuration.onAppMessage else {
-            throw .jsMethodNotFound("on_app_message")
-        }
-
-        try jsState.execute(
-            appMessageAction: action,
-            message: message
-        )
+    func send(message: AppMessage) throws(VS.Error) {
+         jsState.sendSDKEvent(.appMessage(message: message))
     }
 }

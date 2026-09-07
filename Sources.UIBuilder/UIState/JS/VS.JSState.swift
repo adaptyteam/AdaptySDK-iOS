@@ -14,6 +14,7 @@ extension VS {
     final class JSState: ObservableObject {
         private let context: JSContext
         private let actionDispatcher: JSActionDispatcher
+        private var sdkEventHandler: JSValue?
         init(
             name: String = "AdaptyJSState",
             configuration: AdaptyUIConfiguration,
@@ -34,7 +35,7 @@ extension VS {
 
             context.exceptionHandler = actionDispatcher.jsExceptionHandler
 
-            context.setObject(actionDispatcher, forKeyedSubscript: "SDK" as NSString)
+            context.globalObject.setValue(actionDispatcher, forProperty: "SDK")
         }
     }
 }
@@ -50,24 +51,28 @@ extension VS.JSState {
     }
 
     func sendSDKEvent(_ event: VS.SDKEvent) {
-        let name = "handleSDKEvent"
+        let handler: JSValue
+        if let cachedHandler = sdkEventHandler {
+            handler = cachedHandler
+        } else {
+            let name = "handleSDKEvent"
+            let parent: JSValue = context.globalObject
 
-        guard let parent = context.globalObject else {
-            log.warn("fail send event (\(event.debugString)), not found global object")
-            return
-        }
+            guard let value = parent.objectForKeyedSubscript(name), !value.isUndefined else {
+                log.warn("fail send event (\(event.debugString)), not found JS method: \(name)")
+                return
+            }
 
-        guard let handler = parent.objectForKeyedSubscript(name), !handler.isUndefined else {
-            log.warn("fail send event (\(event.debugString)), not found JS method: \(name)")
-            return
-        }
+            guard
+                let functionType = context.objectForKeyedSubscript("Function"),
+                value.isInstance(of: functionType)
+            else {
+                log.warn("fail send event (\(event.debugString)), JS property is not method: \(name)")
+                return
+            }
 
-        guard
-            let functionType = context.objectForKeyedSubscript("Function"),
-            handler.isInstance(of: functionType)
-        else {
-            log.warn("fail send event (\(event.debugString)), JS property is not method: \(name)")
-            return
+            sdkEventHandler = value
+            handler = value
         }
 
         let jsEvent = event.toJSValue(in: context)
@@ -89,15 +94,11 @@ extension VS.JSState {
     func evaluateScripts(
         _ scripts: [String]
     ) {
-//        for script in scripts {
-//            let a = context.evaluateScript(script)
-//            print(a)
-//            print("----")
-//            print(debug(path: "", filter: .withFunctionName))
-//        }
-
+        sdkEventHandler = nil
         let script = scripts.filter { !$0.isEmpty }.joined(separator: "\n")
         context.evaluateScript(script)
+        // Script callbacks may have cached a handler before evaluation finished.
+        sdkEventHandler = nil
         objectWillChange.send()
     }
 
@@ -105,9 +106,7 @@ extension VS.JSState {
         path: [String],
         createIfNeeded: Bool = false
     ) throws(VS.Error) -> JSValue {
-        guard var current = context.globalObject else {
-            throw .jsGlobalObjectNotFound
-        }
+        var current: JSValue = context.globalObject
         guard !path.isEmpty else { return current }
 
         var index = 0
@@ -140,7 +139,7 @@ extension VS.JSState {
             guard let empty = JSValue(newObjectIn: context) else {
                 throw .jsObjectNotFound(path.joined(separator: "."))
             }
-            current.setObject(empty, forKeyedSubscript: component as NSString)
+            current.setValue(empty, forProperty: component)
             current = empty
             index += 1
         }
@@ -280,7 +279,7 @@ extension VS.JSState {
 //        let before = self.debug(path: "", filter: .withoutFunction)
         let parent = try findObject(path: path.dropLast(), createIfNeeded: true)
 
-        parent.setValue(value.toJSValue(in: context), forProperty: name as NSString)
+        parent.setValue(value.toJSValue(in: context), forProperty: name)
 //        let after = self.debug(path: "", filter: .withoutFunction)
         log.debug("set variable \(path.joined(separator: ".")) = \(value)")
         objectWillChange.send()
@@ -328,19 +327,6 @@ extension VS.JSState {
             )
         }
 
-        objectWillChange.send()
-    }
-
-    func execute(
-        appMessageAction action: VC.StaticAction,
-        message: VS.AppMessage
-    ) throws(VS.Error) {
-    
-        _ = try invokeMethod(
-            Bool.self,
-            path: action.path,
-            args: [message]
-        )
         objectWillChange.send()
     }
 }
