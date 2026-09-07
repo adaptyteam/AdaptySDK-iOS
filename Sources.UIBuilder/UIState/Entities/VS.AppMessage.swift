@@ -14,9 +14,9 @@ extension VS {
         let type: Kind
         let screenInstance: ScreenInstance?
         let customElement: CustomElementInstance?
-        let message: [String: any VC.Value]
+        let message: [String: any JSValueConvertable]
 
-        init(screenInstance: ScreenInstance, customElement: VC.CustomElement, message: [String: any VC.Value]) {
+        init(screenInstance: ScreenInstance, customElement: VC.CustomElement, message: [String: any JSValueConvertable]) {
             self.init(
                 screenInstance: screenInstance,
                 customElement: customElement.instance,
@@ -24,7 +24,7 @@ extension VS {
             )
         }
 
-        init(screenInstance: ScreenInstance, customElement: CustomElementInstance, message: [String: any VC.Value]) {
+        init(screenInstance: ScreenInstance, customElement: CustomElementInstance, message: [String: any JSValueConvertable]) {
             id = UUID()
             type = .customElement
             self.screenInstance = screenInstance
