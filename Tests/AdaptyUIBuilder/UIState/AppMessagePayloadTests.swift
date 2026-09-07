@@ -38,7 +38,7 @@ struct AppMessagePayloadTests {
         let event = VS.SDKEvent.appMessage(message: message).toJSValue(in: context)
         let result = try #require(handler.call(withArguments: [event]))
         #expect(result.toInt32() == 123)
-        #expect(context.evaluateScript("received.id === 'message-id' && received.name === 'app_msg' && !('screen' in received) && !('element' in received)")?.toBool() == true)
+        #expect(context.evaluateScript("received.id === 'message-id' && received.name === 'applicationMsg' && !('screen' in received) && !('element' in received)")?.toBool() == true)
         #expect(context.evaluateScript(#"JSON.stringify(received.payload.array) === '[null,null,"converted structure",{"value":42}]'"#)?.toBool() == true)
         #expect(context.exception == nil)
     }

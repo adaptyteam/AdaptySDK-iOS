@@ -15,7 +15,7 @@ extension VS {
         let buttons: [Button]
     }
 
-    struct ShowAlertDialogParametersResponse: Sendable {
+    struct ShowAlertDialogResponse: Sendable {
         let actionId: String?
     }
 }
@@ -36,7 +36,7 @@ extension VS.ShowAlertDialogParameters {
     }
 }
 
-extension VS.ShowAlertDialogParametersResponse: JSValueConvertable {
+extension VS.ShowAlertDialogResponse: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
         object.setValue(actionId.toJSValue(in: context), forProperty: "actionId")

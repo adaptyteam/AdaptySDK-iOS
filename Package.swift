@@ -94,6 +94,7 @@ let package = Package(
             path: "Sources.UIBuilder",
             exclude: [
                 "adapty.uibuilder.schema.yaml",
+                "cue",
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),

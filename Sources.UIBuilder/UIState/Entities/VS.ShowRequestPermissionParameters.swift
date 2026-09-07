@@ -14,14 +14,14 @@ extension VS {
         let customArgs: [String: String]?
     }
 
-    struct ShowRequestPermissionParametersResponse {
+    struct ShowRequestPermissionResponse {
         let request: ShowRequestPermissionParameters
         let result: Bool
         let detailResult: String?
     }
 }
 
-extension VS.ShowRequestPermissionParametersResponse: JSValueConvertable {
+extension VS.ShowRequestPermissionResponse: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
         object.setValue(request.permission.toJSValue(in: context), forProperty: "permission")

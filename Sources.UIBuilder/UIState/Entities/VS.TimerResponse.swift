@@ -10,7 +10,7 @@ import JavaScriptCore
 
 extension VS {
     struct TimerResponse: Sendable {
-        let timerId: String?
+        let timerId: String
     }
 }
 
