@@ -21,9 +21,9 @@ extension VS {
         let type: Kind
         let screenInstance: ScreenInstance?
         let elementInstance: CustomElementInstance?
-        let payload: [String: Any]
+        let payload: [String: any Sendable]
 
-        init(id: String, screenInstance: ScreenInstance, customElement: VC.CustomElement, payload: [String: Any]) throws {
+        init(id: String, screenInstance: ScreenInstance, customElement: VC.CustomElement, payload: [String: any Sendable]) throws {
             try self.init(
                 id: id,
                 type: .customElement,
@@ -33,7 +33,7 @@ extension VS {
             )
         }
 
-        init(id: String, screenInstance: ScreenInstance, elementInstance: CustomElementInstance, payload: [String: Any]) throws {
+        init(id: String, screenInstance: ScreenInstance, elementInstance: CustomElementInstance, payload: [String: any Sendable]) throws {
             try self.init(
                 id: id,
                 type: .customElement,
@@ -43,7 +43,7 @@ extension VS {
             )
         }
 
-        init(id: String, payload: [String: Any]) throws {
+        init(id: String, payload: [String: any Sendable]) throws {
             try self.init(
                 id: id,
                 type: .app,
@@ -58,7 +58,7 @@ extension VS {
             type: Kind,
             screenInstance: ScreenInstance?,
             elementInstance: CustomElementInstance?,
-            payload: [String: Any]
+            payload: [String: any Sendable]
         ) throws {
             self.id = id
             self.type = type

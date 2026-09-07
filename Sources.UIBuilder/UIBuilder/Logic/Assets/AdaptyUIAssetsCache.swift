@@ -54,16 +54,16 @@ extension AdaptyUICachedAsset {
 
 @MainActor
 final class AdaptyUIAssetsCache {
-    private let state: AdaptyUIState
+    private let stateHolder: AdaptyUIStateHolder
     private let customAssetsResolver: AdaptyUIAssetsResolver
 
     private var assetById: [String: AdaptyUICachedAsset] = [:]
 
     init(
-        state: AdaptyUIState,
+        stateHolder: AdaptyUIStateHolder,
         customAssetsResolver: AdaptyUIAssetsResolver
     ) {
-        self.state = state
+        self.stateHolder = stateHolder
         self.customAssetsResolver = customAssetsResolver
     }
 
@@ -73,11 +73,11 @@ final class AdaptyUIAssetsCache {
     ) -> VC.RichText.Attributes? {
         guard let attr else { return nil }
         return .init(
-            fontAssetId: attr.fontAssetId?.getAssetIdentifier(state: state, screen: screen),
+            fontAssetId: attr.fontAssetId?.getAssetIdentifier(state: stateHolder.current, screen: screen),
             size: attr.size,
-            txtColor: attr.color?.getAssetId(state: state, screen: screen),
-            imageTintColor: attr.imageTintColor?.getAssetId(state: state, screen: screen),
-            background: attr.background?.getAssetId(state: state, screen: screen),
+            txtColor: attr.color?.getAssetId(state: stateHolder.current, screen: screen),
+            imageTintColor: attr.imageTintColor?.getAssetId(state: stateHolder.current, screen: screen),
+            background: attr.background?.getAssetId(state: stateHolder.current, screen: screen),
             strike: attr.strike,
             underline: attr.underline,
             letterSpacing: attr.letterSpacing
@@ -90,7 +90,7 @@ final class AdaptyUIAssetsCache {
         screen: VS.ScreenInstance
     ) -> AdaptyUICachedAsset {
         guard let assetIdOrColor = ref?.getAssetId(
-            state: state,
+            state: stateHolder.current,
             screen: screen
         ) else {
             return .empty(mode: mode)
@@ -127,13 +127,13 @@ final class AdaptyUIAssetsCache {
         mode: VC.Mode,
         screen: VS.ScreenInstance
     ) -> AdaptyUIAsset? {
-        guard let assetIdOrColor = ref?.getAssetId(state: state, screen: screen) else { return nil }
+        guard let assetIdOrColor = ref?.getAssetId(state: stateHolder.current, screen: screen) else { return nil }
 
         switch assetIdOrColor {
         case let .color(color):
             return .color(color.resolvedColor)
         case let .assetId(assetId):
-            guard let stateAsset = try? state.asset(assetId, for: mode) else { return nil }
+            guard let stateAsset = try? stateHolder.current.asset(assetId, for: mode) else { return nil }
 
             if let customId = stateAsset.customId,
                let customAsset = customAssetsResolver.asset(for: customId)
@@ -163,7 +163,7 @@ final class AdaptyUIAssetsCache {
             assetById[assetId] = newAsset
         }
 
-        guard let stateAsset = try? state.asset(assetId, for: mode) else {
+        guard let stateAsset = try? stateHolder.current.asset(assetId, for: mode) else {
             newAsset = .empty(mode: mode)
             return newAsset
         }

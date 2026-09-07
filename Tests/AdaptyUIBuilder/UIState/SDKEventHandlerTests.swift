@@ -92,6 +92,6 @@ struct SDKEventHandlerTests {
             showPurchaseLoader: false, showRestoreLoader: false,
             legacySelectedProducts: nil
         )
-        return VS.JSState(configuration: configuration, actionHandler: nil, isInspectable: false)
+        return VS.JSState(name: "SDKEventHandlerTests", configuration: configuration, actionHandler: nil, isInspectable: false)
     }
 }

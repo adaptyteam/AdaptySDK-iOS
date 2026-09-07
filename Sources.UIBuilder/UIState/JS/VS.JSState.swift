@@ -16,7 +16,7 @@ extension VS {
         private let actionDispatcher: JSActionDispatcher
         private var sdkEventHandler: JSValue?
         init(
-            name: String = "AdaptyJSState",
+            name: String,
             configuration: AdaptyUIConfiguration,
             actionHandler: AdaptyUIActionHandler?,
             isInspectable: Bool

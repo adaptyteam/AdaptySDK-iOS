@@ -19,7 +19,7 @@ import Testing
 )
 @MainActor
 struct AppMessagePayloadTests {
-    private final class UnsupportedClass {}
+    private final class UnsupportedClass: Sendable {}
 
     private struct ConvertedStruct: JSValueConvertable {
         func toJSValue(in context: JSContext) -> JSValue {
@@ -32,7 +32,7 @@ struct AppMessagePayloadTests {
         let context = try #require(JSContext())
         context.evaluateScript("function handleSDKEvent(event) { globalThis.received = event; return 123; }")
         let message = try VS.AppMessage(id: "message-id", payload: [
-            "array": [UnsupportedClass(), NSNull(), ConvertedStruct(), ["value": 42]] as [Any],
+            "array": [UnsupportedClass(), NSNull(), ConvertedStruct(), ["value": 42]] as [any Sendable],
         ])
         let handler = try #require(context.objectForKeyedSubscript("handleSDKEvent"))
         let event = VS.SDKEvent.appMessage(message: message).toJSValue(in: context)

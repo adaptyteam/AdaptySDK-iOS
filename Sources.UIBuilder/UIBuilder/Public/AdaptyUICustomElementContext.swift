@@ -156,7 +156,7 @@ public struct AdaptyUICustomElementContext {
         }
 
         do {
-            return try stateViewModel.stateHolder.state.getValue(
+            return try stateViewModel.stateHolder.current.getValue(
                 type,
                 variable: variable,
                 screenInstance: screen

@@ -16,7 +16,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
     let logId: String
     let stateHolder: AdaptyUIStateHolder
 
-    package var viewConfiguration: VC { stateHolder.state.configuration }
+    package var viewConfiguration: VC { stateHolder.current.configuration }
     package let logic: any AdaptyUIBuilderLogic
 
     private var cancellables = Set<AnyCancellable>()
@@ -55,7 +55,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         self.logic = logic
         self.stateHolder = stateHolder
 
-        stateHolder.state.objectWillChange
+        stateHolder.objectWillChange
             .sink { [weak self] _ in
                 self?.stateRevision &+= 1
                 self?.objectWillChange.send()
@@ -81,7 +81,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     func execute(actions: [VC.Action], params: [String: any VC.Value]? = nil, screen: VS.ScreenInstance) {
         do {
-            try stateHolder.state.execute(actions: actions, params: params, screenInstance: screen)
+            try stateHolder.current.execute(actions: actions, params: params, screenInstance: screen)
         } catch {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
         }
@@ -114,7 +114,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) {
         do {
-            try stateHolder.state.setValue(
+            try stateHolder.current.setValue(
                 variable: variable,
                 value: progress,
                 screenInstance: screen
@@ -130,7 +130,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) {
         do {
-            try stateHolder.state.setValue(
+            try stateHolder.current.setValue(
                 variable: variable,
                 value: Int32(index),
                 screenInstance: screen
@@ -146,7 +146,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) -> T {
         do {
-            let value = try stateHolder.state.getValue(
+            let value = try stateHolder.current.getValue(
                 T.self,
                 variable: variable,
                 screenInstance: screen
@@ -165,7 +165,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) -> String {
         do {
-            let value = try stateHolder.state.getTagValue(
+            let value = try stateHolder.current.getTagValue(
                 variable: variable,
                 screenInstance: screen,
                 converter: converter
@@ -202,7 +202,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
                 guard let self else { return defaultValue }
 
                 do {
-                    let value = try stateHolder.state.getValue(
+                    let value = try stateHolder.current.getValue(
                         T.self,
                         variable: variable,
                         screenInstance: screen
@@ -217,7 +217,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
                 guard let self else { return }
 
                 do {
-                    try stateHolder.state.setValue(
+                    try stateHolder.current.setValue(
                         variable: variable,
                         value: value,
                         screenInstance: screen
