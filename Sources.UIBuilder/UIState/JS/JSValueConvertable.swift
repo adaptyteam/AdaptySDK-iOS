@@ -6,6 +6,7 @@
 //
 
 import AdaptyCodable
+import CoreFoundation
 import Foundation
 import JavaScriptCore
 
@@ -16,6 +17,22 @@ protocol JSValueConvertable {
 extension NSNull: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         .init(nullIn: context)
+    }
+}
+
+extension NSString: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        .init(object: self as String, in: context)
+    }
+}
+
+extension NSNumber: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        if CFGetTypeID(self) == CFBooleanGetTypeID() {
+            .init(bool: boolValue, in: context)
+        } else {
+            .init(double: doubleValue, in: context)
+        }
     }
 }
 
@@ -135,6 +152,5 @@ extension Dictionary: JSValueConvertable where Key == String, Value: JSValueConv
         return object
     }
 }
-
 
 

@@ -142,14 +142,12 @@ public struct AdaptyUICustomElementContext {
 
     // MARK: - Bindings and properties
 
-    /// Current value of the read-only binding declared under `id`, converted
-    /// to the requested type. Unsupported types, missing bindings, JavaScript
-    /// null/undefined and read errors return nil.
-    /// Supported types are Bool, Int32, UInt32, Double and String; values use
-    /// the corresponding JavaScript conversion.
-    ///
-    /// Bindings are read-only here: writing back and executing flow actions are
-    /// not part of this contract.
+    /// Returns the current value of the variable for the key passed to `byKey`,
+    /// converted to the requested type.
+    /// Supported types are Bool, Int32, UInt32, Double, String and arrays of
+    /// these types.
+    /// Returns nil if the value is missing, cannot be converted or an error occurs.
+    /// Errors are written to the log.
     public func variableValue<T>(_: T.Type, byKey id: String) -> T? {
         guard let variable = element.bindings?[id] else { return nil }
         guard let type = T.self as? any JSValueRepresentable.Type else {
@@ -169,20 +167,9 @@ public struct AdaptyUICustomElementContext {
         }
     }
 
-    /// `properties` of the element exactly as the configuration carries them:
-    /// an opaque JSON object the SDK does not interpret.
-    ///
-    /// Values are `Bool`, `Int`, `UInt`, `Double`, `String`, a nested
-    /// `[String: any Sendable]`, an `[any Sendable]`, or `NSNull` for a JSON
-    /// null.
-    ///
-    /// The object is valid JSON, so an app that prefers its own `Decodable`
-    /// type can run it through `JSONSerialization` and `JSONDecoder`.
-    ///
-    /// - Note: A number arrives in the narrowest type that fits it, so `1` is
-    ///   an `Int` even where the app means a `Double`, and a value above
-    ///   `Int.max` is a `UInt`. Casting a single number therefore takes more
-    ///   than one attempt, while decoding coerces it.
+    /// Element properties as defined in Adapty Flow Builder.
+    /// The SDK does not interpret their contents.
+    /// Types and values are compatible with JSON. JSON null is represented as `NSNull`.
     public var properties: [String: any Sendable]? { element.properties }
 
     // MARK: - Messages
