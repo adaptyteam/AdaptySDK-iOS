@@ -3,6 +3,7 @@
 //  AdaptyPlugin
 //
 
+import AdaptyCodable
 import AdaptyUI
 import Foundation
 
@@ -25,7 +26,7 @@ extension FlowViewEvent {
             try container.encode(id, forKey: .id)
             try container.encode(view, forKey: .view)
             try container.encode(name, forKey: .name)
-            try container.encode(params.mapValues(PluginJSONValue.init), forKey: .params)
+            try container.encodeDictionary(params, skipNonEncodableValues: true, forKey: .params)
         }
     }
 }
