@@ -20,7 +20,7 @@ import SwiftUI
 @MainActor
 public struct AdaptyUICustomElementContext {
     // consider adding getSelectedProduct + something
-    
+
     private let element: VC.CustomElement
     private let screen: VS.ScreenInstance
     private let colorScheme: ColorScheme
@@ -125,7 +125,7 @@ public struct AdaptyUICustomElementContext {
 
     /// View rendering the localized string declared under `id` in the `strings`
     /// of the element, keeping its formatting, fonts and locale.
-    public func textView(_ id: String) -> (some View)? { // Todo: consider removing
+    public func textView(_ id: String) -> (some View)? { // TODO: consider removing
         guard let ref = element.strings?[id] else {
             return AdaptyUITextView?.none
         }
@@ -170,17 +170,40 @@ public struct AdaptyUICustomElementContext {
     /// Element properties as defined in Adapty Flow Builder.
     /// The SDK does not interpret their contents.
     /// Types and values are compatible with JSON. JSON null is represented as `NSNull`.
-    public var properties: [String: any Sendable]? { element.properties }
-
+    public var payloadDictionary: [String: any Sendable]? {
+        element.properties
+    }
+    
     // MARK: - Messages
 
     /// Sends a message from this element to the flow.
     ///
-    /// - Warning: Message delivery is not implemented yet. This method only logs the call.
-    public func send(message: some Encodable) {
-        Log.ui.warn(
-            "custom element \(element.type):\(element.id) send(message:) is not implemented yet"
-        )
+    /// The script receives it as an SDK event carrying the screen instance, the
+    /// `custom_id` and `custom_type` of this element and the arguments, and
+    /// decides what to do with it — set a variable, fire flow events, anything
+    /// else.
+    ///
+    /// Arguments cross into JavaScript as JSON: a string and a boolean stay
+    /// themselves, every number becomes a JS number, `nil` and `NSNull` become
+    /// `null`, arrays and nested dictionaries are carried through, and a value
+    /// of any other type becomes `null`.
+    public func sendMessage(_ arguments: [String: any Sendable]) {
+        do {
+            let message = try VS.AppMessage(
+                id: Log.stamp,
+                screenInstance: screen,
+                customElement: element,
+                payload: arguments
+            )
+
+            try stateViewModel.stateHolder.current.send(
+                message: message
+            )
+        } catch {
+            Log.ui.error(
+                "custom element \(element.type):\(element.id) sendMessage error: \(error)"
+            )
+        }
     }
 }
 
