@@ -41,7 +41,7 @@ enum CustomElementTests {
             #expect(custom.assets == nil)
             #expect(custom.strings == nil)
             #expect(custom.bindings == nil)
-            #expect(custom.properties == nil)
+            #expect(custom.payload == nil)
             #expect(properties == nil)
         }
 
@@ -49,6 +49,8 @@ enum CustomElementTests {
         @Test("Custom identity fields are required strings", arguments: [
             ##"{"type":"custom","custom_type":"chart"}"##,
             ##"{"type":"custom","custom_id":"hero"}"##,
+            ##"{"type":"custom","custom_id":null,"custom_type":"chart"}"##,
+            ##"{"type":"custom","custom_id":"hero","custom_type":null}"##,
             ##"{"type":"custom","custom_id":1,"custom_type":"chart"}"##,
             ##"{"type":"custom","custom_id":"hero","custom_type":false}"##,
         ])
@@ -69,7 +71,7 @@ enum CustomElementTests {
               "assets": {},
               "strings": {},
               "bindings": {},
-              "properties": {},
+              "payload": "",
               "opacity": 0.5,
               "focus_id": "hero-focus",
               "ui_enabled": { "var": "state.enabled" }
@@ -79,8 +81,7 @@ enum CustomElementTests {
             #expect(custom.assets?.isEmpty == true)
             #expect(custom.strings?.isEmpty == true)
             #expect(custom.bindings?.isEmpty == true)
-            let customProperties = try #require(custom.properties)
-            #expect(customProperties.isEmpty)
+            #expect(custom.payload == "")
             #expect(properties?.opacity == 0.5)
             #expect(properties?.focusId == "hero-focus")
             #expect(properties?.interactionEnabled?.path == ["state", "enabled"])
@@ -200,65 +201,68 @@ enum CustomElementTests {
             #expect(binding.converter != nil)
         }
 
-        /// Custom elements are decoded with absent and empty properties. The UI configuration preserves the difference between both forms.
-        @Test("Absent properties differs from an empty object")
-        func absentPropertiesDiffersFromEmptyObject() throws {
-            let (absent, _) = try CustomElementTests.custom(content: ##"{"type":"custom","custom_id":"absent","custom_type":"raw"}"##)
-            let (empty, _) = try CustomElementTests.custom(content: ##"{"type":"custom","custom_id":"empty","custom_type":"raw","properties":{}}"##)
+        /// Optional maps are supplied independently as empty objects or null. Other channels remain absent.
+        @Test("Optional maps preserve empty objects and accept null", arguments: ["assets", "strings", "bindings"], ["{}", "null"])
+        func optionalMapsPreserveEmptyObjectsAndAcceptNull(field: String, value: String) throws {
+            let (custom, _) = try CustomElementTests.custom(content: ##"{"type":"custom","custom_id":"hero","custom_type":"chart","\##(field)":\##(value)}"##)
 
-            #expect(absent.properties == nil)
-            let emptyObject = try #require(empty.properties)
-            #expect(emptyObject.isEmpty)
+            #expect(custom.assets?.isEmpty == (field == "assets" && value == "{}" ? true : nil))
+            #expect(custom.strings?.isEmpty == (field == "strings" && value == "{}" ? true : nil))
+            #expect(custom.bindings?.isEmpty == (field == "bindings" && value == "{}" ? true : nil))
+            #expect(custom.payload == nil)
         }
 
-        /// A custom element is decoded with recursive raw JSON properties. Scalar, array, object, and special-looking values remain unchanged.
-        @Test("Properties preserves recursive raw JSON")
-        func propertiesPreservesRecursiveRawJSON() throws {
-            let (custom, _) = try CustomElementTests.custom(content: """
-            {
-              "type": "custom",
-              "custom_id": "raw",
-              "custom_type": "payload",
-              "properties": {
-                "null": null,
-                "boolean": true,
-                "integer": 42,
-                "number": 1.5,
-                "string": "value",
-                "array": [null, false, 2, 3.5, "item"],
-                "special": {
-                  "var": "state.value",
-                  "setter": "setValue",
-                  "string_id": "title",
-                  "product": "product_id",
-                  "func": "submit"
-                }
-              }
+        /// Absent and null payloads decode to nil, while an empty string remains present.
+        @Test("Absent and null payloads differ from an empty string")
+        func absentAndNullPayloadsDifferFromEmptyString() throws {
+            let (absent, _) = try CustomElementTests.custom(content: ##"{"type":"custom","custom_id":"absent","custom_type":"raw"}"##)
+            let (null, _) = try CustomElementTests.custom(content: ##"{"type":"custom","custom_id":"null","custom_type":"raw","payload":null}"##)
+            let (empty, _) = try CustomElementTests.custom(content: ##"{"type":"custom","custom_id":"empty","custom_type":"raw","payload":""}"##)
+
+            #expect(absent.payload == nil)
+            #expect(null.payload == nil)
+            #expect(empty.payload == "")
+        }
+
+        /// Payload strings survive decoding without JSON validation, normalization, or interpretation of UIBuilder-like keys.
+        @Test("Payload preserves arbitrary strings", arguments: [
+            "{}",
+            "[null, false, 2, 3.5, \"item\"]",
+            "null",
+            "true",
+            "42",
+            "1.5",
+            "\"text\"",
+            "not json",
+            "{invalid json",
+            "  Привет 👋\n\tquoted: \"value\"; path: \\file  ",
+            ##"{"null":null,"boolean":true,"integer":42,"number":1.5,"array":[null,{"nested":[]}],"special":{"var":"state.value","setter":"setValue","string_id":"title","product":"product_id","func":"submit"}}"##,
+        ])
+        func payloadPreservesArbitraryStrings(payload: String) throws {
+            let encodedPayload = String(decoding: try JSONEncoder().encode(payload), as: UTF8.self)
+            let (custom, _) = try CustomElementTests.custom(content: ##"{"type":"custom","custom_id":"raw","custom_type":"payload","payload":\##(encodedPayload)}"##)
+
+            #expect(custom.payload == payload)
+            #expect(custom.assets == nil)
+            #expect(custom.strings == nil)
+            #expect(custom.bindings == nil)
+        }
+
+        /// Non-null payloads must be strings on the wire, even when their values are otherwise valid JSON.
+        @Test("Payload rejects non-string values", arguments: ["{}", "[]", "true", "false", "42", "1.5"])
+        func payloadRejectsNonStringValues(value: String) {
+            #expect(throws: (any Error).self) {
+                try CustomElementTests.screen(content: ##"{"type":"custom","custom_id":"hero","custom_type":"chart","payload":\##(value)}"##)
             }
-            """)
+        }
 
-            let object = try #require(custom.properties)
+        /// The removed properties key is not an alias for payload and does not override an explicit payload.
+        @Test("Legacy properties does not populate payload", arguments: [false, true])
+        func legacyPropertiesDoesNotPopulatePayload(hasPayload: Bool) throws {
+            let payloadField = hasPayload ? ##", "payload": "current""## : ""
+            let (custom, _) = try CustomElementTests.custom(content: ##"{"type":"custom","custom_id":"hero","custom_type":"chart","properties":{"value":42}\##(payloadField)}"##)
 
-            #expect(object["null"] is NSNull)
-            #expect(object["boolean"] as? Bool == true)
-            #expect(object["integer"] as? Int == 42)
-            #expect(object["number"] as? Double == 1.5)
-            #expect(object["string"] as? String == "value")
-
-            let array = try #require(object["array"] as? [any Sendable])
-            #expect(array.count == 5)
-            #expect(array[0] is NSNull)
-            #expect(array[1] as? Bool == false)
-            #expect(array[2] as? Int == 2)
-            #expect(array[3] as? Double == 3.5)
-            #expect(array[4] as? String == "item")
-
-            let special = try #require(object["special"] as? [String: any Sendable])
-            #expect(special["var"] as? String == "state.value")
-            #expect(special["setter"] as? String == "setValue")
-            #expect(special["string_id"] as? String == "title")
-            #expect(special["product"] as? String == "product_id")
-            #expect(special["func"] as? String == "submit")
+            #expect(custom.payload == (hasPayload ? "current" : nil))
         }
     }
 }

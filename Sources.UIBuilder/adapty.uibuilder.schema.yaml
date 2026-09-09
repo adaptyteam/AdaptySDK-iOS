@@ -895,18 +895,17 @@ UI:
             custom_id: { type: string }
             custom_type: { type: string }
             assets:
-                type: object
+                type: [object, "null"]
                 additionalProperties: { $ref: "#/AssetIdOrColor/Binding" }
             strings:
-                type: object
+                type: [object, "null"]
                 additionalProperties: { $ref: "#/Localization/StringId/Binding" }
             bindings:
-                type: object
+                type: [object, "null"]
                 additionalProperties: { $ref: "#/Script/DataBinding" }
-            properties:
-                type: object
-                default: {}
-                description: "Custom element properties"
+            payload:
+                type: [string, "null"]
+                description: "Opaque custom element payload. String contents are not validated as JSON."
 
     AlignedElement:
         type: object

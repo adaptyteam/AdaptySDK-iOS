@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AdaptyCodable
 
 extension Schema {
     typealias CustomElement = VC.CustomElement
@@ -29,7 +28,7 @@ extension Schema.CustomElement: Decodable {
         case assets
         case strings
         case bindings
-        case properties
+        case payload
     }
 
     init(from decoder: Decoder) throws {
@@ -40,7 +39,7 @@ extension Schema.CustomElement: Decodable {
             assets: container.decodeIfPresent([String: Schema.AssetReference].self, forKey: .assets),
             strings: container.decodeIfPresent([String: Schema.StringReference].self, forKey: .strings),
             bindings: container.decodeIfPresent([String: Schema.Variable].self, forKey: .bindings),
-            properties: container.decodeDictionaryIfPresent(forKey: .properties)
+            payload: container.decodeIfPresent(String.self, forKey: .payload)
         )
     }
 }

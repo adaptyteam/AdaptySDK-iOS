@@ -13,8 +13,7 @@ extension VC {
         let type: String
         let assets: [String: AssetReference]? 
         let strings: [String: StringReference]?
-        let bindings: [String: Variable]? 
-        let properties: [String: any Sendable]?
-
+        let bindings: [String: Variable]?
+        let payload: String?
     }
 }

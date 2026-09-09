@@ -167,13 +167,15 @@ public struct AdaptyUICustomElementContext {
         }
     }
 
-    /// Element properties as defined in Adapty Flow Builder.
-    /// The SDK does not interpret their contents.
-    /// Types and values are compatible with JSON. JSON null is represented as `NSNull`.
-    public var payloadDictionary: [String: any Sendable]? {
-        element.properties
+    public var payloadJsonString: String? { element.payload }
+    public var payloadJsonData: Data? { element.payload?.data(using: .utf8) }
+    public var payloadDictionary: [String: Any]? {
+        guard let data = payloadJsonData,
+              let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+        else { return nil }
+        return dictionary
     }
-    
+
     // MARK: - Messages
 
     /// Sends a message from this element to the flow.
