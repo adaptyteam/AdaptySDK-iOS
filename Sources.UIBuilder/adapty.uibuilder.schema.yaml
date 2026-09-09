@@ -2036,17 +2036,17 @@ Assets:
                 title: User-defined data format
                 type: string
                 minLength: 1
-        oneOf:
-            - title: Base64 encoded data
-              required: [value]
-              properties:
-                  value: { type: string, contentEncoding: base64 }
-              not: { required: [url] }
-            - title: URL to data
-              required: [url]
-              properties:
-                  url: { type: string, minLength: 1 }
-              not: { required: [value] }
+            value:
+                title: Base64 encoded data
+                type: string
+                contentEncoding: base64
+            url:
+                title: URL to data
+                type: string
+                minLength: 1
+        anyOf:
+            - required: [value]
+            - required: [url]
 
 AssetId:
     title: Asset identifier

@@ -41,7 +41,7 @@ extension Schema.DataAsset: Decodable {
             throw DecodingError.dataCorrupted(
                 .init(
                     codingPath: container.codingPath,
-                    debugDescription: "must contain exactly one of value or url"
+                    debugDescription: "must contain at least one of value or url"
                 )
             )
         }

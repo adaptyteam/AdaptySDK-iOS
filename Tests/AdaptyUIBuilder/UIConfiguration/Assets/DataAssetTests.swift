@@ -42,11 +42,8 @@ enum DataAssetTests {
 
             #expect(asset.customId == "chart")
             #expect(asset.format == "Application/Vnd.Example+Binary;Version=2")
-            guard case let .value(data) = asset.source else {
-                Issue.record("Expected an inline data source")
-                return
-            }
-            #expect(data == Data([0x00, 0x01, 0x02, 0x03, 0x04]))
+            #expect(asset.value == Data([0x00, 0x01, 0x02, 0x03, 0x04]))
+            #expect(asset.url == nil)
         }
 
         /// An explicitly present empty Base64 string is decoded from a UIBuilder configuration. It remains a present source with an empty Data value.
@@ -63,16 +60,13 @@ enum DataAssetTests {
                 """##
             ))
 
-            guard case let .value(data) = asset.source else {
-                Issue.record("Expected an inline data source")
-                return
-            }
-            #expect(data.isEmpty)
+            #expect(asset.value == Data())
+            #expect(asset.url == nil)
         }
 
-        /// A URL data asset is decoded from a UIBuilder configuration. Parsing only preserves the URL source and does not fetch or interpret the resource.
-        @Test("URL data remains an unloaded source")
-        func urlDataRemainsAnUnloadedSource() throws {
+        /// A URL data asset is decoded from a UIBuilder configuration. Its URL and format are preserved without an inline value.
+        @Test("URL data preserves its source and format")
+        func urlDataPreservesSourceAndFormat() throws {
             let asset = try DataAssetTests.dataAsset(Json(
                 ##"""
                 {
@@ -85,11 +79,29 @@ enum DataAssetTests {
             ))
 
             #expect(asset.format == "com.example.scene.v1")
-            guard case let .url(url) = asset.source else {
-                Issue.record("Expected a URL data source")
-                return
-            }
-            #expect(url == URL(string: "https://cdn.example.com/scene.riv"))
+            #expect(asset.value == nil)
+            #expect(asset.url == URL(string: "https://cdn.example.com/scene.riv"))
+        }
+
+        /// Both sources are decoded from one asset. Inline bytes, including an empty payload, coexist with the URL without losing metadata.
+        @Test("Inline data and URL are both preserved", arguments: [
+            Data([0x00, 0x01, 0x02, 0xFE, 0xFF]),
+            Data(),
+        ])
+        func inlineDataAndURLAreBothPreserved(value: Data) throws {
+            let asset = try DataAssetTests.dataAsset(Json(deserilized: [
+                "id": "asset",
+                "type": "data",
+                "custom_id": "animation",
+                "format": "Application/Vnd.Example+Binary;Version=2",
+                "value": value.base64EncodedString(),
+                "url": "https://cdn.example.com/animation.json",
+            ]))
+
+            #expect(asset.value == value)
+            #expect(asset.url == URL(string: "https://cdn.example.com/animation.json"))
+            #expect(asset.customId == "animation")
+            #expect(asset.format == "Application/Vnd.Example+Binary;Version=2")
         }
 
         /// Inline bytes that form a JSON document are decoded from a UIBuilder configuration. They remain bytes and are never converted to VC.AnyValue.
@@ -107,11 +119,8 @@ enum DataAssetTests {
                 """##
             ))
 
-            guard case let .value(data) = asset.source else {
-                Issue.record("Expected an inline data source")
-                return
-            }
-            #expect(data == expected)
+            #expect(asset.value == expected)
+            #expect(asset.url == nil)
         }
     }
 
@@ -127,13 +136,21 @@ enum DataAssetTests {
             Json(##"{"id":"asset","type":"data","format":null,"value":"AA=="}"##),
             Json(##"{"id":"asset","type":"data","format":1,"value":"AA=="}"##),
             Json(##"{"id":"asset","type":"data","format":"com.example.data"}"##),
-            Json(##"{"id":"asset","type":"data","format":"com.example.data","value":"AA==","url":"https://example.com/data"}"##),
             Json(##"{"id":"asset","type":"data","format":"com.example.data","value":null}"##),
             Json(##"{"id":"asset","type":"data","format":"com.example.data","url":null}"##),
             Json(##"{"id":"asset","type":"data","format":"com.example.data","value":42}"##),
             Json(##"{"id":"asset","type":"data","format":"com.example.data","url":42}"##),
             Json(##"{"id":"asset","type":"data","format":"com.example.data","url":""}"##),
+            Json(##"{"id":"asset","type":"data","format":"com.example.data","url":"https://["}"##),
             Json(##"{"id":"asset","type":"data","format":"com.example.data","value":"%%%"}"##),
+            Json(##"{"id":"asset","type":"data","format":"com.example.data","value":"AA==\n"}"##),
+            Json(##"{"id":"asset","type":"data","format":"com.example.data","value":null,"url":"https://example.com/data"}"##),
+            Json(##"{"id":"asset","type":"data","format":"com.example.data","value":42,"url":"https://example.com/data"}"##),
+            Json(##"{"id":"asset","type":"data","format":"com.example.data","value":"%%%","url":"https://example.com/data"}"##),
+            Json(##"{"id":"asset","type":"data","format":"com.example.data","value":"AA==","url":null}"##),
+            Json(##"{"id":"asset","type":"data","format":"com.example.data","value":"AA==","url":42}"##),
+            Json(##"{"id":"asset","type":"data","format":"com.example.data","value":"AA==","url":""}"##),
+            Json(##"{"id":"asset","type":"data","format":"com.example.data","value":"AA==","url":"https://["}"##),
         ])
         func invalidDataAssetsAreRejected(asset: Json) {
             #expect(throws: (any Error).self, "Expected invalid data asset: \(asset)") {
@@ -145,14 +162,21 @@ enum DataAssetTests {
         @Test("Malformed data does not use fallback")
         func malformedDataDoesNotUseFallback() {
             #expect(throws: (any Error).self) {
-                try DataAssetTests.configuration(asset: Json(
+                try DataAssetTests.configuration(assets: Json(
                     ##"""
-                    {
-                      "id": "asset",
-                      "type": "data",
-                      "format": "com.example.data",
-                      "fallback_asset_id": "fallback"
-                    }
+                    [
+                      {
+                        "id": "fallback",
+                        "type": "color",
+                        "value": "#FF0000"
+                      },
+                      {
+                        "id": "asset",
+                        "type": "data",
+                        "format": "com.example.data",
+                        "fallback_asset_id": "fallback"
+                      }
+                    ]
                     """##
                 ))
             }
@@ -202,11 +226,8 @@ enum DataAssetTests {
                 return
             }
             #expect(payload.customId == "custom-payload")
-            guard case let .value(data) = payload.source else {
-                Issue.record("Expected an inline data source")
-                return
-            }
-            #expect(data == Data([0x00, 0x01]))
+            #expect(payload.value == Data([0x00, 0x01]))
+            #expect(payload.url == nil)
         }
 
         /// A configuration contains every existing asset discriminator. Each asset remains recognized after adding the data case.
