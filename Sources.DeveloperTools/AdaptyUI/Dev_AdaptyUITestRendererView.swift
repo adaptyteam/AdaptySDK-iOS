@@ -124,6 +124,14 @@ public extension AdaptyUI {
             stateHolder.start()
             productsViewModel.loadProductsIfNeeded()
         }
+
+        /// Sends a message from the app to the script of the previewed flow.
+        ///
+        /// Mirrors `sendAppMessage(_:)` of a production flow configuration, so
+        /// a devtool can exercise the same channel a host app uses.
+        public func sendAppMessage(_ arguments: [String: any Sendable]) {
+            stateViewModel.sendAppMessage(arguments)
+        }
     }
 }
 
@@ -141,6 +149,7 @@ public struct Dev_AdaptyUIRendererView: View {
     private let didFinishRestore: (String) -> Void
     private let didReceiveError: (AdaptyUIBuilderError) -> Void
     private let didReceiveAnalyticEvent: (String, [String: any Sendable]) -> Void
+    private let didCreateConfiguration: ((AdaptyUI.Dev_GalleryPreviewConfiguration) -> Void)?
 
     private let safeAreaOverride: EdgeInsets?
     private let showDebugOverlay: Bool
@@ -166,7 +175,8 @@ public struct Dev_AdaptyUIRendererView: View {
         didStartRestore: @escaping () -> Void,
         didFinishRestore: @escaping (String) -> Void,
         didReceiveError: @escaping (AdaptyUIBuilderError) -> Void,
-        didReceiveAnalyticEvent: @escaping (String, [String: any Sendable]) -> Void
+        didReceiveAnalyticEvent: @escaping (String, [String: any Sendable]) -> Void,
+        didCreateConfiguration: ((AdaptyUI.Dev_GalleryPreviewConfiguration) -> Void)? = nil
     ) {
         self.safeAreaOverride = safeAreaOverride
         self.showDebugOverlay = showDebugOverlay
@@ -203,6 +213,7 @@ public struct Dev_AdaptyUIRendererView: View {
         self.didFinishRestore = didFinishRestore
         self.didReceiveError = didReceiveError
         self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
+        self.didCreateConfiguration = didCreateConfiguration
     }
 
     public var body: some View {
@@ -246,6 +257,9 @@ public struct Dev_AdaptyUIRendererView: View {
             assetsViewModel: galleryConfiguration.assetsViewModel,
             customElementsViewModel: galleryConfiguration.customElementsViewModel
         )
+        .onAppear { [galleryConfiguration, didCreateConfiguration] in
+            didCreateConfiguration?(galleryConfiguration)
+        }
     }
 }
 
