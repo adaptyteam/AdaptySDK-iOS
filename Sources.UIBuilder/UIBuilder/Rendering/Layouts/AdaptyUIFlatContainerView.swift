@@ -80,6 +80,7 @@ struct AdaptyUIFlatContainerView: View {
                                 screen.content,
                                 screenHolderBuilder: { EmptyView() }
                             )
+                            .withScreenSizeAboveFooter(footerSize.height)
                             .id(ScrollAnchor.contentTop)
                             .frame(maxWidth: .infinity)
 
