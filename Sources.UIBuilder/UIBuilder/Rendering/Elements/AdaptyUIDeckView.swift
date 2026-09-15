@@ -1,0 +1,81 @@
+//
+//  AdaptyUIDeckView.swift
+//  AdaptyUIBuilder
+//
+//  Created by Aleksey Goncharov on 15.09.2026.
+//
+
+#if canImport(UIKit)
+
+import SwiftUI
+
+/// Renders a `Deck`: every child gets its own size and alignment inside one
+/// shared area, layered in configuration order.
+///
+/// The view resolves units and alignment against the environment and hands plain
+/// numbers to `AdaptyUIDeckLayout`, so the layout arithmetic stays independent of
+/// both the environment and the interface direction.
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
+struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
+    @Environment(\.adaptyScreenSize)
+    private var screenSize: CGSize
+    @Environment(\.adaptySafeAreaInsets)
+    private var safeArea: EdgeInsets
+    @Environment(\.layoutDirection)
+    private var layoutDirection: LayoutDirection
+
+    private let deck: VC.Deck
+    private let screenHolderBuilder: () -> ScreenHolderContent
+
+    init(
+        _ deck: VC.Deck,
+        @ViewBuilder screenHolderBuilder: @escaping () -> ScreenHolderContent
+    ) {
+        self.deck = deck
+        self.screenHolderBuilder = screenHolderBuilder
+    }
+
+    var body: some View {
+        AdaptyUIDeckLayout(
+            width: deck.width,
+            height: deck.height,
+            items: deck.items.map(layoutItem)
+        ) {
+            ForEach(0 ..< deck.items.count, id: \.self) { idx in
+                // The wrapper turns the layout's proposal into the item's actual
+                // size; without it a content-sized child would ignore it.
+                AdaptyUIDeckItemLayout {
+                    AdaptyUIElementView(
+                        deck.items[idx].content,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                }
+            }
+        }
+    }
+
+    private func layoutItem(_ item: VC.DeckItem) -> AdaptyUIDeckSolver.Item {
+        .init(
+            width: layoutLength(item.width, .horizontal),
+            height: layoutLength(item.height, .vertical),
+            anchorX: item.horizontalAlignment.anchorFraction(with: layoutDirection),
+            anchorY: item.verticalAlignment.anchorFraction
+        )
+    }
+
+    private func layoutLength(
+        _ length: VC.DeckItem.Length,
+        _ direction: VC.Unit.Direction
+    ) -> AdaptyUIDeckSolver.Length {
+        switch length {
+        case .content:
+            .content
+        case let .fixed(unit):
+            .points(unit.points(direction, screenSize, safeArea).cgFloatValue)
+        case let .parent(factor):
+            .parent(factor.cgFloatValue)
+        }
+    }
+}
+
+#endif

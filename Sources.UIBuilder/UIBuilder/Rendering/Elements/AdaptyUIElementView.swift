@@ -34,8 +34,17 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     play: playAnimations
                 )
                 .rangedFrame(box: box)
-        case .deck:
-            AdaptyUIUnknownElementView(value: "deck")
+        case let .deck(deck, _):
+            // Deck is laid out by a custom SwiftUI `Layout`, which needs iOS 16.
+            // Older versions keep treating the element as unknown.
+            if #available(iOS 16.0, macOS 13.0, *) {
+                AdaptyUIDeckView(
+                    deck,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            } else {
+                AdaptyUIUnknownElementView(value: "deck")
+            }
         case let .stack(stack, _):
             AdaptyUIStackView(
                 stack,
