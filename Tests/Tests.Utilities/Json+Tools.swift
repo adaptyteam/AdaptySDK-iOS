@@ -1,5 +1,5 @@
 //
-//  JSON+Tools.swift
+//  Json+Tools.swift
 //  AdaptyTests
 //
 //  Created by Aleksei Valiano on 07.02.2026.
@@ -10,7 +10,7 @@ import Foundation
 struct Json: Hashable, CustomStringConvertible, CustomDebugStringConvertible {
     let data: Data
 
-    private init(data: Data) {
+    init(data: Data) {
         self.data = data
     }
 

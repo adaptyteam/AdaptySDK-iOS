@@ -79,11 +79,13 @@ enum EnvironmentTests {
 
             let request = try #require(harness.capturedRequest.value)
             let attributes = try encodedAttributes(request)
-            let installationMeta = try #require(attributes["installation_meta"] as? [String: Any])
+            let minimumOSVersion = try #require(
+                attributes.resolve(jsonPath: "/installation_meta/app_minimum_os_version") as? String
+            )
 
             #expect(request.httpMethod == "POST")
             #expect(request.url?.path == "/sdk/analytics/profiles/profile-id")
-            #expect(installationMeta["app_minimum_os_version"] as? String == "15.0")
+            #expect(minimumOSVersion == "15.0")
         }
 
         @Test func updateProfileIncludesEnvironmentMetaWithMinimumOSVersion() async throws {
@@ -101,11 +103,13 @@ enum EnvironmentTests {
 
             let request = try #require(harness.capturedRequest.value)
             let attributes = try encodedAttributes(request)
-            let installationMeta = try #require(attributes["installation_meta"] as? [String: Any])
+            let minimumOSVersion = try #require(
+                attributes.resolve(jsonPath: "/installation_meta/app_minimum_os_version") as? String
+            )
 
             #expect(request.httpMethod == "PATCH")
             #expect(request.url?.path == "/sdk/analytics/profiles/profile-id")
-            #expect(installationMeta["app_minimum_os_version"] as? String == "12.0")
+            #expect(minimumOSVersion == "12.0")
         }
 
         @Test func profileRequestsOmitMissingMinimumOSVersion() async throws {
@@ -164,9 +168,7 @@ enum EnvironmentTests {
 
         private func encodedAttributes(_ request: URLRequest) throws -> [String: Any] {
             let body = try #require(request.httpBody)
-            let root = try #require(JSONSerialization.jsonObject(with: body) as? [String: Any])
-            let data = try #require(root["data"] as? [String: Any])
-            return try #require(data["attributes"] as? [String: Any])
+            return try #require(Json(data: body).deserilized(jsonPath: "/data/attributes") as? [String: Any])
         }
     }
 
@@ -239,8 +241,7 @@ enum EnvironmentTests {
     }
 
     private static func encodedObject(_ value: some Encodable) throws -> [String: Any] {
-        let data = try JSONEncoder().encode(value)
-        return try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        try #require(Json.encode(value).deserilized as? [String: Any])
     }
 }
 #endif

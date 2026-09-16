@@ -50,22 +50,18 @@ final class MockURLProtocol: URLProtocol {
         // Можно добавить или удалить поля
         modified["injectedBy"] = "URLProtocol"
 
-        do {
-            let body = try JSONSerialization.data(withJSONObject: modified, options: [])
-            let headers = ["Content-Type": "application/json; charset=utf-8"]
-            let httpResponse = HTTPURLResponse(
-                url: url,
-                statusCode: 200,
-                httpVersion: "HTTP/1.1",
-                headerFields: headers
-            )!
+        let body = Json(deserilized: modified).data
+        let headers = ["Content-Type": "application/json; charset=utf-8"]
+        let httpResponse = HTTPURLResponse(
+            url: url,
+            statusCode: 200,
+            httpVersion: "HTTP/1.1",
+            headerFields: headers
+        )!
 
-            client?.urlProtocol(self, didReceive: httpResponse, cacheStoragePolicy: .notAllowed)
-            client?.urlProtocol(self, didLoad: body)
-            client?.urlProtocolDidFinishLoading(self)
-        } catch {
-            client?.urlProtocol(self, didFailWithError: error)
-        }
+        client?.urlProtocol(self, didReceive: httpResponse, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: body)
+        client?.urlProtocolDidFinishLoading(self)
     }
 
     override func stopLoading() {

@@ -95,9 +95,8 @@ extension AdaptyCodableTests {
 
         @Test func extractPlacement() throws {
             let data = try JSON.jsonExtract(pointer: "/placements/0/onboarding")
-            let str = try #require(String(data: data, encoding: .utf8))
-            #expect(str.contains("variations"))
-            #expect(str.contains("paywall_a"))
+            let id = try #require(Json(data: data).deserilized(jsonPath: "/variations/0/paywall/id") as? String)
+            #expect(id == "paywall_a")
         }
 
         @Test func extractIfContainsNull() throws {
@@ -123,8 +122,8 @@ extension AdaptyCodableTests {
             let data = try JSON.jsonExtract(
                 pointer: "/placements/0/onboarding/variations/0/paywall/id"
             )
-            let str = try #require(String(data: data, encoding: .utf8))
-            #expect(str.contains("paywall_a"))
+            let id = try #require(Json(data: data).deserilized as? String)
+            #expect(id == "paywall_a")
         }
 
         @Test func extractPaywall() throws {
@@ -470,4 +469,3 @@ extension AdaptyCodableTests {
         }
     }
 }
-

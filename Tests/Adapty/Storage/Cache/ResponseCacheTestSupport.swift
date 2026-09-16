@@ -153,12 +153,12 @@ extension StorageCacheTests {
     static func overwriteMetaSchemaVersion(_ schemaVersion: Int, for key: Cache.ItemKey) throws {
         let original = try Data(contentsOf: key.metaFileURL)
         guard
-            var dict = try JSONSerialization.jsonObject(with: original) as? [String: Any]
+            var dict = try Json(data: original).deserilized as? [String: Any]
         else {
             throw TestDecodeError()
         }
         dict["format"] = schemaVersion
-        let patched = try JSONSerialization.data(withJSONObject: dict, options: [.sortedKeys])
+        let patched = Json(deserilized: dict).data
         try writeRawMeta(patched, for: key)
     }
 
