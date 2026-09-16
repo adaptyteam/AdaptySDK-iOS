@@ -117,6 +117,24 @@ $requests:
         properties:
           success: { const: true }
 
+  ### destroyFlowView ###
+  AdaptyUIDestroyFlowView.Request: #request
+    type: object
+    required: [method, id]
+    properties:
+      method: { const: "adapty_ui_destroy_flow_view" }
+      id: { type: string, description: "View Id" }
+
+  AdaptyUIDestroyFlowView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### presentOnboardingView ###
   AdaptyUIPresentOnboardingView.Request: #request
     type: object

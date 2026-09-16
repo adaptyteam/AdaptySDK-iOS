@@ -195,6 +195,25 @@ package extension AdaptyUI {
 #endif
         }
         
+        package static func destroyFlowView(
+            viewId: String
+        ) async throws {
+#if canImport(UIKit)
+            guard let vc = cachedPaywallController(viewId) else {
+                throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
+            }
+
+            await withCheckedContinuation { continuation in
+                vc.dismiss(animated: true) {
+                    deleteCachedPaywallController(viewId)
+                    continuation.resume()
+                }
+            }
+#else
+            throw AdaptyUIError.platformNotSupported
+#endif
+        }
+        
         package static func showDialog(
             viewId: String,
             configuration: AdaptyUI.DialogConfiguration
