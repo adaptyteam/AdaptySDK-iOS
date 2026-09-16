@@ -76,12 +76,30 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
 
     @State private var contentsSize: CGSize = .zero
 
+    @ViewBuilder
     var body: some View {
-        switch column.height {
-        case .hug:
-            fixedBody
-        case .fill, .legacy:
-            weightedBody
+        if let drawAsStack = column.drawAsStack {
+            stackBody(drawAsStack)
+        } else {
+            switch column.height {
+            case .hug:
+                fixedBody
+            case .fill, .legacy:
+                weightedBody
+            }
+        }
+    }
+
+    /// A native VStack: it hugs its content on both axes and drops the items' weights
+    /// — that is what `draw_as_stack` asks for, so `height` stays unused here.
+    private func stackBody(_ params: VC.StackParams) -> some View {
+        VStack(alignment: params.horizontalAlignment.swiftuiValue(with: layoutDirection), spacing: column.spacing) {
+            ForEach(0 ..< column.items.count, id: \.self) { idx in
+                AdaptyUIElementView(
+                    column.items[idx].content,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            }
         }
     }
 
