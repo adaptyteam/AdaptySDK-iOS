@@ -9,8 +9,11 @@ import Foundation
 
 extension VC {
     struct Row: Sendable {
+        let drawAsStack: StackParams?
         let width: AutoSizeMode
         let spacing: Double
         let items: [GridItem]
     }
 }
+
+

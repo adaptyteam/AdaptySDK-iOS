@@ -9,6 +9,7 @@ import Foundation
 
 extension VC {
     struct Column: Sendable {
+        let drawAsStack: StackParams?
         let height: AutoSizeMode
         let spacing: Double
         let items: [GridItem]

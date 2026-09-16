@@ -21,12 +21,12 @@ extension VC.Flex.Direction {
 extension VC.Flex {
     /// Row mode: main-axis size = `width`, spacing = `horizontalSpacing`.
     var asRow: VC.Row {
-        .init(width: width, spacing: horizontalSpacing, items: items)
+        .init(drawAsStack: nil, width: width, spacing: horizontalSpacing, items: items)
     }
 
     /// Column mode: main-axis size = `height`, spacing = `verticalSpacing`.
     var asColumn: VC.Column {
-        .init(height: height, spacing: verticalSpacing, items: items)
+        .init(drawAsStack: nil, height: height, spacing: verticalSpacing, items: items)
     }
 }
 
