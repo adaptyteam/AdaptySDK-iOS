@@ -203,11 +203,11 @@ package extension AdaptyUI {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
             }
 
-            await withCheckedContinuation { continuation in
-                vc.dismiss(animated: true) {
-                    deleteCachedPaywallController(viewId)
-                    continuation.resume()
-                }
+            deleteCachedPaywallController(viewId)
+
+            if vc.presentingViewController != nil {
+                Log.ui.warn("destroyFlowView: view \(viewId) is still presented, use dismissFlowView(destroy: true) instead")
+                vc.dismiss(animated: false)
             }
 #else
             throw AdaptyUIError.platformNotSupported
