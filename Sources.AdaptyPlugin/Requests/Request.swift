@@ -62,6 +62,7 @@ enum Request {
         #if canImport(UIKit)
         let adaptyUiRequests: [AdaptyPluginRequest.Type] = [
             AdaptyUICreateFlowView.self,
+            AdaptyUIDestroyFlowView.self,
             AdaptyUIDismissFlowView.self,
             AdaptyUIPresentFlowView.self,
 
