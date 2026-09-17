@@ -20,6 +20,7 @@ extension Backend.Request {
     fileprivate static let profileIdHeaderKey = "adapty-sdk-profile-id"
     fileprivate static let sdkVersionHeaderKey = "adapty-sdk-version"
     fileprivate static let sdkPlatformHeaderKey = "adapty-sdk-platform"
+    fileprivate static let sdkOSVersionHeaderKey = "adapty-sdk-os-version"
     fileprivate static let sdkStoreHeaderKey = "adapty-sdk-store"
     fileprivate static let sessionIDHeaderKey = "adapty-sdk-session"
     fileprivate static let appVersionHeaderKey = "adapty-app-version"
@@ -44,6 +45,7 @@ extension Backend.Request {
             authorizationHeaderKey: "Api-Key \(configuration.apiKey)",
             sdkVersionHeaderKey: Adapty.SDKVersion,
             sdkPlatformHeaderKey: environment.system.name,
+            sdkOSVersionHeaderKey: environment.system.version,
             sessionIDHeaderKey: environment.sessionIdentifier,
             appInstallIdHeaderKey: environment.application.installationIdentifier,
         ]
