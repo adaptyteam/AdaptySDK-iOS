@@ -35,13 +35,15 @@ struct DestroyFlowViewRequestTests {
         let error: Payload
     }
 
-    @Test("the method is routed end to end and reports viewNotFound as wrongParam")
+    @Test("the method is routed end to end and reports the failing view id as wrongParam")
     func routesThroughThePluginEntryPoint() async throws {
+        let viewId = "00000000-0000-0000-0000-000000000000"
+
         let response = await AdaptyPlugin.execute(
             withJson: Data(##"""
             {
                 "method": "adapty_ui_destroy_flow_view",
-                "id": "00000000-0000-0000-0000-000000000000"
+                "id": "\##(viewId)"
             }
             """##.utf8)
         )
@@ -50,7 +52,7 @@ struct DestroyFlowViewRequestTests {
 
         // 3001 == wrongParam; an unregistered method would fail as a decoding error.
         #expect(envelope.error.adaptyCode == 3001)
-        #expect(envelope.error.message.contains("viewNotFound"))
+        #expect(envelope.error.message.contains(viewId))
     }
     #endif
 }

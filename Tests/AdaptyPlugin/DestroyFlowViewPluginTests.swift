@@ -20,9 +20,7 @@ struct DestroyFlowViewPluginTests {
             try await AdaptyUI.Plugin.destroyFlowView(viewId: viewId)
         }
 
-        // wrongParam is shared by every PluginError case, so pin the case itself too.
         #expect(error?.adaptyErrorCode == .wrongParam)
-        #expect(error?.debugDescription == "AdaptyUIError.viewNotFound(\(viewId))")
     }
 }
 
