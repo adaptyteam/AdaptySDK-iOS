@@ -570,6 +570,7 @@ $requests:
   ### getPendingStoreMessageTypes ###
   GetPendingStoreMessageTypes.Request: #request
     type: object
+    description: "iOS Only. Requires iOS 16+"
     required: [method]
     properties:
       method: { const: "get_pending_store_message_types" }
@@ -589,6 +590,7 @@ $requests:
   ### showStoreMessage ###
   ShowStoreMessage.Request: #request
     type: object
+    description: "iOS Only. Requires iOS 16+"
     required: [method]
     properties:
       method: { const: "show_store_messages" }
@@ -1302,7 +1304,11 @@ $defs:
       customer_identity_parameters:
         { $ref: "#/$defs/CustomerIdentityParameters" }
       observer_mode: { type: boolean, default: false }
-      store_messages_handling: { $ref: "#/$defs/StoreMessagesHandling" }
+      store_messages_handling:
+        {
+          $ref: "#/$defs/StoreMessagesHandling",
+          description: "iOS Only. Requires iOS 16+",
+        }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
       google_enable_pending_prepaid_plans: { type: boolean, default: false }
