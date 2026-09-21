@@ -101,11 +101,11 @@ $requests:
   ### dismissFlowView ###
   AdaptyUIDismissFlowView.Request: #request
     type: object
-    required: [method, id]
+    required: [method, id, destroy]
     properties:
       method: { const: "adapty_ui_dismiss_flow_view" }
       id: { type: string, description: "View Id" }
-      destroy: { type: boolean, default: false }
+      destroy: { type: boolean, description: "Release the view after it is dismissed" }
 
   AdaptyUIDismissFlowView.Response: #response
     type: object
