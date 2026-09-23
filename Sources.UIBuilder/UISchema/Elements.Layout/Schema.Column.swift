@@ -9,7 +9,6 @@ import Foundation
 
 extension Schema {
     struct Column: Sendable {
-        let drawAsStack: StackParams?
         let height: AutoSizeMode
         let spacing: Double
         let items: [GridItem]
@@ -32,7 +31,6 @@ extension Schema.Column: Schema.CompositeElement {
     ) throws(Schema.Error) -> VC.Element {
         try .column(
             .init(
-                drawAsStack: drawAsStack,
                 height: height,
                 spacing: spacing,
                 items: builder.convertGridItems(items, elementIndices.pop(items.count))
@@ -47,7 +45,6 @@ extension Schema.Column: DecodableWithConfiguration {
         case height
         case spacing
         case items
-        case drawAsStack = "draw_as_stack"
     }
 
     init(from decoder: Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
@@ -61,7 +58,6 @@ extension Schema.Column: DecodableWithConfiguration {
             }
 
         try self.init(
-            drawAsStack: container.decodeIfPresent(Schema.StackParams.self, forKey: .drawAsStack),
             height: size,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
             items: container.decode([Schema.GridItem].self, forKey: .items, configuration: configuration)

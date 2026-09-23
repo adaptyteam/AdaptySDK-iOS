@@ -17,9 +17,4 @@ extension VC {
     }
 }
 
-extension VC {
-    struct StackParams: Sendable {
-        let horizontalAlignment: HorizontalAlignment
-        let verticalAlignment: VerticalAlignment
-    }
-}
+

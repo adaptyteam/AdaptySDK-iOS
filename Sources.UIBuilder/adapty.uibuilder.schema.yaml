@@ -1,13 +1,13 @@
 # yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/uibuilder/5.1.1/schema"
+$id: "https://adapty.io/uibuilder/5.1.0/schema"
 title: "AdaptyUI Configuration"
 type: object
 required: [format, screens, scripts]
 properties:
     format:
         type: string
-        const: "5.1.1"
+        const: "5.1.0"
     assets:
         title: "Default assets"
         $ref: "#/Assets"
@@ -1330,19 +1330,11 @@ UI:
                 content: { $ref: "#/UI/Element" }
             unevaluatedProperties: false
 
-    StackParams:
-        type: object
-        properties:
-            h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
-            v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
-        unevaluatedProperties: false
-
     Row:
         type: object
         required: [type, items]
         properties:
             type: { const: row }
-            draw_as_stack: { $ref: "#/UI/StackParams" }
             width: { $ref: "#/Entities/AutoSizeMode", default: fill }
             spacing: { type: number, default: 0 }
             items:
@@ -1355,7 +1347,6 @@ UI:
         required: [type, items]
         properties:
             type: { const: column }
-            draw_as_stack: { $ref: "#/UI/StackParams" }
             height: { $ref: "#/Entities/AutoSizeMode", default: fill }
             spacing: { type: number, default: 0 }
             items:

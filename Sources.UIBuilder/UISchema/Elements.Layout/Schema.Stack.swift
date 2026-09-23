@@ -15,8 +15,6 @@ extension Schema {
         let spacing: Double
         let items: [Item]
     }
-
-    typealias StackParams = VC.StackParams
 }
 
 extension Schema.Stack {
@@ -101,18 +99,6 @@ extension Schema.Stack: DecodableWithConfiguration {
                 ?? Self.default.verticalAlignment,
             spacing: container.decodeIfPresent(Double.self, forKey: .spacing) ?? 0,
             items: container.decode([Item].self, forKey: .content, configuration: configuration)
-        )
-    }
-}
-
-extension Schema.StackParams: Decodable {
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: Schema.Stack.CodingKeys.self)
-        try self.init(
-            horizontalAlignment: container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlignment)
-                ??  Schema.Stack.default.horizontalAlignment,
-            verticalAlignment: container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment)
-                ??  Schema.Stack.default.verticalAlignment
         )
     }
 }
