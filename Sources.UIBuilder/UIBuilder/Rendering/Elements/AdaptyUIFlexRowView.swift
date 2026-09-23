@@ -78,30 +78,12 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
 
     @State private var measuredSize: CGSize = .zero
 
-    @ViewBuilder
     var body: some View {
-        if let drawAsStack = row.drawAsStack {
-            stackBody(drawAsStack)
-        } else {
-            switch row.width {
-            case .hug:
-                fixedBody
-            case .fill, .legacy:
-                weightedBody
-            }
-        }
-    }
-
-    /// A native HStack: it hugs its content on both axes and drops the items' weights
-    /// — that is what `draw_as_stack` asks for, so `width` stays unused here.
-    private func stackBody(_ params: VC.StackParams) -> some View {
-        HStack(alignment: params.verticalAlignment.swiftuiValue, spacing: row.spacing) {
-            ForEach(0 ..< row.items.count, id: \.self) { idx in
-                AdaptyUIElementView(
-                    row.items[idx].content,
-                    screenHolderBuilder: screenHolderBuilder
-                )
-            }
+        switch row.width {
+        case .hug:
+            fixedBody
+        case .fill, .legacy:
+            weightedBody
         }
     }
 
