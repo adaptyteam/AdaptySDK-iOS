@@ -35,7 +35,8 @@ package final class AdaptyUITimerViewModel: ObservableObject {
 
     private static var globalTimers = [String: Date]()
     private var timers = [String: Date]()
-    private var firedElementActionIds = Set<String>()
+    /// timer id -> instance ids of the screens whose Timer element already ran its action for the current run
+    private var firedElementActionScreens = [String: Set<String>]()
 
     private let timerResolver: AdaptyUITimerResolver
 
@@ -67,7 +68,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
     func setEndDate(id: String, date: Date, callback: VS.JSAction?) {
         Log.ui.verbose("#\(logId)# setTimer id: \(id), endAt: \(date)")
         timers[id] = date
-        firedElementActionIds.remove(id)
+        firedElementActionScreens.removeValue(forKey: id)
         if let callback { timerCallbacks[id] = callback }
         objectWillChange.send()
         startCentralTimerIfNeeded()
@@ -75,7 +76,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
 
     func setDuration(id: String, duration: TimeInterval, behavior: VS.SetTimerBehavior, callback: VS.JSAction?) {
         Log.ui.verbose("#\(logId)# setTimer id: \(id), duration: \(duration), behavior: \(behavior)")
-        firedElementActionIds.remove(id)
+        firedElementActionScreens.removeValue(forKey: id)
         if let callback { timerCallbacks[id] = callback }
         startCentralTimerIfNeeded()
 
@@ -128,7 +129,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
 
         let timeLeft = max(0.0, timerEndAt.timeIntervalSince1970 - Date().timeIntervalSince1970)
 
-        if timeLeft <= 0.0, firedElementActionIds.insert(timer.id).inserted {
+        if timeLeft <= 0.0, firedElementActionScreens[timer.id, default: []].insert(screen.id).inserted {
             stateViewModel.execute(actions: timer.actions, screen: screen)
         }
 
@@ -151,7 +152,7 @@ package final class AdaptyUITimerViewModel: ObservableObject {
         stopCentralTimer()
         timers.removeAll()
         timerCallbacks.removeAll()
-        firedElementActionIds.removeAll()
+        firedElementActionScreens.removeAll()
         objectWillChange.send()
     }
 
