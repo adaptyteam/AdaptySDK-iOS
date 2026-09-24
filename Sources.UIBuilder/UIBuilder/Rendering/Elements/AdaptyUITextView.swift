@@ -45,9 +45,9 @@ struct AdaptyUITextView: View {
             screen: screen
         ).asFontAsset
 
-        let lineSpacing: CGFloat? = (text.defaultTextAttributes?.lineHeight ?? defaultFontAsset?.defaultLineHeight).map { lineHeight in
-            CGFloat(lineHeight) - (defaultFontAsset?.font.lineHeight ?? 0)
-        }
+        let baseFont = defaultFontAsset?.font ?? .adaptyDefaultFont
+        let font = text.defaultTextAttributes?.size.map { baseFont.withSize(CGFloat($0)) } ?? baseFont
+        let lineHeight = (text.defaultTextAttributes?.lineHeight ?? defaultFontAsset?.defaultLineHeight).map { CGFloat($0) }
 
         switch productInfo {
         case .notApplicable:
@@ -67,7 +67,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
-                .applyLineSpacing(lineSpacing)
+                .lineHeightMultiple(lineHeight, font: font)
         case .notFound:
             richText
                 .convertToSwiftUIText(
@@ -86,7 +86,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
-                .applyLineSpacing(lineSpacing)
+                .lineHeightMultiple(lineHeight, font: font)
                 .redacted(reason: .placeholder)
         case let .found(productInfoModel):
             richText
@@ -105,7 +105,7 @@ struct AdaptyUITextView: View {
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
                 .minimumScaleFactor(text.overflowMode.contains(.scale) ? 0.1 : 1.0)
-                .applyLineSpacing(lineSpacing)
+                .lineHeightMultiple(lineHeight, font: font)
         }
     }
 }
@@ -300,17 +300,6 @@ extension VC.RichText {
             }
 
             return result
-        }
-    }
-}
-
-extension View {
-    @ViewBuilder
-    func applyLineSpacing(_ lineSpacing: CGFloat?) -> some View {
-        if let lineSpacing {
-            self.lineSpacing(lineSpacing)
-        } else {
-            self
         }
     }
 }
