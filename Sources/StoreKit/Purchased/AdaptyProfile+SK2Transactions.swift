@@ -62,7 +62,12 @@ extension AdaptyProfile {
                     case (nil, nil):
                         needSetNewValue = !oldValue.isActive && newValue.isActive
                     case let (oldExpiresAt?, newExpiresAt?):
-                        needSetNewValue = oldExpiresAt < newExpiresAt
+                        needSetNewValue =
+                            if oldExpiresAt == newExpiresAt {
+                                newValue.hasPreferredRenewalInfo(than: oldValue)
+                            } else {
+                                oldExpiresAt < newExpiresAt
+                            }
                     }
                 }
             }
@@ -74,5 +79,17 @@ extension AdaptyProfile {
 
         profile.accessLevels = resultAcessLevels
         return profile
+    }
+}
+
+private extension AdaptyProfile.AccessLevel {
+
+    func hasPreferredRenewalInfo(than other: AdaptyProfile.AccessLevel) -> Bool {
+        switch (renewalInfoSignedAt, other.renewalInfoSignedAt) {
+        case (.some, .none): false
+        case (.none, .some): true
+        case (.none, .none): false
+        case let (at?, otherAt?): at > otherAt
+        }
     }
 }

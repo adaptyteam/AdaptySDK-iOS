@@ -8,7 +8,7 @@
 import Adapty
 import Foundation
 
-extension AdaptySubscriptionOffer: Encodable {
+extension AdaptySubscriptionOffer: EncodableWithConfiguration {
     enum CodingKeys: String, CodingKey {
         case offerIdentifier = "offer_identifier"
         case phases
@@ -23,12 +23,12 @@ extension AdaptySubscriptionOffer: Encodable {
         case localizedNumberOfPeriods = "localized_number_of_periods"
     }
 
-    public func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder, configuration: AdaptyProductEncodingConfiguration ) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.offerIdentifier, forKey: .offerIdentifier)
         var phases = container.nestedUnkeyedContainer(forKey: .phases)
         var phase = phases.nestedContainer(keyedBy: PhaseCodingKeys.self)
-        try phase.encode(Price(from: self), forKey: .price)
+        try phase.encode(Price(from: self), forKey: .price, configuration: configuration.price)
         try phase.encode(numberOfPeriods, forKey: .numberOfPeriods)
         try phase.encode(paymentMode, forKey: .paymentMode)
         try phase.encode(subscriptionPeriod, forKey: .subscriptionPeriod)

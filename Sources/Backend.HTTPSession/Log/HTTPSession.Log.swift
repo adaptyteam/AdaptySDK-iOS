@@ -32,18 +32,18 @@ extension Log {
         if case let .network(_, _, _, error: originalError) = error,
            originalError.isNetworkConnectionError
         {
-            log.verbose("NO CONNECTION <-- \(error.endpoint.method) \(error.endpoint.pathAsLogString(request.url)) [\(stamp)] -- \(error)\(error.metrics?.debugDescription ?? "")")
+            log.verbose("NO CONNECTION <-- \(error.endpoint.method) \(error.endpoint.pathAsLogString(request.url)) [\(stamp)] -- \(error)\(error.metrics?.debugDescription, default: "")")
         } else if error.isCancelled {
-            log.verbose("CANCELED <-- \(error.endpoint.method) \(error.endpoint.pathAsLogString(request.url)) [\(stamp)]\(error.metrics?.debugDescription ?? "")")
+            log.verbose("CANCELED <-- \(error.endpoint.method) \(error.endpoint.pathAsLogString(request.url)) [\(stamp)]\(error.metrics?.debugDescription, default: "")")
         } else {
-            log.error("ERROR <-- \(error.endpoint.method) \(error.endpoint.pathAsLogString(request.url)) [\(stamp)] -- \(error)\(error.metrics?.debugDescription ?? "")\((Log.isLevel(.verbose) ? response : nil)?.asLogString ?? "")")
+            log.error("ERROR <-- \(error.endpoint.method) \(error.endpoint.pathAsLogString(request.url)) [\(stamp)] -- \(error)\(error.metrics?.debugDescription, default: "")\((Log.isLevel(.verbose) ? response : nil)?.asLogString, default: "")")
         }
     }
 
     static func response(_ response: HTTPDataResponse, request: URLRequest, stamp: String) {
         guard Log.isLevel(.verbose) else { return }
 
-        log.verbose("\(response.statusCode) <-- \(response.endpoint.method) \(response.endpoint.pathAsLogString(request.url)) [\(stamp)]\(response.metrics?.debugDescription ?? "")\(response.asLogString)")
+        log.verbose("\(response.statusCode) <-- \(response.endpoint.method) \(response.endpoint.pathAsLogString(request.url)) [\(stamp)]\(response.metrics?.debugDescription, default: "")\(response.asLogString)")
     }
 }
 

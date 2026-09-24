@@ -9,7 +9,7 @@ import StoreKit
 
 @available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *)
 extension StoreKit.Transaction.Offer.PaymentMode {
-    var asPaymentMode: AdaptySubscriptionOffer.PaymentMode {
+    var asAdaptySubscriptionOfferPaymentMode: AdaptySubscriptionOffer.PaymentMode {
         switch self {
         case .payAsYouGo: .payAsYouGo
         case .payUpFront: .payUpFront

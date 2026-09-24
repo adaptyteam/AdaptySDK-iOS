@@ -9,7 +9,7 @@ import StoreKit
 
 extension StoreKit.Product.SubscriptionOffer {
     var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier {
-        .init(offerId: id, offerType: type.asSubscriptionOfferType)
+        .init(offerId: id, offerType: type.asAdaptySubscriptionOfferType)
     }
 
     fileprivate func asAdaptySubscriptionOffer(
@@ -25,7 +25,7 @@ extension StoreKit.Product.SubscriptionOffer {
             offerIdentifier: subscriptionOfferIdentifier,
             subscriptionPeriod: period,
             numberOfPeriods: periodCount,
-            paymentMode: paymentMode.asPaymentMode,
+            paymentMode: paymentMode.asAdaptySubscriptionOfferPaymentMode,
             localizedSubscriptionPeriod: periodLocale.localized(period: period),
             localizedNumberOfPeriods: periodLocale.localized(period: period, numberOfPeriods: periodCount)
         )
@@ -33,8 +33,11 @@ extension StoreKit.Product.SubscriptionOffer {
 }
 
 extension StoreKit.Product {
-    func adaptySubscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> AdaptySubscriptionOffer? {
-        guard let offer: SubscriptionOffer = subscriptionOffer(by: offerIdentifier) else { return nil }
+    func adaptySubscriptionOffer(
+        by offerIdentifier: AdaptySubscriptionOffer.Identifier,
+        billingPlan: AdaptySubscriptionBillingPlan
+    ) -> AdaptySubscriptionOffer? {
+        guard let offer = subscription?.offer(by: offerIdentifier, for: billingPlan) else { return nil }
         return offer.asAdaptySubscriptionOffer(
             priceFormatStyle: priceFormatStyle,
             subscriptionPeriodFormatStyle: subscriptionPeriodFormatStyle

@@ -13,14 +13,13 @@ extension AdaptyFlowPaywall {
         let flowProductId: String?
         let adaptyProductId: String
         let productInfo: BackendProductInfo
-        let promotionalOfferId: String?
-        let winBackOfferId: String?
+        let pricingTerms: [ProducPricingTerms]
     }
 }
 
 extension AdaptyFlowPaywall.ProductReference: CustomStringConvertible {
     var description: String {
-        "(vendorId: \(productInfo.vendorId), adaptyProductId: \(adaptyProductId), promotionalOfferId: \(promotionalOfferId ?? "nil")))"
+        "(vendorId: \(productInfo.vendorId), adaptyProductId: \(adaptyProductId), pricingTerms: \(pricingTerms)))"
     }
 }
 
@@ -29,17 +28,20 @@ extension AdaptyFlowPaywall.ProductReference: Encodable {
         case flowProductId = "flow_product_id"
         case vendorId = "vendor_product_id"
         case adaptyProductId = "adapty_product_id"
+        case accessLevelId = "access_level_id"
+        case backendProductPeriod = "product_type"
+        case pricingTerms = "pricing_terms"
+
+        // legacy properties:
+        case billingPlan = "billing_plan_id"
         case promotionalOfferEligibility = "promotional_offer_eligibility"
         case promotionalOfferId = "promotional_offer_id"
         case winBackOfferId = "win_back_offer_id"
-        case accessLevelId = "access_level_id"
-        case backendProductPeriod = "product_type"
     }
 
     init(from container: KeyedDecodingContainer<CodingKeys>, index: Int) throws {
         flowProductId = try container.decodeIfPresent(String.self, forKey: .flowProductId)
         paywallProductIndex = index
-        winBackOfferId = try container.decodeIfPresent(String.self, forKey: .winBackOfferId)
         adaptyProductId = try container.decode(String.self, forKey: .adaptyProductId)
         productInfo = try BackendProductInfo(
             vendorId: container.decode(String.self, forKey: .vendorId),
@@ -47,12 +49,11 @@ extension AdaptyFlowPaywall.ProductReference: Encodable {
             period: container.decode(BackendProductInfo.Period.self, forKey: .backendProductPeriod)
         )
 
-        let promotionalOfferEligibility = try container.decodeIfPresent(Bool.self, forKey: .promotionalOfferEligibility) ?? true
-        promotionalOfferId =
-            if promotionalOfferEligibility {
-                try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
+        pricingTerms =
+            if container.exist(.pricingTerms) {
+                 try container.decode([AdaptyFlowPaywall.ProducPricingTerms].self, forKey: .pricingTerms)
             } else {
-                nil
+                try AdaptyFlowPaywall.ProducPricingTerms.legacyDecoding(from: container)
             }
     }
 
@@ -61,9 +62,30 @@ extension AdaptyFlowPaywall.ProductReference: Encodable {
         try container.encodeIfPresent(flowProductId, forKey: .flowProductId)
         try container.encode(productInfo.vendorId, forKey: .vendorId)
         try container.encode(adaptyProductId, forKey: .adaptyProductId)
-        try container.encodeIfPresent(promotionalOfferId, forKey: .promotionalOfferId)
-        try container.encodeIfPresent(winBackOfferId, forKey: .winBackOfferId)
         try container.encode(productInfo.accessLevelId, forKey: .accessLevelId)
         try container.encode(productInfo.period, forKey: .backendProductPeriod)
+        if pricingTerms.isNotEmpty {
+            try container.encode(pricingTerms, forKey: .pricingTerms)
+        }
+    }
+}
+
+private extension AdaptyFlowPaywall.ProducPricingTerms {
+    static func legacyDecoding(from container: KeyedDecodingContainer<AdaptyFlowPaywall.ProductReference.CodingKeys>) throws -> [Self] {
+        let promotionalOfferEligibility = try container.decodeIfPresent(Bool.self, forKey: .promotionalOfferEligibility) ?? true
+        let promotionalOfferId: String? =
+            if promotionalOfferEligibility {
+                try container.decodeIfPresent(String.self, forKey: .promotionalOfferId)
+            } else {
+                nil
+            }
+
+        let item = Self(
+            billingPlan: try container.decodeIfPresent(AdaptySubscriptionBillingPlan.self, forKey: .billingPlan) ?? .upFront,
+            promotionalOfferId: promotionalOfferId,
+            winBackOfferId: try container.decodeIfPresent(String.self, forKey: .winBackOfferId)
+        )
+
+        return if item != .default  { [item] } else { [] }
     }
 }

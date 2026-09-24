@@ -44,20 +44,8 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
         case vendorProductId = "vendor_product_id"
         case persistentPaywallVariationId = "variation_id_persistent"
         case persistentOnboardingVariationId = "onboarding_variation_id"
-        case originalPrice = "original_price"
-        case discountPrice = "discount_price"
-        case priceLocale = "price_locale"
-        case storeCountry = "store_country"
-        case promotionalOfferId = "promotional_offer_id"
-        case subscriptionOffer = "offer"
+        case billingPlan = "billing_plan_id"
         case environment
-    }
-
-    enum SubscriptionOfferKeys: String, CodingKey {
-        case periodUnit = "period_unit"
-        case periodNumberOfUnits = "number_of_units"
-        case paymentMode = "type"
-        case offerType = "category"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -77,23 +65,15 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
             try container.encode(transactionId, forKey: .originalTransactionId)
             try container.encode(transactionId, forKey: .transactionId)
             try container.encodeIfPresent(variationId, forKey: .paywallVariationId)
-        case let .other(info, payload, reason):
+        case let .validate(info, payload, reason):
             try container.encode(userId.profileId, forKey: .profileId)
             try container.encode(reason.rawString, forKey: .requestSource)
             try container.encode(String(info.transactionId), forKey: .transactionId)
             try container.encode(String(info.originalTransactionId), forKey: .originalTransactionId)
             try container.encode(info.vendorProductId, forKey: .vendorProductId)
-            try container.encodeIfPresent(info.price, forKey: .originalPrice)
-            try container.encodeIfPresent(info.subscriptionOffer?.price, forKey: .discountPrice)
-            try container.encodeIfPresent(info.priceLocale, forKey: .priceLocale)
-            try container.encodeIfPresent(info.storeCountry, forKey: .storeCountry)
-            try container.encodeIfPresent(info.subscriptionOffer?.id, forKey: .promotionalOfferId)
-            if let offer = info.subscriptionOffer {
-                var offerContainer = container.nestedContainer(keyedBy: SubscriptionOfferKeys.self, forKey: .subscriptionOffer)
-                try offerContainer.encode(offer.paymentMode, forKey: .paymentMode)
-                try offerContainer.encodeIfPresent(offer.period?.unit, forKey: .periodUnit)
-                try offerContainer.encodeIfPresent(offer.period?.numberOfUnits, forKey: .periodNumberOfUnits)
-                try offerContainer.encode(offer.offerType.stringValue, forKey: .offerType)
+
+            if let billingPlan = info.billingPlan, billingPlan != .upFront {
+                try container.encode(billingPlan, forKey: .billingPlan)
             }
             try container.encode(info.environment, forKey: .environment)
 
@@ -106,7 +86,7 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
     enum RequestSource: Sendable {
         case restore(originalTransactionId: UInt64)
         case report(transactionId: String, variationId: String?)
-        case other(PurchasedTransactionInfo, PurchasePayload, reason: Adapty.ValidatePurchaseReason)
+        case validate(PurchasedTransactionInfo, PurchasePayload, reason: Adapty.ValidatePurchaseReason)
     }
 }
 
@@ -169,7 +149,7 @@ extension Backend.MainExecutor {
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             userId: payload.userId,
-            requestSource: .other(transactionInfo, payload, reason: reason),
+            requestSource: .validate(transactionInfo, payload, reason: reason),
             logParams: [
                 "product_id": transactionInfo.vendorProductId,
                 "original_transaction_id": transactionInfo.originalTransactionId,
@@ -177,7 +157,7 @@ extension Backend.MainExecutor {
                 "variation_id": payload.paywallVariationId,
                 "variation_id_persistent": payload.persistentPaywallVariationId,
                 "onboarding_variation_id": payload.persistentOnboardingVariationId,
-                "promotional_offer_id": transactionInfo.subscriptionOffer?.id,
+                "billing_plan_id": transactionInfo.billingPlan,
                 "environment": transactionInfo.environment,
                 "request_source": reason.rawString,
             ]

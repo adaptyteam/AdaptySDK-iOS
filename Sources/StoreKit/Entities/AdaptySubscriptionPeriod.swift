@@ -14,17 +14,22 @@ public struct AdaptySubscriptionPeriod: Sendable, Hashable {
     /// A number of period units.
     public let numberOfUnits: Int
 
-    init(unit: Unit, numberOfUnits: Int) {
+    init(_ numberOfUnits: Int, _ unit: Unit) {
+        self.unit = unit
+        self.numberOfUnits = numberOfUnits
+    }
+
+}
+
+public extension AdaptySubscriptionPeriod {
+    var normalize: AdaptySubscriptionPeriod {
         switch unit {
         case .day where numberOfUnits.isMultiple(of: 7):
-            self.numberOfUnits = numberOfUnits / 7
-            self.unit = .week
+            .init(numberOfUnits / 7, .week)
         case .month where numberOfUnits.isMultiple(of: 12):
-            self.numberOfUnits = numberOfUnits / 12
-            self.unit = .year
+            .init(numberOfUnits / 12, .year)
         default:
-            self.numberOfUnits = numberOfUnits
-            self.unit = unit
+            self
         }
     }
 }
@@ -44,8 +49,8 @@ extension AdaptySubscriptionPeriod: Codable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         try self.init(
-            unit: container.decode(Unit.self, forKey: .unit),
-            numberOfUnits: container.decode(Int.self, forKey: .numberOfUnits)
+            container.decode(Int.self, forKey: .numberOfUnits),
+            container.decode(Unit.self, forKey: .unit)
         )
     }
 }

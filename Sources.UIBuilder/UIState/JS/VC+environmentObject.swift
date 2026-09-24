@@ -28,6 +28,7 @@ extension VS {
 
         case placementId
         case placementVariationId
+        case placementVariationName
         case placementName
         case placementABTestName
     }
@@ -64,6 +65,7 @@ extension VC {
         case .userUses24HourClock: environment.userUses24HourClock
         case .placementId: environment.flow.placementId
         case .placementVariationId: environment.flow.variationId
+        case .placementVariationName: environment.flow.variationName
         case .placementABTestName: environment.flow.abTestName
         case .placementName: environment.flow.name
         }

@@ -38,15 +38,15 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
     public let price: Decimal
 
     /// The currency code of the locale used to format the price of the product.
-    public let currencyCode: String?
+    public let currencyCode: String
 
     /// A formatted price of a discount for a user's locale.
-    public var localizedPrice: String?
+    public let localizedPrice: String
 
     init(
         price: Decimal,
-        currencyCode: String?,
-        localizedPrice: String?,
+        currencyCode: String,
+        localizedPrice: String,
         offerIdentifier: Identifier,
         subscriptionPeriod: AdaptySubscriptionPeriod,
         numberOfPeriods: Int,
@@ -69,7 +69,7 @@ public struct AdaptySubscriptionOffer: Sendable, Hashable {
 extension AdaptySubscriptionOffer: CustomStringConvertible {
     public var description: String {
         "(price: \(price)"
-            + (localizedPrice.map { ", localizedPrice: \($0)" } ?? "")
+            + ", localizedPrice: \(localizedPrice)"
             + ", type: \(offerType)"
             + (identifier.map { ", identifier: \($0)" } ?? "")
             + ", subscriptionPeriod: \(subscriptionPeriod), numberOfPeriods: \(numberOfPeriods), paymentMode: \(paymentMode)"

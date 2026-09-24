@@ -24,7 +24,7 @@ final class BackendProductInfoStorage {
 
     private static var allProductInfo: [String: BackendProductInfo]? = {
         do {
-            return try userDefaults.getJSON([BackendProductInfo].self, forKey: Constants.productInfoStorageKey)?.asProductInfoByVendorId
+            return try userDefaults.getJSON([BackendProductInfo].self, forKey: Constants.productInfoStorageKey)?.asBackendProductInfoByVendorId
         } catch {
             log.warn(error.localizedDescription)
             return nil
@@ -47,7 +47,7 @@ final class BackendProductInfoStorage {
     func set(allProductInfo: [BackendProductInfo]) {
         do {
             try Self.userDefaults.setJSON(allProductInfo, forKey: Constants.productInfoStorageKey)
-            Self.allProductInfo = allProductInfo.asProductInfoByVendorId
+            Self.allProductInfo = allProductInfo.asBackendProductInfoByVendorId
             log.debug("Saving products info success.")
         } catch {
             log.error("Saving products info fail. \(error.localizedDescription)")
@@ -78,7 +78,7 @@ final class BackendProductInfoStorage {
 }
 
 extension Sequence<BackendProductInfo> {
-    var asProductInfoByVendorId: [String: BackendProductInfo] {
+    var asBackendProductInfoByVendorId: [String: BackendProductInfo] {
         Dictionary(map { ($0.vendorId, $0) }, uniquingKeysWith: { _, second in
             second
         })

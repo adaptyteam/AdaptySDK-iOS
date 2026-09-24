@@ -66,7 +66,7 @@ final class CrossPlacementStorage {
         let oldValue = statesByProfileId[userId.profileId]
         guard newValue.isNewerThan(oldValue) else { return false }
 
-        log.verbose("update crossPlacementState \(userId) to version = \(newValue.version), newValue = \(newValue.variationIdByPlacements), oldValue = \(oldValue?.variationIdByPlacements.description ?? "DISABLED")")
+        log.verbose("update crossPlacementState \(userId) to version = \(newValue.version), newValue = \(newValue.variationIdByPlacements), oldValue = \(oldValue?.variationIdByPlacements.description, default: "DISABLED")")
 
         save(crossPlacementState: newValue, for: userId)
         return true

@@ -30,11 +30,12 @@ extension Request {
             if let paywall {
                 url = try await Adapty.createWebPaywallUrl(for: paywall)
             } else if let pluginProduct = product {
-                let product = try await Adapty.getPaywallProduct(
+                let product = try await Adapty.restorePaywallProduct(
                     flowProductId: pluginProduct.flowProductId,
                     adaptyProductId: pluginProduct.adaptyProductId,
                     productInfo: pluginProduct.productInfo,
                     paywallProductIndex: pluginProduct.paywallProductIndex,
+                    billingPlan: pluginProduct.billingPlan,
                     subscriptionOfferIdentifier: pluginProduct.subscriptionOfferIdentifier,
                     variationId: pluginProduct.variationId,
                     paywallABTestName: pluginProduct.paywallABTestName,

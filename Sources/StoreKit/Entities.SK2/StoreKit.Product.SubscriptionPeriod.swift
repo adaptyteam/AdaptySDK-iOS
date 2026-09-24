@@ -9,6 +9,6 @@ import StoreKit
 
 extension StoreKit.Product.SubscriptionPeriod {
     var asAdaptySubscriptionPeriod: AdaptySubscriptionPeriod {
-        .init(unit: unit.asAdaptySubscriptionPeriodUnit, numberOfUnits: value)
+        .init(value, unit.asAdaptySubscriptionPeriodUnit).normalize
     }
 }

@@ -27,6 +27,13 @@ extension AdaptyPluginDelegate: AdaptyDelegate {
     }
 
     func didReceivePromotedPurchase(_ product: AdaptyPromotedProduct) {
+        // TODO: Preserve the original promoted product across the plugin round trip.
+        // The event JSON does not retain the StoreKit offer received in PurchaseIntent.offer.
+        // make_promoted_purchase restores the offer from the product catalog instead;
+        // purchase_intent_id is currently only copied, not used to retrieve the original product.
+        // If the intent's win-back offer is absent from the catalog's upfront offers,
+        // restoration fails with invalidOffer before StoreKit can start the purchase,
+        // whereas the native path passes the original offer directly to StoreKit.
         eventHandler.handle(event: Event.DidReceivePromotedPurchase(
             product: .init(product)
         ))

@@ -84,6 +84,10 @@ public extension AdaptyProfile {
 
         public let offerId: String?
 
+        public let billingPlan: AdaptySubscriptionBillingPlan
+
+        public let commitmentInfo: AdaptyProfile.SubscriptionCommitmentInfo?
+
         /// A reason why a subscription was cancelled.
         ///
         /// Possible values:
@@ -105,6 +109,8 @@ extension AdaptyProfile.Subscription: CustomStringConvertible {
             + (expiresAt.map { "expiresAt: \($0), " } ?? "")
             + (startsAt.map { "startsAt: \($0), " } ?? "")
             + "isLifetime: \(isLifetime), "
+        + "billingPlan: \(billingPlan.rawValue), "
+            + (commitmentInfo.map { "commitmentInfo: \($0), " } ?? "")
             + (activeIntroductoryOfferType.map { "activeIntroductoryOfferType: \($0), " } ?? "")
             + (activePromotionalOfferType.map { "activePromotionalOfferType: \($0), " } ?? "")
             + (activePromotionalOfferId.map { "activePromotionalOfferId: \($0), " } ?? "")
@@ -141,5 +147,36 @@ extension AdaptyProfile.Subscription: Codable {
         case cancellationReason = "cancellation_reason"
         case isRefund = "is_refund"
         case isSandbox = "is_sandbox"
+        case billingPlan = "billing_plan_id"
+        case commitmentInfo = "commitment"
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        try self.init(
+            store: container.decode(String.self, forKey: .store),
+            vendorProductId: container.decode(String.self, forKey: .vendorProductId),
+            vendorTransactionId: container.decode(String.self, forKey: .vendorTransactionId),
+            vendorOriginalTransactionId: container.decode(String.self, forKey: .vendorOriginalTransactionId),
+            isActive: container.decode(Bool.self, forKey: .isActive),
+            isLifetime: container.decode(Bool.self, forKey: .isLifetime),
+            activatedAt: container.decode(Date.self, forKey: .activatedAt),
+            renewedAt: container.decodeIfPresent(Date.self, forKey: .renewedAt),
+            expiresAt: container.decodeIfPresent(Date.self, forKey: .expiresAt),
+            startsAt: container.decodeIfPresent(Date.self, forKey: .startsAt),
+            unsubscribedAt: container.decodeIfPresent(Date.self, forKey: .unsubscribedAt),
+            billingIssueDetectedAt: container.decodeIfPresent(Date.self, forKey: .billingIssueDetectedAt),
+            isInGracePeriod: container.decode(Bool.self, forKey: .isInGracePeriod),
+            isSandbox: container.decode(Bool.self, forKey: .isSandbox),
+            isRefund: container.decode(Bool.self, forKey: .isRefund),
+            willRenew: container.decode(Bool.self, forKey: .willRenew),
+            activeIntroductoryOfferType: container.decodeIfPresent(String.self, forKey: .activeIntroductoryOfferType),
+            activePromotionalOfferType: container.decodeIfPresent(String.self, forKey: .activePromotionalOfferType),
+            activePromotionalOfferId: container.decodeIfPresent(String.self, forKey: .activePromotionalOfferId),
+            offerId: container.decodeIfPresent(String.self, forKey: .offerId),
+            billingPlan: container.decodeIfPresent(AdaptySubscriptionBillingPlan.self, forKey: .billingPlan) ?? .upFront,
+            commitmentInfo: container.decodeIfPresent(AdaptyProfile.SubscriptionCommitmentInfo.self, forKey: .commitmentInfo),
+            cancellationReason: container.decodeIfPresent(String.self, forKey: .cancellationReason)
+        )
     }
 }

@@ -20,7 +20,7 @@ extension AdaptyProfile.AccessLevel {
         let isLifetime = backendPeriod == .lifetime
         var isRefund = transaction.revocationDate != nil
 
-        let offer = PurchasedSubscriptionOfferInfo(
+        let offer = SubscriptionOfferInfo(
             transaction: transaction,
             product: product
         )
@@ -34,13 +34,16 @@ extension AdaptyProfile.AccessLevel {
         var subscriptionExpirationReason: Product.SubscriptionInfo.RenewalInfo.ExpirationReason?
         var subscriptionGracePeriodExpiredAt: Date?
 
+        var renewalInfoSignedAt: Date?
+
         switch productType {
         case .autoRenewable:
             if let subscriptionStatus = await transaction.subscriptionStatus {
                 let state = subscriptionStatus.state
 
                 if let renewalInfo = try? subscriptionStatus.renewalInfo.payloadValue {
-                    subscriptionWillRenew = renewalInfo.willAutoRenew
+                    renewalInfoSignedAt = subscriptionStatus.renewalInfo.signedDate
+                    subscriptionWillRenew = renewalInfo.subscriptionWillRenew
                     subscriptionExpirationReason = renewalInfo.expirationReason
                     subscriptionGracePeriodExpiredAt = renewalInfo.gracePeriodExpirationDate
 
@@ -98,13 +101,83 @@ extension AdaptyProfile.AccessLevel {
             unsubscribedAt: subscriptionUnsubscribedAt,
             billingIssueDetectedAt: nil, // TODO: need calculate
             startsAt: nil, // Backend Only
+            billingPlan: transaction.unfBillingPlan,
+            commitmentInfo: transaction.subscriptionCommitmentInfo,
             cancellationReason: subscriptionExpirationReason?.asString(isRefund),
-            isRefund: isRefund
+            isRefund: isRefund,
+            renewalInfoSignedAt: renewalInfoSignedAt ?? Date(timeIntervalSince1970: 0)
         )
     }
 }
 
-private extension PurchasedSubscriptionOfferInfo {
+private extension Product.SubscriptionInfo.RenewalInfo {
+    var subscriptionWillRenew:  Bool {
+        #if compiler(>=6.3.2)
+        if #available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *) {
+            // Report renewal of the commitment when one is present.
+            return commitmentInfo?.willAutoRenew ?? willAutoRenew
+        }
+        #endif
+        return willAutoRenew
+    }
+}
+
+private extension Transaction {
+    var subscriptionCommitmentInfo: AdaptyProfile.SubscriptionCommitmentInfo? {
+        #if compiler(>=6.3.2)
+        guard #available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *), let commitmentInfo  else { return nil }
+
+        return .init(
+            billingPeriodNumber: UInt(commitmentInfo.billingPeriodNumber),
+            totalBillingPeriods: UInt(commitmentInfo.totalBillingPeriods),
+            expiresAt: commitmentInfo.expirationDate
+        )
+        #else
+        return nil
+        #endif
+    }
+}
+
+private struct SubscriptionOfferInfo {
+    let id: String?
+    let offerType: AdaptyTransactionOfferType
+    let paymentMode: AdaptySubscriptionOffer.PaymentMode
+
+    init?(
+        transaction: StoreKit.Transaction,
+        product: StoreKit.Product?
+    ) {
+
+        guard #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) else {
+            guard let offerType = transaction.offerType?.asAdaptyTransactionOfferType else { return nil }
+            let offerId = transaction.offerID
+
+            self.id = offerId
+            self.offerType = offerType
+
+            self.paymentMode =
+                if let product, let offerType = offerType.asAdaptySubscriptionOfferType {
+                    product.subscription?
+                        .offer(
+                            by: .init(offerId: offerId, offerType: offerType),
+                            for: .upFront
+                        )?
+                        .paymentMode
+                        .asAdaptySubscriptionOfferPaymentMode ?? .unknown
+                } else {
+                    .unknown
+                }
+            return
+        }
+
+        guard let offer = transaction.offer else { return nil }
+
+        self.id = offer.id
+        self.offerType = offer.type.asAdaptyTransactionOfferType
+        self.paymentMode = offer.paymentMode?.asAdaptySubscriptionOfferPaymentMode ?? .unknown
+
+    }
+
     var activeIntroductoryOfferType: String? {
         (offerType == .introductory) ? paymentMode.encodedValue : nil
     }

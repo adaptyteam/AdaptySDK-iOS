@@ -57,7 +57,7 @@ extension VC.Action {
                 .init(
                     codingPath: [],
                     debugDescription:
-                    "wrong host, unknown scope of action: \(components.host ?? "nil")"
+                        "wrong host, unknown scope of action: \(components.host, default: "nil")"
                 )
             )
         }

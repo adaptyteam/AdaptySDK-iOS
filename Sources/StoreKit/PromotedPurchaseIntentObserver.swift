@@ -31,19 +31,21 @@ final class PromotedPurchaseIntentObserver: Sendable {
 
     @available(iOS 16.4, macOS 14.4, macCatalyst 16.4, *)
     private static func handle(_ intent: PurchaseIntent) async {
-        let subscriptionOffer: AdaptySubscriptionOffer? =
-            if
-                #available(iOS 18.0, macOS 15.0, macCatalyst 18.0, *),
-                let offer = intent.offer
+
+        let skOffer: Product.SubscriptionOffer? =
+            if #available(iOS 18.0, macOS 15.0, macCatalyst 18.0, *)
             {
-                intent.product.adaptySubscriptionOffer(by: offer)
+                intent.offer
             } else {
                 nil
             }
 
         let product = AdaptyPromotedProduct(
+            purchaseIntentId: intent.id,
             skProduct: intent.product,
-            subscriptionOffer: subscriptionOffer
+            subscriptionPricingTerms: intent.product.subscriptionPricingTerms(for: .upFront),
+            subscriptionOffer: skOffer.map(intent.product.adaptySubscriptionOffer),
+            skOffer: skOffer
         )
 
         let called = await Adapty.callDelegate {

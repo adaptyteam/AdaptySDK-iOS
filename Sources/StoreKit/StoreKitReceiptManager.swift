@@ -153,7 +153,7 @@ private final class ReceiptRefresher: NSObject, @unchecked Sendable {
                 log.verbose("Refresh receipt success.")
             }
 
-            log.debug("Call refreshCompletionHandlers.count = \(handlers.count)\(error.map { " with error = \($0)" } ?? "")")
+            log.debug("Call refreshCompletionHandlers.count = \(handlers.count)\(error.map { " with error = \($0)" }, default: "")")
 
             handlers.forEach { $0(error) }
         }

@@ -8,57 +8,23 @@
 import StoreKit
 
 extension StoreKit.Product {
-    var asAdaptyProduct: AdaptyProduct {
-        AdaptyProductWrapper(skProduct: self)
-    }
-}
+    func subscriptionPricingTerms(for billingPlan: AdaptySubscriptionBillingPlan) -> AdaptySubscriptionPricingTerms? {
+        guard let subscription else { return nil }
 
-private struct AdaptyProductWrapper: AdaptyProduct {
-    let skProduct: StoreKit.Product
-}
-
-extension StoreKit.Product {
-    var introductoryOfferNotApplicable: Bool {
-        subscription?.introductoryOffer == nil
-    }
-
-    func subscriptionOffer(by offerId: String?, for offerType: AdaptyTransactionOfferType) -> SubscriptionOffer? {
-        switch offerType {
-        case .introductory:
-            return subscription?.introductoryOffer
-        case .promotional:
-            guard let offerId else { return nil }
-            return subscription?.promotionalOffers.first(where: { $0.id == offerId })
-        case .winBack:
-            guard
-                #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
-                let offerId
-            else { return nil }
-            return subscription?.winBackOffers.first { $0.id == offerId }
-        default:
-            return nil
+        #if compiler(>=6.3.2)
+        if #available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *),
+           let skPricingTerms = subscription.pricingTerms(for: billingPlan.asSKBillingPlanType)
+        {
+            return skPricingTerms.asAdaptySubscriptionPricingTerms
         }
-    }
+        #endif
 
-    func subscriptionOffer(by offerId: String?, for offerType: AdaptySubscriptionOfferType) -> SubscriptionOffer? {
-        switch offerType {
-        case .introductory:
-            return subscription?.introductoryOffer
-        case .promotional:
-            guard let offerId else { return nil }
-            return subscription?.promotionalOffers.first(where: { $0.id == offerId })
-        case .winBack:
-            guard
-                #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
-                let offerId
-            else { return nil }
-            return subscription?.winBackOffers.first { $0.id == offerId }
-        default:
-            return nil
-        }
-    }
+        guard billingPlan == .upFront else { return nil }
 
-    func subscriptionOffer(by offerIdentifier: AdaptySubscriptionOffer.Identifier) -> SubscriptionOffer? {
-        subscriptionOffer(by: offerIdentifier.offerId, for: offerIdentifier.offerType)
+        return AdaptySubscriptionPricingTerms.upFront(
+            price: price,
+            localizedPrice: displayPrice,
+            subscriptionPeriod: subscription.subscriptionPeriod.asAdaptySubscriptionPeriod
+        )
     }
 }

@@ -22,17 +22,26 @@ extension StoreKit.Transaction {
         ]
     }
 
+    var unfBillingPlan: AdaptySubscriptionBillingPlan? {
+        #if compiler(>=6.3.2)
+        if #available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *) {
+            return billingPlanType?.asAdaptySubscriptionBillingPlan
+        }
+        #endif
+        return nil
+    }
+
     var unfOfferType: AdaptyTransactionOfferType? {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            (offer?.type ?? offerType)?.asSubscriptionOfferType
+            offer?.type.asAdaptyTransactionOfferType
         } else {
-            offerType?.asSubscriptionOfferType
+            offerType?.asAdaptyTransactionOfferType
         }
     }
 
     var unfOfferId: String? {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            return offer?.id ?? offerID
+            return offer?.id
         }
         return offerID
     }

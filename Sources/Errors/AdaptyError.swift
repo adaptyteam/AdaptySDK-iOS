@@ -78,6 +78,7 @@ public extension AdaptyError {
         case fetchSubscriptionStatusFailed = 1020
         case paymentPendingError = 1050
         case unknownTransactionId = 1030
+        case billingPlanUnavailable = 1060
 
         /// Adapty SDK is not activated.
         case notActivated = 2002

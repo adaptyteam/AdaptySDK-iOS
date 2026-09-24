@@ -10,6 +10,8 @@ import StoreKit
 public struct AdaptyPaywallProduct: AdaptyProduct, WebPaywallURLProviding {
     public let skProduct: StoreKit.Product
 
+    public let subscriptionPricingTerms: AdaptySubscriptionPricingTerms? 
+
     package let flowProductId: String?
 
     public let adaptyProductId: String
@@ -40,6 +42,6 @@ public struct AdaptyPaywallProduct: AdaptyProduct, WebPaywallURLProviding {
     package let webPaywallBaseUrl: URL?
 
     public var description: String {
-        "(adaptyProductId: \(adaptyProductId), info: \(productInfo), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map(\.description) ?? "nil") , skProduct:\(skProduct))"
+        "(adaptyProductId: \(adaptyProductId), info: \(productInfo), paywallName: \(paywallName), variationId: \(variationId), paywallABTestName: \(paywallABTestName), subscriptionOffer:\(subscriptionOffer.map(\.description), default: "nil") , skProduct:\(skProduct))"
     }
 }

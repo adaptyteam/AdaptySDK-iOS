@@ -17,6 +17,7 @@ enum StoreKitManagerError: Error {
     case unknownTransactionId(AdaptyError.Source)
     case transactionUnverified(AdaptyError.Source, error: Error?)
     case invalidOffer(AdaptyError.Source, error: String)
+    case billingPlanUnavailable(AdaptyError.Source, error: String)
     case getSubscriptionInfoStatusFailed(AdaptyError.Source, error: Error)
     case paymentPendingError(AdaptyError.Source)
 }
@@ -54,6 +55,8 @@ extension StoreKitManagerError: CustomStringConvertible {
             }
         case let .invalidOffer(source, error):
             "StoreKitManagerError.invalidOffer(\(source), \"\(error)\")"
+        case let .billingPlanUnavailable(source, error):
+            "StoreKitManagerError.billingPlanUnavailable(\(source), \"\(error)\")"
         case let .getSubscriptionInfoStatusFailed(source, error):
             "StoreKitManagerError.getSubscriptionInfoStatusFailed(\(source), \(error))"
         case let .paymentPendingError(source):
@@ -74,6 +77,7 @@ extension StoreKitManagerError {
              let .unknownTransactionId(src),
              let .transactionUnverified(src, _),
              let .invalidOffer(src, _),
+             let .billingPlanUnavailable(src, _),
              let .getSubscriptionInfoStatusFailed(src, _),
              let .paymentPendingError(src): src
         }
@@ -191,6 +195,15 @@ extension StoreKitManagerError {
         line: UInt = #line
     ) -> Self {
         .invalidOffer(AdaptyError.Source(file: file, function: function, line: line), error: error)
+    }
+
+    static func billingPlanUnavailable(
+        _ error: String,
+        file: String = #fileID,
+        function: String = #function,
+        line: UInt = #line
+    ) -> Self {
+        .billingPlanUnavailable(AdaptyError.Source(file: file, function: function, line: line), error: error)
     }
 
     static func getSubscriptionInfoStatusFailed(

@@ -55,7 +55,7 @@ actor StoreKitPurchaser {
                         params: transaction.logParams(other: ["unverified": error.localizedDescription])
                     ))
                 case let .verified(transaction):
-                    log.debug("Transaction \(transaction.id) (originalId: \(transaction.originalID),  productId: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description ?? "nil"), expirationDate:\(transaction.expirationDate?.description ?? "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
+                    log.debug("Transaction \(transaction.id) (originalId: \(transaction.originalID),  productId: \(transaction.productID), revocationDate:\(transaction.revocationDate?.description, default: "nil"), expirationDate:\(transaction.expirationDate?.description, default: "nil") \((transaction.expirationDate.map { $0 < Date() } ?? false) ? "[expired]" : "") , isUpgraded:\(transaction.isUpgraded) ) ")
 
                     Task.detached {
                         if await AdaptyConfiguration.transactionFinishBehavior == .manual {
@@ -72,14 +72,8 @@ actor StoreKitPurchaser {
                         }
 
                         do {
-                            let productOrNil = try? await productsManager.fetchProduct(
-                                id: transaction.productID,
-                                fetchPolicy: .returnCacheDataElseLoad
-                            ).asAdaptyProduct
-
                             try await transactionSynchronizer.report(
                                 .init(
-                                    product: productOrNil,
                                     transaction: transaction
                                 ),
                                 payload: storage.purchasePayload(
@@ -114,7 +108,9 @@ actor StoreKitPurchaser {
         userId: AdaptyUserId,
         appAccountToken: UUID?,
         skProduct: StoreKit.Product,
-        subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
+        billingPlan: AdaptySubscriptionBillingPlan?,
+        offerIdentifier: AdaptySubscriptionOffer.Identifier?,
+        skOffer:  Product.SubscriptionOffer? = nil
     ) async throws(AdaptyError) -> Set<Product.PurchaseOption> {
         var options = Set<Product.PurchaseOption>()
 
@@ -124,8 +120,26 @@ actor StoreKitPurchaser {
             options.insert(.appAccountToken(uuid))
         }
 
-        if let offerIdentifier = subscriptionOfferIdentifier {
-            if let offerId = offerIdentifier.promotionalOfferId {
+        if let billingPlan, billingPlan != .upFront {
+            #if compiler(>=6.3.2)
+            if #available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *)  {
+                options.insert(.billingPlanType(billingPlan.asSKBillingPlanType))
+            } else {
+                throw  StoreKitManagerError.billingPlanUnavailable("Invalid iOS version, can't use billingPlan:\(billingPlan.rawValue) for productId: \(skProduct.id)").asAdaptyError
+            }
+            #else
+            throw StoreKitManagerError.billingPlanUnavailable("The StoreKit SDK does not support billingPlan:\(billingPlan.rawValue) for productId: \(skProduct.id)").asAdaptyError
+            #endif
+        }
+
+        if let offerIdentifier {
+            switch offerIdentifier.offerType {
+            case .promotional:
+
+                guard let offerId = offerIdentifier.offerId else {
+                    throw StoreKitManagerError.invalidOffer("Promotional offer without id for productId: \(skProduct.id)").asAdaptyError
+                }
+
                 let response = try await subscriptionOfferSigner.sign(
                     offerId: offerId,
                     subscriptionVendorId: skProduct.id,
@@ -133,25 +147,42 @@ actor StoreKitPurchaser {
                     with: appAccountToken
                 )
 
-                options.insert(
-                    .promotionalOffer(
+                options.insert(.promotionalOffer(
                         offerID: offerId,
                         keyID: response.keyIdentifier,
                         nonce: response.nonce,
                         signature: response.signature,
                         timestamp: response.timestamp
-                    )
-                )
-            } else if let offerId = offerIdentifier.winBackOfferId {
-                if #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *),
-                   let winBackOffer = skProduct.subscriptionOffer(by: .winBack(offerId))
-                {
-                    options.insert(.winBackOffer(winBackOffer))
-                } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit Not found winBackOfferId:\(offerId) for productId: \(skProduct.id)").asAdaptyError
+                ))
+            case .winBack:
+
+                guard let offerId = offerIdentifier.offerId else {
+                    throw StoreKitManagerError.invalidOffer("WinBack offer without id for productId: \(skProduct.id)").asAdaptyError
                 }
+
+                guard #available(iOS 18.0, macOS 15.0, tvOS 18.0, watchOS 11.0, visionOS 2.0, *) else {
+                    throw StoreKitManagerError.invalidOffer("Winback offer unsuported on this OS version for productId: \(skProduct.id)").asAdaptyError
+                }
+
+                let billingPlan = billingPlan ?? .upFront
+
+                let winBackOffer: Product.SubscriptionOffer
+
+                if let skOffer, skOffer.type == .winBack {
+                    winBackOffer = skOffer
+                } else {
+                    guard let skOffer = skProduct.subscription?.offer(by: .winBack(offerId), for: billingPlan) else {
+                        throw StoreKitManagerError.invalidOffer("StoreKit not found winback offer id: \(offerId) for productId: \(skProduct.id) in billing plan: \(billingPlan)").asAdaptyError
+                    }
+                    winBackOffer = skOffer
+                }
+
+                options.insert(.winBackOffer(winBackOffer))
+            default:
+                break
             }
         }
+
         return options
     }
 
@@ -164,7 +195,8 @@ actor StoreKitPurchaser {
             userId: userId,
             appAccountToken: appAccountToken,
             skProduct: product.skProduct,
-            subscriptionOfferIdentifier: product.subscriptionOffer?.offerIdentifier
+            billingPlan: product.subscriptionPricingTerms?.billingPlan,
+            offerIdentifier: product.subscriptionOffer?.offerIdentifier
         )
 
         await productManager.storeProductInfo(productInfo: [product.productInfo])
@@ -184,19 +216,25 @@ actor StoreKitPurchaser {
         )
     }
 
-    func makePromotedPurchase(
+    func makePurchase(
         userId: AdaptyUserId,
         appAccountToken: UUID?,
-        vendorProductId: String,
-        subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
+        product: AdaptyPromotedProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        let skProduct: StoreKit.Product = try await productManager.fetchProduct(id: vendorProductId)
+
+        if let billingPlan = product.subscriptionPricingTerms?.billingPlan {
+            guard billingPlan == .upFront else {
+                throw StoreKitManagerError.billingPlanUnavailable("Unsupported billingPlan: \(billingPlan) for AdaptyPromotedProduct with vendorProductId:: \(product.vendorProductId)").asAdaptyError
+            }
+        }
 
         let options = try await createOptions(
             userId: userId,
             appAccountToken: appAccountToken,
-            skProduct: skProduct,
-            subscriptionOfferIdentifier: subscriptionOfferIdentifier
+            skProduct: product.skProduct,
+            billingPlan: product.subscriptionPricingTerms?.billingPlan,
+            offerIdentifier: product.subscriptionOffer?.offerIdentifier,
+            skOffer:  product.skOffer
         )
 
         let payload = await PurchasePayload(
@@ -205,7 +243,7 @@ actor StoreKitPurchaser {
         )
 
         return try await makePurchase(
-            skProduct,
+            product.skProduct,
             options,
             payload,
             reason: .promotedPurchase
@@ -323,7 +361,6 @@ actor StoreKitPurchaser {
         do {
             let profile = try await transactionSynchronizer.validate(
                 .init(
-                    product: product.asAdaptyProduct,
                     transaction: transaction
                 ),
                 payload: payload,

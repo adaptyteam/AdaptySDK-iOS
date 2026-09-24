@@ -62,7 +62,7 @@ extension Adapty {
         let stamp = Log.stamp
 
         Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: methodName, stamp: stamp, params: logParams))
-        log.verbose("Calling now: \(function) [\(stamp)]  \(methodName): \(logParams?.description ?? "nil")")
+        log.verbose("Calling now: \(function) [\(stamp)]  \(methodName): \(logParams?.description, default: "nil")")
 
         do {
             let result = try await operation(Adapty.activatedSDK)
@@ -85,7 +85,7 @@ extension Adapty {
         let stamp = Log.stamp
 
         Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: methodName, stamp: stamp, params: logParams))
-        log.verbose("Calling now: \(function) [\(stamp)].  \(methodName): \(logParams?.description ?? "nil")")
+        log.verbose("Calling now: \(function) [\(stamp)].  \(methodName): \(logParams?.description, default: "nil")")
 
         do {
             let result = try await operation(Adapty.optionalSDK)

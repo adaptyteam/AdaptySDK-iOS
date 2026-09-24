@@ -14,6 +14,7 @@ extension Request {
         let adaptyProductId: String
         let productInfo: BackendProductInfo
         let paywallProductIndex: Int
+        let billingPlan: AdaptySubscriptionBillingPlan?
         let subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
         let variationId: String
         let paywallABTestName: String
@@ -30,8 +31,9 @@ extension Request {
                 period: BackendProductInfo.Period(rawValue: container.decode(String.self, forKey: .adaptyProductType))
             )
             paywallProductIndex = try container.decode(Int.self, forKey: .paywallProductIndex)
+            billingPlan = try container.decodeSubscriptionBillingPlanIfPresent(forKey: .subscription)
             subscriptionOfferIdentifier =
-                try container.decodeSubscriptionOfferIdentifierIfPresent(forKey: .subscription) ?? container.decodeIfPresent(AdaptySubscriptionOffer.Identifier.self, forKey: .subscriptionOfferIdentifier)
+                try container.decodeSubscriptionOfferIdentifierIfPresent(forKey: .subscription)
             variationId = try container.decode(String.self, forKey: .paywallVariationId)
             paywallABTestName = try container.decode(String.self, forKey: .paywallABTestName)
             paywallName = try container.decode(String.self, forKey: .paywallName)
@@ -51,13 +53,26 @@ private enum CodingKeys: String, CodingKey {
     case paywallABTestName = "paywall_ab_test_name"
     case paywallName = "paywall_name"
     case webPaywallBaseUrl = "web_purchase_url"
-    case subscriptionOfferIdentifier = "subscription_offer_identifier"
-    case subscription
     case localizedDescription = "localized_description"
     case localizedTitle = "localized_title"
     case price
     case regionCode = "region_code"
     case isFamilyShareable = "is_family_shareable"
+
+    case subscription
+}
+
+public struct AdaptyProductEncodingConfiguration {
+    let price: Price.EncodingConfiguration
+}
+
+extension AdaptyProductEncodingConfiguration {
+    init(product: some AdaptyProduct) {
+        self.price = .init(
+            currencyCode: product.currencyCode,
+            currencySymbol: product.currencySymbol
+        )
+    }
 }
 
 extension Response {
@@ -69,6 +84,7 @@ extension Response {
         }
 
         func encode(to encoder: Encoder) throws {
+            let configuration = AdaptyProductEncodingConfiguration(product: wrapped)
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encode(wrapped.vendorProductId, forKey: .vendorProductId)
             try container.encodeIfPresent(wrapped.flowProductId, forKey: .flowProductId)
@@ -80,12 +96,13 @@ extension Response {
             try container.encode(wrapped.paywallABTestName, forKey: .paywallABTestName)
             try container.encode(wrapped.paywallName, forKey: .paywallName)
             try container.encodeIfPresent(wrapped.webPaywallBaseUrl, forKey: .webPaywallBaseUrl)
+
             try container.encode(wrapped.localizedDescription, forKey: .localizedDescription)
             try container.encode(wrapped.localizedTitle, forKey: .localizedTitle)
             try container.encode(wrapped.isFamilyShareable, forKey: .isFamilyShareable)
             try container.encodeIfPresent(wrapped.regionCode, forKey: .regionCode)
-            try container.encode(Price(from: wrapped), forKey: .price)
-            try container.encodeIfPresent(Subscription(product: wrapped, offer: wrapped.subscriptionOffer), forKey: .subscription)
+            try container.encode(Price(from: wrapped), forKey: .price, configuration: configuration.price)
+            try container.encodeIfPresent(Subscription(product: wrapped, offer: wrapped.subscriptionOffer), forKey: .subscription, configuration: configuration)
         }
     }
 }

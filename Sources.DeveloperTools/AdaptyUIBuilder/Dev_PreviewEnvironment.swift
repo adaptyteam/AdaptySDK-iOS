@@ -157,15 +157,15 @@ public struct Dev_PreviewProduct: Sendable {
 
     public struct Price: Sendable {
         public var amount: Double
-        public var currencyCode: String?
+        public var currencyCode: String
         public var currencySymbol: String?
-        public var localizedString: String?
+        public var localizedString: String
 
         public init(
             amount: Double,
-            currencyCode: String? = nil,
+            currencyCode: String,
             currencySymbol: String? = nil,
-            localizedString: String? = nil
+            localizedString: String
         ) {
             self.amount = amount
             self.currencyCode = currencyCode

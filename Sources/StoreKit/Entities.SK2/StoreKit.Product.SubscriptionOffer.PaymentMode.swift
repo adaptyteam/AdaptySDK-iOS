@@ -8,7 +8,7 @@
 import StoreKit
 
 extension StoreKit.Product.SubscriptionOffer.PaymentMode {
-    var asPaymentMode: AdaptySubscriptionOffer.PaymentMode {
+    var asAdaptySubscriptionOfferPaymentMode: AdaptySubscriptionOffer.PaymentMode {
         switch self {
         case .payAsYouGo: .payAsYouGo
         case .payUpFront: .payUpFront

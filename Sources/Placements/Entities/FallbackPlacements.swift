@@ -82,7 +82,7 @@ struct FallbackPlacements: Sendable {
         do {
             let placementPointer = "/data/\(id.jsonPointerSegment())"
             guard let data = try Data(contentsOf: fileURL).jsonExtractIfPresent(pointer: placementPointer) else {
-                Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: nil")
+                Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId, default: "nil DRAW") response: nil")
 
                 return nil
             }
@@ -94,15 +94,15 @@ struct FallbackPlacements: Sendable {
                 withFallbackVersion: version
             )
         } catch let error as PlacementDecodingError where error == .notFoundVariationId {
-            Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: nil")
+            Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId, default: "nil DRAW") response: nil")
             return nil
         } catch {
             log.error(String(describing: error))
-            Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") error: \(error)")
+            Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId, default: "nil DRAW") error: \(error)")
             throw error
         }
 
-        Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId ?? "nil DRAW") response: variationId = \(draw.content.variationId)")
+        Log.crossAB.verbose("fallbackFile request: placementId = \(id), variationId = \(variationId, default: "nil DRAW") response: variationId = \(draw.content.variationId)")
 
         return draw
     }
