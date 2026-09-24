@@ -8,7 +8,6 @@
 #if canImport(UIKit)
 
 import AVKit
-import Combine
 import SwiftUI
 
 extension VC.AspectRatio {
@@ -39,12 +38,56 @@ extension View {
     }
 }
 
+private extension View {
+    /// Lays out resizable image content the way `AVPlayerLayer` lays out video
+    /// with the matching gravity: centered in the bounds. Without a bounded
+    /// proposal it falls back to the content's own size.
+    @ViewBuilder
+    func videoGravityLayout(_ aspect: VC.AspectRatio) -> some View {
+        switch aspect {
+        case .fit, .fill:
+            aspectRatio(contentMode: aspect.swiftUIContentMode)
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+        case .stretch:
+            frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+        }
+    }
+}
+
+/// The video's preview image, laid out like the video it stands in for, so the
+/// first frame replaces it in place.
+private struct AdaptyUIVideoPlaceholderView: View {
+    let asset: AdaptyUIResolvedImageAsset
+    let aspect: VC.AspectRatio
+
+    var body: some View {
+        switch asset {
+        case .image(let image):
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .videoGravityLayout(aspect)
+            }
+        case .remote(let url, let preview):
+            RemoteImage(
+                url: url,
+                placeholder: {
+                    if let preview {
+                        Image(uiImage: preview)
+                            .resizable()
+                            .videoGravityLayout(aspect)
+                    }
+                }
+            )
+            .resizable()
+            .videoGravityLayout(aspect)
+        }
+    }
+}
+
 struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
     var player: AVPlayer
     var videoGravity: AVLayerVideoGravity
-    var onReadyForDisplay: () -> Void
-
-    @State private var playerStatusObservation: NSKeyValueObservation?
 
     func makeUIViewController(context _: Context) -> AVPlayerViewController {
         let playerViewController = AVPlayerViewController()
@@ -58,36 +101,6 @@ struct AdaptyUIVideoPlayerView: UIViewControllerRepresentable {
         playerViewController.allowsPictureInPicturePlayback = false
         player.seek(to: .zero)
         player.play()
-
-        DispatchQueue.main.async {
-#if os(visionOS)
-            playerStatusObservation = playerViewController.player?.observe(
-                \.status,
-                options: [.old, .new],
-                changeHandler: { player, _ in
-                    DispatchQueue.main.async {
-                        if player.status == .readyToPlay {
-                            onReadyForDisplay()
-                        }
-                    }
-                }
-            )
-#else
-            playerStatusObservation = playerViewController.observe(
-                \.isReadyForDisplay,
-                options: [.new, .initial],
-                changeHandler: { playerVC, _ in
-                    DispatchQueue.main.async {
-                        if playerVC.isReadyForDisplay {
-                            DispatchQueue.main.async {
-                                onReadyForDisplay()
-                            }
-                        }
-                    }
-                }
-            )
-#endif
-        }
 
         return playerViewController
     }
@@ -110,9 +123,6 @@ struct AdaptyUIVideoView: View {
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
 
-    @State
-    private var showPlaceholder = true
-
     private let video: VC.VideoPlayer
 
     init(video: VC.VideoPlayer) {
@@ -134,29 +144,24 @@ struct AdaptyUIVideoView: View {
                 }
             )
 
+            // The placeholder stays under the player for the element's lifetime:
+            // the player layer is transparent until its first frame is composited,
+            // so the placeholder shows through without a gap, however late that is.
             ZStack {
+                if let placeholder = videoAsset.image {
+                    AdaptyUIVideoPlaceholderView(asset: placeholder, aspect: video.aspect)
+                        .allowsHitTesting(false)
+                }
+
                 if let player = playerManager.player {
                     AdaptyUIVideoPlayerView(
                         player: player,
-                        videoGravity: video.aspect.videoGravity,
-                        onReadyForDisplay: {
-                            showPlaceholder = false
-                        }
+                        videoGravity: video.aspect.videoGravity
                     )
-                }
-
-                if showPlaceholder, let placeholder = videoAsset.image {
-                    AdaptyUIImageView(
-                        .resolvedImageAsset(
-                            asset: placeholder,
-                            aspect: video.aspect,
-                            tint: nil
-                        )
-                    )
-                    .allowsHitTesting(false)
                 }
             }
             .applyAspectLayout(ratio: videoAsset.ratio, aspect: video.aspect)
+            .clipped()
             .id(videoAsset.id)
         } else {
             Rectangle()
