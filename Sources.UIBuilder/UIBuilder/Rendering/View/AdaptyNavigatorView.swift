@@ -128,24 +128,7 @@ struct AdaptyNavigatorView: View {
 
             AdaptyUIElementView(
                 navigatorViewModel.navigator.content,
-                screenHolderBuilder: {
-                    AdaptyUIScreenHolderView(
-                        screens: navigatorViewModel.screens
-                    ) { screenInstance in
-                        AdaptyScreenView(
-                            screen: screenInstance.configuration
-                        )
-                        .overrideOpenUrl { url in
-                            stateViewModel.handle(
-                                url: url,
-                                screen: screenInstance.instance
-                            ) ? .handled : .discarded
-                        }
-                        .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
-                        .environmentObject(screenInstance)
-                        .environment(\.adaptyScreenInstanceId, screenInstance.instance.id)
-                    }
-                }
+                screenHolderBuilder: { AdaptyNavigatorScreensView() }
             )
             .withElementPool(navigatorViewModel.navigator.poolElements)
             .animatablePropertiesTransition(
@@ -164,6 +147,35 @@ struct AdaptyNavigatorView: View {
         .environmentObject(navigatorViewModel.eventBus)
         .zIndex(navigatorViewModel.order * 1000.0)
         .onReceive(navigatorViewModel.$contentAnimations) { contentAnimations = $0 ?? [] }
+    }
+}
+
+/// Reads the navigator's screens in its own body, so a screen change re-renders the
+/// holder even when the element views between the navigator and its `screen_holder`
+/// are not re-evaluated (iOS 16.1 and earlier skip them).
+private struct AdaptyNavigatorScreensView: View {
+    @EnvironmentObject
+    private var navigatorViewModel: AdaptyUINavigatorViewModel
+    @EnvironmentObject
+    private var stateViewModel: AdaptyUIStateViewModel
+
+    var body: some View {
+        AdaptyUIScreenHolderView(
+            screens: navigatorViewModel.screens
+        ) { screenInstance in
+            AdaptyScreenView(
+                screen: screenInstance.configuration
+            )
+            .overrideOpenUrl { url in
+                stateViewModel.handle(
+                    url: url,
+                    screen: screenInstance.instance
+                ) ? .handled : .discarded
+            }
+            .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
+            .environmentObject(screenInstance)
+            .environment(\.adaptyScreenInstanceId, screenInstance.instance.id)
+        }
     }
 }
 
