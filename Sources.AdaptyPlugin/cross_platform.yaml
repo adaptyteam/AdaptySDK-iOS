@@ -101,13 +101,31 @@ $requests:
   ### dismissFlowView ###
   AdaptyUIDismissFlowView.Request: #request
     type: object
-    required: [method, id]
+    required: [method, id, destroy]
     properties:
       method: { const: "adapty_ui_dismiss_flow_view" }
       id: { type: string, description: "View Id" }
-      destroy: { type: boolean, default: false }
+      destroy: { type: boolean, description: "Release the view after it is dismissed" }
 
   AdaptyUIDismissFlowView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### destroyFlowView ###
+  AdaptyUIDestroyFlowView.Request: #request
+    type: object
+    required: [method, id]
+    properties:
+      method: { const: "adapty_ui_destroy_flow_view" }
+      id: { type: string, description: "View Id" }
+
+  AdaptyUIDestroyFlowView.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -332,49 +350,6 @@ $requests:
         properties:
           success: { const: true }
 
-  ### preloadOnboardings ###
-  PreloadOnboardings.Request: #request
-    type: object
-    required: [method, placement_ids]
-    properties:
-      method: { const: "preload_onboardings" }
-      placement_ids:
-        type: array
-        items: { type: string }
-      locale: { $ref: "#/$defs/AdaptyLocale" }
-      load_timeout: { type: number, description: "seconds" }
-
-  PreloadOnboardings.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
-
-  ### preloadOnboardingsForDefaultAudience ###
-  PreloadOnboardingsForDefaultAudience.Request: #request
-    type: object
-    required: [method, placement_ids]
-    properties:
-      method: { const: "preload_onboardings_for_default_audience" }
-      placement_ids:
-        type: array
-        items: { type: string }
-      locale: { $ref: "#/$defs/AdaptyLocale" }
-
-  PreloadOnboardingsForDefaultAudience.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
-
   ### getPaywallProducts ###
   GetPaywallProducts.Request: #request
     type: object
@@ -552,6 +527,7 @@ $requests:
   ### getPendingStoreMessageTypes ###
   GetPendingStoreMessageTypes.Request: #request
     type: object
+    description: "iOS Only. Requires iOS 16+"
     required: [method]
     properties:
       method: { const: "get_pending_store_message_types" }
@@ -571,6 +547,7 @@ $requests:
   ### showStoreMessage ###
   ShowStoreMessage.Request: #request
     type: object
+    description: "iOS Only. Requires iOS 16+"
     required: [method]
     properties:
       method: { const: "show_store_messages" }
@@ -1284,7 +1261,11 @@ $defs:
       customer_identity_parameters:
         { $ref: "#/$defs/CustomerIdentityParameters" }
       observer_mode: { type: boolean, default: false }
-      store_messages_handling: { $ref: "#/$defs/StoreMessagesHandling" }
+      store_messages_handling:
+        {
+          $ref: "#/$defs/StoreMessagesHandling",
+          description: "iOS Only. Requires iOS 16+",
+        }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
       google_enable_pending_prepaid_plans: { type: boolean, default: false }
@@ -1530,6 +1511,7 @@ $defs:
       flow_id: { type: string }
       flow_name: { type: string }
       variation_id: { type: string }
+      variation_name: { type: string }
       remote_configs:
         type: array
         items: { $ref: "#/$defs/AdaptyRemoteConfig" }
