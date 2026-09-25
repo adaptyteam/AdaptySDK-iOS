@@ -16,6 +16,8 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
         case .unidentifiedUserLogout: "Logout cannot be called for an unidentified user"
         case .cantMakePayments: "In-App Purchases are not available on this device. Please check your device settings."
         case .notAllowedInObserveMode: "The operation is not allowed in observe mode."
+        case .storeMessageSceneUnavailable: "No foreground-active UIWindowScene is available to display store messages."
+        case .storeMessageShowInProgress: "Another store message show operation is already in progress."
         case .notActivated: "Adapty SDK is not initialized. You need to activate the SDK before using its methods."
         case .profileWasChanged: "The user was replaced with a different user in the SDK during the execution of the operation."
         case let .fetchFailed(_, description, _): description
@@ -27,7 +29,9 @@ extension InternalAdaptyError: CustomDebugStringConvertible {
 
 extension HTTPError: CustomDebugStringConvertible {
     var debugDescription: String {
-        if isCancelled { return "The network request was cancelled." }
+        if isCancelled {
+            return "The network request was cancelled."
+        }
         switch self {
         case .perform: return "Failed to prepare the network request. See the original error for more details."
         case .network: return "Network request error. See the original error for more details."

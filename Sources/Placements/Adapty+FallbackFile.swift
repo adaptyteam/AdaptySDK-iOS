@@ -20,13 +20,14 @@ extension Adapty {
     ///   - fileURL:
     /// - Throws: An ``AdaptyError`` object
     public nonisolated static func setFallback(fileURL url: URL) async throws(AdaptyError) {
-        try await withoutSDK(
+        try await withOptionalSDK(
             methodName: .setFallback
-        ) { () async throws(AdaptyError) in
+        ) { _ async throws(AdaptyError) in
             Adapty.fallbackPlacements = try FallbackPlacements(fileURL: url)
         }
     }
 }
+
 extension FallbackPlacements {
     @inlinable
     func read<Content: PlacementContent>(

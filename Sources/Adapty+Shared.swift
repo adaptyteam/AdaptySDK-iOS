@@ -22,7 +22,9 @@ extension Adapty {
 
     private static var shared: Shared?
     static func set(activatingSDK task: Task<Adapty, Never>) {
-        if shared == nil { shared = .activating(task) }
+        if shared == nil {
+            shared = .activating(task)
+        }
     }
 
     static func set(shared sdk: Adapty) {
@@ -74,19 +76,19 @@ extension Adapty {
         }
     }
 
-    static func withoutSDK<T: Sendable>(
+    static func withOptionalSDK<T: Sendable, Failure: Error>(
         methodName: MethodName,
         logParams: EventParameters? = nil,
         function: StaticString = #function,
-        operation: @AdaptyActor @Sendable @escaping () async throws(AdaptyError) -> T
-    ) async throws(AdaptyError) -> T {
+        operation: @AdaptyActor @Sendable @escaping (Adapty?) async throws(Failure) -> T
+    ) async throws(Failure) -> T {
         let stamp = Log.stamp
 
         Adapty.trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: methodName, stamp: stamp, params: logParams))
         log.verbose("Calling now: \(function) [\(stamp)].  \(methodName): \(logParams?.description ?? "nil")")
 
         do {
-            let result = try await operation()
+            let result = try await operation(Adapty.optionalSDK)
             Adapty.trackSystemEvent(AdaptySDKMethodResponseParameters(methodName: methodName, stamp: stamp))
             log.verbose("Completed \(function) [\(stamp)] is successful.")
             return result

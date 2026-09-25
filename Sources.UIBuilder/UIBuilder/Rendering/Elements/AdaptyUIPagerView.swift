@@ -41,7 +41,7 @@ extension View {
                      onEnded: @escaping (DragGesture.Value) -> Void) -> some View
     {
         if condition {
-            gesture(
+            simultaneousGesture(
                 DragGesture()
                     .onChanged { onChanged($0) }
                     .onEnded { onEnded($0) }
@@ -79,6 +79,10 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
         return Int(stateViewModel.getValue(variable, defaultValue: Int32(0), screen: screen))
     }
 
+    private var clampedPageIndexFromBinding: Int {
+        max(0, min(pageIndexFromBinding, pager.content.count - 1))
+    }
+
     // We had to introduce this additional State variable to workaround weird SwiftUI crash caused animated currentPage change
     // PageControl now relies on currentPageSelectedIndex variable which is updating outside of withAnimation block
     @State private var currentPageSelectedIndex: Int = 0
@@ -91,6 +95,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
     }
 
     @State private var offset = CGFloat.zero
+    @State private var isHorizontalDrag: Bool?
     @State private var isInteracting = false
     @State private var timer: Timer?
 
@@ -136,6 +141,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
             handlePageControlTap(index: $0)
         }
         .onAppear {
+            currentPage = clampedPageIndexFromBinding
             startAutoScroll()
         }
         .onDisappear {
@@ -144,8 +150,8 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
         .onChange(of: currentPage) { newPage in
             handlePageChanged(to: newPage)
         }
-        .onChange(of: pageIndexFromBinding) { newTarget in
-            let clamped = max(0, min(newTarget, pager.content.count - 1))
+        .onChange(of: pageIndexFromBinding) { _ in
+            let clamped = clampedPageIndexFromBinding
             guard clamped != currentPage else { return }
             withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
                 currentPage = clamped
@@ -269,11 +275,20 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
             .dragGesture(
                 condition: pager.interactionBehavior != .none,
                 onChanged: { value in
+                    let isHorizontal = isHorizontalDrag
+                        ?? (abs(value.translation.width) >= abs(value.translation.height))
+                    isHorizontalDrag = isHorizontal
+                    guard isHorizontal else { return }
+
                     offset = value.translation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
                     isInteracting = true
                     stopAutoScroll() // Stop the autoscroll while interacting
                 },
                 onEnded: { value in
+                    let wasHorizontal = isHorizontalDrag ?? false
+                    isHorizontalDrag = nil
+                    guard wasHorizontal else { return }
+
                     withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
                         offset = value.predictedEndTranslation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
                         currentPage -= Int((offset / width).rounded())

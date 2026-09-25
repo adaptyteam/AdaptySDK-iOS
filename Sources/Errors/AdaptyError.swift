@@ -101,7 +101,8 @@ public extension AdaptyError {
         /// It is not possible to call `.logout` method for  unidentified user.
         case unidentifiedUserLogout = 3020
         case fetchTimeoutError = 3101
-
+        case operationInProgress = 3201
+        case resolverFailure = 3202
         case operationInterrupted = 9000
     }
 }

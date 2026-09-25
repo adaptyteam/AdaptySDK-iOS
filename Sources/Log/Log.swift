@@ -36,6 +36,7 @@ enum Log {
     static let fallbackPlacements = Log.Category(name: "FallbackPlacements")
 
     static let storeFront = Log.Category(name: "Storefront")
+    static let storeMessages = Log.Category(name: "StoreMessages")
     static let productManager = Log.Category(name: "ProductsManager")
     static let transactionManager = Log.Category(name: "TransactionManager")
     static let receiptManager = Log.Category(name: "ReceiptManager")

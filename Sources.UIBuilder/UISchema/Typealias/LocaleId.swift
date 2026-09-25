@@ -6,7 +6,3 @@
 //
 
 public typealias LocaleId = String
-
-extension Schema {
-    static let defaultLocaleId: LocaleId = "en"
-}

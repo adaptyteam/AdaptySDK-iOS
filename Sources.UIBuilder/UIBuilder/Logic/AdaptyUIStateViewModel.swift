@@ -136,18 +136,25 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) -> T {
         do {
-            let value = try stateHolder.state.getValue(
+            guard let value = try stateHolder.state.getValue(
                 T.self,
                 variable: variable,
                 screenInstance: screen
-            )
-            return value ?? defaultValue
+            ) else { return defaultValue }
+
+            guard let value = value as? Double,
+                  !value.isFinite
+            else { return value }
+
+            Log.ui.error("#\(logId)# getValue result is not finite: \(value)")
+            return defaultValue
+
         } catch {
             Log.ui.error("#\(logId)# getValue error: \(error)")
             return defaultValue
         }
     }
-    
+
     func getTagValue(
         _ variable: VC.Variable,
         converter: VC.TagConverter?,
@@ -190,18 +197,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         Binding(
             get: { [weak self] in
                 guard let self else { return defaultValue }
-
-                do {
-                    let value = try stateHolder.state.getValue(
-                        T.self,
-                        variable: variable,
-                        screenInstance: screen
-                    )
-                    return value ?? defaultValue
-                } catch {
-                    Log.ui.error("#\(logId)# getValue error: \(error)")
-                    return defaultValue
-                }
+                return getValue(variable, defaultValue: defaultValue, screen: screen)
             },
             set: { [weak self] value in
                 guard let self else { return }

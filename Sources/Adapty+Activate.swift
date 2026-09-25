@@ -47,7 +47,7 @@ public extension Adapty {
         let kidsModeEnabled = false
         #endif
 
-        let logParams: EventParameters? = [
+        let logParams: EventParameters = [
             "observer_mode": configuration.observerMode,
             "customer_user_id": configuration.customerUserId,
             "app_account_token": configuration.appAccountToken?.uuidString,
@@ -56,10 +56,11 @@ public extension Adapty {
             "adapty_attribution_enabled": configuration.adaptyAttributionEnabled,
             "clear_data_on_backup": configuration.clearDataOnBackup,
             "kids_mode_enabled": kidsModeEnabled,
+            "store_messages_handling": configuration.storeMessagesHandling,
         ]
 
         trackSystemEvent(AdaptySDKMethodRequestParameters(methodName: .activate, stamp: stamp, params: logParams))
-        log.verbose("Calling Adapty activate [\(stamp)] with params: \(logParams?.description ?? "nil")")
+        log.verbose("Calling Adapty activate [\(stamp)] with params: \(logParams.description)")
 
         guard !isActivated else {
             let error = AdaptyError.activateOnceError()
@@ -69,7 +70,9 @@ public extension Adapty {
         }
 
         let task = Task<Adapty, Never>.detached { @AdaptyActor @Sendable () async -> Adapty in
-            if let logLevel = configuration.logLevel { Adapty.logLevel = logLevel }
+            if let logLevel = configuration.logLevel {
+                Adapty.logLevel = logLevel
+            }
 
             await Storage.clearAllDataIf(
                 differentApiKey: configuration.apiKey,

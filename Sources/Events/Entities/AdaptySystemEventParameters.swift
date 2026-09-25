@@ -127,6 +127,9 @@ enum MethodName: String {
     case identify
     case logout
 
+    case getPendingStoreMessageTypes
+    case showStoreMessages
+
     case getProfile = "get_profile"
     case updateProfile = "update_profile"
     case updateExternalAttribution = "update_external_attribution"

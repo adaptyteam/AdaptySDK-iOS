@@ -17,9 +17,9 @@ struct AdaptyUIGeometrySizePreferenceKey: PreferenceKey {
 }
 
 struct AdaptyUIGeometrySizeObserver: ViewModifier {
-    var onChange: (CGSize) -> Void
+    var onChange: @MainActor @Sendable (CGSize) -> Void
 
-    init(_ onChange: @escaping (CGSize) -> Void) {
+    init(_ onChange: @escaping @MainActor @Sendable (CGSize) -> Void) {
         self.onChange = onChange
     }
 
@@ -30,7 +30,7 @@ struct AdaptyUIGeometrySizeObserver: ViewModifier {
                     Color
                         .clear
                         .preference(key: AdaptyUIGeometrySizePreferenceKey.self, value: proxy.size)
-                        .onPreferenceChange(AdaptyUIGeometrySizePreferenceKey.self) { value in
+                        .onPreferenceChange(AdaptyUIGeometrySizePreferenceKey.self) { @Sendable value in
                             Task { @MainActor in
                                 onChange(value)
                             }
@@ -42,13 +42,13 @@ struct AdaptyUIGeometrySizeObserver: ViewModifier {
 
 extension View {
     @ViewBuilder
-    func onGeometrySizeChange(perform action: @escaping (CGSize) -> Void) -> some View {
+    func onGeometrySizeChange(perform action: @escaping @MainActor @Sendable (CGSize) -> Void) -> some View {
 #if compiler(>=6.0)
         if #available(iOS 18.0, visionOS 2.0, *) {
             onGeometryChange(
                 for: CGSize.self,
-                of: { $0.frame(in: .local).size },
-                action: { _, x in Task { @MainActor in action(x) } }
+                of: { @Sendable proxy in proxy.frame(in: .local).size },
+                action: { @Sendable _, x in Task { @MainActor in action(x) } }
             )
         } else {
             modifier(AdaptyUIGeometrySizeObserver(action))

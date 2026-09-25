@@ -14,7 +14,6 @@ public struct AdaptyConfiguration: Sendable {
         idfaCollectionDisabled: false,
         ipAddressCollectionDisabled: false,
         adaptyAttributionEnabled: false,
-        transactionFinishBehavior: TransactionFinishBehavior.default,
         clearDataOnBackup: false
     )
 
@@ -22,6 +21,7 @@ public struct AdaptyConfiguration: Sendable {
     let customerUserId: String?
     let appAccountToken: UUID?
     let observerMode: Bool
+    let storeMessagesHandling: StoreMessagesHandling
     let idfaCollectionDisabled: Bool
     let ipAddressCollectionDisabled: Bool
     let adaptyAttributionEnabled: Bool
@@ -35,7 +35,7 @@ public struct AdaptyConfiguration: Sendable {
 
 extension AdaptyConfiguration {
     @AdaptyActor
-    static var transactionFinishBehavior = Self.default.transactionFinishBehavior
+    static var transactionFinishBehavior = TransactionFinishBehavior.default
 
     var apiKeyPrefix: String {
         String(apiKey.prefix(while: { $0 != "." }))

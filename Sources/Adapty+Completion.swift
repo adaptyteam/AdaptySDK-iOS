@@ -7,6 +7,10 @@
 
 import AdaptyCodable
 import StoreKit
+import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 public typealias AdaptyResult<Success> = Swift.Result<Success, AdaptyError>
 
@@ -546,6 +550,57 @@ public extension Adapty {
     }
 }
 
+#if os(iOS) || os(visionOS)
+@available(iOS 16.0, macCatalyst 16.0, visionOS 1.0, *)
+public extension Adapty {
+    /// Returns a snapshot of pending App Store message types through a completion handler.
+    ///
+    /// - Parameter completion: Receives the current unique message types on the configured callback queue.
+    nonisolated static func getPendingStoreMessageTypes(
+        _ completion: @escaping @Sendable (Set<AdaptyStoreMessageType>) -> Void
+    ) {
+        withCompletion(completion) {
+            await getPendingStoreMessageTypes()
+        }
+    }
+
+    #if canImport(UIKit)
+    /// Displays pending App Store messages in an explicit or best-effort window scene.
+    ///
+    /// - Parameters:
+    ///   - filter: The message types to display, or `nil` for all current pending messages.
+    ///   - scene: The exact scene to use, or `nil` to resolve one before each display call.
+    ///   - completion: Receives a public presentation error, or `nil` after a best-effort pass.
+    nonisolated static func showStoreMessages(
+        for filter: Set<AdaptyStoreMessageType>? = nil,
+        in scene: UIWindowScene? = nil,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await showStoreMessages(for: filter, in: scene)
+        }
+    }
+    #endif
+
+    /// Displays pending App Store messages through a SwiftUI presentation action.
+    ///
+    /// - Parameters:
+    ///   - filter: The message types to display, or `nil` for all current pending messages.
+    ///   - action: The action from `EnvironmentValues.displayStoreKitMessage` for the current view.
+    ///   - completion: Receives a public presentation error, or `nil` after a best-effort pass.
+    @MainActor
+    static func showStoreMessages(
+        for filter: Set<AdaptyStoreMessageType>? = nil,
+        using action: DisplayMessageAction,
+        _ completion: AdaptyErrorCompletion? = nil
+    ) {
+        withCompletion(completion) { () async throws(AdaptyError) in
+            try await showStoreMessages(for: filter, using: action)
+        }
+    }
+}
+#endif
+
 public extension AdaptyUnfinishedTransaction {
     nonisolated func finish(
         _ completion: AdaptyErrorCompletion? = nil
@@ -606,3 +661,14 @@ private func withCompletion<T: Sendable>(
     }
 }
 
+private func withCompletion<T: Sendable>(
+    _ completion: @escaping @Sendable (T) -> Void,
+    from operation: @escaping @Sendable () async -> T
+) {
+    Task {
+        let value = await operation()
+        await (AdaptyConfiguration.callbackDispatchQueue ?? .main).async {
+            completion(value)
+        }
+    }
+}

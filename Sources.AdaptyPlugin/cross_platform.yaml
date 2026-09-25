@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/4.1.3/schema"
+$id: "https://adapty.io/crossPlatform/4.2.0/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -101,13 +101,31 @@ $requests:
   ### dismissFlowView ###
   AdaptyUIDismissFlowView.Request: #request
     type: object
-    required: [method, id]
+    required: [method, id, destroy]
     properties:
       method: { const: "adapty_ui_dismiss_flow_view" }
       id: { type: string, description: "View Id" }
-      destroy: { type: boolean, default: false }
+      destroy: { type: boolean, description: "Release the view after it is dismissed" }
 
   AdaptyUIDismissFlowView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### destroyFlowView ###
+  AdaptyUIDestroyFlowView.Request: #request
+    type: object
+    required: [method, id]
+    properties:
+      method: { const: "adapty_ui_destroy_flow_view" }
+      id: { type: string, description: "View Id" }
+
+  AdaptyUIDestroyFlowView.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -291,6 +309,47 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyFlow" }
 
+  ### preloadFlows ###
+  PreloadFlows.Request: #request
+    type: object
+    required: [method, placement_ids]
+    properties:
+      method: { const: "preload_flows" }
+      placement_ids:
+        type: array
+        items: { type: string }
+      load_timeout: { type: number, description: "seconds" }
+
+  PreloadFlows.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### preloadFlowsForDefaultAudience ###
+  PreloadFlowsForDefaultAudience.Request: #request
+    type: object
+    required: [method, placement_ids]
+    properties:
+      method: { const: "preload_flows_for_default_audience" }
+      placement_ids:
+        type: array
+        items: { type: string }
+
+  PreloadFlowsForDefaultAudience.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### getPaywallProducts ###
   GetPaywallProducts.Request: #request
     type: object
@@ -308,10 +367,10 @@ $requests:
       - required: [success]
         properties:
           success:
-            {
-              type: array,
-              items: { $ref: "#/$defs/AdaptyPaywallProduct.Response" },
-            }
+            type: array
+            items: { $ref: "#/$defs/AdaptyPaywallProduct.Response" }
+
+
 
   ### getProfile ###
   GetProfile.Request: #request
@@ -465,6 +524,46 @@ $requests:
         properties:
           success: { $ref: "#/$defs/AdaptyPurchaseResult" }
 
+  ### getPendingStoreMessageTypes ###
+  GetPendingStoreMessageTypes.Request: #request
+    type: object
+    description: "iOS Only. Requires iOS 16+"
+    required: [method]
+    properties:
+      method: { const: "get_pending_store_message_types" }
+
+  GetPendingStoreMessageTypes.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success:
+            type: array
+            items: { $ref: "#/$defs/AdaptyStoreMessageType" }
+
+  ### showStoreMessage ###
+  ShowStoreMessage.Request: #request
+    type: object
+    description: "iOS Only. Requires iOS 16+"
+    required: [method]
+    properties:
+      method: { const: "show_store_messages" }
+      filter:
+        type: array
+        items: { $ref: "#/$defs/AdaptyStoreMessageType" }
+
+  ShowStoreMessage.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
   OpenWebPaywall.Request: #request
     type: object
     required: [method]
@@ -1124,7 +1223,34 @@ $defs:
 
   Date: #response #request
     type: string
-    format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    description: |
+      UTC timestamp in ISO 8601 format.
+    
+      Requirements:
+      - Fractional seconds are required and must contain between 1 and 9 digits. In the `format` property, they are represented by `SSS`; the exact accepted length is defined by the `pattern` property.
+      - The time zone must be either `Z` or `+0000`.
+      - `+00:00` and non-zero UTC offsets are not allowed.
+      
+      format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      Format components:
+      - `yyyy`: Four-digit year.
+      - `MM`: Two-digit month (`01`–`12`).
+      - `dd`: Two-digit day of the month (`01`–`31`).
+      - `'T'`: Literal separator between the date and time.
+      - `HH`: Two-digit hour in 24-hour format (`00`–`23`).
+      - `mm`: Two-digit minute (`00`–`59`).
+      - `ss`: Two-digit second (`00`–`59`).
+      - `SSS`: Fractional-seconds field. The accepted value contains between 1 and 9 digits.
+      - `Z`: Time-zone field. Only `Z` and `+0000` are accepted.
+      
+      Format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      
+      Examples:
+      - 2026-08-24T09:34:24.727Z
+      - 2026-08-24T09:34:24.727000+0000
+    
+    pattern: '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\.[0-9]{1,9}(Z|\+0000)$'
+    example: '2026-08-24T09:34:24.727000+0000'
 
   AdaptyConfiguration: #request
     type: object
@@ -1135,6 +1261,11 @@ $defs:
       customer_identity_parameters:
         { $ref: "#/$defs/CustomerIdentityParameters" }
       observer_mode: { type: boolean, default: false }
+      store_messages_handling:
+        {
+          $ref: "#/$defs/StoreMessagesHandling",
+          description: "iOS Only. Requires iOS 16+",
+        }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
       google_enable_pending_prepaid_plans: { type: boolean, default: false }
@@ -1156,6 +1287,20 @@ $defs:
             { type: integer, description: "bytes" }
           memory_storage_count_limit: { type: integer }
           disk_storage_size_limit: { type: integer, description: "bytes" }
+
+  StoreMessagesHandling: #request
+    type: string
+    enum: ["auto", "manual", "default"]
+
+  AdaptyStoreMessageType: #request #response
+    type: string
+    anyOf:
+      - enum:
+          - generic
+          - price_increase_consent
+          - billing_issue
+          - win_back_offer
+      - pattern: "^storekit_-?[0-9]+$"
 
   CustomerIdentityParameters: #request
     type: object
@@ -1366,6 +1511,7 @@ $defs:
       flow_id: { type: string }
       flow_name: { type: string }
       variation_id: { type: string }
+      variation_name: { type: string }
       remote_configs:
         type: array
         items: { $ref: "#/$defs/AdaptyRemoteConfig" }

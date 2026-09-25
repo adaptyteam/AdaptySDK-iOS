@@ -25,6 +25,16 @@ public struct AdaptyUISchema: Sendable {
     let legacySelectedProducts: [String: String]?
 }
 
+public extension AdaptyUISchema {
+    var defaultLocalId: String? {
+        defaultLocalization?.id
+    }
+
+    var allLocalIds: [String] {
+        Array(localizations.keys)
+    }
+}
+
 extension AdaptyUISchema: DecodableWithConfiguration {
     private enum CodingKeys: String, CodingKey {
         case formatVersion = "format"
@@ -45,7 +55,7 @@ extension AdaptyUISchema: DecodableWithConfiguration {
         case showPurchaseLoader = "show_purchase_loader"
         case showRestoreLoader = "show_restore_loader"
     }
-    
+
     public init(from decoder: Decoder, configuration: DecodingConfiguration) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         formatVersion = try container.decode(Version.self, forKey: .formatVersion)
@@ -195,3 +205,4 @@ private extension Decoder {
         return (scriptsResult, selectedProducts)
     }
 }
+

@@ -14,6 +14,8 @@ enum InternalAdaptyError: Error {
     case activateOnceError(AdaptyError.Source)
     case cantMakePayments(AdaptyError.Source)
     case notAllowedInObserveMode(AdaptyError.Source)
+    case storeMessageSceneUnavailable(AdaptyError.Source)
+    case storeMessageShowInProgress(AdaptyError.Source)
 
     case notActivated(AdaptyError.Source)
     case unidentifiedUserLogout(AdaptyError.Source)
@@ -40,6 +42,10 @@ extension InternalAdaptyError: CustomStringConvertible {
             "AdaptyError.cantMakePayments(\(source))"
         case let .notAllowedInObserveMode(source):
             "AdaptyError.notAllowedInObserveMode(\(source))"
+        case let .storeMessageSceneUnavailable(source):
+            "AdaptyError.storeMessageSceneUnavailable(\(source))"
+        case let .storeMessageShowInProgress(source):
+            "AdaptyError.storeMessageShowInProgress(\(source))"
         case let .notActivated(source):
             "AdaptyError.notActivated(\(source))"
         case let .profileWasChanged(source):
@@ -67,7 +73,9 @@ extension InternalAdaptyError {
              let .profileWasChanged(src),
              let .fetchFailed(src, _, _),
              let .decodingFailed(src, _, _),
-             let .wrongParam(src, _):
+             let .wrongParam(src, _),
+             let .storeMessageSceneUnavailable(src),
+             let .storeMessageShowInProgress(src):
             src
         }
     }
@@ -95,6 +103,8 @@ extension InternalAdaptyError: CustomNSError {
         case .unidentifiedUserLogout: .unidentifiedUserLogout
         case .cantMakePayments: .cantMakePayments
         case .notAllowedInObserveMode: .cantMakePayments
+        case .storeMessageSceneUnavailable: .resolverFailure
+        case .storeMessageShowInProgress: .operationInProgress
         case .notActivated: .notActivated
         case .profileWasChanged: .profileWasChanged
         case .fetchFailed: .networkFailed
@@ -143,6 +153,14 @@ extension AdaptyError {
 
     static func notAllowedInObserveMode(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
         InternalAdaptyError.notAllowedInObserveMode(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func storeMessageSceneUnavailable(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.storeMessageSceneUnavailable(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
+    }
+
+    static func storeMessageShowInProgress(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {
+        InternalAdaptyError.storeMessageShowInProgress(AdaptyError.Source(file: file, function: function, line: line)).asAdaptyError
     }
 
     static func notActivated(file: String = #fileID, function: String = #function, line: UInt = #line) -> Self {

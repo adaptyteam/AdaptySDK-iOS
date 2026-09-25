@@ -23,6 +23,7 @@ public extension Dev_AdaptyUIConfiguration {
         contents: [AdaptyUISchema.ExampleContent],
         script: String? = nil,
         startScreenName: String?,
+        withLocaleId localeId: LocaleId? = nil,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration,
         environment: Dev_PreviewEnvironment = .empty
     ) throws -> Self {
@@ -37,6 +38,7 @@ public extension Dev_AdaptyUIConfiguration {
 
         return try create(
             json: json,
+            withLocaleId: localeId,
             decodingConfiguration: decodingConfiguration,
             environment: environment
         )
@@ -44,6 +46,7 @@ public extension Dev_AdaptyUIConfiguration {
 
     static func create(
         json: String,
+        withLocaleId localeId: LocaleId? = nil,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration,
         environment: Dev_PreviewEnvironment = .empty
     ) throws -> Self {
@@ -51,6 +54,7 @@ public extension Dev_AdaptyUIConfiguration {
         let schema = try AdaptyUISchema(from: json, configuration: decodingConfiguration)
         let configuration = try schema.extractUIConfiguration(
             id: uuid,
+            withLocaleId: localeId ?? schema.defaultLocalId ?? "en",
             envoriment: .init(
                 sdkVersion: environment.sdkVersion,
                 osName: environment.osName,
@@ -78,4 +82,3 @@ public extension Dev_AdaptyUIConfiguration {
         )
     }
 }
-
