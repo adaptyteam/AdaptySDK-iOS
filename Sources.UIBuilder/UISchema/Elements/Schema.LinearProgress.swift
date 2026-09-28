@@ -11,7 +11,7 @@ extension Schema {
     typealias LinearProgress = VC.LinearProgress
 }
 
-extension Schema.LinearProgress: Schema.SimpleElement {
+extension Schema.LinearProgress: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,

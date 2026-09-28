@@ -8,12 +8,12 @@
 import Foundation
 
 extension VC {
-    struct NumberConverter: Converter {
+    struct NumberConverter: VCConverter {
         let format: String
     }
 }
 
-extension VC.NumberConverter: VC.TagConverter {
+extension VC.NumberConverter: VCTagConverter {
     func toString(_ value: Any, locale: Locale) -> String? {
         switch value {
         case let value as UInt:

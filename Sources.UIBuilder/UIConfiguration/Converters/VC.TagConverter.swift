@@ -6,18 +6,16 @@
 //
 import Foundation
 
-extension VC {
-    protocol TagConverter {
-        func toString(_: Any, locale: Locale) -> String?
-    }
+protocol VCTagConverter {
+    func toString(_: Any, locale: Locale) -> String?
 }
 
 extension VC.AnyConverter {
     var isTagConverter: Bool {
-        wrapped is VC.TagConverter
+        wrapped is VCTagConverter
     }
 
-    var asTagConverter: VC.TagConverter? {
-        wrapped as? VC.TagConverter
+    var asTagConverter: VCTagConverter? {
+        wrapped as? VCTagConverter
     }
 }

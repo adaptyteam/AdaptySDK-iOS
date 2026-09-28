@@ -9,7 +9,7 @@ extension Schema {
     typealias RadialProgress = VC.RadialProgress
 }
 
-extension Schema.RadialProgress: Schema.SimpleElement {
+extension Schema.RadialProgress: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,

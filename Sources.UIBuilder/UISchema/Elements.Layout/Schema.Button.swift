@@ -16,7 +16,7 @@ extension Schema {
     }
 }
 
-extension Schema.Button: Schema.CompositeElement {
+extension Schema.Button: SchemaCompositeElement {
     @inlinable
     func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
         taskStack.append(.planElement(content))

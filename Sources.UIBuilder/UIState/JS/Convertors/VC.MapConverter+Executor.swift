@@ -8,7 +8,7 @@
 import Foundation
 import JavaScriptCore
 
-extension VC.MapConverter: VS.DataBindingConverter {
+extension VC.MapConverter: VSDataBindingConverter {
     func readValue(_ jsValue: JSValue, in context: JSContext) throws(VS.Error) -> JSValue {
         guard let index32 = Int32.fromJSValue(jsValue) else {
             throw .convertorError("MapConvertor: expected a integer index")

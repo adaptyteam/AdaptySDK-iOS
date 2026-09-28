@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum TimerConverter: Converter {
+    enum TimerConverter: VCConverter {
         case days(String)
         case hours(String)
         case minutes(String)
@@ -25,7 +25,7 @@ extension VC {
     }
 }
 
-extension VC.TimerConverter: VC.TagConverter {
+extension VC.TimerConverter: VCTagConverter {
     func toString(_ value: Any, locale: Locale) -> String? {
         switch value {
         case is Bool:

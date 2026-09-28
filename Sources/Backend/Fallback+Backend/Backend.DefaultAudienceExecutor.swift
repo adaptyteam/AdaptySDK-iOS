@@ -7,6 +7,4 @@
 
 import Foundation
 
-extension Backend {
-    protocol DefaultAudienceExecutor: BackendExecutor {}
-}
+protocol BackendDefaultAudienceExecutor: BackendExecutor {}

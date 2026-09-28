@@ -301,7 +301,7 @@ extension VS.JSState {
 
     func execute(
         actions: [VC.Action],
-        params: [String: any VC.Value]?,
+        params: [String: any VCValue]?,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
         guard !actions.isEmpty else { return }

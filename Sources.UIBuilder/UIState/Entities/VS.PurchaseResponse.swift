@@ -14,7 +14,7 @@ package extension VS {
         let result: PurchaseResult
     }
 
-    enum PurchaseResult: String, VC.Value {
+    enum PurchaseResult: String, VCValue {
         case fail
         case userCanceled
         case success
