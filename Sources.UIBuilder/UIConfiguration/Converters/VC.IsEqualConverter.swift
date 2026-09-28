@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct IsEqualConverter: Converter {
+    struct IsEqualConverter: VCConverter {
         let value: VC.AnyValue
         let falseValue: VC.AnyValue?
     }

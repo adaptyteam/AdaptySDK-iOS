@@ -59,7 +59,7 @@ public extension Adapty {
 
     private func preloadPlacementsForDefaultAudience(
         _ type: (some PlacementContent).Type,
-        _ session: Backend.DefaultAudienceExecutor,
+        _ session: BackendDefaultAudienceExecutor,
         placementIds: Set<String>,
         locale: AdaptyLocale? = nil
     ) async throws(AdaptyError) {
@@ -89,7 +89,7 @@ public extension Adapty {
 
     internal func preloadBackendPlacementsForDefaultAudience(
         _ type: (some PlacementContent).Type,
-        _ session: Backend.DefaultAudienceExecutor,
+        _ session: BackendDefaultAudienceExecutor,
         _ placementIds: Set<String>,
         _ locale: AdaptyLocale?,
         _ userId: AdaptyUserId,

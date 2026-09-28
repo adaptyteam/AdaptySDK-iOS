@@ -8,13 +8,13 @@
 import Foundation
 
 extension VC {
-    enum DateTimeConverter: Converter {
+    enum DateTimeConverter: VCConverter {
         case format(String)
         case styles(date: DateFormatter.Style, time: DateFormatter.Style)
     }
 }
 
-extension VC.DateTimeConverter: VC.TagConverter {
+extension VC.DateTimeConverter: VCTagConverter {
     func toString(_ value: Any, locale: Locale) -> String? {
         switch value {
         case let value as Date:

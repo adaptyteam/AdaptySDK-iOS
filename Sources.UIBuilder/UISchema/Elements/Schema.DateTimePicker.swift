@@ -11,7 +11,7 @@ extension Schema {
     typealias DateTimePicker = VC.DateTimePicker
 }
 
-extension Schema.DateTimePicker: Schema.SimpleElement {
+extension Schema.DateTimePicker: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,

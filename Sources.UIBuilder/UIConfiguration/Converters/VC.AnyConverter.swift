@@ -7,13 +7,13 @@
 
 import Foundation
 
+protocol VCConverter: Sendable {}
+
 extension VC {
-    protocol Converter: Sendable {}
+    struct AnyConverter: VCConverter {
+        let wrapped: any VCConverter
 
-    struct AnyConverter: Converter {
-        let wrapped: any Converter
-
-        init(_ value: any Converter) {
+        init(_ value: any VCConverter) {
             if let value = value as? AnyConverter {
                 self = value
             } else {
@@ -22,12 +22,12 @@ extension VC {
         }
     }
 
-    struct UnknownConverter: Converter {
+    struct UnknownConverter: VCConverter {
         let name: String
     }
 }
 
-extension VC.Converter {
+extension VCConverter {
     @inlinable
     var asAnyConverter: VC.AnyConverter {
         .init(self)

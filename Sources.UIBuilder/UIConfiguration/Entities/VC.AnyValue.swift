@@ -8,13 +8,13 @@
 import AdaptyCodable
 import Foundation
 
+protocol VCValue: Sendable, JSValueConvertable {}
+
 extension VC {
-    protocol Value: Sendable, JSValueConvertable {}
+    struct AnyValue: VCValue {
+        let wrapped: any VCValue
 
-    struct AnyValue: Value {
-        let wrapped: any Value
-
-        init(_ value: any Value) {
+        init(_ value: any VCValue) {
             if let value = value as? Self {
                 self = value
             } else {
@@ -24,19 +24,19 @@ extension VC {
     }
 }
 
-extension Bool: VC.Value {}
-extension Int: VC.Value {}
-extension UInt: VC.Value {}
-extension Int32: VC.Value {}
-extension UInt32: VC.Value {}
-extension Double: VC.Value {}
-extension String: VC.Value {}
-extension Optional: VC.Value where Wrapped: VC.Value {}
+extension Bool: VCValue {}
+extension Int: VCValue {}
+extension UInt: VCValue {}
+extension Int32: VCValue {}
+extension UInt32: VCValue {}
+extension Double: VCValue {}
+extension String: VCValue {}
+extension Optional: VCValue where Wrapped: VCValue {}
 
-extension Array: VC.Value where Element: VC.Value {}
-extension Dictionary: VC.Value where Key == String, Value: VC.Value {}
+extension Array: VCValue where Element: VCValue {}
+extension Dictionary: VCValue where Key == String, Value: VCValue {}
 
-extension VC.Value {
+extension VCValue {
     var isNil: Bool {
         if let value = self as? VC.AnyValue {
             return value.wrapped.isNil
@@ -48,29 +48,29 @@ extension VC.Value {
         if let value = self as? VC.AnyValue {
             return value.wrapped.isArray
         }
-        return self is [any VC.Value]
+        return self is [any VCValue]
     }
 
     var isObject: Bool {
         if let value = self as? VC.AnyValue {
             return value.wrapped.isObject
         }
-        return self is [String: any VC.Value]
+        return self is [String: any VCValue]
     }
 
-    var asArray: [any VC.Value]? {
+    var asArray: [any VCValue]? {
         if let value = self as? VC.AnyValue {
             return value.wrapped.asArray
         }
-        guard let value = self as? [any VC.Value] else { return nil }
+        guard let value = self as? [any VCValue] else { return nil }
         return value
     }
 
-    var asObject: [String: any VC.Value]? {
+    var asObject: [String: any VCValue]? {
         if let value = self as? VC.AnyValue {
             return value.wrapped.asObject
         }
-        guard let value = self as? [String: any VC.Value] else { return nil }
+        guard let value = self as? [String: any VCValue] else { return nil }
         return value
     }
 }

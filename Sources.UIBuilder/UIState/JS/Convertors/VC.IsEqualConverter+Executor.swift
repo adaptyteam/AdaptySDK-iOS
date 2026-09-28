@@ -7,7 +7,7 @@
 import Foundation
 import JavaScriptCore
 
-extension VC.IsEqualConverter: VS.DataBindingConverter {
+extension VC.IsEqualConverter: VSDataBindingConverter {
     func readValue(_ jsValue: JSValue, in context: JSContext) throws(VS.Error) -> JSValue {
         let rhs = value.toJSValue(in: context)
         let result = jsValue.isEqual(to: rhs)

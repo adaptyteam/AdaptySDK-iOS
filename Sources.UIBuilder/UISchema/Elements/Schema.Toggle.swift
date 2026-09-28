@@ -11,7 +11,7 @@ extension Schema {
     typealias Toggle = VC.Toggle
 }
 
-extension Schema.Toggle: Schema.SimpleElement {
+extension Schema.Toggle: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,
