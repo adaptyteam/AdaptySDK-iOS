@@ -23,8 +23,41 @@ private final class AdaptyUIAnimationCoordinator: ObservableObject {
     }
 }
 
+/// Calls `onFinished` once every animation started from one `play` value has
+/// completed. `track()` is taken per animation, `seal()` after the last one.
+@MainActor
+private final class AdaptyUIAnimationCompletionGroup {
+    private var pending = 0
+    private var sealed = false
+    private var onFinished: (() -> Void)?
+
+    init(_ onFinished: @escaping () -> Void) {
+        self.onFinished = onFinished
+    }
+
+    func track() -> () -> Void {
+        pending += 1
+        return { [self] in
+            pending -= 1
+            fireIfDone()
+        }
+    }
+
+    func seal() {
+        sealed = true
+        fireIfDone()
+    }
+
+    private func fireIfDone() {
+        guard sealed, pending == 0, let onFinished else { return }
+        self.onFinished = nil
+        onFinished()
+    }
+}
+
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private var play: Binding<[VC.Animation]>
+    private let onFinished: (() -> Void)?
 
     private let initialBlurRadius: Double
 
@@ -98,6 +131,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
 
         self.play = play
+        self.onFinished = nil
     }
 
     init(
@@ -113,6 +147,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         initialShadowFilling: VC.AssetReference?,
         initialShadowOffset: VC.Offset,
         initialShadowBlurRadius: Double,
+        onFinished: (() -> Void)?
     ) {
         self.initialOpacity = initialOpacity
 
@@ -132,6 +167,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.initialShadowBlurRadius = initialShadowBlurRadius
 
         self.play = play
+        self.onFinished = onFinished
     }
 
     @State private var animatedOffsetX: CGFloat?
@@ -195,6 +231,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     private func startAnimations(_ animations: [VC.Animation]) {
         var tokens = Set<AdaptyUIAnimationToken>()
+        // An empty `play` only resets the transition; it has nothing to finish.
+        let completionGroup = animations.isEmpty ? nil : onFinished.map(AdaptyUIAnimationCompletionGroup.init)
 
         for animation in animations {
             let timeline = animation.timeline
@@ -205,6 +243,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     timeline.animate(
                         from: value.start,
                         to: value.end,
+                        completion: completionGroup?.track(),
                         updateBlock: {
                             self.animatedOpacity = $0
                         }
@@ -217,6 +256,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     timeline.animate(
                         from: value.start,
                         to: value.end,
+                        completion: completionGroup?.track(),
                         updateBlock: {
                             self.animatedOffsetX = $0.x.points(.horizontal, screenSize, safeArea)
                             self.animatedOffsetY = $0.y.points(.vertical, screenSize, safeArea)
@@ -230,6 +270,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     timeline.animate(
                         from: value.angle.start,
                         to: value.angle.end,
+                        completion: completionGroup?.track(),
                         updateBlock: {
                             self.animatedRotation = .degrees($0)
                         }
@@ -244,6 +285,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     timeline.animate(
                         from: value.scale.start,
                         to: value.scale.end,
+                        completion: completionGroup?.track(),
                         updateBlock: {
                             self.animatedScaleX = $0.x
                             self.animatedScaleY = $0.y
@@ -270,6 +312,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     timeline.animate(
                         from: (value.color?.start, value.blurRadius?.start, value.offset?.start),
                         to: (value.color?.end, value.blurRadius?.end, value.offset?.end),
+                        completion: completionGroup?.track(),
                         updateBlock: { value in
                             if let colorValue = value.0 {
                                 animatedShadowFilling = colorValue
@@ -294,6 +337,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     timeline.animate(
                         from: value.start,
                         to: value.end,
+                        completion: completionGroup?.track(),
                         updateBlock: {
                             self.animatedBlurRadius = $0
                         }
@@ -304,6 +348,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             }
         }
 
+        completionGroup?.seal()
         animationCoordinator.tokens = tokens
     }
 }
@@ -340,6 +385,7 @@ extension View {
         initialShadowFilling: VC.AssetReference? = nil,
         initialShadowOffset: VC.Offset = .zero,
         initialShadowBlurRadius: Double = .zero,
+        onFinished: (() -> Void)? = nil
     ) -> some View {
         modifier(
             AdaptyUIAnimatablePropertiesModifier(
@@ -355,6 +401,7 @@ extension View {
                 initialShadowFilling: initialShadowFilling,
                 initialShadowOffset: initialShadowOffset,
                 initialShadowBlurRadius: initialShadowBlurRadius,
+                onFinished: onFinished
             )
         )
     }

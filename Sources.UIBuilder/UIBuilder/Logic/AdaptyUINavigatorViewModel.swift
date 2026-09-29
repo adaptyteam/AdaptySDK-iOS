@@ -52,6 +52,11 @@ final class AdaptyUIScreenViewModel: ObservableObject {
     }
 }
 
+enum AdaptyUIScreenTransitionSide {
+    case incoming
+    case outgoing
+}
+
 @MainActor
 package final class AdaptyUINavigatorViewModel: ObservableObject {
     let navigator: VC.Navigator
@@ -136,6 +141,22 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     @Published var backgroundAnimation: VC.Animation.Background? = nil
     @Published var contentAnimations: [VC.Animation]? = nil
 
+    /// Extra time past a screen transition's duration before it is finished
+    /// without its animations having reported completion.
+    private static let screenTransitionTimeout: TimeInterval = 2.0
+
+    private struct PendingScreenTransition {
+        let id = UUID()
+        let outgoing: AdaptyUIScreenViewModel
+        let incoming: AdaptyUIScreenViewModel
+        let outgoingAnimations: [VC.Animation]?
+        var unfinished: Set<AdaptyUIScreenTransitionSide>
+        var incomingMounted = false
+        let finish: () -> Void
+    }
+
+    private var pendingScreenTransition: PendingScreenTransition?
+
     func startScreenTransition(
         _ screen: AdaptyUIScreenViewModel,
         transitionId: String,
@@ -214,7 +235,10 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             newScreen.zIndex = 0.0
         }
 
-        currentScreen.startOutgoingTransition(transition.outgoing)
+        // Arms the incoming screen: it takes its initial (pre-transition) values
+        // from here on its first body and plays the animation once mounted. The
+        // outgoing animation waits for that mount too (see screenDidMount), so a
+        // slow first render of the incoming screen cannot eat into the transition.
         newScreen.startIncomingTransition(transition.incoming)
 
         // Fire onWillAppear for incoming screen
@@ -225,49 +249,107 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             screenInstanceId: newScreen.instance.id
         )
 
+        var unfinished = Set<AdaptyUIScreenTransitionSide>()
+        if transition.incoming?.isEmpty == false { unfinished.insert(.incoming) }
+        if transition.outgoing?.isEmpty == false { unfinished.insert(.outgoing) }
+
+        let pending = PendingScreenTransition(
+            outgoing: currentScreen,
+            incoming: newScreen,
+            outgoingAnimations: transition.outgoing,
+            unfinished: unfinished,
+            finish: { [weak self] in
+                guard let self else { return }
+
+                Log.ui.verbose("#\(self.logId)# screen:\(screen.id) in navigator:\(self.navigator.id) - transition finished")
+
+                // Fire onDidDisappear for outgoing screen
+                self.executeScreenActions(.onDidDisappear, screen: currentScreen.instance)
+
+                // Clear stale pending events for outgoing screen
+                self.eventBus.clearPending(for: currentScreen.instance.id)
+
+                self.screens.remove(at: 0)
+                self.screens.first?.zIndex = 1.0
+                completion?()
+
+                // TODO: SDK-1043 — disarming armed @Published values after the
+                // animation is fragile: if the view tree remounts before this
+                // fires, re-subscribers will still receive the armed value and
+                // replay the animation. Replace with a one-shot signal (e.g. UUID
+                // nonce) so transition triggers fire exactly once regardless of
+                // re-subscriptions. Also applies to startNavigatorTransition
+                // (backgroundAnimation / contentAnimations) below. Investigate
+                // the orthogonal issue of why AdaptyNavigatorView remounts
+                // twice on app foreground.
+                currentScreen.startOutgoingTransition(nil)
+                screen.startIncomingTransition(nil)
+
+                // Fire onDidAppear for the new screen
+                self.executeScreenActions(.onDidAppear, screen: screen.instance)
+                self.eventBus.publish(
+                    eventId: .onDidAppear,
+                    transitionId: transitionId,
+                    screenInstanceId: screen.instance.id
+                )
+            }
+        )
+        pendingScreenTransition = pending
+
         screens.append(newScreen)
 
-        // Extra 0.1s buffer accounts for the delay between when the timer
-        // starts and when SwiftUI actually begins rendering the animations
-        // (view update pipeline: onReceive → onChange → startAnimations → Task).
+        // Safety net only: the transition normally finishes on its animations'
+        // completion. If the incoming screen never mounts, finish anyway so the
+        // navigator does not keep two screens and drop every later transition.
+        let pendingId = pending.id
         DispatchQueue.main.asyncAfter(
-            deadline: .now() + transition.totalDuration + 0.1
+            deadline: .now() + transition.totalDuration + Self.screenTransitionTimeout
         ) { [weak self] in
-            guard let self else { return }
-
-            Log.ui.verbose("#\(self.logId)# screen:\(screen.id) in navigator:\(self.navigator.id) - transition finished")
-
-            // Fire onDidDisappear for outgoing screen
-            self.executeScreenActions(.onDidDisappear, screen: currentScreen.instance)
-
-            // Clear stale pending events for outgoing screen
-            self.eventBus.clearPending(for: currentScreen.instance.id)
-
-            self.screens.remove(at: 0)
-            self.screens.first?.zIndex = 1.0
-            completion?()
-
-            // TODO: SDK-1043 — disarming armed @Published values after the
-            // animation deadline is fragile: if the app is backgrounded
-            // mid-transition (or the view tree remounts before this fires),
-            // re-subscribers will still receive the armed value and replay
-            // the animation. Replace with a one-shot signal (e.g. UUID
-            // nonce) so transition triggers fire exactly once regardless of
-            // re-subscriptions. Also applies to startNavigatorTransition
-            // (backgroundAnimation / contentAnimations) below. Investigate
-            // the orthogonal issue of why AdaptyNavigatorView remounts
-            // twice on app foreground.
-            currentScreen.startOutgoingTransition(nil)
-            screen.startIncomingTransition(nil)
-
-            // Fire onDidAppear for the new screen
-            self.executeScreenActions(.onDidAppear, screen: screen.instance)
-            self.eventBus.publish(
-                eventId: .onDidAppear,
-                transitionId: transitionId,
-                screenInstanceId: screen.instance.id
-            )
+            guard let self, self.pendingScreenTransition?.id == pendingId else { return }
+            Log.ui.error("#\(self.logId)# screen:\(screen.id) in navigator:\(self.navigator.id) - transition did not finish in time")
+            self.finishPendingScreenTransition()
         }
+    }
+
+    /// Called from the screen's `onAppear`. Starts the outgoing animation of a
+    /// pending transition once its incoming screen is mounted.
+    func screenDidMount(_ screen: AdaptyUIScreenViewModel) {
+        guard var pending = pendingScreenTransition,
+              pending.incoming === screen,
+              !pending.incomingMounted
+        else { return }
+
+        pending.incomingMounted = true
+        pendingScreenTransition = pending
+
+        pending.outgoing.startOutgoingTransition(pending.outgoingAnimations)
+
+        if pending.unfinished.isEmpty {
+            finishPendingScreenTransition()
+        }
+    }
+
+    /// Called when all animations of one side of a screen transition have completed.
+    func screenTransitionDidFinish(_ screen: AdaptyUIScreenViewModel, side: AdaptyUIScreenTransitionSide) {
+        guard var pending = pendingScreenTransition else { return }
+
+        switch side {
+        case .incoming: guard pending.incoming === screen else { return }
+        case .outgoing: guard pending.outgoing === screen else { return }
+        }
+
+        pending.unfinished.remove(side)
+        pendingScreenTransition = pending
+
+        if pending.unfinished.isEmpty, pending.incomingMounted {
+            finishPendingScreenTransition()
+        }
+    }
+
+    private func finishPendingScreenTransition() {
+        guard let pending = pendingScreenTransition else { return }
+        pendingScreenTransition = nil
+        pending.finish()
     }
 
     func startNavigatorTransition(

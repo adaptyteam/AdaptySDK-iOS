@@ -49,14 +49,19 @@ struct AdaptyScreenView: View {
             initialRotation: incomingAnimations.transitionInitialRotation ?? .zero,
             initialRotationAnchor: incomingAnimations.transitionInitialRotationAnchor ?? .center,
             initialOffset: incomingAnimations.transitionInitialOffset ?? .zero,
-            initialBlurRadius: incomingAnimations.transitionInitialBlurRadius ?? .zero
+            initialBlurRadius: incomingAnimations.transitionInitialBlurRadius ?? .zero,
+            onFinished: { navigatorViewModel.screenTransitionDidFinish(screenInstance, side: .incoming) }
         )
         .animatablePropertiesTransition(
-            play: $playOutgoingTransition
+            play: $playOutgoingTransition,
+            onFinished: { navigatorViewModel.screenTransitionDidFinish(screenInstance, side: .outgoing) }
         )
         .onReceive(screenInstance.$playIncomingTransition) { playIncomingTransition = $0 ?? [] }
         .onReceive(screenInstance.$playOutgoingTransition) { playOutgoingTransition = $0 ?? [] }
-        .onAppear { screenInstance.consumeFireOnDidAppear() }
+        .onAppear {
+            navigatorViewModel.screenDidMount(screenInstance)
+            screenInstance.consumeFireOnDidAppear()
+        }
     }
 
     @ViewBuilder
