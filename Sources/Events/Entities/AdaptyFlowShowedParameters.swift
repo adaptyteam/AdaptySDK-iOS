@@ -9,10 +9,12 @@ import Foundation
 
 struct AdaptyFlowShowedParameters: Sendable {
     let variationId: String
+    let flowVersionId: String?
 }
 
 extension AdaptyFlowShowedParameters: Codable {
     enum CodingKeys: String, CodingKey {
         case variationId = "variation_id"
+        case flowVersionId = "flow_version_id"
     }
 }
