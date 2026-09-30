@@ -52,6 +52,27 @@ extension View {
     }
 }
 
+/// Set while a drag is in progress on a pager, so that a full-size button on its
+/// page does not fire its action when the drag is released over it. The flag
+/// lives in the pager, not in the button: a drag gesture on the button would take
+/// the touch from an enclosing scroll view. A reference type keeps the flag out
+/// of the view state — mutating it must not redraw the pages.
+@MainActor
+final class AdaptyUIPagerDragGuard {
+    var didDrag = false
+}
+
+struct AdaptyUIPagerDragGuardKey: EnvironmentKey {
+    static let defaultValue: AdaptyUIPagerDragGuard? = nil
+}
+
+extension EnvironmentValues {
+    var adaptyPagerDragGuard: AdaptyUIPagerDragGuard? {
+        get { self[AdaptyUIPagerDragGuardKey.self] }
+        set { self[AdaptyUIPagerDragGuardKey.self] = newValue }
+    }
+}
+
 fileprivate let pageControllTapAnimationDuration = 0.3
 
 @MainActor
@@ -96,6 +117,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
 
     @State private var offset = CGFloat.zero
     @State private var isHorizontalDrag: Bool?
+    @State private var dragGuard = AdaptyUIPagerDragGuard()
     @State private var isInteracting = false
     @State private var timer: Timer?
 
@@ -262,6 +284,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 }
             }
             .padding(.top, pagePaddingTop)
+            .environment(\.adaptyPagerDragGuard, dragGuard)
             .offset(x: VC.Pager.pagesOffsetX(
                 currentPage: currentPage,
                 pageCount: pages.count,
@@ -275,6 +298,8 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
             .dragGesture(
                 condition: pager.interactionBehavior != .none,
                 onChanged: { value in
+                    dragGuard.didDrag = true
+
                     let isHorizontal = isHorizontalDrag
                         ?? (abs(value.translation.width) >= abs(value.translation.height))
                     isHorizontalDrag = isHorizontal
@@ -285,6 +310,9 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                     stopAutoScroll() // Stop the autoscroll while interacting
                 },
                 onEnded: { value in
+                    // Reset after the release has reached the button under the finger.
+                    Task { @MainActor in dragGuard.didDrag = false }
+
                     let wasHorizontal = isHorizontalDrag ?? false
                     isHorizontalDrag = nil
                     guard wasHorizontal else { return }
