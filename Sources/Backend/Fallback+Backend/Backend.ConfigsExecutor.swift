@@ -8,7 +8,7 @@
 import Foundation
 
 extension Backend {
-    struct ConfigsExecutor: DefaultAudienceExecutor {
+    struct ConfigsExecutor: BackendDefaultAudienceExecutor {
         let manager: StateManager
         let session: HTTPSession
         let kind = AdaptyServerKind.configs

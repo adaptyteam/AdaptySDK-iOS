@@ -8,7 +8,7 @@
 import Foundation
 
 extension Backend {
-    struct FallbackExecutor: DefaultAudienceExecutor {
+    struct FallbackExecutor: BackendDefaultAudienceExecutor {
         let manager: StateManager
         let session: HTTPSession
         let kind = AdaptyServerKind.fallback

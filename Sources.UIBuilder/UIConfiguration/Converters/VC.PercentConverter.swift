@@ -8,12 +8,12 @@
 import Foundation
 
 extension VC {
-    struct PercentConverter: Converter {
+    struct PercentConverter: VCConverter {
         let format: String
     }
 }
 
-extension VC.PercentConverter: VC.TagConverter {
+extension VC.PercentConverter: VCTagConverter {
     func toString(_ value: Any, locale: Locale) -> String? {
         switch value {
         case let value as Double:
