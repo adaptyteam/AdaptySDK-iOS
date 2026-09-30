@@ -35,7 +35,7 @@ extension StoreKit.Product.SubscriptionOffer {
 extension StoreKit.Product {
     func adaptySubscriptionOffer(
         by offerIdentifier: AdaptySubscriptionOffer.Identifier,
-        billingPlan: AdaptySubscriptionBillingPlan
+        for billingPlan: AdaptySubscriptionBillingPlan
     ) -> AdaptySubscriptionOffer? {
         guard let offer = subscription?.offer(by: offerIdentifier, for: billingPlan) else { return nil }
         return offer.asAdaptySubscriptionOffer(

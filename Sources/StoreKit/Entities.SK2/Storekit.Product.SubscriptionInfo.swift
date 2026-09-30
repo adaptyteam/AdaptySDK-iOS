@@ -69,7 +69,11 @@ extension StoreKit.Product.SubscriptionInfo {
         for billingPlanType: BillingPlanType
     ) -> Product.SubscriptionOffer? {
         let offerType = offerIdentifier.offerType.asSKSubscriptionOfferType
-        return pricingTerms(for: billingPlanType)?.subscriptionOffers.first { $0.type == offerType && $0.id == offerIdentifier.offerId }
+        return if offerType == .introductory {
+             pricingTerms(for: billingPlanType)?.subscriptionOffers.first { $0.type == offerType }
+        } else {
+             pricingTerms(for: billingPlanType)?.subscriptionOffers.first { $0.type == offerType && $0.id == offerIdentifier.offerId }
+        }
     }
 }
 #endif
