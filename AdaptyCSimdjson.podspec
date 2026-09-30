@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = 'AdaptyCSimdjson'
   s.module_name      = 'CSimdjson'
-  s.version          = '4.2.0'
+  s.version          = '4.2.0-SNAPSHOT'
   s.summary          = 'simdjson C bridge used by the Adapty SDK.'
 
   s.description      = <<-DESC
