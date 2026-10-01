@@ -79,6 +79,36 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
             safeAreaEnd: self.safeArea.bottom
         )
 
+        self.declaringWidthProposal(
+            self.framed(content, wConstraints, hConstraints),
+            wConstraints
+        )
+    }
+
+    /// A `shrink` width proposes an unspecified width to the content — that is what
+    /// `fixedSize(horizontal:)` does — and any other width constraint hands one down.
+    /// A box that constrains neither stays silent, so the content keeps whatever the
+    /// enclosing box declared. See `AdaptyUIUnspecifiedWidthProposalKey`.
+    @ViewBuilder
+    private func declaringWidthProposal(
+        _ content: some View,
+        _ wConstraints: Constraints
+    ) -> some View {
+        if wConstraints.shrink {
+            content.withUnspecifiedWidthProposal(true)
+        } else if wConstraints.min != nil || wConstraints.max != nil {
+            content.withUnspecifiedWidthProposal(false)
+        } else {
+            content
+        }
+    }
+
+    @ViewBuilder
+    private func framed(
+        _ content: Content,
+        _ wConstraints: Constraints,
+        _ hConstraints: Constraints
+    ) -> some View {
         if wConstraints.min == nil && wConstraints.max == nil && wConstraints.shrink == false &&
             hConstraints.min == nil && hConstraints.max == nil && hConstraints.shrink == false
         {

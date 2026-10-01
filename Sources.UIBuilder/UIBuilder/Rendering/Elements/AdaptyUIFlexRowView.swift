@@ -16,6 +16,8 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
+    @Environment(\.adaptyUnspecifiedWidthProposal)
+    private var unspecifiedWidthProposal: Bool
 
     private let row: VC.Row
     private let externalSize: CGSize?
@@ -138,15 +140,33 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     }
 
     private var weightedBody: some View {
+        GeometryReader { proxy in
+            weightedContent(availableWidth: externalSize?.width
+                ?? (unspecifiedWidthProposal ? nil : proxy.size.width))
+        }
+        // The reader is greedy on both axes; the row hugs its content vertically, so
+        // the measured height is handed back as the row's own height — the same shape
+        // `AdaptyUIRowView` uses. Height does not ratchet: it is measured on the
+        // content, which does not depend on the height proposed to it.
+        .frame(height: measuredSize.height)
+    }
+
+    /// - Parameter availableWidth: width to distribute among the weighted items, or
+    ///   nil while it is genuinely unknown — under a `shrink` box, and on the first
+    ///   frame. Weighted items then keep their natural width instead of collapsing to
+    ///   width 0, where texts vanish and their ideal height explodes.
+    ///
+    ///   It comes from the live reader rather than from `measuredSize`: the HStack
+    ///   below is measured *into* `measuredSize`, so feeding that back as the width to
+    ///   divide made the row grow-only. Items got hard widths summing to the old
+    ///   width, the HStack could not shrink below them, and the measurement never
+    ///   fell — a narrower proposal simply spilled past the edge.
+    @ViewBuilder
+    private func weightedContent(availableWidth: CGFloat?) -> some View {
         let (totalWeight, reservedLength) = calculateTotalWeight(for: row.items)
-        // nil until the first measurement lands: for that frame weighted items keep
-        // their natural width instead of collapsing to width 0, where texts vanish
-        // and their ideal height explodes. An externally provided size counts as
-        // a measurement.
-        let availableWidth: CGFloat? = externalSize?.width ?? (measuredSize == .zero ? nil : measuredSize.width)
         let weightsAvailableLength: CGFloat? = availableWidth.map { max(0, $0 - reservedLength) }
 
-        return HStack(spacing: row.spacing) {
+        HStack(spacing: row.spacing) {
             ForEach(0 ..< row.items.count, id: \.self) { idx in
                 let item = row.items[idx]
 
