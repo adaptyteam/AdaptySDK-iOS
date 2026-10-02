@@ -16,8 +16,8 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
-    @Environment(\.adaptyUnspecifiedWidthProposal)
-    private var unspecifiedWidthProposal: Bool
+    @Environment(\.adaptyUnspecifiedProposalAxes)
+    private var unspecifiedProposalAxes: Axis.Set
 
     private let row: VC.Row
     private let externalSize: CGSize?
@@ -142,7 +142,7 @@ struct AdaptyUIFlexRowView<ScreenHolderContent: View>: View {
     private var weightedBody: some View {
         GeometryReader { proxy in
             weightedContent(availableWidth: externalSize?.width
-                ?? (unspecifiedWidthProposal ? nil : proxy.size.width))
+                ?? (unspecifiedProposalAxes.contains(.horizontal) ? nil : proxy.size.width))
         }
         // The reader is greedy on both axes; the row hugs its content vertically, so
         // the measured height is handed back as the row's own height — the same shape

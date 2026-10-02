@@ -11,7 +11,7 @@ import SwiftUI
 struct AdaptyUIFlexStackView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize) private var screenSize: CGSize
     @Environment(\.adaptyInterfaceOrientation) private var orientation: VC.Orientation
-    @Environment(\.adaptyUnspecifiedWidthProposal) private var unspecifiedWidthProposal: Bool
+    @Environment(\.adaptyUnspecifiedProposalAxes) private var unspecifiedProposalAxes: Axis.Set
 
     private let flexStack: VC.FlexStack
     private let screenHolderBuilder: () -> ScreenHolderContent
@@ -64,13 +64,12 @@ struct AdaptyUIFlexStackView<ScreenHolderContent: View>: View {
         // parent proposal when bounded (so the condition reads it), but the view can't
         // collapse to ~10pt when the parent proposes nil (a ScrollView scroll axis).
         //
-        // The width is floored only where the width is actually unspecified, because
+        // Each axis is floored only where its length is actually unspecified, because
         // a floor is a hard minimum: kept unconditionally it ratchets, swallowing
-        // every narrower proposal and pinning the parents above too. The height needs
-        // no such flag — the scroll axis is always the vertical one here.
+        // every smaller proposal and pinning the parents above too.
         .frame(
-            minWidth: unspecifiedWidthProposal ? contentsSize.width : nil,
-            minHeight: contentsSize.height
+            minWidth: unspecifiedProposalAxes.contains(.horizontal) ? contentsSize.width : nil,
+            minHeight: unspecifiedProposalAxes.contains(.vertical) ? contentsSize.height : nil
         )
     }
 

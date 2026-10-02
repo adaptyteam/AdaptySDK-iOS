@@ -16,8 +16,8 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
     private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
-    @Environment(\.adaptyUnspecifiedWidthProposal)
-    private var unspecifiedWidthProposal: Bool
+    @Environment(\.adaptyUnspecifiedProposalAxes)
+    private var unspecifiedProposalAxes: Axis.Set
 
     private let column: VC.Column
     private let externalSize: CGSize?
@@ -174,8 +174,9 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
         }
         // A live width from an enclosing flex is safe to pin to — it tracks the parent.
         // The measured width is not: as a hard minimum it ratchets, so it is only used
-        // where the width is genuinely unspecified (`AdaptyUIUnspecifiedWidthProposalKey`).
-        .frame(minWidth: externalSize?.width ?? (unspecifiedWidthProposal ? contentsSize.width : nil))
+        // where the width is genuinely unspecified (`AdaptyUIUnspecifiedProposalAxesKey`).
+        .frame(minWidth: externalSize?.width
+            ?? (unspecifiedProposalAxes.contains(.horizontal) ? contentsSize.width : nil))
     }
 }
 

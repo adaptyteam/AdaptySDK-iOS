@@ -11,7 +11,7 @@ import SwiftUI
 struct AdaptyUISwitchView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize) private var screenSize: CGSize
     @Environment(\.adaptyInterfaceOrientation) private var orientation: VC.Orientation
-    @Environment(\.adaptyUnspecifiedWidthProposal) private var unspecifiedWidthProposal: Bool
+    @Environment(\.adaptyUnspecifiedProposalAxes) private var unspecifiedProposalAxes: Axis.Set
 
     private let switchElement: VC.Switch
     private let screenHolderBuilder: () -> ScreenHolderContent
@@ -77,12 +77,12 @@ struct AdaptyUISwitchView<ScreenHolderContent: View>: View {
         // parent proposal when bounded (so the condition reads it), but the view can't
         // collapse to ~10pt when the parent proposes nil (a ScrollView scroll axis).
         //
-        // The width is floored only where the width is actually unspecified — see
-        // `AdaptyUIUnspecifiedWidthProposalKey`; an unconditional floor is a hard
+        // Each axis is floored only where its length is actually unspecified — see
+        // `AdaptyUIUnspecifiedProposalAxesKey`; an unconditional floor is a hard
         // minimum and ratchets the whole screen on the way down.
         .frame(
-            minWidth: unspecifiedWidthProposal ? contentsSize.width : nil,
-            minHeight: contentsSize.height
+            minWidth: unspecifiedProposalAxes.contains(.horizontal) ? contentsSize.width : nil,
+            minHeight: unspecifiedProposalAxes.contains(.vertical) ? contentsSize.height : nil
         )
     }
 
