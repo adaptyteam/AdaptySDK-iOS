@@ -72,10 +72,13 @@ actor StoreKitPurchaser {
                         }
 
                         do {
+                            let product = try? await productsManager.fetchProduct(
+                                id: transaction.productID,
+                                fetchPolicy: .returnCacheDataElseLoad
+                            )
+
                             try await transactionSynchronizer.report(
-                                .init(
-                                    transaction: transaction
-                                ),
+                                .init(product, transaction),
                                 payload: storage.purchasePayload(
                                     byTransaction: transaction,
                                     orCreateFor: ProfileStorage.userId
@@ -360,9 +363,7 @@ actor StoreKitPurchaser {
 
         do {
             let profile = try await transactionSynchronizer.validate(
-                .init(
-                    transaction: transaction
-                ),
+                .init(product, transaction),
                 payload: payload,
                 reason: reason
             )

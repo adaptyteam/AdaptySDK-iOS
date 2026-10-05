@@ -46,6 +46,21 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
         case persistentOnboardingVariationId = "onboarding_variation_id"
         case billingPlan = "billing_plan_id"
         case environment
+
+        case billingPrice = "original_price" // legacy backend name
+        case priceCurrencyCode = "price_locale" // legacy backend name
+        case priceRegionCode = "store_country" // legacy backend name
+
+        case offerId = "promotional_offer_id" // legacy backend name
+        case offerPrice = "discount_price" // legacy backend name
+        case subscriptionOffer = "offer"
+    }
+
+    enum SubscriptionOfferKeys: String, CodingKey {
+        case periodUnit = "period_unit"
+        case periodNumberOfUnits = "number_of_units"
+        case paymentMode = "type"
+        case type = "category"
     }
 
     func encode(to encoder: Encoder) throws {
@@ -74,6 +89,18 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
 
             if let billingPlan = info.billingPlan, billingPlan != .upFront {
                 try container.encode(billingPlan, forKey: .billingPlan)
+            }
+            try container.encodeIfPresent(info.billingPrice, forKey: .billingPrice)
+            try container.encodeIfPresent(info.priceCurrencyCode, forKey: .priceCurrencyCode)
+            try container.encodeIfPresent(info.priceRegionCode, forKey: .priceRegionCode)
+            if let offer = info.subscriptionOffer {
+                try container.encodeIfPresent(offer.id, forKey: .offerId)
+                try container.encodeIfPresent(offer.price, forKey: .offerPrice)
+                var offerContainer = container.nestedContainer(keyedBy: SubscriptionOfferKeys.self, forKey: .subscriptionOffer)
+                try offerContainer.encode(offer.paymentMode, forKey: .paymentMode)
+                try offerContainer.encodeIfPresent(offer.period?.unit, forKey: .periodUnit)
+                try offerContainer.encodeIfPresent(offer.period?.numberOfUnits, forKey: .periodNumberOfUnits)
+                try offerContainer.encodeIfPresent(offer.type, forKey: .type)
             }
             try container.encode(info.environment, forKey: .environment)
 
@@ -158,6 +185,7 @@ extension Backend.MainExecutor {
                 "variation_id_persistent": payload.persistentPaywallVariationId,
                 "onboarding_variation_id": payload.persistentOnboardingVariationId,
                 "billing_plan_id": transactionInfo.billingPlan,
+                "offer_id": transactionInfo.subscriptionOffer?.id,
                 "environment": transactionInfo.environment,
                 "request_source": reason.rawString,
             ]

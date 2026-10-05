@@ -50,10 +50,13 @@ public extension Adapty {
 
             guard !transaction.isXcodeEnvironment else { return }
 
+            let product = try? await sdk.productsManager.fetchProduct(
+                id: transaction.productID,
+                fetchPolicy: .returnCacheDataElseLoad
+            )
+
             try await sdk.report(
-                .init(
-                    transaction: transaction
-                ),
+                .init(product, transaction),
                 payload: .init(
                     userId: userId,
                     paywallVariationId: variationId,
