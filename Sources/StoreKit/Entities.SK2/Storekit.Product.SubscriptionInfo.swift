@@ -27,7 +27,7 @@ extension StoreKit.Product.SubscriptionInfo {
     ) -> Product.SubscriptionOffer? {
         #if compiler(>=6.3.2)
         if #available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *) {
-            return offer(by: offerIdentifier, for: billingPlan.asSKBillingPlanType)
+            return  pricingTerms(for: billingPlan.asSKBillingPlanType)?.offer(by: offerIdentifier)
         }
         #endif
 
@@ -63,13 +63,19 @@ extension StoreKit.Product.SubscriptionInfo {
     func pricingTerms(for billingPlanType: BillingPlanType) -> PricingTerms? {
         pricingTerms.first { $0.billingPlanType == billingPlanType }
     }
+}
 
+@available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *)
+extension StoreKit.Product.SubscriptionInfo.PricingTerms {
     func offer(
-        by offerIdentifier: AdaptySubscriptionOffer.Identifier,
-        for billingPlanType: BillingPlanType
+        by offerIdentifier: AdaptySubscriptionOffer.Identifier
     ) -> Product.SubscriptionOffer? {
         let offerType = offerIdentifier.offerType.asSKSubscriptionOfferType
-        return pricingTerms(for: billingPlanType)?.subscriptionOffers.first { $0.type == offerType && $0.id == offerIdentifier.offerId }
+        return if offerType == .introductory {
+            subscriptionOffers.first { $0.type == offerType }
+        } else {
+             subscriptionOffers.first { $0.type == offerType && $0.id == offerIdentifier.offerId }
+        }
     }
 }
 #endif

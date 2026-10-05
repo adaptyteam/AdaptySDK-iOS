@@ -149,11 +149,11 @@ private struct SubscriptionOfferInfo {
     ) {
 
         guard #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) else {
-            guard let offerType = transaction.offerType?.asAdaptyTransactionOfferType else { return nil }
+            guard let offerType = transaction.offerType else { return nil }
             let offerId = transaction.offerID
 
             self.id = offerId
-            self.offerType = offerType
+            self.offerType = offerType.asAdaptyTransactionOfferType
 
             self.paymentMode =
                 if let product, let offerType = offerType.asAdaptySubscriptionOfferType {

@@ -19,7 +19,7 @@ extension StoreKit.Transaction.OfferType {
     }
 }
 
-extension AdaptyTransactionOfferType {
+extension StoreKit.Transaction.OfferType {
     var asAdaptySubscriptionOfferType: AdaptySubscriptionOfferType? {
         switch self {
         case .introductory: .introductory

@@ -33,7 +33,6 @@ extension AdaptyFlowPaywall.ProductReference: Encodable {
         case pricingTerms = "pricing_terms"
 
         // legacy properties:
-        case billingPlan = "billing_plan_id"
         case promotionalOfferEligibility = "promotional_offer_eligibility"
         case promotionalOfferId = "promotional_offer_id"
         case winBackOfferId = "win_back_offer_id"
@@ -49,12 +48,17 @@ extension AdaptyFlowPaywall.ProductReference: Encodable {
             period: container.decode(BackendProductInfo.Period.self, forKey: .backendProductPeriod)
         )
 
-        pricingTerms =
-            if container.exist(.pricingTerms) {
-                 try container.decode([AdaptyFlowPaywall.ProducPricingTerms].self, forKey: .pricingTerms)
+        let legacyTerm = try AdaptyFlowPaywall.ProducPricingTerms.legacyDecoding(from: container)
+
+        if let pricingTerms = try container.decodeIfPresent([AdaptyFlowPaywall.ProducPricingTerms].self, forKey: .pricingTerms), let last = pricingTerms.last {
+            if last == legacyTerm || (last.billingPlan == .upFront && legacyTerm == .default) {
+                self.pricingTerms = pricingTerms
             } else {
-                try AdaptyFlowPaywall.ProducPricingTerms.legacyDecoding(from: container)
+                self.pricingTerms = pricingTerms + [legacyTerm]
             }
+        } else {
+            self.pricingTerms = [legacyTerm]
+        }
     }
 
     func encode(to encoder: Encoder) throws {
@@ -71,7 +75,7 @@ extension AdaptyFlowPaywall.ProductReference: Encodable {
 }
 
 private extension AdaptyFlowPaywall.ProducPricingTerms {
-    static func legacyDecoding(from container: KeyedDecodingContainer<AdaptyFlowPaywall.ProductReference.CodingKeys>) throws -> [Self] {
+    static func legacyDecoding(from container: KeyedDecodingContainer<AdaptyFlowPaywall.ProductReference.CodingKeys>) throws -> Self {
         let promotionalOfferEligibility = try container.decodeIfPresent(Bool.self, forKey: .promotionalOfferEligibility) ?? true
         let promotionalOfferId: String? =
             if promotionalOfferEligibility {
@@ -81,11 +85,11 @@ private extension AdaptyFlowPaywall.ProducPricingTerms {
             }
 
         let item = Self(
-            billingPlan: try container.decodeIfPresent(AdaptySubscriptionBillingPlan.self, forKey: .billingPlan) ?? .upFront,
+            billingPlan: .upFront,
             promotionalOfferId: promotionalOfferId,
             winBackOfferId: try container.decodeIfPresent(String.self, forKey: .winBackOfferId)
         )
 
-        return if item != .default  { [item] } else { [] }
+        return item
     }
 }

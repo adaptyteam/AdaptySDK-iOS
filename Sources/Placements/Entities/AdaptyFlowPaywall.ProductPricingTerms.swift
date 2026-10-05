@@ -9,7 +9,7 @@
 import Foundation
 
 extension AdaptyFlowPaywall {
-    struct ProducPricingTerms: Sendable, Hashable {
+    struct ProducPricingTerms: Sendable, Hashable, Equatable {
         static let `default` = Self(billingPlan: .upFront, promotionalOfferId: nil, winBackOfferId: nil)
 
         let billingPlan: AdaptySubscriptionBillingPlan

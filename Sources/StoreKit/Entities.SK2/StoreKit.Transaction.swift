@@ -31,11 +31,29 @@ extension StoreKit.Transaction {
         return nil
     }
 
-    var unfOfferType: AdaptyTransactionOfferType? {
-        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            offer?.type.asAdaptyTransactionOfferType
+    var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier? {
+        let offerId: String?
+        let offerType: Transaction.OfferType?
+        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *), let offer {
+            offerId = offer.id
+            offerType = offer.type
         } else {
-            offerType?.asAdaptyTransactionOfferType
+            offerId = offerID
+            offerType = self.offerType
+        }
+
+        guard let offerType = offerType?.asAdaptySubscriptionOfferType else {
+            return nil
+        }
+
+        return .init(offerId: offerId, offerType: offerType)
+    }
+
+    var unfOfferType: StoreKit.Transaction.OfferType? {
+        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+            offer?.type
+        } else {
+            offerType
         }
     }
 
@@ -44,6 +62,20 @@ extension StoreKit.Transaction {
             return offer?.id
         }
         return offerID
+    }
+
+    var unfOfferPeriod: AdaptySubscriptionPeriod? {
+        if #available(iOS 18.4, macOS 15.4, tvOS 18.4, watchOS 11.4, visionOS 2.4, *) {
+            return offer?.period?.asAdaptySubscriptionPeriod
+        }
+        return nil
+    }
+
+    var unfOfferPaymentMode: AdaptySubscriptionOffer.PaymentMode? {
+        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+            return offer?.paymentMode?.asAdaptySubscriptionOfferPaymentMode
+        }
+        return nil
     }
 
     var isXcodeEnvironment: Bool {
