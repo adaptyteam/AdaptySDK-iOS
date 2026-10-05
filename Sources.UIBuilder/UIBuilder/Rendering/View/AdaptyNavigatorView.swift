@@ -38,6 +38,7 @@ struct AdaptyScreenView: View {
             screenInstance.configuration.layoutBehaviour,
             screen: screenInstance.configuration
         )
+        .excludingTransitionAnimation()
         .withScreenInstance(screenInstance.instance)
         .withElementPool(screenInstance.configuration.poolElements)
         .animatablePropertiesTransition(
