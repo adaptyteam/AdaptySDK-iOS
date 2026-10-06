@@ -10,6 +10,6 @@ import Foundation
 extension VC.WheelItemsPicker {
     struct Item: Sendable {
         let stringId: VC.StringIdentifier
-        let value: VC.AnyValue
+        let value: VC.Value
     }
 }

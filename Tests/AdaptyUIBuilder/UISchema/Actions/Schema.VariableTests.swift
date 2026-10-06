@@ -43,7 +43,7 @@ extension SchemaTests {
             ),
             // With converter
             (
-                Value(path: ["section"], setter: nil, scope: .screen, converter: VC.IsEqualConverter(value: VC.AnyValue(5), falseValue: nil).asAnyConverter),
+                Value(path: ["section"], setter: nil, scope: .screen, converter: VC.IsEqualConverter(value: VC.Value(5), falseValue: nil).asAnyConverter),
                 Json(##"""
                 {
                     "var": "section",

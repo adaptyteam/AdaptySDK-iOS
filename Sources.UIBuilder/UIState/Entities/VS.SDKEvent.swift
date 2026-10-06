@@ -8,7 +8,7 @@
 import JavaScriptCore
 
 extension VS {
-    enum SDKEvent: Sendable, VCValue {
+    enum SDKEvent: Sendable {
         case productsLoaded
         case willPurchase(productId: String)
         case didPurchase(productId: String, result: PurchaseResult)
@@ -18,7 +18,7 @@ extension VS {
 }
 
 extension VS.SDKEvent {
-    enum Name: String, Hashable, VCValue {
+    enum Name: String, Hashable {
         case productsLoaded
         case willPurchase
         case didPurchase

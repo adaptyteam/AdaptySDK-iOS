@@ -12,7 +12,7 @@ extension VC {
         let path: [String]
         let setter: String?
         let scope: Scope
-        let converter: AnyConverter?
+        let converter: JSDataBindingConverter?
     }
 }
 
