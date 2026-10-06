@@ -58,9 +58,6 @@ private final class AdaptyUIAnimationCompletionGroup {
 struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     private var play: Binding<[VC.Animation]>
     private let onFinished: (() -> Void)?
-    /// Set for screen and navigator transitions: their transactions are marked so the
-    /// screen content can apply what they bring in without their animation.
-    private let marksTransition: Bool
 
     private let initialBlurRadius: Double
 
@@ -135,7 +132,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
         self.play = play
         self.onFinished = nil
-        self.marksTransition = false
     }
 
     init(
@@ -172,7 +168,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
         self.play = play
         self.onFinished = onFinished
-        self.marksTransition = true
     }
 
     @State private var animatedOffsetX: CGFloat?
@@ -234,13 +229,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             .onChange(of: play.wrappedValue) { startAnimations($0) }
     }
 
-    private func marked<Value>(_ update: @escaping (Value) -> Void) -> (Value) -> Void {
-        guard marksTransition, #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *) else { return update }
-        return { value in
-            withTransaction(\.isAdaptyScreenTransition, true) { update(value) }
-        }
-    }
-
     private func startAnimations(_ animations: [VC.Animation]) {
         var tokens = Set<AdaptyUIAnimationToken>()
         // An empty `play` only resets the transition; it has nothing to finish.
@@ -256,7 +244,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         from: value.start,
                         to: value.end,
                         completion: completionGroup?.track(),
-                        updateBlock: marked {
+                        updateBlock: {
                             self.animatedOpacity = $0
                         }
                     )
@@ -269,7 +257,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         from: value.start,
                         to: value.end,
                         completion: completionGroup?.track(),
-                        updateBlock: marked {
+                        updateBlock: {
                             self.animatedOffsetX = $0.x.points(.horizontal, screenSize, safeArea)
                             self.animatedOffsetY = $0.y.points(.vertical, screenSize, safeArea)
                         }
@@ -283,7 +271,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         from: value.angle.start,
                         to: value.angle.end,
                         completion: completionGroup?.track(),
-                        updateBlock: marked {
+                        updateBlock: {
                             self.animatedRotation = .degrees($0)
                         }
                     )
@@ -298,7 +286,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         from: value.scale.start,
                         to: value.scale.end,
                         completion: completionGroup?.track(),
-                        updateBlock: marked {
+                        updateBlock: {
                             self.animatedScaleX = $0.x
                             self.animatedScaleY = $0.y
                         }
@@ -325,7 +313,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         from: (value.color?.start, value.blurRadius?.start, value.offset?.start),
                         to: (value.color?.end, value.blurRadius?.end, value.offset?.end),
                         completion: completionGroup?.track(),
-                        updateBlock: marked { value in
+                        updateBlock: { value in
                             if let colorValue = value.0 {
                                 animatedShadowFilling = colorValue
                             }
@@ -350,7 +338,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                         from: value.start,
                         to: value.end,
                         completion: completionGroup?.track(),
-                        updateBlock: marked {
+                        updateBlock: {
                             self.animatedBlurRadius = $0
                         }
                     )
@@ -365,33 +353,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     }
 }
 
-@available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
-private struct AdaptyScreenTransitionKey: TransactionKey {
-    static let defaultValue = false
-}
-
-@available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *)
-extension Transaction {
-    var isAdaptyScreenTransition: Bool {
-        get { self[AdaptyScreenTransitionKey.self] }
-        set { self[AdaptyScreenTransitionKey.self] = newValue }
-    }
-}
-
 extension View {
-    /// Applies what a screen or navigator transition brings into this content without
-    /// the transition's animation. Otherwise every layout change caught by the
-    /// transition's transaction — safe area insets the scroll view recomputes as the
-    /// screen slides in, paddings, frames — animates along with it for the whole
-    /// transition, and the system lowers the frame rate of the slide.
-    func excludingTransitionAnimation() -> some View {
-        transaction { transaction in
-            if #available(iOS 17.0, macOS 14.0, tvOS 17.0, watchOS 10.0, *), transaction.isAdaptyScreenTransition {
-                transaction.animation = nil
-            }
-        }
-    }
-
     @ViewBuilder
     func animatableProperties(
         _ properties: VC.Element.Properties?,
