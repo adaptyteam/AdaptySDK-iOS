@@ -81,17 +81,17 @@ extension VC.Action {
             return
         }
 
-        var params = [String: VC.AnyValue]()
+        var params = [String: VC.Value]()
         for item in queryItems {
             let (fullPath, suffix) = item.name.extractSuffix()
             let path = fullPath.split(separator: ".").map(String.init)
 
             let value =
                 if autodetectType {
-                    (try? VC.AnyValue(key: fullPath, suffix: suffix, value: item.value))
-                        ?? VC.AnyValue(string: item.value)
+                    (try? VC.Value(key: fullPath, suffix: suffix, value: item.value))
+                        ?? VC.Value(string: item.value)
                 } else {
-                    try VC.AnyValue(key: fullPath, suffix: suffix, value: item.value)
+                    try VC.Value(key: fullPath, suffix: suffix, value: item.value)
                 }
             params.setParameter(value, for: path)
         }
@@ -118,7 +118,7 @@ private extension String {
     }
 }
 
-private extension VC.AnyValue {
+private extension VC.Value {
     func asQueryItems(name: String) -> [URLQueryItem] {
         if wrapped.isNil {
             return [URLQueryItem(name: name, value: nil)]
@@ -141,7 +141,7 @@ private extension VC.AnyValue {
         if let dict = wrapped.asObject {
             return dict
                 .sorted(by: { $0.key < $1.key })
-                .flatMap { VC.AnyValue($0.value).asQueryItems(name: "\(name).\($0.key)") }
+                .flatMap { VC.Value($0.value).asQueryItems(name: "\(name).\($0.key)") }
         }
 
         return []
@@ -236,21 +236,21 @@ private extension VC.AnyValue {
     }
 }
 
-private extension [String: VC.AnyValue] {
-    mutating func setParameter(_ value: VC.AnyValue, for path: [String]) {
+private extension [String: VC.Value] {
+    mutating func setParameter(_ value: VC.Value, for path: [String]) {
         guard !path.isEmpty else { return }
         let key = path[0]
         if path.count == 1 {
             self[key] = value
         } else {
-            var subParams: [String: VC.AnyValue] =
+            var subParams: [String: VC.Value] =
                 if let existing = self[key]?.asObject {
-                    existing.mapValues(VC.AnyValue.init)
+                    existing.mapValues(VC.Value.init)
                 } else {
                     [:]
                 }
             subParams.setParameter(value, for: Array(path.dropFirst()))
-            self[key] = VC.AnyValue(subParams)
+            self[key] = VC.Value(subParams)
         }
     }
 }

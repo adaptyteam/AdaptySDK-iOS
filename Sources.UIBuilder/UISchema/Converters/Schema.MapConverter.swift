@@ -13,7 +13,7 @@ extension Schema {
 
 extension Schema.MapConverter: Decodable {
     init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: Schema.AnyConverter.CodingKeys.self)
-        try self.init(values: container.decode([Schema.AnyValue].self, forKey: .converterParameters))
+        let container = try decoder.container(keyedBy: Schema.Converter.CodingKeys.self)
+        try self.init(values: container.decode([Schema.Value].self, forKey: .converterParameters))
     }
 }

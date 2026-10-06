@@ -17,7 +17,7 @@ extension Schema {
     }
 }
 
-extension Schema.TextProgress: Schema.SimpleElement {
+extension Schema.TextProgress: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _ builder: Schema.ConfigurationBuilder,

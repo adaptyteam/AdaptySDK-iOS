@@ -8,8 +8,8 @@
 import Foundation
 
 extension VC {
-    struct IsEqualConverter: Converter {
-        let value: VC.AnyValue
-        let falseValue: VC.AnyValue?
+    struct IsEqualConverter: Sendable {
+        let value: VC.Value
+        let falseValue: VC.Value?
     }
 }

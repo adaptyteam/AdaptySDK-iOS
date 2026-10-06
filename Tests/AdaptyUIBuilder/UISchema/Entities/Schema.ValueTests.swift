@@ -1,5 +1,5 @@
 //
-//  Schema.AnyValueTests.swift
+//  Schema.ValueTests.swift
 //  AdaptyTests
 //
 //  Created by Aleksei Valiano on2026-02-05.
@@ -10,8 +10,8 @@ import Foundation
 import Testing
 
 private extension SchemaTests {
-    struct AnyValueTests {
-        typealias Value = Schema.AnyValue
+    struct ValueTests {
+        typealias Value = Schema.Value
 
         // MARK: - Test Data
 

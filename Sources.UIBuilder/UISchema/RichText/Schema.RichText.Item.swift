@@ -39,14 +39,14 @@ extension Schema.RichText.Item: Decodable {
         } else if container.contains(.tag) {
             var tag = try container.decode(String.self, forKey: .tag)
 
-            let converter: Schema.AnyConverter?
+            let converter: AdaptyUITagValueConverter?
 
             if container.exist(.converter) {
-                converter = try Schema.AnyConverter.forTag(from: decoder)
+                converter = try Schema.Converter.tagValueConverter(from: decoder)
             } else if tag == "PERCENT", container.exist(.format) {
-                converter = try? Schema.PercentConverter(from: decoder).asAnyConverter
+                converter = try? Schema.PercentConverter(from: decoder)
             } else if tag.hasPrefix("TIMER_") {
-                converter = Self.legacyConverterFromTimer(tag: tag)?.asAnyConverter
+                converter = Self.legacyConverterFromTimer(tag: tag)
                 if converter != nil {
                     tag = "TIMER"
                 }

@@ -15,7 +15,7 @@ extension Schema.WheelItemsPicker.Item: Decodable {
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        let value = try container.decode(Schema.AnyValue.self, forKey: .value)
+        let value = try container.decode(Schema.Value.self, forKey: .value)
 
         if value.isArray || value.isObject {
             throw DecodingError.dataCorruptedError(

@@ -66,7 +66,7 @@ private struct FetchPlacementVariationsForDefaultAudienceRequest: BackendRequest
     }
 }
 
-extension Backend.DefaultAudienceExecutor {
+extension Backend.FallbackExecutor {
     func fetchPlacementVariationsForDefaultAudience<Content: PlacementContent>(
         _ type: Content.Type,
         apiKeyPrefix: String,
