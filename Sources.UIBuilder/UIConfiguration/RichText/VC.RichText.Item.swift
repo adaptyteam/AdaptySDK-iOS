@@ -10,7 +10,7 @@ import Foundation
 extension VC.RichText {
     enum Item: Sendable {
         case text(String, Attributes?, VC.Action?)
-        case tag(String, Attributes?, VC.AnyConverter?, VC.Action?)
+        case tag(String, Attributes?, AdaptyUITagValueConverter?, VC.Action?)
         case image(VC.AssetReference, Attributes?)
         case unknown
     }

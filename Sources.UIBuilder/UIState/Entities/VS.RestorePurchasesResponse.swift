@@ -12,7 +12,7 @@ package extension VS {
         let result: RestorePurchasesResult
     }
 
-    enum RestorePurchasesResult: String, VCValue {
+    enum RestorePurchasesResult: String {
         case fail
         case success
     }

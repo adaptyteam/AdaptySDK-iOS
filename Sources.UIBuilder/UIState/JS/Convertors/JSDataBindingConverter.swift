@@ -7,17 +7,7 @@
 import Foundation
 import JavaScriptCore
 
-protocol VSDataBindingConverter {
+protocol JSDataBindingConverter: Sendable {
     func readValue(_: JSValue, in _: JSContext) throws(VS.Error) -> JSValue
     func writeValue(_: some JSValueConvertable, in _: JSContext) throws(VS.Error) -> any JSValueConvertable
-}
-
-extension VC.AnyConverter {
-    var isDataBindingConverter: Bool {
-        wrapped is VSDataBindingConverter
-    }
-
-    var asDataBindingConverter: VSDataBindingConverter? {
-        wrapped as? VSDataBindingConverter
-    }
 }

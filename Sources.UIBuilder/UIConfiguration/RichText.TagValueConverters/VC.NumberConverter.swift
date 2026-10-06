@@ -8,24 +8,22 @@
 import Foundation
 
 extension VC {
-    struct NumberConverter: VCConverter {
+    struct NumberConverter: AdaptyUITagValueConverter {
         let format: String
-    }
-}
 
-extension VC.NumberConverter: VCTagConverter {
-    func toString(_ value: Any, locale: Locale) -> String? {
-        switch value {
-        case let value as UInt:
-            toString(number: value, locale: locale)
-        case let value as Int:
-            toString(number: value, locale: locale)
-        case let value as Double:
-            toString(number: value, locale: locale)
-        case let value as NSNumber:
-            toString(number: value, locale: locale)
-        default:
-            nil
+        func toString(_ value: Any, locale: Locale) -> String? {
+            switch value {
+            case let value as UInt:
+                toString(number: value, locale: locale)
+            case let value as Int:
+                toString(number: value, locale: locale)
+            case let value as Double:
+                toString(number: value, locale: locale)
+            case let value as NSNumber:
+                toString(number: value, locale: locale)
+            default:
+                nil
+            }
         }
     }
 }

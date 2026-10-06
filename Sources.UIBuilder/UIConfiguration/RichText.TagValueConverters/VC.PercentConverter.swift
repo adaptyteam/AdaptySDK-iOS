@@ -8,20 +8,18 @@
 import Foundation
 
 extension VC {
-    struct PercentConverter: VCConverter {
+    struct PercentConverter: AdaptyUITagValueConverter {
         let format: String
-    }
-}
 
-extension VC.PercentConverter: VCTagConverter {
-    func toString(_ value: Any, locale: Locale) -> String? {
-        switch value {
-        case let value as Double:
-            toString(percent: value, locale: locale)
-        case let value as NSNumber:
-            toString(percent: value, locale: locale)
-        default:
-            nil
+        func toString(_ value: Any, locale: Locale) -> String? {
+            switch value {
+            case let value as Double:
+                toString(percent: value, locale: locale)
+            case let value as NSNumber:
+                toString(percent: value, locale: locale)
+            default:
+                nil
+            }
         }
     }
 }

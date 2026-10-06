@@ -34,7 +34,7 @@ package extension VC {
 
 package extension VC.FlowConstants {
     struct ProductConstants: Sendable {
-        let values: [String: VC.AnyValue]
+        let values: [String: VC.Value]
         let id: String
         package init(
             flowProductId: String,
@@ -46,12 +46,12 @@ package extension VC.FlowConstants {
         ) {
             id = flowProductId
             values = [
-                "flowProductId": VC.AnyValue(flowProductId),
-                "adaptyProductId": VC.AnyValue(adaptyProductId),
-                "adaptyAccessLevelId": VC.AnyValue(adaptyAccessLevelId),
-                "adaptyProductType": VC.AnyValue(adaptyProductType),
-                "paywallVariationId": VC.AnyValue(paywallVariationId),
-                "paywallName": VC.AnyValue(paywallName),
+                "flowProductId": VC.Value(flowProductId),
+                "adaptyProductId": VC.Value(adaptyProductId),
+                "adaptyAccessLevelId": VC.Value(adaptyAccessLevelId),
+                "adaptyProductType": VC.Value(adaptyProductType),
+                "paywallVariationId": VC.Value(paywallVariationId),
+                "paywallName": VC.Value(paywallName),
             ]
         }
 
@@ -71,25 +71,25 @@ package extension VC.FlowConstants {
         ) {
             id = flowProductId
             values = [
-                "flowProductId": VC.AnyValue(flowProductId),
-                "adaptyProductId": VC.AnyValue(adaptyProductId),
-                "adaptyAccessLevelId": VC.AnyValue(adaptyAccessLevelId),
-                "adaptyProductType": VC.AnyValue(adaptyProductType),
-                "paywallVariationId": VC.AnyValue(paywallVariationId),
-                "paywallName": VC.AnyValue(paywallName),
+                "flowProductId": VC.Value(flowProductId),
+                "adaptyProductId": VC.Value(adaptyProductId),
+                "adaptyAccessLevelId": VC.Value(adaptyAccessLevelId),
+                "adaptyProductType": VC.Value(adaptyProductType),
+                "paywallVariationId": VC.Value(paywallVariationId),
+                "paywallName": VC.Value(paywallName),
                 // vendors
-                "localizedDescription": VC.AnyValue(localizedDescription),
-                "localizedTitle": VC.AnyValue(localizedTitle),
-                "isFamilyShareable": VC.AnyValue(isFamilyShareable),
-                "regionCode": VC.AnyValue(regionCode),
-                "price": VC.AnyValue(price.values),
-                "subscription": VC.AnyValue(subscription?.values),
+                "localizedDescription": VC.Value(localizedDescription),
+                "localizedTitle": VC.Value(localizedTitle),
+                "isFamilyShareable": VC.Value(isFamilyShareable),
+                "regionCode": VC.Value(regionCode),
+                "price": VC.Value(price.values),
+                "subscription": VC.Value(subscription?.values),
             ]
         }
     }
 
     struct PriceConstants: Sendable {
-        let values: [String: VC.AnyValue]
+        let values: [String: VC.Value]
         package init(
             amount: Double,
             currencyCode: String?,
@@ -97,16 +97,16 @@ package extension VC.FlowConstants {
             localizedString: String?
         ) {
             values = [
-                "amount": VC.AnyValue(amount),
-                "currencyCode": VC.AnyValue(currencyCode),
-                "currencySymbol": VC.AnyValue(currencySymbol),
-                "localizedString": VC.AnyValue(localizedString),
+                "amount": VC.Value(amount),
+                "currencyCode": VC.Value(currencyCode),
+                "currencySymbol": VC.Value(currencySymbol),
+                "localizedString": VC.Value(localizedString),
             ]
         }
     }
 
     struct ProductSubscriptionConstants: Sendable {
-        let values: [String: VC.AnyValue]
+        let values: [String: VC.Value]
         package init(
             groupIdentifier: String,
             period: SubscriptionPeriodConstants,
@@ -114,29 +114,29 @@ package extension VC.FlowConstants {
             offer: SubscriptionOfferConstants?
         ) {
             values = [
-                "groupIdentifier": VC.AnyValue(groupIdentifier),
-                "period": VC.AnyValue(period.values),
-                "localizedPeriod": VC.AnyValue(localizedPeriod),
-                "offer": VC.AnyValue(offer?.values),
+                "groupIdentifier": VC.Value(groupIdentifier),
+                "period": VC.Value(period.values),
+                "localizedPeriod": VC.Value(localizedPeriod),
+                "offer": VC.Value(offer?.values),
             ]
         }
     }
 
     struct SubscriptionPeriodConstants: Sendable {
-        let values: [String: VC.AnyValue]
+        let values: [String: VC.Value]
         package init(
             unit: String,
             numberOfUnits: Int
         ) {
             values = [
-                "unit": VC.AnyValue(unit),
-                "numberOfUnits": VC.AnyValue(numberOfUnits),
+                "unit": VC.Value(unit),
+                "numberOfUnits": VC.Value(numberOfUnits),
             ]
         }
     }
 
     struct SubscriptionOfferConstants: Sendable {
-        let values: [String: VC.AnyValue]
+        let values: [String: VC.Value]
         package init(
             id: String?,
             type: String,
@@ -148,16 +148,16 @@ package extension VC.FlowConstants {
             localizedNumberOfPeriods: String?
         ) {
             values = [
-                "id": VC.AnyValue(id),
-                "type": VC.AnyValue(type),
-                "phases": VC.AnyValue([
-                    VC.AnyValue([
-                        "price": VC.AnyValue(price?.values),
-                        "paymentMode": VC.AnyValue(paymentMode),
-                        "period": VC.AnyValue(period.values),
-                        "numberOfPeriods": VC.AnyValue(numberOfPeriods),
-                        "localizedPeriod": VC.AnyValue(localizedPeriod),
-                        "localizedNumberOfPeriods": VC.AnyValue(localizedNumberOfPeriods),
+                "id": VC.Value(id),
+                "type": VC.Value(type),
+                "phases": VC.Value([
+                    VC.Value([
+                        "price": VC.Value(price?.values),
+                        "paymentMode": VC.Value(paymentMode),
+                        "period": VC.Value(period.values),
+                        "numberOfPeriods": VC.Value(numberOfPeriods),
+                        "localizedPeriod": VC.Value(localizedPeriod),
+                        "localizedNumberOfPeriods": VC.Value(localizedNumberOfPeriods),
                     ]),
                 ]),
             ]

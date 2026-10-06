@@ -8,16 +8,13 @@
 import Foundation
 
 extension Backend {
-    struct ConfigsExecutor: BackendDefaultAudienceExecutor {
-        let manager: StateManager
-        let session: HTTPSession
-        let kind = AdaptyServerKind.configs
-    }
+    typealias ConfigsExecutor = FallbackExecutor
 
     func createConfigsExecutor() -> ConfigsExecutor {
         ConfigsExecutor(
             manager: networkManager,
-            session: HTTPSession(configuration: defaultHTTPConfiguration)
+            session: HTTPSession(configuration: configsHTTPConfiguration),
+            kind: .configs
         )
     }
 }
