@@ -108,35 +108,26 @@ package extension AdaptyUI {
             observerModeResolver: AdaptyObserverModeResolver? = nil,
             systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
         ) async throws -> AdaptyUI.FlowView {
-            let products: [AdaptyPaywallProduct]?
-            
-            if preloadProducts {
-                do {
-                    products = try await Adapty.getPaywallProducts(flow: flow)
-                } catch {
-                    // A failed preload must not break view creation: the products
-                    // view model loads them on its own once the configuration is
-                    // built. Same contract as the Android plugin.
-                    Log.ui.error("createFlowView preloadProducts error: \(error)")
-                    products = nil
-                }
-            } else {
-                products = nil
-            }
-            
             let configuration = try await AdaptyUI.getFlowConfiguration(
                 forFlow: flow,
                 locale: locale,
                 customLayoutId: customLayoutId,
                 loadTimeout: loadTimeout,
-                products: products,
                 observerModeResolver: observerModeResolver,
                 tagResolver: tagResolver,
                 timerResolver: timerResolver,
                 assetsResolver: assetsResolver,
                 systemRequestsHandler: systemRequestsHandler
             )
-            
+
+            // Products already load alongside the UI schema; preloading only
+            // waits for that first attempt. A failure doesn't break view
+            // creation: the view model retries on its own. Same contract as
+            // the Android plugin.
+            if preloadProducts {
+                await configuration.productsViewModel.waitForProducts()
+            }
+
             let vc = try AdaptyUI.paywallControllerWithUniversalDelegate(configuration)
             cachePaywallController(vc, id: vc.id)
             return vc.toAdaptyUIView()

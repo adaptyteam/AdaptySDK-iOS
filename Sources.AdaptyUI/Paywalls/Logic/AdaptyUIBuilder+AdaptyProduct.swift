@@ -110,6 +110,19 @@ extension AdaptyPaywallProduct: ProductResolver {
     }
 }
 
+extension AdaptyFlow {
+    /// Whether `products` are exactly the products of this flow: one per
+    /// product of every paywall, with nothing foreign or duplicated.
+    func matches(products: [AdaptyPaywallProduct]) -> Bool {
+        let expected = paywalls.flatMap { paywall in
+            paywall.vendorProductIds.enumerated().map { [paywall.variationId, String($0.offset), $0.element] }
+        }
+        let provided = products.map { [$0.variationId, String($0.paywallProductIndex), $0.vendorProductId] }
+        let providedSet = Set(provided)
+        return providedSet.count == provided.count && providedSet == Set(expected)
+    }
+}
+
 extension AdaptyProduct {
     /// Shared math behind `PRICE_PER_*` and `OFFER_PRICE_PER_*`.
     /// Contract: `price` is the total paid for `billingPeriod` repeated `repeatCount` times.

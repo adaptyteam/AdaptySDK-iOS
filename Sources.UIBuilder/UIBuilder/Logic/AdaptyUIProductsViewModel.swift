@@ -37,6 +37,8 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
     package var onProductsLoaded: (([ProductResolver]) -> Void)?
 
+    private var loadingTask: Task<Void, Never>?
+
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,
@@ -60,6 +62,11 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         loadProducts()
     }
 
+    /// Waits for the products request in flight, if any; does not wait for retries.
+    package func waitForProducts() async {
+        await loadingTask?.value
+    }
+
     package func prepareForReuse() {
         Log.ui.verbose("#\(logId)# prepareForReuse")
         productsLoadingInProgress = false
@@ -78,7 +85,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         let logId = logId
         Log.ui.verbose("#\(logId)# loadProducts begin")
 
-        Task { @MainActor [weak self] in
+        loadingTask = Task { @MainActor [weak self] in
             guard let self else { return }
 
             do {

@@ -289,7 +289,7 @@ public extension AdaptyUI {
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exeeds.
-    ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products.
+    ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products. Products that don't exactly match this flow's products are ignored and fetched anew.
     ///   - observerModeResolver: if you are going to use AdaptyUI in Observer Mode, pass the resolver function here.
     ///   - tagResolver: if you are going to use custom tags functionality, pass the resolver function here.
     ///   - timerResolver: if you are going to use custom timers functionality, pass the resolver function here.
@@ -341,6 +341,17 @@ public extension AdaptyUI {
             throw err
         }
 
+        var products = products
+        if let provided = products, !flow.matches(products: provided) {
+            Log.ui.warn("AdaptyUI getFlowConfiguration: products don't match flow \(flow.id), fetching them anew")
+            products = nil
+        }
+
+        // Products depend only on the flow, so they load while the UI schema does.
+        let productsPrefetch = products == nil
+            ? Task { try await Adapty.getPaywallProducts(flow: flow) }
+            : nil
+
         let (flowLayout, viewConfiguration) = try await Adapty.getUIConfiguration(
             flow: flow,
             device: device,
@@ -355,6 +366,7 @@ public extension AdaptyUI {
             flowLayout: flowLayout,
             viewConfiguration: viewConfiguration,
             products: products,
+            productsPrefetch: productsPrefetch,
             observerModeResolver: observerModeResolver,
             tagResolver: tagResolver,
             timerResolver: timerResolver,
