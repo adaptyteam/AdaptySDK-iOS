@@ -25,9 +25,12 @@ swift test
 ## SDK Version Management
 For update version read scripts/README.md 
 
-## Distribution
+## Publishing to CocoaPods
 
-Distributed via Swift Package Manager only. CocoaPods support was dropped in 4.0.0.
+```bash
+./scripts/publish_podspecs.sh [--skip-lint] [--skip-tests] [--max-retries N]
+```
+Publishes in dependency order: AdaptyLogger → AdaptyCSimdjson → AdaptyCodable → AdaptyUIBuilder → Adapty → AdaptyUI → AdaptyPlugin. Details in scripts/README.md.
 
 ## Sources Structure
 | Module                 | Path                      | Purpose                                    |

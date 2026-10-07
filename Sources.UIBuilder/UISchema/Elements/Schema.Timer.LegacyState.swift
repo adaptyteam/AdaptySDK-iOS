@@ -8,22 +8,23 @@
 import Foundation
 
 extension Schema {
-    private enum CodingKeys: String, CodingKey {
-        case duration
-        case behavior = "behaviour"
-        case endTime = "end_time"
-    }
-
-    private enum BehaviorType: String, Codable {
-        case everyAppear = "start_at_every_appear"
-        case firstAppear = "start_at_first_appear"
-        case firstAppearPersisted = "start_at_first_appear_persisted"
-        case endAtLocalTime = "end_at_local_time"
-        case endAtUTC = "end_at_utc_time"
-        case custom
-    }
-
     static func decodeLegacySetTimer(id: String, from decoder: Decoder) throws -> String {
+
+         enum CodingKeys: String, CodingKey {
+            case duration
+            case behavior = "behaviour"
+            case endTime = "end_time"
+        }
+
+         enum BehaviorType: String, Codable {
+            case everyAppear = "start_at_every_appear"
+            case firstAppear = "start_at_first_appear"
+            case firstAppearPersisted = "start_at_first_appear_persisted"
+            case endAtLocalTime = "end_at_local_time"
+            case endAtUTC = "end_at_utc_time"
+            case custom
+        }
+
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         var endAt: Date?

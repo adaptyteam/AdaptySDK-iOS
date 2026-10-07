@@ -39,7 +39,7 @@ extension VS.JSState {
             let global = context.globalObject
         else { return }
 
-        let products = VC.AnyValue(Dictionary(products.map { ($0.id, VC.AnyValue($0.values)) }, uniquingKeysWith: { first, _ in first }))
+        let products = VC.Value(Dictionary(products.map { ($0.id, VC.Value($0.values)) }, uniquingKeysWith: { first, _ in first }))
             .toJSValue(in: context)
 
         let objectClass = context.objectForKeyedSubscript("Object")

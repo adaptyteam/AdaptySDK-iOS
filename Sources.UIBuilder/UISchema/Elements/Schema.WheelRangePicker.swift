@@ -17,7 +17,7 @@ extension Schema {
     }
 }
 
-extension Schema.WheelRangePicker: Schema.SimpleElement {
+extension Schema.WheelRangePicker: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _ builder: Schema.ConfigurationBuilder,

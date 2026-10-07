@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    struct MapConverter: Converter {
-        let values: [VC.AnyValue]
+    struct MapConverter: Sendable {
+        let values: [VC.Value]
     }
 }

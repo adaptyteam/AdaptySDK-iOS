@@ -29,7 +29,7 @@ extension Schema.Stack {
     )
 }
 
-extension Schema.Stack: Schema.CompositeElement {
+extension Schema.Stack: SchemaCompositeElement {
     @inlinable
     func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
         for item in items.reversed() {

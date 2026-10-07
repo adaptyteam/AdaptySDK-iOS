@@ -149,7 +149,7 @@ extension [VC.RichText.Item] {
                 let tagReplacementResult: String
 
                 if let anyValue = internalTagResolver?(value),
-                   let convertedValue = converter?.asTagConverter?.toString(anyValue, locale: stateViewModel.viewConfiguration.locale)
+                   let convertedValue = converter?.toString(anyValue, locale: stateViewModel.viewConfiguration.locale)
                 {
                     tagReplacementResult = convertedValue
                 } else if let customTagResult = customTagResolver.replacement(for: value) {
@@ -162,7 +162,7 @@ extension [VC.RichText.Item] {
                         case let .variable(variable):
                             stateViewModel.getTagValue(
                                 variable,
-                                converter: converter?.asTagConverter,
+                                converter: converter,
                                 defaultValue: displayMissingTags ? "<var:\(variable.path.joined(separator: "."))}>" : "",
                                 screen: screen
                             )
