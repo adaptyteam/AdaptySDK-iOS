@@ -34,11 +34,13 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     play: playAnimations
                 )
                 .rangedFrame(box: box)
+                .alignmentBarrier()
         case let .stack(stack, _):
             AdaptyUIStackView(
                 stack,
                 screenHolderBuilder: screenHolderBuilder
             )
+            .alignmentBarrier()
         case let .text(text, _):
             AdaptyUITextView(text)
         case let .textField(textField, props):
