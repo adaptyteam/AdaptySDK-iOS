@@ -210,6 +210,7 @@ struct AdaptyUIHeroContainerView: View {
                     playAnimations: $playOnAppearAnimations,
                     screenHolderBuilder: { EmptyView() }
                 )
+                .withScreenSizeAboveFooter(footerSize.height)
 
                 FooterVerticalFillerView(height: footerSize.height) { frame in
                     withAnimation {
