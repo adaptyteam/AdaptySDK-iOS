@@ -1,0 +1,28 @@
+name: Test CocoaPods specs scripts
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/cocoapods-specs/**'
+      - '.github/workflows/publish-cocoapods-specs.yml'
+      - '.github/workflows/test-cocoapods-specs.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Script tests (bash 3.2)
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Syntax check
+        run: /bin/bash -n scripts/cocoapods-specs/publish.sh
+
+      - name: Tests
+        run: scripts/cocoapods-specs/test/run.sh
