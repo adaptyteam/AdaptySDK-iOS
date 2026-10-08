@@ -27,6 +27,12 @@ For update version read scripts/README.md
 
 ## Publishing to CocoaPods
 
+Spec repo (4.x, the only channel after the trunk freeze on 2026-12-02): pushing a release tag runs the
+**Publish CocoaPods specs** workflow, which needs an approval in the `cocoapods-specs` environment.
+Manual and snapshot use: `scripts/cocoapods-specs/publish.sh` (see scripts/README.md).
+
+Trunk (until 2026-12-02):
+
 ```bash
 ./scripts/publish_podspecs.sh [--skip-lint] [--skip-tests] [--max-retries N]
 ```
