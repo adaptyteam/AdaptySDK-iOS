@@ -24,9 +24,9 @@ extension Schema.Variable: Decodable {
 
         let path = try container.decode(String.self, forKey: .path)
 
-        let converter: Schema.AnyConverter? =
+        let converter: JSDataBindingConverter? =
             if container.exist(.converter) {
-                try Schema.AnyConverter.forDataBinding(from: decoder)
+                try Schema.Converter.dataBindingConverter(from: decoder)
             } else {
                 nil
             }

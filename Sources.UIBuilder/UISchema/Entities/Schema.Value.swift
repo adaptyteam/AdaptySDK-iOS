@@ -1,5 +1,5 @@
 //
-//  Schema.AnyValue.swift
+//  Schema.Value.swift
 //  AdaptyUIBulder
 //
 //  Created by Aleksei Valiano on 13.04.2026.
@@ -8,10 +8,10 @@
 import Foundation
 
 extension Schema {
-    typealias AnyValue = VC.AnyValue
+    typealias Value = VC.Value
 }
 
-extension Schema.AnyValue: Decodable {
+extension Schema.Value: Decodable {
     init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
 
@@ -39,11 +39,11 @@ extension Schema.AnyValue: Decodable {
             self.init(value)
             return
         }
-        if let value = try? container.decode([Schema.AnyValue].self) {
+        if let value = try? container.decode([Schema.Value].self) {
             self.init(value)
             return
         }
-        if let value = try? container.decode([String: Schema.AnyValue].self) {
+        if let value = try? container.decode([String: Schema.Value].self) {
             self.init(value)
             return
         }
@@ -51,7 +51,7 @@ extension Schema.AnyValue: Decodable {
             Self.self,
             .init(
                 codingPath: decoder.codingPath,
-                debugDescription: "Unsupported Schema.AnyValue type"
+                debugDescription: "Unsupported Schema.Value type"
             )
         )
     }

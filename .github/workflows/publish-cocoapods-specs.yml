@@ -1,0 +1,131 @@
+name: Publish CocoaPods specs
+
+# Publishes the Adapty pods to adaptyteam/AdaptySDK-CocoaPods-Specs. A release tag publishes with the
+# tag as source; a manual run from a branch publishes its head pinned by commit (use a version that
+# will never be a release, e.g. 4.3.0-SNAPSHOT.1). `stage` lints without secrets; `publish` waits for
+# approval in the cocoapods-specs environment and pushes with a GitHub App token.
+on:
+  push:
+    tags: ['[0-9]*.[0-9]*.[0-9]*']
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  stage:
+    name: Lint and stage
+    runs-on: macos-26
+    timeout-minutes: 90
+    outputs:
+      has_new: ${{ steps.stage.outputs.has_new }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Select Xcode
+        run: |
+          [ -d /Applications/Xcode_26.6.app ] || { echo "Xcode 26.6 is not on this runner image" >&2; exit 1; }
+          sudo xcode-select -s /Applications/Xcode_26.6.app
+
+      - name: Install CocoaPods
+        run: gem install cocoapods -v 1.17.0 --no-document
+
+      - name: Stage
+        id: stage
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then ref="$GITHUB_REF_NAME"; else ref="$GITHUB_SHA"; fi
+          scripts/cocoapods-specs/publish.sh stage --ref "$ref" --out "$RUNNER_TEMP/staged"
+          if [ -f "$RUNNER_TEMP/staged/manifest.json" ]; then
+            echo "has_new=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_new=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Summary
+        run: |
+          {
+            echo "### CocoaPods specs: $GITHUB_REF_TYPE $GITHUB_REF_NAME"
+            echo
+            echo "Commit: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+            echo
+            if [ -f "$RUNNER_TEMP/staged/manifest.json" ]; then
+              echo "Staged (check ref and SHA against the run header before approving):"
+              echo
+              echo '```json'
+              cat "$RUNNER_TEMP/staged/manifest.json"
+              echo '```'
+            else
+              echo "Nothing to publish."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload staged specs
+        if: steps.stage.outputs.has_new == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: staged
+          path: ${{ runner.temp }}/staged
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    name: Push to the spec repo
+    needs: stage
+    if: needs.stage.outputs.has_new == 'true'
+    runs-on: macos-26
+    timeout-minutes: 15
+    environment: cocoapods-specs
+    env:
+      EXPECTED_SHA: ${{ github.sha }}
+      EXPECTED_REF: ${{ github.ref_name }}
+      EXPECTED_MODE: ${{ github.ref_type == 'tag' && 'tag' || 'commit' }}
+    # Job-level only: a run waiting for approval must not hold or cancel other runs.
+    concurrency:
+      group: cocoapods-specs-publish
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Outside the workspace, so the artifact cannot overwrite the script.
+      - name: Download staged specs
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: staged
+          path: ${{ runner.temp }}/staged
+
+      - name: Verify staged specs
+        run: scripts/cocoapods-specs/publish.sh verify --from "$RUNNER_TEMP/staged"
+
+      - name: Create spec repo token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.SPECS_APP_CLIENT_ID }}
+          private-key: ${{ secrets.SPECS_APP_PRIVATE_KEY }}
+          owner: adaptyteam
+          repositories: AdaptySDK-CocoaPods-Specs
+          permission-contents: write
+
+      - name: Push
+        env:
+          TOKEN: ${{ steps.app-token.outputs.token }}
+          APP_SLUG: ${{ steps.app-token.outputs.app-slug }}
+        run: |
+          bot_id=$(GH_TOKEN="$TOKEN" gh api "/users/${APP_SLUG}%5Bbot%5D" --jq .id)
+          export GIT_AUTHOR_NAME="${APP_SLUG}[bot]" GIT_COMMITTER_NAME="${APP_SLUG}[bot]"
+          export GIT_AUTHOR_EMAIL="${bot_id}+${APP_SLUG}[bot]@users.noreply.github.com"
+          export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+          auth=$(printf 'x-access-token:%s' "$TOKEN" | base64 | tr -d '\n')
+          echo "::add-mask::$auth"
+          # Scoped to the spec repo URL; never in a URL, argv or .git/config.
+          export GIT_CONFIG_COUNT=1
+          export GIT_CONFIG_KEY_0="http.https://github.com/adaptyteam/AdaptySDK-CocoaPods-Specs.git.extraheader"
+          export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth"
+          scripts/cocoapods-specs/publish.sh push --from "$RUNNER_TEMP/staged"

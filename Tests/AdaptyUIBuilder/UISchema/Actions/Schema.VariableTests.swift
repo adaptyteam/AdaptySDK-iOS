@@ -43,7 +43,7 @@ extension SchemaTests {
             ),
             // With converter
             (
-                Value(path: ["section"], setter: nil, scope: .screen, converter: VC.IsEqualConverter(value: VC.AnyValue(5), falseValue: nil).asAnyConverter),
+                Value(path: ["section"], setter: nil, scope: .screen, converter: VC.IsEqualConverter(value: VC.Value(5), falseValue: nil)),
                 Json(##"""
                 {
                     "var": "section",
@@ -74,8 +74,7 @@ extension SchemaTests {
             ),
             // Full — all fields
             (
-                Value(path: ["data", "count"], setter: "setCount", scope: .global, converter:
-                        VC.UnknownConverter(name: "to_string").asAnyConverter),
+                Value(path: ["data", "count"], setter: "setCount", scope: .global, converter: nil),
                 Json(##"""
                 {
                     "var": "data.count",

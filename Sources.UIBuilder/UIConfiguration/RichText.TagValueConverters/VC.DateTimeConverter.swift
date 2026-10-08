@@ -8,23 +8,21 @@
 import Foundation
 
 extension VC {
-    enum DateTimeConverter: Converter {
+    enum DateTimeConverter: AdaptyUITagValueConverter {
         case format(String)
         case styles(date: DateFormatter.Style, time: DateFormatter.Style)
-    }
-}
 
-extension VC.DateTimeConverter: VC.TagConverter {
-    func toString(_ value: Any, locale: Locale) -> String? {
-        switch value {
-        case let value as Date:
-            formatter(locale: locale).string(from: value)
-        case is Bool:
-            nil
-        case let value as NSNumber:
-            toString(unixtimestamp: value.doubleValue, locale: locale)
-        default:
-            nil
+        func toString(_ value: Any, locale: Locale) -> String? {
+            switch value {
+            case let value as Date:
+                formatter(locale: locale).string(from: value)
+            case is Bool:
+                nil
+            case let value as NSNumber:
+                toString(unixtimestamp: value.doubleValue, locale: locale)
+            default:
+                nil
+            }
         }
     }
 }

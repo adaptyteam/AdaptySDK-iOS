@@ -19,7 +19,7 @@ extension SchemaTests {
             (
                 Value(
                     path: ["SDK", "openUrl"],
-                    params: ["stringId": VC.AnyValue("example_com")],
+                    params: ["stringId": VC.Value("example_com")],
                     scope: .global
                 ),
                 Json(##"{"type":"open_url","url":"example_com"}"##)
@@ -41,7 +41,7 @@ extension SchemaTests {
             (
                 Value(
                     path: ["SDK", "userCustomAction"],
-                    params: ["userCustomId": VC.AnyValue("my_action")],
+                    params: ["userCustomId": VC.Value("my_action")],
                     scope: .global
                 ),
                 Json(##"{"type":"custom","custom_id":"my_action"}"##)
@@ -70,7 +70,7 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "purchaseProduct"],
                     params: [
-                        "productId": VC.AnyValue("premium"),
+                        "productId": VC.Value("premium"),
                     ],
                     scope: .global
                 ),
@@ -80,8 +80,8 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "webPurchaseProduct"],
                     params: [
-                        "productId": VC.AnyValue("premium"),
-                        "openIn": VC.AnyValue("browser_out_app"),
+                        "productId": VC.Value("premium"),
+                        "openIn": VC.Value("browser_out_app"),
                     ],
                     scope: .global
                 ),
@@ -91,10 +91,10 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "openScreen"],
                     params: [
-                        "type": VC.AnyValue("details"),
-                        "instanceId": VC.AnyValue("legacy-bottom-sheet"),
-                        "navigatorId": VC.AnyValue("legacy-bottom-sheet"),
-                        "transitionId": VC.AnyValue("on_appear"),
+                        "type": VC.Value("details"),
+                        "instanceId": VC.Value("legacy-bottom-sheet"),
+                        "navigatorId": VC.Value("legacy-bottom-sheet"),
+                        "transitionId": VC.Value("on_appear"),
                     ],
                     scope: .global
                 ),
@@ -104,7 +104,7 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "closeScreen"],
                     params: [
-                        "navigatorId": VC.AnyValue("legacy-bottom-sheet"),
+                        "navigatorId": VC.Value("legacy-bottom-sheet"),
                     ],
                     scope: .global
                 ),
@@ -114,8 +114,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "selectProduct"],
                     params: [
-                        "productId": VC.AnyValue("prod1"),
-                        "groupId": VC.AnyValue("group_B"),
+                        "productId": VC.Value("prod1"),
+                        "groupId": VC.Value("group_B"),
                     ],
                     scope: .global
                 ),
@@ -125,8 +125,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "selectProduct"],
                     params: [
-                        "productId": VC.AnyValue("prod1"),
-                        "groupId": VC.AnyValue("group_A"),
+                        "productId": VC.Value("prod1"),
+                        "groupId": VC.Value("group_A"),
                     ],
                     scope: .global
                 ),
@@ -136,7 +136,7 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "unselectProduct"],
                     params: [
-                        "groupId": VC.AnyValue("group_B"),
+                        "groupId": VC.Value("group_B"),
                     ],
                     scope: .global
                 ),
@@ -146,7 +146,7 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "unselectProduct"],
                     params: [
-                        "groupId": VC.AnyValue("group_A"),
+                        "groupId": VC.Value("group_A"),
                     ],
                     scope: .global
                 ),
@@ -156,7 +156,7 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "purchaseSelectedProduct"],
                     params: [
-                        "groupId": VC.AnyValue("group_B"),
+                        "groupId": VC.Value("group_B"),
                     ],
                     scope: .global
                 ),
@@ -166,7 +166,7 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "purchaseSelectedProduct"],
                     params: [
-                        "groupId": VC.AnyValue("group_A"),
+                        "groupId": VC.Value("group_A"),
                     ],
                     scope: .global
                 ),
@@ -176,8 +176,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "webPurchaseSelectedProduct"],
                     params: [
-                        "groupId": VC.AnyValue("group_B"),
-                        "openIn": VC.AnyValue("browser_out_app"),
+                        "groupId": VC.Value("group_B"),
+                        "openIn": VC.Value("browser_out_app"),
                     ],
                     scope: .global
                 ),
@@ -187,8 +187,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "webPurchaseSelectedProduct"],
                     params: [
-                        "groupId": VC.AnyValue("group_A"),
-                        "openIn": VC.AnyValue("browser_out_app"),
+                        "groupId": VC.Value("group_A"),
+                        "openIn": VC.Value("browser_out_app"),
                     ],
                     scope: .global
                 ),
@@ -198,8 +198,8 @@ extension SchemaTests {
                 Value(
                     path: ["Legacy", "switchSection"],
                     params: [
-                        "sectionId": VC.AnyValue("tabs"),
-                        "index": VC.AnyValue(1),
+                        "sectionId": VC.Value("tabs"),
+                        "index": VC.Value(1),
                     ],
                     scope: .global
                 ),

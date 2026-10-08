@@ -25,9 +25,18 @@ swift test
 ## SDK Version Management
 For update version read scripts/README.md 
 
-## Distribution
+## Publishing to CocoaPods
 
-Distributed via Swift Package Manager only. CocoaPods support was dropped in 4.0.0.
+Spec repo (4.x, the only channel after the trunk freeze on 2026-12-02): pushing a release tag runs the
+**Publish CocoaPods specs** workflow, which needs an approval in the `cocoapods-specs` environment.
+Manual and snapshot use: `scripts/cocoapods-specs/publish.sh` (see scripts/README.md).
+
+Trunk (until 2026-12-02):
+
+```bash
+./scripts/publish_podspecs.sh [--skip-lint] [--skip-tests] [--max-retries N]
+```
+Publishes in dependency order: AdaptyLogger → AdaptyCSimdjson → AdaptyCodable → AdaptyUIBuilder → Adapty → AdaptyUI → AdaptyPlugin. Details in scripts/README.md.
 
 ## Sources Structure
 | Module                 | Path                      | Purpose                                    |

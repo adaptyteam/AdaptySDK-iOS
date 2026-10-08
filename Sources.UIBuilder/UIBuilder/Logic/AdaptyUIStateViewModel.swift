@@ -69,7 +69,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         }
     }
 
-    func execute(actions: [VC.Action], params: [String: any VC.Value]? = nil, screen: VS.ScreenInstance) {
+    func execute(actions: [VC.Action], params: [String: any JSValueConvertable]? = nil, screen: VS.ScreenInstance) {
         do {
             try stateHolder.state.execute(actions: actions, params: params, screenInstance: screen)
         } catch {
@@ -83,7 +83,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         actions: [VC.Action],
         screen: VS.ScreenInstance
     ) {
-        var additionalParams: [String: any VC.Value] = [:]
+        var additionalParams: [String: any JSValueConvertable] = [:]
         if let newFocusId {
             additionalParams["focusId"] = newFocusId
         }
@@ -157,7 +157,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     func getTagValue(
         _ variable: VC.Variable,
-        converter: VC.TagConverter?,
+        converter: AdaptyUITagValueConverter?,
         defaultValue: String,
         screen: VS.ScreenInstance
     ) -> String {

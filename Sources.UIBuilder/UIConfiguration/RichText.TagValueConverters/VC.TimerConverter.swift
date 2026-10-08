@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC {
-    enum TimerConverter: Converter {
+    enum TimerConverter: AdaptyUITagValueConverter {
         case days(String)
         case hours(String)
         case minutes(String)
@@ -22,18 +22,16 @@ extension VC {
         case totalMinutes(String)
         case totalSeconds(String)
         case totalMilliseconds(String)
-    }
-}
 
-extension VC.TimerConverter: VC.TagConverter {
-    func toString(_ value: Any, locale: Locale) -> String? {
-        switch value {
-        case is Bool:
-            nil
-        case let value as NSNumber:
-            toString(timeinterval: value.doubleValue)
-        default:
-            nil
+        func toString(_ value: Any, locale: Locale) -> String? {
+            switch value {
+            case is Bool:
+                nil
+            case let value as NSNumber:
+                toString(timeinterval: value.doubleValue)
+            default:
+                nil
+            }
         }
     }
 }

@@ -5,14 +5,12 @@
 //  Created by Aleksei Valiano on 28.05.2026.
 //
 
-extension AdaptyUIBuilder {
-    protocol ProgressExtensions {
-        var maxValue: Double { get }
-        var minValue: Double { get }
-    }
+protocol AdaptyUIBuilderProgressExtensions {
+    var maxValue: Double { get }
+    var minValue: Double { get }
 }
 
-extension AdaptyUIBuilder.ProgressExtensions {
+extension AdaptyUIBuilderProgressExtensions {
     func normalize(_ raw: Double) -> Double {
         let span = maxValue - minValue
         guard span > 0 else { return 0 }
@@ -25,7 +23,7 @@ extension AdaptyUIBuilder.ProgressExtensions {
     }
 }
 
-extension VC.LinearProgress: AdaptyUIBuilder.ProgressExtensions {}
-extension VC.RadialProgress: AdaptyUIBuilder.ProgressExtensions {}
-extension VC.TextProgress: AdaptyUIBuilder.ProgressExtensions {}
+extension VC.LinearProgress: AdaptyUIBuilderProgressExtensions {}
+extension VC.RadialProgress: AdaptyUIBuilderProgressExtensions {}
+extension VC.TextProgress: AdaptyUIBuilderProgressExtensions {}
 

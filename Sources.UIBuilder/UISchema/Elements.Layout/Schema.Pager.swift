@@ -37,7 +37,7 @@ extension Schema.Pager {
     )
 }
 
-extension Schema.Pager: Schema.CompositeElement {
+extension Schema.Pager: SchemaCompositeElement {
     @inlinable
     func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
         for item in content.reversed() {
