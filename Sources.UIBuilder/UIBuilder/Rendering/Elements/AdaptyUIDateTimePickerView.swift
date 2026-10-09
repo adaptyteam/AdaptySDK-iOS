@@ -28,14 +28,17 @@ struct AdaptyUIDateTimePickerView: View {
         self.picker = picker
     }
 
-    private var dateBinding: Binding<Date> {
+    private func dateBinding(in range: ClosedRange<Date>) -> Binding<Date> {
         let doubleBinding = stateViewModel.createBinding(
             picker.value,
             defaultValue: Date().timeIntervalSince1970 * 1000.0,
             screen: screen
         )
         return Binding(
-            get: { Date(timeIntervalSince1970: doubleBinding.wrappedValue / 1000.0) },
+            get: {
+                let date = Date(timeIntervalSince1970: doubleBinding.wrappedValue / 1000.0).clampedToCalendarRange ?? Date()
+                return Swift.min(Swift.max(date, range.lowerBound), range.upperBound)
+            },
             set: { doubleBinding.wrappedValue = $0.timeIntervalSince1970 * 1000.0 }
         )
     }
@@ -58,10 +61,10 @@ struct AdaptyUIDateTimePickerView: View {
         flowViewModel.flowStartedAt ?? Date()
     }
 
-    private func resolvedClosedRange(min: VC.DateTime, max: VC.DateTime) -> ClosedRange<Date> {
+    private var dateRange: ClosedRange<Date> {
         let startAt = flowStartedAt
-        let resolvedMin = min.asDate(startAt: startAt)
-        let resolvedMax = max.asDate(startAt: startAt)
+        let resolvedMin = picker.minDate?.asDate(startAt: startAt).clampedToCalendarRange ?? .distantPast
+        let resolvedMax = picker.maxDate?.asDate(startAt: startAt).clampedToCalendarRange ?? .distantFuture
         guard resolvedMin <= resolvedMax else {
             Log.ui.warn("DateTimePicker: min (\(resolvedMin)) is later than max (\(resolvedMax)); clamping min to max")
             return resolvedMax ... resolvedMax
@@ -69,40 +72,15 @@ struct AdaptyUIDateTimePickerView: View {
         return resolvedMin ... resolvedMax
     }
 
-    @ViewBuilder
     private var datePickerView: some View {
-        if let minDate = picker.minDate, let maxDate = picker.maxDate {
-            DatePicker(
-                "",
-                selection: dateBinding,
-                in: resolvedClosedRange(min: minDate, max: maxDate),
-                displayedComponents: displayedComponents
-            )
-            .labelsHidden()
-        } else if let minDate = picker.minDate {
-            DatePicker(
-                "",
-                selection: dateBinding,
-                in: minDate.asDate(startAt: flowStartedAt)...,
-                displayedComponents: displayedComponents
-            )
-            .labelsHidden()
-        } else if let maxDate = picker.maxDate {
-            DatePicker(
-                "",
-                selection: dateBinding,
-                in: ...maxDate.asDate(startAt: flowStartedAt),
-                displayedComponents: displayedComponents
-            )
-            .labelsHidden()
-        } else {
-            DatePicker(
-                "",
-                selection: dateBinding,
-                displayedComponents: displayedComponents
-            )
-            .labelsHidden()
-        }
+        let range = dateRange
+        return DatePicker(
+            "",
+            selection: dateBinding(in: range),
+            in: range,
+            displayedComponents: displayedComponents
+        )
+        .labelsHidden()
     }
 
     @ViewBuilder
@@ -126,6 +104,14 @@ struct AdaptyUIDateTimePickerView: View {
                     screen: screen
                 ).asColorAsset
             )
+    }
+}
+
+private extension Date {
+    /// `UICalendarView` aborts on a date outside `distantPast ... distantFuture`.
+    var clampedToCalendarRange: Date? {
+        guard timeIntervalSince1970.isFinite else { return nil }
+        return Swift.min(Swift.max(self, .distantPast), .distantFuture)
     }
 }
 

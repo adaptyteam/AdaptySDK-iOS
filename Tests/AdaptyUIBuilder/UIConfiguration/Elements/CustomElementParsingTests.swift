@@ -322,6 +322,7 @@ private extension VC.EnvironmentConstants {
         flow: .init(
             placementId: "test",
             variationId: "test",
+            variationName: nil,
             abTestName: "test",
             name: "test",
             products: []

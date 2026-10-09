@@ -1407,11 +1407,19 @@ UI:
                 content: { $ref: "#/UI/Element" }
             unevaluatedProperties: false
 
+    StackParams:
+        type: object
+        properties:
+            h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
+            v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
+        unevaluatedProperties: false
+
     Row:
         type: object
         required: [type, items]
         properties:
             type: { const: row }
+            draw_as_stack: { $ref: "#/UI/StackParams" }
             width: { $ref: "#/Entities/AutoSizeMode", default: fill }
             spacing: { type: number, default: 0 }
             items:
@@ -1424,6 +1432,7 @@ UI:
         required: [type, items]
         properties:
             type: { const: column }
+            draw_as_stack: { $ref: "#/UI/StackParams" }
             height: { $ref: "#/Entities/AutoSizeMode", default: fill }
             spacing: { type: number, default: 0 }
             items:

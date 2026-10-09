@@ -140,16 +140,14 @@ private extension Adapty {
                 }
 
                 do {
-                    let productOrNil = try? await productsManager.fetchProduct(
+
+                    let product = try? await productsManager.fetchProduct(
                         id: transaction.productID,
                         fetchPolicy: .returnCacheDataElseLoad
-                    ).asAdaptyProduct
+                    )
 
                     try await report(
-                        .init(
-                            product: productOrNil,
-                            transaction: transaction
-                        ),
+                        .init(product, transaction),
                         payload: purchasePayloadStorage.purchasePayload(
                             byTransaction: transaction,
                             orCreateFor: ProfileStorage.userId

@@ -38,7 +38,7 @@ extension SchemaTests {
             (
                 Value(
                     path: ["SDK", "openUrl"],
-                    params: ["url": VC.AnyValue("example_com")],
+                    params: ["url": VC.Value("example_com")],
                     scope: .screen
                 ),
                 Json(##"""
@@ -82,7 +82,7 @@ extension SchemaTests {
             (
                 Value(
                     path: ["SDK", "openUrl"],
-                    params: ["url": VC.AnyValue("example_com")],
+                    params: ["url": VC.Value("example_com")],
                     scope: .global
                 ),
                 Json(##"""
@@ -100,8 +100,8 @@ extension SchemaTests {
                 Value(
                     path: ["SDK", "webPurchaseProduct"],
                     params: [
-                        "productId": VC.AnyValue("premium"),
-                        "openIn": VC.AnyValue("browser_out_app"),
+                        "productId": VC.Value("premium"),
+                        "openIn": VC.Value("browser_out_app"),
                     ],
                     scope: .global
                 ),

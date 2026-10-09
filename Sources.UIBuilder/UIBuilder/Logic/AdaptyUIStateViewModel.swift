@@ -79,7 +79,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         }
     }
 
-    func execute(actions: [VC.Action], params: [String: any VC.Value]? = nil, screen: VS.ScreenInstance) {
+    func execute(actions: [VC.Action], params: [String: any JSValueConvertable]? = nil, screen: VS.ScreenInstance) {
         do {
             try stateHolder.current.execute(actions: actions, params: params, screenInstance: screen)
         } catch {
@@ -93,7 +93,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         actions: [VC.Action],
         screen: VS.ScreenInstance
     ) {
-        var additionalParams: [String: any VC.Value] = [:]
+        var additionalParams: [String: any JSValueConvertable] = [:]
         if let newFocusId {
             additionalParams["focusId"] = newFocusId
         }
@@ -146,21 +146,28 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) -> T {
         do {
-            let value = try stateHolder.current.getValue(
+            guard let value = try stateHolder.current.getValue(
                 T.self,
                 variable: variable,
                 screenInstance: screen
-            )
-            return value ?? defaultValue
+            ) else { return defaultValue }
+
+            guard let value = value as? Double,
+                  !value.isFinite
+            else { return value }
+
+            Log.ui.error("#\(logId)# getValue result is not finite: \(value)")
+            return defaultValue
+
         } catch {
             Log.ui.error("#\(logId)# getValue error: \(error)")
             return defaultValue
         }
     }
-    
+
     func getTagValue(
         _ variable: VC.Variable,
-        converter: VC.TagConverter?,
+        converter: AdaptyUITagValueConverter?,
         defaultValue: String,
         screen: VS.ScreenInstance
     ) -> String {
@@ -214,18 +221,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         Binding(
             get: { [weak self] in
                 guard let self else { return defaultValue }
-
-                do {
-                    let value = try stateHolder.current.getValue(
-                        T.self,
-                        variable: variable,
-                        screenInstance: screen
-                    )
-                    return value ?? defaultValue
-                } catch {
-                    Log.ui.error("#\(logId)# getValue error: \(error)")
-                    return defaultValue
-                }
+                return getValue(variable, defaultValue: defaultValue, screen: screen)
             },
             set: { [weak self] value in
                 guard let self else { return }

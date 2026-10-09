@@ -34,12 +34,12 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
         let action = Action(
             path: ["submit"],
             params: [
-                "message": VC.AnyValue("hello"),
-                "payload": VC.AnyValue([
-                    "enabled": VC.AnyValue(true),
-                    "name": VC.AnyValue("alex"),
-                    "ratio": VC.AnyValue(1.5),
-                    "empty": VC.AnyValue(String?.none),
+                "message": VC.Value("hello"),
+                "payload": VC.Value([
+                    "enabled": VC.Value(true),
+                    "name": VC.Value("alex"),
+                    "ratio": VC.Value(1.5),
+                    "empty": VC.Value(String?.none),
                 ]),
             ],
             scope: .screen
@@ -72,13 +72,13 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
         #expect(action.path == ["submit"])
 
         let params = try #require(action.params)
-        try expectEqual(params["message"], VC.AnyValue("hello"))
+        try expectEqual(params["message"], VC.Value("hello"))
 
         let payload = try #require(params["payload"])
         let payloadObject = try #require(payload.wrapped.asObject)
-        try expectEqual(payloadObject["enabled"].map(VC.AnyValue.init), VC.AnyValue(true))
-        try expectEqual(payloadObject["name"].map(VC.AnyValue.init), VC.AnyValue("alex"))
-        try expectEqual(payloadObject["ratio"].map(VC.AnyValue.init), VC.AnyValue(1.5))
+        try expectEqual(payloadObject["enabled"].map(VC.Value.init), VC.Value(true))
+        try expectEqual(payloadObject["name"].map(VC.Value.init), VC.Value("alex"))
+        try expectEqual(payloadObject["ratio"].map(VC.Value.init), VC.Value(1.5))
         let empty = try #require(payloadObject["empty"])
         #expect(empty.isNil)
     }
@@ -88,11 +88,11 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
         let action = Action(
             path: ["track", "event"],
             params: [
-                "flag": VC.AnyValue(false),
-                "meta": VC.AnyValue([
-                    "comment": VC.AnyValue("ok"),
-                    "value": VC.AnyValue(3.25),
-                    "missing": VC.AnyValue(String?.none),
+                "flag": VC.Value(false),
+                "meta": VC.Value([
+                    "comment": VC.Value("ok"),
+                    "value": VC.Value(3.25),
+                    "missing": VC.Value(String?.none),
                 ]),
             ],
             scope: .global
@@ -127,7 +127,7 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
         }
     }
 
-    private func expectEqual(_ lhs: [String: VC.AnyValue], _ rhs: [String: VC.AnyValue]) throws {
+    private func expectEqual(_ lhs: [String: VC.Value], _ rhs: [String: VC.Value]) throws {
         #expect(lhs.count == rhs.count)
         #expect(Set(lhs.keys) == Set(rhs.keys))
 
@@ -136,7 +136,7 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
         }
     }
 
-    private func expectEqual(_ lhs: VC.AnyValue?, _ rhs: VC.AnyValue?) throws {
+    private func expectEqual(_ lhs: VC.Value?, _ rhs: VC.Value?) throws {
         switch (lhs, rhs) {
         case let (.some(lhs), .some(rhs)):
             try expectEqual(lhs, rhs)
@@ -147,7 +147,7 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
         }
     }
 
-    private func expectEqual(_ lhs: VC.AnyValue, _ rhs: VC.AnyValue) throws {
+    private func expectEqual(_ lhs: VC.Value, _ rhs: VC.Value) throws {
         if lhs.wrapped.isNil || rhs.wrapped.isNil {
             #expect(lhs.wrapped.isNil == rhs.wrapped.isNil)
             return
@@ -166,7 +166,7 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
             return
         }
         if let lhs = lhs.wrapped.asObject, let rhs = rhs.wrapped.asObject {
-            try expectEqual(lhs.mapValues(VC.AnyValue.init), rhs.mapValues(VC.AnyValue.init))
+            try expectEqual(lhs.mapValues(VC.Value.init), rhs.mapValues(VC.Value.init))
             return
         }
 

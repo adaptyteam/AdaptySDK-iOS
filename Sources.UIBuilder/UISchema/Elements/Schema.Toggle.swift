@@ -11,7 +11,7 @@ extension Schema {
     typealias Toggle = VC.Toggle
 }
 
-extension Schema.Toggle: Schema.SimpleElement {
+extension Schema.Toggle: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,
@@ -56,10 +56,9 @@ extension Schema.Toggle: DecodableWithConfiguration {
                 setter: nil,
                 scope: .global,
                 converter: Schema.IsEqualConverter(
-                    value: Schema.AnyValue(onIndex),
-                    falseValue: Schema.AnyValue(offIndex)
-                ).asAnyConverter
-
+                    value: Schema.Value(onIndex),
+                    falseValue: Schema.Value(offIndex)
+                )
             ),
             color: container.decodeIfPresent(Schema.AssetReference.self, forKey: .colorAssetId)
         )

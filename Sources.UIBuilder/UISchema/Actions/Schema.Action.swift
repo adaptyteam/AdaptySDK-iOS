@@ -29,7 +29,7 @@ extension Schema.Action: Decodable {
             }
             try self.init(
                 path: path,
-                params: container.decodeIfPresent([String: Schema.AnyValue].self, forKey: .params),
+                params: container.decodeIfPresent([String: Schema.Value].self, forKey: .params),
                 scope: container.decodeIfPresent(Schema.Context.self, forKey: .scope) ?? .default
             )
         } else {
@@ -79,13 +79,13 @@ extension Schema.Action {
         case "open_url":
             if let url = try? container.decode(URL.self, forKey: .url), url.scheme != nil {
                 try self.init(path: ["SDK", "openUrl"], params: [
-                    "url": VC.AnyValue(url.absoluteString),
-                    "openIn": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
+                    "url": VC.Value(url.absoluteString),
+                    "openIn": VC.Value(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
                 ], scope: .global)
             } else {
                 try self.init(path: ["SDK", "openUrl"], params: [
-                    "stringId": VC.AnyValue(container.decode(String.self, forKey: .url)),
-                    "openIn": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
+                    "stringId": VC.Value(container.decode(String.self, forKey: .url)),
+                    "openIn": VC.Value(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
                 ], scope: .global)
             }
         case "restore":
@@ -94,50 +94,50 @@ extension Schema.Action {
             self.init(path: ["SDK", "closeAll"], params: nil, scope: .global)
         case "custom":
             try self.init(path: ["SDK", "userCustomAction"], params: [
-                "userCustomId": VC.AnyValue(container.decode(String.self, forKey: .customId)),
+                "userCustomId": VC.Value(container.decode(String.self, forKey: .customId)),
             ], scope: .global)
         case "purchase_product":
             try self.init(path: ["SDK", "purchaseProduct"], params: [
-                "productId": VC.AnyValue(container.decode(String.self, forKey: .productId)),
+                "productId": VC.Value(container.decode(String.self, forKey: .productId)),
             ], scope: .global)
         case "web_purchase_product":
             try self.init(path: ["SDK", "webPurchaseProduct"], params: [
-                "productId": VC.AnyValue(container.decode(String.self, forKey: .productId)),
-                "openIn": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
+                "productId": VC.Value(container.decode(String.self, forKey: .productId)),
+                "openIn": VC.Value(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
             ], scope: .global)
         case "open_screen":
             try self.init(path: ["SDK", "openScreen"], params: [
-                "type": VC.AnyValue(container.decode(String.self, forKey: .screenType)),
-                "instanceId": VC.AnyValue("legacy-bottom-sheet"),
-                "navigatorId": VC.AnyValue("legacy-bottom-sheet"),
-                "transitionId": VC.AnyValue("on_appear"),
+                "type": VC.Value(container.decode(String.self, forKey: .screenType)),
+                "instanceId": VC.Value("legacy-bottom-sheet"),
+                "navigatorId": VC.Value("legacy-bottom-sheet"),
+                "transitionId": VC.Value("on_appear"),
             ], scope: .global)
         case "close_screen":
             self.init(path: ["SDK", "closeScreen"], params: [
-                "navigatorId": VC.AnyValue("legacy-bottom-sheet"),
+                "navigatorId": VC.Value("legacy-bottom-sheet"),
             ], scope: .global)
         case "select_product":
             try self.init(path: ["Legacy", "selectProduct"], params: [
-                "productId": VC.AnyValue(container.decode(String.self, forKey: .productId)),
-                "groupId": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
+                "productId": VC.Value(container.decode(String.self, forKey: .productId)),
+                "groupId": VC.Value(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
             ], scope: .global)
         case "unselect_product":
             try self.init(path: ["Legacy", "unselectProduct"], params: [
-                "groupId": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
+                "groupId": VC.Value(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
             ], scope: .global)
         case "purchase_selected_product":
             try self.init(path: ["Legacy", "purchaseSelectedProduct"], params: [
-                "groupId": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
+                "groupId": VC.Value(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
             ], scope: .global)
         case "web_purchase_selected_product":
             try self.init(path: ["Legacy", "webPurchaseSelectedProduct"], params: [
-                "groupId": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
-                "openIn": VC.AnyValue(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
+                "groupId": VC.Value(container.decodeIfPresent(String.self, forKey: .groupId) ?? defaultGroupId),
+                "openIn": VC.Value(container.decodeIfPresent(String.self, forKey: .openIn) ?? defaultOpenIn),
             ], scope: .global)
         case "switch":
             try self.init(path: ["Legacy", "switchSection"], params: [
-                "sectionId": VC.AnyValue(container.decode(String.self, forKey: .sectionId)),
-                "index": VC.AnyValue(container.decode(Int.self, forKey: .index)),
+                "sectionId": VC.Value(container.decode(String.self, forKey: .sectionId)),
+                "index": VC.Value(container.decode(Int.self, forKey: .index)),
             ], scope: .global)
         default:
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath + [LegacyCodingKeys.type], debugDescription: "unknown value"))

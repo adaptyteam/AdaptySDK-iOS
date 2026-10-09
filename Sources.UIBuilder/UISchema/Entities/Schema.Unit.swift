@@ -42,7 +42,7 @@ extension Schema.Unit: Decodable {
                 case CodingKeys.point.rawValue, nil:
                     self = .point(value)
                 default:
-                    throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.unit], debugDescription: "usupport value: \(unit ?? "nil")"))
+                    throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: container.codingPath + [CodingKeys.unit], debugDescription: "usupport value: \(unit, default: "nil")"))
                 }
             }
         }

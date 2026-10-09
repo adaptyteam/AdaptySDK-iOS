@@ -37,6 +37,7 @@ public extension AdaptyUIBuilder {
                 flow: .init(
                     placementId: "",
                     variationId: "",
+                    variationName: nil,
                     abTestName: "",
                     name: "",
                     products: []

@@ -8,16 +8,18 @@
 import Foundation
 
 extension Backend {
-    struct FallbackExecutor: DefaultAudienceExecutor {
+
+    struct FallbackExecutor: BackendExecutor {
         let manager: StateManager
         let session: HTTPSession
-        let kind = AdaptyServerKind.fallback
+        let kind: AdaptyServerKind
     }
 
     func createFallbackExecutor() -> FallbackExecutor {
         FallbackExecutor(
             manager: networkManager,
-            session: HTTPSession(configuration: fallbackHTTPConfiguration)
+            session: HTTPSession(configuration: fallbackHTTPConfiguration),
+            kind: .fallback
         )
     }
 }

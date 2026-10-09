@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/4.2.0-SNAPSHOT/schema"
+$id: "https://adapty.io/crossPlatform/4.3.0/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -101,13 +101,31 @@ $requests:
   ### dismissFlowView ###
   AdaptyUIDismissFlowView.Request: #request
     type: object
-    required: [method, id]
+    required: [method, id, destroy]
     properties:
       method: { const: "adapty_ui_dismiss_flow_view" }
       id: { type: string, description: "View Id" }
-      destroy: { type: boolean, default: false }
+      destroy: { type: boolean, description: "Release the view after it is dismissed" }
 
   AdaptyUIDismissFlowView.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
+  ### destroyFlowView ###
+  AdaptyUIDestroyFlowView.Request: #request
+    type: object
+    required: [method, id]
+    properties:
+      method: { const: "adapty_ui_destroy_flow_view" }
+      id: { type: string, description: "View Id" }
+
+  AdaptyUIDestroyFlowView.Response: #response
     type: object
     oneOf:
       - required: [error]
@@ -332,49 +350,6 @@ $requests:
         properties:
           success: { const: true }
 
-  ### preloadOnboardings ###
-  PreloadOnboardings.Request: #request
-    type: object
-    required: [method, placement_ids]
-    properties:
-      method: { const: "preload_onboardings" }
-      placement_ids:
-        type: array
-        items: { type: string }
-      locale: { $ref: "#/$defs/AdaptyLocale" }
-      load_timeout: { type: number, description: "seconds" }
-
-  PreloadOnboardings.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
-
-  ### preloadOnboardingsForDefaultAudience ###
-  PreloadOnboardingsForDefaultAudience.Request: #request
-    type: object
-    required: [method, placement_ids]
-    properties:
-      method: { const: "preload_onboardings_for_default_audience" }
-      placement_ids:
-        type: array
-        items: { type: string }
-      locale: { $ref: "#/$defs/AdaptyLocale" }
-
-  PreloadOnboardingsForDefaultAudience.Response: #response
-    type: object
-    oneOf:
-      - required: [error]
-        properties:
-          error: { $ref: "#/$defs/AdaptyError" }
-      - required: [success]
-        properties:
-          success: { const: true }
-
   ### getPaywallProducts ###
   GetPaywallProducts.Request: #request
     type: object
@@ -552,6 +527,7 @@ $requests:
   ### getPendingStoreMessageTypes ###
   GetPendingStoreMessageTypes.Request: #request
     type: object
+    description: "iOS Only. Requires iOS 16+"
     required: [method]
     properties:
       method: { const: "get_pending_store_message_types" }
@@ -571,6 +547,7 @@ $requests:
   ### showStoreMessage ###
   ShowStoreMessage.Request: #request
     type: object
+    description: "iOS Only. Requires iOS 16+"
     required: [method]
     properties:
       method: { const: "show_store_messages" }
@@ -1284,7 +1261,11 @@ $defs:
       customer_identity_parameters:
         { $ref: "#/$defs/CustomerIdentityParameters" }
       observer_mode: { type: boolean, default: false }
-      store_messages_handling: { $ref: "#/$defs/StoreMessagesHandling" }
+      store_messages_handling:
+        {
+          $ref: "#/$defs/StoreMessagesHandling",
+          description: "iOS Only. Requires iOS 16+",
+        }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
       google_enable_pending_prepaid_plans: { type: boolean, default: false }
@@ -1365,7 +1346,10 @@ $defs:
 
   AdaptyPrice: #response
     type: object
-    required: [amount]
+    required:
+        - amount
+        - currency_code # iOS Only
+        - localized_string # iOS Only
     properties:
       amount: { type: number }
       currency_code: { type: string }
@@ -1375,12 +1359,19 @@ $defs:
   AdaptyPromotedProduct.Request: #request
     type: object
     required:
+      - purchase_intent_id # iOS Only
       - vendor_product_id
     properties:
+      purchase_intent_id: { type: string } # iOS Only
       vendor_product_id: { type: string }
       subscription:
         type: object
         properties:
+          pricing_terms: # iOS Only
+            type: object
+            required: [billing_plan_id]
+            properties:
+              billing_plan_id: { type: string }
           offer:
             type: object
             required: [offer_identifier]
@@ -1392,12 +1383,14 @@ $defs:
   AdaptyPromotedProduct.Response: #event
     type: object
     required:
+      - purchase_intent_id # iOS Only
       - vendor_product_id
       - localized_description
       - localized_title
       - is_family_shareable # iOS Only
       - price
     properties:
+      purchase_intent_id: { type: string } # iOS Only
       vendor_product_id: { type: string }
       localized_description: { type: string }
       localized_title: { type: string }
@@ -1408,17 +1401,41 @@ $defs:
       subscription: { $ref: "#/$defs/AdaptyProduct.Subscription" }
       payload_data: { type: string }
 
+  AdaptySubscriptionPricingTerms: #event #response
+    type: object
+    required:
+        - billing_plan_id
+        - billing_price
+        - billing_period
+        - commitment_info
+    properties:
+      billing_plan_id: { type: string }
+      billing_price: { $ref: "#/$defs/AdaptyPrice" }
+      billing_period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
+      commitment_info: { $ref: "#/$defs/AdaptySubscriptionCommitmentInfo" }
+
+  AdaptySubscriptionCommitmentInfo: #event #response
+    type: object
+    required:
+        - price
+        - period
+    properties:
+      price: { $ref: "#/$defs/AdaptyPrice" }
+      period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
+
   AdaptyProduct.Subscription: #event #response
     type: object
     required:
       - group_identifier # iOS Only
       - period
+      - pricing_terms # iOS Only
       - renewal_type # Android Only
       - base_plan_id # Android Only
     properties:
       group_identifier: { type: string, description: "iOS Only" }
       period: { $ref: "#/$defs/AdaptySubscriptionPeriod" }
       localized_period: { type: string }
+      pricing_terms: { $ref: "#/$defs/AdaptySubscriptionPricingTerms" }
       offer: { $ref: "#/$defs/AdaptySubscriptionOffer" }
       renewal_type: # Android Only
         type: string
@@ -1449,6 +1466,11 @@ $defs:
       subscription:
         type: object
         properties:
+          pricing_terms: # iOS Only
+            type: object
+            required: [billing_plan_id]
+            properties:
+              billing_plan_id: { type: string }
           offer:
             type: object
             required: [offer_identifier]
@@ -1530,6 +1552,7 @@ $defs:
       flow_id: { type: string }
       flow_name: { type: string }
       variation_id: { type: string }
+      variation_name: { type: string }
       remote_configs:
         type: array
         items: { $ref: "#/$defs/AdaptyRemoteConfig" }
@@ -1655,10 +1678,18 @@ $defs:
       adapty_product_id: { type: string }
       access_level_id: { type: string }
       product_type: { type: string }
-      promotional_offer_id: { type: string, description: "iOS Only" }
-      win_back_offer_id: { type: string, description: "iOS Only" }
       base_plan_id: { type: string, description: "Android Only" }
       offer_id: { type: string, description: "Android Only" }
+      pricing_terms: # iOS only
+        type: array
+        items:
+          type: object
+          required:
+            - billing_plan_id # iOS only
+          properties:
+            billing_plan_id: { type: string } # iOS only
+            promotional_offer_id: { type: string } # iOS only
+            win_back_offer_id: { type: string } # iOS only
 
   AdaptySubscriptionPeriod: #response
     type: object
@@ -1736,6 +1767,8 @@ $defs:
       billing_issue_detected_at: { $ref: "#/$defs/Date" }
       starts_at: { $ref: "#/$defs/Date" }
       cancellation_reason: { type: string }
+      billing_plan_id: { type: string, description: "iOS Only" }
+      commitment: { $ref: "#/$defs/AdaptyProfile.SubscriptionCommitmentInfo" }
       is_refund: { type: boolean }
 
   AdaptyProfile.NonSubscription: #response
@@ -1772,6 +1805,7 @@ $defs:
       - is_refund
       - is_sandbox
       - will_renew
+      - billing_plan_id # iOS Only
     properties:
       store: { type: string }
       vendor_product_id: { type: string }
@@ -1794,6 +1828,16 @@ $defs:
       active_promotional_offer_id: { type: string }
       offer_id: { type: string }
       cancellation_reason: { type: string }
+      billing_plan_id: { type: string, description: "iOS Only" }
+      commitment: { $ref: "#/$defs/AdaptyProfile.SubscriptionCommitmentInfo" }
+
+  AdaptyProfile.SubscriptionCommitmentInfo: #response
+    type: object
+    required: [billing_period_number, total_billing_periods, expires_at]
+    properties:
+      billing_period_number: { type: integer, minimum: 0 }
+      total_billing_periods: { type: integer, minimum: 0 }
+      expires_at: { $ref: "#/$defs/Date" }
 
   AdaptyProfile.CustomAttributes:
     type: object
@@ -1830,7 +1874,7 @@ $defs:
       analytics_disabled: { type: boolean }
 
   AdaptySubscriptionOffer.Identifier: #request #response
-    type: string
+    type: object
     oneOf:
       - required: [type]
         properties:

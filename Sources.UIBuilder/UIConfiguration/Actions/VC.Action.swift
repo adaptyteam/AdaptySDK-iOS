@@ -10,7 +10,7 @@ import Foundation
 package extension VC {
     struct Action: Sendable {
         let path: [String]
-        let params: [String: VC.AnyValue]?
+        let params: [String: VC.Value]?
         let scope: Scope
     }
 }

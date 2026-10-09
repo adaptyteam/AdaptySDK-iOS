@@ -1,2 +1,7 @@
 # Global code owners - all files will be assigned to these users for review
 * @aleksei-valiano @x401om
+
+# Publishing to adaptyteam/AdaptySDK-CocoaPods-Specs: these files decide what the spec repo receives.
+/.github/workflows/publish-cocoapods-specs.yml @aleksei-valiano @x401om @StanislavMayorov
+/.github/workflows/test-cocoapods-specs.yml @aleksei-valiano @x401om @StanislavMayorov
+/scripts/cocoapods-specs/ @aleksei-valiano @x401om @StanislavMayorov

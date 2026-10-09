@@ -36,6 +36,31 @@ extension Dev_PreviewProduct {
                             numberOfUnits: sub.period.numberOfUnits
                         ),
                         localizedPeriod: sub.localizedPeriod,
+                        pricingTerms: .init(
+                            billingPlanId: "up_front",
+                            billingPrice: .init(
+                                amount: price.amount,
+                                currencyCode: price.currencyCode,
+                                currencySymbol: price.currencySymbol,
+                                localizedString: price.localizedString
+                            ),
+                            billingPeriod: .init(
+                                unit: sub.period.unit,
+                                numberOfUnits: sub.period.numberOfUnits
+                            ),
+                            commitmentInfo: .init(
+                                price: .init(
+                                    amount: price.amount,
+                                    currencyCode: price.currencyCode,
+                                    currencySymbol: price.currencySymbol,
+                                    localizedString: price.localizedString
+                                ),
+                                period: .init(
+                                    unit: sub.period.unit,
+                                    numberOfUnits: sub.period.numberOfUnits
+                                )
+                            )
+                        ),
                         offer: sub.offer.map { offer in
                             .init(
                                 id: offer.id,

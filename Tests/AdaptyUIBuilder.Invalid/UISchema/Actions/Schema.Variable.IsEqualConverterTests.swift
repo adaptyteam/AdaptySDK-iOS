@@ -17,19 +17,19 @@ private extension SchemaTests.VariableTests {
 
         static let jsonCases: [(value: Value, json: Json)] = [
             (
-                Value(value: VC.AnyValue("section_1"), falseValue: nil),
+                Value(value: VC.Value("section_1"), falseValue: nil),
                 Json(##"{"converter":"is_equal", "converter_params": "section_1"}"##)
             ),
             (
-                Value(value: VC.AnyValue(45), falseValue: nil),
+                Value(value: VC.Value(45), falseValue: nil),
                 Json(##"{"converter":"is_equal", "converter_params": {"value": 45}}"##)
             ),
             (
-                Value(value: VC.AnyValue(45), falseValue: VC.AnyValue(0)),
+                Value(value: VC.Value(45), falseValue: VC.Value(0)),
                 Json(##"{"converter":"is_equal", "converter_params": {"value": 45, "false_value": 0}}"##)
             ),
             (
-                Value(value: VC.AnyValue(true), falseValue: VC.AnyValue(false)),
+                Value(value: VC.Value(true), falseValue: VC.Value(false)),
                 Json(##"{"converter":"is_equal", "converter_params": {"value": true, "false_value": false}}"##)
             ),
         ]

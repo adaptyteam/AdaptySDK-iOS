@@ -18,11 +18,12 @@ extension Request {
         }
 
         func execute() async throws -> AdaptyJsonData {
-            let product = try await Adapty.getPaywallProduct(
+            let product = try await Adapty.restorePaywallProduct(
                 flowProductId: product.flowProductId,
                 adaptyProductId: product.adaptyProductId,
                 productInfo: product.productInfo,
                 paywallProductIndex: product.paywallProductIndex,
+                billingPlan: product.billingPlan,
                 subscriptionOfferIdentifier: product.subscriptionOfferIdentifier,
                 variationId: product.variationId,
                 paywallABTestName: product.paywallABTestName,

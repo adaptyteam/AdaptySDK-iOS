@@ -9,6 +9,11 @@ import StoreKit
 
 public protocol AdaptyProduct: Sendable, CustomStringConvertible {
     var skProduct: StoreKit.Product { get }
+
+    /// Regular pricing terms for the selected billing plan, without subscription offers.
+    /// On older systems, up-front terms are built from the underlying product.
+    /// Returns `nil` for non-subscription products or an unavailable non-up-front plan.
+    var subscriptionPricingTerms: AdaptySubscriptionPricingTerms? { get }
 }
 
 public extension AdaptyProduct {
@@ -33,11 +38,11 @@ public extension AdaptyProduct {
 
     /// The cost of the product in the local currency.
     var price: Decimal {
-        skProduct.price
+        return subscriptionPricingTerms?.commitmentInfo.price ?? skProduct.price
     }
 
     /// The currency code of the locale used to format the price of the product.
-    var currencyCode: String? {
+    var currencyCode: String {
         skProduct.priceFormatStyle.currencyCode
     }
 
@@ -60,9 +65,11 @@ public extension AdaptyProduct {
         skProduct.isFamilyShareable
     }
 
-    /// The period details for products that are subscriptions. (Will be `nil` for iOS version below 11.2 and macOS version below 10.14.4).
+    /// The normalized commitment period of the selected billing plan.
+    /// Falls back to the underlying StoreKit subscription period when pricing terms are unavailable.
+
     var subscriptionPeriod: AdaptySubscriptionPeriod? {
-        skProduct.subscription?.subscriptionPeriod.asAdaptySubscriptionPeriod
+        subscriptionPricingTerms?.commitmentInfo.period
     }
 
     /// The identifier of the subscription group to which the subscription belongs. (Will be `nil` for iOS version below 12.0 and macOS version below 10.14).
@@ -71,8 +78,8 @@ public extension AdaptyProduct {
     }
 
     /// The price's language is determined by the preferred language set on the device.
-    var localizedPrice: String? {
-        skProduct.displayPrice
+    var localizedPrice: String {
+        subscriptionPricingTerms?.commitmentInfo.localizedPrice ?? skProduct.displayPrice
     }
 
     /// The period's language is determined by the preferred language set on the device.

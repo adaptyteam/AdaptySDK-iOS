@@ -103,7 +103,8 @@ public extension Adapty {
         try await withActivatedSDK(methodName: .logShowFlow) { _ throws(AdaptyError) in
             try await trackEvent(
                 .flowShowed(.init(
-                    variationId: flow.variationId
+                    variationId: flow.variationId,
+                    flowVersionId: flow.layoutsConfiguration?.versionId
                 )),
                 date: now
             )

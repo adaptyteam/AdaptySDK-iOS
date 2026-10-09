@@ -11,7 +11,7 @@ extension Schema {
     typealias WheelItemsPicker = VC.WheelItemsPicker
 }
 
-extension Schema.WheelItemsPicker: Schema.SimpleElement {
+extension Schema.WheelItemsPicker: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,

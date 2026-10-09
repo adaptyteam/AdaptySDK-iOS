@@ -18,7 +18,7 @@ extension Schema {
     }
 }
 
-extension Schema.Timer: Schema.SimpleElement {
+extension Schema.Timer: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _ builder: Schema.ConfigurationBuilder,

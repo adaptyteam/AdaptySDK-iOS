@@ -86,7 +86,7 @@ struct SDKEventHandlerTests {
                 sdkVersion: "test", osName: "test", osVersion: "test", deviceModel: "test",
                 appBundleId: nil, appVersion: nil, appBuild: nil, appCurrentLocale: nil,
                 userLocales: [], userUses24HourClock: true,
-                flow: .init(placementId: "test", variationId: "test", abTestName: "test", name: "test", products: [])
+                flow: .init(placementId: "test", variationId: "test", variationName: nil, abTestName: "test", name: "test", products: [])
             ),
             assets: [:], strings: [:], navigators: [:], screens: [:], scripts: [],
             showPurchaseLoader: false, showRestoreLoader: false,

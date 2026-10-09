@@ -13,6 +13,9 @@ struct AdaptyUIButtonView: View {
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
 
+    @Environment(\.adaptyPagerDragGuard)
+    private var pagerDragGuard: AdaptyUIPagerDragGuard?
+
     private var button: VC.Button
 
     @EnvironmentObject
@@ -38,6 +41,8 @@ struct AdaptyUIButtonView: View {
 
     var body: some View {
         Button {
+            guard pagerDragGuard?.didDrag != true else { return }
+
             stateViewModel.execute(
                 actions: button.actions,
                 screen: screen

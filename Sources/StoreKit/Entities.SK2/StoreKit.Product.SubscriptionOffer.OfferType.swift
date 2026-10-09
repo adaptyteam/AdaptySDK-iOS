@@ -10,7 +10,7 @@ import StoreKit
 private let SKWinBackOfferKey = "Winback"
 
 extension StoreKit.Product.SubscriptionOffer.OfferType {
-    var asSubscriptionOfferType: AdaptySubscriptionOfferType {
+    var asAdaptySubscriptionOfferType: AdaptySubscriptionOfferType {
         switch self {
         case .introductory: .introductory
         case .promotional: .promotional

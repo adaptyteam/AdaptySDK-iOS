@@ -18,9 +18,9 @@ extension Schema.IsEqualConverter: Decodable {
     }
 
     init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: Schema.AnyConverter.CodingKeys.self)
+        let container = try decoder.container(keyedBy: Schema.Converter.CodingKeys.self)
 
-        if let value = try? container.decode(Schema.AnyValue.self, forKeys: .converterParameters), !value.isObject {
+        if let value = try? container.decode(Schema.Value.self, forKeys: .converterParameters), !value.isObject {
             self.init(value: value, falseValue: nil)
             return
         }
@@ -28,8 +28,8 @@ extension Schema.IsEqualConverter: Decodable {
         let params = try container.nestedContainer(keyedBy: CodingKeys.self, forKeys: .converterParameters)
 
         try self.init(
-            value: params.decode(Schema.AnyValue.self, forKeys: .value),
-            falseValue: params.decodeIfPresent(Schema.AnyValue.self, forKeys: .falseValue)
+            value: params.decode(Schema.Value.self, forKeys: .value),
+            falseValue: params.decodeIfPresent(Schema.Value.self, forKeys: .falseValue)
         )
     }
 }

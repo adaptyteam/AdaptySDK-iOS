@@ -50,6 +50,9 @@ struct AdaptyUIFlatContainerView: View {
                 }
             }
             .scrollIndicatorsHidden_compatible()
+            // The scroll axis proposes no height to the content: the floors below need
+            // this, and without it they would collapse to ~10pt inside a scroll.
+            .declaringProposal(.vertical, unspecified: true)
             .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
             .onChange(of: stateViewModel.scrollCommand) { command in
                 guard let command, command.instanceId == screenInstance.id, command.kind == .footer else { return }
@@ -95,6 +98,9 @@ struct AdaptyUIFlatContainerView: View {
                         .scrollProgressTracker(kind: .main, coordinateSpaceName: CoordinateSpace.adaptyGlobalName, viewportHeight: globalProxy.size.height)
                     }
                     .scrollIndicatorsHidden_compatible()
+                    // The scroll axis proposes no height to the content: the floors below need
+                    // this, and without it they would collapse to ~10pt inside a scroll.
+                    .declaringProposal(.vertical, unspecified: true)
                     .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
                     .onChange(of: stateViewModel.scrollCommand) { command in
                         guard let command, command.instanceId == screenInstance.id, command.kind == .content else { return }

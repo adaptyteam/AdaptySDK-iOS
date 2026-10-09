@@ -33,7 +33,7 @@ struct JSValueSafeConverterTests {
         }
     }
 
-    private final class ConvertedClass: JSValueConvertable {
+    private final class ConvertedClass: JSValueConvertable, @unchecked Sendable {
         var calls = 0
 
         func toJSValue(in context: JSContext) -> JSValue {

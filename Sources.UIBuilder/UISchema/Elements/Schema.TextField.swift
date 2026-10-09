@@ -11,7 +11,7 @@ extension Schema {
     typealias TextField = VC.TextField
 }
 
-extension Schema.TextField: Schema.SimpleElement {
+extension Schema.TextField: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,

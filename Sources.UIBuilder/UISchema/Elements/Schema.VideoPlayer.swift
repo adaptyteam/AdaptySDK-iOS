@@ -11,7 +11,7 @@ extension Schema {
     typealias VideoPlayer = VC.VideoPlayer
 }
 
-extension Schema.VideoPlayer: Schema.SimpleElement {
+extension Schema.VideoPlayer: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,

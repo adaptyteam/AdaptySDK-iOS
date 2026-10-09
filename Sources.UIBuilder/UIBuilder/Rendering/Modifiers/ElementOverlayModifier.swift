@@ -19,18 +19,22 @@ struct AdaptyUIOverlayElementsView<ScreenHolderContent: View>: View {
     var body: some View {
         ForEach(overlays.indices, id: \.self) { index in
             let item = overlays[index]
-            AdaptyUIElementView(
-                item.content,
-                screenHolderBuilder: screenHolderBuilder
-            )
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity,
-                alignment: .from(
+            // A flexible frame never shrinks below its child, so an oversized layer
+            // made the frame as wide as itself and the alignment inside it became a
+            // no-op — every h_align collapsed to the centering done by the enclosing
+            // layer. Stretch an inert placeholder instead and let the overlay's own
+            // alignment place the layer, which keeps overflow on the expected side.
+            Color.clear
+                .allowsHitTesting(false)
+                .overlay(alignment: .from(
                     horizontal: item.horizontalAlignment.swiftuiValue(with: layoutDirection),
                     vertical: item.verticalAlignment.swiftuiValue
-                )
-            )
+                )) {
+                    AdaptyUIElementView(
+                        item.content,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                }
         }
     }
 }

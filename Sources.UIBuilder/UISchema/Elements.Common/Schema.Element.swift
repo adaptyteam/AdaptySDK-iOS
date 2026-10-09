@@ -7,23 +7,23 @@
 
 import Foundation
 
+protocol SchemaSimpleElement: Sendable {
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _: VC.Element.Properties?
+    ) -> VC.Element
+}
+
+protocol SchemaCompositeElement: Sendable {
+    func planTasks(in: inout Schema.ConfigurationBuilder.TasksStack)
+    func buildElement(
+        _: Schema.ConfigurationBuilder,
+        _: VC.Element.Properties?,
+        _: inout [VC.ElementIndex]
+    ) throws(Schema.Error) -> VC.Element
+}
+
 extension Schema {
-    protocol SimpleElement: Sendable {
-        func buildElement(
-            _: Schema.ConfigurationBuilder,
-            _: VC.Element.Properties?
-        ) -> VC.Element
-    }
-
-    protocol CompositeElement: Sendable {
-        func planTasks(in: inout Schema.ConfigurationBuilder.TasksStack)
-        func buildElement(
-            _: Schema.ConfigurationBuilder,
-            _: VC.Element.Properties?,
-            _: inout [VC.ElementIndex]
-        ) throws(Schema.Error) -> VC.Element
-    }
-
     struct Element: Sendable {
         let properties: ElementProperties?
         let node: Node
@@ -33,8 +33,8 @@ extension Schema {
         case legacyReference(String)
         indirect case templateInstance(Schema.TemplateInstance)
         case screenHolder
-        case simpleElement(any SimpleElement)
-        case compositeElement(any CompositeElement)
+        case simpleElement(any SchemaSimpleElement)
+        case compositeElement(any SchemaCompositeElement)
         case unknown(String)
     }
 }

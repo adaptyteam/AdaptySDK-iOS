@@ -49,6 +49,9 @@ struct AdaptyUITransparentContainerView: View {
             Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
         }
         .scrollIndicatorsHidden_compatible()
+        // The scroll axis proposes no height to the content: the floors below need
+        // this, and without it they would collapse to ~10pt inside a scroll.
+        .declaringProposal(.vertical, unspecified: true)
         .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
         .onAppear {
             DispatchQueue.main.async {

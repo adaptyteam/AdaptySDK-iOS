@@ -168,7 +168,7 @@ extension VS.JSState {
 
         log.debug("get variable \(path.joined(separator: ".")) = \(result)")
 
-        guard let converter = variable.converter?.asDataBindingConverter else {
+        guard let converter = variable.converter else {
             return result
         }
 
@@ -238,7 +238,7 @@ extension VS.JSState {
         value: some JSValueConvertable,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
-        guard let convertor = variable.converter?.asDataBindingConverter else {
+        guard let convertor = variable.converter else {
             try setValueWithoutConverter(variable: variable, value: value, screenInstance: screenInstance)
             return
         }
@@ -300,7 +300,7 @@ extension VS.JSState {
 
     func execute(
         actions: [VC.Action],
-        params: [String: any VC.Value]?,
+        params: [String: any JSValueConvertable]?,
         screenInstance: VS.ScreenInstance
     ) throws(VS.Error) {
         guard !actions.isEmpty else { return }
@@ -312,7 +312,7 @@ extension VS.JSState {
 
             if let params {
                 for (key, value) in params {
-                    mergedParams[key] = VC.AnyValue(value)
+                    mergedParams[key] = VC.Value(value)
                 }
             }
 
@@ -358,7 +358,7 @@ extension VS.JSState {
             }
 
         let result = context.evaluateScript(script)
-        return "\(path): \(result?.toString() ?? "unknown")"
+        return "\(path): \(result?.toString(), default: "unknown")"
     }
 
     func debug(

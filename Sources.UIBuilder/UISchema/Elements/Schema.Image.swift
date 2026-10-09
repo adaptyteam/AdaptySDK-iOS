@@ -11,7 +11,7 @@ extension Schema {
     typealias Image = VC.Image
 }
 
-extension Schema.Image: Schema.SimpleElement {
+extension Schema.Image: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,

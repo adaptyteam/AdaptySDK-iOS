@@ -32,26 +32,22 @@ extension UIFont {
         weight: Int,
         italic: Bool
     ) -> UIFont {
-        var attributes = [UIFontDescriptor.AttributeName: Any]()
-        var traits = (attributes[.traits] as? [UIFontDescriptor.TraitKey: Any]) ?? [:]
+        var traits: [UIFontDescriptor.TraitKey: Any] = [
+            .weight: UIFont.Weight.fromInteger(weight),
+        ]
 
-        traits[.weight] = UIFont.Weight.fromInteger(weight)
-
-        attributes[.name] = nil
-        attributes[.traits] = traits
-        attributes[.family] = name
-
-        var testDescr = UIFontDescriptor(fontAttributes: attributes)
-
-        var symbolicTraits: UIFontDescriptor.SymbolicTraits = []
-
+        // `withSymbolicTraits` builds a fresh descriptor and drops the numeric weight
+        // trait, so italic has to travel in the same dictionary as the weight.
         if italic {
-            symbolicTraits = symbolicTraits.union(.traitItalic)
+            traits[.symbolic] = UIFontDescriptor.SymbolicTraits.traitItalic.rawValue
         }
 
-        testDescr = testDescr.withSymbolicTraits(symbolicTraits) ?? testDescr
+        let descriptor = UIFontDescriptor(fontAttributes: [
+            .family: name,
+            .traits: traits,
+        ])
 
-        return UIFont(descriptor: testDescr, size: size)
+        return UIFont(descriptor: descriptor, size: size)
     }
 }
 

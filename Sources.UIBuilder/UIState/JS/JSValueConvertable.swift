@@ -10,7 +10,7 @@ import CoreFoundation
 import Foundation
 import JavaScriptCore
 
-protocol JSValueConvertable {
+protocol JSValueConvertable: Sendable {
     func toJSValue(in: JSContext) -> JSValue
 }
 
@@ -110,7 +110,7 @@ extension String: JSValueConvertable {
     }
 }
 
-extension VC.AnyValue: JSValueConvertable {
+extension VC.Value {
     func toJSValue(in context: JSContext) -> JSValue {
         wrapped.toJSValue(in: context)
     }

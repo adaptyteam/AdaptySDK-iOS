@@ -113,9 +113,17 @@ fallback_file: {
 	vendor_product_id!:             #Identifier
 	flow_product_id?:               null | #Identifier
 	win_back_offer_id?:             null | #Identifier
-	promotional_offer_eligibility?: *true | bool
+	promotional_offer_eligibility?: *true | bool | null
 	promotional_offer_id?:          null | #Identifier
 	product_type!:                  string
+	pricing_terms?: null | [...#ProductPricingTerms]
+	...
+}
+
+#ProductPricingTerms: {
+	billing_plan_id!:      string
+	promotional_offer_id?: null | #Identifier
+	win_back_offer_id?:    null | #Identifier
 	...
 }
 

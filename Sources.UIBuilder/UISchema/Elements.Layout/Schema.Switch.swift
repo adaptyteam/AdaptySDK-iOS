@@ -20,7 +20,7 @@ extension Schema {
     }
 }
 
-extension Schema.Switch: Schema.CompositeElement {
+extension Schema.Switch: SchemaCompositeElement {
     @inlinable
     func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
         for item in cases.reversed() {

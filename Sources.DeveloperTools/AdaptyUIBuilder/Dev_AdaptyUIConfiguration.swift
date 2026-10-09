@@ -69,6 +69,7 @@ public extension Dev_AdaptyUIConfiguration {
                 flow: .init(
                     placementId: environment.placementId,
                     variationId: environment.variationId,
+                    variationName: nil,
                     abTestName: environment.abTestName,
                     name: environment.placementName,
                     products: environment.products.asProductConstants()

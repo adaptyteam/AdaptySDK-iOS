@@ -11,7 +11,7 @@ extension Schema {
     typealias CustomElement = VC.CustomElement
 }
 
-extension Schema.CustomElement: Schema.SimpleElement {
+extension Schema.CustomElement: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,

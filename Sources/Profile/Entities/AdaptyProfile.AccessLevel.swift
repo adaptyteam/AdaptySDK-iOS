@@ -75,6 +75,10 @@ public extension AdaptyProfile {
         /// Time when this access level has started (could be in the future).
         public let startsAt: Date?
 
+        public let billingPlan: AdaptySubscriptionBillingPlan?
+
+        public let commitmentInfo: AdaptyProfile.SubscriptionCommitmentInfo?
+
         /// A reason why a subscription was cancelled.
         ///
         /// Possible values:
@@ -89,6 +93,9 @@ public extension AdaptyProfile {
 
         /// `true` if this purchase was refunded
         public let isRefund: Bool
+
+        /// signedDate из JWSRenewalInfoDecodedPayload.
+        let renewalInfoSignedAt: Date?
     }
 }
 
@@ -99,6 +106,8 @@ extension AdaptyProfile.AccessLevel: CustomStringConvertible {
             + (expiresAt.map { "expiresAt: \($0), " } ?? "")
             + (startsAt.map { "startsAt: \($0), " } ?? "")
             + "isLifetime: \(isLifetime), "
+            + "billingPlan: \(billingPlan?.rawValue, default: "nil"), "
+            + (commitmentInfo.map { "commitmentInfo: \($0), " } ?? "")
             + (activeIntroductoryOfferType.map { "activeIntroductoryOfferType: \($0), " } ?? "")
             + (activePromotionalOfferType.map { "activePromotionalOfferType: \($0), " } ?? "")
             + (activePromotionalOfferId.map { "activePromotionalOfferId: \($0), " } ?? "")
@@ -132,5 +141,8 @@ extension AdaptyProfile.AccessLevel: Codable {
         case startsAt = "starts_at"
         case cancellationReason = "cancellation_reason"
         case isRefund = "is_refund"
+        case billingPlan = "billing_plan_id"
+        case commitmentInfo = "commitment"
+        case renewalInfoSignedAt = "renewal_info_signed_at"
     }
 }

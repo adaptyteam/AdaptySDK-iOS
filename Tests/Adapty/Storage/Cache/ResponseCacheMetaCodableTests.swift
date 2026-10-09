@@ -90,9 +90,9 @@ extension StorageCacheTests {
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
             )
 
-            let data = try JSONEncoder().encode(meta)
-            let dict = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
-            #expect(dict["profile"] as? String == "p1")
+            let json = try Json.encode(meta)
+            let profile = try #require(json.deserilized(jsonPath: "/profile") as? String)
+            #expect(profile == "p1")
         }
 
         @Test func encode_meta_without_profile_omits_profile_key() throws {
@@ -107,8 +107,7 @@ extension StorageCacheTests {
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
             )
 
-            let data = try JSONEncoder().encode(meta)
-            let dict = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+            let dict = try #require(Json.encode(meta).deserilized as? [String: Any])
             #expect(dict["profile"] == nil)
         }
 
@@ -145,8 +144,7 @@ extension StorageCacheTests {
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
             )
 
-            let data = try JSONEncoder().encode(meta)
-            let dict = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+            let dict = try #require(Json.encode(meta).deserilized as? [String: Any])
             #expect(dict["locale"] == nil)
         }
 
@@ -182,9 +180,9 @@ extension StorageCacheTests {
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
             )
 
-            let data = try JSONEncoder().encode(meta)
-            let dict = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
-            #expect((dict["version"] as? Int) == 42)
+            let json = try Json.encode(meta)
+            let version = try #require(json.deserilized(jsonPath: "/version") as? Int)
+            #expect(version == 42)
         }
 
         @Test func encode_meta_with_zero_dataVersion_writes_zero() throws {
@@ -199,9 +197,9 @@ extension StorageCacheTests {
                 lastAccessedAt: Date(timeIntervalSince1970: 1_700_000_100)
             )
 
-            let data = try JSONEncoder().encode(meta)
-            let dict = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
-            #expect((dict["version"] as? Int) == 0)
+            let json = try Json.encode(meta)
+            let version = try #require(json.deserilized(jsonPath: "/version") as? Int)
+            #expect(version == 0)
         }
 
         @Test func roundtrip_preserves_dataVersion() throws {
@@ -243,4 +241,3 @@ extension StorageCacheTests {
     }
 }
 #endif
-

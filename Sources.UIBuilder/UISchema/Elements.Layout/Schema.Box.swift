@@ -24,7 +24,7 @@ extension Schema.Box {
     )
 }
 
-extension Schema.Box: Schema.CompositeElement {
+extension Schema.Box: SchemaCompositeElement {
     @inlinable
     func planTasks(in taskStack: inout Schema.ConfigurationBuilder.TasksStack) {
         if let content {

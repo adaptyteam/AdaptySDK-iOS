@@ -11,7 +11,7 @@ extension Schema {
     typealias Slider = VC.Slider
 }
 
-extension Schema.Slider: Schema.SimpleElement {
+extension Schema.Slider: SchemaSimpleElement {
     @inlinable
     func buildElement(
         _: Schema.ConfigurationBuilder,
