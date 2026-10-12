@@ -135,6 +135,7 @@ public extension AdaptyUI {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public struct Dev_AdaptyUIRendererView: View {
     let viewConfiguration: AdaptyUIConfiguration
     @StateObject private var galleryConfiguration: AdaptyUI.Dev_GalleryPreviewConfiguration

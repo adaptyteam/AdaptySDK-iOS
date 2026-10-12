@@ -10,6 +10,7 @@
 import SwiftUI
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     private let element: VC.Element
     private let screenHolderBuilder: () -> ScreenHolderContent
@@ -35,16 +36,10 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                 )
                 .rangedFrame(box: box)
         case let .deck(deck, _):
-            // Deck is laid out by a custom SwiftUI `Layout`, which needs iOS 16.
-            // Older versions keep treating the element as unknown.
-            if #available(iOS 16.0, macOS 13.0, *) {
-                AdaptyUIDeckView(
-                    deck,
-                    screenHolderBuilder: screenHolderBuilder
-                )
-            } else {
-                AdaptyUIUnknownElementView(value: "deck")
-            }
+            AdaptyUIDeckView(
+                deck,
+                screenHolderBuilder: screenHolderBuilder
+            )
         case let .stack(stack, _):
             AdaptyUIStackView(
                 stack,
@@ -152,6 +147,7 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIElementView<ScreenHolderContent: View>: View {
     private let elementIndex: VC.ElementIndex
     private let drawDecoratorBackground: Bool

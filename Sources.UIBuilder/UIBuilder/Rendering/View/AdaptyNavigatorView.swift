@@ -15,6 +15,7 @@ extension VC {
     static let templateIdTransparent = "transparent"
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyScreenView: View {
     var screen: VC.Screen
 
@@ -101,6 +102,7 @@ struct AdaptyScreenView: View {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyNavigatorView: View {
     @EnvironmentObject
     private var navigatorViewModel: AdaptyUINavigatorViewModel
@@ -158,6 +160,7 @@ struct AdaptyNavigatorView: View {
 /// Reads the navigator's screens in its own body, so a screen change re-renders the
 /// holder even when the element views between the navigator and its `screen_holder`
 /// are not re-evaluated (iOS 16.1 and earlier skip them).
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 private struct AdaptyNavigatorScreensView: View {
     @EnvironmentObject
     private var navigatorViewModel: AdaptyUINavigatorViewModel

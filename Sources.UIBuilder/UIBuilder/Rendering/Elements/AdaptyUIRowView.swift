@@ -9,6 +9,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIRowView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize

@@ -47,6 +47,7 @@ import UIKit
 
 /// Implement this protocol to respond to different events happening inside the purchase screen.
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public protocol AdaptyFlowControllerDelegate: AnyObject {
     /// This method is invoked when the paywall view was presented.
     ///
@@ -283,6 +284,7 @@ public extension AdaptyUI {
 #if canImport(UIKit)
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public extension AdaptyUI {
     /// If you are using the [Paywall Builder](https://adapty.io/docs/3.0/adapty-paywall-builder), you can use this method to get a configuration object for your paywall.
     ///

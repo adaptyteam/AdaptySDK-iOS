@@ -25,6 +25,7 @@ import SwiftUI
 ///
 /// The screens stay siblings of one container so that their identity — and with it
 /// their state and their running transition animations — survives a screen change.
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIScreenHolderView<ScreenContent: View>: View {
     private let screens: [AdaptyUIScreenViewModel]
     private let screenBuilder: (AdaptyUIScreenViewModel) -> ScreenContent
@@ -38,30 +39,7 @@ struct AdaptyUIScreenHolderView<ScreenContent: View>: View {
     }
 
     var body: some View {
-        if #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) {
-            AdaptyUIScreenHolderLayout {
-                ForEach(screens, id: \.id) { screenBuilder($0) }
-            }
-        } else {
-            legacyBody
-        }
-    }
-
-    // MARK: - iOS 15
-
-    /// `Layout` is unavailable before iOS 16, so the screens keep sharing a `ZStack`
-    /// and a screen wider than the viewport still stretches its neighbour for the
-    /// duration of a transition.
-    ///
-    /// The alternative — anchoring the size on the current screen and rendering the
-    /// rest as its background / overlay — fixes the layout but moves the outgoing
-    /// screen to a different position in the view tree mid-transition. SwiftUI then
-    /// hands the outgoing screen's state to the incoming one (scroll offsets, timers,
-    /// players, armed transition animations) and remounts the outgoing screen, which
-    /// restarts its exit animation. Keeping the screens siblings preserves identity,
-    /// so the layout defect is left in place here rather than traded for a state one.
-    private var legacyBody: some View {
-        ZStack {
+        AdaptyUIScreenHolderLayout {
             ForEach(screens, id: \.id) { screenBuilder($0) }
         }
     }

@@ -11,6 +11,7 @@ import Adapty
 import AdaptyUIBuilder
 import UIKit
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public extension AdaptyFlowControllerDelegate {
     func flowControllerDidAppear(_: AdaptyFlowController) {}
 

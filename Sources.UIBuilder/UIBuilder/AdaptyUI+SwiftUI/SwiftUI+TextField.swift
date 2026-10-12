@@ -49,6 +49,7 @@ extension View {
 
 // MARK: - Text Attributes
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func applyTextAttributes(
@@ -65,18 +66,12 @@ extension View {
 
         let tracking = CGFloat(fontAsset?.defaultLetterSpacing ?? 0)
 
-        if #available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *) {
-            self
-                .font(resolvedFont)
-                .foregroundColor(colorAsset ?? fontAsset?.defaultColor)
-                .underline(attr?.underline ?? false)
-                .strikethrough(attr?.strike ?? false)
-                .tracking(tracking)
-        } else {
-            self
-                .font(resolvedFont)
-                .foregroundColor(colorAsset ?? fontAsset?.defaultColor)
-        }
+        self
+            .font(resolvedFont)
+            .foregroundColor(colorAsset ?? fontAsset?.defaultColor)
+            .underline(attr?.underline ?? false)
+            .strikethrough(attr?.strike ?? false)
+            .tracking(tracking)
     }
 }
 

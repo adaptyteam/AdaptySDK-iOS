@@ -19,6 +19,7 @@ private enum ScrollAnchor {
     static let footerBottom = "adapty.hero.footer.bottom"
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIHeroContainerView: View {
     @EnvironmentObject
     private var flowViewModel: AdaptyUIFlowViewModel
@@ -75,7 +76,7 @@ struct AdaptyUIHeroContainerView: View {
                             )
                         }
                         .ignoresSafeArea()
-                        .scrollIndicatorsHidden_compatible()
+                        .scrollIndicators(.hidden)
                         // The scroll axis proposes no height to the content: the floors below need
                         // this, and without it they would collapse to ~10pt inside a scroll.
                         .declaringProposal(.vertical, unspecified: true)
@@ -286,7 +287,7 @@ struct AdaptyUIHeroContainerView: View {
 
                 Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
             }
-            .scrollIndicatorsHidden_compatible()
+            .scrollIndicators(.hidden)
             // The scroll axis proposes no height to the content: the floors below need
             // this, and without it they would collapse to ~10pt inside a scroll.
             .declaringProposal(.vertical, unspecified: true)

@@ -12,8 +12,11 @@ import Foundation
 
 @MainActor
 extension AdaptyUI {
-    public static var universalDelegate: (AdaptyFlowControllerDelegate & AdaptyOnboardingControllerDelegate)?
+    /// Receives the events of every view created through the plugin. Flow views
+    /// need it to conform to ``AdaptyFlowControllerDelegate`` as well.
+    public static var universalDelegate: AdaptyOnboardingControllerDelegate?
 
+    @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
     package static func paywallControllerWithUniversalDelegate(
         _ paywallConfiguration: FlowConfiguration,
         showDebugOverlay: Bool = false
@@ -24,7 +27,7 @@ extension AdaptyUI {
             throw err
         }
 
-        guard let delegate = AdaptyUI.universalDelegate else {
+        guard let delegate = AdaptyUI.universalDelegate as? AdaptyFlowControllerDelegate else {
             Log.ui.error("AdaptyUI delegateIsNotRegestired")
             throw AdaptyError(AdaptyUI.PluginError.delegateIsNotRegestired)
         }

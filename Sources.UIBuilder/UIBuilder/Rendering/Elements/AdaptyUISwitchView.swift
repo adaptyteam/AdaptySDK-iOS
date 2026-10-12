@@ -8,6 +8,7 @@
 import SwiftUI
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUISwitchView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize) private var screenSize: CGSize
     @Environment(\.adaptyInterfaceOrientation) private var orientation: VC.Orientation

@@ -9,6 +9,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIStackView<ScreenHolderContent: View>: View {
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection

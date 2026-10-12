@@ -10,6 +10,7 @@
 import SwiftUI
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIFlowViewModifier<Placeholder>: ViewModifier where Placeholder: View {
     @Environment(\.presentationMode) private var presentationMode
 
@@ -99,6 +100,7 @@ struct AdaptyUIFlowViewModifier<Placeholder>: ViewModifier where Placeholder: Vi
 }
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public extension View {
     func flow<Placeholder: View>(
         isPresented: Binding<Bool>,
@@ -132,6 +134,7 @@ public extension View {
 }
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public struct AdaptyUIFlowView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 

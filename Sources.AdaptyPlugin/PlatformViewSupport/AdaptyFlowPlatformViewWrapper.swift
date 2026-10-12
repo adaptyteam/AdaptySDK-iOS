@@ -11,6 +11,7 @@
     import AdaptyUI
     import UIKit
 
+    @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
     public final class AdaptyFlowPlatformViewWrapper: UIView {
         private let eventHandler: EventHandler
         private let flowView: AdaptyFlowUIView
@@ -48,6 +49,7 @@
     }
 
     @MainActor
+    @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
     extension AdaptyFlowPlatformViewWrapper: AdaptyFlowViewDelegate {
         package func flowViewDidAppear(_ view: AdaptyFlowUIView) {
             eventHandler.handle(

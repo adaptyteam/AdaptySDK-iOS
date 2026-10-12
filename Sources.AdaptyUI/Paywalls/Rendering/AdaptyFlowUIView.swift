@@ -12,6 +12,7 @@ import AdaptyUIBuilder
 import SwiftUI
 import UIKit
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 package final class AdaptyFlowUIView: UIView {
     let id: String
     let configuration: AdaptyUI.FlowConfiguration

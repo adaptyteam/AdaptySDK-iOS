@@ -108,16 +108,13 @@ extension InsettableShape {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func clipShape(_ shape: VC.ShapeType) -> some View {
         switch shape {
         case let .rectangle(radii):
-            if #available(iOS 16.0, *) {
-                self.clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
-            } else {
-                self.clipShape(UnevenRoundedRectangleFallback(cornerRadii: radii))
-            }
+            self.clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
         case .circle:
             self.clipShape(Circle())
         case .curveUp:
@@ -129,6 +126,7 @@ extension View {
 }
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 extension VC.ShapeType {
     @ViewBuilder
     func swiftUIShapeFill(
@@ -136,13 +134,8 @@ extension VC.ShapeType {
     ) -> some View {
         switch self {
         case let .rectangle(radii):
-            if #available(iOS 16.0, *) {
-                UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
-                    .fill(asset: asset)
-            } else {
-                UnevenRoundedRectangleFallback(cornerRadii: radii)
-                    .fill(asset: asset)
-            }
+            UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
+                .fill(asset: asset)
         case .circle:
             Circle()
                 .fill(asset: asset)
@@ -162,13 +155,8 @@ extension VC.ShapeType {
     ) -> some View {
         switch self {
         case let .rectangle(radii):
-            if #available(iOS 16.0, *) {
-                UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
-                    .stroke(asset: asset, lineWidth: lineWidth)
-            } else {
-                UnevenRoundedRectangleFallback(cornerRadii: radii)
-                    .stroke(asset: asset, lineWidth: lineWidth)
-            }
+            UnevenRoundedRectangle(cornerRadii: radii.systemRadii)
+                .stroke(asset: asset, lineWidth: lineWidth)
         case .circle:
             Circle()
                 .stroke(asset: asset, lineWidth: lineWidth)
@@ -184,7 +172,7 @@ extension VC.ShapeType {
 }
 
 @MainActor
-@available(iOS 16.0, *)
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 extension InsettableShape {
     @ViewBuilder
     fileprivate func fill(
@@ -212,7 +200,7 @@ extension InsettableShape {
 }
 
 @MainActor
-@available(iOS 16.0, *)
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 extension VC.ShapeType {
     @ViewBuilder
     func swiftUIShapeFill(
@@ -234,6 +222,7 @@ extension VC.ShapeType {
 }
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private let decorator: VC.Decorator
     private let includeBackground: Bool
@@ -362,7 +351,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
             screen: screen
         ).asColorOrGradientOrImageAsset
 
-        if #available(iOS 16.0, *), let innerShadow = resolvedInnerShadowStyle {
+        if let innerShadow = resolvedInnerShadowStyle {
             self.decorator.shapeType
                 .swiftUIShapeFill(asset: asset, innerShadow: innerShadow)
         } else {
@@ -371,7 +360,6 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         }
     }
 
-    @available(iOS 16.0, *)
     private var resolvedInnerShadowStyle: ShadowStyle? {
         guard let filling = resolvedInnerShadowFilling else { return nil }
         let color = self.assetsViewModel.resolvedAsset(
@@ -432,8 +420,6 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                     )
                 }
             case let .innerShadow(value):
-                guard #available(iOS 16.0, *) else { break }
-
                 if let colorValue = value.color {
                     animatedInnerShadowFilling = colorValue.start
                 }
@@ -472,6 +458,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func animatableDecorator(

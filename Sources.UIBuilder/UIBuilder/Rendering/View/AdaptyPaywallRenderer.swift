@@ -19,6 +19,7 @@ extension VS.ShowAlertDialogParameters.ActionStyle {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIFlowRendererView: View {
     @EnvironmentObject
     private var flowViewModel: AdaptyUIFlowViewModel

@@ -9,6 +9,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIBackgroundElementsView<ScreenHolderContent: View>: View {
     var backgrounds: [VC.AlignedElement]
     var screenHolderBuilder: () -> ScreenHolderContent
@@ -39,6 +40,7 @@ struct AdaptyUIBackgroundElementsView<ScreenHolderContent: View>: View {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct ElementBackgroundModifier<ScreenHolderContent: View>: ViewModifier {
     var backgrounds: [VC.AlignedElement]?
     var screenHolderBuilder: () -> ScreenHolderContent

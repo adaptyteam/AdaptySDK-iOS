@@ -12,6 +12,7 @@ import AdaptyUIBuilder
 import SwiftUI
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 

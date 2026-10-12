@@ -9,6 +9,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIOverlayElementsView<ScreenHolderContent: View>: View {
     var overlays: [VC.AlignedElement]
     var screenHolderBuilder: () -> ScreenHolderContent
@@ -39,6 +40,7 @@ struct AdaptyUIOverlayElementsView<ScreenHolderContent: View>: View {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct ElementOverlayModifier<ScreenHolderContent: View>: ViewModifier {
     var overlays: [VC.AlignedElement]?
     var screenHolderBuilder: () -> ScreenHolderContent

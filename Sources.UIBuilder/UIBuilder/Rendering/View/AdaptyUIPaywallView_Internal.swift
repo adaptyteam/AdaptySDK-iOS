@@ -10,6 +10,7 @@
 import SwiftUI
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 package struct AdaptyUIPaywallView_Internal: View {
     @EnvironmentObject private var productsViewModel: AdaptyUIProductsViewModel
 

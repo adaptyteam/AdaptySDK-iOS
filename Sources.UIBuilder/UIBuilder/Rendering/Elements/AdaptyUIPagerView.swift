@@ -76,6 +76,7 @@ extension EnvironmentValues {
 fileprivate let pageControllTapAnimationDuration = 0.3
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
     @EnvironmentObject
     private var assetsViewModel: AdaptyUIAssetsViewModel

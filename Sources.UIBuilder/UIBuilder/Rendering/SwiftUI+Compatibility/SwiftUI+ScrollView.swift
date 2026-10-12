@@ -11,15 +11,6 @@ import SwiftUI
 
 extension View {
     @ViewBuilder
-    func scrollIndicatorsHidden_compatible() -> some View {
-        if #available(iOS 16.0, *) {
-            scrollIndicators(.hidden)
-        } else {
-            self
-        }
-    }
-
-    @ViewBuilder
     func applyScrollAnchor(_ id: String?) -> some View {
         if let id {
             self.id(id)

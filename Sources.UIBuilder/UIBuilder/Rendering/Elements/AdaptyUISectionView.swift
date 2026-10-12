@@ -9,6 +9,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUISectionView<ScreenHolderContent: View>: View {
     @EnvironmentObject
     private var stateViewModel: AdaptyUIStateViewModel
