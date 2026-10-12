@@ -13,20 +13,27 @@ import Foundation
 
 extension AdaptyPaywallProduct: ProductResolver {
     public var flowId: String { flowProductId ?? adaptyProductId }
-    
-    public var paymentMode: PaymentModeValue {
+
+    public var billingPlan: BillingPlanId? {
+        guard skProduct.subscription != nil else { return nil }
+        let billingPlan = subscriptionPricingTerms?.billingPlan ?? .upFront
+        return billingPlan.rawValue
+    }
+
+    public var paymentMode: PaymentModeId? {
         subscriptionOffer?.paymentMode.encodedValue
     }
 
     private func isApplicableForTag(_ tag: TextProductTag) -> Bool {
         switch tag {
         case .title, .description, .price, .priceAmount, .priceAmountInteger,
+             .billingPrice, .billingPriceAmount, .billingPriceAmountInteger,
              .currencyCode, .currencySymbol:
             true
-        case .priceAmountFraction:
+        case .priceAmountFraction, .billingPriceAmountFraction:
             maximumFractionDigits(for: priceLocale) > 0
         case .pricePerDay, .pricePerWeek, .pricePerMonth, .pricePerYear,
-             .subscriptionPeriod:
+                .subscriptionPeriod, .subscriptionBillingPeriod:
             subscriptionPeriod != nil
         case .offerPrice, .offerPeriods, .offerNumberOfPeriods,
              .offerPricePerDay, .offerPricePerWeek, .offerPricePerMonth, .offerPricePerYear:
@@ -51,6 +58,18 @@ extension AdaptyPaywallProduct: ProductResolver {
                 priceAmountInteger(for: priceLocale)
             case .priceAmountFraction:
                 priceAmountFraction(for: priceLocale)
+            case .billingPrice:
+                nil ?? // TODO: billingPrice
+                localizedPrice
+            case .billingPriceAmount:
+                nil ?? // TODO: billingPrice
+                priceAmount(for: priceLocale)
+            case .billingPriceAmountInteger:
+                nil ?? // TODO: billingPrice
+                priceAmountInteger(for: priceLocale)
+            case .billingPriceAmountFraction:
+                nil ?? // TODO: billingPrice
+                priceAmountFraction(for: priceLocale)
             case .currencyCode:
                 currencyCode
             case .currencySymbol:
@@ -64,6 +83,9 @@ extension AdaptyPaywallProduct: ProductResolver {
             case .pricePerYear:
                 pricePer(period: .year)
             case .subscriptionPeriod:
+                localizedSubscriptionPeriod
+            case .subscriptionBillingPeriod:
+                nil ?? // TODO: billingPeriod
                 localizedSubscriptionPeriod
             case .offerPrice:
                 subscriptionOffer?.localizedPrice
