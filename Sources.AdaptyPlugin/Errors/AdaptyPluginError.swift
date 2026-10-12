@@ -25,7 +25,11 @@ extension AdaptyPluginError {
         if let adaptyError = error as? AdaptyError {
             return adaptyError.asAdaptyPluginError
         }
-        
+
+        if let adaptyUIError = error as? AdaptyUIError {
+            return adaptyUIError.asAdaptyPluginError
+        }
+
         return AdaptyPluginError(
             errorCode: AdaptyError.ErrorCode.unknown.rawValue,
             message: "Unknown: \(error.localizedDescription)",
