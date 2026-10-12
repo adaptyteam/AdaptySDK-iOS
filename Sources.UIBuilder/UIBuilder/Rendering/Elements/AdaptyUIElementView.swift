@@ -65,10 +65,23 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     screenHolderBuilder: screenHolderBuilder
                 )
             case .hug, .fill:
-                AdaptyUIFlexRowView(
-                    row,
-                    screenHolderBuilder: screenHolderBuilder
-                )
+                if let stack = row.asStack {
+                    AdaptyUIStackView(
+                        stack,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                } else {
+                    AdaptyUIWeightedView(
+                        axis: .horizontal,
+                        mainAxisSizing: row.width == .hug ? .hug : .fill,
+                        // The configuration has no cross-axis sizing yet; a row has
+                        // always hugged its height.
+                        crossAxisSizing: .hug,
+                        spacing: row.spacing,
+                        items: row.items,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                }
             }
         case let .column(column, _):
             switch column.height {
@@ -78,10 +91,23 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     screenHolderBuilder: screenHolderBuilder
                 )
             case .hug, .fill:
-                AdaptyUIFlexColumnView(
-                    column,
-                    screenHolderBuilder: screenHolderBuilder
-                )
+                if let stack = column.asStack {
+                    AdaptyUIStackView(
+                        stack,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                } else {
+                    AdaptyUIWeightedView(
+                        axis: .vertical,
+                        mainAxisSizing: column.height == .hug ? .hug : .fill,
+                        // The configuration has no cross-axis sizing yet; a column has
+                        // always filled its width.
+                        crossAxisSizing: .fill,
+                        spacing: column.spacing,
+                        items: column.items,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                }
             }
         case let .section(section, _):
             AdaptyUISectionView(
