@@ -16,10 +16,19 @@ package final class AdaptyUIStateViewModel: ObservableObject {
     let logId: String
     let stateHolder: AdaptyUIStateHolder
 
-    package var viewConfiguration: VC { stateHolder.state.configuration }
+    package var viewConfiguration: VC { stateHolder.current.configuration }
     package let logic: any AdaptyUIBuilderLogic
 
     private var cancellables = Set<AnyCancellable>()
+
+    /// Monotonic counter of flow state updates.
+    ///
+    /// Values read through the custom element context are read lazily from the
+    /// state, so a context built from the same models and the same element is
+    /// indistinguishable from the previous one. SwiftUI compares the app view
+    /// built around it, finds it unchanged and never re-evaluates its body.
+    /// Carrying this counter in the context is what makes an update visible.
+    private(set) var stateRevision: UInt = 0
 
     @Published var focusedId: String?
     var isAutoScrollingToFocus = false
@@ -46,8 +55,9 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         self.logic = logic
         self.stateHolder = stateHolder
 
-        stateHolder.state.objectWillChange
+        stateHolder.objectWillChange
             .sink { [weak self] _ in
+                self?.stateRevision &+= 1
                 self?.objectWillChange.send()
             }
             .store(in: &cancellables)
@@ -71,7 +81,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     func execute(actions: [VC.Action], params: [String: any JSValueConvertable]? = nil, screen: VS.ScreenInstance) {
         do {
-            try stateHolder.state.execute(actions: actions, params: params, screenInstance: screen)
+            try stateHolder.current.execute(actions: actions, params: params, screenInstance: screen)
         } catch {
             Log.ui.error("#\(logId)# execute actions error: \(error)")
         }
@@ -104,7 +114,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) {
         do {
-            try stateHolder.state.setValue(
+            try stateHolder.current.setValue(
                 variable: variable,
                 value: progress,
                 screenInstance: screen
@@ -120,7 +130,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) {
         do {
-            try stateHolder.state.setValue(
+            try stateHolder.current.setValue(
                 variable: variable,
                 value: Int32(index),
                 screenInstance: screen
@@ -136,7 +146,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) -> T {
         do {
-            guard let value = try stateHolder.state.getValue(
+            guard let value = try stateHolder.current.getValue(
                 T.self,
                 variable: variable,
                 screenInstance: screen
@@ -162,7 +172,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         screen: VS.ScreenInstance
     ) -> String {
         do {
-            let value = try stateHolder.state.getTagValue(
+            let value = try stateHolder.current.getTagValue(
                 variable: variable,
                 screenInstance: screen,
                 converter: converter
@@ -184,6 +194,20 @@ package final class AdaptyUIStateViewModel: ObservableObject {
         alertDialog = AlertDialogState(params: params)
     }
 
+    /// Sends a message from the app itself to the flow, outside any element.
+    ///
+    /// The script receives it as an SDK event named `app_msg`, without a screen
+    /// instance and without an element identity: nothing on the app side of the
+    /// call names either of them.
+    package func sendAppMessage(_ arguments: [String: any Sendable]) {
+        do {
+            let message = try VS.AppMessage(id: Log.stamp, payload: arguments)
+            try stateHolder.current.send(message: message)
+        } catch {
+            Log.ui.error("#\(logId)# sendAppMessage error: \(error)")
+        }
+    }
+
     package func prepareForReuse() {
         Log.ui.verbose("#\(logId)# prepareForReuse")
         stateHolder.prepareForReuse()
@@ -203,7 +227,7 @@ package final class AdaptyUIStateViewModel: ObservableObject {
                 guard let self else { return }
 
                 do {
-                    try stateHolder.state.setValue(
+                    try stateHolder.current.setValue(
                         variable: variable,
                         value: value,
                         screenInstance: screen

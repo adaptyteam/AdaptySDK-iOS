@@ -35,6 +35,7 @@ public extension AdaptyUI {
         package let flowViewModel: AdaptyUIFlowViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
+        package let customElementsViewModel: AdaptyUICustomElementsViewModel
         package let timerViewModel: AdaptyUITimerViewModel
         package let screensViewModel: AdaptyUIScreensViewModel
         package let assetsViewModel: AdaptyUIAssetsViewModel
@@ -47,6 +48,7 @@ public extension AdaptyUI {
         fileprivate let tagResolver: AdaptyUITagResolver?
         fileprivate let timerResolver: AdaptyTimerResolver?
         fileprivate let assetsResolver: AdaptyUIAssetsResolver?
+        fileprivate let customElementsResolver: (any AdaptyUICustomElementsResolver)?
         fileprivate let systemRequestsHandler: AdaptyUISystemRequestsHandler?
 
         private var appeared = false
@@ -62,6 +64,7 @@ public extension AdaptyUI {
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyUIAssetsResolver?,
+            customElementsResolver: (any AdaptyUICustomElementsResolver)?,
             systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
         ) {
             Log.ui.verbose("#\(logId)# init products: \(products?.count ?? 0), observerModeResolver: \(observerModeResolver != nil)")
@@ -77,6 +80,7 @@ public extension AdaptyUI {
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
+            self.customElementsResolver = customElementsResolver
             self.systemRequestsHandler = systemRequestsHandler
 
             let flowViewIdentityBox = FlowViewIdentityBox()
@@ -92,6 +96,7 @@ public extension AdaptyUI {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
+            customElementsViewModel = AdaptyUICustomElementsViewModel(customElementsResolver: customElementsResolver)
             flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
                 logic: logic,
@@ -190,6 +195,26 @@ public extension AdaptyUI {
         func reportOnDisappear() {
             logic.reportViewDidDisappear()
             timerViewModel.pauseTimers()
+        }
+
+        /// Sends a message from the app to the script of this flow.
+        ///
+        /// The script receives it in `handleSDKEvent` as an SDK event named
+        /// `app_msg` and decides what to do with it — set a variable, fire flow
+        /// events, anything else. Unlike a message from a custom element, this
+        /// one carries neither a screen instance nor an element identity, so a
+        /// script that needs to reach a specific screen has to name it itself;
+        /// `SDK.sendEvents` without an `instanceId` reaches every navigator.
+        ///
+        /// Arguments cross into JavaScript as JSON: a string and a boolean stay
+        /// themselves, every number becomes a JS number, `nil` and `NSNull`
+        /// become `null`, arrays and nested dictionaries are carried through,
+        /// and a value of any other type becomes `null`.
+        ///
+        /// Delivery does not depend on the flow being on screen: the script
+        /// runs from the moment this configuration is created.
+        public func sendAppMessage(_ arguments: [String: any Sendable]) {
+            stateViewModel.sendAppMessage(arguments)
         }
 
         /// Resets the transient runtime state so this configuration can be

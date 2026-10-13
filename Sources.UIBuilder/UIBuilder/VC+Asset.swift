@@ -83,3 +83,12 @@ extension VC.Asset {
     }
 }
 
+extension VC.Asset {
+    @inlinable
+    var asDataAsset: VC.DataAsset? {
+        guard case let .data(value) = self else {
+            return nil
+        }
+        return value
+    }
+}

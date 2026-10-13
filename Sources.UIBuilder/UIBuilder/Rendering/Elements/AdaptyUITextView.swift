@@ -25,8 +25,8 @@ struct AdaptyUITextView: View {
     private var colorScheme: ColorScheme
     @Environment(\.adaptyScreenInstance)
     private var screen: VS.ScreenInstance
-    @Environment(\.adaptyDisplayMissingTags)
-    private var displayMissingTags: Bool
+    @Environment(\.adaptyShowsDebugPlaceholders)
+    private var showsDebugPlaceholders: Bool
 
     init(_ text: VC.Text) {
         self.text = text
@@ -62,7 +62,7 @@ struct AdaptyUITextView: View {
                     productInfo: nil,
                     colorScheme: colorScheme,
                     screen: screen,
-                    displayMissingTags: displayMissingTags
+                    showsDebugPlaceholders: showsDebugPlaceholders
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -81,7 +81,7 @@ struct AdaptyUITextView: View {
                     colorScheme: colorScheme,
                     screen: screen,
                     placeholder: true,
-                    displayMissingTags: displayMissingTags
+                    showsDebugPlaceholders: showsDebugPlaceholders
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -100,7 +100,7 @@ struct AdaptyUITextView: View {
                     productInfo: productInfoModel,
                     colorScheme: colorScheme,
                     screen: screen,
-                    displayMissingTags: displayMissingTags
+                    showsDebugPlaceholders: showsDebugPlaceholders
                 )
                 .multilineTextAlignment(text.horizontalAlign)
                 .lineLimit(text.maxRows)
@@ -116,6 +116,129 @@ extension AdaptyUIBuilder {
     }
 }
 
+/// Resolves a single rich text tag to its replacement string.
+///
+/// Shared by the `Text` renderer and by the plain string form used to expose
+/// element strings to custom elements, so both apply the same resolution order:
+/// internal resolver, app tag resolver, tag values of the string reference,
+/// product tags.
+@MainActor
+func richTextTagReplacement(
+    tag: String,
+    converter: AdaptyUITagValueConverter?,
+    stateViewModel: AdaptyUIStateViewModel,
+    tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
+    internalTagResolver: AdaptyUIInternalTagResolver?,
+    customTagResolver: AdaptyUITagResolver,
+    productInfo: ProductResolver?,
+    screen: VS.ScreenInstance,
+    showsDebugPlaceholders: Bool
+) throws -> String {
+    if let anyValue = internalTagResolver?(tag),
+       let convertedValue = converter?.toString(anyValue, locale: stateViewModel.viewConfiguration.locale)
+    {
+        return convertedValue
+    }
+
+    if let customTagResult = customTagResolver.replacement(for: tag) {
+        return customTagResult
+    }
+
+    if let tagValue = tagValues?[tag] {
+        return switch tagValue {
+        case let .value(value):
+            value
+        case let .variable(variable):
+            stateViewModel.getTagValue(
+                variable,
+                converter: converter,
+                defaultValue: showsDebugPlaceholders ? "<var:\(variable.path.joined(separator: "."))}>" : "",
+                screen: screen
+            )
+        }
+    }
+
+    if let productTag = TextProductTag(rawValue: tag),
+       let productTagResult = productInfo?.value(byTag: productTag)
+    {
+        return switch productTagResult {
+        case .notApplicable: ""
+        case let .value(string): string
+        }
+    }
+
+    guard showsDebugPlaceholders else {
+        throw AdaptyUIBuilder.RichTextError.tagReplacementNotFound
+    }
+
+    return "<tag:\(tag)>"
+}
+
+@MainActor
+extension [VC.RichText.Item] {
+    /// Whole rich text as one `AttributedString`.
+    ///
+    /// Mirrors `convertToSwiftUITextThrowingError` for everything except inline
+    /// images: SwiftUI `Text` does not render attachments carried by an
+    /// `AttributedString` on any iOS version, so images are carried as
+    /// `NSTextAttachment` on a `U+FFFC` run. A host rendering into `UILabel` or
+    /// `UITextView` draws them; SwiftUI `Text` silently drops them.
+    func convertToAttributedStringThrowingError(
+        assetsCache: AdaptyUIAssetsCache,
+        stateViewModel: AdaptyUIStateViewModel,
+        tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
+        internalTagResolver: AdaptyUIInternalTagResolver?,
+        customTagResolver: AdaptyUITagResolver,
+        productInfo: ProductResolver?,
+        colorScheme: ColorScheme,
+        screen: VS.ScreenInstance,
+        showsDebugPlaceholders: Bool
+    ) throws -> AttributedString {
+        try reduce(into: AttributedString()) { partialResult, item in
+            switch item {
+            case .unknown:
+                break
+            case let .text(value, attr, action):
+                partialResult += AttributedString.createFrom(
+                    value: value,
+                    link: action?.asURL,
+                    attributes: attr,
+                    assetsCache: assetsCache,
+                    colorScheme: colorScheme
+                )
+            case let .tag(value, attr, converter, action):
+                let replacement = try richTextTagReplacement(
+                    tag: value,
+                    converter: converter,
+                    stateViewModel: stateViewModel,
+                    tagValues: tagValues,
+                    internalTagResolver: internalTagResolver,
+                    customTagResolver: customTagResolver,
+                    productInfo: productInfo,
+                    screen: screen,
+                    showsDebugPlaceholders: showsDebugPlaceholders
+                )
+                partialResult += AttributedString.createFrom(
+                    value: replacement,
+                    link: action?.asURL,
+                    attributes: attr,
+                    assetsCache: assetsCache,
+                    colorScheme: colorScheme
+                )
+            case let .image(value, attr):
+                guard let run = AttributedString.attachmentRun(
+                    asset: value,
+                    attributes: attr,
+                    assetsCache: assetsCache,
+                    colorScheme: colorScheme,
+                    screen: screen
+                ) else { return }
+                partialResult += run
+            }
+        }
+    }
+}
+
 @MainActor
 extension [VC.RichText.Item] {
     func convertToSwiftUITextThrowingError(
@@ -127,7 +250,7 @@ extension [VC.RichText.Item] {
         productInfo: ProductResolver?,
         colorScheme: ColorScheme,
         screen: VS.ScreenInstance,
-        displayMissingTags: Bool
+        showsDebugPlaceholders: Bool
     ) throws -> Text {
         try reduce(Text("")) {
             partialResult,
@@ -146,44 +269,17 @@ extension [VC.RichText.Item] {
                     )
                 )
             case let .tag(value, attr, converter, action):
-                let tagReplacementResult: String
-
-                if let anyValue = internalTagResolver?(value),
-                   let convertedValue = converter?.toString(anyValue, locale: stateViewModel.viewConfiguration.locale)
-                {
-                    tagReplacementResult = convertedValue
-                } else if let customTagResult = customTagResolver.replacement(for: value) {
-                    tagReplacementResult = customTagResult
-                } else if let tagValue = tagValues?[value] {
-                    tagReplacementResult =
-                        switch tagValue {
-                        case let .value(value):
-                            value
-                        case let .variable(variable):
-                            stateViewModel.getTagValue(
-                                variable,
-                                converter: converter,
-                                defaultValue: displayMissingTags ? "<var:\(variable.path.joined(separator: "."))}>" : "",
-                                screen: screen
-                            )
-                        }
-                } else if let productTag = TextProductTag(rawValue: value),
-                          let productTagResult = productInfo?.value(byTag: productTag)
-                {
-                    switch productTagResult {
-                    case .notApplicable:
-                        tagReplacementResult = ""
-                    case let .value(string):
-                        tagReplacementResult = string
-                    }
-
-                } else {
-                    if displayMissingTags {
-                        tagReplacementResult = "<tag:\(value)>"
-                    } else {
-                        throw AdaptyUIBuilder.RichTextError.tagReplacementNotFound
-                    }
-                }
+                let tagReplacementResult = try richTextTagReplacement(
+                    tag: value,
+                    converter: converter,
+                    stateViewModel: stateViewModel,
+                    tagValues: tagValues,
+                    internalTagResolver: internalTagResolver,
+                    customTagResolver: customTagResolver,
+                    productInfo: productInfo,
+                    screen: screen,
+                    showsDebugPlaceholders: showsDebugPlaceholders
+                )
 
                 return partialResult + Text(
                     AttributedString.createFrom(
@@ -234,6 +330,46 @@ extension [VC.RichText.Item] {
 
 @MainActor
 extension VC.RichText {
+    /// `AttributedString` form, mirroring `convertToSwiftUIText` including the
+    /// fallback. `nil` when neither the items nor the fallback resolve.
+    func convertToAttributedString(
+        defaultAttributes: VC.TextAttributes?,
+        assetsCache: AdaptyUIAssetsCache,
+        stateViewModel: AdaptyUIStateViewModel,
+        tagValues: [String: AdaptyUIConfiguration.StringReference.TagValue]?,
+        internalTagResolver: AdaptyUIInternalTagResolver?,
+        customTagResolver: AdaptyUITagResolver,
+        productInfo: ProductResolver?,
+        colorScheme: ColorScheme,
+        screen: VS.ScreenInstance,
+        showsDebugPlaceholders: Bool
+    ) -> AttributedString? {
+        let resolvedAttributes = assetsCache.resolveDataBinding(defaultAttributes, screen)
+
+        func convert(_ items: [Item]) throws -> AttributedString {
+            try items
+                .apply(defaultAttributes: resolvedAttributes)
+                .convertToAttributedStringThrowingError(
+                    assetsCache: assetsCache,
+                    stateViewModel: stateViewModel,
+                    tagValues: tagValues,
+                    internalTagResolver: internalTagResolver,
+                    customTagResolver: customTagResolver,
+                    productInfo: productInfo,
+                    colorScheme: colorScheme,
+                    screen: screen,
+                    showsDebugPlaceholders: showsDebugPlaceholders
+                )
+        }
+
+        if let result = try? convert(items) { return result }
+        guard let fallback else { return nil }
+        return try? convert(fallback)
+    }
+}
+
+@MainActor
+extension VC.RichText {
     func convertToSwiftUIText(
         defaultAttributes: VC.TextAttributes?,
         assetsCache: AdaptyUIAssetsCache,
@@ -245,7 +381,7 @@ extension VC.RichText {
         colorScheme: ColorScheme,
         screen: VS.ScreenInstance,
         placeholder: Bool = false,
-        displayMissingTags: Bool = false
+        showsDebugPlaceholders: Bool = false
     ) -> Text {
         if placeholder {
             let reducedString = items.reduce("") { partialResult, item in
@@ -276,7 +412,7 @@ extension VC.RichText {
                         productInfo: productInfo,
                         colorScheme: colorScheme,
                         screen: screen,
-                        displayMissingTags: displayMissingTags
+                        showsDebugPlaceholders: showsDebugPlaceholders
                     )
             } catch {
                 if let fallback, let fallbackText = try? fallback
@@ -290,7 +426,7 @@ extension VC.RichText {
                         productInfo: productInfo,
                         colorScheme: colorScheme,
                         screen: screen,
-                        displayMissingTags: displayMissingTags
+                        showsDebugPlaceholders: showsDebugPlaceholders
                     )
                 {
                     result = fallbackText
@@ -368,6 +504,52 @@ extension AttributedString {
         result.link = link
 
         return result
+    }
+}
+
+@MainActor
+extension AttributedString {
+    /// A single `U+FFFC` run carrying the inline image as an `NSTextAttachment`.
+    ///
+    /// The image is pre-scaled to the cap height of the surrounding font, as on
+    /// the `Text` path, and pre-tinted: `tintColor` does not reach attachments,
+    /// so the bitmap has to carry the colour itself.
+    static func attachmentRun(
+        asset: VC.AssetReference,
+        attributes: VC.RichText.Attributes?,
+        assetsCache: AdaptyUIAssetsCache,
+        colorScheme: ColorScheme,
+        screen: VS.ScreenInstance
+    ) -> AttributedString? {
+        let imageAsset = assetsCache.cachedAsset(
+            asset,
+            mode: colorScheme.toVCMode,
+            screen: screen
+        ).asImageAsset
+
+        let fontAsset = assetsCache.cachedAsset(
+            attributes?.fontAssetId,
+            mode: colorScheme.toVCMode
+        ).asFontAsset
+
+        guard var image = imageAsset?.textAttachmentImage(
+            font: fontAsset?.font ?? .adaptyDefaultFont
+        ) else { return nil }
+
+        if let tint = assetsCache.cachedAsset(
+            attributes?.imageTintColor,
+            mode: colorScheme.toVCMode
+        ).asColorAsset?.uiColor {
+            image = image.withTintColor(tint, renderingMode: .alwaysOriginal)
+        }
+
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        attachment.bounds = CGRect(origin: .zero, size: image.size)
+
+        var run = AttributedString("\u{FFFC}")
+        run.attachment = attachment
+        return run
     }
 }
 

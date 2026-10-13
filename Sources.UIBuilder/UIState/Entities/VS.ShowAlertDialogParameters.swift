@@ -39,7 +39,7 @@ extension VS.ShowAlertDialogParameters {
 extension VS.ShowAlertDialogParametersResponse: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-        object.setObject(actionId.toJSValue(in: context), forKeyedSubscript: "actionId" as NSString)
+        object.setValue(actionId.toJSValue(in: context), forProperty: "actionId")
         return object
     }
 }

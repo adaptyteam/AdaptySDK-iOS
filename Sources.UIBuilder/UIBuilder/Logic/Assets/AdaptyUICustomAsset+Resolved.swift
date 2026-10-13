@@ -129,4 +129,30 @@ extension AdaptyUICustomAsset {
     }
 }
 
+extension AdaptyUICustomAsset {
+    /// The same asset in the public type the app reads assets in. Lossless: the
+    /// two types differ only in that a colour loses its UIKit form.
+    var asAsset: AdaptyUIAsset {
+        switch self {
+        case let .image(image):
+            .image(image)
+        case let .video(video):
+            .video(video)
+        case let .color(color):
+            .color(color.resolvedColor)
+        case let .gradient(gradient):
+            .gradient(gradient)
+        case let .font(font):
+            .font(
+                .init(
+                    font: font.font,
+                    color: font.defaultColor?.resolvedColor,
+                    letterSpacing: font.defaultLetterSpacing,
+                    lineHeight: font.defaultLineHeight
+                )
+            )
+        }
+    }
+}
+
 #endif

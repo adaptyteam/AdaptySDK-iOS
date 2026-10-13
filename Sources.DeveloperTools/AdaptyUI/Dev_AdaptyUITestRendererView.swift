@@ -21,6 +21,7 @@ public extension AdaptyUI {
         package let flowViewModel: AdaptyUIFlowViewModel
         package let productsViewModel: AdaptyUIProductsViewModel
         package let tagResolverViewModel: AdaptyUITagResolverViewModel
+        package let customElementsViewModel: AdaptyUICustomElementsViewModel
         package let timerViewModel: AdaptyUITimerViewModel
         package let screensViewModel: AdaptyUIScreensViewModel
         package let assetsViewModel: AdaptyUIAssetsViewModel
@@ -32,6 +33,7 @@ public extension AdaptyUI {
         fileprivate let tagResolver: AdaptyUITagResolver?
         fileprivate let timerResolver: AdaptyTimerResolver?
         fileprivate let assetsResolver: AdaptyUIAssetsResolver?
+        fileprivate let customElementsResolver: (any AdaptyUICustomElementsResolver)?
 
         package init(
             logId: String,
@@ -41,6 +43,7 @@ public extension AdaptyUI {
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
             assetsResolver: AdaptyUIAssetsResolver?,
+            customElementsResolver: (any AdaptyUICustomElementsResolver)?,
             systemRequestsHandler: AdaptyUISystemRequestsHandler?,
             rtlOverride: Bool?
         ) {
@@ -49,6 +52,7 @@ public extension AdaptyUI {
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
+            self.customElementsResolver = customElementsResolver
 
             eventsHandler = AdaptyUIEventsHandler(logId: logId)
             logic = Dev_AdaptyUILogic(
@@ -58,6 +62,7 @@ public extension AdaptyUI {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
+            customElementsViewModel = AdaptyUICustomElementsViewModel(customElementsResolver: customElementsResolver)
 
             flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
@@ -119,6 +124,14 @@ public extension AdaptyUI {
             stateHolder.start()
             productsViewModel.loadProductsIfNeeded()
         }
+
+        /// Sends a message from the app to the script of the previewed flow.
+        ///
+        /// Mirrors `sendAppMessage(_:)` of a production flow configuration, so
+        /// a devtool can exercise the same channel a host app uses.
+        public func sendAppMessage(_ arguments: [String: any Sendable]) {
+            stateViewModel.sendAppMessage(arguments)
+        }
     }
 }
 
@@ -136,18 +149,20 @@ public struct Dev_AdaptyUIRendererView: View {
     private let didFinishRestore: (String) -> Void
     private let didReceiveError: (AdaptyUIBuilderError) -> Void
     private let didReceiveAnalyticEvent: (String, [String: any Sendable]) -> Void
+    private let didCreateConfiguration: ((AdaptyUI.Dev_GalleryPreviewConfiguration) -> Void)?
 
     private let safeAreaOverride: EdgeInsets?
     private let showDebugOverlay: Bool
-    private let displayMissingTags: Bool
+    private let showsDebugPlaceholders: Bool
     private let interfaceOrientationOverride: Dev_InterfaceOrientation?
 
     public init(
         viewConfiguration: Dev_AdaptyUIConfiguration,
         assetsResolver: AdaptyUIAssetsResolver?,
+        customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
         showDebugOverlay: Bool = false,
-        displayMissingTags: Bool = true,
+        showsDebugPlaceholders: Bool = true,
         safeAreaOverride: EdgeInsets? = nil,
         interfaceOrientationOverride: Dev_InterfaceOrientation? = nil,
         rtlOverride: Bool? = nil,
@@ -160,11 +175,12 @@ public struct Dev_AdaptyUIRendererView: View {
         didStartRestore: @escaping () -> Void,
         didFinishRestore: @escaping (String) -> Void,
         didReceiveError: @escaping (AdaptyUIBuilderError) -> Void,
-        didReceiveAnalyticEvent: @escaping (String, [String: any Sendable]) -> Void
+        didReceiveAnalyticEvent: @escaping (String, [String: any Sendable]) -> Void,
+        didCreateConfiguration: ((AdaptyUI.Dev_GalleryPreviewConfiguration) -> Void)? = nil
     ) {
         self.safeAreaOverride = safeAreaOverride
         self.showDebugOverlay = showDebugOverlay
-        self.displayMissingTags = displayMissingTags
+        self.showsDebugPlaceholders = showsDebugPlaceholders
         self.interfaceOrientationOverride = interfaceOrientationOverride
         self.viewConfiguration = viewConfiguration.wrapped
         // @StateObject so the configuration (and its JS state) survives
@@ -181,6 +197,7 @@ public struct Dev_AdaptyUIRendererView: View {
                 tagResolver: ["TEST_TAG": "Adapty"],
                 timerResolver: nil,
                 assetsResolver: assetsResolver,
+                customElementsResolver: customElementsResolver,
                 systemRequestsHandler: systemRequestsHandler,
                 rtlOverride: rtlOverride
             )
@@ -196,6 +213,7 @@ public struct Dev_AdaptyUIRendererView: View {
         self.didFinishRestore = didFinishRestore
         self.didReceiveError = didReceiveError
         self.didReceiveAnalyticEvent = didReceiveAnalyticEvent
+        self.didCreateConfiguration = didCreateConfiguration
     }
 
     public var body: some View {
@@ -220,7 +238,7 @@ public struct Dev_AdaptyUIRendererView: View {
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: showDebugOverlay,
-            displayMissingTags: displayMissingTags,
+            showsDebugPlaceholders: showsDebugPlaceholders,
             safeAreaOverride: safeAreaOverride,
             interfaceOrientationOverride: interfaceOrientationOverride.map { override in
                 switch override {
@@ -236,8 +254,12 @@ public struct Dev_AdaptyUIRendererView: View {
             tagResolverViewModel: galleryConfiguration.tagResolverViewModel,
             timerViewModel: galleryConfiguration.timerViewModel,
             screensViewModel: galleryConfiguration.screensViewModel,
-            assetsViewModel: galleryConfiguration.assetsViewModel
+            assetsViewModel: galleryConfiguration.assetsViewModel,
+            customElementsViewModel: galleryConfiguration.customElementsViewModel
         )
+        .onAppear { [galleryConfiguration, didCreateConfiguration] in
+            didCreateConfiguration?(galleryConfiguration)
+        }
     }
 }
 

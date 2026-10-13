@@ -304,6 +304,7 @@ public extension AdaptyUI {
         tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         assetsResolver: AdaptyUIAssetsResolver? = nil,
+        customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
     ) async throws -> FlowConfiguration {
         try await getFlowConfiguration(
@@ -317,6 +318,7 @@ public extension AdaptyUI {
             tagResolver: tagResolver,
             timerResolver: timerResolver,
             assetsResolver: assetsResolver,
+            customElementsResolver: customElementsResolver,
             systemRequestsHandler: systemRequestsHandler
         )
     }
@@ -332,6 +334,7 @@ public extension AdaptyUI {
         tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         assetsResolver: AdaptyUIAssetsResolver? = nil,
+        customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
     ) async throws -> FlowConfiguration {
         guard AdaptyUI.isActivated else {
@@ -359,6 +362,7 @@ public extension AdaptyUI {
             tagResolver: tagResolver,
             timerResolver: timerResolver,
             assetsResolver: assetsResolver,
+            customElementsResolver: customElementsResolver,
             systemRequestsHandler: systemRequestsHandler
         )
     }
@@ -414,4 +418,18 @@ package extension Adapty.DeviceInfo {
         )
     }
 }
+
+@MainActor
+public extension AdaptyUI {
+    /// Sets the resolver that renders custom elements in every flow that does
+    /// not carry its own `customElementsResolver`.
+    ///
+    /// A resolver passed for a single flow replaces this one entirely rather
+    /// than merging with it, so a `custom_type` always resolves through exactly
+    /// one of the two. Compose them yourself when both are needed.
+    static func setCustomElementsResolver(_ resolver: (any AdaptyUICustomElementsResolver)?) {
+        AdaptyUIBuilder.setCustomElementsResolver(resolver)
+    }
+}
+
 #endif

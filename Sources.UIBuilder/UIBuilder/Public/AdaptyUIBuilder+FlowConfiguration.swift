@@ -17,7 +17,8 @@ public extension AdaptyUIBuilder {
         products: [ProductResolver],
         tagResolver: AdaptyUITagResolver?,
         timerResolver: AdaptyUITimerResolver?,
-        assetsResolver: AdaptyUIAssetsResolver?
+        assetsResolver: AdaptyUIAssetsResolver?,
+        customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil
     ) async throws -> FlowConfiguration {
         let viewConfiguration = try schema.extractUIConfiguration(
             id: UUID().uuidString,
@@ -50,7 +51,8 @@ public extension AdaptyUIBuilder {
             products: products,
             tagResolver: tagResolver,
             timerResolver: timerResolver,
-            assetsResolver: assetsResolver
+            assetsResolver: assetsResolver,
+            customElementsResolver: customElementsResolver
         )
     }
 }
@@ -77,6 +79,7 @@ public extension AdaptyUIBuilder {
         let flowViewModel: AdaptyUIFlowViewModel
         let productsViewModel: AdaptyUIProductsViewModel
         let tagResolverViewModel: AdaptyUITagResolverViewModel
+        let customElementsViewModel: AdaptyUICustomElementsViewModel
         let timerViewModel: AdaptyUITimerViewModel
         let screensViewModel: AdaptyUIScreensViewModel
         let assetsViewModel: AdaptyUIAssetsViewModel
@@ -87,6 +90,7 @@ public extension AdaptyUIBuilder {
         fileprivate let tagResolver: AdaptyUITagResolver?
         fileprivate let timerResolver: AdaptyUITimerResolver?
         fileprivate let assetsResolver: AdaptyUIAssetsResolver?
+        fileprivate let customElementsResolver: (any AdaptyUICustomElementsResolver)?
 
         init(
             logId: String,
@@ -94,12 +98,14 @@ public extension AdaptyUIBuilder {
             products: [ProductResolver],
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyUITimerResolver?,
-            assetsResolver: AdaptyUIAssetsResolver?
+            assetsResolver: AdaptyUIAssetsResolver?,
+            customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil
         ) {
             self.logId = logId
             self.tagResolver = tagResolver
             self.timerResolver = timerResolver
             self.assetsResolver = assetsResolver
+            self.customElementsResolver = customElementsResolver
             
             eventsHandler = AdaptyUIEventsHandler(logId: logId)
             logic = AdaptyUIBuilderAppLogic(
@@ -109,6 +115,7 @@ public extension AdaptyUIBuilder {
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
+            customElementsViewModel = AdaptyUICustomElementsViewModel(customElementsResolver: customElementsResolver)
             flowViewModel = AdaptyUIFlowViewModel(
                 logId: logId,
                 logic: logic,
@@ -173,6 +180,26 @@ public extension AdaptyUIBuilder {
         func reportOnDisappear() {
             logic.reportViewDidDisappear()
             timerViewModel.pauseTimers()
+        }
+
+        /// Sends a message from the app to the script of this flow.
+        ///
+        /// The script receives it in `handleSDKEvent` as an SDK event named
+        /// `app_msg` and decides what to do with it — set a variable, fire flow
+        /// events, anything else. Unlike a message from a custom element, this
+        /// one carries neither a screen instance nor an element identity, so a
+        /// script that needs to reach a specific screen has to name it itself;
+        /// `SDK.sendEvents` without an `instanceId` reaches every navigator.
+        ///
+        /// Arguments cross into JavaScript as JSON: a string and a boolean stay
+        /// themselves, every number becomes a JS number, `nil` and `NSNull`
+        /// become `null`, arrays and nested dictionaries are carried through,
+        /// and a value of any other type becomes `null`.
+        ///
+        /// Delivery does not depend on the flow being on screen: the script
+        /// runs from the moment this configuration is created.
+        public func sendAppMessage(_ arguments: [String: any Sendable]) {
+            stateViewModel.sendAppMessage(arguments)
         }
 
         /// Resets the transient runtime state so this configuration can be

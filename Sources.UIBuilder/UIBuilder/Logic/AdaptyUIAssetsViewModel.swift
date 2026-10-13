@@ -29,11 +29,11 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
         self.assetsResolver = assetsResolver
         self.stateHolder = stateHolder
         cache = AdaptyUIAssetsCache(
-            state: stateHolder.state,
+            stateHolder: stateHolder,
             customAssetsResolver: assetsResolver
         )
 
-        stateHolder.state.objectWillChange
+        stateHolder.objectWillChange
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
             }
@@ -67,19 +67,19 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
     ) {
         switch ref {
         case let .stringId(stringId, tagValues):
-            let text = try? stateHolder.state.richText(stringId)
+            let text = try? stateHolder.current.richText(stringId)
             return (
                 richText: text ?? .empty,
                 tagValues: tagValues,
                 productInfo: .notApplicable
             )
         case let .variable(variable):
-            if let stringId = try? stateHolder.state.getValue(
+            if let stringId = try? stateHolder.current.getValue(
                 String.self,
                 variable: variable,
                 screenInstance: screen
             ) {
-                let text = try? stateHolder.state.richText(stringId)
+                let text = try? stateHolder.current.richText(stringId)
                 return (
                     richText: text ?? .empty,
                     tagValues: nil,
@@ -96,7 +96,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
             switch product {
             case let .id(productId, sufix):
                 let productResolver = productsInfoProvider?.productInfo(by: productId)
-                let text = try? stateHolder.state.richText(
+                let text = try? stateHolder.current.richText(
                     adaptyProductId: productId,
                     billingPlan: productResolver?.billingPlan,
                     paymentMode: productResolver?.paymentMode,
@@ -108,12 +108,12 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                     productInfo: productResolver.map { .found($0) } ?? .notFound
                 )
             case let .variable(variable, sufix):
-                guard let productId = try? stateHolder.state.getValue(
+                guard let productId = try? stateHolder.current.getValue(
                     String.self,
                     variable: variable,
                     screenInstance: screen
                 ) else {
-                    let text = try? stateHolder.state.richTextForNonSelectedProduct(suffix: sufix)
+                    let text = try? stateHolder.current.richTextForNonSelectedProduct(suffix: sufix)
                     return (
                         richText: text ?? .empty,
                         tagValues: nil,
@@ -122,7 +122,7 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                 }
 
                 let productResolver = productsInfoProvider?.productInfo(by: productId)
-                let text = try? stateHolder.state.richText(
+                let text = try? stateHolder.current.richText(
                     adaptyProductId: productId,
                     billingPlan: productResolver?.billingPlan,
                     paymentMode: productResolver?.paymentMode,

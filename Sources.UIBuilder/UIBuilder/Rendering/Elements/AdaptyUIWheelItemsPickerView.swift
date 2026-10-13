@@ -77,7 +77,7 @@ struct AdaptyUIWheelItemsPickerView: View {
     private func writeSelectedValue(_ index: Int) {
         guard picker.items.indices.contains(index) else { return }
         do {
-            try stateViewModel.stateHolder.state.setValue(
+            try stateViewModel.stateHolder.current.setValue(
                 variable: picker.value,
                 value: picker.items[index].value,
                 screenInstance: screen

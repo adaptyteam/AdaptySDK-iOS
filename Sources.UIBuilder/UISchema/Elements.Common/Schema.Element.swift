@@ -111,6 +111,7 @@ extension Schema.Element: DecodableWithConfiguration {
         case video
         case button
         case box
+        case deck
         case vStack = "v_stack"
         case hStack = "h_stack"
         case zStack = "z_stack"
@@ -136,6 +137,7 @@ extension Schema.Element: DecodableWithConfiguration {
         case horizontalProgress = "horizontal_progress"
         case verticalProgress = "vertical_progress"
         case radialProgress = "radial_progress"
+        case custom
     }
 
     init(from decoder: any Decoder, configuration: Schema.InternalDecodingConfiguration) throws {
@@ -179,6 +181,11 @@ extension Schema.Element: DecodableWithConfiguration {
             try self.init(
                 properties: propertyOrNil(),
                 node: .compositeElement(Schema.Box(from: decoder, configuration: configuration))
+            )
+        case .deck:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .compositeElement(Schema.Deck(from: decoder, configuration: configuration))
             )
         case .vStack, .hStack, .zStack:
             try self.init(
@@ -290,6 +297,11 @@ extension Schema.Element: DecodableWithConfiguration {
                 properties: propertyOrNil(),
                 node: .simpleElement(Schema.RadialProgress(from: decoder))
             )
+        case .custom:
+            try self.init(
+                properties: propertyOrNil(),
+                node: .simpleElement(Schema.CustomElement(from: decoder))
+            )
         }
 
         func propertyOrNil() throws -> Schema.ElementProperties? {
@@ -298,4 +310,3 @@ extension Schema.Element: DecodableWithConfiguration {
         }
     }
 }
-

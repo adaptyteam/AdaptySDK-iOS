@@ -205,4 +205,3 @@ private extension Decoder {
         return (scriptsResult, selectedProducts)
     }
 }
-

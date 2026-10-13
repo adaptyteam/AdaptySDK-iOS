@@ -68,6 +68,22 @@ extension String: JSValueRepresentable {
     }
 }
 
+extension Array: JSValueRepresentable where Element: JSValueRepresentable {
+    static func fromJSValue(_ value: JSValue) -> Self? {
+        guard value.isArray,
+              let length = value.forProperty("length"), length.isNumber,
+              let count = UInt32(exactly: length.toDouble()) else { return nil }
+
+        var result: Self = []
+        for index in 0..<Int(count) {
+            guard let value = value.atIndex(index),
+                  let element = Element.fromJSValue(value) else { return nil }
+            result.append(element)
+        }
+        return result
+    }
+}
+
 extension VC.AssetIdentifierOrValue: JSValueRepresentable {
     static func fromJSValue(_ value: JSValue) -> VC.AssetIdentifierOrValue? {
         if value.isUndefined { nil }
