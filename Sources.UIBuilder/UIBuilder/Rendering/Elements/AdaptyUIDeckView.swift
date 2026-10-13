@@ -37,8 +37,8 @@ struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
 
     var body: some View {
         AdaptyUIDeckLayout(
-            width: deck.width,
-            height: deck.height,
+            width: layoutSizing(deck.width),
+            height: layoutSizing(deck.height),
             items: deck.items.map(layoutItem)
         ) {
             ForEach(0 ..< deck.items.count, id: \.self) { idx in
@@ -51,6 +51,15 @@ struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
                     )
                 }
             }
+        }
+    }
+
+    private func layoutSizing(_ mode: VC.AutoSizeMode) -> AdaptyUILayoutSizing {
+        switch mode {
+        case .hug: .hug
+        // The schema decodes only `hug` and `fill` for a deck, so `legacy` never
+        // arrives here; were it to, it would behave as `fill`.
+        case .fill, .legacy: .fill
         }
     }
 

@@ -56,8 +56,8 @@ enum AdaptyUIDeckSolver {
     /// Every size here is the deck's *inner* area: padding belongs to the
     /// surrounding decorator, so both the proposal and the result exclude it.
     static func solve(
-        width widthMode: VC.AutoSizeMode,
-        height heightMode: VC.AutoSizeMode,
+        width widthMode: AdaptyUILayoutSizing,
+        height heightMode: AdaptyUILayoutSizing,
         items: [Item],
         proposedWidth: CGFloat?,
         proposedHeight: CGFloat?,
@@ -107,17 +107,16 @@ enum AdaptyUIDeckSolver {
         return Result(size: CGSize(width: width, height: height), frames: frames)
     }
 
-    /// The deck's inner size along one axis. `legacy` is unreachable for a deck —
-    /// the schema decodes only `hug` and `fill` — and behaves as `fill`.
+    /// The deck's inner size along one axis.
     private static func innerLength(
-        mode: VC.AutoSizeMode,
+        mode: AdaptyUILayoutSizing,
         proposed: CGFloat?,
         bases: [CGFloat?]
     ) -> CGFloat {
         switch mode {
         case .hug:
             bases.compactMap { $0 }.max() ?? fallbackLength
-        case .fill, .legacy:
+        case .fill:
             if let proposed, proposed.isFinite { max(0, proposed) } else { fallbackLength }
         }
     }

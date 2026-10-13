@@ -15,8 +15,8 @@ import SwiftUI
 /// is only worth its invalidation rules if profiling asks for it.
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIDeckLayout: Layout {
-    let width: VC.AutoSizeMode
-    let height: VC.AutoSizeMode
+    let width: AdaptyUILayoutSizing
+    let height: AdaptyUILayoutSizing
     let items: [AdaptyUIDeckSolver.Item]
 
     func sizeThatFits(
