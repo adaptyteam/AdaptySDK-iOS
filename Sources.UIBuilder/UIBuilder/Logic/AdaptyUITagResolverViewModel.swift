@@ -23,10 +23,10 @@ public enum TextProductTag: String {
     case priceAmountInteger = "PRICE_AMOUNT_INTEGER"
     case priceAmountFraction = "PRICE_AMOUNT_FRACTION"
 
-    case billingPrice = "BILLING_PRICE"
-    case billingPriceAmount = "BILLING_PRICE_AMOUNT"
-    case billingPriceAmountInteger = "BILLING_PRICE_INTEGER"
-    case billingPriceAmountFraction = "BILLING_PRICE_FRACTION"
+    case billingPrice = "BIL_PRICE"
+    case billingPriceAmount = "BIL_PRICE_AMT"
+    case billingPriceAmountInteger = "BIL_PRICE_AMT_INT"
+    case billingPriceAmountFraction = "BIL_PRICE_AMT_FRC"
 
     case currencyCode = "CURRENCY_CODE"
     case currencySymbol = "CURRENCY_SYMBOL"
@@ -37,7 +37,7 @@ public enum TextProductTag: String {
     case pricePerYear = "PRICE_PER_YEAR"
 
     case subscriptionPeriod = "SUBSCRIPTION_PERIOD"
-    case subscriptionBillingPeriod = "BILLING_PERIOD"
+    case subscriptionBillingPeriod = "BIL_PERIOD"
 
     case offerPrice = "OFFER_PRICE"
     case offerPeriods = "OFFER_PERIOD"

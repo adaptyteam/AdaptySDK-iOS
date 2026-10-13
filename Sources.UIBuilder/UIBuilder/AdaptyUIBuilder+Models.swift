@@ -30,4 +30,8 @@ public protocol ProductResolver: Sendable {
     func value(byTag tag: TextProductTag) -> TextTagValue?
 }
 
+public extension ProductResolver {
+    var billingPlan: BillingPlanId? { nil }
+}
+
 #endif
