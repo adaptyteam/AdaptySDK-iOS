@@ -33,7 +33,7 @@ package extension VC.ColorGradient {
                 .angular(
                     gradient: .init(stops: stops),
                     center: start.unitPoint,
-                    angle: .degrees(360)
+                    angle: .zero
                 )
             )
         case .radial:
