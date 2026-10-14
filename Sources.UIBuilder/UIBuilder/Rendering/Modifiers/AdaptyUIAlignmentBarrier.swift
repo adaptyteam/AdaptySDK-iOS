@@ -27,9 +27,9 @@ extension View {
 
 private struct AdaptyUIAlignmentBarrierModifier: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(iOS 18.0, *) {
+        if #available(iOS 18.0, macOS 15.0, visionOS 2.0, *) {
             content
-        } else if #available(iOS 17.0, *) {
+        } else if #available(iOS 17.0, macOS 14.0, visionOS 1.0, *) {
             AdaptyUIAlignmentBarrierLayout { content }
         } else {
             content
