@@ -52,7 +52,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         self.flowViewModel = flowViewModel
 
         if let products {
-            flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+            flowProducts = Dictionary(products.map { ($0.flowId, $0) }, uniquingKeysWith: { first, _ in first })
         }
     }
     
@@ -90,7 +90,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
             do {
                 let products = try await logic.getProducts()
-                flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+                flowProducts = Dictionary(products.map { ($0.flowId, $0) }, uniquingKeysWith: { first, _ in first })
                 onProductsLoaded?(products)
             } catch {
                 Log.ui.error("#\(logId)# loadProducts fail: \(error)")
