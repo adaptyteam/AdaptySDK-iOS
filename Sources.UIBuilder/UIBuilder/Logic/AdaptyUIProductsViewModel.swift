@@ -52,10 +52,17 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         self.flowViewModel = flowViewModel
 
         if let products {
-            flowProducts = Dictionary(products.map { ($0.flowId, $0) }, uniquingKeysWith: { first, _ in first })
+            flowProducts = Self.flowProducts(products, logId: logId)
         }
     }
     
+    private static func flowProducts(_ products: [any ProductResolver], logId: String) -> [String: ProductResolver] {
+        Dictionary(products.map { ($0.flowId, $0) }) { first, _ in
+            Log.ui.error("#\(logId)# duplicate flowProductId \(first.flowId), keeping the first product")
+            return first
+        }
+    }
+
     package func loadProductsIfNeeded() {
         guard !productsLoadingInProgress, flowProducts == nil else { return }
 
@@ -90,7 +97,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
             do {
                 let products = try await logic.getProducts()
-                flowProducts = Dictionary(products.map { ($0.flowId, $0) }, uniquingKeysWith: { first, _ in first })
+                flowProducts = Self.flowProducts(products, logId: logId)
                 onProductsLoaded?(products)
             } catch {
                 Log.ui.error("#\(logId)# loadProducts fail: \(error)")
