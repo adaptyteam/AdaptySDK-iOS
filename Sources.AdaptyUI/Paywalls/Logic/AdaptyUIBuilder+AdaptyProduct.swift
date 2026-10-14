@@ -13,20 +13,27 @@ import Foundation
 
 extension AdaptyPaywallProduct: ProductResolver {
     public var flowId: String { flowProductId ?? adaptyProductId }
-    
-    public var paymentMode: PaymentModeValue {
+
+    public var billingPlan: BillingPlanId? {
+        guard skProduct.subscription != nil else { return nil }
+        let billingPlan = subscriptionPricingTerms?.billingPlan ?? .upFront
+        return billingPlan.rawValue
+    }
+
+    public var paymentMode: PaymentModeId? {
         subscriptionOffer?.paymentMode.encodedValue
     }
 
     private func isApplicableForTag(_ tag: TextProductTag) -> Bool {
         switch tag {
         case .title, .description, .price, .priceAmount, .priceAmountInteger,
+             .billingPrice, .billingPriceAmount, .billingPriceAmountInteger,
              .currencyCode, .currencySymbol:
             true
-        case .priceAmountFraction:
+        case .priceAmountFraction, .billingPriceAmountFraction:
             maximumFractionDigits(for: priceLocale) > 0
         case .pricePerDay, .pricePerWeek, .pricePerMonth, .pricePerYear,
-             .subscriptionPeriod:
+             .subscriptionPeriod, .subscriptionBillingPeriod:
             subscriptionPeriod != nil
         case .offerPrice, .offerPeriods, .offerNumberOfPeriods,
              .offerPricePerDay, .offerPricePerWeek, .offerPricePerMonth, .offerPricePerYear:
@@ -46,11 +53,19 @@ extension AdaptyPaywallProduct: ProductResolver {
             case .price:
                 localizedPrice
             case .priceAmount:
-                priceAmount(for: priceLocale)
+                priceAmount(price, for: priceLocale)
             case .priceAmountInteger:
-                priceAmountInteger(for: priceLocale)
+                priceAmountInteger(price, for: priceLocale)
             case .priceAmountFraction:
-                priceAmountFraction(for: priceLocale)
+                priceAmountFraction(price, for: priceLocale)
+            case .billingPrice:
+                subscriptionPricingTerms?.localizedBillingPrice ?? localizedPrice
+            case .billingPriceAmount:
+                priceAmount(billingPrice, for: priceLocale)
+            case .billingPriceAmountInteger:
+                priceAmountInteger(billingPrice, for: priceLocale)
+            case .billingPriceAmountFraction:
+                priceAmountFraction(billingPrice, for: priceLocale)
             case .currencyCode:
                 currencyCode
             case .currencySymbol:
@@ -65,6 +80,8 @@ extension AdaptyPaywallProduct: ProductResolver {
                 pricePer(period: .year)
             case .subscriptionPeriod:
                 localizedSubscriptionPeriod
+            case .subscriptionBillingPeriod:
+                localizedBillingPeriod ?? localizedSubscriptionPeriod
             case .offerPrice:
                 subscriptionOffer?.localizedPrice
             case .offerPeriods:
@@ -132,12 +149,17 @@ extension AdaptyProduct {
         return formatter.string(from: NSDecimalNumber(decimal: pricePerPeriod))
     }
 
+    /// Price of a single payment of the selected billing plan; the product price when there are no pricing terms.
+    var billingPrice: Decimal {
+        subscriptionPricingTerms?.billingPrice ?? price
+    }
+
     func pricePer(period unit: AdaptySubscriptionPeriod.Unit) -> String? {
         guard let subscriptionPeriod else { return nil }
         return formatPrice(price, perTargetUnit: unit, billingPeriod: subscriptionPeriod)
     }
 
-    func priceAmount(for locale: Locale) -> String? {
+    func priceAmount(_ price: Decimal, for locale: Locale) -> String? {
         let digits = maximumFractionDigits(for: locale)
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -147,7 +169,7 @@ extension AdaptyProduct {
         return formatter.string(from: NSDecimalNumber(decimal: price))
     }
 
-    func priceAmountInteger(for locale: Locale) -> String? {
+    func priceAmountInteger(_ price: Decimal, for locale: Locale) -> String? {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.locale = locale
@@ -156,7 +178,7 @@ extension AdaptyProduct {
         return formatter.string(from: NSDecimalNumber(decimal: price))
     }
 
-    func priceAmountFraction(for locale: Locale) -> String? {
+    func priceAmountFraction(_ price: Decimal, for locale: Locale) -> String? {
         let fractionDigits = maximumFractionDigits(for: locale)
         guard fractionDigits > 0 else { return nil }
 

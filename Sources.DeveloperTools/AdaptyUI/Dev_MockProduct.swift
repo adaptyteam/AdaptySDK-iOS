@@ -11,14 +11,18 @@ import Foundation
 struct Dev_MockProduct: ProductResolver, Sendable {
     let flowId: String
     let adaptyProductId: String
-    let paymentMode: PaymentModeValue
-
+    let billingPlan: BillingPlanId?
+    let paymentMode: PaymentModeId?
     let title: String?
     let description: String?
     let price: String?
     let priceAmount: String?
     let priceAmountInteger: String?
     let priceAmountFraction: String?
+    let billingPrice: String?
+    let billingPriceAmount: String?
+    let billingPriceAmountInteger: String?
+    let billingPriceAmountFraction: String?
     let currencyCode: String?
     let currencySymbol: String?
     let pricePerDay: String?
@@ -26,6 +30,7 @@ struct Dev_MockProduct: ProductResolver, Sendable {
     let pricePerMonth: String?
     let pricePerYear: String?
     let subscriptionPeriod: String?
+    let billingPeriod: String?
     let offerPrice: String?
     let offerPeriods: String?
     let offerNumberOfPeriods: String?
@@ -42,6 +47,10 @@ struct Dev_MockProduct: ProductResolver, Sendable {
         case .priceAmount: priceAmount
         case .priceAmountInteger: priceAmountInteger
         case .priceAmountFraction: priceAmountFraction
+        case .billingPrice: billingPrice
+        case .billingPriceAmount: billingPriceAmount
+        case .billingPriceAmountInteger: billingPriceAmountInteger
+        case .billingPriceAmountFraction: billingPriceAmountFraction
         case .currencyCode: currencyCode
         case .currencySymbol: currencySymbol
         case .pricePerDay: pricePerDay
@@ -49,6 +58,7 @@ struct Dev_MockProduct: ProductResolver, Sendable {
         case .pricePerMonth: pricePerMonth
         case .pricePerYear: pricePerYear
         case .subscriptionPeriod: subscriptionPeriod
+        case .subscriptionBillingPeriod: billingPeriod
         case .offerPrice: offerPrice
         case .offerPeriods: offerPeriods
         case .offerNumberOfPeriods: offerNumberOfPeriods
@@ -68,22 +78,18 @@ extension Dev_MockProduct {
 
         flowId = preview.flowProductId
         adaptyProductId = preview.adaptyProductId
+        billingPlan = preview.subscription.map { $0.pricingTerms?.billingPlanId ?? "up_front" }
         paymentMode = preview.subscription?.offer?.paymentMode
 
         title = preview.localizedTitle
         description = preview.localizedDescription
         price = priceString
+        (priceAmount, priceAmountInteger, priceAmountFraction) = Dev_MockProduct.amountParts(preview.price?.amount)
 
-        if let amount = preview.price?.amount {
-            priceAmount = String(format: "%.2f", amount)
-            priceAmountInteger = String(Int(amount))
-            let fractionPart = Int((amount - floor(amount)) * 100 + 0.5)
-            priceAmountFraction = String(format: "%02d", fractionPart)
-        } else {
-            priceAmount = nil
-            priceAmountInteger = nil
-            priceAmountFraction = nil
-        }
+        let pricingTerms = preview.subscription?.pricingTerms
+        billingPrice = pricingTerms?.billingPrice.localizedString ?? priceString
+        (billingPriceAmount, billingPriceAmountInteger, billingPriceAmountFraction) =
+            Dev_MockProduct.amountParts(pricingTerms?.billingPrice.amount ?? preview.price?.amount)
 
         self.currencyCode = currencyCode
         currencySymbol = preview.price?.currencySymbol
@@ -95,6 +101,7 @@ extension Dev_MockProduct {
         pricePerYear = Dev_MockProduct.pricePer(.year, preview: preview)
 
         subscriptionPeriod = subscription?.localizedPeriod
+        billingPeriod = pricingTerms.map { $0.localizedBillingPeriod } ?? subscriptionPeriod
 
         let offer = subscription?.offer
         offerPrice = offer?.price?.localizedString
@@ -105,6 +112,12 @@ extension Dev_MockProduct {
         offerPricePerWeek = Dev_MockProduct.offerPricePer(.week, preview: preview)
         offerPricePerMonth = Dev_MockProduct.offerPricePer(.month, preview: preview)
         offerPricePerYear = Dev_MockProduct.offerPricePer(.year, preview: preview)
+    }
+
+    private static func amountParts(_ amount: Double?) -> (String?, String?, String?) {
+        guard let amount else { return (nil, nil, nil) }
+        let fractionPart = Int((amount - floor(amount)) * 100 + 0.5)
+        return (String(format: "%.2f", amount), String(Int(amount)), String(format: "%02d", fractionPart))
     }
 
     // MARK: - Price-per-period math (mirrors SDK constants in AdaptyProductSubscriptionPeriod+Extensions)

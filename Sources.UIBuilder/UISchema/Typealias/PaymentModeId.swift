@@ -1,8 +1,8 @@
 //
-//  PaymentModeValue.swift
+//  PaymentModeId.swift
 //  AdaptyUIBuilder
 //
 //  Created by Aleksei Valiano on 15.09.2025.
 //
 
-public typealias PaymentModeValue = String?
+public typealias PaymentModeId = String
