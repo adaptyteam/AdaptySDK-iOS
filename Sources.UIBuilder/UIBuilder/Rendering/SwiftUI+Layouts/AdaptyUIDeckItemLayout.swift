@@ -49,6 +49,28 @@ struct AdaptyUIDeckItemLayout: Layout {
         }
     }
 
+    /// The default merges the children's guides, which asks every child down the
+    /// tree again. Nothing in the rendering aligns to a container's guides.
+    func explicitAlignment(
+        of _: HorizontalAlignment,
+        in _: CGRect,
+        proposal _: ProposedViewSize,
+        subviews _: Subviews,
+        cache _: inout ()
+    ) -> CGFloat? {
+        nil
+    }
+
+    func explicitAlignment(
+        of _: VerticalAlignment,
+        in _: CGRect,
+        proposal _: ProposedViewSize,
+        subviews _: Subviews,
+        cache _: inout ()
+    ) -> CGFloat? {
+        nil
+    }
+
     /// A proposal is usable as a size only when it is both present and finite.
     private func bounded(_ length: CGFloat?) -> CGFloat? {
         guard let length, length.isFinite else { return nil }

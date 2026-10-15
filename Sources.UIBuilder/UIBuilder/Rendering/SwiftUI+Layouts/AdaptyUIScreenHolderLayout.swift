@@ -37,6 +37,28 @@ struct AdaptyUIScreenHolderLayout: Layout {
             )
         }
     }
+
+    /// The default merges the children's guides, which asks every child down the
+    /// tree again. Nothing in the rendering aligns to a container's guides.
+    func explicitAlignment(
+        of _: HorizontalAlignment,
+        in _: CGRect,
+        proposal _: ProposedViewSize,
+        subviews _: Subviews,
+        cache _: inout ()
+    ) -> CGFloat? {
+        nil
+    }
+
+    func explicitAlignment(
+        of _: VerticalAlignment,
+        in _: CGRect,
+        proposal _: ProposedViewSize,
+        subviews _: Subviews,
+        cache _: inout ()
+    ) -> CGFloat? {
+        nil
+    }
 }
 
 #endif

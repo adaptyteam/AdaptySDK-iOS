@@ -54,6 +54,28 @@ struct AdaptyUIDeckLayout: Layout {
         }
     }
 
+    /// The default merges the children's guides, which asks every child down the
+    /// tree again. Nothing in the rendering aligns to a container's guides.
+    func explicitAlignment(
+        of _: HorizontalAlignment,
+        in _: CGRect,
+        proposal _: ProposedViewSize,
+        subviews _: Subviews,
+        cache _: inout ()
+    ) -> CGFloat? {
+        nil
+    }
+
+    func explicitAlignment(
+        of _: VerticalAlignment,
+        in _: CGRect,
+        proposal _: ProposedViewSize,
+        subviews _: Subviews,
+        cache _: inout ()
+    ) -> CGFloat? {
+        nil
+    }
+
     /// The view builds subviews by iterating the same array, so subview `i` is the
     /// content of item `i`. If the two ever drift apart, the pairs that do exist are
     /// laid out rather than trapping on an index.
