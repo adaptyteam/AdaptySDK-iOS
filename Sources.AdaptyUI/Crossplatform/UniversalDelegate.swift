@@ -27,8 +27,13 @@ extension AdaptyUI {
             throw err
         }
 
-        guard let delegate = AdaptyUI.universalDelegate as? AdaptyFlowControllerDelegate else {
+        guard let universalDelegate = AdaptyUI.universalDelegate else {
             Log.ui.error("AdaptyUI delegateIsNotRegestired")
+            throw AdaptyError(AdaptyUI.PluginError.delegateIsNotRegestired)
+        }
+
+        guard let delegate = universalDelegate as? AdaptyFlowControllerDelegate else {
+            Log.ui.error("AdaptyUI universalDelegate does not conform to AdaptyFlowControllerDelegate, which flow views require")
             throw AdaptyError(AdaptyUI.PluginError.delegateIsNotRegestired)
         }
 

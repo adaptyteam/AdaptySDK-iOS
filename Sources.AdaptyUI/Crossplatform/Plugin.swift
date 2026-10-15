@@ -62,25 +62,6 @@ package extension AdaptyUI {
     @MainActor
     class Plugin {
 #if canImport(UIKit)
-        
-        @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
-        private static var paywallControllers = [String: AdaptyFlowController]()
-        
-        @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
-        private static func cachePaywallController(_ controller: AdaptyFlowController, id: String) {
-            paywallControllers[id] = controller
-        }
-        
-        @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
-        private static func deleteCachedPaywallController(_ id: String) {
-            paywallControllers.removeValue(forKey: id)
-        }
-        
-        @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
-        private static func cachedPaywallController(_ id: String) -> AdaptyFlowController? {
-            paywallControllers[id]
-        }
-        
         @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static var onboardingControllers = [String: AdaptyOnboardingController]()
 
@@ -277,6 +258,27 @@ package extension AdaptyUI {
         case secondary
     }
 }
+
+#if canImport(UIKit)
+
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
+extension AdaptyUI.Plugin {
+    private static var paywallControllers = [String: AdaptyFlowController]()
+
+    private static func cachePaywallController(_ controller: AdaptyFlowController, id: String) {
+        paywallControllers[id] = controller
+    }
+
+    private static func deleteCachedPaywallController(_ id: String) {
+        paywallControllers.removeValue(forKey: id)
+    }
+
+    private static func cachedPaywallController(_ id: String) -> AdaptyFlowController? {
+        paywallControllers[id]
+    }
+}
+
+#endif
 
 @MainActor
 @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")

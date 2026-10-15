@@ -12,7 +12,7 @@ import SwiftUI
 // MARK: - Line Limit
 
 extension View {
-    @available(iOS 16.0, macOS 13.0, tvOS 16.0, watchOS 9.0, *)
+    @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
     @ViewBuilder
     func applyLineLimit(
         kind: VC.TextField.Kind,
