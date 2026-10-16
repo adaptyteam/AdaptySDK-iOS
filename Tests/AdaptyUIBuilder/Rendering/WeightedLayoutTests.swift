@@ -256,6 +256,33 @@ enum WeightedLayoutTests {
             #expect((axis == .horizontal ? result.size.width : result.size.height) == 60)
         }
 
+        /// `hug` spaces only the items without a weight: a weighted item takes
+        /// neither length nor spacing and sits where the next item starts.
+        @Test("Hug spaces only items without a weight", arguments: [Solver.Axis.horizontal, .vertical])
+        func hugSpacesOnlyItemsWithoutAWeight(axis: Solver.Axis) {
+            let result = Solver.solve(
+                axis: axis,
+                mainAxisSizing: .hug,
+                crossAxisSizing: WeightedLayoutTests.historicalCrossAxisSizing(axis),
+                spacing: 8,
+                items: [
+                    WeightedLayoutTests.item(.weight(1)),
+                    WeightedLayoutTests.item(.points(60)),
+                    WeightedLayoutTests.item(.weight(1)),
+                    WeightedLayoutTests.item(.points(40)),
+                    WeightedLayoutTests.item(.weight(2)),
+                ],
+                proposedWidth: 300,
+                proposedHeight: 300,
+                measure: WeightedLayoutTests.fixedMeasure(CGSize(width: 10, height: 10))
+            )
+
+            let starts = result.frames.map { axis == .horizontal ? $0.cell.minX : $0.cell.minY }
+            #expect(WeightedLayoutTests.mainLengths(result, axis) == [0, 60, 0, 40, 0])
+            #expect(starts == [0, 0, 60, 68, 108])
+            #expect((axis == .horizontal ? result.size.width : result.size.height) == 108)
+        }
+
         /// A negative spacing overlaps neighbours. It shortens a hugging container,
         /// but is not handed to the weights of a filling one.
         @Test("Negative spacing overlaps items")
@@ -338,7 +365,9 @@ enum WeightedLayoutTests {
             let reported = axis == .horizontal ? result.size.width : result.size.height
 
             #expect(span == reported)
-            #expect(WeightedLayoutTests.mainLengths(result, axis).reduce(0, +) + 12 == reported)
+            // `hug` spaces only the items without a weight, and here there is one.
+            let spacing: CGFloat = mainAxisSizing == .hug ? 0 : 12
+            #expect(WeightedLayoutTests.mainLengths(result, axis).reduce(0, +) + spacing == reported)
         }
 
         /// The size reported without a proposal, proposed back, splits into the same

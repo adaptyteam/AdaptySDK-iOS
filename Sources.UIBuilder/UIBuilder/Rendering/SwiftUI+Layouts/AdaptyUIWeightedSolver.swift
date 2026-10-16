@@ -89,7 +89,8 @@ enum AdaptyUIWeightedSolver {
     ///   largest natural width per weight. The row reports exactly the width
     ///   that, proposed back, splits into the same cells;
     /// - a column without a height gives weighted items height 0;
-    /// - in `hug` mode a weighted item gets length 0.
+    /// - in `hug` mode a weighted item gets length 0 and no spacing: only the
+    ///   items without a weight are spaced.
     ///
     /// Both axes size the container by the same rule: `fill` takes the proposal
     /// and falls back to the content without one, `hug` takes the content. The
@@ -131,7 +132,11 @@ enum AdaptyUIWeightedSolver {
             }
         }
 
-        let gaps = CGFloat(max(0, items.count - 1))
+        let spaced = items.map { item in
+            guard mainAxisSizing == .hug, case .weight = item.length else { return true }
+            return false
+        }
+        let gaps = CGFloat(max(0, spaced.filter { $0 }.count - 1))
         var totalWeight = 0
         var reserved: CGFloat = 0
         for item in items {
@@ -196,13 +201,18 @@ enum AdaptyUIWeightedSolver {
             }
 
         var cursor: CGFloat = 0
+        var spacedBefore = false
         let frames = items.indices.map { index in
+            if spaced[index] {
+                if spacedBefore { cursor += spacing }
+                spacedBefore = true
+            }
             let cell =
                 switch axis {
                 case .horizontal: CGRect(x: cursor, y: 0, width: lengths[index], height: cross)
                 case .vertical: CGRect(x: 0, y: cursor, width: cross, height: lengths[index])
                 }
-            cursor += lengths[index] + spacing
+            cursor += lengths[index]
 
             return Frame(
                 cell: cell,
