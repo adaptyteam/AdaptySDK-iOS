@@ -11,6 +11,7 @@ import SwiftUI
 
 extension Double {
     var cgFloatValue: CGFloat { CGFloat(self) }
+    fileprivate var nonZero: Double? { self == 0 ? nil : self }
 }
 
 struct AdaptyUIRangedFrameModifier: ViewModifier {
@@ -48,11 +49,13 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
             )
         case let .shrinkable(min, max):
             (
+                // `fixedSize` already gives the content its own length on this axis,
+                // so a zero `min` bounds nothing and needs no frame.
                 min: min.points(
                     screenSize: screenSize,
                     safeAreaStart: safeAreaStart,
                     safeAreaEnd: safeAreaEnd
-                ),
+                ).nonZero,
                 max: max?.points(
                     screenSize: screenSize,
                     safeAreaStart: safeAreaStart,
