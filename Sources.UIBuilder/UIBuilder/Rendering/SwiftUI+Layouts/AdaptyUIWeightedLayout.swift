@@ -5,6 +5,12 @@
 
 import SwiftUI
 
+/// The item a subview of `AdaptyUIWeightedLayout` was built for.
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
+struct AdaptyUIWeightedItemKey: LayoutValueKey {
+    static let defaultValue: Int? = nil
+}
+
 /// Lays out the items of a `Row` or a `Column` along one axis, each in its own
 /// cell with its own alignment.
 ///
@@ -13,6 +19,10 @@ import SwiftUI
 /// the solver. Like `AdaptyUIDeckLayout` it solves again in `placeSubviews`
 /// instead of keeping a `Cache`, so sizing and placement read the same proposal
 /// through the same rule.
+///
+/// Subviews are matched to items by `AdaptyUIWeightedItemKey` rather than by
+/// position, so an element is laid out exactly as it renders: one that renders
+/// nothing takes no cell, and one that renders several views keeps them in one.
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIWeightedLayout: Layout {
     let axis: AdaptyUIWeightedSolver.Axis
@@ -26,7 +36,7 @@ struct AdaptyUIWeightedLayout: Layout {
         subviews: Subviews,
         cache _: inout ()
     ) -> CGSize {
-        solve(proposal: proposal, subviews: subviews).size
+        solve(proposal: proposal, subviews: subviews).result.size
     }
 
     func placeSubviews(
@@ -35,19 +45,25 @@ struct AdaptyUIWeightedLayout: Layout {
         subviews: Subviews,
         cache _: inout ()
     ) {
-        let result = solve(proposal: proposal, subviews: subviews)
+        let (rendered, result) = solve(proposal: proposal, subviews: subviews)
+        var placed = Set<Int>()
 
-        for (index, frame) in result.frames.enumerated() {
-            subviews[index].place(
-                at: CGPoint(x: bounds.minX + frame.anchor.x, y: bounds.minY + frame.anchor.y),
-                anchor: UnitPoint(x: items[index].anchorX, y: items[index].anchorY),
-                proposal: ProposedViewSize(frame.cell.size)
-            )
+        for (item, frame) in zip(rendered, result.frames) {
+            // Views of one item overlay each other at the item's anchor.
+            for index in item.subviews {
+                subviews[index].place(
+                    at: CGPoint(x: bounds.minX + frame.anchor.x, y: bounds.minY + frame.anchor.y),
+                    anchor: UnitPoint(x: items[item.item].anchorX, y: items[item.item].anchorY),
+                    proposal: ProposedViewSize(frame.cell.size)
+                )
+                placed.insert(index)
+            }
         }
 
-        // Unreachable while the view builds one subview per item, but every subview
-        // must be placed, so a leftover collapses instead of landing unplaced.
-        for index in result.frames.count ..< subviews.count {
+        // Unreachable while the view marks every subview with its item, but every
+        // subview must be placed, so a stray one collapses instead of landing
+        // unplaced.
+        for index in subviews.indices where !placed.contains(index) {
             subviews[index].place(
                 at: CGPoint(x: bounds.minX, y: bounds.minY),
                 anchor: .topLeading,
@@ -78,23 +94,32 @@ struct AdaptyUIWeightedLayout: Layout {
         nil
     }
 
-    /// The view wraps every item in exactly one subview, so subview `i` is the
-    /// content of item `i`. If the two ever drift apart, the pairs that do exist are
-    /// laid out rather than trapping on an index.
-    private func solve(proposal: ProposedViewSize, subviews: Subviews) -> AdaptyUIWeightedSolver.Result {
-        AdaptyUIWeightedSolver.solve(
+    private func solve(
+        proposal: ProposedViewSize,
+        subviews: Subviews
+    ) -> (rendered: [AdaptyUIWeightedSolver.Rendered], result: AdaptyUIWeightedSolver.Result) {
+        let rendered = AdaptyUIWeightedSolver.rendered(
+            itemCount: items.count,
+            subviewItems: subviews.map { $0[AdaptyUIWeightedItemKey.self] }
+        )
+
+        let result = AdaptyUIWeightedSolver.solve(
             axis: axis,
             mainAxisSizing: mainAxisSizing,
             crossAxisSizing: crossAxisSizing,
             spacing: spacing,
-            items: Array(items.prefix(subviews.count)),
+            items: rendered.map { items[$0.item] },
             proposedWidth: proposal.width,
             proposedHeight: proposal.height,
             measure: { index, proposedWidth, proposedHeight in
-                subviews[index].sizeThatFits(
-                    ProposedViewSize(width: proposedWidth, height: proposedHeight)
-                )
+                let proposal = ProposedViewSize(width: proposedWidth, height: proposedHeight)
+                return rendered[index].subviews.reduce(CGSize.zero) { size, subview in
+                    let next = subviews[subview].sizeThatFits(proposal)
+                    return CGSize(width: max(size.width, next.width), height: max(size.height, next.height))
+                }
             }
         )
+
+        return (rendered, result)
     }
 }

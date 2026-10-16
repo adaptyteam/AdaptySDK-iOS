@@ -52,6 +52,32 @@ enum AdaptyUIWeightedSolver {
         let frames: [Frame]
     }
 
+    /// One item that rendered to at least one subview, with those subviews in
+    /// their original order.
+    struct Rendered: Equatable {
+        let item: Int
+        let subviews: [Int]
+    }
+
+    /// Pairs the configured items with the subviews that actually arrived.
+    ///
+    /// `subviewItems[i]` is the item subview `i` was built for, `nil` when it
+    /// carries none. An element may render to no subview at all — an empty
+    /// screen holder, an image that failed to decode — and then its item drops
+    /// out together with its spacing, as it does in a native stack. A custom
+    /// element may render to several, and they stay one item. Subviews with an
+    /// item outside `0 ..< itemCount` or with none are left out.
+    static func rendered(itemCount: Int, subviewItems: [Int?]) -> [Rendered] {
+        var subviews = [[Int]](repeating: [], count: max(0, itemCount))
+        for (subview, item) in subviewItems.enumerated() {
+            guard let item, subviews.indices.contains(item) else { continue }
+            subviews[item].append(subview)
+        }
+        return subviews.indices.compactMap { item in
+            subviews[item].isEmpty ? nil : Rendered(item: item, subviews: subviews[item])
+        }
+    }
+
     /// Resolves the container and its items.
     ///
     /// Main axis:

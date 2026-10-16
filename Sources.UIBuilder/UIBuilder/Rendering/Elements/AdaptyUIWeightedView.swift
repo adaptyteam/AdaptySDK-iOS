@@ -53,14 +53,13 @@ struct AdaptyUIWeightedView<ScreenHolderContent: View>: View {
             items: items.map(layoutItem)
         ) {
             ForEach(0 ..< items.count, id: \.self) { idx in
-                // A layout container is always exactly one subview, so subview
-                // `idx` stays item `idx` whatever the element renders to.
-                ZStack {
-                    AdaptyUIElementView(
-                        items[idx].content,
-                        screenHolderBuilder: screenHolderBuilder
-                    )
-                }
+                // Marked rather than wrapped, so the layout reaches the element's
+                // own views and lays them out as the element rendered them.
+                AdaptyUIElementView(
+                    items[idx].content,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+                .layoutValue(key: AdaptyUIWeightedItemKey.self, value: idx)
             }
         }
     }

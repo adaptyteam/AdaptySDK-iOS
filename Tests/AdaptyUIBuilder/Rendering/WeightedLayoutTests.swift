@@ -698,4 +698,65 @@ enum WeightedLayoutTests {
             #expect(result.frames.map(\.anchor.x) == [50, 60])
         }
     }
+
+    @Suite(
+        "Weighted Rendered Items",
+        .story("Weighted Rendered Items")
+    )
+    struct RenderedItemsTests {
+        @Test("One subview per item keeps every item")
+        func oneSubviewPerItem() {
+            #expect(Solver.rendered(itemCount: 3, subviewItems: [0, 1, 2]) == [
+                .init(item: 0, subviews: [0]),
+                .init(item: 1, subviews: [1]),
+                .init(item: 2, subviews: [2]),
+            ])
+        }
+
+        /// An element that renders nothing drops out, so its neighbours become
+        /// adjacent and only one spacing separates them, as in a native stack.
+        @Test("An item without a subview drops out with its spacing")
+        func itemWithoutSubviewDropsOut() {
+            let rendered = Solver.rendered(itemCount: 3, subviewItems: [0, 2])
+            #expect(rendered == [
+                .init(item: 0, subviews: [0]),
+                .init(item: 2, subviews: [1]),
+            ])
+
+            let items = [
+                WeightedLayoutTests.item(.points(50)),
+                WeightedLayoutTests.item(.points(30)),
+                WeightedLayoutTests.item(.points(50)),
+            ]
+            let result = Solver.solve(
+                axis: .horizontal,
+                mainAxisSizing: .hug,
+                crossAxisSizing: .hug,
+                spacing: 10,
+                items: rendered.map { items[$0.item] },
+                proposedWidth: nil,
+                proposedHeight: nil,
+                measure: WeightedLayoutTests.fixedMeasure(CGSize(width: 10, height: 10))
+            )
+
+            #expect(result.size.width == 110)
+            #expect(result.frames.map(\.cell.minX) == [0, 60])
+        }
+
+        @Test("Several subviews of one item stay one item")
+        func severalSubviewsStayOneItem() {
+            #expect(Solver.rendered(itemCount: 2, subviewItems: [0, 0, 1]) == [
+                .init(item: 0, subviews: [0, 1]),
+                .init(item: 1, subviews: [2]),
+            ])
+        }
+
+        @Test("Subviews without a known item are left out")
+        func unknownSubviewsAreLeftOut() {
+            #expect(Solver.rendered(itemCount: 2, subviewItems: [nil, 1, 5, -1]) == [
+                .init(item: 1, subviews: [1]),
+            ])
+            #expect(Solver.rendered(itemCount: 2, subviewItems: []).isEmpty)
+        }
+    }
 }
