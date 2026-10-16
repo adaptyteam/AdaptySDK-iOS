@@ -14,6 +14,7 @@ extension Double {
     fileprivate var nonZero: Double? { self == 0 ? nil : self }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIRangedFrameModifier: ViewModifier {
     typealias Constraints = (min: Double?, max: Double?, shrink: Bool)
 
@@ -120,26 +121,28 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
                     vertical: hConstraints.shrink
                 )
         } else {
-            content
-                .frame(
-                    minWidth: wConstraints.min?.cgFloatValue,
-                    maxWidth: wConstraints.max?.cgFloatValue,
-                    minHeight: hConstraints.min?.cgFloatValue,
-                    maxHeight: hConstraints.max?.cgFloatValue,
-                    alignment: .from(
-                        horizontal: self.box.horizontalAlignment.swiftuiValue(with: self.layoutDirection),
-                        vertical: self.box.verticalAlignment.swiftuiValue
-                    )
+            AdaptyUIBoxFrameLayout(
+                minWidth: wConstraints.min?.cgFloatValue,
+                maxWidth: wConstraints.max?.cgFloatValue,
+                minHeight: hConstraints.min?.cgFloatValue,
+                maxHeight: hConstraints.max?.cgFloatValue,
+                alignment: UnitPoint(
+                    x: self.box.horizontalAlignment.anchorFraction(with: self.layoutDirection),
+                    y: self.box.verticalAlignment.anchorFraction
                 )
-                .fixedSize(
-                    horizontal: wConstraints.shrink,
-                    vertical: hConstraints.shrink
-                )
+            ) {
+                content
+            }
+            .fixedSize(
+                horizontal: wConstraints.shrink,
+                vertical: hConstraints.shrink
+            )
         }
     }
 }
 
 extension View {
+    @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
     func rangedFrame(box: VC.Box) -> some View {
         modifier(AdaptyUIRangedFrameModifier(box: box))
     }
