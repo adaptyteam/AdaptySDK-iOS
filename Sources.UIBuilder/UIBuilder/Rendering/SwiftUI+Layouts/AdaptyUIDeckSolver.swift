@@ -45,7 +45,11 @@ enum AdaptyUIDeckSolver {
     /// Resolves the deck and its children.
     ///
     /// The width pass runs first so a content height is measured against a width
-    /// that is already final and text wraps inside it. A `parent` child never
+    /// that is already final and text wraps inside it. A child sized by its content
+    /// across takes its height from the same measurement that gave its width:
+    /// asking again with that width would hand the child its own answer, and
+    /// content that picks its layout from the proposal could answer for another
+    /// layout than the one it is placed with. A `parent` child never
     /// sizes the deck: it is excluded from a `hug` measurement and then takes its
     /// fraction of the result, overflowing the deck when the fraction exceeds `1`.
     ///
@@ -63,10 +67,11 @@ enum AdaptyUIDeckSolver {
         proposedHeight: CGFloat?,
         measure: (_ index: Int, _ proposedWidth: CGFloat?, _ proposedHeight: CGFloat?) -> CGSize
     ) -> Result {
-        var naturalWidths = [CGFloat?](repeating: nil, count: items.count)
+        var naturalSizes = [CGSize?](repeating: nil, count: items.count)
         for (index, item) in items.enumerated() where item.width == .content {
-            naturalWidths[index] = measure(index, nil, nil).width
+            naturalSizes[index] = measure(index, nil, nil)
         }
+        let naturalWidths = naturalSizes.map { $0?.width }
 
         let width = innerLength(
             mode: widthMode,
@@ -80,7 +85,7 @@ enum AdaptyUIDeckSolver {
 
         var contentHeights = [CGFloat?](repeating: nil, count: items.count)
         for (index, item) in items.enumerated() where item.height == .content {
-            contentHeights[index] = measure(index, childWidths[index], nil).height
+            contentHeights[index] = (naturalSizes[index] ?? measure(index, childWidths[index], nil)).height
         }
 
         let height = innerLength(

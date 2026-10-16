@@ -162,6 +162,32 @@ enum DeckLayoutTests {
             #expect(result.frames[0].size == CGSize(width: 140, height: 90))
         }
 
+        /// A child sized by its content on both axes is measured once, without a
+        /// length: asking for its height at its own width would hand it back its
+        /// own answer.
+        @Test("Content child is measured without a length only")
+        func contentChildIsMeasuredWithoutLengthOnly() {
+            var proposals: [CGSize?] = []
+            let result = AdaptyUIDeckSolver.solve(
+                width: .fill,
+                height: .hug,
+                items: [DeckLayoutTests.item()],
+                proposedWidth: 300,
+                proposedHeight: nil,
+                measure: { _, proposedWidth, proposedHeight in
+                    proposals.append(proposedWidth.map { CGSize(width: $0, height: proposedHeight ?? -1) })
+                    // Picks a wide layout without a width and a tall one at 248 pt.
+                    return (proposedWidth ?? .infinity) > 248
+                        ? CGSize(width: 248, height: 44)
+                        : CGSize(width: 120, height: 96)
+                }
+            )
+
+            #expect(proposals == [nil])
+            #expect(result.frames[0].size == CGSize(width: 248, height: 44))
+            #expect(result.size == CGSize(width: 300, height: 44))
+        }
+
         /// Negative literals are rejected while decoding; a negative resolved size
         /// still collapses to zero instead of inverting the layout.
         @Test("Negative length collapses to zero")
