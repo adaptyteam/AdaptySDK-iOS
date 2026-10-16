@@ -44,7 +44,7 @@ struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
             ForEach(0 ..< deck.items.count, id: \.self) { idx in
                 // The wrapper turns the layout's proposal into the item's actual
                 // size; without it a content-sized child would ignore it.
-                AdaptyUIDeckItemLayout {
+                AdaptyUIDeckItemLayout(contentAxes: contentAxes(deck.items[idx])) {
                     AdaptyUIElementView(
                         deck.items[idx].content,
                         screenHolderBuilder: screenHolderBuilder
@@ -61,6 +61,13 @@ struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
         // arrives here; were it to, it would behave as `fill`.
         case .fill, .legacy: .fill
         }
+    }
+
+    private func contentAxes(_ item: VC.DeckItem) -> Axis.Set {
+        var axes: Axis.Set = []
+        if case .content = item.width { axes.insert(.horizontal) }
+        if case .content = item.height { axes.insert(.vertical) }
+        return axes
     }
 
     private func layoutItem(_ item: VC.DeckItem) -> AdaptyUIDeckSolver.Item {

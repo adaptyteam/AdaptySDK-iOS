@@ -19,19 +19,30 @@ import SwiftUI
 /// keeps the deck's measurement of `content` children honest. The content itself is
 /// proposed the resulting size, so flexible content fills it and text wraps inside
 /// it, while content with a size of its own keeps that size and is centered.
+///
+/// On `contentAxes` — those where the item has no length — the deck measured the
+/// content without a length, and the item's size there is the content's own
+/// answer. Placement proposes no length on those axes either: proposing the answer
+/// back would let content that picks its layout from the proposal place a layout
+/// other than the one it was measured with.
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIDeckItemLayout: Layout {
+    let contentAxes: Axis.Set
+
     func sizeThatFits(
         proposal: ProposedViewSize,
         subviews: Subviews,
         cache _: inout ()
     ) -> CGSize {
-        let content = subviews.first?.sizeThatFits(proposal) ?? .zero
+        let width = bounded(proposal.width)
+        let height = bounded(proposal.height)
 
-        return CGSize(
-            width: bounded(proposal.width) ?? content.width,
-            height: bounded(proposal.height) ?? content.height
-        )
+        // A fully bounded offer is the answer; asking the content too would only
+        // measure it once more with a size it never gets placed with.
+        if let width, let height { return CGSize(width: width, height: height) }
+
+        let content = subviews.first?.sizeThatFits(proposal) ?? .zero
+        return CGSize(width: width ?? content.width, height: height ?? content.height)
     }
 
     func placeSubviews(
@@ -44,7 +55,10 @@ struct AdaptyUIDeckItemLayout: Layout {
             subview.place(
                 at: CGPoint(x: bounds.midX, y: bounds.midY),
                 anchor: .center,
-                proposal: ProposedViewSize(bounds.size)
+                proposal: ProposedViewSize(
+                    width: contentAxes.contains(.horizontal) ? nil : bounds.width,
+                    height: contentAxes.contains(.vertical) ? nil : bounds.height
+                )
             )
         }
     }
