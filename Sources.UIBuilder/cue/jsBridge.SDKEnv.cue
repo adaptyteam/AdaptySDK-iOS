@@ -10,7 +10,7 @@ package jsBridge
 // ...
 // 
 #SDKEnv: {
-	platform!:      "ios"
+	platform!:      "ios" | "android"
 	schemaVersion!: string
 	sdkVersion!:    string
 
@@ -19,7 +19,7 @@ package jsBridge
 
 	osName!:       string
 	osVersion!:    string
-	deviceVendor!: "Apple"
+	deviceVendor!: "Apple" | string
 	deviceModel!:  string
 
 	// Missing native values are omitted, not serialized as null.

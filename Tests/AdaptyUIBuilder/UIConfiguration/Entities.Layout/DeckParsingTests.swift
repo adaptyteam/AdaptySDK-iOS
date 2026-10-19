@@ -123,8 +123,11 @@ enum DeckTests {
                 Issue.record("Expected content-based height")
                 return
             }
-            #expect(item.horizontalAlignment == .center)
-            #expect(item.verticalAlignment == .center)
+            #expect(item.anchor.x == 0.5)
+            #expect(item.anchor.y == 0.5)
+            #expect(item.position.x == 0.5)
+            #expect(item.position.y == 0.5)
+            #expect(!item.mirrorInRTL)
 
             guard case .text = screen.poolElements[item.content] else {
                 Issue.record("Expected DeckItem content to be a text element")
@@ -155,8 +158,10 @@ enum DeckTests {
             """)
 
             let item = try #require(deck.items.first)
-            #expect(item.horizontalAlignment == .justified)
-            #expect(item.verticalAlignment == .bottom)
+            #expect(item.anchor.x == 0.5)
+            #expect(item.anchor.y == 1)
+            #expect(item.position.x == 0.5)
+            #expect(item.position.y == 1)
 
             guard case let .fixed(.point(width)) = item.width else {
                 Issue.record("Expected a fixed point width")
@@ -169,6 +174,137 @@ enum DeckTests {
                 return
             }
             #expect(height == 1.5)
+        }
+
+        /// Explicit points are preserved; RTL mirroring is enabled only by the mirror behavior.
+        @Test("Explicit anchor, position and RTL behavior are preserved", arguments: [
+            ("omitted", false),
+            ("preserve", false),
+            ("keep", false),
+            ("mirror", true),
+            ("PRESERVE", false),
+            ("KeEp", false),
+            ("MIRROR", true),
+            ("mIrRoR", true),
+        ])
+        func explicitAnchorAndPositionArePreserved(rtl: String, mirrorInRTL: Bool) throws {
+            let rtlField = rtl == "omitted" ? "" : #""rtl": "\#(rtl)","#
+            let (deck, _) = try DeckTests.deck(content: """
+            {
+              "type": "deck",
+              "items": [{
+                "type": "deck_item",
+                "anchor": { "x": 0.25, "y": 0.75 },
+                "position": { "x": 0.8, "y": 0.2 },
+                \(rtlField)
+                "content": { "type": "text", "string_id": "title" }
+              }]
+            }
+            """)
+
+            let item = try #require(deck.items.first)
+            #expect(item.anchor.x == 0.25)
+            #expect(item.anchor.y == 0.75)
+            #expect(item.position.x == 0.8)
+            #expect(item.position.y == 0.2)
+            #expect(item.mirrorInRTL == mirrorInRTL)
+        }
+
+        /// Directional alignments keep their RTL behavior when converted to points.
+        @Test("Legacy horizontal alignment preserves RTL behavior", arguments: [
+            "leading", "trailing", "left", "right", "center", "justified",
+        ])
+        func legacyHorizontalAlignmentPreservesRTLBehavior(alignment: String) throws {
+            let (deck, _) = try DeckTests.deck(content: """
+            {
+              "type": "deck",
+              "items": [{
+                "type": "deck_item",
+                "h_align": "\(alignment)",
+                "content": { "type": "text", "string_id": "title" }
+              }]
+            }
+            """)
+
+            let item = try #require(deck.items.first)
+            #expect(item.mirrorInRTL == (alignment == "leading" || alignment == "trailing"))
+            let expectedX: Double = switch alignment {
+            case "leading", "left": 0
+            case "trailing", "right": 1
+            default: 0.5
+            }
+            #expect(item.anchor.x == expectedX)
+            #expect(item.position.x == expectedX)
+        }
+
+        /// RTL behavior accepts only the declared string values.
+        @Test("Invalid RTL behavior is rejected", arguments: [#""unknown""#, "true", "1"])
+        func invalidRTLBehaviorIsRejected(rtl: String) {
+            #expect(throws: DecodingError.self) {
+                try DeckTests.screen(content: """
+                {
+                  "type": "deck",
+                  "items": [{
+                    "type": "deck_item",
+                    "anchor": {},
+                    "position": {},
+                    "rtl": \(rtl),
+                    "content": { "type": "text", "string_id": "title" }
+                  }]
+                }
+                """)
+            }
+        }
+
+        /// Either legacy alignment can be omitted; the missing axis remains centered.
+        @Test("A single alignment defaults the missing axis to center", arguments: ["h_align", "v_align"])
+        func singleAlignmentDefaultsMissingAxisToCenter(key: String) throws {
+            let value = key == "h_align" ? "left" : "top"
+            let (deck, _) = try DeckTests.deck(content: """
+            {
+              "type": "deck",
+              "items": [{
+                "type": "deck_item",
+                "\(key)": "\(value)",
+                "content": { "type": "text", "string_id": "title" }
+              }]
+            }
+            """)
+
+            let item = try #require(deck.items.first)
+            #expect(item.anchor.x == (key == "h_align" ? 0 : 0.5))
+            #expect(item.anchor.y == (key == "v_align" ? 0 : 0.5))
+            #expect(item.position.x == item.anchor.x)
+            #expect(item.position.y == item.anchor.y)
+        }
+
+        /// Coordinates must form a non-null pair and cannot be combined with legacy alignment keys.
+        @Test("Incomplete and mixed positioning modes are rejected", arguments: [
+            #""anchor": {"x": 0.25, "y": 0.75}"#,
+            #""position": {"x": 0.8, "y": 0.2}"#,
+            #""anchor": null, "position": {}"#,
+            #""anchor": {}, "position": null"#,
+            #""anchor": {}, "position": {}, "h_align": "left""#,
+            #""anchor": {}, "position": {}, "v_align": "top""#,
+            #""anchor": {}, "position": {}, "h_align": null"#,
+            #""anchor": {}, "position": {}, "v_align": null"#,
+            #""rtl": "mirror""#,
+            #""h_align": "leading", "rtl": "preserve""#,
+            #""v_align": "top", "rtl": "mirror""#,
+        ])
+        func incompleteAndMixedPositioningModesAreRejected(fields: String) {
+            #expect(throws: DecodingError.self) {
+                try DeckTests.screen(content: """
+                {
+                  "type": "deck",
+                  "items": [{
+                    "type": "deck_item",
+                    \(fields),
+                    "content": { "type": "text", "string_id": "title" }
+                  }]
+                }
+                """)
+            }
         }
 
         /// A DeckItem is decoded with an invalid discriminator or a negative length. Schema decoding rejects the item.
