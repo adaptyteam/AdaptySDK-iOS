@@ -52,40 +52,61 @@ struct AdaptyUIWeightedView<ScreenHolderContent: View>: View {
             mainAxisSizing: mainAxisSizing,
             crossAxisSizing: crossAxisSizing,
             spacing: spacing.cgFloatValue,
-            items: items.map(layoutItem)
-        ) {
-            ForEach(0 ..< items.count, id: \.self) { idx in
-                // Marked rather than wrapped, so the layout reaches the element's
-                // own views and lays them out as the element rendered them.
-                AdaptyUIElementView(
-                    items[idx].content,
-                    screenHolderBuilder: screenHolderBuilder
-                )
-                .layoutValue(key: AdaptyUIWeightedItemKey.self, value: idx)
+            items: items.map {
+                $0.weightedItem(axis, screenSize, safeArea, layoutDirection, elementPool)
             }
+        ) {
+            AdaptyUIWeightedItemsView(items: items, screenHolderBuilder: screenHolderBuilder)
         }
     }
+}
 
-    private func layoutItem(_ item: VC.GridItem) -> AdaptyUIWeightedSolver.Item {
-        .init(
-            length: layoutLength(item.length),
-            anchorX: item.horizontalAlignment.anchorFraction(with: layoutDirection),
-            anchorY: item.verticalAlignment.anchorFraction,
+/// The elements of `items`, each marked with its item for `AdaptyUIWeightedLayout`.
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
+struct AdaptyUIWeightedItemsView<ScreenHolderContent: View>: View {
+    let items: [VC.GridItem]
+    let screenHolderBuilder: () -> ScreenHolderContent
+
+    var body: some View {
+        ForEach(0 ..< items.count, id: \.self) { idx in
+            // Marked rather than wrapped, so the layout reaches the element's own
+            // views and lays them out as the element rendered them.
+            AdaptyUIElementView(
+                items[idx].content,
+                screenHolderBuilder: screenHolderBuilder
+            )
+            .layoutValue(key: AdaptyUIWeightedItemKey.self, value: idx)
+        }
+    }
+}
+
+extension VC.GridItem {
+    /// The item as the weighted layout along `axis` sees it: units resolved to
+    /// points, alignments to anchors for the layout direction.
+    func weightedItem(
+        _ axis: AdaptyUIWeightedSolver.Axis,
+        _ screenSize: CGSize,
+        _ safeArea: EdgeInsets,
+        _ layoutDirection: LayoutDirection,
+        _ elementPool: [VC.Element]
+    ) -> AdaptyUIWeightedSolver.Item {
+        let points: AdaptyUIWeightedSolver.Length =
+            switch length {
+            case let .fixed(unit):
+                .points(unit.points(axis == .horizontal ? .horizontal : .vertical, screenSize, safeArea).cgFloatValue)
+            case let .weight(weight):
+                .weight(weight)
+            }
+        return .init(
+            length: points,
+            anchorX: horizontalAlignment.anchorFraction(with: layoutDirection),
+            anchorY: verticalAlignment.anchorFraction,
             // A row measures its children without a height and places them with
             // its own. Content that picks its layout from `available_height` is
             // placed without one too, so it lays out what it was measured for —
             // at the cost of not stretching to a taller neighbour.
-            placesAsMeasured: axis == .horizontal && elementPool.picksLayoutFromHeight(item.content)
+            placesAsMeasured: axis == .horizontal && elementPool.picksLayoutFromHeight(content)
         )
-    }
-
-    private func layoutLength(_ length: VC.GridItem.Length) -> AdaptyUIWeightedSolver.Length {
-        switch length {
-        case let .fixed(unit):
-            .points(unit.points(axis == .horizontal ? .horizontal : .vertical, screenSize, safeArea).cgFloatValue)
-        case let .weight(weight):
-            .weight(weight)
-        }
     }
 }
 

@@ -124,6 +124,37 @@ struct LayoutProposalTests {
         #expect(log.measured.allSatisfy { $0 == placed })
     }
 
+    /// A flex lays out as the row or the column it turns into, chosen from the
+    /// proposal of the same pass: the child gets the cell width of that direction,
+    /// half the row or the whole column.
+    @Test("Flex lays out as the row or the column it turns into", arguments: [(300, 173), (400, 354)] as [(Double, CGFloat)])
+    func flexChoosesDirection(minWidth: Double, width: CGFloat) throws {
+        let log = Log()
+        let items = [Self.item(.weight(1)), Self.item(.weight(1))]
+        Self.render(
+            AdaptyUIFlexLayout(
+                conditions: [.availableWidth(min: minWidth, max: nil)],
+                direction: .horizontal,
+                screenSize: CGSize(width: 402, height: 874),
+                orientation: .portrait,
+                huggedAxes: [],
+                row: AdaptyUIWeightedLayout(axis: .horizontal, mainAxisSizing: .fill, crossAxisSizing: .hug, spacing: 8, items: items),
+                column: AdaptyUIWeightedLayout(axis: .vertical, mainAxisSizing: .hug, crossAxisSizing: .fill, spacing: 8, items: [
+                    Self.item(.points(600)), Self.item(.points(40)),
+                ])
+            ) {
+                Recorder(log: log) { Color.clear }
+                    .layoutValue(key: AdaptyUIWeightedItemKey.self, value: 0)
+                Color.clear.frame(height: 44)
+                    .layoutValue(key: AdaptyUIWeightedItemKey.self, value: 1)
+            }
+        )
+
+        let placed = try #require(log.placed.last)
+        #expect(placed.width == width)
+        #expect(log.measured.allSatisfy { $0.width == width })
+    }
+
     /// A column cell with a length is the whole cell on both axes.
     @Test("Column cell places with the cell it measured with")
     func columnCellBothAxes() throws {

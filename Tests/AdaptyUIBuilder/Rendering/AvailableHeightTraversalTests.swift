@@ -8,7 +8,7 @@ import Foundation
 import Testing
 
 /// Which row items are placed without the row's height: those whose content, at
-/// any depth, has a `flex_stack` that picks its layout from `available_height`.
+/// any depth, has a `flex` or `flex_stack` that picks its layout from `available_height`.
 @Suite(
     "AdaptyUIBuilder Tests",
     .component("AdaptyUIBuilder"),
@@ -37,6 +37,7 @@ struct AvailableHeightTraversalTests {
         arguments: [
             // The container itself.
             flexStack("available_height"),
+            "{ \"type\": \"flex\", \"direction\": \"row\", \"condition\": [{ \"metric\": \"available_height\", \"min\": 100 }], \"items\": [{ \"type\": \"grid_item\", \"weight\": 1, \"content\": { \"type\": \"text\", \"string_id\": \"a\" } }] }",
             // Under boxes and another container.
             "{ \"type\": \"box\", \"content\": { \"type\": \"v_stack\", \"content\": [{ \"type\": \"box\", \"content\": \(flexStack("available_height")) }] } }",
             // A switch case holding one.

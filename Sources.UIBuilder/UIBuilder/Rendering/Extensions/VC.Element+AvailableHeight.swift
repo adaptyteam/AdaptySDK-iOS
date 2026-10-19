@@ -30,14 +30,19 @@ extension VC.Element {
         return own + decorations.map(\.content)
     }
 
-    /// A `flex_stack` with a condition on `available_height`.
+    /// A `flex` or a `flex_stack` with a condition on `available_height`.
     ///
-    /// `flex` and `switch` are left out while they still read the proposal
-    /// through a `GeometryReader` when placed: placed without a height, they would
-    /// read none at all.
+    /// `switch` is left out while it still reads the proposal through a
+    /// `GeometryReader` when placed: placed without a height, it would read none
+    /// at all.
     var picksLayoutFromHeight: Bool {
-        guard case let .flexStack(flexStack, _) = self else { return false }
-        return flexStack.condition.contains {
+        let conditions: [VC.Condition] =
+            switch self {
+            case let .flexStack(flexStack, _): flexStack.condition
+            case let .flex(flex, _): flex.condition
+            default: []
+            }
+        return conditions.contains {
             if case .availableHeight = $0 { true } else { false }
         }
     }
