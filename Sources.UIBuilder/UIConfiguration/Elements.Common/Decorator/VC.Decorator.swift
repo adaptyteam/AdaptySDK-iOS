@@ -15,5 +15,6 @@ extension VC {
         let shadow: Shadow?
         let innerShadow: Shadow?
         let blurRadius: Double?
+        let clip: Clip
     }
 }

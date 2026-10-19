@@ -852,6 +852,11 @@ UI:
                 shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
                 inner_shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
                 blur_radius: { type: number }
+                clip:
+                    type: string
+                    enum: [content, none]
+                    default: content
+                    description: "Clips the decorator background, content and border to its shape. None allows content overflow while preserving shaped fills and strokes. Element backgrounds, overlays and outer shadow remain outside this mask."
             dependentSchemas:
                 border:
                     properties:
