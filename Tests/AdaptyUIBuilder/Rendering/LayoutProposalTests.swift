@@ -155,6 +155,28 @@ struct LayoutProposalTests {
         #expect(log.measured.allSatisfy { $0.width == width })
     }
 
+    /// A switch takes the size of its branch, not what its parent offers, and
+    /// places its probe with what the parent offers.
+    @Test("Switch takes its branch and probes the parent")
+    func switchTakesItsBranch() throws {
+        let probe = Log()
+        let branch = Log()
+        let frames = BoxFrameLayoutTests.Frames()
+        Self.render(
+            BoxFrameLayoutTests.Root(proposal: ProposedViewSize(width: 402, height: nil), frames: frames) {
+                AdaptyUISwitchLayout(screenSize: CGSize(width: 402, height: 874), probes: true) {
+                    Recorder(log: probe) { Color.clear }
+                    Recorder(log: branch, size: CGSize(width: 250, height: 44)) { Color.clear }
+                }
+            },
+            width: 402
+        )
+
+        #expect(frames.box?.size == CGSize(width: 250, height: 44))
+        #expect(try #require(probe.placed.last) == ProposedViewSize(width: 402, height: 874))
+        #expect(branch.placed.allSatisfy { $0.width == 402 })
+    }
+
     /// A column cell with a length is the whole cell on both axes.
     @Test("Column cell places with the cell it measured with")
     func columnCellBothAxes() throws {

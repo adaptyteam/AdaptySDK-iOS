@@ -7,12 +7,19 @@
 
 import SwiftUI
 
+/// Renders a `Switch`: the first case whose conditions hold, `default` when none
+/// does, and only that one, so the branches not shown are never built.
+///
+/// Conditions on the screen, the device and the orientation are read in `body`
+/// and right on the first frame. A condition on `available_*` needs what the
+/// parent proposes, which only a layout pass shows: until a probe in
+/// `AdaptyUISwitchLayout` reports it, the screen stands in. That first
+/// correction is not animated; a later change of branch is, with the transition.
 @MainActor
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUISwitchView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize) private var screenSize: CGSize
     @Environment(\.adaptyInterfaceOrientation) private var orientation: VC.Orientation
-    @Environment(\.adaptyUnspecifiedProposalAxes) private var unspecifiedProposalAxes: Axis.Set
 
     private let switchElement: VC.Switch
     private let screenHolderBuilder: () -> ScreenHolderContent
@@ -25,78 +32,46 @@ struct AdaptyUISwitchView<ScreenHolderContent: View>: View {
         self.screenHolderBuilder = screenHolderBuilder
     }
 
-    @State private var availableSize: CGSize = .zero
-    /// Index of the selected case; -1 → default.
-    @State private var selection: Int = -1
-    /// Natural size of the selected branch. Used as a floor on the greedy
-    /// GeometryReader so it can't collapse below its content when the parent
-    /// proposes nil on an axis (e.g. the scroll axis of a ScrollView).
-    @State private var contentsSize: CGSize = .zero
+    /// What the parent offers, as the probe last reported it; nil until it has.
+    @State private var available: CGSize?
 
-    private func computedSelection(orientation: VC.Orientation) -> Int {
-        for (index, item) in switchElement.cases.enumerated() {
-            if VC.Condition.evaluate(
-                item.condition,
-                available: availableSize,
-                screen: screenSize,
-                orientation: orientation
-            ) {
-                return index
-            }
-        }
-        return -1
-    }
-
-    private var selectedElement: VC.ElementIndex {
-        if selection >= 0, selection < switchElement.cases.count {
-            switchElement.cases[selection].content
-        } else {
-            switchElement.default
-        }
+    private func selection(_ available: CGSize?) -> VC.ElementIndex {
+        switchElement.selectedContent(available: available ?? screenSize, screen: screenSize, orientation: orientation)
     }
 
     var body: some View {
-        GeometryReader { proxy in
-            AdaptyUIElementView(
-                selectedElement,
-                screenHolderBuilder: screenHolderBuilder
-            )
-            .onGeometrySizeChange { contentsSize = $0 }
-            .onAppear {
-                availableSize = proxy.size
-                selection = computedSelection(orientation: orientation)
-            }
-            .onChange(of: proxy.size) { newSize in
-                guard newSize != availableSize else { return }
-                availableSize = newSize
-                recompute(orientation: orientation)
-            }
-            .onChange(of: screenSize) { _ in recompute(orientation: orientation) }
-            .onChange(of: orientation) { newOrientation in recompute(orientation: newOrientation) }
+        if let animation = switchElement.transition?.swiftUIAnimation {
+            content
+                .animation(animation, value: screenSize)
+                .animation(animation, value: orientation)
+        } else {
+            content
         }
-        // Floor the greedy reader at the content size: `proxy.size` still equals the
-        // parent proposal when bounded (so the condition reads it), but the view can't
-        // collapse to ~10pt when the parent proposes nil (a ScrollView scroll axis).
-        //
-        // Each axis is floored only where its length is actually unspecified — see
-        // `AdaptyUIUnspecifiedProposalAxesKey`; an unconditional floor is a hard
-        // minimum and ratchets the whole screen on the way down.
-        .frame(
-            minWidth: unspecifiedProposalAxes.contains(.horizontal) ? contentsSize.width : nil,
-            minHeight: unspecifiedProposalAxes.contains(.vertical) ? contentsSize.height : nil
-        )
     }
 
-    private func recompute(orientation: VC.Orientation) {
-        let newSelection = computedSelection(orientation: orientation)
-        guard newSelection != selection else { return }
-        // Drop the stale floor so the incoming branch re-measures from scratch;
-        // otherwise a larger previous branch would over-size a smaller new one.
-        contentsSize = .zero
-        if let transition = switchElement.transition {
-            withAnimation(transition.swiftUIAnimation) { selection = newSelection }
+    private var content: some View {
+        let probes = switchElement.readsAvailableSize
+        return AdaptyUISwitchLayout(screenSize: screenSize, probes: probes) {
+            if probes {
+                Color.clear
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+                    .onGeometrySizeChange { report($0) }
+            }
+            AdaptyUIElementView(
+                selection(available),
+                screenHolderBuilder: screenHolderBuilder
+            )
+        }
+    }
+
+    private func report(_ size: CGSize) {
+        guard size != available else { return }
+        let changesBranch = available != nil && selection(available) != selection(size)
+        if changesBranch, let animation = switchElement.transition?.swiftUIAnimation {
+            withAnimation(animation) { available = size }
         } else {
-            selection = newSelection
+            available = size
         }
     }
 }

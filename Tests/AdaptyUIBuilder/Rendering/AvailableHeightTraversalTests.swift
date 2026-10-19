@@ -8,7 +8,7 @@ import Foundation
 import Testing
 
 /// Which row items are placed without the row's height: those whose content, at
-/// any depth, has a `flex` or `flex_stack` that picks its layout from `available_height`.
+/// any depth, has a `flex`, `flex_stack` or `switch` that picks its layout from `available_height`.
 @Suite(
     "AdaptyUIBuilder Tests",
     .component("AdaptyUIBuilder"),
@@ -40,6 +40,8 @@ struct AvailableHeightTraversalTests {
             "{ \"type\": \"flex\", \"direction\": \"row\", \"condition\": [{ \"metric\": \"available_height\", \"min\": 100 }], \"items\": [{ \"type\": \"grid_item\", \"weight\": 1, \"content\": { \"type\": \"text\", \"string_id\": \"a\" } }] }",
             // Under boxes and another container.
             "{ \"type\": \"box\", \"content\": { \"type\": \"v_stack\", \"content\": [{ \"type\": \"box\", \"content\": \(flexStack("available_height")) }] } }",
+            // A switch on available_height.
+            "{ \"type\": \"switch\", \"cases\": [{ \"condition\": [{ \"metric\": \"available_height\", \"min\": 500 }], \"content\": { \"type\": \"text\", \"string_id\": \"a\" } }], \"default\": { \"type\": \"text\", \"string_id\": \"b\" } }",
             // A switch case holding one.
             "{ \"type\": \"switch\", \"cases\": [{ \"condition\": [], \"content\": \(flexStack("available_height")) }], \"default\": { \"type\": \"text\", \"string_id\": \"b\" } }",
             // An overlay.
@@ -55,8 +57,7 @@ struct AvailableHeightTraversalTests {
         arguments: [
             flexStack("available_width"),
             "{ \"type\": \"box\", \"content\": { \"type\": \"text\", \"string_id\": \"a\" } }",
-            // A switch itself is not, while it reads the proposal when placed.
-            "{ \"type\": \"switch\", \"cases\": [{ \"condition\": [{ \"metric\": \"available_height\", \"min\": 500 }], \"content\": { \"type\": \"text\", \"string_id\": \"a\" } }], \"default\": { \"type\": \"text\", \"string_id\": \"b\" } }",
+            "{ \"type\": \"switch\", \"cases\": [{ \"condition\": [{ \"metric\": \"screen_height\", \"min\": 500 }], \"content\": { \"type\": \"text\", \"string_id\": \"a\" } }], \"default\": { \"type\": \"text\", \"string_id\": \"b\" } }",
         ]
     )
     func notFound(content: String) throws {
