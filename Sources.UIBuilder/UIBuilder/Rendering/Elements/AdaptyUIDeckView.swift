@@ -74,8 +74,8 @@ struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
         .init(
             width: layoutLength(item.width, .horizontal),
             height: layoutLength(item.height, .vertical),
-            anchorX: item.horizontalAlignment.anchorFraction(with: layoutDirection),
-            anchorY: item.verticalAlignment.anchorFraction
+            anchorX: item.deprecatedHorizontalAlignment.anchorFraction(with: layoutDirection),
+            anchorY: item.deprecatedVerticalAlignment.anchorFraction
         )
     }
 

@@ -11,8 +11,8 @@ import Foundation
 struct Dev_MockProduct: ProductResolver, Sendable {
     let flowId: String
     let adaptyProductId: String
-    let paymentMode: PaymentModeValue
-
+    var billingPlan: BillingPlanId? { return "up_front" } // TODO: For a subscription product, billingPlan cannot be null; use "up_front". For non-subscription products, billingPlan is always zero.
+    let paymentMode: PaymentModeId?
     let title: String?
     let description: String?
     let price: String?
@@ -42,6 +42,10 @@ struct Dev_MockProduct: ProductResolver, Sendable {
         case .priceAmount: priceAmount
         case .priceAmountInteger: priceAmountInteger
         case .priceAmountFraction: priceAmountFraction
+        case .billingPrice: nil ?? price // TODO: billingPeriod else price
+        case .billingPriceAmount: nil ?? priceAmount // TODO: billingPeriod else price
+        case .billingPriceAmountInteger: nil ?? priceAmountInteger // TODO: billingPeriod else price
+        case .billingPriceAmountFraction: nil ?? priceAmountFraction // TODO: billingPeriod else price
         case .currencyCode: currencyCode
         case .currencySymbol: currencySymbol
         case .pricePerDay: pricePerDay
@@ -49,6 +53,7 @@ struct Dev_MockProduct: ProductResolver, Sendable {
         case .pricePerMonth: pricePerMonth
         case .pricePerYear: pricePerYear
         case .subscriptionPeriod: subscriptionPeriod
+        case .subscriptionBillingPeriod: nil ?? subscriptionPeriod // TODO: billingPeriod else subscriptionPeriod
         case .offerPrice: offerPrice
         case .offerPeriods: offerPeriods
         case .offerNumberOfPeriods: offerNumberOfPeriods

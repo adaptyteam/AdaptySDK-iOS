@@ -21,6 +21,7 @@ extension Schema.Decorator: Decodable {
         case shadow
         case innerShadow = "inner_shadow"
         case blurRadius = "blur_radius"
+        case clip
     }
 
     init(from decoder: Decoder) throws {
@@ -51,7 +52,8 @@ extension Schema.Decorator: Decodable {
             border: border,
             shadow: container.decodeIfPresent(Schema.Shadow.self, forKey: .shadow),
             innerShadow: container.decodeIfPresent(Schema.Shadow.self, forKey: .innerShadow),
-            blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius)
+            blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius),
+            clip: container.decodeIfPresent(Clip.self, forKey: .clip) ?? .content
         )
     }
 }

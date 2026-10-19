@@ -852,6 +852,11 @@ UI:
                 shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
                 inner_shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
                 blur_radius: { type: number }
+                clip:
+                    type: string
+                    enum: [content, none]
+                    default: content
+                    description: "Clips the decorator background, content and border to its shape. None allows content overflow while preserving shaped fills and strokes. Element backgrounds, overlays and outer shadow remain outside this mask."
             dependentSchemas:
                 border:
                     properties:
@@ -1305,9 +1310,32 @@ UI:
             type: { const: deck_item }
             width: { $ref: "#/UI/DeckItemLength" }
             height: { $ref: "#/UI/DeckItemLength" }
-            h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
-            v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
             content: { $ref: "#/UI/Element" }
+        oneOf:
+            - title: "Anchor and position"
+              required: [anchor, position]
+              properties:
+                  anchor:
+                      $ref: "#/Entities/Point"
+                      description: "Anchor point inside the DeckItem, in normalized coordinates"
+                  position:
+                      $ref: "#/Entities/Point"
+                      description: "Position inside the Deck at which the DeckItem anchor is placed, in normalized coordinates"
+                  rtl:
+                      type: string
+                      pattern: "^([pP][rR][eE][sS][eE][rR][vV][eE]|[kK][eE][eE][pP]|[mM][iI][rR][rR][oO][rR])(?![\\s\\S])"
+                      default: preserve
+                      examples: [preserve, keep, mirror]
+                      description: "preserve/keep: keep horizontal coordinates; mirror: mirror anchor.x and position.x in RTL. Values are case-insensitive."
+            - title: "Horizontal and vertical alignment"
+              properties:
+                  h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
+                  v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
+              not:
+                  anyOf:
+                      - required: [anchor]
+                      - required: [position]
+                      - required: [rtl]
         unevaluatedProperties: false
 
     DeckItemLength:

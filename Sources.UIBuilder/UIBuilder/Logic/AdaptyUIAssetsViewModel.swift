@@ -98,7 +98,8 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                 let productResolver = productsInfoProvider?.productInfo(by: productId)
                 let text = try? stateHolder.current.richText(
                     adaptyProductId: productId,
-                    byPaymentMode: productResolver?.paymentMode,
+                    billingPlan: productResolver?.billingPlan,
+                    paymentMode: productResolver?.paymentMode,
                     suffix: sufix
                 )
                 return (
@@ -123,7 +124,8 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
                 let productResolver = productsInfoProvider?.productInfo(by: productId)
                 let text = try? stateHolder.current.richText(
                     adaptyProductId: productId,
-                    byPaymentMode: productResolver?.paymentMode,
+                    billingPlan: productResolver?.billingPlan,
+                    paymentMode: productResolver?.paymentMode,
                     suffix: sufix
                 )
                 return (

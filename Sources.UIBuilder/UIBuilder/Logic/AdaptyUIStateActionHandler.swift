@@ -354,7 +354,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         pendingAlertDialogCallback = nil
 
         guard let callback, screenInstance != nil else { return }
-        let response = VS.ShowAlertDialogParametersResponse(actionId: actionId)
+        let response = VS.ShowAlertDialogResponse(actionId: actionId)
         do {
             try stateHolder?.current.execute(action: callback, response: response)
         } catch {
@@ -391,7 +391,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
             guard let callback, self.screensViewModel.topmostScreenInstance != nil else { return }
 
-            let response = VS.ShowRequestPermissionParametersResponse(
+            let response = VS.ShowRequestPermissionResponse(
                 request: params,
                 result: result.isGranted,
                 detailResult: result.detail

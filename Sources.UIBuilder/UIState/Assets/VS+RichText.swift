@@ -18,7 +18,7 @@ extension VS {
         suffix: String?
     ) throws(VS.Error) -> VC.RichText? {
         configuration.strings[
-            Schema.StringReference.Product.calculate(
+            Schema.StringReference.Product.calculateNonSelected(
                 suffix: suffix
             )
         ]
@@ -26,13 +26,16 @@ extension VS {
 
     func richText(
         adaptyProductId: String,
-        byPaymentMode paymentMode: PaymentModeValue = nil,
+        billingPlan: BillingPlanId?,
+        paymentMode: PaymentModeId?,
         suffix: String?
     ) throws(VS.Error) -> VC.RichText? {
+//        let billingPlan = billingPlan ?? "up_front"
         if let value = configuration.strings[
             Schema.StringReference.Product.calculate(
                 adaptyProductId: adaptyProductId,
-                byPaymentMode: paymentMode,
+                billingPlan: billingPlan,
+                paymentMode: paymentMode,
                 suffix: suffix
             )
         ] { return value }
@@ -40,21 +43,58 @@ extension VS {
         if paymentMode != nil, let value = configuration.strings[
             Schema.StringReference.Product.calculate(
                 adaptyProductId: adaptyProductId,
-                byPaymentMode: nil,
+                billingPlan: billingPlan,
+                paymentMode: nil,
                 suffix: suffix
             )
         ] { return value }
 
         if let value = configuration.strings[
             Schema.StringReference.Product.calculate(
-                byPaymentMode: paymentMode,
+                adaptyProductId: adaptyProductId,
+                billingPlan: nil,
+                paymentMode: paymentMode,
                 suffix: suffix
             )
         ] { return value }
 
         if paymentMode != nil, let value = configuration.strings[
             Schema.StringReference.Product.calculate(
-                byPaymentMode: nil,
+                adaptyProductId: adaptyProductId,
+                billingPlan: nil,
+                paymentMode: nil,
+                suffix: suffix
+            )
+        ] { return value }
+
+        if let value = configuration.strings[
+            Schema.StringReference.Product.calculate(
+                billingPlan: billingPlan,
+                paymentMode: paymentMode,
+                suffix: suffix
+            )
+        ] { return value }
+
+        if paymentMode != nil, let value = configuration.strings[
+            Schema.StringReference.Product.calculate(
+                billingPlan: billingPlan,
+                paymentMode: nil,
+                suffix: suffix
+            )
+        ] { return value }
+
+        if let value = configuration.strings[
+            Schema.StringReference.Product.calculate(
+                billingPlan: nil,
+                paymentMode: paymentMode,
+                suffix: suffix
+            )
+        ] { return value }
+
+        if paymentMode != nil, let value = configuration.strings[
+            Schema.StringReference.Product.calculate(
+                billingPlan: nil,
+                paymentMode: nil,
                 suffix: suffix
             )
         ] { return value }

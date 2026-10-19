@@ -13,8 +13,8 @@ extension VS {
     struct AppMessage: Identifiable {
 
         enum Kind: String {
-            case app = "app_msg"
-            case customElement = "custom_element_msg"
+            case app = "applicationMsg"
+            case customElement = "customElementMsg"
         }
 
         let id: String
