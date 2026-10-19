@@ -321,7 +321,7 @@ enum DeckTests {
     }
 }
 
-private extension DeckTests {
+extension DeckTests {
     static func deck(content: String) throws -> (deck: VC.Deck, screen: VC.Screen) {
         let screen = try screen(content: content)
         guard case let .deck(deck, _) = screen.poolElements[screen.content] else {

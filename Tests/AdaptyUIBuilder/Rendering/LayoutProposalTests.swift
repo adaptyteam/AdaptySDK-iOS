@@ -96,6 +96,34 @@ struct LayoutProposalTests {
         #expect(log.measured.allSatisfy { $0.width == 173 })
     }
 
+    /// A row measures children without a height and places them with its own; a
+    /// child that picks its layout from `available_height` is placed without one,
+    /// as it was measured.
+    @Test("Row cell places height-conditional content without a height")
+    func rowCellCrossAxis() throws {
+        let log = Log()
+        var item = Self.item(.weight(1))
+        item.placesAsMeasured = true
+        Self.render(
+            AdaptyUIWeightedLayout(
+                axis: .horizontal,
+                mainAxisSizing: .fill,
+                crossAxisSizing: .hug,
+                spacing: 8,
+                items: [item, Self.item(.weight(1))]
+            ) {
+                Recorder(log: log) { Color.clear }
+                    .layoutValue(key: AdaptyUIWeightedItemKey.self, value: 0)
+                Color.clear.frame(height: 96)
+                    .layoutValue(key: AdaptyUIWeightedItemKey.self, value: 1)
+            }
+        )
+
+        let placed = try #require(log.placed.last)
+        #expect(placed == ProposedViewSize(width: 173, height: nil))
+        #expect(log.measured.allSatisfy { $0 == placed })
+    }
+
     /// A column cell with a length is the whole cell on both axes.
     @Test("Column cell places with the cell it measured with")
     func columnCellBothAxes() throws {

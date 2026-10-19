@@ -20,6 +20,8 @@ struct AdaptyUIWeightedView<ScreenHolderContent: View>: View {
     private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
+    @Environment(\.adaptyElementPool)
+    private var elementPool: [VC.Element]
 
     private let axis: AdaptyUIWeightedSolver.Axis
     private let mainAxisSizing: AdaptyUILayoutSizing
@@ -68,7 +70,12 @@ struct AdaptyUIWeightedView<ScreenHolderContent: View>: View {
         .init(
             length: layoutLength(item.length),
             anchorX: item.horizontalAlignment.anchorFraction(with: layoutDirection),
-            anchorY: item.verticalAlignment.anchorFraction
+            anchorY: item.verticalAlignment.anchorFraction,
+            // A row measures its children without a height and places them with
+            // its own. Content that picks its layout from `available_height` is
+            // placed without one too, so it lays out what it was measured for —
+            // at the cost of not stretching to a taller neighbour.
+            placesAsMeasured: axis == .horizontal && elementPool.picksLayoutFromHeight(item.content)
         )
     }
 

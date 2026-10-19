@@ -48,13 +48,21 @@ struct AdaptyUIWeightedLayout: Layout {
         let (rendered, result) = solve(proposal: proposal, subviews: subviews)
         var placed = Set<Int>()
 
+        // What children were measured with across the axis; a hugging cross axis
+        // measures them without a length.
+        let measuredCross = crossAxisSizing == .hug ? nil : (axis == .horizontal ? proposal.height : proposal.width)
+
         for (item, frame) in zip(rendered, result.frames) {
+            var cell = ProposedViewSize(frame.cell.size)
+            if items[item.item].placesAsMeasured {
+                if axis == .horizontal { cell.height = measuredCross } else { cell.width = measuredCross }
+            }
             // Views of one item overlay each other at the item's anchor.
             for index in item.subviews {
                 subviews[index].place(
                     at: CGPoint(x: bounds.minX + frame.anchor.x, y: bounds.minY + frame.anchor.y),
                     anchor: UnitPoint(x: items[item.item].anchorX, y: items[item.item].anchorY),
-                    proposal: ProposedViewSize(frame.cell.size)
+                    proposal: cell
                 )
                 placed.insert(index)
             }

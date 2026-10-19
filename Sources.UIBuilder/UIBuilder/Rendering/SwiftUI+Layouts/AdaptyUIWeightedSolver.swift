@@ -34,6 +34,10 @@ enum AdaptyUIWeightedSolver {
         let length: Length
         let anchorX: CGFloat
         let anchorY: CGFloat
+        /// Placed with the cross-axis proposal it was measured with instead of the
+        /// cell's cross length: content that picks its layout from that length
+        /// would otherwise be measured for one layout and placed for another.
+        var placesAsMeasured = false
     }
 
     /// Where one item goes: its cell, and the point inside the cell where the
