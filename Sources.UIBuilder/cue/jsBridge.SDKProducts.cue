@@ -47,7 +47,7 @@ package jsBridge
 	isFamilyShareable!:    bool
 	regionCode!:           null | string
 	price!:                #SDKProductPrice
-	subscription!: null | #SDKProductSubscription
+	subscription!:         null | #SDKProductSubscription
 }
 
 #SDKProductPrice: {
@@ -81,8 +81,8 @@ package jsBridge
 }
 
 #SDKProductSubscriptionOffer: {
-	id!: null | string
-	type!: "introductory" | "promotional" | "win_back" | string
+	id!:     null | string
+	type!:   "introductory" | "promotional" | "win_back" | string
 	phases!: [...#SDKProductSubscriptionOfferPhase]
 }
 

@@ -70,13 +70,13 @@ struct AdaptyUIFlowRendererView: View {
             flowViewModel.logShowFlow()
         }
         .alert(
-            stateViewModel.alertDialog?.params.title ?? "",
+            stateViewModel.alertDialog?.params.title?.text ?? "",
             isPresented: alertIsPresented,
             actions: {
                 if let buttons = stateViewModel.alertDialog?.params.buttons, !buttons.isEmpty {
                     ForEach(buttons.indices, id: \.self) { idx in
                         let button = buttons[idx]
-                        Button(button.title ?? "", role: button.style.buttonRole) {
+                        Button(button.title?.text ?? "", role: button.style.buttonRole) {
                             stateViewModel.onAlertDialogResponse?(
                                 button.actionId,
                                 screensViewModel.topmostScreenInstance
@@ -86,7 +86,7 @@ struct AdaptyUIFlowRendererView: View {
                 }
             },
             message: {
-                if let message = stateViewModel.alertDialog?.params.message {
+                if let message = stateViewModel.alertDialog?.params.message?.text {
                     Text(message)
                 }
             }

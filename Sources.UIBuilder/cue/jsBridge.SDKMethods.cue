@@ -221,16 +221,19 @@ package jsBridge
 // SDK.showAlertDialog(...)
 
 #ShowAlertDialogParameters: {
-    title?:   string
-    message?: string
-    actions?: [...#ShowAlertDialogButtonParameters]
-	callback?:  #ShowAlertDialogCallback
+    titleStringId?:   string
+    title?:           string
+    messageStringId?: string
+    message?:         string
+    actions?:         [...#ShowAlertDialogButtonParameters]
+	callback?:        #ShowAlertDialogCallback
 }
 
 #ShowAlertDialogButtonParameters: {
-    title?:      string
-    style?:    *"default" | "cancel" | "destructive"
-    actionId?: string 
+    titleStringId?: string
+    title?:         string
+    style?:         *"default" | "cancel" | "destructive"
+    actionId?:      string 
 
     if title != _|_ {
         actionId: *title | string
