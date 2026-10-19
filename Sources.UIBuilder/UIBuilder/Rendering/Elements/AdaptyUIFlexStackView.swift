@@ -7,12 +7,15 @@
 
 import SwiftUI
 
+/// Renders a `FlexStack`: resolves the environment into numbers and leaves the
+/// choice of direction to `AdaptyUIFlexStackLayout`, which sees the proposal.
 @MainActor
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIFlexStackView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize) private var screenSize: CGSize
     @Environment(\.adaptyInterfaceOrientation) private var orientation: VC.Orientation
-    @Environment(\.adaptyUnspecifiedProposalAxes) private var unspecifiedProposalAxes: Axis.Set
+    @Environment(\.adaptyHuggedAxes) private var huggedAxes: Axis.Set
+    @Environment(\.layoutDirection) private var layoutDirection: LayoutDirection
 
     private let flexStack: VC.FlexStack
     private let screenHolderBuilder: () -> ScreenHolderContent
@@ -25,65 +28,49 @@ struct AdaptyUIFlexStackView<ScreenHolderContent: View>: View {
         self.screenHolderBuilder = screenHolderBuilder
     }
 
-    @State private var availableSize: CGSize = .zero
-    @State private var direction: VC.Flex.Direction = .vertical
-    /// Natural size of the current stack. Used as a floor on the greedy
-    /// GeometryReader so it can't collapse below its content when the parent
-    /// proposes nil on an axis (e.g. the scroll axis of a ScrollView).
-    @State private var contentsSize: CGSize = .zero
-
-    private func computedDirection(orientation: VC.Orientation) -> VC.Flex.Direction {
-        let match = VC.Condition.evaluate(
-            flexStack.condition,
-            available: availableSize,
-            screen: screenSize,
-            orientation: orientation
-        )
-        return match ? flexStack.direction : flexStack.direction.opposite
-    }
-
     var body: some View {
-        GeometryReader { proxy in
-            AdaptyUIStackView(
-                flexStack.asStack(direction: direction),
-                screenHolderBuilder: screenHolderBuilder
-            )
-            .onGeometrySizeChange { contentsSize = $0 }
-            .onAppear {
-                availableSize = proxy.size
-                direction = computedDirection(orientation: orientation)
-            }
-            .onChange(of: proxy.size) { newSize in
-                guard newSize != availableSize else { return }
-                availableSize = newSize
-                recompute(orientation: orientation)
-            }
-            .onChange(of: screenSize) { _ in recompute(orientation: orientation) }
-            .onChange(of: orientation) { newOrientation in recompute(orientation: newOrientation) }
+        if let animation = flexStack.transition?.swiftUIAnimation {
+            // The direction is chosen inside the layout pass, where no animation
+            // can be started. A reorientation follows the screen almost always — a
+            // rotation, a resized window — so the transition animates the changes
+            // these bring.
+            stack
+                .animation(animation, value: screenSize)
+                .animation(animation, value: orientation)
+        } else {
+            stack
         }
-        // Floor the greedy reader at the content size: `proxy.size` still equals the
-        // parent proposal when bounded (so the condition reads it), but the view can't
-        // collapse to ~10pt when the parent proposes nil (a ScrollView scroll axis).
-        //
-        // Each axis is floored only where its length is actually unspecified, because
-        // a floor is a hard minimum: kept unconditionally it ratchets, swallowing
-        // every smaller proposal and pinning the parents above too.
-        .frame(
-            minWidth: unspecifiedProposalAxes.contains(.horizontal) ? contentsSize.width : nil,
-            minHeight: unspecifiedProposalAxes.contains(.vertical) ? contentsSize.height : nil
-        )
     }
 
-    private func recompute(orientation: VC.Orientation) {
-        let newDirection = computedDirection(orientation: orientation)
-        guard newDirection != direction else { return }
-        // Drop the stale floor so the flipped stack re-measures from scratch;
-        // otherwise the previous axis' size would over-size the new orientation.
-        contentsSize = .zero
-        if let transition = flexStack.transition {
-            withAnimation(transition.swiftUIAnimation) { direction = newDirection }
-        } else {
-            direction = newDirection
+    private var stack: some View {
+        AdaptyUIFlexStackLayout(
+            conditions: flexStack.condition,
+            direction: flexStack.direction,
+            screenSize: screenSize,
+            orientation: orientation,
+            huggedAxes: huggedAxes,
+            horizontalSpacing: flexStack.horizontalSpacing.cgFloatValue,
+            verticalSpacing: flexStack.verticalSpacing.cgFloatValue,
+            verticalAnchor: flexStack.verticalAlignment.anchorFraction,
+            horizontalAnchor: flexStack.horizontalAlignment.anchorFraction(with: layoutDirection)
+        ) {
+            // The subviews a native stack would get: elements as they render, one
+            // `Spacer` per unit of `space`.
+            ForEach(0 ..< flexStack.items.count, id: \.self) { idx in
+                switch flexStack.items[idx] {
+                case let .space(count):
+                    if count > 0 {
+                        ForEach(0 ..< count, id: \.self) { _ in
+                            Spacer().layoutValue(key: AdaptyUIFlexStackSpaceKey.self, value: true)
+                        }
+                    }
+                case let .element(element):
+                    AdaptyUIElementView(
+                        element,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                }
+            }
         }
     }
 }

@@ -86,6 +86,8 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
         self.framed(content, wConstraints, hConstraints)
             .declaringProposal(.horizontal, unspecified: self.unspecifiedProposal(wConstraints))
             .declaringProposal(.vertical, unspecified: self.unspecifiedProposal(hConstraints))
+            .declaringHug(.horizontal, self.unspecifiedProposal(wConstraints))
+            .declaringHug(.vertical, self.unspecifiedProposal(hConstraints))
     }
 
     /// A `shrink` length proposes an unspecified length to the content — that is what

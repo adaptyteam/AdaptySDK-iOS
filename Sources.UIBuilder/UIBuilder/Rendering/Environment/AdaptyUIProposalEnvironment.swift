@@ -25,10 +25,25 @@ struct AdaptyUIUnspecifiedProposalAxesKey: EnvironmentKey {
     static let defaultValue: Axis.Set = []
 }
 
+/// The axes on which a box with `shrink` hugs this subtree.
+///
+/// Unlike `AdaptyUIUnspecifiedProposalAxesKey` it is set by the box alone, not by
+/// scroll axes and footers: a container that picks its layout from `available_*`
+/// compares an unspecified length with its own content under such a box and with
+/// the screen anywhere else.
+struct AdaptyUIHuggedAxesKey: EnvironmentKey {
+    static let defaultValue: Axis.Set = []
+}
+
 extension EnvironmentValues {
     var adaptyUnspecifiedProposalAxes: Axis.Set {
         get { self[AdaptyUIUnspecifiedProposalAxesKey.self] }
         set { self[AdaptyUIUnspecifiedProposalAxesKey.self] = newValue }
+    }
+
+    var adaptyHuggedAxes: Axis.Set {
+        get { self[AdaptyUIHuggedAxesKey.self] }
+        set { self[AdaptyUIHuggedAxesKey.self] = newValue }
     }
 }
 
@@ -43,6 +58,20 @@ extension View {
         if let unspecified {
             transformEnvironment(\.adaptyUnspecifiedProposalAxes) {
                 if unspecified { $0.formUnion(axes) } else { $0.subtract(axes) }
+            }
+        } else {
+            self
+        }
+    }
+
+    /// Declares whether a box hugs its content on `axes`, by the same rule as
+    /// `declaringProposal(_:unspecified:)`: `true` hugs, `false` hands down a
+    /// length, `nil` keeps what was declared further up.
+    @ViewBuilder
+    func declaringHug(_ axes: Axis.Set, _ hugs: Bool?) -> some View {
+        if let hugs {
+            transformEnvironment(\.adaptyHuggedAxes) {
+                if hugs { $0.formUnion(axes) } else { $0.subtract(axes) }
             }
         } else {
             self
