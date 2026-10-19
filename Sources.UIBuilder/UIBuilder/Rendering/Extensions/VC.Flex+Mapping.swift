@@ -3,8 +3,6 @@
 //  AdaptyUIBuilder
 //
 
-#if canImport(UIKit)
-
 import Foundation
 
 extension VC.Flex.Direction: Equatable {}
@@ -41,5 +39,3 @@ extension VC.FlexStack {
         )
     }
 }
-
-#endif
