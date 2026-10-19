@@ -20,6 +20,7 @@ import SwiftUI
 struct AdaptyUISwitchView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize) private var screenSize: CGSize
     @Environment(\.adaptyInterfaceOrientation) private var orientation: VC.Orientation
+    @Environment(\.adaptyUnspecifiedProposalAxes) private var unspecifiedAxes: Axis.Set
 
     private let switchElement: VC.Switch
     private let screenHolderBuilder: () -> ScreenHolderContent
@@ -51,7 +52,7 @@ struct AdaptyUISwitchView<ScreenHolderContent: View>: View {
 
     private var content: some View {
         let probes = switchElement.readsAvailableSize
-        return AdaptyUISwitchLayout(screenSize: screenSize, probes: probes) {
+        return AdaptyUISwitchLayout(screenSize: screenSize, probes: probes, unspecifiedAxes: unspecifiedAxes) {
             if probes {
                 Color.clear
                     .allowsHitTesting(false)

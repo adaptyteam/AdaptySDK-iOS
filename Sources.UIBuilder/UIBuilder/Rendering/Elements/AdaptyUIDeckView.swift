@@ -49,6 +49,8 @@ struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
                         deck.items[idx].content,
                         screenHolderBuilder: screenHolderBuilder
                     )
+                    .declaringProposal(.horizontal, unspecified: fixes(deck.items[idx].width) ? false : nil)
+                    .declaringProposal(.vertical, unspecified: fixes(deck.items[idx].height) ? false : nil)
                 }
             }
         }
@@ -61,6 +63,12 @@ struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
         // arrives here; were it to, it would behave as `fill`.
         case .fill, .legacy: .fill
         }
+    }
+
+    /// A fixed length is the item's own; a share of the deck is only as definite
+    /// as the deck's.
+    private func fixes(_ length: VC.DeckItem.Length) -> Bool {
+        if case .fixed = length { true } else { false }
     }
 
     private func contentAxes(_ item: VC.DeckItem) -> Axis.Set {

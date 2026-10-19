@@ -28,6 +28,9 @@ struct AdaptyUIFlexStackLayout: Layout {
     let orientation: VC.Orientation
     /// The axes a box with `shrink` hugs the stack on.
     let huggedAxes: Axis.Set
+    /// The axes without a length from above, where the proposal is not read.
+    /// See `AdaptyUIUnspecifiedProposalAxesKey`.
+    var unspecifiedAxes: Axis.Set = []
     let horizontalSpacing: CGFloat
     let verticalSpacing: CGFloat
     /// Cross-axis alignment of a row: `0` top, `1` bottom.
@@ -81,11 +84,12 @@ struct AdaptyUIFlexStackLayout: Layout {
     }
 
     private func solve(proposal: ProposedViewSize, subviews: Subviews) -> AdaptyUIFlexStackSolver.Result {
+        let read = proposal.withoutLength(on: unspecifiedAxes)
         let chosen = AdaptyUIFlexDirectionSolver.direction(
             conditions: conditions,
             direction: direction,
-            proposedWidth: proposal.width,
-            proposedHeight: proposal.height,
+            proposedWidth: read.width,
+            proposedHeight: read.height,
             hugsWidth: huggedAxes.contains(.horizontal),
             hugsHeight: huggedAxes.contains(.vertical),
             screen: screenSize,

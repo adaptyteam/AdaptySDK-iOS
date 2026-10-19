@@ -84,17 +84,27 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
         )
 
         self.framed(content, wConstraints, hConstraints)
-            .declaringProposal(.horizontal, unspecified: self.unspecifiedProposal(wConstraints))
-            .declaringProposal(.vertical, unspecified: self.unspecifiedProposal(hConstraints))
-            .declaringHug(.horizontal, self.unspecifiedProposal(wConstraints))
-            .declaringHug(.vertical, self.unspecifiedProposal(hConstraints))
+            .declaringProposal(.horizontal, unspecified: self.unspecifiedProposal(self.box.width))
+            .declaringProposal(.vertical, unspecified: self.unspecifiedProposal(self.box.height))
+            .declaringHug(.horizontal, self.hugs(wConstraints))
+            .declaringHug(.vertical, self.hugs(hConstraints))
     }
 
-    /// A `shrink` length proposes an unspecified length to the content — that is what
-    /// `fixedSize` does — and any other constraint on the axis hands one down. An axis
-    /// the box constrains in no way declares nothing, so the content keeps whatever the
-    /// enclosing box declared. See `AdaptyUIUnspecifiedProposalAxesKey`.
-    private func unspecifiedProposal(_ constraints: Constraints) -> Bool? {
+    /// A `shrink` length proposes no length to the content — that is what
+    /// `fixedSize` does — and a fixed one hands its own down. `min` and `max` clamp
+    /// the box's proposal and pass no length on where it has none, so they declare
+    /// nothing, as an unconstrained axis does. See `AdaptyUIUnspecifiedProposalAxesKey`.
+    private func unspecifiedProposal(_ length: VC.Box.Length?) -> Bool? {
+        switch length {
+        case .shrinkable: true
+        case .fixed: false
+        default: nil
+        }
+    }
+
+    /// A `shrink` length hugs the content, any other constraint on the axis ends
+    /// the hug of a box further up. See `AdaptyUIHuggedAxesKey`.
+    private func hugs(_ constraints: Constraints) -> Bool? {
         if constraints.shrink {
             true
         } else if constraints.min != nil || constraints.max != nil {

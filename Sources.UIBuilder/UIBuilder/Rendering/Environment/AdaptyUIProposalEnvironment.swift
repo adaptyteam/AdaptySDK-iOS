@@ -7,20 +7,23 @@
 
 import SwiftUI
 
-/// The axes on which the parent proposes an unspecified length to this subtree.
+/// The axes on which this subtree has no length from above: its proposal there is
+/// no length of the parent's, whatever number it carries.
 ///
-/// A greedy `GeometryReader` cannot tell "proposal nil" from "proposal small" — it
-/// sees a number either way — so the elements built on one floor themselves at their
-/// measured content to survive a nil proposal. That floor is what makes the layout
-/// ratchet: it is a hard minimum, so a smaller proposal never reaches the content, and
-/// every parent above is pinned with it.
+/// A proposal does not say where its number comes from. Without a length a
+/// parent may still hand one down: a native stack in a scroll places a child with
+/// a share of a length it never had, and SwiftUI on iOS 16 measures and places
+/// such a child with made-up heights; a parent may place a child with the size
+/// the child answered. A container that picks its layout from `available_*`
+/// would compare that number and lay out differently from what it was measured
+/// for. Such containers read the proposal only on the axes not declared here.
 ///
-/// The one thing a reader cannot derive, it can be told. An unspecified length comes
-/// from two kinds of place in the renderer: a view that hands its content a nil
-/// proposal through `fixedSize` — a `box` that shrinks on an axis, a footer that hugs
-/// its content — and the scroll axis of a scroll container, vertical in all of them
-/// here. Those declare the axis, and the elements below floor an axis only while it is
-/// declared.
+/// The axis is declared where a length stops coming from above — the scroll axis
+/// of a scroll container, vertical in all of them here, a footer that hugs its
+/// content, a `box` that shrinks — and cleared where a length is handed down
+/// again: a `box` of a fixed length, a cell of a fixed length, a `deck` item of a
+/// fixed length, a `pager` page, the cover of a hero screen. A view that passes
+/// its own proposal on, clamped or not, declares nothing.
 struct AdaptyUIUnspecifiedProposalAxesKey: EnvironmentKey {
     static let defaultValue: Axis.Set = []
 }
@@ -29,8 +32,8 @@ struct AdaptyUIUnspecifiedProposalAxesKey: EnvironmentKey {
 ///
 /// Unlike `AdaptyUIUnspecifiedProposalAxesKey` it is set by the box alone, not by
 /// scroll axes and footers: a container that picks its layout from `available_*`
-/// compares an unspecified length with its own content under such a box and with
-/// the screen anywhere else.
+/// compares an axis without a length with its own content under such a box and
+/// with the screen anywhere else.
 struct AdaptyUIHuggedAxesKey: EnvironmentKey {
     static let defaultValue: Axis.Set = []
 }
@@ -53,6 +56,7 @@ extension View {
     /// own passes `false`. `nil` declares nothing, and so does leaving an axis out of
     /// `axes`: both keep the value set further up, which is also what a view that
     /// merely forwards its own proposal must do by not calling this at all.
+    /// See `AdaptyUIUnspecifiedProposalAxesKey`.
     @ViewBuilder
     func declaringProposal(_ axes: Axis.Set, unspecified: Bool?) -> some View {
         if let unspecified {

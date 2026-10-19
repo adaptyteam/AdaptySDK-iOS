@@ -279,6 +279,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                         screenHolderBuilder: screenHolderBuilder
                     )
                     .frame(width: max(width, 0), height: max(height, 0))
+                    .declaringProposal([.horizontal, .vertical], unspecified: false)
                     .clipped()
                     .padding(.leading, idx == 0 ? pagePaddingLeading : 0)
                     .padding(.trailing, idx == pages.count - 1 ? pagePaddingTrailing : 0)

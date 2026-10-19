@@ -177,6 +177,53 @@ struct LayoutProposalTests {
         #expect(branch.placed.allSatisfy { $0.width == 402 })
     }
 
+    /// On an axis without a length from above, a flex reads the screen, not the
+    /// number in its proposal: the width of 354 points does not meet a minimum of
+    /// 380, the screen of 402 does.
+    @Test("Flex reads the screen on an axis without a length", arguments: [([], 354), (.horizontal, 173)] as [(Axis.Set, CGFloat)])
+    func flexIgnoresUnspecifiedAxis(unspecifiedAxes: Axis.Set, width: CGFloat) throws {
+        let log = Log()
+        let items = [Self.item(.weight(1)), Self.item(.weight(1))]
+        Self.render(
+            AdaptyUIFlexLayout(
+                conditions: [.availableWidth(min: 380, max: nil)],
+                direction: .horizontal,
+                screenSize: CGSize(width: 402, height: 874),
+                orientation: .portrait,
+                huggedAxes: [],
+                unspecifiedAxes: unspecifiedAxes,
+                row: AdaptyUIWeightedLayout(axis: .horizontal, mainAxisSizing: .fill, crossAxisSizing: .hug, spacing: 8, items: items),
+                column: AdaptyUIWeightedLayout(axis: .vertical, mainAxisSizing: .hug, crossAxisSizing: .fill, spacing: 8, items: items)
+            ) {
+                Recorder(log: log) { Color.clear }
+                    .layoutValue(key: AdaptyUIWeightedItemKey.self, value: 0)
+                Color.clear.frame(height: 44)
+                    .layoutValue(key: AdaptyUIWeightedItemKey.self, value: 1)
+            }
+        )
+
+        #expect(try #require(log.placed.last).width == width)
+        #expect(log.measured.allSatisfy { $0.width == width })
+    }
+
+    /// On an axis without a length from above, the probe of a switch reports the
+    /// screen whatever number the parent places it with.
+    @Test("Switch probes the screen on an axis without a length", arguments: [([], 20), (.vertical, 874)] as [(Axis.Set, CGFloat)])
+    func switchIgnoresUnspecifiedAxis(unspecifiedAxes: Axis.Set, height: CGFloat) throws {
+        let probe = Log()
+        Self.render(
+            BoxFrameLayoutTests.Root(proposal: ProposedViewSize(width: 402, height: 20), frames: BoxFrameLayoutTests.Frames()) {
+                AdaptyUISwitchLayout(screenSize: CGSize(width: 402, height: 874), probes: true, unspecifiedAxes: unspecifiedAxes) {
+                    Recorder(log: probe) { Color.clear }
+                    Color.clear.frame(width: 250, height: 44)
+                }
+            },
+            width: 402
+        )
+
+        #expect(try #require(probe.placed.last) == ProposedViewSize(width: 402, height: height))
+    }
+
     /// A column cell with a length is the whole cell on both axes.
     @Test("Column cell places with the cell it measured with")
     func columnCellBothAxes() throws {

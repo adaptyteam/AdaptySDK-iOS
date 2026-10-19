@@ -18,6 +18,7 @@ struct AdaptyUIFlexView<ScreenHolderContent: View>: View {
     @Environment(\.adaptySafeAreaInsets) private var safeArea: EdgeInsets
     @Environment(\.adaptyInterfaceOrientation) private var orientation: VC.Orientation
     @Environment(\.adaptyHuggedAxes) private var huggedAxes: Axis.Set
+    @Environment(\.adaptyUnspecifiedProposalAxes) private var unspecifiedAxes: Axis.Set
     @Environment(\.layoutDirection) private var layoutDirection: LayoutDirection
     @Environment(\.adaptyElementPool) private var elementPool: [VC.Element]
 
@@ -53,10 +54,15 @@ struct AdaptyUIFlexView<ScreenHolderContent: View>: View {
             screenSize: screenSize,
             orientation: orientation,
             huggedAxes: huggedAxes,
+            unspecifiedAxes: unspecifiedAxes,
             row: weighted(.horizontal, flex.width, flex.horizontalSpacing),
             column: weighted(.vertical, flex.height, flex.verticalSpacing)
         ) {
-            AdaptyUIWeightedItemsView(items: flex.items, screenHolderBuilder: screenHolderBuilder)
+            // The direction is chosen in the layout pass, after the environment
+            // is set, so a cell of a fixed length cannot declare that it hands a
+            // length down: under a scroll a `switch`, `flex` or `flex_stack` in it
+            // compares `available_*` with the screen on that axis.
+            AdaptyUIWeightedItemsView(items: flex.items, axis: nil, screenHolderBuilder: screenHolderBuilder)
         }
     }
 

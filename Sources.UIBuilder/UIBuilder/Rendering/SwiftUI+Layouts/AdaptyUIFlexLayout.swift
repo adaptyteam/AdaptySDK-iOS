@@ -21,6 +21,9 @@ struct AdaptyUIFlexLayout: Layout {
     let orientation: VC.Orientation
     /// The axes a box with `shrink` hugs the flex on.
     let huggedAxes: Axis.Set
+    /// The axes without a length from above, where the proposal is not read.
+    /// See `AdaptyUIUnspecifiedProposalAxesKey`.
+    var unspecifiedAxes: Axis.Set = []
     let row: AdaptyUIWeightedLayout
     let column: AdaptyUIWeightedLayout
 
@@ -64,11 +67,12 @@ struct AdaptyUIFlexLayout: Layout {
     }
 
     private func layout(for proposal: ProposedViewSize, subviews: Subviews) -> AdaptyUIWeightedLayout {
+        let read = proposal.withoutLength(on: unspecifiedAxes)
         let chosen = AdaptyUIFlexDirectionSolver.direction(
             conditions: conditions,
             direction: direction,
-            proposedWidth: proposal.width,
-            proposedHeight: proposal.height,
+            proposedWidth: read.width,
+            proposedHeight: read.height,
             hugsWidth: huggedAxes.contains(.horizontal),
             hugsHeight: huggedAxes.contains(.vertical),
             screen: screenSize,
@@ -80,5 +84,16 @@ struct AdaptyUIFlexLayout: Layout {
             }
         )
         return chosen == .horizontal ? row : column
+    }
+}
+
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
+extension ProposedViewSize {
+    /// The proposal with no length on `axes`.
+    func withoutLength(on axes: Axis.Set) -> ProposedViewSize {
+        ProposedViewSize(
+            width: axes.contains(.horizontal) ? nil : width,
+            height: axes.contains(.vertical) ? nil : height
+        )
     }
 }

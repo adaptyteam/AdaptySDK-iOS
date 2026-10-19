@@ -12,13 +12,17 @@ import SwiftUI
 /// The branch is measured and placed with the parent's proposal. The probe is
 /// the first subview: it takes no part in the switch's size and is placed with
 /// the proposal itself, so its frame is the length the parent offers on each
-/// axis. An axis without a length — `nil`, or infinity from a probing parent —
-/// reads as the screen, as the conditions do without a proposal.
+/// axis. An axis without a length — `nil`, infinity from a probing parent, or
+/// one declared without a length from above — reads as the screen, as the
+/// conditions do without a proposal.
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUISwitchLayout: Layout {
     let screenSize: CGSize
     /// Whether the first subview is the probe.
     let probes: Bool
+    /// The axes without a length from above, where the proposal is not read.
+    /// See `AdaptyUIUnspecifiedProposalAxesKey`.
+    var unspecifiedAxes: Axis.Set = []
 
     func sizeThatFits(
         proposal: ProposedViewSize,
@@ -38,7 +42,7 @@ struct AdaptyUISwitchLayout: Layout {
         cache _: inout ()
     ) {
         if probes, let probe = subviews.first {
-            probe.place(at: bounds.origin, proposal: Self.offered(proposal, screen: screenSize))
+            probe.place(at: bounds.origin, proposal: Self.offered(proposal.withoutLength(on: unspecifiedAxes), screen: screenSize))
         }
         // Views of one branch overlay each other in the middle, as in a `ZStack`.
         for subview in branch(subviews) {

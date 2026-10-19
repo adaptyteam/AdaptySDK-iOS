@@ -15,6 +15,7 @@ struct AdaptyUIFlexStackView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize) private var screenSize: CGSize
     @Environment(\.adaptyInterfaceOrientation) private var orientation: VC.Orientation
     @Environment(\.adaptyHuggedAxes) private var huggedAxes: Axis.Set
+    @Environment(\.adaptyUnspecifiedProposalAxes) private var unspecifiedAxes: Axis.Set
     @Environment(\.layoutDirection) private var layoutDirection: LayoutDirection
 
     private let flexStack: VC.FlexStack
@@ -49,6 +50,7 @@ struct AdaptyUIFlexStackView<ScreenHolderContent: View>: View {
             screenSize: screenSize,
             orientation: orientation,
             huggedAxes: huggedAxes,
+            unspecifiedAxes: unspecifiedAxes,
             horizontalSpacing: flexStack.horizontalSpacing.cgFloatValue,
             verticalSpacing: flexStack.verticalSpacing.cgFloatValue,
             verticalAnchor: flexStack.verticalAlignment.anchorFraction,

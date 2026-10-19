@@ -56,7 +56,7 @@ struct AdaptyUIWeightedView<ScreenHolderContent: View>: View {
                 $0.weightedItem(axis, screenSize, safeArea, layoutDirection, elementPool)
             }
         ) {
-            AdaptyUIWeightedItemsView(items: items, screenHolderBuilder: screenHolderBuilder)
+            AdaptyUIWeightedItemsView(items: items, axis: axis, screenHolderBuilder: screenHolderBuilder)
         }
     }
 }
@@ -65,6 +65,9 @@ struct AdaptyUIWeightedView<ScreenHolderContent: View>: View {
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIWeightedItemsView<ScreenHolderContent: View>: View {
     let items: [VC.GridItem]
+    /// The axis the items are laid out along, where it is known when the view is
+    /// built: a cell of a fixed length hands that length down on it.
+    let axis: AdaptyUIWeightedSolver.Axis?
     let screenHolderBuilder: () -> ScreenHolderContent
 
     var body: some View {
@@ -75,8 +78,14 @@ struct AdaptyUIWeightedItemsView<ScreenHolderContent: View>: View {
                 items[idx].content,
                 screenHolderBuilder: screenHolderBuilder
             )
+            .declaringProposal(axis == .horizontal ? .horizontal : .vertical, unspecified: fixes(items[idx]) ? false : nil)
             .layoutValue(key: AdaptyUIWeightedItemKey.self, value: idx)
         }
+    }
+
+    private func fixes(_ item: VC.GridItem) -> Bool {
+        guard axis != nil, case .fixed = item.length else { return false }
+        return true
     }
 }
 

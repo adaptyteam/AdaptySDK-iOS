@@ -77,8 +77,8 @@ struct AdaptyUIHeroContainerView: View {
                         }
                         .ignoresSafeArea()
                         .scrollIndicators(.hidden)
-                        // The scroll axis proposes no height to the content: the floors below need
-                        // this, and without it they would collapse to ~10pt inside a scroll.
+                        // The scroll axis has no height for the content, whatever the stacks in it
+                        // propose. See `AdaptyUIUnspecifiedProposalAxesKey`.
                         .declaringProposal(.vertical, unspecified: true)
                         .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
                         .onChange(of: stateViewModel.scrollCommand) { command in
@@ -183,6 +183,8 @@ struct AdaptyUIHeroContainerView: View {
             )
         }
         .frame(height: height)
+        // The cover has a height of its own, though it scrolls with the content.
+        .declaringProposal(.vertical, unspecified: false)
     }
 
     @State
@@ -288,8 +290,8 @@ struct AdaptyUIHeroContainerView: View {
                 Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
             }
             .scrollIndicators(.hidden)
-            // The scroll axis proposes no height to the content: the floors below need
-            // this, and without it they would collapse to ~10pt inside a scroll.
+            // The scroll axis has no height for the content, whatever the stacks in it
+            // propose. See `AdaptyUIUnspecifiedProposalAxesKey`.
             .declaringProposal(.vertical, unspecified: true)
             .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
             .onChange(of: stateViewModel.scrollCommand) { command in
@@ -308,6 +310,7 @@ struct AdaptyUIHeroContainerView: View {
                 drawDecoratorBackground: drawFooterBackground
             )
             .fixedSize(horizontal: false, vertical: true)
+            .declaringProposal(.vertical, unspecified: true)
         }
     }
 }

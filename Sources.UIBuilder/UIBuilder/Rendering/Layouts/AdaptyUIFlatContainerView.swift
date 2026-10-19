@@ -51,8 +51,8 @@ struct AdaptyUIFlatContainerView: View {
                 }
             }
             .scrollIndicators(.hidden)
-            // The scroll axis proposes no height to the content: the floors below need
-            // this, and without it they would collapse to ~10pt inside a scroll.
+            // The scroll axis has no height for the content, whatever the stacks in it
+            // propose. See `AdaptyUIUnspecifiedProposalAxesKey`.
             .declaringProposal(.vertical, unspecified: true)
             .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
             .onChange(of: stateViewModel.scrollCommand) { command in
@@ -71,6 +71,7 @@ struct AdaptyUIFlatContainerView: View {
                 drawDecoratorBackground: drawFooterBackground
             )
             .fixedSize(horizontal: false, vertical: true)
+            .declaringProposal(.vertical, unspecified: true)
         }
     }
 
@@ -99,8 +100,8 @@ struct AdaptyUIFlatContainerView: View {
                         .scrollProgressTracker(kind: .main, coordinateSpaceName: CoordinateSpace.adaptyGlobalName, viewportHeight: globalProxy.size.height)
                     }
                     .scrollIndicators(.hidden)
-                    // The scroll axis proposes no height to the content: the floors below need
-                    // this, and without it they would collapse to ~10pt inside a scroll.
+                    // The scroll axis has no height for the content, whatever the stacks in it
+                    // propose. See `AdaptyUIUnspecifiedProposalAxesKey`.
                     .declaringProposal(.vertical, unspecified: true)
                     .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
                     .onChange(of: stateViewModel.scrollCommand) { command in
