@@ -24,37 +24,103 @@ extension Adapty {
             uniqueKeysWithValues: skProducts.map { ($0.id, $0) }
         )
 
-        var products = [ProductTuple]()
-        products.reserveCapacity(paywalls.reduce(into: 0) { $0 += $1.products.count })
+        var eligibleIntroductory = [String: Bool]()
+        var eligiblePromotional: Bool?
+        var eligibleWinBackIds = [String: [String]]()
+
+        var newProducts = [(
+            product: StoreKit.Product,
+            subscriptionPricingTerms: AdaptySubscriptionPricingTerms?,
+            paywall: AdaptyFlowPaywall,
+            reference: AdaptyFlowPaywall.ProductReference,
+            offer: AdaptySubscriptionOffer?
+        )]()
+        newProducts.reserveCapacity(paywalls.reduce(into: 0) { $0 += $1.products.count })
 
         for paywall in paywalls {
             for reference in paywall.products {
                 guard let skProduct = skProductsById[reference.productInfo.vendorId] else {
                     continue
                 }
+                guard let subscription = skProduct.subscription else {
+                    newProducts.append((skProduct, nil, paywall, reference, nil))
+                    continue
+                }
 
-                let ((offer, determinedOffer), subscriptionGroupId): ((AdaptySubscriptionOffer?, Bool), String?) =
-                    if let subscriptionGroupId = skProduct.subscription?.subscriptionGroupID,
-                    winBackOfferExist(with: reference.winBackOfferId, from: skProduct) {
-                        ((nil, false), subscriptionGroupId)
+                let selectedPricingTerm = reference.pricingTerms.first { subscription.availableBillingPlan(for: $0.billingPlan) } ?? .default
+                var selectedOffer: AdaptySubscriptionOffer? = nil
+
+                // 1. try select winBack offer
+                if selectedOffer == nil, let offerId = selectedPricingTerm.winBackOfferId {
+                    if let winBackOffer = skProduct.adaptySubscriptionOffer(by: .winBack(offerId), for: selectedPricingTerm.billingPlan) {
+                        let groupId = subscription.subscriptionGroupID
+                        if eligibleWinBackIds[groupId] == nil {
+                            eligibleWinBackIds[groupId] = try await eligibleWinBackOfferIds(for: groupId)
+                        }
+                        if eligibleWinBackIds[groupId]?.contains(offerId) == true {
+                            selectedOffer = winBackOffer
+                        }
+
                     } else {
-                        (subscriptionOfferAvailable(reference, skProduct), nil)
+                        log.warn("no win back offer found with id:\(offerId) in productId:\(skProduct.id)")
                     }
-                products.append((skProduct, paywall, reference, offer, determinedOffer, subscriptionGroupId))
+                }
+
+                // 2. try select promotional offer
+                if selectedOffer == nil, let offerId = selectedPricingTerm.promotionalOfferId {
+                    if let promotionalOffer = skProduct.adaptySubscriptionOffer(by: .promotional(offerId), for: selectedPricingTerm.billingPlan) {
+                        switch eligiblePromotional {
+                        case .none:
+                            if await eligiblePromotionalOffer() {
+                                selectedOffer = promotionalOffer
+                                eligiblePromotional = true
+                            } else {
+                                eligiblePromotional = false
+                            }
+                        case .some(true):
+                            selectedOffer = promotionalOffer
+                        case .some(false):
+                            break
+                        }
+                    } else {
+                        log.warn("no promotional offer found with id:\(offerId) in productId:\(skProduct.id)")
+                    }
+                }
+
+                // 3. try select introductory offer
+                if selectedOffer == nil {
+                    if let introductoryOffer = skProduct.adaptySubscriptionOffer(by: .introductory, for: selectedPricingTerm.billingPlan) {
+                        let groupId = subscription.subscriptionGroupID
+                        switch eligibleIntroductory[groupId] {
+                        case .none:
+                            if await eligibleIntroductoryOffer(for: groupId) {
+                                selectedOffer = introductoryOffer
+                                eligibleIntroductory[groupId] = true
+                            } else {
+                                eligibleIntroductory[groupId] = false
+                            }
+                        case .some(true):
+                            selectedOffer = introductoryOffer
+                        case .some(false):
+                            break
+                        }
+                    }
+                }
+
+                newProducts.append((
+                    skProduct,
+                    skProduct.subscriptionPricingTerms(for: selectedPricingTerm.billingPlan),
+                    paywall,
+                    reference,
+                    selectedOffer
+                ))
             }
-        }
-
-        let eligibleWinBackOfferIds = try await eligibleWinBackOfferIds(for: Set(products.compactMap(\.subscriptionGroupId)))
-
-        var newProducts = [(product: StoreKit.Product, paywall: AdaptyFlowPaywall, reference: AdaptyFlowPaywall.ProductReference, offer: AdaptySubscriptionOffer?)]()
-        newProducts.reserveCapacity(products.count)
-        for product in products {
-            await newProducts.append(determineOfferFor(product, with: eligibleWinBackOfferIds))
         }
 
         return newProducts.map {
             AdaptyPaywallProduct(
                 skProduct: $0.product,
+                subscriptionPricingTerms: $0.subscriptionPricingTerms,
                 flowProductId: $0.reference.flowProductId,
                 adaptyProductId: $0.reference.adaptyProductId,
                 productInfo: $0.reference.productInfo,
@@ -68,105 +134,55 @@ extension Adapty {
         }
     }
 
-    func getPaywallProduct(
-        flowProductId: String?,
-        adaptyProductId: String,
-        productInfo: BackendProductInfo,
-        paywallProductIndex: Int,
-        subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?,
-        variationId: String,
-        paywallABTestName: String,
-        paywallName: String,
-        webPaywallBaseUrl: URL?,
-        productsManager: ProductsManager
-    ) async throws(AdaptyError) -> AdaptyPaywallProduct {
-        let product = try await productsManager.fetchProduct(id: productInfo.vendorId, fetchPolicy: .returnCacheDataElseLoad)
+    func restoreProduct(
+        vendorProductId: String,
+        billingPlan: AdaptySubscriptionBillingPlan?,
+        subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
+    ) async throws(AdaptyError) -> (
+        skProduct: StoreKit.Product,
+        subscriptionPricingTerms:  AdaptySubscriptionPricingTerms?,
+        subscriptionOffer: AdaptySubscriptionOffer?
+    ) {
+        let skProduct = try await productsManager.fetchProduct(id: vendorProductId, fetchPolicy: .returnCacheDataElseLoad)
 
-        let subscriptionOffer: AdaptySubscriptionOffer? =
-            if let subscriptionOfferIdentifier {
-                if let offer = product.adaptySubscriptionOffer(by: subscriptionOfferIdentifier) {
+        let subscriptionPricingTerms: AdaptySubscriptionPricingTerms?
+        let subscriptionOffer: AdaptySubscriptionOffer?
+
+        if skProduct.subscription != nil {
+            let billingPlan = billingPlan ?? .upFront
+            guard let pricingTerms = skProduct.subscriptionPricingTerms(for: billingPlan) else {
+                throw StoreKitManagerError.billingPlanUnavailable("Cannot restore productId: \(skProduct.id) with billingPlan: \(billingPlan.rawValue)").asAdaptyError
+            }
+            subscriptionPricingTerms = pricingTerms
+
+            subscriptionOffer = if let subscriptionOfferIdentifier {
+                if let offer = skProduct.adaptySubscriptionOffer(by: subscriptionOfferIdentifier, for: pricingTerms.billingPlan) {
                     offer
                 } else {
-                    throw StoreKitManagerError.invalidOffer("StoreKit product don't have offer id: `\(subscriptionOfferIdentifier.offerId ?? "nil")` with type:\(subscriptionOfferIdentifier.offerType.rawValue) ").asAdaptyError
+                    throw StoreKitManagerError.invalidOffer("StoreKit product don't have offer id: `\(subscriptionOfferIdentifier.offerId, default: "nil")` with type:\(subscriptionOfferIdentifier.offerType.rawValue) ").asAdaptyError
                 }
             } else {
                 nil
             }
-
-        return AdaptyPaywallProduct(
-            skProduct: product,
-            flowProductId: flowProductId,
-            adaptyProductId: adaptyProductId,
-            productInfo: productInfo,
-            paywallProductIndex: paywallProductIndex,
-            subscriptionOffer: subscriptionOffer,
-            variationId: variationId,
-            paywallABTestName: paywallABTestName,
-            paywallName: paywallName,
-            webPaywallBaseUrl: webPaywallBaseUrl
-        )
-    }
-
-    private typealias ProductTuple = (
-        product: StoreKit.Product,
-        paywall: AdaptyFlowPaywall,
-        reference: AdaptyFlowPaywall.ProductReference,
-        offer: AdaptySubscriptionOffer?,
-        determinedOffer: Bool,
-        subscriptionGroupId: String?
-    )
-
-    private func subscriptionOfferAvailable(
-        _ reference: AdaptyFlowPaywall.ProductReference,
-        _ product: StoreKit.Product
-    ) -> (offer: AdaptySubscriptionOffer?, determinedOffer: Bool) {
-        if let promotionalOffer = promotionalOffer(with: reference.promotionalOfferId, from: product) {
-            (promotionalOffer, true)
-        } else if product.introductoryOfferNotApplicable {
-            (nil, true)
         } else {
-            (nil, false)
+            subscriptionPricingTerms = nil
+            subscriptionOffer = nil
         }
+        return (skProduct, subscriptionPricingTerms, subscriptionOffer)
     }
 
-    private func determineOfferFor(
-        _ tuple: ProductTuple,
-        with eligibleWinBackOfferIds: [String: [String]]
-    ) async -> (product: StoreKit.Product, paywall: AdaptyFlowPaywall, reference: AdaptyFlowPaywall.ProductReference, offer: AdaptySubscriptionOffer?) {
-        guard !tuple.determinedOffer else { return (tuple.product, tuple.paywall, tuple.reference, tuple.offer) }
-
-        if let subscriptionGroupId = tuple.subscriptionGroupId,
-           let winBackOfferId = tuple.reference.winBackOfferId
-        {
-            if eligibleWinBackOfferIds[subscriptionGroupId]?.contains(winBackOfferId) ?? false,
-               let winBackOffer = winBackOffer(with: winBackOfferId, from: tuple.product)
-            {
-                return (tuple.product, tuple.paywall, tuple.reference, winBackOffer)
-            }
-
-            let offerAvailable = subscriptionOfferAvailable(tuple.reference, tuple.product)
-
-            if offerAvailable.determinedOffer {
-                return (tuple.product, tuple.paywall, tuple.reference, offerAvailable.offer)
-            }
-        }
-
-        guard let subscription = tuple.product.subscription,
-              let introductoryOffer = tuple.product.adaptySubscriptionOffer(by: .introductory)
-        else {
-            return (tuple.product, tuple.paywall, tuple.reference, nil)
-        }
+    private func eligibleIntroductoryOffer(for subscriptionGroupIdentifier: String) async -> Bool {
 
         let stamp = Log.stamp
         Adapty.trackSystemEvent(AdaptyAppleRequestParameters(
             methodName: .isEligibleForIntroOffer,
             stamp: stamp,
             params: [
-                "product_id": tuple.product.id,
+                "subscription_group_id": subscriptionGroupIdentifier
             ]
         ))
 
-        let eligible = await subscription.isEligibleForIntroOffer
+        let eligible = await Product.SubscriptionInfo.isEligibleForIntroOffer(for: subscriptionGroupIdentifier)
 
         Adapty.trackSystemEvent(AdaptyAppleResponseParameters(
             methodName: .isEligibleForIntroOffer,
@@ -176,43 +192,20 @@ extension Adapty {
             ]
         ))
 
-        return (tuple.product, tuple.paywall, tuple.reference, eligible ? introductoryOffer : nil)
+        return eligible
     }
 
-    private func winBackOffer(with offerId: String?, from product: StoreKit.Product) -> AdaptySubscriptionOffer? {
-        guard let offerId else { return nil }
-        guard let offer = product.adaptySubscriptionOffer(by: .winBack(offerId)) else {
-            log.warn("no win back offer found with id:\(offerId) in productId:\(product.id)")
-            return nil
+    private func eligiblePromotionalOffer() async -> Bool {
+        for await transition in StoreKit.Transaction.all {
+            switch transition {
+            case .unverified: continue
+            case let .verified(transition):
+                guard transition.productType == .autoRenewable else { continue }
+                return true
+            }
         }
-        return offer
-    }
 
-    private func winBackOfferExist(with offerId: String?, from product: StoreKit.Product) -> Bool {
-        guard let offerId else { return false }
-        guard product.subscriptionOffer(by: .winBack(offerId)) != nil else {
-            log.warn("no win back offer found with id:\(offerId) in productId:\(product.id)")
-            return false
-        }
-        return true
-    }
-
-    private func promotionalOffer(with offerId: String?, from product: StoreKit.Product) -> AdaptySubscriptionOffer? {
-        guard let offerId else { return nil }
-        guard let offer = product.adaptySubscriptionOffer(by: .promotional(offerId)) else {
-            log.warn("no promotional offer found with id:\(offerId) in productId:\(product.id)")
-            return nil
-        }
-        return offer
-    }
-
-    private func eligibleWinBackOfferIds(for subscriptionGroupIdentifiers: Set<String>) async throws(AdaptyError) -> [String: [String]] {
-        var result = [String: [String]]()
-        result.reserveCapacity(subscriptionGroupIdentifiers.count)
-        for subscriptionGroupIdentifier in subscriptionGroupIdentifiers {
-            result[subscriptionGroupIdentifier] = try await eligibleWinBackOfferIds(for: subscriptionGroupIdentifier)
-        }
-        return result
+        return false
     }
 
     private func eligibleWinBackOfferIds(for subscriptionGroupIdentifier: String) async throws(AdaptyError) -> [String] {

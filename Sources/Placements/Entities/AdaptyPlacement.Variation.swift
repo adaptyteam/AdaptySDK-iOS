@@ -53,7 +53,7 @@ extension [AdaptyPlacement.Variation] {
         guard countVariations > 1 else { return 0 }
 
         let data = Data("\(placementAudienceVersionId)-\(userId.profileId)".md5.suffix(8))
-        let value: UInt64 = data.withUnsafeBytes { $0.load(as: UInt64.self).bigEndian }
+        let value: UInt64 = data.withUnsafeBytes { $0.loadUnaligned(as: UInt64.self).bigEndian }
         var weight = Int(value % 100)
 
         let sortedItems = self

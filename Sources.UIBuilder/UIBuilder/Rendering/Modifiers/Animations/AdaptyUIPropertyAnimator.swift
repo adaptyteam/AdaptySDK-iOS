@@ -24,13 +24,18 @@ extension VC.Animation.Timeline {
         }
     }
 
+    /// `completion` fires once a non-repeating animation has finished. Repeating
+    /// animations have no end, so for them it fires right away.
     @MainActor
     func animate<Value>(
         from start: Value,
         to end: Value,
+        completion: (() -> Void)? = nil,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        switch loop {
+        if loop != nil { completion?() }
+
+        return switch loop {
         case .normal:
             if canUseNativeRepeat {
                 AdaptyUIPropertyAnimator.animateWithNativeRepeat(
@@ -82,7 +87,8 @@ extension VC.Animation.Timeline {
                 startDelay: startDelay,
                 from: start,
                 to: end,
-                updateBlock: updateBlock
+                updateBlock: updateBlock,
+                completion: completion
             )
         }
     }
@@ -300,14 +306,18 @@ enum AdaptyUIPropertyAnimator {
         startDelay: TimeInterval,
         from start: Value,
         to end: Value,
-        updateBlock: @escaping (Value) -> Void
+        updateBlock: @escaping (Value) -> Void,
+        completion: (() -> Void)?
     ) -> AdaptyUIAnimationToken {
         timeline.withAsyncAnimation(
             token: nil,
             delay: startDelay,
             onBeforeAnimation: { updateBlock(start) },
             body: { updateBlock(end) },
-            completion: { $0.invalidate() }
+            completion: {
+                $0.invalidate()
+                completion?()
+            }
         )
     }
 }

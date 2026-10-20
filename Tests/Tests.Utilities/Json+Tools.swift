@@ -1,16 +1,17 @@
 //
-//  JSON+Tools.swift
+//  Json+Tools.swift
 //  AdaptyTests
 //
 //  Created by Aleksei Valiano on 07.02.2026.
 //
 
 import Foundation
+import AdaptyCodable
 
 struct Json: Hashable, CustomStringConvertible, CustomDebugStringConvertible {
     let data: Data
 
-    private init(data: Data) {
+    init(data: Data) {
         self.data = data
     }
 
@@ -96,10 +97,31 @@ struct Json: Hashable, CustomStringConvertible, CustomDebugStringConvertible {
         try JSONDecoder().decode(type, from: data)
     }
 
-    static func encode(_ value: some Encodable) throws -> Json {
+    static func encode(_ value: some Encodable, with otherEncoder: JSONEncoder? = nil) throws -> Json {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys]
+        if let otherEncoder {
+            encoder.dataEncodingStrategy = otherEncoder.dataEncodingStrategy
+            encoder.dateEncodingStrategy = otherEncoder.dateEncodingStrategy
+            encoder.keyEncodingStrategy = otherEncoder.keyEncodingStrategy
+            encoder.nonConformingFloatEncodingStrategy = otherEncoder.nonConformingFloatEncodingStrategy
+            encoder.userInfo = otherEncoder.userInfo
+        }
         return try Json(data: encoder.encode(value))
+    }
+
+    @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+    static func encode<T: EncodableWithConfiguration>(_ value: T, configuration: T.EncodingConfiguration, with otherEncoder: JSONEncoder? = nil) throws -> Json {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        if let otherEncoder {
+            encoder.dataEncodingStrategy = otherEncoder.dataEncodingStrategy
+            encoder.dateEncodingStrategy = otherEncoder.dateEncodingStrategy
+            encoder.keyEncodingStrategy = otherEncoder.keyEncodingStrategy
+            encoder.nonConformingFloatEncodingStrategy = otherEncoder.nonConformingFloatEncodingStrategy
+            encoder.userInfo = otherEncoder.userInfo
+        }
+        return try Json(data: encoder.encode(value, configuration: configuration))
     }
 }
 

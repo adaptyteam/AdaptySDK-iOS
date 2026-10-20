@@ -8,11 +8,9 @@
 import Adapty
 import Foundation
 
-struct Price: Encodable {
+struct Price: EncodableWithConfiguration {
     let amount: Decimal
-    let currencyCode: String?
-    let currencySymbol: String?
-    let localizedString: String?
+    let localizedString: String
 
     enum CodingKeys: String, CodingKey {
         case amount
@@ -21,17 +19,36 @@ struct Price: Encodable {
         case localizedString = "localized_string"
     }
 
+    func encode(to encoder: any Encoder, configuration: EncodingConfiguration ) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.amount, forKey: .amount)
+        try container.encode(configuration.currencyCode, forKey: .currencyCode)
+        try container.encodeIfPresent(configuration.currencySymbol, forKey: .currencySymbol)
+        try container.encode(self.localizedString, forKey: .localizedString)
+    }
+
+    struct EncodingConfiguration {
+        let currencyCode: String
+        let currencySymbol: String?
+    }
+
     init(from product: some AdaptyProduct) {
         self.amount = product.price
-        self.currencyCode = product.currencyCode
-        self.currencySymbol = product.currencySymbol
         self.localizedString = product.localizedPrice
     }
 
     init(from offer: AdaptySubscriptionOffer) {
         self.amount = offer.price
-        self.currencyCode = offer.currencyCode
-        self.currencySymbol = nil
         self.localizedString = offer.localizedPrice
+    }
+
+    init(from terms: AdaptySubscriptionPricingTerms) {
+        self.amount = terms.billingPrice
+        self.localizedString = terms.localizedBillingPrice
+    }
+
+    init(from commitmentInfo: AdaptySubscriptionCommitmentInfo) {
+        self.amount = commitmentInfo.price
+        self.localizedString = commitmentInfo.localizedPrice
     }
 }

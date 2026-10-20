@@ -69,6 +69,8 @@ extension StoreKitManagerError: CustomDebugStringConvertible {
             }
         case let .invalidOffer(_, error):
             error
+        case let .billingPlanUnavailable(_, error):
+            error
         case .getSubscriptionInfoStatusFailed: "Failed to retrieve subscription information."
         case .paymentPendingError: "The payment is deferred."
         }

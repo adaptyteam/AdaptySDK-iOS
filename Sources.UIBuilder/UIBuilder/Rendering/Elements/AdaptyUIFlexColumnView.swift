@@ -16,6 +16,8 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
     private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
+    @Environment(\.adaptyUnspecifiedProposalAxes)
+    private var unspecifiedProposalAxes: Axis.Set
 
     private let column: VC.Column
     private let externalSize: CGSize?
@@ -76,12 +78,30 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
 
     @State private var contentsSize: CGSize = .zero
 
+    @ViewBuilder
     var body: some View {
-        switch column.height {
-        case .hug:
-            fixedBody
-        case .fill, .legacy:
-            weightedBody
+        if let drawAsStack = column.drawAsStack {
+            stackBody(drawAsStack)
+        } else {
+            switch column.height {
+            case .hug:
+                fixedBody
+            case .fill, .legacy:
+                weightedBody
+            }
+        }
+    }
+
+    /// A native VStack: it hugs its content on both axes and drops the items' weights
+    /// — that is what `draw_as_stack` asks for, so `height` stays unused here.
+    private func stackBody(_ params: VC.StackParams) -> some View {
+        VStack(alignment: params.horizontalAlignment.swiftuiValue(with: layoutDirection), spacing: column.spacing) {
+            ForEach(0 ..< column.items.count, id: \.self) { idx in
+                AdaptyUIElementView(
+                    column.items[idx].content,
+                    screenHolderBuilder: screenHolderBuilder
+                )
+            }
         }
     }
 
@@ -152,7 +172,11 @@ struct AdaptyUIFlexColumnView<ScreenHolderContent: View>: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .onGeometrySizeChange { contentsSize = $0 }
         }
-        .frame(minWidth: externalSize?.width ?? contentsSize.width)
+        // A live width from an enclosing flex is safe to pin to — it tracks the parent.
+        // The measured width is not: as a hard minimum it ratchets, so it is only used
+        // where the width is genuinely unspecified (`AdaptyUIUnspecifiedProposalAxesKey`).
+        .frame(minWidth: externalSize?.width
+            ?? (unspecifiedProposalAxes.contains(.horizontal) ? contentsSize.width : nil))
     }
 }
 

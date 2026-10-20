@@ -31,8 +31,7 @@ private extension AdaptyPaywallProduct {
             regionCode: regionCode,
             price: .init(
                 amount: NSDecimalNumber(decimal: price).doubleValue,
-                currencyCode: currencyCode,
-                currencySymbol: currencySymbol,
+                priceFormatStyle: skProduct.priceFormatStyle,
                 localizedString: localizedPrice
             ),
             subscription: asUIBuilderFlowProductSubscription()
@@ -41,9 +40,11 @@ private extension AdaptyPaywallProduct {
 
     func asUIBuilderFlowProductSubscription() -> VC.FlowConstants.ProductSubscriptionConstants? {
         guard let subscriptionGroupIdentifier,
-              let subscriptionPeriod
+              let subscriptionPeriod,
+              let subscriptionPricingTerms
         else { return nil }
 
+        let priceFormatStyle = skProduct.priceFormatStyle
         return .init(
             groupIdentifier: subscriptionGroupIdentifier,
             period: .init(
@@ -51,20 +52,56 @@ private extension AdaptyPaywallProduct {
                 numberOfUnits: subscriptionPeriod.numberOfUnits
             ),
             localizedPeriod: localizedSubscriptionPeriod,
-            offer: subscriptionOffer?.asUIBuilderSubscriptionOffer()
+            pricingTerms: subscriptionPricingTerms.asUIBuilderPricingTerms(
+                priceFormatStyle: priceFormatStyle
+            ),
+            offer: subscriptionOffer?.asUIBuilderSubscriptionOffer(
+                priceFormatStyle: priceFormatStyle
+            )
+        )
+    }
+}
+
+extension AdaptySubscriptionPricingTerms {
+    func asUIBuilderPricingTerms(
+        priceFormatStyle: Decimal.FormatStyle.Currency
+    ) -> VC.FlowConstants.SubscriptionPricingTermsConstants {
+        .init(
+            billingPlanId: billingPlan.rawValue,
+            billingPrice: .init(
+                amount: NSDecimalNumber(decimal: billingPrice).doubleValue,
+                priceFormatStyle: priceFormatStyle,
+                localizedString: localizedBillingPrice
+            ),
+            billingPeriod: .init(
+                unit: billingPeriod.unit.encodedValue,
+                numberOfUnits: billingPeriod.numberOfUnits
+            ),
+            commitmentInfo: .init(
+                price: .init(
+                    amount: NSDecimalNumber(decimal: commitmentInfo.price).doubleValue,
+                    priceFormatStyle: priceFormatStyle,
+                    localizedString: commitmentInfo.localizedPrice
+                ),
+                period: .init(
+                    unit: commitmentInfo.period.unit.encodedValue,
+                    numberOfUnits: commitmentInfo.period.numberOfUnits
+                )
+            )
         )
     }
 }
 
 private extension AdaptySubscriptionOffer {
-    func asUIBuilderSubscriptionOffer() -> VC.FlowConstants.SubscriptionOfferConstants {
+    func asUIBuilderSubscriptionOffer(
+        priceFormatStyle: Decimal.FormatStyle.Currency
+    ) -> VC.FlowConstants.SubscriptionOfferConstants {
         .init(
             id: identifier,
             type: offerType.rawValue,
             price: .init(
                 amount: NSDecimalNumber(decimal: price).doubleValue,
-                currencyCode: currencyCode,
-                currencySymbol: nil,
+                priceFormatStyle: priceFormatStyle,
                 localizedString: localizedPrice
             ),
             paymentMode: paymentMode.encodedValue ?? "unknown",

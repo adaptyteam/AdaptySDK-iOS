@@ -47,20 +47,12 @@ public extension Adapty {
     nonisolated static func makePurchase(
         product: AdaptyPromotedProduct
     ) async throws(AdaptyError) -> AdaptyPurchaseResult {
-        try await makePromotedPurchase(
-            vendorProductId: product.vendorProductId,
-            subscriptionOfferIdentifier: product.subscriptionOffer?.offerIdentifier
-        )
-    }
 
-    package nonisolated static func makePromotedPurchase(
-        vendorProductId: String,
-        subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier?
-    ) async throws(AdaptyError) -> AdaptyPurchaseResult {
         try await withActivatedSDK(
             methodName: .makePromotedPurchase,
             logParams: [
-                "product_id": vendorProductId,
+                "product_id": product.vendorProductId,
+                "billing_plan_id": product.subscriptionPricingTerms?.billingPlan,
                 "purchase_source": "app_store_promoted",
             ]
         ) { sdk throws(AdaptyError) in
@@ -73,11 +65,10 @@ public extension Adapty {
                     nil
                 }
 
-            return try await purchaser.makePromotedPurchase(
+            return try await purchaser.makePurchase(
                 userId: userId,
                 appAccountToken: appAccountToken,
-                vendorProductId: vendorProductId,
-                subscriptionOfferIdentifier: subscriptionOfferIdentifier
+                product: product
             )
         }
     }

@@ -116,6 +116,7 @@ extension StoreKitManagerError: CustomAdaptyError {
                 .networkFailed
             }
         case .invalidOffer: .invalidOfferIdentifier
+        case .billingPlanUnavailable: .billingPlanUnavailable
         case .getSubscriptionInfoStatusFailed: .fetchSubscriptionStatusFailed
         case .paymentPendingError: .paymentPendingError
         }

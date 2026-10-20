@@ -12,6 +12,7 @@ package extension VC {
     struct FlowConstants: Sendable {
         let placementId: String
         let variationId: String
+        let variationName: String?
         let abTestName: String
         let name: String
         let products: [ProductConstants]
@@ -19,12 +20,14 @@ package extension VC {
         package init(
             placementId: String,
             variationId: String,
+            variationName: String?,
             abTestName: String,
             name: String,
             products: [ProductConstants]
         ) {
             self.placementId = placementId
             self.variationId = variationId
+            self.variationName = variationName
             self.abTestName = abTestName
             self.name = name
             self.products = products
@@ -36,6 +39,7 @@ package extension VC.FlowConstants {
     struct ProductConstants: Sendable {
         let values: [String: VC.Value]
         let id: String
+
         package init(
             flowProductId: String,
             adaptyProductId: String,
@@ -62,6 +66,7 @@ package extension VC.FlowConstants {
             adaptyProductType: String,
             paywallVariationId: String,
             paywallName: String,
+
             localizedDescription: String,
             localizedTitle: String,
             isFamilyShareable: Bool,
@@ -90,11 +95,25 @@ package extension VC.FlowConstants {
 
     struct PriceConstants: Sendable {
         let values: [String: VC.Value]
+
         package init(
             amount: Double,
-            currencyCode: String?,
+            priceFormatStyle: Decimal.FormatStyle.Currency,
+            localizedString: String
+        ) {
+            self.init(
+                amount: amount,
+                currencyCode: priceFormatStyle.currencyCode,
+                currencySymbol: priceFormatStyle.locale.currencySymbol,
+                localizedString: localizedString
+            )
+        }
+
+        package init(
+            amount: Double,
+            currencyCode: String,
             currencySymbol: String?,
-            localizedString: String?
+            localizedString: String
         ) {
             values = [
                 "amount": VC.Value(amount),
@@ -111,13 +130,42 @@ package extension VC.FlowConstants {
             groupIdentifier: String,
             period: SubscriptionPeriodConstants,
             localizedPeriod: String?,
+            pricingTerms: SubscriptionPricingTermsConstants,
             offer: SubscriptionOfferConstants?
         ) {
             values = [
                 "groupIdentifier": VC.Value(groupIdentifier),
                 "period": VC.Value(period.values),
                 "localizedPeriod": VC.Value(localizedPeriod),
+                "pricingTerms": VC.Value(pricingTerms.values),
                 "offer": VC.Value(offer?.values),
+            ]
+        }
+    }
+
+    struct SubscriptionPricingTermsConstants: Sendable {
+        let values: [String: VC.Value]
+        package init(
+            billingPlanId: String,
+            billingPrice: PriceConstants,
+            billingPeriod: SubscriptionPeriodConstants,
+            commitmentInfo: SubscriptionCommitmentInfoConstants
+        ) {
+            values = [
+                "billingPlanId": VC.Value(billingPlanId),
+                "billingPrice": VC.Value(billingPrice.values),
+                "billingPeriod": VC.Value(billingPeriod.values),
+                "commitmentInfo": VC.Value(commitmentInfo.values),
+            ]
+        }
+    }
+
+    struct SubscriptionCommitmentInfoConstants: Sendable {
+        let values: [String: VC.Value]
+        package init(price: PriceConstants, period: SubscriptionPeriodConstants) {
+            values = [
+                "price": VC.Value(price.values),
+                "period": VC.Value(period.values),
             ]
         }
     }

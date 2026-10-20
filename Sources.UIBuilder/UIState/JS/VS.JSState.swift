@@ -359,7 +359,7 @@ extension VS.JSState {
             }
 
         let result = context.evaluateScript(script)
-        return "\(path): \(result?.toString() ?? "unknown")"
+        return "\(path): \(result?.toString(), default: "unknown")"
     }
 
     func debug(

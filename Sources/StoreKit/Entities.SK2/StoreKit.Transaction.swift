@@ -22,19 +22,60 @@ extension StoreKit.Transaction {
         ]
     }
 
-    var unfOfferType: AdaptyTransactionOfferType? {
-        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            (offer?.type ?? offerType)?.asSubscriptionOfferType
+    var unfBillingPlan: AdaptySubscriptionBillingPlan? {
+        #if compiler(>=6.3.2)
+        if #available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *) {
+            return billingPlanType?.asAdaptySubscriptionBillingPlan
+        }
+        #endif
+        return nil
+    }
+
+    var subscriptionOfferIdentifier: AdaptySubscriptionOffer.Identifier? {
+        let offerId: String?
+        let offerType: Transaction.OfferType?
+        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *), let offer {
+            offerId = offer.id
+            offerType = offer.type
         } else {
-            offerType?.asSubscriptionOfferType
+            offerId = offerID
+            offerType = self.offerType
+        }
+
+        guard let offerType = offerType?.asAdaptySubscriptionOfferType else {
+            return nil
+        }
+
+        return .init(offerId: offerId, offerType: offerType)
+    }
+
+    var unfOfferType: StoreKit.Transaction.OfferType? {
+        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+            offer?.type
+        } else {
+            offerType
         }
     }
 
     var unfOfferId: String? {
         if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
-            return offer?.id ?? offerID
+            return offer?.id
         }
         return offerID
+    }
+
+    var unfOfferPeriod: AdaptySubscriptionPeriod? {
+        if #available(iOS 18.4, macOS 15.4, tvOS 18.4, watchOS 11.4, visionOS 2.4, *) {
+            return offer?.period?.asAdaptySubscriptionPeriod
+        }
+        return nil
+    }
+
+    var unfOfferPaymentMode: AdaptySubscriptionOffer.PaymentMode? {
+        if #available(iOS 17.2, macOS 14.2, tvOS 17.2, watchOS 10.2, visionOS 1.1, *) {
+            return offer?.paymentMode?.asAdaptySubscriptionOfferPaymentMode
+        }
+        return nil
     }
 
     var isXcodeEnvironment: Bool {

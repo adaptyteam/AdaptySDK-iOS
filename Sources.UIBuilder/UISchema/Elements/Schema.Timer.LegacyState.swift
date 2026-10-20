@@ -54,7 +54,7 @@ extension Schema {
             duration = try container.decode(TimeInterval.self, forKey: .duration)
             behavior = .custom
         default:
-            throw DecodingError.dataCorruptedError(forKey: .behavior, in: container, debugDescription: "unknown value '\(value ?? "nil")'")
+            throw DecodingError.dataCorruptedError(forKey: .behavior, in: container, debugDescription: "unknown value '\(value, default: "nil")'")
         }
 
         return if let endAt {
@@ -62,7 +62,7 @@ extension Schema {
         } else if let duration {
             #"SDK.setTimer({"id":"\#(id)", "duration": \#(duration), "behavior": "\#((behavior ?? .continue).rawValue)"});"#
         } else {
-            throw DecodingError.dataCorruptedError(forKey: .behavior, in: container, debugDescription: "unknown value '\(value ?? "nil")'")
+            throw DecodingError.dataCorruptedError(forKey: .behavior, in: container, debugDescription: "unknown value '\(value, default: "nil")'")
         }
     }
 }

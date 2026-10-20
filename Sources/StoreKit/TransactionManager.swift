@@ -140,16 +140,14 @@ private extension Adapty {
                 }
 
                 do {
-                    let productOrNil = try? await productsManager.fetchProduct(
+
+                    let product = try? await productsManager.fetchProduct(
                         id: transaction.productID,
                         fetchPolicy: .returnCacheDataElseLoad
-                    ).asAdaptyProduct
+                    )
 
                     try await report(
-                        .init(
-                            product: productOrNil,
-                            transaction: transaction
-                        ),
+                        .init(product, transaction),
                         payload: purchasePayloadStorage.purchasePayload(
                             byTransaction: transaction,
                             orCreateFor: ProfileStorage.userId
@@ -255,7 +253,7 @@ private extension TransactionManager {
     }
 }
 
-private extension VerificationResult<StoreKit.Transaction> {
+extension VerificationResult<StoreKit.Transaction> {
     var verifiedTransaction: StoreKit.Transaction? {
         switch self {
         case let .unverified(transaction, _):
