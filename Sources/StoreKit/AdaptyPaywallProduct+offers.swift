@@ -25,6 +25,7 @@ extension Adapty {
         )
 
         var eligibleIntroductory = [String: Bool]()
+        var eligiblePromotional: Bool?
         var eligibleWinBackIds = [String: [String]]()
 
         var newProducts = [(
@@ -67,8 +68,23 @@ extension Adapty {
 
                 // 2. try select promotional offer
                 if selectedOffer == nil, let offerId = selectedPricingTerm.promotionalOfferId {
-                    selectedOffer = skProduct.adaptySubscriptionOffer(by: .promotional(offerId), for: selectedPricingTerm.billingPlan)
-                    if selectedOffer == nil { log.warn("no promotional offer found with id:\(offerId) in productId:\(skProduct.id)") }
+                    if let promotionalOffer = skProduct.adaptySubscriptionOffer(by: .promotional(offerId), for: selectedPricingTerm.billingPlan) {
+                        switch eligiblePromotional {
+                        case .none:
+                            if await eligiblePromotionalOffer() {
+                                selectedOffer = promotionalOffer
+                                eligiblePromotional = true
+                            } else {
+                                eligiblePromotional = false
+                            }
+                        case .some(true):
+                            selectedOffer = promotionalOffer
+                        case .some(false):
+                            break
+                        }
+                    } else {
+                        log.warn("no promotional offer found with id:\(offerId) in productId:\(skProduct.id)")
+                    }
                 }
 
                 // 3. try select introductory offer
@@ -177,6 +193,19 @@ extension Adapty {
         ))
 
         return eligible
+    }
+
+    private func eligiblePromotionalOffer() async -> Bool {
+        for await transition in StoreKit.Transaction.all {
+            switch transition {
+            case .unverified: continue
+            case let .verified(transition):
+                guard transition.productType == .autoRenewable else { continue }
+                return true
+            }
+        }
+
+        return false
     }
 
     private func eligibleWinBackOfferIds(for subscriptionGroupIdentifier: String) async throws(AdaptyError) -> [String] {
