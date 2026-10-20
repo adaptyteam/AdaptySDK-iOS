@@ -94,8 +94,6 @@ struct AdaptyUIColumnView<ScreenHolderContent: View>: View {
                             column.items[idx].content,
                             screenHolderBuilder: screenHolderBuilder
                         )
-                        // Every cell has its length: a fixed one or a share of the proxy.
-                        .declaringProposal(.vertical, unspecified: false)
                     }
                 }
             )
