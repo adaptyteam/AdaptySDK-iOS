@@ -21,14 +21,15 @@ enum AdaptyUIDeckSolver {
         case parent(CGFloat)
     }
 
-    /// One child as the layout sees it. Anchors are fractions of the free space —
-    /// `0` leading/top, `0.5` center, `1` trailing/bottom — already mapped for the
-    /// current layout direction.
+    /// One child as the layout sees it. Both points are fractions — `0` leading/top,
+    /// `0.5` center, `1` trailing/bottom — already mapped for the current layout
+    /// direction: `anchor` of the child's own size, `position` of the deck's inner
+    /// size. The child's anchor lands on the deck's position.
     struct Item: Sendable, Equatable {
         let width: Length
         let height: Length
-        let anchorX: CGFloat
-        let anchorY: CGFloat
+        let anchor: CGPoint
+        let position: CGPoint
     }
 
     /// The deck's inner size plus one frame per child, in the deck's own
@@ -102,8 +103,8 @@ enum AdaptyUIDeckSolver {
 
             return CGRect(
                 origin: CGPoint(
-                    x: items[index].anchorX * (width - size.width),
-                    y: items[index].anchorY * (height - size.height)
+                    x: items[index].position.x * width - items[index].anchor.x * size.width,
+                    y: items[index].position.y * height - items[index].anchor.y * size.height
                 ),
                 size: size
             )

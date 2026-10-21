@@ -257,7 +257,7 @@ struct LayoutProposalTests {
             AdaptyUIDeckLayout(
                 width: .fill,
                 height: .hug,
-                items: [.init(width: .content, height: .content, anchorX: 0.5, anchorY: 0.5)]
+                items: [.init(width: .content, height: .content, anchor: CGPoint(x: 0.5, y: 0.5), position: CGPoint(x: 0.5, y: 0.5))]
             ) {
                 AdaptyUIDeckItemLayout(contentAxes: [.horizontal, .vertical]) {
                     Recorder(log: log) { Color.clear }
@@ -279,7 +279,7 @@ struct LayoutProposalTests {
             AdaptyUIDeckLayout(
                 width: .fill,
                 height: .hug,
-                items: [.init(width: .points(200), height: .content, anchorX: 0.5, anchorY: 0.5)]
+                items: [.init(width: .points(200), height: .content, anchor: CGPoint(x: 0.5, y: 0.5), position: CGPoint(x: 0.5, y: 0.5))]
             ) {
                 AdaptyUIDeckItemLayout(contentAxes: [.vertical]) {
                     Recorder(log: log) { Color.clear }

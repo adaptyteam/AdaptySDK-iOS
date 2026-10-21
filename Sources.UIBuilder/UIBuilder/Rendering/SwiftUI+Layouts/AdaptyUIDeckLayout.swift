@@ -6,7 +6,7 @@
 import SwiftUI
 
 /// Lays out the children of a `Deck` in one shared area, each with its own size
-/// and alignment.
+/// and placement.
 ///
 /// All arithmetic lives in `AdaptyUIDeckSolver`, which is free of SwiftUI and
 /// unit-tested; this type only translates between the proposal, the subviews and

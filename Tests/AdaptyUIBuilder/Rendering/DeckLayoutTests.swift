@@ -23,10 +23,10 @@ enum DeckLayoutTests {
     fileprivate static func item(
         width: AdaptyUIDeckSolver.Length = .content,
         height: AdaptyUIDeckSolver.Length = .content,
-        anchorX: CGFloat = 0.5,
-        anchorY: CGFloat = 0.5
+        anchor: CGPoint = CGPoint(x: 0.5, y: 0.5),
+        position: CGPoint? = nil
     ) -> AdaptyUIDeckSolver.Item {
-        .init(width: width, height: height, anchorX: anchorX, anchorY: anchorY)
+        .init(width: width, height: height, anchor: anchor, position: position ?? anchor)
     }
 
     /// Reports the same size for every child, whatever the proposal.
@@ -238,8 +238,8 @@ enum DeckLayoutTests {
                 width: .fill,
                 height: .fill,
                 items: [
-                    DeckLayoutTests.item(width: .points(100), height: .points(50), anchorX: 0, anchorY: 0),
-                    DeckLayoutTests.item(width: .points(100), height: .points(50), anchorX: 1, anchorY: 1),
+                    DeckLayoutTests.item(width: .points(100), height: .points(50), anchor: CGPoint(x: 0, y: 0)),
+                    DeckLayoutTests.item(width: .points(100), height: .points(50), anchor: CGPoint(x: 1, y: 1)),
                     DeckLayoutTests.item(width: .points(100), height: .points(50)),
                 ],
                 proposedWidth: 300,
@@ -250,6 +250,36 @@ enum DeckLayoutTests {
             #expect(result.frames[0].origin == CGPoint(x: 0, y: 0))
             #expect(result.frames[1].origin == CGPoint(x: 200, y: 150))
             #expect(result.frames[2].origin == CGPoint(x: 100, y: 75))
+        }
+
+        /// The child's anchor lands on the deck's position, so the two points move it
+        /// independently and can push it past the deck's edge.
+        @Test("Anchor lands on position")
+        func anchorLandsOnPosition() {
+            let result = AdaptyUIDeckSolver.solve(
+                width: .fill,
+                height: .fill,
+                items: [
+                    DeckLayoutTests.item(
+                        width: .points(100),
+                        height: .points(50),
+                        anchor: CGPoint(x: 0.25, y: 0.5),
+                        position: CGPoint(x: 0.8, y: 0.2)
+                    ),
+                    DeckLayoutTests.item(
+                        width: .points(100),
+                        height: .points(50),
+                        anchor: CGPoint(x: 0, y: 0),
+                        position: CGPoint(x: 1, y: 1)
+                    ),
+                ],
+                proposedWidth: 300,
+                proposedHeight: 200,
+                measure: DeckLayoutTests.fixedMeasure(.zero)
+            )
+
+            #expect(result.frames[0].origin == CGPoint(x: 215, y: 15))
+            #expect(result.frames[1].origin == CGPoint(x: 300, y: 200))
         }
 
         /// The frames come back in configuration order, which is the Z order.
