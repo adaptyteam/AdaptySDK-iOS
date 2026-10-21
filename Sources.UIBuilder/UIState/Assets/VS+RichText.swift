@@ -14,6 +14,14 @@ extension VS {
         configuration.strings[stringId]
     }
 
+    /// The localized string for `stringId`, or `text` when the id is absent or not localized.
+    func text(_ value: VS.StringIdentifierOrText) -> String? {
+        guard let stringId = value.stringId else { return value.text }
+        if let text = try? richText(stringId)?.asString { return text }
+        Log.viewState.error("string_id \(stringId) is not localized as plain text")
+        return value.text
+    }
+
     func richTextForNonSelectedProduct(
         suffix: String?
     ) throws(VS.Error) -> VC.RichText? {
