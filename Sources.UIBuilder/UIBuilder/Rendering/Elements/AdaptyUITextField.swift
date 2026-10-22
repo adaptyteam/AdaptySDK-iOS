@@ -124,7 +124,7 @@ struct AdaptyUITextField: View {
                     screen: screen
                 )
             }
-            .multilineTextAlignment(textField.horizontalAlign)
+            .modifier(TextFieldAlignmentModifier(alignment: textField.horizontalAlign))
             .applyTextAttributes(
                 resolvedRichTextAttributes,
                 assetsCache: assetsViewModel.cache,
@@ -136,6 +136,38 @@ struct AdaptyUITextField: View {
                 lastValid: $lastConstrainedText
             )
             .applyKeyboardOptions(textField.keyboardOptions)
+    }
+}
+
+// iOS 26+ TextField resolves .leading against the system direction and
+// ignores an RTL layoutDirection override. Pin the field to LTR and pass
+// the physical side instead.
+private struct TextFieldAlignmentModifier: ViewModifier {
+    @Environment(\.layoutDirection)
+    private var layoutDirection: LayoutDirection
+
+    let alignment: VC.HorizontalAlignment
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        let logical = alignment.textAlignment(with: layoutDirection)
+        if layoutDirection == .rightToLeft {
+            content
+                .multilineTextAlignment(logical.mirrored)
+                .environment(\.layoutDirection, .leftToRight)
+        } else {
+            content.multilineTextAlignment(logical)
+        }
+    }
+}
+
+private extension TextAlignment {
+    var mirrored: TextAlignment {
+        switch self {
+        case .leading: .trailing
+        case .trailing: .leading
+        default: self
+        }
     }
 }
 
