@@ -9,6 +9,15 @@
 
 import Foundation
 
+package func makeProductLookupByFlowId(
+    _ products: [any ProductResolver]
+) -> [String: any ProductResolver] {
+    Dictionary(
+        products.map { ($0.flowId, $0) },
+        uniquingKeysWith: { first, _ in first }
+    )
+}
+
 @MainActor
 protocol ProductsInfoProvider {
     func productInfo(by productId: String) -> ProductResolver?
@@ -50,7 +59,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         self.flowViewModel = flowViewModel
 
         if let products {
-            flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+            flowProducts = makeProductLookupByFlowId(products)
         }
     }
     
@@ -83,7 +92,7 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
             do {
                 let products = try await logic.getProducts()
-                flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+                flowProducts = makeProductLookupByFlowId(products)
                 onProductsLoaded?(products)
             } catch {
                 Log.ui.error("#\(logId)# loadProducts fail: \(error)")
