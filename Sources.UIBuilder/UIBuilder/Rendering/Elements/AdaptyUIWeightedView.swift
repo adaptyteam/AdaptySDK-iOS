@@ -70,6 +70,9 @@ struct AdaptyUIWeightedItemsView<ScreenHolderContent: View>: View {
     let axis: AdaptyUIWeightedSolver.Axis?
     let screenHolderBuilder: () -> ScreenHolderContent
 
+    @Environment(\.adaptyUnspecifiedProposalAxes)
+    private var unspecifiedAxes: Axis.Set
+
     var body: some View {
         ForEach(0 ..< items.count, id: \.self) { idx in
             // Marked rather than wrapped, so the layout reaches the element's own
@@ -78,9 +81,17 @@ struct AdaptyUIWeightedItemsView<ScreenHolderContent: View>: View {
                 items[idx].content,
                 screenHolderBuilder: screenHolderBuilder
             )
+            .collapsedCellClipped(collapses(items[idx]), axis: .vertical)
             .declaringProposal(axis == .horizontal ? .horizontal : .vertical, unspecified: fixes(items[idx]) ? false : nil)
             .layoutValue(key: AdaptyUIWeightedItemKey.self, value: idx)
         }
+    }
+
+    /// A column without a height gives a weighted item none, and its content must
+    /// not draw over its neighbours, as it would at its own size. A row without a
+    /// width sizes weighted items by their content instead.
+    private func collapses(_ item: VC.GridItem) -> Bool {
+        axis == .vertical && item.isWeight && unspecifiedAxes.contains(.vertical)
     }
 
     private func fixes(_ item: VC.GridItem) -> Bool {
@@ -89,7 +100,24 @@ struct AdaptyUIWeightedItemsView<ScreenHolderContent: View>: View {
     }
 }
 
+/// A weighted cell collapsed to no length on `axis` hides its content instead of
+/// drawing it at the content's own size over the neighbouring cells.
+extension View {
+    @ViewBuilder
+    func collapsedCellClipped(_ collapsed: Bool, axis: Axis) -> some View {
+        if collapsed {
+            frame(width: axis == .horizontal ? 0 : nil, height: axis == .vertical ? 0 : nil).clipped()
+        } else {
+            self
+        }
+    }
+}
+
 extension VC.GridItem {
+    var isWeight: Bool {
+        if case .weight = length { true } else { false }
+    }
+
     /// The item as the weighted layout along `axis` sees it: units resolved to
     /// points, alignments to anchors for the layout direction.
     func weightedItem(

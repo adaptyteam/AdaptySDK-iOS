@@ -92,6 +92,12 @@ struct AdaptyUIRowView<ScreenHolderContent: View>: View {
                             row.items[idx].content,
                             screenHolderBuilder: screenHolderBuilder
                         )
+                        // A weighted cell left with no width must not draw its
+                        // content over the neighbours.
+                        .collapsedCellClipped(
+                            row.items[idx].isWeight && weightsAvailableLength <= 0,
+                            axis: .horizontal
+                        )
                     }
                 }
             )

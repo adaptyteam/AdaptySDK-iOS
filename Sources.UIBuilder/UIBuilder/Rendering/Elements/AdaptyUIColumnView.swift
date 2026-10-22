@@ -94,6 +94,12 @@ struct AdaptyUIColumnView<ScreenHolderContent: View>: View {
                             column.items[idx].content,
                             screenHolderBuilder: screenHolderBuilder
                         )
+                        // A weighted cell left with no height must not draw its
+                        // content over the neighbours.
+                        .collapsedCellClipped(
+                            column.items[idx].isWeight && weightsAvailableLength <= 0,
+                            axis: .vertical
+                        )
                     }
                 }
             )
