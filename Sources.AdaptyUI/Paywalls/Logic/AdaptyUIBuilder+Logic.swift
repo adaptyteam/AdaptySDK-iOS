@@ -11,25 +11,28 @@ import Adapty
 import AdaptyUIBuilder
 import Foundation
 
-struct AdaptyUILogic: AdaptyUIBuilderLogic {
+final class AdaptyUILogic: AdaptyUIBuilderLogic {
     let logId: String
     let flow: AdaptyFlow
     let flowLayout: AdaptyFlow.Layout
     let events: AdaptyEventsHandler
     let observerModeResolver: AdaptyObserverModeResolver?
+    private var productsPrefetch: Task<[AdaptyPaywallProduct], any Error>?
 
     package init(
         logId: String,
         flow: AdaptyFlow,
         flowLayout: AdaptyFlow.Layout,
         events: AdaptyEventsHandler,
-        observerModeResolver: AdaptyObserverModeResolver?
+        observerModeResolver: AdaptyObserverModeResolver?,
+        productsPrefetch: Task<[AdaptyPaywallProduct], any Error>?
     ) {
         self.logId = logId
         self.flow = flow
         self.flowLayout = flowLayout
         self.events = events
         self.observerModeResolver = observerModeResolver
+        self.productsPrefetch = productsPrefetch
     }
 
     func reportViewDidAppear() {
@@ -75,7 +78,15 @@ struct AdaptyUILogic: AdaptyUIBuilderLogic {
     }
 
     private func getProductsInternal() async throws -> ([ProductResolver], [String]) {
-        let products = try await Adapty.getPaywallProducts(flow: flow)
+        // The prefetch is the first attempt: its error is reported like any
+        // other, and retries make a new request.
+        let prefetch = productsPrefetch
+        productsPrefetch = nil
+        let products = if let prefetch {
+            try await prefetch.value
+        } else {
+            try await Adapty.getPaywallProducts(flow: flow)
+        }
         let returnedIds = Set(products.map(\.vendorProductId))
         let failedProductIds = flow.paywallsUniqueVendorProductIds.filter { !returnedIds.contains($0) }
         return (products, failedProductIds)

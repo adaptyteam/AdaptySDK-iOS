@@ -178,18 +178,42 @@ public struct Dev_PreviewProduct: Sendable {
         public var groupIdentifier: String
         public var period: Period
         public var localizedPeriod: String?
+        /// Terms of the selected billing plan. `nil` means `up_front`: one payment of `price` per `period`.
+        public var pricingTerms: PricingTerms?
         public var offer: Offer?
 
         public init(
             groupIdentifier: String,
             period: Period,
             localizedPeriod: String? = nil,
+            pricingTerms: PricingTerms? = nil,
             offer: Offer? = nil
         ) {
             self.groupIdentifier = groupIdentifier
             self.period = period
             self.localizedPeriod = localizedPeriod
+            self.pricingTerms = pricingTerms
             self.offer = offer
+        }
+
+        /// A single payment of the plan; `price` and `period` of the product stay the commitment.
+        public struct PricingTerms: Sendable {
+            public var billingPlanId: String
+            public var billingPrice: Price
+            public var billingPeriod: Period
+            public var localizedBillingPeriod: String?
+
+            public init(
+                billingPlanId: String,
+                billingPrice: Price,
+                billingPeriod: Period,
+                localizedBillingPeriod: String? = nil
+            ) {
+                self.billingPlanId = billingPlanId
+                self.billingPrice = billingPrice
+                self.billingPeriod = billingPeriod
+                self.localizedBillingPeriod = localizedBillingPeriod
+            }
         }
 
         public struct Period: Sendable {
