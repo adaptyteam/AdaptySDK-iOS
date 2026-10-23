@@ -29,7 +29,9 @@ extension Dev_PreviewProduct {
                     localizedString: price.localizedString
                 ),
                 subscription: subscription.map { sub in
-                    .init(
+                    let billingPrice = sub.pricingTerms?.billingPrice ?? price
+                    let billingPeriod = sub.pricingTerms?.billingPeriod ?? sub.period
+                    return .init(
                         groupIdentifier: sub.groupIdentifier,
                         period: .init(
                             unit: sub.period.unit,
@@ -37,16 +39,16 @@ extension Dev_PreviewProduct {
                         ),
                         localizedPeriod: sub.localizedPeriod,
                         pricingTerms: .init(
-                            billingPlanId: "up_front",
+                            billingPlanId: sub.pricingTerms?.billingPlanId ?? "up_front",
                             billingPrice: .init(
-                                amount: price.amount,
-                                currencyCode: price.currencyCode,
-                                currencySymbol: price.currencySymbol,
-                                localizedString: price.localizedString
+                                amount: billingPrice.amount,
+                                currencyCode: billingPrice.currencyCode,
+                                currencySymbol: billingPrice.currencySymbol,
+                                localizedString: billingPrice.localizedString
                             ),
                             billingPeriod: .init(
-                                unit: sub.period.unit,
-                                numberOfUnits: sub.period.numberOfUnits
+                                unit: billingPeriod.unit,
+                                numberOfUnits: billingPeriod.numberOfUnits
                             ),
                             commitmentInfo: .init(
                                 price: .init(

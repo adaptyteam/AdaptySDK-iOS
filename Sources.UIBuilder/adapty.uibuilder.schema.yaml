@@ -1,13 +1,13 @@
 # yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/uibuilder/5.1.1/schema"
+$id: "https://adapty.io/uibuilder/5.1.2/schema"
 title: "AdaptyUI Configuration"
 type: object
 required: [format, screens, scripts]
 properties:
     format:
         type: string
-        const: "5.1.1"
+        const: "5.1.2"
     assets:
         title: "Default assets"
         $ref: "#/Assets"

@@ -24,9 +24,14 @@ public extension AdaptyUIBuilder {
 
 public protocol ProductResolver: Sendable {
     var flowId: String { get }
-    var paymentMode: PaymentModeValue { get }
+    var billingPlan: BillingPlanId? { get }
+    var paymentMode: PaymentModeId? { get }
 
     func value(byTag tag: TextProductTag) -> TextTagValue?
+}
+
+public extension ProductResolver {
+    var billingPlan: BillingPlanId? { nil }
 }
 
 #endif

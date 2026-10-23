@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/4.3.0/schema"
+$id: "https://adapty.io/crossPlatform/4.3.1/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -547,7 +547,7 @@ $requests:
   ### showStoreMessage ###
   ShowStoreMessage.Request: #request
     type: object
-    description: "iOS Only. Requires iOS 16+"
+    description: "Requires iOS 16+ on iOS"
     required: [method]
     properties:
       method: { const: "show_store_messages" }
@@ -1264,7 +1264,7 @@ $defs:
       store_messages_handling:
         {
           $ref: "#/$defs/StoreMessagesHandling",
-          description: "iOS Only. Requires iOS 16+",
+          description: "Requires iOS 16+ on iOS",
         }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }
