@@ -34,6 +34,7 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     play: playAnimations
                 )
                 .rangedFrame(box: box)
+                .alignmentBarrier()
         case let .deck(deck, _):
             // Deck is laid out by a custom SwiftUI `Layout`, which needs iOS 16.
             // Older versions keep treating the element as unknown.
@@ -50,6 +51,7 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                 stack,
                 screenHolderBuilder: screenHolderBuilder
             )
+            .alignmentBarrier()
         case let .text(text, _):
             AdaptyUITextView(text)
         case let .textField(textField, props):

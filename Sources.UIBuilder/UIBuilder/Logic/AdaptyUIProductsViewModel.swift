@@ -37,6 +37,8 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
     package var onProductsLoaded: (([ProductResolver]) -> Void)?
 
+    private var loadingTask: Task<Void, Never>?
+
     package init(
         logId: String,
         logic: AdaptyUIBuilderLogic,
@@ -50,14 +52,26 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         self.flowViewModel = flowViewModel
 
         if let products {
-            flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+            flowProducts = Self.flowProducts(products, logId: logId)
         }
     }
     
+    private static func flowProducts(_ products: [any ProductResolver], logId: String) -> [String: ProductResolver] {
+        Dictionary(products.map { ($0.flowId, $0) }) { first, _ in
+            Log.ui.error("#\(logId)# duplicate flowProductId \(first.flowId), keeping the first product")
+            return first
+        }
+    }
+
     package func loadProductsIfNeeded() {
         guard !productsLoadingInProgress, flowProducts == nil else { return }
 
         loadProducts()
+    }
+
+    /// Waits for the products request in flight, if any; does not wait for retries.
+    package func waitForProducts() async {
+        await loadingTask?.value
     }
 
     package func prepareForReuse() {
@@ -78,12 +92,12 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
         let logId = logId
         Log.ui.verbose("#\(logId)# loadProducts begin")
 
-        Task { @MainActor [weak self] in
+        loadingTask = Task { @MainActor [weak self] in
             guard let self else { return }
 
             do {
                 let products = try await logic.getProducts()
-                flowProducts = Dictionary(uniqueKeysWithValues: products.map { ($0.flowId, $0) })
+                flowProducts = Self.flowProducts(products, logId: logId)
                 onProductsLoaded?(products)
             } catch {
                 Log.ui.error("#\(logId)# loadProducts fail: \(error)")

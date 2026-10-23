@@ -253,7 +253,7 @@ private extension TransactionManager {
     }
 }
 
-private extension VerificationResult<StoreKit.Transaction> {
+extension VerificationResult<StoreKit.Transaction> {
     var verifiedTransaction: StoreKit.Transaction? {
         switch self {
         case let .unverified(transaction, _):

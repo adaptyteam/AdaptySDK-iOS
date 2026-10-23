@@ -88,6 +88,13 @@ public extension AdaptyProduct {
         return skProduct.subscriptionPeriodFormatStyle.locale.localized(period: period)
     }
 
+    /// The period of a single payment of the selected billing plan.
+    /// The period's language is determined by the preferred language set on the device.
+    var localizedBillingPeriod: String? {
+        guard let period = subscriptionPricingTerms?.billingPeriod else { return nil }
+        return skProduct.subscriptionPeriodFormatStyle.locale.localized(period: period)
+    }
+
     var description: String {
         "(vendorProductId: \(vendorProductId), skProduct: \(skProduct))"
     }

@@ -60,6 +60,7 @@ public extension AdaptyUI {
             flowLayout: AdaptyFlow.Layout,
             viewConfiguration: AdaptyUIConfiguration,
             products: [AdaptyPaywallProduct]?,
+            productsPrefetch: Task<[AdaptyPaywallProduct], any Error>?,
             observerModeResolver: AdaptyObserverModeResolver?,
             tagResolver: AdaptyUITagResolver?,
             timerResolver: AdaptyTimerResolver?,
@@ -92,7 +93,8 @@ public extension AdaptyUI {
                 flow: flow,
                 flowLayout: flowLayout,
                 events: eventsHandler,
-                observerModeResolver: observerModeResolver
+                observerModeResolver: observerModeResolver,
+                productsPrefetch: productsPrefetch
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)

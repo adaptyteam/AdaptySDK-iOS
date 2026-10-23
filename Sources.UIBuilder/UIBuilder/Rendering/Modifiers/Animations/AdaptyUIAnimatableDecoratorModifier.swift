@@ -84,11 +84,11 @@ extension InsettableShape {
     ) -> some View {
         switch gradient {
         case let .linear(gradient):
-            self.strokeBorder(gradient)
+            self.strokeBorder(gradient, lineWidth: lineWidth)
         case let .angular(gradient):
-            self.strokeBorder(gradient)
+            self.strokeBorder(gradient, lineWidth: lineWidth)
         case let .radial(gradient):
-            self.strokeBorder(gradient)
+            self.strokeBorder(gradient, lineWidth: lineWidth)
         }
     }
 

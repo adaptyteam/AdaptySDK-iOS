@@ -29,7 +29,7 @@ extension VC.StringReference.Product {
         paymentMode: PaymentModeId?,
         suffix: String?
     ) -> String {
-       let billingPart = billingPlan.map { "_billing_\($0)" } ?? ""
+       let billingPart = billingPlan.map { "_bil_\($0)" } ?? ""
        let paymentMode = paymentMode ?? "default"
        let base = "PRODUCT_\(adaptyProductId)\(billingPart)_\(paymentMode)"
        return if let suffix { "\(base)_\(suffix)" } else {  base }
@@ -40,7 +40,7 @@ extension VC.StringReference.Product {
         paymentMode: PaymentModeId?,
         suffix: String?
     ) -> String {
-        let billingPart = billingPlan.map { "_billing_\($0)" } ?? ""
+        let billingPart = billingPlan.map { "_bil_\($0)" } ?? ""
         let paymentMode = paymentMode ?? "default"
         let base = "PRODUCT\(billingPart)_\(paymentMode)"
         return if let suffix { "\(base)_\(suffix)" } else {  base }
