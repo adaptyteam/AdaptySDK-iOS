@@ -37,6 +37,8 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
     package var onProductsLoaded: (([ProductResolver]) -> Void)?
 
+    private var retryTask: Task<Void, Never>?
+
     private var loadingTask: Task<Void, Never>?
 
     package init(
@@ -109,13 +111,18 @@ package final class AdaptyUIProductsViewModel: ObservableObject {
 
     private func retryLoadingProductsIfNeeded(error: Error) {
         guard logic.reportDidFailLoadingProductsShouldRetry(with: error) else { return }
+        // A load started on appear can fail while a retry is already pending;
+        // one pending retry is enough.
+        guard retryTask == nil else { return }
 
-        Task { [weak self] in
+        retryTask = Task { [weak self] in
+            try? await Task.sleep(seconds: 2)
             guard let self else { return }
+            retryTask = nil
 
-            try await Task.sleep(seconds: 2)
-
-            if presentationViewModel.presentationState == .appeared {
+            // Skip only a screen that was shown and closed: a load that failed
+            // before the first appearance must be retried too.
+            if presentationViewModel.presentationState != .disappeared {
                 loadProductsIfNeeded()
             }
         }
