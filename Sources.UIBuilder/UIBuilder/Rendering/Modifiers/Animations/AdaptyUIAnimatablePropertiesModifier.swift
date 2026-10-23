@@ -126,9 +126,9 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
         self.initialBlurRadius = properties.decorator?.blurRadius ?? .zero
 
-        self.initialShadowFilling = properties.decorator?.shadow?.filling
-        self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
-        self.initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
+        self.initialShadowFilling = properties.decorator?.deprecatedShadow?.filling
+        self.initialShadowOffset = properties.decorator?.deprecatedShadow?.offset ?? .zero
+        self.initialShadowBlurRadius = properties.decorator?.deprecatedShadow?.blurRadius ?? .zero
 
         self.play = play
         self.onFinished = nil
@@ -293,6 +293,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                     )
                 )
             case let .shadow(value):
+                let shadowId = value.targetId // TODO: use animation for shadow with id
+
                 if let colorValue = value.color {
                     animatedShadowFilling = colorValue.start
                 }

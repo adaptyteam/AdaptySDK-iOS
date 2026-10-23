@@ -20,7 +20,6 @@ extension Schema.Animation: Decodable {
         case offset
         case angle
         case anchor
-        case color
         case blurRadius = "blur_radius"
     }
 
@@ -62,9 +61,7 @@ extension Schema.Animation: Decodable {
             case .box:
                 try .box(.init(from: decoder))
             case .background:
-                try .background(
-                    container.decode(Range<Schema.AssetReference>.self, forKey: .color)
-                )
+                try .background(.init(from: decoder))
             case .border:
                 try .border(.init(from: decoder))
             case .shadow:
@@ -83,4 +80,3 @@ extension Schema.Animation: Decodable {
         )
     }
 }
-
