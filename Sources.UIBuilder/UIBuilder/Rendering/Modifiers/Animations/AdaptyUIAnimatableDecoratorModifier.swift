@@ -335,11 +335,14 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                 shape.swiftUIShapeFill(self.withInnerShadows(gradient.shapeStyle, layer))
                     .clipShape(shape)
             case let .image(image):
-                // ponytail: no inner shadows on images, ShapeStyle has no image fill
-                // here; add an inner-shadow overlay when a design needs it.
                 shape.swiftUIShapeFill(AnyShapeStyle(.clear))
                     .background {
                         AdaptyUIImageView(.resolvedImageAsset(asset: image, aspect: aspect, tint: nil))
+                    }
+                    .overlay {
+                        ForEach(Array(self.resolvedShadows(layer, kind: .inner).enumerated()), id: \.offset) {
+                            self.innerShadow($0.element, shape: shape)
+                        }
                     }
                     .clipShape(shape)
             case .none:
@@ -379,6 +382,20 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                 x: shadow.offset.width,
                 y: shadow.offset.height
             )))
+        }
+    }
+
+    /// An inner shadow over content that is not a ShapeStyle, such as an image:
+    /// the shape's own inner shadow, drawn white on black, masks the shadow colour.
+    private func innerShadow(_ shadow: ResolvedShadow, shape: VC.ShapeType) -> some View {
+        shadow.color.mask {
+            shape.swiftUIShapeFill(AnyShapeStyle(Color.black.shadow(.inner(
+                color: .white,
+                radius: shadow.radius,
+                x: shadow.offset.width,
+                y: shadow.offset.height
+            ))))
+            .luminanceToAlpha()
         }
     }
 
