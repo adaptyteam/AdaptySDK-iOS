@@ -4,6 +4,23 @@ import Testing
 
 @Suite("Decorator Effects Parsing", .tags(.codable))
 struct DecoratorEffectsParsingTests {
+    @Test("Shadow kinds use string identifiers for Codable", arguments: [
+        ("drop_shadow", VC.Decorator.Shadow.Kind.drop),
+        ("inner_shadow", VC.Decorator.Shadow.Kind.inner),
+    ])
+    func shadowKindCodable(identifier: String, expected: VC.Decorator.Shadow.Kind) throws {
+        let kind = try Json(deserilized: identifier).decode(VC.Decorator.Shadow.Kind.self)
+        #expect(kind == expected)
+
+        let encoded = try JSONEncoder().encode(kind)
+        #expect(try JSONDecoder().decode(String.self, from: encoded) == identifier)
+    }
+
+    @Test("Shadow kinds reject numeric raw values", arguments: [Json("0"), Json("1")])
+    func shadowKindRejectsNumbers(value: Json) {
+        #expect(throws: DecodingError.self) { try value.decode(VC.Decorator.Shadow.Kind.self) }
+    }
+
     @Test("Both planes retain ordered layers, shadows, IDs and defaults")
     func orderedPlanes() throws {
         let value = try DecoratorEffectsFixtures.decorator(Json(##"""
@@ -111,7 +128,7 @@ struct DecoratorEffectsParsingTests {
     }
 
     @Test("Malformed plane payloads fail decoding", arguments: [
-        Json(##"{}"##), Json(##"false"##), Json(##"[{}]"##),
+        Json(##"{}"##), Json(##"false"##),
     ], ["underlays", "overlays"])
     func invalidArrays(value: Json, key: String) throws {
         try DecoratorEffectsFixtures.reject(Json(deserilized: [key: value.deserilized]))

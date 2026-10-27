@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Decorator.Shadow {
-    enum Kind: Int {
+    enum Kind {
         case drop
         case inner
     }
