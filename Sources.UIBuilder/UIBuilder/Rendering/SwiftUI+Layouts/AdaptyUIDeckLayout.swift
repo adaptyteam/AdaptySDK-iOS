@@ -18,6 +18,9 @@ struct AdaptyUIDeckLayout: Layout {
     let width: AdaptyUILayoutSizing
     let height: AdaptyUILayoutSizing
     let items: [AdaptyUIDeckSolver.Item]
+    /// The axes without a length from above, where the proposal is not read: a
+    /// `fill` axis there takes the fallback. See `AdaptyUIUnspecifiedProposalAxesKey`.
+    var unspecifiedAxes: Axis.Set = []
 
     func sizeThatFits(
         proposal: ProposedViewSize,
@@ -81,6 +84,7 @@ struct AdaptyUIDeckLayout: Layout {
     /// laid out rather than trapping on an index.
     private func solve(proposal: ProposedViewSize, subviews: Subviews) -> AdaptyUIDeckSolver.Result {
         let count = min(items.count, subviews.count)
+        let proposal = proposal.withoutLength(on: unspecifiedAxes)
 
         return AdaptyUIDeckSolver.solve(
             width: width,

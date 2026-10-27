@@ -248,6 +248,31 @@ struct LayoutProposalTests {
         #expect(log.measured.allSatisfy { $0 == placed })
     }
 
+    /// On an axis without a length from above, a `fill` deck takes the fallback, not
+    /// the number it is proposed: iOS 16 places a child of a stack in a scroll with
+    /// such a number. The item sized `{ "parent": 1 }` shows the deck's height.
+    @Test("Fill deck ignores the proposal on an axis without a length", arguments: [([], 20), (.vertical, AdaptyUIDeckSolver.fallbackLength)] as [(Axis.Set, CGFloat)])
+    func fillDeckIgnoresUnspecifiedAxis(unspecifiedAxes: Axis.Set, height: CGFloat) throws {
+        let log = Log()
+        Self.render(
+            BoxFrameLayoutTests.Root(proposal: ProposedViewSize(width: 402, height: 20), frames: BoxFrameLayoutTests.Frames()) {
+                AdaptyUIDeckLayout(
+                    width: .fill,
+                    height: .fill,
+                    items: [.init(width: .parent(1), height: .parent(1), anchor: CGPoint(x: 0.5, y: 0.5), position: CGPoint(x: 0.5, y: 0.5))],
+                    unspecifiedAxes: unspecifiedAxes
+                ) {
+                    AdaptyUIDeckItemLayout(contentAxes: []) {
+                        Recorder(log: log) { Color.clear }
+                    }
+                }
+            },
+            width: 402
+        )
+
+        #expect(try #require(log.placed.last) == ProposedViewSize(width: 402, height: height))
+    }
+
     /// A deck item without lengths is sized by its content: measured without a
     /// length on either axis, and placed without one.
     @Test("Deck item without lengths places without a proposal")

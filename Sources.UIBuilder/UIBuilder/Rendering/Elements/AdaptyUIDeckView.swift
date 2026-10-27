@@ -23,6 +23,8 @@ struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
     private var safeArea: EdgeInsets
     @Environment(\.layoutDirection)
     private var layoutDirection: LayoutDirection
+    @Environment(\.adaptyUnspecifiedProposalAxes)
+    private var unspecifiedAxes: Axis.Set
 
     private let deck: VC.Deck
     private let screenHolderBuilder: () -> ScreenHolderContent
@@ -39,7 +41,8 @@ struct AdaptyUIDeckView<ScreenHolderContent: View>: View {
         AdaptyUIDeckLayout(
             width: layoutSizing(deck.width),
             height: layoutSizing(deck.height),
-            items: deck.items.map(layoutItem)
+            items: deck.items.map(layoutItem),
+            unspecifiedAxes: unspecifiedAxes
         ) {
             ForEach(0 ..< deck.items.count, id: \.self) { idx in
                 // The wrapper turns the layout's proposal into the item's actual
