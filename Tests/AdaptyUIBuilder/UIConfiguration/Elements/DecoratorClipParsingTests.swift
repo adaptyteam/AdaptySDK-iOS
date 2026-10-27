@@ -41,10 +41,23 @@ struct DecoratorClipParsingTests {
         #expect(radius.topTrailing == 20)
         #expect(radius.bottomTrailing == 30)
         #expect(radius.bottomLeading == 40)
-        #expect(value.background != nil)
-        #expect(value.border?.thickness == 3)
-        #expect(value.shadow?.blurRadius == 4)
-        #expect(value.innerShadow?.blurRadius == 2)
+        try #require(value.underlays.count == 1)
+        try #require(value.overlays.count == 1)
+        let background = value.underlays[0]
+        let border = value.overlays[0]
+        #expect(background.id == 0)
+        #expect(border.id == 0)
+        guard case let .image(asset: backgroundAsset, aspect: aspect) = background.kind,
+              case let .stroke(asset: borderAsset, thickness: thickness) = border.kind,
+              case .color = backgroundAsset, case .color = borderAsset else {
+            Issue.record("Expected normalized legacy background and border")
+            return
+        }
+        #expect(aspect == .fill)
+        #expect(thickness == 3)
+        #expect(background.effects.map(\.kind) == [.drop, .inner])
+        #expect(background.effects.map(\.id) == [0, 0])
+        #expect(background.effects.map(\.blurRadius) == [4, 2])
         #expect(value.blurRadius == 5)
     }
 

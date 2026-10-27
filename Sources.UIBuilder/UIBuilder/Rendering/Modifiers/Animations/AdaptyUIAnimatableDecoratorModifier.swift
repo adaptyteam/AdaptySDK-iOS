@@ -282,12 +282,12 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         self.play = play
         self.includeBackground = includeBackground
 
-        self.initialBorderFilling = decorator.border?.filling
-        self.initialBorderThickness = decorator.border?.thickness
+        self.initialBorderFilling = decorator.deprecatedBorder?.filling
+        self.initialBorderThickness = decorator.deprecatedBorder?.thickness
 
-        self.initialInnerShadowFilling   = decorator.innerShadow?.filling
-        self.initialInnerShadowBlurRadius = decorator.innerShadow?.blurRadius ?? .zero
-        self.initialInnerShadowOffset     = decorator.innerShadow?.offset ?? .zero
+        self.initialInnerShadowFilling   = decorator.deprecatedInnerShadow?.filling
+        self.initialInnerShadowBlurRadius = decorator.deprecatedInnerShadow?.blurRadius ?? .zero
+        self.initialInnerShadowOffset     = decorator.deprecatedInnerShadow?.offset ?? .zero
     }
 
     @EnvironmentObject
@@ -332,7 +332,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         // branches into backgroundFill(for:) and lost the includeBackground
         // modifier on the way, which is how the footer background came back
         // unconditionally (SDK-1169).
-        if let filling = animatedBackgroundFilling ?? self.decorator.background {
+        if let filling = animatedBackgroundFilling ?? self.decorator.deprecatedBackground {
             content
                 .background {
                     self.backgroundFill(for: filling)
@@ -384,16 +384,18 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
             let timeline = animation.timeline
             switch animation.kind {
             case let .background(value):
-                self.animatedBackgroundFilling = value.start
+                let layerId = value.targetId // TODO: use animation for layer with id
+                self.animatedBackgroundFilling = value.color.start
 
                 tokens.insert(
                     timeline.animate(
-                        from: value.start,
-                        to: value.end,
+                        from: value.color.start,
+                        to: value.color.end,
                         updateBlock: { self.animatedBackgroundFilling = $0 }
                     )
                 )
             case let .border(value):
+                let layerId = value.targetId // TODO: use animation for layer with id
                 self.animatedBorderThickness = value.thickness?.start
 
                 if let color = value.color {
@@ -420,6 +422,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                     )
                 }
             case let .innerShadow(value):
+                let shadowId = value.targetId // TODO: use animation for shadow with id
+
                 if let colorValue = value.color {
                     animatedInnerShadowFilling = colorValue.start
                 }

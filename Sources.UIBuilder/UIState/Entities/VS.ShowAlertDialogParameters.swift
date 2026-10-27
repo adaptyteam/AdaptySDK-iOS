@@ -9,7 +9,6 @@ import Foundation
 import JavaScriptCore
 
 extension VS {
-    
     struct ShowAlertDialogParameters: Sendable {
         let title: StringIdentifierOrText?
         let message: StringIdentifierOrText?
