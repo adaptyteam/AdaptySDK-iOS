@@ -61,10 +61,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     private let initialBlurRadius: Double
 
-    private let initialShadowFilling: VC.AssetReference?
     private let initialOffset: VC.Offset
-    private let initialShadowOffset: VC.Offset
-    private let initialShadowBlurRadius: Double
 
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
@@ -126,10 +123,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
         self.initialBlurRadius = properties.decorator?.blurRadius ?? .zero
 
-        self.initialShadowFilling = properties.decorator?.deprecatedShadow?.filling
-        self.initialShadowOffset = properties.decorator?.deprecatedShadow?.offset ?? .zero
-        self.initialShadowBlurRadius = properties.decorator?.deprecatedShadow?.blurRadius ?? .zero
-
         self.play = play
         self.onFinished = nil
     }
@@ -144,9 +137,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         initialRotationAnchor: UnitPoint,
         initialOffset: VC.Offset,
         initialBlurRadius: Double,
-        initialShadowFilling: VC.AssetReference?,
-        initialShadowOffset: VC.Offset,
-        initialShadowBlurRadius: Double,
         onFinished: (() -> Void)?
     ) {
         self.initialOpacity = initialOpacity
@@ -161,10 +151,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         self.initialOffset = initialOffset
 
         self.initialBlurRadius = initialBlurRadius
-
-        self.initialShadowFilling = initialShadowFilling
-        self.initialShadowOffset = initialShadowOffset
-        self.initialShadowBlurRadius = initialShadowBlurRadius
 
         self.play = play
         self.onFinished = onFinished
@@ -184,31 +170,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         animatedBlurRadius ?? initialBlurRadius
     }
 
-    @State private var animatedShadowFilling: VC.AssetReference?
-    @State private var animatedShadowBlurRadius: Double?
-    @State private var animatedShadowOffset: CGSize?
-
-    private var resolvedShadowFilling: VC.AssetReference? {
-        animatedShadowFilling ?? initialShadowFilling
-    }
-
-    private var resolvedShadowBlurRadius: Double {
-        animatedShadowBlurRadius ?? initialShadowBlurRadius
-    }
-
-    private var resolvedShadowOffset: CGSize {
-        if let animatedShadowOffset {
-            CGSize(
-                width: animatedShadowOffset.width,
-                height: animatedShadowOffset.height
-            )
-        } else {
-            CGSize(
-                width: initialShadowOffset.x.points(.horizontal, screenSize, safeArea),
-                height: initialShadowOffset.y.points(.vertical, screenSize, safeArea)
-            )
-        }
-    }
 
     func body(content: Content) -> some View {
         content
@@ -216,15 +177,6 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
             .offset(resolvedOffset)
             .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
             .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
-            .shadow(
-                color: assetsViewModel.resolvedAsset(
-                    resolvedShadowFilling,
-                    mode: colorScheme.toVCMode,
-                    screen: screen
-                ).asColorAsset,
-                blurRadius: resolvedShadowBlurRadius,
-                offset: resolvedShadowOffset
-            )
             .opacity(resolvedOpacity)
             .onChange(of: play.wrappedValue) { startAnimations($0) }
     }
@@ -291,49 +243,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                             self.animatedScaleY = $0.y
                         }
                     )
-                )
-            case let .shadow(value):
-                let shadowId = value.targetId // TODO: use animation for shadow with id
-
-                if let colorValue = value.color {
-                    animatedShadowFilling = colorValue.start
-                }
-
-                if let blurValue = value.blurRadius {
-                    animatedShadowBlurRadius = blurValue.start
-                }
-
-                if let offsetValue = value.offset {
-                    animatedShadowOffset = CGSize(
-                        width: offsetValue.start.x.points(.horizontal, screenSize, safeArea),
-                        height: offsetValue.start.y.points(.vertical, screenSize, safeArea)
-                    )
-                }
-
-                tokens.insert(
-                    timeline.animate(
-                        from: (value.color?.start, value.blurRadius?.start, value.offset?.start),
-                        to: (value.color?.end, value.blurRadius?.end, value.offset?.end),
-                        completion: completionGroup?.track(),
-                        updateBlock: { value in
-                            if let colorValue = value.0 {
-                                animatedShadowFilling = colorValue
-                            }
-
-                            if let blurValue = value.1 {
-                                animatedShadowBlurRadius = blurValue
-                            }
-
-                            if let offsetValue = value.2 {
-                                animatedShadowOffset = CGSize(
-                                    width: offsetValue.x.points(.horizontal, screenSize, safeArea),
-                                    height: offsetValue.y.points(.vertical, screenSize, safeArea)
-                                )
-                            }
-                        }
-                    )
-                )
-            case let .blur(value):
+                )            case let .blur(value):
                 animatedBlurRadius = value.start
                 tokens.insert(
                     timeline.animate(
@@ -384,9 +294,6 @@ extension View {
         initialRotationAnchor: UnitPoint = .center,
         initialOffset: VC.Offset = .zero,
         initialBlurRadius: Double = .zero,
-        initialShadowFilling: VC.AssetReference? = nil,
-        initialShadowOffset: VC.Offset = .zero,
-        initialShadowBlurRadius: Double = .zero,
         onFinished: (() -> Void)? = nil
     ) -> some View {
         modifier(
@@ -400,9 +307,6 @@ extension View {
                 initialRotationAnchor: initialRotationAnchor,
                 initialOffset: initialOffset,
                 initialBlurRadius: initialBlurRadius,
-                initialShadowFilling: initialShadowFilling,
-                initialShadowOffset: initialShadowOffset,
-                initialShadowBlurRadius: initialShadowBlurRadius,
                 onFinished: onFinished
             )
         )

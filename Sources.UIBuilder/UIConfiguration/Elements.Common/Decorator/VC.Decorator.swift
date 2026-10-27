@@ -16,24 +16,3 @@ extension VC {
         let clip: Clip
     }
 }
-
-// TODO: Remove all deprecated properties and structs
-
-extension VC.Decorator {
-    @available(*, deprecated)
-    var deprecatedBackground: VC.AssetReference? { nil }
-    @available(*, deprecated)
-    var deprecatedBorder: VC.DeprecatedBorder? { nil }
-    @available(*, deprecated)
-    var deprecatedShadow: Shadow? { nil }
-    @available(*, deprecated)
-    var deprecatedInnerShadow: Shadow? { nil  }
-}
-
-extension VC {
-    @available(*, deprecated)
-    struct DeprecatedBorder: Sendable {
-        let filling: AssetReference
-        let thickness: Double
-    }
-}
