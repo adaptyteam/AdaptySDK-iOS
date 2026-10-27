@@ -107,8 +107,7 @@ extension VC.BlendMode {
         case .sourceAtop: .sourceAtop
         case .destinationOver: .destinationOver
         case .destinationOut: .destinationOut
-        // ponytail: SwiftUI has no destinationIn; draw it normally until a
-        // design needs it, then render the layer as a mask.
+        // SwiftUI has no destinationIn: `composed` renders such a layer as a mask.
         case .destinationIn: .normal
         case .plusLighter: .plusLighter
         }
@@ -243,26 +242,28 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     }
 
     private func decorated(_ content: Content) -> some View {
-        self.clippedContent(content)
-            .dropShadows(self.contentShadows)
-            .background {
-                // One gate for every underlay: 4.0.0 lost the includeBackground
-                // modifier on the image branch, which is how the footer
-                // background came back unconditionally (SDK-1169).
-                ZStack {
-                    ForEach(self.decorator.underlays.indices, id: \.self) {
-                        self.layerView(self.decorator.underlays[$0])
-                    }
+        self.composed(
+            self.decorator.overlays,
+            over: self.clippedContent(content)
+                .dropShadows(self.contentShadows)
+                .background {
+                    // One gate for every underlay: 4.0.0 lost the includeBackground
+                    // modifier on the image branch, which is how the footer
+                    // background came back unconditionally (SDK-1169).
+                    self.composed(self.decorator.underlays, over: Color.clear)
+                        .opacity(includeBackground ? 1.0 : 0.0)
                 }
-                .opacity(includeBackground ? 1.0 : 0.0)
-            }
-            .overlay {
-                ZStack {
-                    ForEach(self.decorator.overlays.indices, id: \.self) {
-                        self.layerView(self.decorator.overlays[$0])
-                    }
-                }
-            }
+        )
+    }
+
+    /// Draws `layers` over `base` in order. A `destination_in` layer masks
+    /// everything drawn before it.
+    private func composed(_ layers: [VC.Decorator.Layer], over base: some View) -> AnyView {
+        layers.reduce(AnyView(base)) { drawn, layer in
+            layer.blend == .destinationIn
+                ? AnyView(drawn.mask { self.layerView(layer) })
+                : AnyView(drawn.overlay { self.layerView(layer) })
+        }
     }
 
     /// Layer blend modes compose within the element, not with the screen. The
