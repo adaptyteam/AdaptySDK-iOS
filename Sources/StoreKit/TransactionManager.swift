@@ -147,7 +147,7 @@ private extension Adapty {
                     )
 
                     try await report(
-                        .init(product, transaction),
+                        .init(product, transaction, signedTransaction.jwsRepresentation),
                         payload: purchasePayloadStorage.purchasePayload(
                             byTransaction: transaction,
                             orCreateFor: ProfileStorage.userId

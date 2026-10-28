@@ -646,6 +646,7 @@ $requests:
       method: { const: "report_transaction" }
       variation_id: { type: string }
       transaction_id: { type: string }
+      apple_jws_transaction: { type: string }
 
   ReportTransaction.Response: #response
     type: object

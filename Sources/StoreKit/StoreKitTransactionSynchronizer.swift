@@ -40,12 +40,14 @@ extension Adapty: StoreKitTransactionSynchronizer {
 
     func sendTransactionId(
         _ transactionId: String,
+        jwsTransaction: String?,
         with variationId: String?,
         for userId: AdaptyUserId
     ) async throws(AdaptyError) {
         do {
             let response = try await httpSession.sendTransactionId(
                 transactionId,
+                jwsTransaction: jwsTransaction,
                 with: variationId,
                 for: userId
             )

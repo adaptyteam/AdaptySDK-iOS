@@ -78,7 +78,7 @@ actor StoreKitPurchaser {
                             )
 
                             try await transactionSynchronizer.report(
-                                .init(product, transaction),
+                                .init(product, transaction, signedTransaction.jwsRepresentation),
                                 payload: storage.purchasePayload(
                                     byTransaction: transaction,
                                     orCreateFor: ProfileStorage.userId
@@ -363,7 +363,7 @@ actor StoreKitPurchaser {
 
         do {
             let profile = try await transactionSynchronizer.validate(
-                .init(product, transaction),
+                .init(product, transaction, signedTransaction.jwsRepresentation),
                 payload: payload,
                 reason: reason
             )

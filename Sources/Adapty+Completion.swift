@@ -452,6 +452,7 @@ public extension Adapty {
     ///   - variationId:  A string identifier of variation. You can get it using variationId property of `AdaptyFlowPaywall`.
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
     ///   - completion: A result containing an optional error.
+    @available(*, deprecated, message: "Use reportTransaction(_:withVariationId:_:) with StoreKit.VerificationResult<StoreKit.Transaction> instead.")
     nonisolated static func reportTransaction(
         _ transaction: StoreKit.Transaction,
         withVariationId variationId: String? = nil,
