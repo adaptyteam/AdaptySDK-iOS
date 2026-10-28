@@ -114,21 +114,45 @@ struct AdaptyScreenView: View {
 /// the navigator's display list, and a transition that moves it updates every leaf layer
 /// on every frame: on a 120 Hz display that holds the slide at 60 Hz. The other layouts
 /// get the layer from the scroll view they are built on; this is the same scroll view
-/// with scrolling off, keeping the full screen size the content had outside it.
+/// with scrolling off.
+///
+/// The screen keeps the size it had outside the scroll view: its content is offered the
+/// screen size and the scroll view takes the size the content picks, so a screen that
+/// hugs its content (a bottom sheet) is still placed by its navigator.
 @available(iOS 16.0, *)
 private struct AdaptyUIScreenLayerView<Content: View>: View {
+    @Environment(\.adaptyScreenSize)
+    private var screenSize: CGSize
+
+    @State
+    private var contentSize: CGSize?
+
     @ViewBuilder let content: Content
 
     var body: some View {
-        GeometryReader { proxy in
-            ScrollView(.vertical) {
-                content
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-            }
-            .scrollDisabled(true)
-            .scrollIndicatorsHidden_compatible()
-            .ignoresSafeArea()
+        ScrollView(.vertical) {
+            AdaptyUIProposingLayout(size: screenSize) { content }
+                .onGeometrySizeChange { contentSize = $0 }
         }
+        .scrollDisabled(true)
+        .scrollIndicatorsHidden_compatible()
+        .ignoresSafeArea()
+        .frame(width: contentSize?.width, height: contentSize?.height)
+    }
+}
+
+/// Offers its content a fixed size, whatever it is offered itself, and takes the size
+/// the content picks.
+@available(iOS 16.0, *)
+private struct AdaptyUIProposingLayout: Layout {
+    let size: CGSize
+
+    func sizeThatFits(proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) -> CGSize {
+        subviews.first?.sizeThatFits(ProposedViewSize(size)) ?? .zero
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
+        subviews.first?.place(at: bounds.origin, proposal: ProposedViewSize(size))
     }
 }
 
