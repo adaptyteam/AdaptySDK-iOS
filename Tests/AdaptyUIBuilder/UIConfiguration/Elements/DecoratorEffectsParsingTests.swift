@@ -12,8 +12,7 @@ struct DecoratorEffectsParsingTests {
         let kind = try Json(deserilized: identifier).decode(VC.Decorator.Shadow.Kind.self)
         #expect(kind == expected)
 
-        let encoded = try JSONEncoder().encode(kind)
-        #expect(try JSONDecoder().decode(String.self, from: encoded) == identifier)
+        #expect(try Json.encode(kind) == Json(deserilized: identifier))
     }
 
     @Test("Shadow kinds reject numeric raw values", arguments: [Json("0"), Json("1")])
@@ -91,8 +90,10 @@ struct DecoratorEffectsParsingTests {
         #expect(value.clip == .content)
     }
 
-    @Test("Missing or empty planes produce no layers", arguments: [
+    @Test("Missing, null or empty planes produce no layers", arguments: [
         Json(##"{}"##), Json(##"{"underlays":[],"overlays":[]}"##),
+        Json(##"{"underlays":null}"##), Json(##"{"overlays":null}"##),
+        Json(##"{"underlays":null,"overlays":null}"##),
     ])
     func emptyPlanes(json: Json) throws {
         let value = try DecoratorEffectsFixtures.decorator(json)
@@ -139,21 +140,83 @@ struct DecoratorEffectsParsingTests {
         Json(##"{"id":-1,"type":"fill","asset_id":"#FFFFFF"}"##),
         Json(##"{"id":1.5,"type":"fill","asset_id":"#FFFFFF"}"##),
         Json(##"{"id":"1","type":"fill","asset_id":"#FFFFFF"}"##),
-        Json(##"{"id":1,"type":"unknown","asset_id":"#FFFFFF"}"##),
+        Json(##"{"id":1,"type":123}"##),
         Json(##"{"id":1,"type":"fill"}"##),
         Json(##"{"id":1,"type":"fill","value":"#FFFFFF"}"##),
         Json(##"{"id":1,"type":"stroke","color":"#FFFFFF"}"##),
         Json(##"{"id":1,"type":"image","asset_id":"photo","aspect":"tile"}"##),
         Json(##"{"id":1,"type":"stroke","asset_id":"#FFFFFF","thickness":"wide"}"##),
         Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":{}}"##),
+        Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":[null]}"##),
+        Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":[true]}"##),
+        Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":[{"type":0,"color":"#000000"}]}"##),
         Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":[{"id":0,"color":"#000000"}]}"##),
         Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":[{"id":-1,"color":"#000000"}]}"##),
         Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":[{"id":1.5,"color":"#000000"}]}"##),
-        Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":[{"id":2,"type":"unknown","color":"#000000"}]}"##),
         Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":[{"id":2,"type":"inner_shadow"}]}"##),
+        Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":[{"type":"unknown"},{"type":"drop_shadow","color":"#000000","blur_radius":"bad"}]}"##),
     ])
     func invalidPayload(layer: Json) throws {
         try DecoratorEffectsFixtures.reject(Json(deserilized: ["underlays": [layer.deserilized]]))
+    }
+
+    @Test("Unknown layers are skipped without changing known or legacy layers", arguments: ["underlays", "overlays"])
+    func unknownLayers(key: String) throws {
+        let layers = Json(##"""
+        [
+          {"type":"future_before","id":-1,"effects":false},
+          {"id":11,"type":"fill","asset_id":"#112233"},
+          {"type":"future_middle"},
+          {"id":12,"type":"stroke","asset_id":"#445566"},
+          {"id":13,"type":"image","asset_id":"photo"},
+          {"id":14,"type":"effects"},
+          {"id":15},
+          {"id":16,"type":null},
+          {"type":"future_after","asset_id":false}
+        ]
+        """##)
+        let value = try DecoratorEffectsFixtures.decorator(Json(deserilized: [
+            "background": "#FFFFFF", "border": "#000000", key: layers.deserilized,
+        ]))
+        let decoded = key == "underlays" ? value.underlays : value.overlays
+        #expect(decoded.map(\.id) == [0, 11, 12, 13, 14, 15, 16])
+        let explicit = Array(decoded.dropFirst())
+        try #require(explicit.count == 6)
+        guard case .fill = explicit[0].kind,
+              case let .stroke(_, thickness) = explicit[1].kind,
+              case let .image(_, aspect) = explicit[2].kind,
+              case .effects = explicit[3].kind,
+              case .effects = explicit[4].kind,
+              case .effects = explicit[5].kind else {
+            Issue.record("Expected known layer kinds and effects defaults")
+            return
+        }
+        #expect(thickness == 1)
+        #expect(aspect == .fill)
+    }
+
+    @Test("An array of unknown layers produces no layers", arguments: [
+        Json(##"[{"id":1,"type":"unknown","asset_id":"#FFFFFF"}]"##),
+        Json(##"[{"type":"future_one"},{"type":"future_two","id":0,"effects":false}]"##),
+    ], ["underlays", "overlays"])
+    func allLayersUnknown(layers: Json, key: String) throws {
+        let value = try DecoratorEffectsFixtures.decorator(Json(deserilized: [key: layers.deserilized]))
+        #expect(value.underlays.isEmpty && value.overlays.isEmpty)
+    }
+
+    @Test("Null effects produce no shadows without removing the layer", arguments: ["underlays", "overlays"])
+    func nullEffects(key: String) throws {
+        let layer = Json(##"{"id":1,"type":"fill","asset_id":"#FFFFFF","effects":null}"##)
+        let value = try DecoratorEffectsFixtures.decorator(Json(deserilized: [key: [layer.deserilized]]))
+        let layers = key == "underlays" ? value.underlays : value.overlays
+        #expect(layers.map(\.id) == [1])
+        let decoded = try #require(layers.first)
+        #expect(decoded.effects.isEmpty)
+        guard case let .fill(asset) = decoded.kind else {
+            Issue.record("Expected retained fill layer")
+            return
+        }
+        try DecoratorEffectsFixtures.expectColor(asset, "#FFFFFF")
     }
 
     @Test("IDs are optional and shadows default to drop")
@@ -190,6 +253,42 @@ struct DecoratorEffectsParsingTests {
         #expect(layer.id == 3)
         #expect(layer.effects.map(\.id) == [9])
         #expect(layer.effects.map(\.kind) == [.inner])
+    }
+
+    @Test("Unknown effects are skipped without changing known effects", arguments: ["underlays", "overlays"])
+    func unknownEffects(key: String) throws {
+        let layer = Json(##"""
+        {"type":"effects","effects":[
+          {"type":"future_blur","id":-1,"color":false,"payload":{"nested":[1,2]}},
+          {"id":11,"type":"drop_shadow","color":"#000000","blur_radius":2},
+          {"type":"future_glow"},
+          {"id":12,"type":"inner_shadow","color":"#FFFFFF","blur_radius":3},
+          {"id":13,"color":"#FF0000"},
+          {"id":14,"type":null,"color":"#00FF00"},
+          {"type":"future_shadow","id":"invalid"}
+        ]}
+        """##)
+        let value = try DecoratorEffectsFixtures.decorator(Json(deserilized: [key: [layer.deserilized]]))
+        let layers = key == "underlays" ? value.underlays : value.overlays
+        let effects = try #require(layers.first).effects
+        #expect(effects.map(\.id) == [11, 12, 13, 14])
+        #expect(effects.map(\.kind) == [.drop, .inner, .drop, .drop])
+        #expect(effects.map(\.blurRadius) == [2, 3, 0, 0])
+        for (effect, color) in zip(effects, ["#000000", "#FFFFFF", "#FF0000", "#00FF00"]) {
+            try DecoratorEffectsFixtures.expectColor(effect.filling, color)
+        }
+    }
+
+    @Test("An array of unknown effects produces no shadows", arguments: [
+        Json(##"[{"id":2,"type":"unknown","color":"#000000"}]"##),
+        Json(##"[{"type":"future_blur"},{"type":"future_glow","color":false}]"##),
+    ])
+    func allEffectsUnknown(effects: Json) throws {
+        let value = try DecoratorEffectsFixtures.decorator(Json(deserilized: [
+            "underlays": [["type": "effects", "effects": effects.deserilized]],
+        ]))
+        let layer = try #require(value.underlays.first)
+        #expect(layer.effects.isEmpty)
     }
 
     @Test("Legacy combinations normalize to paint or effects layers", arguments: 0..<16)

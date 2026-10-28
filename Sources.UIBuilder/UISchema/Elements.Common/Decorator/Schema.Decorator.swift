@@ -82,8 +82,8 @@ extension Schema.Decorator: Decodable {
             )]
         }
 
-        let underlays = try container.decodeIfPresent([Schema.Decorator.Layer].self, forKey: .underlays) ?? []
-        let overlays = try container.decodeIfPresent([Schema.Decorator.Layer].self, forKey: .overlays) ?? []
+        let underlays = try container.decodeLayers(forKey: .underlays)
+        let overlays = try container.decodeLayers(forKey: .overlays)
 
         try self.init(
             shapeType: shapeType,
@@ -92,5 +92,33 @@ extension Schema.Decorator: Decodable {
             blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius),
             clip: container.decodeIfPresent(Clip.self, forKey: .clip) ?? .content
         )
+    }
+}
+
+private enum LayerCodingKeys: String, CodingKey {
+    case kind = "type"
+}
+
+private extension KeyedDecodingContainer {
+    func decodeLayers(forKey key: Key) throws -> [Schema.Decorator.Layer] {
+        guard contains(key) else { return [] }
+        if try decodeNil(forKey: key) { return [] }
+
+        var array = try self.nestedUnkeyedContainer(forKey: key)
+
+        var layers = [Schema.Decorator.Layer]()
+        if let count = array.count {
+            layers.reserveCapacity(count)
+        }
+        while !array.isAtEnd {
+            let decoder = try array.superDecoder()
+            let layer = try decoder.container(keyedBy: LayerCodingKeys.self)
+            if let kind = try layer.decodeIfPresent(String.self, forKey: .kind),
+               Schema.Decorator.Layer.Kind.Value(rawValue: kind) == nil {
+                continue
+            }
+            layers.append(try Schema.Decorator.Layer(from: decoder))
+        }
+        return layers
     }
 }

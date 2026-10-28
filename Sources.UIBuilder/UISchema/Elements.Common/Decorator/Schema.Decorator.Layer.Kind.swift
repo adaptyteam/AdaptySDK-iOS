@@ -9,11 +9,11 @@ import Foundation
 
 extension Schema.Decorator.Layer.Kind: Decodable {
 
-    private enum Types {
-        static let effects = "effects"
-        static let image = "image"
-        static let fill = "fill"
-        static let stroke = "stroke"
+    enum Value: String {
+        case effects = "effects"
+        case image = "image"
+        case fill = "fill"
+        case stroke = "stroke"
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -28,18 +28,18 @@ extension Schema.Decorator.Layer.Kind: Decodable {
         let type = try container.decodeIfPresent(String.self, forKey: .type)
 
         switch type {
-        case .none, Types.effects:
+        case .none, Value.effects.rawValue:
             self = .effects
-        case Types.image:
+        case Value.image.rawValue:
             self = .image(
                 asset: try container.decode(Schema.AssetReference.self, forKey: .assetId),
                 aspect: try container.decodeIfPresent(Schema.AspectRatio.self, forKeys: .aspect) ?? .fill
             )
-        case Types.fill:
+        case Value.fill.rawValue:
             self = .fill(
                 asset: try container.decode(Schema.AssetReference.self, forKey: .assetId)
             )
-        case Types.stroke:
+        case Value.stroke.rawValue:
             self = .stroke(
                 asset: try container.decode(Schema.AssetReference.self, forKey: .assetId),
                 thickness: try container.decodeIfPresent(Double.self, forKey: .thickness) ?? 1.0

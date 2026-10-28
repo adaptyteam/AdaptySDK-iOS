@@ -6,8 +6,7 @@
 //
 
 import Foundation
-
-
+    
 extension Schema.Decorator.Shadow.Kind: RawRepresentable {
     private enum Key {
         static let drop = "drop_shadow"

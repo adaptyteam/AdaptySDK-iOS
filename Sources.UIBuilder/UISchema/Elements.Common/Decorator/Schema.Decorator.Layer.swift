@@ -26,39 +26,35 @@ extension Schema.Decorator.Layer: Decodable {
             id: id,
             kind: Schema.Decorator.Layer.Kind(from: decoder),
             blend: (try? container.decodeIfPresent(Schema.BlendMode.self, forKey: .blend)) ?? .default,
-            effects: container.decodeIfPresent([Schema.Decorator.Shadow].self, forKey: .effects, configuration: .defaultShadow) ?? []
+            effects: container.decodeEffects(forKey: .effects)
         )
     }
 }
 
-//private enum EffectCodingKeys: String, CodingKey {
-//    case kind = "type"
-//}
-//
-//private extension KeyedDecodingContainer {
-//    func decodeEffects(forKey key: Key) throws -> [Schema.Decorator.Shadow] {
-//
-//
-//
-//        var array = try self.nestedUnkeyedContainer(forKey: key)
-//
-//        var effects = [Schema.Decorator.Shadow]()
-//        if let count = array.count {
-//            effects.reserveCapacity(count)
-//        }
-//        while !array.isAtEnd {
-//            let effect = try array.nestedContainer(keyedBy: EffectCodingKeys.self)
-//            do {
-//                _ = try effect.decode(Schema.Decorator.Shadow.Kind.self, forKey: .kind)
-//                effects.append(<#T##newElement: Schema.Decorator.Shadow##Schema.Decorator.Shadow#>)
-//            } catch {
-//                continue
-//            }
-//            try strings[item.decode(Schema.StringIdentifier.self, forKey: .id)] = try Item(
-//                value: item.decode(Schema.RichText.self, forKey: .value),
-//                fallback: item.decodeIfPresent(Schema.RichText.self, forKey: .fallback)
-//            )
-//        }
-//        return effects
-//    }
-//}
+private enum EffectCodingKeys: String, CodingKey {
+    case kind = "type"
+}
+
+private extension KeyedDecodingContainer {
+    func decodeEffects(forKey key: Key) throws -> [Schema.Decorator.Shadow] {
+        guard contains(key) else { return [] }
+        if try decodeNil(forKey: key) { return [] }
+
+        var array = try self.nestedUnkeyedContainer(forKey: key)
+
+        var effects = [Schema.Decorator.Shadow]()
+        if let count = array.count {
+            effects.reserveCapacity(count)
+        }
+        while !array.isAtEnd {
+            let decoder = try array.superDecoder()
+            let effect = try decoder.container(keyedBy: EffectCodingKeys.self)
+            if let kind = try effect.decodeIfPresent(String.self, forKey: .kind),
+               Schema.Decorator.Shadow.Kind(rawValue: kind) == nil {
+                continue
+            }
+            effects.append(try Schema.Decorator.Shadow(from: decoder, configuration: .defaultShadow))
+        }
+        return effects
+    }
+}
