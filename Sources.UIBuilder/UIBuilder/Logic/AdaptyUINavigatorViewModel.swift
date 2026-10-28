@@ -145,6 +145,14 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
     /// without its animations having reported completion.
     private static let screenTransitionTimeout: TimeInterval = 2.0
 
+    private struct PendingNavigatorTransition {
+        let id = UUID()
+        let backgroundTail: TimeInterval
+        let finish: () -> Void
+    }
+
+    private var pendingNavigatorTransition: PendingNavigatorTransition?
+
     private struct PendingScreenTransition {
         let id = UUID()
         let outgoing: AdaptyUIScreenViewModel
@@ -404,14 +412,18 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
             return
         }
 
+        // A transition still waiting for its animation is finished before the next one
+        // starts, as its timer would have done.
+        if let previous = pendingNavigatorTransition {
+            pendingNavigatorTransition = nil
+            previous.finish()
+        }
+
         backgroundAnimation = transition.background
         contentAnimations = transition.content
 
         let totalDuration = transition.totalDuration
-
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + totalDuration
-        ) { [weak self] in
+        let finish: () -> Void = { [weak self] in
             guard let self else { return }
             Log.ui.verbose("#\(self.logId)# navigator:\(self.navigator.id) - transition finished")
 
@@ -435,6 +447,44 @@ package final class AdaptyUINavigatorViewModel: ObservableObject {
                     screenInstanceId: screen.instance.id
                 )
             }
+        }
+
+        guard let content = transition.content, !content.isEmpty else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration, execute: finish)
+            return
+        }
+
+        // The content animation reports its own completion (see
+        // contentTransitionDidFinish): a timer started here would run ahead of it by
+        // however long the first frame takes, and cut the end of the slide off. A
+        // background that outlasts the content is waited for past that point.
+        let pending = PendingNavigatorTransition(
+            backgroundTail: max(0, totalDuration - content.totalDuration),
+            finish: finish
+        )
+        pendingNavigatorTransition = pending
+
+        // Safety net only, as for screen transitions.
+        let pendingId = pending.id
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + totalDuration + Self.screenTransitionTimeout
+        ) { [weak self] in
+            guard let self, self.pendingNavigatorTransition?.id == pendingId else { return }
+            Log.ui.error("#\(self.logId)# navigator:\(self.navigator.id) - transition did not finish in time")
+            self.pendingNavigatorTransition = nil
+            finish()
+        }
+    }
+
+    /// Called when the navigator's content animation completes.
+    func contentTransitionDidFinish() {
+        guard let pending = pendingNavigatorTransition else { return }
+        pendingNavigatorTransition = nil
+
+        if pending.backgroundTail > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + pending.backgroundTail, execute: pending.finish)
+        } else {
+            pending.finish()
         }
     }
 

@@ -194,7 +194,8 @@ struct AdaptyNavigatorView: View {
             .animatablePropertiesTransition(
                 play: $contentAnimations,
                 initialOpacity: navigatorViewModel.contentSeedOpacity,
-                initialOffset: navigatorViewModel.contentSeedOffset
+                initialOffset: navigatorViewModel.contentSeedOffset,
+                onFinished: { navigatorViewModel.contentTransitionDidFinish() }
             )
             .overrideOpenUrl { url in
                 stateViewModel.handle(
