@@ -51,7 +51,11 @@ private final class AdaptyUIAnimationCompletionGroup {
     private func fireIfDone() {
         guard sealed, pending == 0, let onFinished else { return }
         self.onFinished = nil
-        onFinished()
+        // SwiftUI reports completion from the update that is about to show the last
+        // frame. What the caller does on finish (state resets, appear events, scripts)
+        // would land in that same update and hold the last frame back, so it runs on
+        // the next turn of the main queue, after the frame is committed.
+        DispatchQueue.main.async(execute: onFinished)
     }
 }
 
