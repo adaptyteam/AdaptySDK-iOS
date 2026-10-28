@@ -77,26 +77,57 @@ struct AdaptyScreenView: View {
         case .transparent:
             AdaptyUITransparentContainerView(screen: screen)
         default:
-            AdaptyUIElementView(
-                screen.content,
-                screenHolderBuilder: { EmptyView() }
-            )
-            .background {
-                if let background = screen.background {
-                    AdaptyUIBackgroundElementsView(
-                        backgrounds: background,
-                        screenHolderBuilder: { EmptyView() }
-                    )
-                }
+            if #available(iOS 16.0, *) {
+                AdaptyUIScreenLayerView { defaultScreenView(screen) }
+            } else {
+                defaultScreenView(screen)
             }
-            .overlay {
-                if let overlay = screen.overlay {
-                    AdaptyUIOverlayElementsView(
-                        overlays: overlay,
-                        screenHolderBuilder: { EmptyView() }
-                    )
-                }
+        }
+    }
+
+    @ViewBuilder
+    private func defaultScreenView(_ screen: VC.Screen) -> some View {
+        AdaptyUIElementView(
+            screen.content,
+            screenHolderBuilder: { EmptyView() }
+        )
+        .background {
+            if let background = screen.background {
+                AdaptyUIBackgroundElementsView(
+                    backgrounds: background,
+                    screenHolderBuilder: { EmptyView() }
+                )
             }
+        }
+        .overlay {
+            if let overlay = screen.overlay {
+                AdaptyUIOverlayElementsView(
+                    overlays: overlay,
+                    screenHolderBuilder: { EmptyView() }
+                )
+            }
+        }
+    }
+}
+
+/// Gives a `.default` screen a layer of its own. Without one the screen is flattened into
+/// the navigator's display list, and a transition that moves it updates every leaf layer
+/// on every frame: on a 120 Hz display that holds the slide at 60 Hz. The other layouts
+/// get the layer from the scroll view they are built on; this is the same scroll view
+/// with scrolling off, keeping the full screen size the content had outside it.
+@available(iOS 16.0, *)
+private struct AdaptyUIScreenLayerView<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        GeometryReader { proxy in
+            ScrollView(.vertical) {
+                content
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+            }
+            .scrollDisabled(true)
+            .scrollIndicatorsHidden_compatible()
+            .ignoresSafeArea()
         }
     }
 }
