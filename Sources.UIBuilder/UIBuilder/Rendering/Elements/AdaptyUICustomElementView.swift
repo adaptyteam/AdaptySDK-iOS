@@ -13,6 +13,7 @@ import SwiftUI
 ///
 /// Observing the view models here is what makes the app view rebuild on flow
 /// state updates without the app subscribing to anything.
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUICustomElementView: View {
     private let element: VC.CustomElement
 
@@ -45,7 +46,10 @@ struct AdaptyUICustomElementView: View {
 
     @ViewBuilder
     private var unservedBody: some View {
-        if showsDebugPlaceholders {
+        if let fallback = element.fallback {
+            AdaptyUIElementView(fallback, screenHolderBuilder: { EmptyView() })
+                .onAppear { logUnserved() }
+        } else if showsDebugPlaceholders {
             // Colours are fixed rather than inherited: the placeholder has to be
             // readable over whatever the configuration draws behind it.
             Text("custom \(element.type):\(element.id)")
