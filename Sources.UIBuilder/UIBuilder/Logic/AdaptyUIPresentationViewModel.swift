@@ -30,12 +30,12 @@ package final class AdaptyUIPresentationViewModel: ObservableObject {
         self.logic = logic
     }
 
-    func viewDidAppear() {
+    package func viewDidAppear() {
         presentationState = .appeared
         logic.reportViewDidAppear()
     }
 
-    func viewDidDisappear() {
+    package func viewDidDisappear() {
         presentationState = .disappeared
         logic.reportViewDidDisappear()
     }

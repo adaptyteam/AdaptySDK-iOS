@@ -547,7 +547,7 @@ $requests:
   ### showStoreMessage ###
   ShowStoreMessage.Request: #request
     type: object
-    description: "iOS Only. Requires iOS 16+"
+    description: "Requires iOS 16+ on iOS"
     required: [method]
     properties:
       method: { const: "show_store_messages" }
@@ -646,6 +646,7 @@ $requests:
       method: { const: "report_transaction" }
       variation_id: { type: string }
       transaction_id: { type: string }
+      apple_jws_transaction: { type: string }
 
   ReportTransaction.Response: #response
     type: object
@@ -1264,7 +1265,7 @@ $defs:
       store_messages_handling:
         {
           $ref: "#/$defs/StoreMessagesHandling",
-          description: "iOS Only. Requires iOS 16+",
+          description: "Requires iOS 16+ on iOS",
         }
       apple_idfa_collection_disabled: { type: boolean, default: false }
       google_adid_collection_disabled: { type: boolean, default: false }

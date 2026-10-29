@@ -169,7 +169,7 @@ public extension AdaptyUI {
         func reportOnAppear() {
             appeared = true
             tryEmitLegacyAutoSelect()
-            logic.reportViewDidAppear()
+            presentationViewModel.viewDidAppear()
             flowViewModel.logShowFlow()
             timerViewModel.resumeTimers()
         }
@@ -195,7 +195,7 @@ public extension AdaptyUI {
         }
 
         func reportOnDisappear() {
-            logic.reportViewDidDisappear()
+            presentationViewModel.viewDidDisappear()
             timerViewModel.pauseTimers()
         }
 

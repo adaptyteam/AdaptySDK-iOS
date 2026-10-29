@@ -172,13 +172,13 @@ public extension AdaptyUIBuilder {
         }
 
         func reportOnAppear() {
-            logic.reportViewDidAppear()
+            presentationViewModel.viewDidAppear()
             flowViewModel.logShowFlow()
             timerViewModel.resumeTimers()
         }
 
         func reportOnDisappear() {
-            logic.reportViewDidDisappear()
+            presentationViewModel.viewDidDisappear()
             timerViewModel.pauseTimers()
         }
 
