@@ -306,8 +306,6 @@ extension VS.JSState {
         guard !actions.isEmpty else { return }
 
         for action in actions {
-            guard !actionDispatcher.fastExecute(action) else { continue }
-
             var mergedParams = action.params ?? [:]
 
             if let params {
@@ -315,6 +313,9 @@ extension VS.JSState {
                     mergedParams[key] = VC.Value(value)
                 }
             }
+
+            if let sdkMethod = action.sdkMethod,
+               actionDispatcher.fastExecute(sdkMethod, params: mergedParams) { continue }
 
             let object = VS.ActionParameters(
                 screenInstance: screenInstance,

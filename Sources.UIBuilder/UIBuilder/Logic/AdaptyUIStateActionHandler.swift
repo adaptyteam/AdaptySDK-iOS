@@ -447,7 +447,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
             if event.isCustomer {
                 self?.logic.reportCustomerAnalyticEvent(
                     name: event.name,
-                    params: event.params
+                    params: event.params(with: [.name, .instanceId])
                 )
             }
         }

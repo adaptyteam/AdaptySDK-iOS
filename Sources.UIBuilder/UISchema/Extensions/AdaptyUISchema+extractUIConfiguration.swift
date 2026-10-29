@@ -8,7 +8,11 @@
 import Foundation
 
 package extension AdaptyUISchema {
-    func extractUIConfiguration(id: String, withLocaleId localeId: LocaleId, envoriment: VC.EnvironmentConstants) throws -> AdaptyUIConfiguration {
+    func extractUIConfiguration(
+        id: String,
+        withLocaleId localeId: LocaleId,
+        envoriment: VC.EnvironmentConstants
+    ) throws -> AdaptyUIConfiguration {
         try ConfigurationBuilder(id: id, source: self, withLocaleId: localeId).localize(envoriment: envoriment)
     }
 }

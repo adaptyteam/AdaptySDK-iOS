@@ -5,53 +5,70 @@
 //  Created by Aleksei Valiano on 14.04.2026.
 //
 
+import Foundation
+
 extension VS.JSActionDispatcher {
     @inlinable
-    func fastExecute(_ action: VC.Action) -> Bool {
-        guard
-            action.isSDK,
-            let method = action.path.count > 1 ? action.path[0] : nil
-        else { return false }
+    func fastExecute(_ method: String,  params: [String: VC.Value]?) -> Bool {
 
         switch method {
         case "log":
-            log(action.paramsAsDictionary())
+            log(params?.asSimpleDictionary)
         case "openUrl":
-            openUrl(action.paramsAsDictionary())
+            openUrl(params?.asSimpleDictionary)
         case "userCustomAction":
-            userCustomAction(action.paramsAsDictionary())
+            userCustomAction(params?.asSimpleDictionary)
         case "purchaseProduct":
-            purchaseProduct(action.paramsAsDictionary(), callback: nil)
+            purchaseProduct(params?.asSimpleDictionary, callback: nil)
         case "webPurchaseProduct":
-            webPurchaseProduct(action.paramsAsDictionary(), callback: nil)
+            webPurchaseProduct(params?.asSimpleDictionary, callback: nil)
         case "restorePurchases":
             restorePurchases(callback: nil)
         case "closeAll":
             closeAll()
         case "onSelectProduct":
-            onSelectProduct(action.paramsAsDictionary())
+            onSelectProduct(params?.asSimpleDictionary)
         case "openScreen":
-            openScreen(action.paramsAsDictionary())
+            openScreen(params?.asSimpleDictionary)
         case "closeScreen":
-            closeScreen(action.paramsAsDictionary())
+            closeScreen(params?.asSimpleDictionary)
         case "changeFocus":
-            changeFocus(action.paramsAsDictionary())
+            changeFocus(params?.asSimpleDictionary)
         case "setTimer":
-            setTimer(action.paramsAsDictionary(), callback: nil)
+            setTimer(params?.asSimpleDictionary, callback: nil)
         case "moveScroll":
-            moveScroll(action.paramsAsDictionary())
+            moveScroll(params?.asSimpleDictionary)
         case "showAppRate":
             showAppRate()
         case "showAlertDialog":
-            showAlertDialog(action.paramsAsDictionary(), callback: nil)
+            showAlertDialog(params?.asSimpleDictionary, callback: nil)
         case "showRequestPermission":
-            showRequestPermission(action.paramsAsDictionary(), callback: nil)
+            showRequestPermission(params?.asSimpleDictionary, callback: nil)
         case "sendEvents":
-            sendEvents(action.paramsAsDictionary())
+            sendEvents(params?.asSimpleDictionary)
         case "sendAnalyticsEvent":
-            sendAnalyticsEvent(action.paramsAsDictionary() as? [String: any Sendable])
+            sendAnalyticsEvent(params?.asSimpleDictionary)
         default: return false
         }
         return true
+    }
+}
+
+private extension [String: VC.Value] {
+    var asSimpleDictionary: [String: any Sendable]? {
+        mapValues(\.actionParameter)
+    }
+}
+
+private extension VC.Value {
+    var actionParameter: any Sendable {
+        if wrapped.isNil { return NSNull() }
+        if let array = wrapped.asArray {
+            return array.map { VC.Value($0).actionParameter }
+        }
+        if let object = wrapped.asObject {
+            return object.mapValues { VC.Value($0).actionParameter }
+        }
+        return wrapped
     }
 }

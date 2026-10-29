@@ -217,12 +217,12 @@ extension VS.JSActionDispatcher {
             return
         }
 
-        if let endAt = params["endAt"] as? Double {
+        if let endAt = (params["endAt"] as? NSNumber)?.doubleValue {
             handler?.setTimer(id: timerId, endAt: Date(timeIntervalSince1970: endAt / 1000), callback: callback)
             return
         }
 
-        if let duration = params["duration"] as? Double {
+        if let duration = (params["duration"] as? NSNumber)?.doubleValue {
             handler?.setTimer(id: timerId, duration: duration, behavior: behavior ?? .continue, callback: callback)
             return
         }

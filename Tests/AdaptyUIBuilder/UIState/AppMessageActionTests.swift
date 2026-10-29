@@ -149,10 +149,7 @@ enum AppMessageActionTests {
             ]))
             let event = try #require(handler.analyticsEvents.only)
             #expect(event.name == "app_message")
-            #expect(event.params["channel"] as? String == "native")
-            #expect(event.params["source"] as? String == "application")
-            #expect(event.params["id"] == nil)
-            #expect(event.params["_message"] == nil)
+            #expect(Json(deserilized: event.params()) == Json(##"{"channel":"native","source":"application"}"##))
         }
 
         /// Missing or invalid handlers skip the event without throwing an action-resolution error.
