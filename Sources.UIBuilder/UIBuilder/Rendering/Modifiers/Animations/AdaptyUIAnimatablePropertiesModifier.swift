@@ -87,6 +87,12 @@ struct AdaptyUIAnimatablePropertiesModifier<Layers: ViewModifier>: ViewModifier 
     private let initialRotation: Angle
     private let initialRotationAnchor: UnitPoint
 
+    /// Whether the content gets a rotation and a scale effect at all. A geometry effect
+    /// costs a layer and rounds the frame of its content to whole pixels, so an element
+    /// whose configuration neither sets nor animates one gets none.
+    private let rotates: Bool
+    private let scales: Bool
+
     private let initialOpacity: Double
 
     @State private var animatedScaleX: CGFloat?
@@ -130,6 +136,8 @@ struct AdaptyUIAnimatablePropertiesModifier<Layers: ViewModifier>: ViewModifier 
 
         self.initialBlurRadius = properties.decorator?.blurRadius ?? .zero
 
+        (self.rotates, self.scales) = Self.transforms(properties)
+
         self.play = play
         self.onFinished = nil
         self.blend = blend
@@ -162,6 +170,10 @@ struct AdaptyUIAnimatablePropertiesModifier<Layers: ViewModifier>: ViewModifier 
 
         self.initialBlurRadius = initialBlurRadius
 
+        // A transition may animate either of them.
+        self.rotates = true
+        self.scales = true
+
         self.play = play
         self.onFinished = onFinished
         self.blend = nil
@@ -183,16 +195,52 @@ struct AdaptyUIAnimatablePropertiesModifier<Layers: ViewModifier>: ViewModifier 
     }
 
 
+    /// Whether an element sets or animates a rotation and a scale.
+    static func transforms(_ properties: VC.Element.Properties) -> (rotates: Bool, scales: Bool) {
+        let animated = properties.eventHandlers.flatMap(\.animations).map(\.kind)
+        let rotates = properties.rotation != nil || animated.contains {
+            if case .rotation = $0 { true } else { false }
+        }
+        let scales = properties.scale != nil || animated.contains {
+            if case .scale = $0 { true } else { false }
+        }
+        return (rotates, scales)
+    }
+
     func body(content: Content) -> some View {
-        content
-            .blur(radius: resolvedBlurRadius)
-            .elementBlend(blend)
-            .modifier(layers(resolvedBlurRadius))
-            .offset(resolvedOffset)
-            .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
-            .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
-            .opacity(resolvedOpacity)
-            .onChange(of: play.wrappedValue) { startAnimations($0) }
+        transformed(
+            content
+                .blur(radius: resolvedBlurRadius)
+                .elementBlend(blend)
+                .modifier(layers(resolvedBlurRadius))
+                .offset(resolvedOffset)
+        )
+        .opacity(resolvedOpacity)
+        .onChange(of: play.wrappedValue) { startAnimations($0) }
+    }
+
+    /// The rotation and scale effects the element needs, with the content placed in
+    /// the size it measured under them. `rotates` and `scales` never change for an
+    /// element, so the branch it takes stays the same through its animations.
+    @ViewBuilder
+    private func transformed(_ view: some View) -> some View {
+        switch (rotates, scales) {
+        case (false, false):
+            view
+        case (true, false):
+            view
+                .measuredPlacement()
+                .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
+        case (false, true):
+            view
+                .measuredPlacement()
+                .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
+        case (true, true):
+            view
+                .measuredPlacement()
+                .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
+                .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
+        }
     }
 
     private func startAnimations(_ animations: [VC.Animation]) {
