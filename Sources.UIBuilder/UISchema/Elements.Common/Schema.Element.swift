@@ -300,7 +300,7 @@ extension Schema.Element: DecodableWithConfiguration {
         case .custom:
             try self.init(
                 properties: propertyOrNil(),
-                node: .simpleElement(Schema.CustomElement(from: decoder))
+                node: .compositeElement(Schema.CustomElement(from: decoder, configuration: configuration))
             )
         }
 

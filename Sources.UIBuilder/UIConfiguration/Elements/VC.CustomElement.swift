@@ -15,5 +15,6 @@ extension VC {
         let strings: [String: StringReference]?
         let bindings: [String: Variable]?
         let payload: String?
+        let fallback: ElementIndex?
     }
 }

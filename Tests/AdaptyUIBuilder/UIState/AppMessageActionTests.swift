@@ -101,7 +101,13 @@ enum AppMessageActionTests {
                 message = try VS.AppMessage(
                     id: "context-id", screenInstance: screenInstance,
                     customElement: VC.CustomElement(
-                        id: "hero", type: "chart", assets: nil, strings: nil, bindings: nil, payload: nil
+                        id: "hero",
+                        type: "chart",
+                        assets: nil,
+                        strings: nil,
+                        bindings: nil,
+                        payload: nil,
+                        fallback: nil
                     ),
                     payload: ["kind": "tap"]
                 )

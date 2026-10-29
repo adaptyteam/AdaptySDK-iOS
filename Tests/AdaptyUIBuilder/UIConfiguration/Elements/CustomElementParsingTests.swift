@@ -42,7 +42,172 @@ enum CustomElementTests {
             #expect(custom.strings == nil)
             #expect(custom.bindings == nil)
             #expect(custom.payload == nil)
+            #expect(custom.fallback == nil)
             #expect(properties == nil)
+        }
+
+        /// An omitted or null fallback leaves no child in the screen's element pool.
+        @Test("Absent and null fallback produce no child", arguments: ["", ",\"fallback\":null"])
+        func absentAndNullFallbackProduceNoChild(fallbackField: String) throws {
+            let screen = try CustomElementTests.screen(content: ##"{"type":"custom","custom_id":"hero","custom_type":"chart"\##(fallbackField)}"##)
+            guard case let .custom(custom, _) = screen.poolElements[screen.content] else {
+                Issue.record("Expected a custom element")
+                return
+            }
+
+            #expect(custom.fallback == nil)
+            #expect(screen.poolElements.count == 1)
+        }
+
+        /// A fallback is a full element with properties independent of its custom parent.
+        @Test("Fallback preserves its own element properties")
+        func fallbackPreservesElementProperties() throws {
+            let screen = try CustomElementTests.screen(content: """
+            {
+              "type": "custom", "custom_id": "hero", "custom_type": "chart",
+              "opacity": 0.8, "focus_id": "custom",
+              "fallback": { "type": "box", "opacity": 0.3, "focus_id": "fallback" }
+            }
+            """)
+            guard case let .custom(custom, properties) = screen.poolElements[screen.content] else {
+                Issue.record("Expected a custom element")
+                return
+            }
+            let index = try #require(custom.fallback)
+            try #require(screen.poolElements.indices.contains(index))
+            guard case let .box(box, fallbackProperties) = screen.poolElements[index] else {
+                Issue.record("Expected a box fallback")
+                return
+            }
+
+            #expect(screen.poolElements.count == 2)
+            #expect(properties?.opacity == 0.8)
+            #expect(properties?.focusId == "custom")
+            #expect(fallbackProperties?.opacity == 0.3)
+            #expect(fallbackProperties?.focusId == "fallback")
+            #expect(box.content == nil)
+        }
+
+        /// Composite fallbacks and nested custom fallbacks keep every child reachable in the pool.
+        @Test("Fallback can contain a custom element with its own fallback")
+        func nestedFallbacksPreserveTheirChildren() throws {
+            let screen = try CustomElementTests.screen(content: """
+            {
+              "type": "custom", "custom_id": "hero", "custom_type": "chart",
+              "fallback": {
+                "type": "box",
+                "content": {
+                  "type": "custom", "custom_id": "nested", "custom_type": "badge",
+                  "fallback": { "type": "box", "focus_id": "leaf" }
+                }
+              }
+            }
+            """)
+            guard case let .custom(custom, _) = screen.poolElements[screen.content] else {
+                Issue.record("Expected a custom element")
+                return
+            }
+            let fallbackIndex = try #require(custom.fallback)
+            try #require(screen.poolElements.indices.contains(fallbackIndex))
+            guard case let .box(box, _) = screen.poolElements[fallbackIndex] else {
+                Issue.record("Expected a composite fallback")
+                return
+            }
+            let nestedIndex = try #require(box.content)
+            try #require(screen.poolElements.indices.contains(nestedIndex))
+            guard case let .custom(nested, _) = screen.poolElements[nestedIndex] else {
+                Issue.record("Expected a nested custom element")
+                return
+            }
+            let leafIndex = try #require(nested.fallback)
+            try #require(screen.poolElements.indices.contains(leafIndex))
+            guard case let .box(leaf, properties) = screen.poolElements[leafIndex] else {
+                Issue.record("Expected a leaf fallback")
+                return
+            }
+
+            #expect(screen.poolElements.count == 4)
+            #expect(nested.id == "nested")
+            #expect(nested.type == "badge")
+            #expect(properties?.focusId == "leaf")
+            #expect(leaf.content == nil)
+        }
+
+        /// Fallback planning must not consume or reorder indices belonging to background and overlay elements.
+        @Test("Fallback does not mix background and overlay indices", arguments: [false, true])
+        func fallbackDoesNotMixPropertyIndices(hasFallback: Bool) throws {
+            let fallbackField = hasFallback ? ##", "fallback": {"type":"box","focus_id":"fallback"}"## : ""
+            let screen = try CustomElementTests.screen(content: """
+            {
+              "type": "custom", "custom_id": "hero", "custom_type": "chart",
+              "background": [
+                { "content": { "type": "box", "focus_id": "background-1" } },
+                { "content": { "type": "box", "focus_id": "background-2" } }
+              ],
+              "overlay": [
+                { "content": { "type": "box", "focus_id": "overlay-1" } },
+                { "content": { "type": "box", "focus_id": "overlay-2" } }
+              ]
+              \(fallbackField)
+            }
+            """)
+            guard case let .custom(custom, properties) = screen.poolElements[screen.content] else {
+                Issue.record("Expected a custom element")
+                return
+            }
+            let background = try #require(properties?.background)
+            let overlay = try #require(properties?.overlay)
+            let indices = background.map(\.content) + overlay.map(\.content)
+            try #require(indices.allSatisfy { screen.poolElements.indices.contains($0) })
+            #expect(background.map { screen.poolElements[$0.content].properties?.focusId } == ["background-1", "background-2"])
+            #expect(overlay.map { screen.poolElements[$0.content].properties?.focusId } == ["overlay-1", "overlay-2"])
+            #expect(screen.poolElements.count == (hasFallback ? 6 : 5))
+
+            if hasFallback {
+                let index = try #require(custom.fallback)
+                try #require(screen.poolElements.indices.contains(index))
+                #expect(screen.poolElements[index].properties?.focusId == "fallback")
+                #expect(!indices.contains(index))
+            } else {
+                #expect(custom.fallback == nil)
+            }
+        }
+
+        /// Fallbacks use the same template resolution as other composite children.
+        @Test("Fallback resolves a template instance")
+        func fallbackResolvesTemplate() throws {
+            let screen = try CustomElementTests.screen(
+                content: ##"{"type":"custom","custom_id":"hero","custom_type":"chart","fallback":{"type":"#placeholder"}}"##,
+                templates: ##"{"placeholder":{"content":{"type":"box","focus_id":"template-fallback"}}}"##
+            )
+            guard case let .custom(custom, _) = screen.poolElements[screen.content] else {
+                Issue.record("Expected a custom element")
+                return
+            }
+            let index = try #require(custom.fallback)
+            try #require(screen.poolElements.indices.contains(index))
+            guard case .box = screen.poolElements[index] else {
+                Issue.record("Expected the template's box content")
+                return
+            }
+            #expect(screen.poolElements[index].properties?.focusId == "template-fallback")
+            #expect(screen.poolElements.count == 2)
+        }
+
+        /// Malformed fallback values are rejected instead of silently dropping the child.
+        @Test("Fallback rejects malformed elements", arguments: [
+            "true",
+            "42",
+            "\"box\"",
+            "[]",
+            "{}",
+            ##"{"type":null}"##,
+            ##"{"type":"custom","custom_type":"badge"}"##,
+        ])
+        func fallbackRejectsMalformedElements(value: String) {
+            #expect(throws: (any Error).self) {
+                try CustomElementTests.screen(content: ##"{"type":"custom","custom_id":"hero","custom_type":"chart","fallback":\##(value)}"##)
+            }
         }
 
         /// A custom element is decoded without valid string identity fields. Schema decoding rejects each configuration.
@@ -278,11 +443,12 @@ private extension CustomElementTests {
         return (custom, properties)
     }
 
-    static func screen(content: String) throws -> VC.Screen {
+    static func screen(content: String, templates: String = "{}") throws -> VC.Screen {
         let schema = try AdaptyUISchema(
             from: """
             {
               "format": "5.1.0",
+              "templates": \(templates),
               "screens": {
                 "main": {
                   "content": \(content)
