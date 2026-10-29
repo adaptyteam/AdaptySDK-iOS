@@ -93,6 +93,7 @@ extension Schema.ConfigurationBuilder {
                 rotation: value.rotation,
                 scale: value.scale,
                 opacity: value.opacity,
+                blend: value.blend,
                 background: background ?? [],
                 overlay: overlay ?? [],
                 eventHandlers: value.eventHandlers,
@@ -107,6 +108,7 @@ extension Schema.ConfigurationBuilder {
                 rotation: nil,
                 scale: nil,
                 opacity: Schema.ElementProperties.default.opacity,
+                blend: .default,
                 background: background,
                 overlay: overlay,
                 eventHandlers: [],
@@ -127,6 +129,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
         case scale
         case legacyVisibility = "visibility"
         case opacity
+        case blend
         case legacyTransitionIn = "transition_in"
         case eventHandlers = "event_handlers"
         case legacyOnAppear = "on_appear"
@@ -189,6 +192,7 @@ extension Schema.ElementProperties: DecodableWithConfiguration {
             rotation: rotation?.isZero ?? true ? nil : rotation,
             scale: scale?.isEmpty ?? true ? nil : scale,
             opacity: opacity,
+            blend: container.decodeIfPresent(Schema.BlendMode.self, forKey: .blend) ?? .default,
             background: nil,
             overlay: nil,
             eventHandlers: eventHandlers.filter { !$0.isEmpty },
