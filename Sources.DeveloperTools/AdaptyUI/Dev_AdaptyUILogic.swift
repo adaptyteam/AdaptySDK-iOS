@@ -14,15 +14,23 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     let logId: String
     let events: AdaptyUIEventsHandler
     let products: [Dev_MockProduct]
+    /// How long mocked products, purchases and restores take to answer.
+    let responseDelay: TimeInterval
 
     init(
         logId: String,
         events: AdaptyUIEventsHandler,
-        products: [Dev_MockProduct]
+        products: [Dev_MockProduct],
+        responseDelay: TimeInterval
     ) {
         self.logId = logId
         self.events = events
         self.products = products
+        self.responseDelay = responseDelay
+    }
+
+    private var responseDelayNanoseconds: UInt64 {
+        UInt64(max(responseDelay, 0) * 1_000_000_000)
     }
 
     func reportViewDidAppear() {
@@ -48,7 +56,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
     package func logShowFlow() async throws {}
 
     package func getProducts() async throws -> [ProductResolver] {
-        try await Task.sleep(nanoseconds: 1_500_000_000)
+        try await Task.sleep(nanoseconds: responseDelayNanoseconds)
         return products
     }
 
@@ -61,7 +69,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didStartPurchase(product: product)
 
         Task { @MainActor in
-            try await Task.sleep(nanoseconds: 1_500_000_000)
+            try await Task.sleep(nanoseconds: responseDelayNanoseconds)
             events.event_didFinishPurchase(product: product, result: .success)
             onFinish(.success)
         }
@@ -72,7 +80,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         in openIn: VC.Action.WebOpenInParameter,
         onFinish: @MainActor @Sendable @escaping (VS.PurchaseResult) -> Void
     ) async {
-        try? await Task.sleep(nanoseconds: 1_500_000_000)
+        try? await Task.sleep(nanoseconds: responseDelayNanoseconds)
         events.event_didFinishPurchase(product: product, result: .success)
         onFinish(.success)
     }
@@ -85,7 +93,7 @@ struct Dev_AdaptyUILogic: AdaptyUIBuilderLogic {
         events.event_didStartRestore()
 
         Task { @MainActor in
-            try await Task.sleep(nanoseconds: 1_500_000_000)
+            try await Task.sleep(nanoseconds: responseDelayNanoseconds)
             events.event_didFinishRestore(result: .success)
             onFinish(.success)
         }

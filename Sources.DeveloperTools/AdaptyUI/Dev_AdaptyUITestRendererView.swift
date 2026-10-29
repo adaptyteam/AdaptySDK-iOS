@@ -45,7 +45,8 @@ public extension AdaptyUI {
             assetsResolver: AdaptyUIAssetsResolver?,
             customElementsResolver: (any AdaptyUICustomElementsResolver)?,
             systemRequestsHandler: AdaptyUISystemRequestsHandler?,
-            rtlOverride: Bool?
+            rtlOverride: Bool?,
+            mockResponseDelay: TimeInterval = 1.5
         ) {
             self.logId = logId
             self.observerModeResolver = observerModeResolver
@@ -58,7 +59,8 @@ public extension AdaptyUI {
             logic = Dev_AdaptyUILogic(
                 logId: logId,
                 events: eventsHandler,
-                products: previewProducts.map(Dev_MockProduct.init(from:))
+                products: previewProducts.map(Dev_MockProduct.init(from:)),
+                responseDelay: mockResponseDelay
             )
             presentationViewModel = AdaptyUIPresentationViewModel(logId: logId, logic: logic)
             tagResolverViewModel = AdaptyUITagResolverViewModel(tagResolver: tagResolver)
@@ -167,6 +169,7 @@ public struct Dev_AdaptyUIRendererView: View {
         safeAreaOverride: EdgeInsets? = nil,
         interfaceOrientationOverride: Dev_InterfaceOrientation? = nil,
         rtlOverride: Bool? = nil,
+        mockResponseDelay: TimeInterval = 1.5,
         didAppear: @escaping () -> Void,
         didDisappear: @escaping () -> Void,
         didPerformAction: @escaping (AdaptyUIBuilder.Action) -> Void,
@@ -200,7 +203,8 @@ public struct Dev_AdaptyUIRendererView: View {
                 assetsResolver: assetsResolver,
                 customElementsResolver: customElementsResolver,
                 systemRequestsHandler: systemRequestsHandler,
-                rtlOverride: rtlOverride
+                rtlOverride: rtlOverride,
+                mockResponseDelay: mockResponseDelay
             )
         )
 
