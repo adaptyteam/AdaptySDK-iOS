@@ -25,7 +25,7 @@ struct SwitchSelectionTests {
 
     /// A switch with a wide case, an orientation case and a default.
     static func switchElement() throws -> (VC.Switch, [VC.Element]) {
-        let screen = try DeckTests.screen(content: """
+        let screen = try DeckLayoutPointsTests.screen(content: """
         { "type": "switch",
           "cases": [
             { "condition": [{ "metric": "available_width", "min": 600 }], "content": \(text("wide")) },
@@ -34,7 +34,7 @@ struct SwitchSelectionTests {
           "default": \(text("default")) }
         """)
         guard case let .switch(element, _) = screen.poolElements[screen.content] else {
-            throw DeckTests.TestError.expectedDeck
+            throw DeckLayoutPointsTests.TestError.expectedDeck
         }
         return (element, screen.poolElements)
     }

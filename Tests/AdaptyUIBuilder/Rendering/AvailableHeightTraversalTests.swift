@@ -28,7 +28,7 @@ struct AvailableHeightTraversalTests {
     }
 
     static func picks(_ content: String) throws -> Bool {
-        let screen = try DeckTests.screen(content: content)
+        let screen = try DeckLayoutPointsTests.screen(content: content)
         return screen.poolElements.picksLayoutFromHeight(screen.content)
     }
 

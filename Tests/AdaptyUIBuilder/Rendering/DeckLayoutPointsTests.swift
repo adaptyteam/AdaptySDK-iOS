@@ -20,7 +20,7 @@ import Testing
 )
 struct DeckLayoutPointsTests {
     private static func item(_ fields: String) throws -> VC.DeckItem {
-        let (deck, _) = try DeckTests.deck(content: """
+        let (deck, _) = try DeckLayoutPointsTests.deck(content: """
         {
           "type": "deck",
           "items": [{
@@ -81,5 +81,65 @@ struct DeckLayoutPointsTests {
 
         #expect(item.layoutAnchor(with: layoutDirection) == CGPoint(x: anchorX, y: 0.75))
         #expect(item.layoutPosition(with: layoutDirection) == CGPoint(x: positionX, y: 0.2))
+    }
+}
+
+extension DeckLayoutPointsTests {
+    static func deck(content: String) throws -> (deck: VC.Deck, screen: VC.Screen) {
+        let screen = try screen(content: content)
+        guard case let .deck(deck, _) = screen.poolElements[screen.content] else {
+            Issue.record("Expected root element to be a Deck")
+            throw TestError.expectedDeck
+        }
+
+        return (deck, screen)
+    }
+
+    static func screen(content: String) throws -> VC.Screen {
+        
+        let schema = try AdaptyUISchema(
+            from: """
+            {
+              "format": "5.1.0",
+              "screens": {
+                "main": {
+                  "content": \(content)
+                }
+              }
+            }
+            """,
+            configuration: .init(device: .phone)
+        )
+
+        let configuration = try schema.extractUIConfiguration(
+            id: "deck-layout-points-test",
+            withLocaleId: "en",
+            envoriment: .init(
+                sdkVersion: "test",
+                osName: "test",
+                osVersion: "test",
+                deviceModel: "test",
+                appBundleId: nil,
+                appVersion: nil,
+                appBuild: nil,
+                appCurrentLocale: nil,
+                userLocales: [],
+                userUses24HourClock: true,
+                flow: .init(
+                    placementId: "test",
+                    variationId: "test",
+                    variationName: nil,
+                    abTestName: "test",
+                    name: "test",
+                    products: []
+                )
+            )
+        )
+
+        return try #require(configuration.screens["main"])
+    }
+
+    enum TestError: Error {
+        case expectedDeck
     }
 }
