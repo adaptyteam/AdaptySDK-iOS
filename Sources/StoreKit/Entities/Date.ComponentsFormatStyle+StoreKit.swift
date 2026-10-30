@@ -1,13 +1,14 @@
 //
-//  Locale+StoreKit.swift
+//  Date.ComponentsFormatStyle+StoreKit.swift
 //  AdaptySDK
 //
-//  Created by Aleksei Valiano on 01.02.2024
+//  Created by Aleksei Valiano on 30.10.2026.
 //
+
 
 import StoreKit
 
-extension Locale {
+extension Date.ComponentsFormatStyle {
     func localized(period: AdaptySubscriptionPeriod, numberOfPeriods: Int = 1) -> String? {
         let countUnits = period.numberOfUnits * numberOfPeriods
         switch period.unit {
@@ -27,7 +28,7 @@ extension Locale {
 
     private func localizedComponents(day: Int? = nil, weekOfMonth: Int? = nil, month: Int? = nil, year: Int? = nil) -> String? {
         var calendar = Calendar.current
-        calendar.locale = self
+        calendar.locale = locale
 
         var components = DateComponents(calendar: calendar)
         components.day = day

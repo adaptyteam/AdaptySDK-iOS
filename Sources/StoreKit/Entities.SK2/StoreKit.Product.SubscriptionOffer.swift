@@ -17,7 +17,7 @@ extension StoreKit.Product.SubscriptionOffer {
         subscriptionPeriodFormatStyle: Date.ComponentsFormatStyle
     ) -> AdaptySubscriptionOffer {
         let period = period.asAdaptySubscriptionPeriod
-        let periodLocale = subscriptionPeriodFormatStyle.locale
+        let periodLocale = subscriptionPeriodFormatStyle
         return .init(
             price: price,
             currencyCode: priceFormatStyle.currencyCode,

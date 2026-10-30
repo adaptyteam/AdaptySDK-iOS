@@ -11,6 +11,7 @@ public struct AdaptySubscriptionPricingTerms: Sendable, Hashable {
     public let billingPrice: Decimal
     public let localizedBillingPrice: String
     public let billingPeriod: AdaptySubscriptionPeriod
+    public let localizedBillingPeriod: String?
     public let commitmentInfo: AdaptySubscriptionCommitmentInfo
 
     package init(
@@ -26,6 +27,7 @@ public struct AdaptySubscriptionPricingTerms: Sendable, Hashable {
         self.billingPrice = billingPrice
         self.localizedBillingPrice = localizedBillingPrice
         self.billingPeriod = billingPeriod
+        self.localizedBillingPeriod = periodFormatStyle.localized(period: billingPeriod)
         self.commitmentInfo = commitmentInfo
     }
 }
