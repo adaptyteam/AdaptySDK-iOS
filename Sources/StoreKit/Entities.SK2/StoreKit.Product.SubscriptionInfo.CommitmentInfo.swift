@@ -11,11 +11,16 @@ import StoreKit
 
 @available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *)
 extension StoreKit.Product.SubscriptionInfo.CommitmentInfo {
-    var asAdaptySubscriptionCommitmentInfo: AdaptySubscriptionCommitmentInfo {
+    func asAdaptySubscriptionCommitmentInfo(
+        priceFormatStyle: Decimal.FormatStyle.Currency,
+        periodFormatStyle: Date.ComponentsFormatStyle
+    ) -> AdaptySubscriptionCommitmentInfo {
         .init(
             price: price,
             localizedPrice: displayPrice,
-            period: period.asAdaptySubscriptionPeriod
+            period: period.asAdaptySubscriptionPeriod,
+            priceFormatStyle: priceFormatStyle,
+            periodFormatStyle: periodFormatStyle
         )
     }
 }

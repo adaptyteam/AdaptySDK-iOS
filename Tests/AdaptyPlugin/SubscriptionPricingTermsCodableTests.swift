@@ -31,15 +31,23 @@ struct SubscriptionPricingTermsCodableTests {
             localizedCommitmentPrice: String
         )
     ) throws {
+        let locale = Locale(identifier: currency.code == "USD" ? "en_US" : "de_DE")
+        let priceFormatStyle = Decimal.FormatStyle.Currency(code: currency.code, locale: locale)
+        let periodFormatStyle = Date.ComponentsFormatStyle(style: .wide, fields: [.year, .month, .week, .day])
+            .locale(locale)
         let terms = AdaptySubscriptionPricingTerms(
             billingPlan: .init(rawValue: plan),
             billingPrice: currency.billingPrice,
             localizedBillingPrice: currency.localizedBillingPrice,
             billingPeriod: .init(1, .month),
+            priceFormatStyle: priceFormatStyle,
+            periodFormatStyle: periodFormatStyle,
             commitmentInfo: .init(
                 price: currency.commitmentPrice,
                 localizedPrice: currency.localizedCommitmentPrice,
-                period: .init(12, .month)
+                period: .init(12, .month),
+                priceFormatStyle: priceFormatStyle,
+                periodFormatStyle: periodFormatStyle
             )
         )
         let encodingConfiguration = AdaptyProductEncodingConfiguration(

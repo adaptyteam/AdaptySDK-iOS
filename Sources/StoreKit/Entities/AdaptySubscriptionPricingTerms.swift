@@ -18,6 +18,8 @@ public struct AdaptySubscriptionPricingTerms: Sendable, Hashable {
         billingPrice: Decimal,
         localizedBillingPrice: String,
         billingPeriod: AdaptySubscriptionPeriod,
+        priceFormatStyle: Decimal.FormatStyle.Currency,
+        periodFormatStyle: Date.ComponentsFormatStyle,
         commitmentInfo: AdaptySubscriptionCommitmentInfo
     ) {
         self.billingPlan = billingPlan
@@ -32,17 +34,23 @@ extension AdaptySubscriptionPricingTerms {
     static func upFront(
         price: Decimal,
         localizedPrice: String,
-        subscriptionPeriod:  AdaptySubscriptionPeriod
+        subscriptionPeriod:  AdaptySubscriptionPeriod,
+        priceFormatStyle: Decimal.FormatStyle.Currency,
+        periodFormatStyle: Date.ComponentsFormatStyle
     ) -> Self?{
         .init(
             billingPlan: .upFront,
             billingPrice: price,
             localizedBillingPrice: localizedPrice,
             billingPeriod: subscriptionPeriod,
+            priceFormatStyle: priceFormatStyle,
+            periodFormatStyle: periodFormatStyle,
             commitmentInfo: .init(
                 price: price,
                 localizedPrice: localizedPrice,
-                period: subscriptionPeriod
+                period: subscriptionPeriod,
+                priceFormatStyle: priceFormatStyle,
+                periodFormatStyle: periodFormatStyle
             )
         )
     }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import StoreKit
 
 public struct AdaptySubscriptionCommitmentInfo: Sendable, Hashable  {
     public let price: Decimal
@@ -15,7 +16,9 @@ public struct AdaptySubscriptionCommitmentInfo: Sendable, Hashable  {
     package init(
         price: Decimal,
         localizedPrice: String,
-        period: AdaptySubscriptionPeriod
+        period: AdaptySubscriptionPeriod,
+        priceFormatStyle: Decimal.FormatStyle.Currency,
+        periodFormatStyle: Date.ComponentsFormatStyle
     ) {
         self.price = price
         self.localizedPrice = localizedPrice
