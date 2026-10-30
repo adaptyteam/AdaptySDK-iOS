@@ -99,4 +99,18 @@ struct AdaptyUIFlowRendererView: View {
     }
 }
 
+// TODO: в UIState нет возможности ресолвить теги в строках, потому не верно заводить такую функцию внутрь UIState. Поэтому я ее перенес сюда - где она используется.
+// TODO: функция сначало должна обработать возможность взять строку по stringId, text - является фаллбеком !
+// TODO: richText(stringId)?.asString - нельзя использовать ( данный метод вообще используется для другого) - мы договаривались что будет братся вся rich строка , будут подставлятся все теги , игнорируются атрибуты цвета и других параметров что не совместими с AllertView
+
+private extension VS {
+
+    /// The localized string for `stringId`, or `text` when the id is absent or not localized.
+    func text(_ value: VS.StringIdentifierOrText) -> String? {
+        guard let stringId = value.stringId else { return value.text }
+        if let text = try? richText(stringId)?.asString { return text }
+        Log.viewState.error("string_id \(stringId) is not localized as plain text")
+        return value.text
+    }
+}
 #endif

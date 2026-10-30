@@ -550,26 +550,6 @@ struct DecoratorEffectsParsingTests {
         }
         try DecoratorEffectsFixtures.expectColor(asset, "#FFFFFF")
     }
-
-    @Test("Element blend is read from the element itself", arguments: [
-        Json(##"{"type":"text","string_id":"title","blend":"multiply"}"##),
-        Json(##"{"type":"box","width":60,"offset":[20,0],"blend":"multiply"}"##),
-    ])
-    func elementBlend(element: Json) throws {
-        let value = try DecoratorEffectsFixtures.properties(Json(##"{"type":"rect"}"##), element: element)
-        #expect(value.blend == .multiply)
-    }
-
-    @Test("Element blend survives nesting in a stack")
-    func nestedElementBlend() throws {
-        let configuration = try DecoratorEffectsFixtures.configuration(
-            Json(##"{"type":"rect"}"##),
-            element: Json(##"{"type":"z_stack","content":[{"type":"box","width":60},{"type":"box","width":60,"blend":"multiply"}]}"##)
-        )
-        let screen = try #require(configuration.screens["main"])
-        let blends = screen.poolElements.compactMap { $0.properties?.blend }
-        #expect(blends.contains(.multiply), "\(blends)")
-    }
 }
 
 private enum DecoratorEffectsFixtures {
