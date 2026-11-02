@@ -55,9 +55,14 @@ private final class AdaptyUIAnimationCompletionGroup {
     }
 }
 
-struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
+struct AdaptyUIAnimatablePropertiesModifier<Layers: ViewModifier>: ViewModifier {
     private var play: Binding<[VC.Animation]>
     private let onFinished: (() -> Void)?
+
+    private let blend: VC.BlendMode?
+    // Element background/overlay, added outside the blended group but under the
+    // shared transforms. Takes the blur radius so they stay blurred with the element.
+    private let layers: (Double) -> Layers
 
     private let initialBlurRadius: Double
 
@@ -108,7 +113,9 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     init(
         _ properties: VC.Element.Properties,
-        play: Binding<[VC.Animation]>
+        play: Binding<[VC.Animation]>,
+        blend: VC.BlendMode?,
+        layers: @escaping (Double) -> Layers
     ) {
         self.initialOpacity = properties.opacity
 
@@ -125,6 +132,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
         self.play = play
         self.onFinished = nil
+        self.blend = blend
+        self.layers = layers
     }
 
     init(
@@ -137,7 +146,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         initialRotationAnchor: UnitPoint,
         initialOffset: VC.Offset,
         initialBlurRadius: Double,
-        onFinished: (() -> Void)?
+        onFinished: (() -> Void)?,
+        layers: @escaping (Double) -> Layers
     ) {
         self.initialOpacity = initialOpacity
 
@@ -154,6 +164,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
         self.play = play
         self.onFinished = onFinished
+        self.blend = nil
+        self.layers = layers
     }
 
     @State private var animatedOffsetX: CGFloat?
@@ -174,6 +186,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .blur(radius: resolvedBlurRadius)
+            .elementBlend(blend)
+            .modifier(layers(resolvedBlurRadius))
             .offset(resolvedOffset)
             .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
             .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
@@ -271,15 +285,29 @@ extension View {
         _ properties: VC.Element.Properties?,
         play: Binding<[VC.Animation]>
     ) -> some View {
+        animatableProperties(properties, play: play, blend: nil) { _ in EmptyModifier() }
+    }
+
+    /// `blend` applies to the element after its blur; `layers` go on top of the
+    /// blended group, so they are not part of the blend source.
+    @ViewBuilder
+    func animatableProperties<Layers: ViewModifier>(
+        _ properties: VC.Element.Properties?,
+        play: Binding<[VC.Animation]>,
+        blend: VC.BlendMode?,
+        layers: @escaping (Double) -> Layers
+    ) -> some View {
         if let properties {
             modifier(
                 AdaptyUIAnimatablePropertiesModifier(
                     properties,
-                    play: play
+                    play: play,
+                    blend: blend,
+                    layers: layers
                 )
             )
         } else {
-            self
+            modifier(layers(.zero))
         }
     }
 
@@ -307,9 +335,21 @@ extension View {
                 initialRotationAnchor: initialRotationAnchor,
                 initialOffset: initialOffset,
                 initialBlurRadius: initialBlurRadius,
-                onFinished: onFinished
+                onFinished: onFinished,
+                layers: { _ in EmptyModifier() }
             )
         )
+    }
+
+    @ViewBuilder
+    fileprivate func elementBlend(_ blend: VC.BlendMode?) -> some View {
+        if let blend, blend != .normal {
+            // Without the group, layers that set their own blend mode (every
+            // decorator layer does) override this one.
+            self.compositingGroup().blendMode(blend.swiftUIBlendMode)
+        } else {
+            self
+        }
     }
 }
 

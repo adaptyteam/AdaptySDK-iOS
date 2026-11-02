@@ -212,16 +212,22 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
                 play: $playAnimations,
                 includeBackground: drawDecoratorBackground
             )
-            .modifier(ElementBackgroundModifier(
-                backgrounds: element.properties?.background,
-                screenHolderBuilder: screenHolderBuilder
-            ))
-            .modifier(ElementOverlayModifier(
-                overlays: element.properties?.overlay,
-                screenHolderBuilder: screenHolderBuilder
-            ))
-            .animatableProperties(element.properties, play: $playAnimations)
-            .elementBlend(element.properties?.blend)
+            .animatableProperties(
+                element.properties,
+                play: $playAnimations,
+                blend: element.properties?.blend
+            ) { blurRadius in
+                ElementBackgroundModifier(
+                    backgrounds: element.properties?.background,
+                    screenHolderBuilder: screenHolderBuilder,
+                    blurRadius: blurRadius
+                )
+                .concat(ElementOverlayModifier(
+                    overlays: element.properties?.overlay,
+                    screenHolderBuilder: screenHolderBuilder,
+                    blurRadius: blurRadius
+                ))
+            }
             .padding(element.properties?.padding)
             .modifier(ElementInteractionEnabledModifier(element.properties?.interactionEnabled))
             .modifier(DebugOverlayModifier())
@@ -363,19 +369,6 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             }
         } else {
             stateViewModel.execute(actions: actions, screen: screenInstance)
-        }
-    }
-}
-
-private extension View {
-    @ViewBuilder
-    func elementBlend(_ blend: VC.BlendMode?) -> some View {
-        if let blend, blend != .normal {
-            // Without the group, layers that set their own blend mode (every
-            // decorator layer does) override this one.
-            self.compositingGroup().blendMode(blend.swiftUIBlendMode)
-        } else {
-            self
         }
     }
 }

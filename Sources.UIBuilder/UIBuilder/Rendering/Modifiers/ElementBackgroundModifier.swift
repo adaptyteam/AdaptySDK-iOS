@@ -44,6 +44,7 @@ struct AdaptyUIBackgroundElementsView<ScreenHolderContent: View>: View {
 struct ElementBackgroundModifier<ScreenHolderContent: View>: ViewModifier {
     var backgrounds: [VC.AlignedElement]?
     var screenHolderBuilder: () -> ScreenHolderContent
+    var blurRadius: Double = .zero
 
     func body(content: Content) -> some View {
         if let backgrounds, !backgrounds.isEmpty {
@@ -53,6 +54,7 @@ struct ElementBackgroundModifier<ScreenHolderContent: View>: ViewModifier {
                         backgrounds: backgrounds,
                         screenHolderBuilder: screenHolderBuilder
                     )
+                    .blur(radius: blurRadius)
                 }
         } else {
             content

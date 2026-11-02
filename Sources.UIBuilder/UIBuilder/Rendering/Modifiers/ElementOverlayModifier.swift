@@ -44,6 +44,7 @@ struct AdaptyUIOverlayElementsView<ScreenHolderContent: View>: View {
 struct ElementOverlayModifier<ScreenHolderContent: View>: ViewModifier {
     var overlays: [VC.AlignedElement]?
     var screenHolderBuilder: () -> ScreenHolderContent
+    var blurRadius: Double = .zero
 
     func body(content: Content) -> some View {
         if let overlays, !overlays.isEmpty {
@@ -53,6 +54,7 @@ struct ElementOverlayModifier<ScreenHolderContent: View>: ViewModifier {
                         overlays: overlays,
                         screenHolderBuilder: screenHolderBuilder
                     )
+                    .blur(radius: blurRadius)
                 }
         } else {
             content
