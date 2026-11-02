@@ -94,6 +94,32 @@ Entities:
             - hug
             - fill
 
+    BlendMode:
+        title: "Blend mode for an element or decorator layer"
+        type: string
+        enum:
+            - normal
+            - multiply
+            - screen
+            - overlay
+            - darken
+            - lighten
+            - color_dodge
+            - color_burn
+            - hard_light
+            - difference
+            - exclusion
+            - hue
+            - saturation
+            - color
+            - luminosity
+            - source_atop
+            - destination_over
+            - destination_out
+            - destination_in
+            - plus_lighter
+        default: normal
+
     Condition:
         title: Condition
         description: "Predicate resolving to boolean; used by flex, flex_stack and switch"
@@ -481,6 +507,10 @@ Animation:
         required: [type, color]
         properties:
             type: { const: background }
+            target_id:
+                type: integer
+                default: 0
+                description: "Decorator layer ID. 0 targets the legacy background layer. Used only for element animations."
             color:
                 type: object
                 required: [start, end]
@@ -496,6 +526,10 @@ Animation:
         required: [type]
         properties:
             type: { const: border }
+            target_id:
+                type: integer
+                default: 0
+                description: "Decorator stroke layer ID. 0 targets the legacy border layer."
         anyOf:
             - required: [color]
               properties:
@@ -523,6 +557,10 @@ Animation:
         required: [type]
         properties:
             type: { enum: [shadow, inner_shadow] }
+            target_id:
+                type: integer
+                default: 0
+                description: "Decorator effect ID, selected together with the shadow kind. 0 targets the legacy shadow of that kind."
         anyOf:
             - required: [color]
               properties:
@@ -780,6 +818,7 @@ UI:
                         rotation: { $ref: "#/Entities/Rotation" }
                         scale: { $ref: "#/Entities/Scale" }
                         opacity: { type: number, default: 1.0 }
+                        blend: { $ref: "#/Entities/BlendMode" }
                         background:
                             type: array
                             items: { $ref: "#/UI/AlignedElement" } # { $ref: "#/pool_index" }
@@ -851,9 +890,16 @@ UI:
                 border: { $ref: "#/AssetIdOrColor/Binding" }
                 shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
                 inner_shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
+                underlays:
+                    type: array
+                    items: { $ref: "#/UI/Element/Decorator/Layer" }
+                    description: "Layers below content, in drawing order"
+                overlays:
+                    type: array
+                    items: { $ref: "#/UI/Element/Decorator/Layer" }
+                    description: "Layers above content, in drawing order"
                 blur_radius: { type: number }
                 clip:
-                    type: string
                     enum: [content, none]
                     default: content
                     description: "Clips the decorator background, content and border to its shape. None allows content overflow while preserving shaped fills and strokes. Element backgrounds, overlays and outer shadow remain outside this mask."
@@ -889,6 +935,56 @@ UI:
                         type: number
                         default: 0
                         description: "A measure of how much to blur the shadow. Larger values result in more blur."
+                    offset: { $ref: "#/Entities/Offset", default: [0, 0] }
+                unevaluatedProperties: false
+
+            Layer:
+                type: object
+                properties:
+                    id:
+                        type: integer
+                        minimum: 1
+                        description: "Optional animation target"
+                    blend: { $ref: "#/Entities/BlendMode" }
+                    effects:
+                        type: array
+                        items: { $ref: "#/UI/Element/Decorator/Effect" }
+                oneOf:
+                    - title: "Effects only"
+                      properties:
+                          type: { const: effects, default: effects }
+                    - title: "Image layer"
+                      required: [type, asset_id]
+                      properties:
+                          type: { const: image }
+                          asset_id: { $ref: "#/AssetIdOrColor/Binding" }
+                          aspect: { $ref: "#/Entities/AspectRatio", default: fill }
+                    - title: "Shape fill"
+                      required: [type, asset_id]
+                      properties:
+                          type: { const: fill }
+                          asset_id: { $ref: "#/AssetIdOrColor/Binding" }
+                    - title: "Shape stroke"
+                      required: [type, asset_id]
+                      properties:
+                          type: { const: stroke }
+                          asset_id: { $ref: "#/AssetIdOrColor/Binding" }
+                          thickness: { type: number, default: 1 }
+                unevaluatedProperties: false
+
+            Effect:
+                type: object
+                required: [color]
+                properties:
+                    id:
+                        type: integer
+                        minimum: 1
+                        description: "Optional animation target"
+                    type:
+                        enum: [drop_shadow, inner_shadow]
+                        default: drop_shadow
+                    color: { $ref: "#/AssetIdOrColor/Binding" }
+                    blur_radius: { type: number, default: 0 }
                     offset: { $ref: "#/Entities/Offset", default: [0, 0] }
                 unevaluatedProperties: false
 
@@ -1030,6 +1126,12 @@ UI:
                   required: [shrink]
                   properties:
                       shrink: { $ref: "#/Entities/Unit" }
+                      max: { $ref: "#/Entities/Unit" }
+                  unevaluatedProperties: false
+                - title: Set max only
+                  type: object
+                  required: [max]
+                  properties:
                       max: { $ref: "#/Entities/Unit" }
                   unevaluatedProperties: false
 
@@ -1257,7 +1359,7 @@ UI:
                 }
             min: { type: number }
             max: { type: number }
-            step: { type: number }
+            step: { type: number, default: 1.0 }
 
     Button:
         type: object
@@ -1324,11 +1426,9 @@ UI:
                       $ref: "#/Entities/Point"
                       description: "Position inside the Deck at which the DeckItem anchor is placed, in normalized coordinates"
                   rtl:
-                      type: string
-                      pattern: "^([pP][rR][eE][sS][eE][rR][vV][eE]|[kK][eE][eE][pP]|[mM][iI][rR][rR][oO][rR])(?![\\s\\S])"
+                      enum: [preserve, keep, mirror]
                       default: preserve
-                      examples: [preserve, keep, mirror]
-                      description: "preserve/keep: keep horizontal coordinates; mirror: mirror anchor.x and position.x in RTL. Values are case-insensitive."
+                      description: "preserve/keep: keep horizontal coordinates; mirror: mirror anchor.x and position.x in RTL"
             - title: "Horizontal and vertical alignment"
               properties:
                   h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
@@ -1344,6 +1444,11 @@ UI:
         oneOf:
             - title: "Fixed length"
               $ref: "#/Entities/Unit"
+              minimum: 0
+              properties:
+                  point: { minimum: 0 }
+                  screen: { minimum: 0 }
+                  value: { minimum: 0 }
             - title: "Parent-relative length"
               type: object
               required: [parent]
@@ -1578,7 +1683,7 @@ UI:
             page_control:
                 type: object
                 properties:
-                    layout: { enum: [overlaid, stacked] }
+                    layout: { enum: [overlaid, stacked], default: stacked }
                     v_align:
                         {
                             $ref: "#/Entities/VerticalAlignment",
@@ -1596,7 +1701,6 @@ UI:
                     start_delay: { type: number, default: 0 }
                     page_transition:
                         $ref: "#/UI/Pager/Transition"
-                        default: { type: slide }
                     repeat_transition: { $ref: "#/UI/Pager/Transition" }
                     after_interaction_delay: { type: number, default: 3000 }
                 unevaluatedProperties: false
@@ -1854,6 +1958,9 @@ Localization:
     properties:
         id: { $ref: "#/Localization/Identifier" }
         is_right_to_left: { type: boolean, default: false }
+        ios_locale_id:
+            type: string
+            description: "Foundation locale identifier used for formatting on Apple platforms."
         assets: { $ref: "#/Assets" }
         strings:
             type: array
@@ -2049,7 +2156,7 @@ Assets:
                   properties:
                       value: { type: string, contentEncoding: base64 }
                 - title: URL to image
-                  required: [url, preview_value]
+                  required: [url]
                   properties:
                       url: { type: string }
                       preview_value: { type: string, contentEncoding: base64 }

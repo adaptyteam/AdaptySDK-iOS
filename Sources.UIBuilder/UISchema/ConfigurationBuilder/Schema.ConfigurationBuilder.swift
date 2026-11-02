@@ -38,10 +38,10 @@ extension Schema {
 
             self.localizationId = localization?.id ?? localizationId
             locale = if let identifier = localization?.localeIdentificator {
-                Locale(identifier: identifier)
-            } else {
-                Locale.current
-            }
+                        Locale(identifier: identifier)
+                    } else {
+                        Locale.current
+                    }
         }
     }
 }
