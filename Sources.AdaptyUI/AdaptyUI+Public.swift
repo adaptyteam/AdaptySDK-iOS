@@ -208,7 +208,7 @@ public typealias AdaptyTagResolver = AdaptyUITagResolver
 
 public typealias AdaptyAssetsResolver = AdaptyUIAssetsResolver
 
-public typealias AdaptyCustomAsset = AdaptyUICustomAsset
+public typealias AdaptyCustomAsset = AdaptyUIAsset
 
 public typealias AdaptySystemRequestsHandler = AdaptyUISystemRequestsHandler
 

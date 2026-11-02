@@ -10,17 +10,6 @@
 import SwiftUI
 import UIKit
 
-extension AdaptyUICustomColorAsset {
-    var resolvedColor: AdaptyUIResolvedColorAsset {
-        switch self {
-        case .uiColor(let color):
-            SwiftUI.Color(color)
-        case .swiftUIColor(let color):
-            color
-        }
-    }
-}
-
 extension AdaptyUICustomGradientAsset {
     var resolvedGradient: AdaptyUIResolvedGradientAsset {
         switch self {
@@ -100,11 +89,11 @@ private extension CGSize {
 }
 
 @MainActor
-extension AdaptyUICustomAsset {
+extension AdaptyUIAsset {
     func resolved(id: String) -> AdaptyUIResolvedAsset? {
         switch self {
         case .color(let color):
-            .color(color.resolvedColor)
+            .color(color)
         case .gradient(let gradient):
             .colorGradient(gradient.resolvedGradient)
         case .image(let image):
@@ -119,38 +108,14 @@ extension AdaptyUICustomAsset {
             .font(
                 .init(
                     font: font.font,
-                    defaultColor: font.defaultColor?.resolvedColor
-                        ?? SwiftUI.Color(UIColor.adaptyDefaultTextColor),
-                    defaultLetterSpacing: font.defaultLetterSpacing,
-                    defaultLineHeight: font.defaultLineHeight
+                    defaultColor: font.color ?? SwiftUI.Color(UIColor.adaptyDefaultTextColor),
+                    defaultLetterSpacing: font.letterSpacing,
+                    defaultLineHeight: font.lineHeight
                 )
             )
-        }
-    }
-}
-
-extension AdaptyUICustomAsset {
-    /// The same asset in the public type the app reads assets in. Lossless: the
-    /// two types differ only in that a colour loses its UIKit form.
-    var asAsset: AdaptyUIAsset {
-        switch self {
-        case let .image(image):
-            .image(image)
-        case let .video(video):
-            .video(video)
-        case let .color(color):
-            .color(color.resolvedColor)
-        case let .gradient(gradient):
-            .gradient(gradient)
-        case let .font(font):
-            .font(
-                .init(
-                    font: font.font,
-                    color: font.defaultColor?.resolvedColor,
-                    letterSpacing: font.defaultLetterSpacing,
-                    lineHeight: font.defaultLineHeight
-                )
-            )
+        case .data:
+            // A data asset has no visual representation.
+            nil
         }
     }
 }

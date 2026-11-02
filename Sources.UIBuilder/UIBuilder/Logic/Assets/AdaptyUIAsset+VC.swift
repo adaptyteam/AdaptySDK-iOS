@@ -11,13 +11,13 @@ import SwiftUI
 import UIKit
 
 package extension VC.Color {
-    var asCustomAsset: AdaptyUICustomAsset {
-        .color(.swiftUIColor(resolvedColor))
+    var asCustomAsset: AdaptyUIAsset {
+        .color(resolvedColor)
     }
 }
 
 package extension VC.ColorGradient {
-    var asCustomAsset: AdaptyUICustomAsset {
+    var asCustomAsset: AdaptyUIAsset {
         .gradient(asGradientAsset)
     }
 

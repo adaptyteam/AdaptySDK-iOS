@@ -10,16 +10,13 @@
 import SwiftUI
 import UIKit
 
-/// Asset of the flow as the app reads it.
+/// Asset of the flow, in both directions.
 ///
-/// This is the reading side of the asset contract: a custom element asks the
-/// context for an asset and gets it in this type, whether the configuration
-/// declares the asset or the app substitutes it through
-/// ``AdaptyUIAssetsResolver``.
+/// The app passes its own assets in through ``AdaptyUIAssetsResolver``, and a
+/// custom element reads assets back from its context, in this same type.
 ///
-/// A colour arrives here as a plain `SwiftUI.Color` with no UIKit alternative
-/// to switch on. That is what separates this type from ``AdaptyUICustomAsset``,
-/// which the app passes its own assets in with and which keeps its UIKit forms.
+/// A colour is a plain `SwiftUI.Color`; a `UIColor` is passed in as
+/// `Color(uiColor:)`.
 public enum AdaptyUIAsset: Sendable {
     case image(AdaptyUIImageAsset)
     case video(AdaptyUIVideoAsset)
@@ -29,8 +26,9 @@ public enum AdaptyUIAsset: Sendable {
     case data(AdaptyUIDataAsset)
 }
 
-/// Images, videos and gradients cross the boundary in the same shape in both
-/// directions: none of them carries a UIKit alternative to choose between.
+@available(*, deprecated, renamed: "AdaptyUIAsset")
+public typealias AdaptyUICustomAsset = AdaptyUIAsset
+
 public typealias AdaptyUIImageAsset = AdaptyUICustomImageAsset
 public typealias AdaptyUIVideoAsset = AdaptyUICustomVideoAsset
 public typealias AdaptyUIGradientAsset = AdaptyUICustomGradientAsset
@@ -44,19 +42,33 @@ public struct AdaptyUIFontAsset: Sendable {
     public let color: Color?
     public let letterSpacing: Double?
     public let lineHeight: Double?
+
+    public init(
+        font: UIFont,
+        color: Color? = nil,
+        letterSpacing: Double? = nil,
+        lineHeight: Double? = nil
+    ) {
+        self.font = font
+        self.color = color
+        self.letterSpacing = letterSpacing
+        self.lineHeight = lineHeight
+    }
 }
 
-/// Payload the SDK carries but does not interpret, declared in the
-/// configuration as a data asset. Reaching it is the job of a custom element:
-/// the format is meaningful to the app, not to the SDK.
+/// Payload the SDK carries but does not interpret. Reaching it is the job of a
+/// custom element: the format is meaningful to the app, not to the SDK.
+///
+/// The SDK never draws a data asset, so substituting one through
+/// ``AdaptyUIAssetsResolver`` only changes what custom elements read.
 public struct AdaptyUIDataAsset: Sendable {
-    /// Format declared by the configuration, for example `lottie`.
+    /// Format of the payload, for example `lottie`.
     public let format: String
 
     /// Payload carried by the configuration itself.
     public let value: Data?
 
-    /// Location of the payload, when the configuration points at a file.
+    /// Location of the payload, local or remote.
     /// The SDK does not download it: it does not interpret the format and
     /// therefore cannot decide how the payload should be fetched or cached.
     public let url: URL?
@@ -66,7 +78,15 @@ public struct AdaptyUIDataAsset: Sendable {
     /// Both are optional rather than mutually exclusive so that a configuration
     /// carrying an inline payload alongside a remote one — as an image already
     /// carries a preview alongside its URL — does not require a new type.
-    init(format: String, value: Data? = nil, url: URL? = nil) {
+    public init(format: String, value: Data) {
+        self.init(format: format, value: value, url: nil)
+    }
+
+    public init(format: String, url: URL) {
+        self.init(format: format, value: nil, url: url)
+    }
+
+    init(format: String, value: Data?, url: URL?) {
         self.format = format
         self.value = value
         self.url = url

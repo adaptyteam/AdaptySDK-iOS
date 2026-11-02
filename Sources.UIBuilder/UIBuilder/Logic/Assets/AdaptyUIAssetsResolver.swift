@@ -23,29 +23,8 @@ public enum AdaptyUICustomVideoAsset: Sendable {
     case player(item: AVPlayerItem, player: AVPlayer, preview: AdaptyUICustomImageAsset?, resolution: CGSize?)
 }
 
-public enum AdaptyUICustomColorAsset: Sendable {
-    case uiColor(UIColor)
-    case swiftUIColor(Color)
-}
-
-public struct AdaptyUICustomFontAsset: Sendable {
-    public let font: UIFont
-    public let defaultColor: AdaptyUICustomColorAsset?
-    public let defaultLetterSpacing: Double?
-    public let defaultLineHeight: Double?
-
-    public init(
-        font: UIFont,
-        defaultColor: AdaptyUICustomColorAsset? = nil,
-        defaultLetterSpacing: Double? = nil,
-        defaultLineHeight: Double? = nil
-    ) {
-        self.font = font
-        self.defaultColor = defaultColor
-        self.defaultLetterSpacing = defaultLetterSpacing
-        self.defaultLineHeight = defaultLineHeight
-    }
-}
+@available(*, deprecated, renamed: "AdaptyUIFontAsset")
+public typealias AdaptyUICustomFontAsset = AdaptyUIFontAsset
 
 public enum AdaptyUICustomGradientAsset: Sendable {
     case linear(gradient: Gradient, startPoint: UnitPoint, endPoint: UnitPoint)
@@ -53,26 +32,18 @@ public enum AdaptyUICustomGradientAsset: Sendable {
     case radial(gradient: Gradient, center: UnitPoint, startRadius: CGFloat, endRadius: CGFloat)
 }
 
-public enum AdaptyUICustomAsset: Sendable {
-    case image(AdaptyUICustomImageAsset)
-    case video(AdaptyUICustomVideoAsset)
-    case color(AdaptyUICustomColorAsset)
-    case gradient(AdaptyUICustomGradientAsset)
-    case font(AdaptyUICustomFontAsset)
-}
-
 public protocol AdaptyUIAssetsResolver: Sendable {
-    func asset(for id: String) -> AdaptyUICustomAsset?
+    func asset(for id: String) -> AdaptyUIAsset?
 }
 
-extension [String: AdaptyUICustomAsset]: AdaptyUIAssetsResolver {
-    public func asset(for id: String) -> AdaptyUICustomAsset? { self[id] }
+extension [String: AdaptyUIAsset]: AdaptyUIAssetsResolver {
+    public func asset(for id: String) -> AdaptyUIAsset? { self[id] }
 }
 
 package struct AdaptyUIDefaultAssetsResolver: AdaptyUIAssetsResolver {
     package init() {}
 
-    package func asset(for id: String) -> AdaptyUICustomAsset? {
+    package func asset(for id: String) -> AdaptyUIAsset? {
         guard let uiImage = UIImage(named: id) else { return nil }
         return .image(.uiImage(value: uiImage))
     }

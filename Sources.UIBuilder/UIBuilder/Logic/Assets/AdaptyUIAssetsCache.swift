@@ -135,13 +135,20 @@ final class AdaptyUIAssetsCache {
         case let .assetId(assetId):
             guard let stateAsset = try? stateHolder.current.asset(assetId, for: mode) else { return nil }
 
-            if let customId = stateAsset.customId,
-               let customAsset = customAssetsResolver.asset(for: customId)
-            {
-                return customAsset.asAsset
+            let configAsset = stateAsset.asAsset
+
+            guard let customId = stateAsset.customId,
+                  let customAsset = customAssetsResolver.asset(for: customId)
+            else { return configAsset }
+
+            // Built-in elements fall back to the configuration asset when the
+            // substitute is of another kind; a custom element does the same.
+            if let configAsset, !customAsset.isSameKind(as: configAsset) {
+                Log.ui.warn("asset \(customId) from resolver is not of the kind declared by configuration, using configuration asset")
+                return configAsset
             }
 
-            return stateAsset.asAsset
+            return customAsset
         }
     }
 
@@ -183,6 +190,18 @@ final class AdaptyUIAssetsCache {
         )
 
         return newAsset
+    }
+}
+
+private extension AdaptyUIAsset {
+    func isSameKind(as other: AdaptyUIAsset) -> Bool {
+        switch (self, other) {
+        case (.image, .image), (.video, .video), (.color, .color),
+             (.gradient, .gradient), (.font, .font), (.data, .data):
+            true
+        default:
+            false
+        }
     }
 }
 
