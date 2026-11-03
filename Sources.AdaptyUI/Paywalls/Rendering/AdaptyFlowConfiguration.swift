@@ -150,6 +150,8 @@ public extension AdaptyUI {
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
                 stateHolder: stateHolder
             )
+            actionHandler.assetsViewModel = assetsViewModel
+            actionHandler.tagResolverViewModel = tagResolverViewModel
 
             productsViewModel.onProductsLoaded = { [weak self, weak stateHolder] resolvers in
                 let constants = resolvers.compactMap { $0 as? AdaptyPaywallProduct }.asUIBuilderFlowProducts()

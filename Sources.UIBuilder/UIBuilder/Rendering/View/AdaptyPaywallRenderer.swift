@@ -29,6 +29,13 @@ struct AdaptyUIFlowRendererView: View {
     private var screensViewModel: AdaptyUIScreensViewModel
     @EnvironmentObject
     private var stateViewModel: AdaptyUIStateViewModel
+    @EnvironmentObject
+    private var assetsViewModel: AdaptyUIAssetsViewModel
+    @EnvironmentObject
+    private var tagResolverViewModel: AdaptyUITagResolverViewModel
+
+    @Environment(\.adaptyShowsDebugPlaceholders)
+    private var showsDebugPlaceholders: Bool
 
     private var alertIsPresented: Binding<Bool> {
         Binding(
@@ -94,22 +101,25 @@ struct AdaptyUIFlowRendererView: View {
         )
     }
 
+    /// The whole localized string for `stringId` with every tag substituted and
+    /// the attributes dropped, since a system alert shows plain text only.
+    /// `text` when the id is absent, not localized, or neither the string nor
+    /// its fallback resolves.
     private func text(_ value: VS.StringIdentifierOrText?) -> String? {
-        value.flatMap { stateViewModel.stateHolder.current.text($0) }
-    }
-}
-
-// TODO: в UIState нет возможности ресолвить теги в строках, потому не верно заводить такую функцию внутрь UIState. Поэтому я ее перенес сюда - где она используется.
-// TODO: функция сначало должна обработать возможность взять строку по stringId, text - является фаллбеком !
-// TODO: richText(stringId)?.asString - нельзя использовать ( данный метод вообще используется для другого) - мы договаривались что будет братся вся rich строка , будут подставлятся все теги , игнорируются атрибуты цвета и других параметров что не совместими с AllertView
-
-private extension VS {
-
-    /// The localized string for `stringId`, or `text` when the id is absent or not localized.
-    func text(_ value: VS.StringIdentifierOrText) -> String? {
+        guard let value else { return nil }
         guard let stringId = value.stringId else { return value.text }
-        if let text = try? richText(stringId)?.asString { return text }
-        Log.viewState.error("string_id \(stringId) is not localized as plain text")
+        // A script may show an alert before any screen is open; a plain string id needs no screen.
+        let screen = screensViewModel.topmostScreenInstance ?? AdaptyUIScreenInstanceKey.defaultValue
+
+        if let text = assetsViewModel.plainText(
+            stringId,
+            screen: screen,
+            stateViewModel: stateViewModel,
+            customTagResolver: tagResolverViewModel,
+            showsDebugPlaceholders: showsDebugPlaceholders
+        ) { return text }
+
+        Log.viewState.error("string_id \(stringId) is not localized or does not resolve")
         return value.text
     }
 }

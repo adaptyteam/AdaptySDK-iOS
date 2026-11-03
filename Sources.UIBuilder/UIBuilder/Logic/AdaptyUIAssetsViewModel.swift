@@ -137,6 +137,43 @@ package class AdaptyUIAssetsViewModel: ObservableObject {
         }
     }
 
+    /// The whole localized string for `stringId` as plain text, for places that
+    /// cannot show attributes: alert dialogs, URLs.
+    ///
+    /// Tags go through the same resolution as text elements, attributes are
+    /// dropped. There is no product, so product tags never resolve and the
+    /// string takes its localization fallback. `nil` when the id is not
+    /// localized or neither the string nor its fallback resolves.
+    func plainText(
+        _ stringId: VC.StringIdentifier,
+        screen: VS.ScreenInstance,
+        stateViewModel: AdaptyUIStateViewModel,
+        customTagResolver: AdaptyUITagResolver,
+        showsDebugPlaceholders: Bool
+    ) -> String? {
+        let (richText, tagValues, _) = resolvedText(
+            .stringId(stringId, nil),
+            screen: screen,
+            productsInfoProvider: nil
+        )
+
+        guard !richText.isEmpty, let attributed = richText.convertToAttributedString(
+            defaultAttributes: nil,
+            assetsCache: cache,
+            stateViewModel: stateViewModel,
+            tagValues: tagValues,
+            internalTagResolver: nil,
+            customTagResolver: customTagResolver,
+            productInfo: nil,
+            colorScheme: .light, // attributes are dropped, the scheme picks nothing
+            screen: screen,
+            showsDebugPlaceholders: showsDebugPlaceholders
+        ) else { return nil }
+
+        // Inline images come as attachment runs on U+FFFC, which plain text cannot carry.
+        return String(attributed.characters).replacingOccurrences(of: "\u{FFFC}", with: "")
+    }
+
     // MARK: - Video Player Logic
 
     private var playerManagers = [String: AdaptyUIVideoPlayerManager]()

@@ -118,6 +118,8 @@ public extension AdaptyUI {
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
                 stateHolder: stateHolder
             )
+            actionHandler.assetsViewModel = assetsViewModel
+            actionHandler.tagResolverViewModel = tagResolverViewModel
 
             productsViewModel.onProductsLoaded = { [weak stateHolder, previewProducts] _ in
                 stateHolder?.setProducts(previewProducts.asProductConstants())

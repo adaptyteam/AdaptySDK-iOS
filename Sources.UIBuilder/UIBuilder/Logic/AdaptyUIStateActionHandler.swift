@@ -94,6 +94,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     }
 
     package weak var timerViewModel: AdaptyUITimerViewModel?
+    package weak var assetsViewModel: AdaptyUIAssetsViewModel?
+    package weak var tagResolverViewModel: AdaptyUITagResolverViewModel?
 
     package var systemRequestsHandler: AdaptyUISystemRequestsHandler?
 
@@ -145,8 +147,15 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    private func resolvedText(stringId: String) -> VC.RichText? {
-        try? stateHolder?.current.richText(stringId)
+    private func plainText(stringId: String) -> String? {
+        guard let assetsViewModel, let stateViewModel, let tagResolverViewModel else { return nil }
+        return assetsViewModel.plainText(
+            stringId,
+            screen: screensViewModel.topmostScreenInstance ?? AdaptyUIScreenInstanceKey.defaultValue,
+            stateViewModel: stateViewModel,
+            customTagResolver: tagResolverViewModel,
+            showsDebugPlaceholders: false // a placeholder would make a URL out of `<tag:…>`
+        )
     }
 
     nonisolated func openUrl(
@@ -155,8 +164,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     ) {
         Task { @MainActor [weak self] in
             guard
-                let text = self?.resolvedText(stringId: stringId),
-                let str = text.asString,
+                let str = self?.plainText(stringId: stringId),
                 let url = URL(string: str)
             else {
                 self?.logic.reportDidReceiveError(.invalidActionURL(stringId))

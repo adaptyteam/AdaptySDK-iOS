@@ -166,6 +166,8 @@ public extension AdaptyUIBuilder {
                 assetsResolver: assetsResolver ?? AdaptyUIDefaultAssetsResolver(),
                 stateHolder: stateHolder
             )
+            actionHandler.assetsViewModel = assetsViewModel
+            actionHandler.tagResolverViewModel = tagResolverViewModel
 
             stateHolder.start()
             productsViewModel.loadProductsIfNeeded()
