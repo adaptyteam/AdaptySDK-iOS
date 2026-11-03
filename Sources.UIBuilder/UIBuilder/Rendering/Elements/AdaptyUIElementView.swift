@@ -215,7 +215,7 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             .animatableProperties(
                 element.properties,
                 play: $playAnimations,
-                blend: .default
+                blend: element.properties?.blend
             ) { blurRadius in
                 ElementBackgroundModifier(
                     backgrounds: element.properties?.background,

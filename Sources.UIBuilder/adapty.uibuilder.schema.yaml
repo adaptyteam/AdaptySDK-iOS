@@ -818,6 +818,7 @@ UI:
                         rotation: { $ref: "#/Entities/Rotation" }
                         scale: { $ref: "#/Entities/Scale" }
                         opacity: { type: number, default: 1.0 }
+                        blend: { $ref: "#/Entities/BlendMode" }
                         background:
                             type: array
                             items: { $ref: "#/UI/AlignedElement" } # { $ref: "#/pool_index" }
