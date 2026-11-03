@@ -90,9 +90,9 @@ public extension AdaptyProduct {
 
     /// The period of a single payment of the selected billing plan.
     /// The period's language is determined by the preferred language set on the device.
+    @available(*, deprecated, message: "Use subscriptionPricingTerms?.localizedBillingPeriod")
     var localizedBillingPeriod: String? {
-        guard let period = subscriptionPricingTerms?.billingPeriod else { return nil }
-        return skProduct.subscriptionPeriodFormatStyle.localized(period: period)
+        subscriptionPricingTerms?.localizedBillingPeriod
     }
 
     var description: String {

@@ -27,9 +27,6 @@ extension Date.ComponentsFormatStyle {
     }
 
     private func localizedComponents(day: Int? = nil, weekOfMonth: Int? = nil, month: Int? = nil, year: Int? = nil) -> String? {
-        var calendar = Calendar.current
-        calendar.locale = locale
-
         var components = DateComponents(calendar: calendar)
         components.day = day
         components.weekOfMonth = weekOfMonth
