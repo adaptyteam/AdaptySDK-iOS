@@ -96,6 +96,7 @@ let package = Package(
                 "adapty.uibuilder.schema.yaml",
                 "cue",
             ],
+            resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
             ]

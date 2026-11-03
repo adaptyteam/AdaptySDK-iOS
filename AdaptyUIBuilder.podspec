@@ -20,6 +20,7 @@ Pod::Spec.new do |s|
   s.swift_version = '6.0'
   
   s.source_files = 'Sources.UIBuilder/**/*.swift'
+  s.resource_bundles = {"AdaptyUIBuilder" => ["Sources.UIBuilder/PrivacyInfo.xcprivacy"]}
   
   s.frameworks = 'SwiftUI'
   s.ios.framework = 'UIKit'
