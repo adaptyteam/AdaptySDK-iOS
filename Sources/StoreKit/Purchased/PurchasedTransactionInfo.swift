@@ -9,6 +9,7 @@ import Foundation
 import StoreKit
 
 struct PurchasedTransactionInfo: Sendable {
+    let jwsTransaction: String?
     let transactionId: UInt64
     let originalTransactionId: UInt64
     let vendorProductId: String
@@ -23,7 +24,9 @@ struct PurchasedTransactionInfo: Sendable {
     init(
         _ product: StoreKit.Product?,
         _ transaction: StoreKit.Transaction,
+        _ jwsTransaction: String?
     ) {
+        self.jwsTransaction = jwsTransaction
         transactionId = transaction.id
         originalTransactionId = transaction.originalID
         vendorProductId = transaction.productID

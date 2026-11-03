@@ -10,6 +10,7 @@ import StoreKit
 public extension Adapty {
     package nonisolated static func reportTransaction(
         _ transactionId: String,
+        jwsTransaction: String?,
         withVariationId variationId: String?
     ) async throws(AdaptyError) {
         let variationId = variationId.trimmed.nonEmptyOrNil
@@ -23,6 +24,7 @@ public extension Adapty {
             let userId = sdk.profileStorage.userId
             try await sdk.sendTransactionId(
                 transactionId,
+                jwsTransaction: jwsTransaction,
                 with: variationId,
                 for: userId
             )
@@ -37,6 +39,7 @@ public extension Adapty {
     ///   - transaction: A purchased transaction (note, that this method is suitable only for Store Kit version 2) [Transaction](https://developer.apple.com/documentation/storekit/transaction).
     ///   - withVariationId:  A string identifier of variation. You can get it using variationId property of `AdaptyFlowPaywall`.
     /// - Throws: An ``AdaptyError`` object
+    @available(*, deprecated, message: "Use reportTransaction(_:withVariationId:) with StoreKit.VerificationResult<StoreKit.Transaction> instead.")
     nonisolated static func reportTransaction(
         _ transaction: StoreKit.Transaction,
         withVariationId variationId: String? = nil
@@ -56,7 +59,7 @@ public extension Adapty {
             )
 
             try await sdk.report(
-                .init(product, transaction),
+                .init(product, transaction, nil),
                 payload: .init(
                     userId: userId,
                     paywallVariationId: variationId,
@@ -86,7 +89,30 @@ public extension Adapty {
             throw StoreKitManagerError.transactionUnverified(error).asAdaptyError
         }
 
-        return try await reportTransaction(transaction, withVariationId: variationId)
+        let variationId = variationId.trimmed.nonEmptyOrNil
+        try await withActivatedSDK(methodName: .reportTransaction, logParams: [
+            "variation_id": variationId,
+            "transaction_id": transaction.id,
+        ]) { sdk throws(AdaptyError) in
+            let userId = try await sdk.createdProfileManager.userId
+
+            guard !transaction.isXcodeEnvironment else { return }
+
+            let product = try? await sdk.productsManager.fetchProduct(
+                id: transaction.productID,
+                fetchPolicy: .returnCacheDataElseLoad
+            )
+
+            try await sdk.report(
+                .init(product, transaction, signedTransaction.jwsRepresentation),
+                payload: .init(
+                    userId: userId,
+                    paywallVariationId: variationId,
+                    persistentOnboardingVariationId: sdk.purchasePayloadStorage.onboardingVariationId()
+                ),
+                reason: .setVariation
+            )
+        }
     }
 
     /// Link product purchase result with paywall's variationId.
@@ -102,8 +128,8 @@ public extension Adapty {
         withVariationId variationId: String? = nil
     ) async throws(AdaptyError) {
         switch purchaseResult {
-        case let .success(verificationResult):
-            try await reportTransaction(verificationResult, withVariationId: variationId)
+        case let .success(signedTransaction):
+            try await reportTransaction(signedTransaction, withVariationId: variationId)
         case .userCancelled:
             return
         case .pending:

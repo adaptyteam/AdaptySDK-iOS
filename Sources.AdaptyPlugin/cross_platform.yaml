@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/4.3.1/schema"
+$id: "https://adapty.io/crossPlatform/4.3.2/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -646,6 +646,7 @@ $requests:
       method: { const: "report_transaction" }
       variation_id: { type: string }
       transaction_id: { type: string }
+      apple_jws_transaction: { type: string }
 
   ReportTransaction.Response: #response
     type: object

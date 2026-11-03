@@ -114,7 +114,18 @@ extension View {
         switch shape {
         case let .rectangle(radii):
             if #available(iOS 16.0, *) {
-                self.clipShape(UnevenRoundedRectangle(cornerRadii: radii.systemRadii))
+                let systemRadii = radii.systemRadii
+                // Equal corners clip through the shapes Core Animation clips without an
+                // offscreen pass; an uneven rectangle costs one on every frame it is drawn.
+                if let radius = systemRadii.uniformRadius {
+                    if radius == 0 {
+                        self.clipped()
+                    } else {
+                        self.clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
+                    }
+                } else {
+                    self.clipShape(UnevenRoundedRectangle(cornerRadii: systemRadii))
+                }
             } else {
                 self.clipShape(UnevenRoundedRectangleFallback(cornerRadii: radii))
             }
@@ -490,6 +501,13 @@ extension View {
         } else {
             self
         }
+    }
+}
+
+@available(iOS 16.0, *)
+private extension RectangleCornerRadii {
+    var uniformRadius: CGFloat? {
+        topLeading == topTrailing && topLeading == bottomLeading && topLeading == bottomTrailing ? topLeading : nil
     }
 }
 

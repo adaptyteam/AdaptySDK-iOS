@@ -17,12 +17,13 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
     let stamp = Log.stamp
     let requestName = BackendRequestName.validateTransaction
     let logParams: EventParameters?
-
+    let jwsTransaction: String?
     let userId: AdaptyUserId
     let requestSource: RequestSource
 
     init(
         userId: AdaptyUserId,
+        jwsTransaction: String?,
         requestSource: RequestSource,
         logParams: EventParameters
     ) {
@@ -30,6 +31,7 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
             .setUserProfileId(userId)
 
         self.userId = userId
+        self.jwsTransaction = jwsTransaction
         self.requestSource = requestSource
         self.logParams = logParams
     }
@@ -47,6 +49,7 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
         case billingPlan = "billing_plan_id"
         case environment
 
+        case jwsTransaction = "transaction"
         case billingPrice = "original_price" // legacy backend name
         case priceCurrencyCode = "price_locale" // legacy backend name
         case priceRegionCode = "store_country" // legacy backend name
@@ -68,6 +71,7 @@ private struct ValidateTransactionRequest: BackendEncodableRequest {
         var dataContainer = perentContainer.nestedContainer(keyedBy: Backend.CodingKeys.self, forKey: .data)
         try dataContainer.encode("adapty_purchase_app_store_original_transaction_id_validation_result", forKey: .type)
         var container = dataContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .attributes)
+        try container.encodeIfPresent(jwsTransaction, forKey: .jwsTransaction)
 
         switch requestSource {
         case let .restore(originalTransactionId):
@@ -141,6 +145,7 @@ extension Backend.MainExecutor {
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             userId: userId,
+            jwsTransaction: nil,
             requestSource: .restore(originalTransactionId: originalTransactionId),
             logParams: [
                 "original_transaction_id": originalTransactionId,
@@ -153,11 +158,13 @@ extension Backend.MainExecutor {
 
     func sendTransactionId(
         _ transactionId: String,
+        jwsTransaction: String?,
         with variationId: String?,
         for userId: AdaptyUserId
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             userId: userId,
+            jwsTransaction: jwsTransaction,
             requestSource: .report(transactionId: transactionId, variationId: variationId),
             logParams: [
                 "transaction_id": transactionId,
@@ -176,6 +183,7 @@ extension Backend.MainExecutor {
     ) async throws(HTTPError) -> VH<AdaptyProfile> {
         let request = ValidateTransactionRequest(
             userId: payload.userId,
+            jwsTransaction: transactionInfo.jwsTransaction,
             requestSource: .validate(transactionInfo, payload, reason: reason),
             logParams: [
                 "product_id": transactionInfo.vendorProductId,

@@ -17,4 +17,9 @@ public extension AdaptyConfiguration.Builder {
         with(backendBaseUrl: mainBaseUrl, for: .main)
             .with(backendBaseUrl: adaptyAttributionBaseUrl, for: .adaptyAttribution)
     }
+
+    @discardableResult
+    func dev_with(urlProtocolClasses classes: [AnyClass]) -> Self {
+        with(urlProtocolClasses: classes)
+    }
 }
