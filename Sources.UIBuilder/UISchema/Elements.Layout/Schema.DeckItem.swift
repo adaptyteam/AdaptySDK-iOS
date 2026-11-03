@@ -15,10 +15,6 @@ extension Schema {
         let position: Point
         let mirrorInRTL: Bool
         let content: Element
-        @available(*, deprecated, message: "Use anchor, position and mirrorInRTL instead.")
-        let deprecatedHorizontalAlignment: HorizontalAlignment
-        @available(*, deprecated, message: "Use anchor and position instead.")
-        let deprecatedVerticalAlignment: VerticalAlignment
     }
 }
 
@@ -44,9 +40,7 @@ extension Schema.ConfigurationBuilder {
                 anchor: item.anchor,
                 position: item.position,
                 mirrorInRTL: item.mirrorInRTL,
-                content: elements[index],
-                deprecatedHorizontalAlignment: item.deprecatedHorizontalAlignment,
-                deprecatedVerticalAlignment: item.deprecatedVerticalAlignment
+                content: elements[index]
             ))
         }
         return deckItems
@@ -81,8 +75,6 @@ extension Schema.DeckItem: DecodableWithConfiguration {
             )
         }
 
-        let horizontalAlignment: Schema.HorizontalAlignment
-        let verticalAlignment: Schema.VerticalAlignment
         let anchor: Schema.Point
         let position: Schema.Point
         let rtlBehavior: Schema.RTLBehavior
@@ -99,8 +91,6 @@ extension Schema.DeckItem: DecodableWithConfiguration {
             anchor = try container.decode(Schema.Point.self, forKey: .anchor)
             position = try container.decode(Schema.Point.self, forKey: .position)
             rtlBehavior = try container.decodeIfPresent(Schema.RTLBehavior.self, forKey: .rtlBehavior) ?? .default
-            horizontalAlignment = .center
-            verticalAlignment = .center
         } else {
             guard !container.contains(.rtlBehavior) else {
                 throw DecodingError.dataCorruptedError(
@@ -110,8 +100,8 @@ extension Schema.DeckItem: DecodableWithConfiguration {
                 )
             }
 
-            horizontalAlignment = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? Self.default.horizontalAlignment
-            verticalAlignment = try container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment) ?? Self.default.verticalAlignment
+            let horizontalAlignment = try container.decodeIfPresent(Schema.HorizontalAlignment.self, forKey: .horizontalAlignment) ?? Self.default.horizontalAlignment
+            let verticalAlignment = try container.decodeIfPresent(Schema.VerticalAlignment.self, forKey: .verticalAlignment) ?? Self.default.verticalAlignment
             anchor = calculatePoint(horizontalAlignment, verticalAlignment)
             position = anchor
             rtlBehavior = calculateRTLBehavior(horizontalAlignment)
@@ -123,9 +113,7 @@ extension Schema.DeckItem: DecodableWithConfiguration {
             anchor: anchor,
             position: position,
             mirrorInRTL: rtlBehavior.mirrorInRTL,
-            content: try container.decode(Schema.Element.self, forKey: .content, configuration: configuration),
-            deprecatedHorizontalAlignment: horizontalAlignment,
-            deprecatedVerticalAlignment: verticalAlignment
+            content: try container.decode(Schema.Element.self, forKey: .content, configuration: configuration)
         )
 
         func calculateRTLBehavior(
