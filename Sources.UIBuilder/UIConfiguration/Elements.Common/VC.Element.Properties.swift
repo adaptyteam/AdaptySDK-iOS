@@ -14,9 +14,7 @@ extension VC.Element {
         let offset: VC.Offset?
         let rotation: VC.Rotation?
         let scale: VC.Scale?
-
         let opacity: Double
-        let blend: VC.BlendMode
 
         let background: [VC.AlignedElement]?
         let overlay: [VC.AlignedElement]?
@@ -36,7 +34,6 @@ extension VC.Element.Properties {
             && rotation?.isZero ?? true
             && scale?.isEmpty ?? true
             && opacity == 1.0
-            && blend == .default
             && background?.isEmpty ?? true
             && overlay?.isEmpty ?? true
             && eventHandlers.isEmpty

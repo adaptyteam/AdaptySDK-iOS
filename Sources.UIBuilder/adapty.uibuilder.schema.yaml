@@ -818,7 +818,6 @@ UI:
                         rotation: { $ref: "#/Entities/Rotation" }
                         scale: { $ref: "#/Entities/Scale" }
                         opacity: { type: number, default: 1.0 }
-                        blend: { $ref: "#/Entities/BlendMode" }
                         background:
                             type: array
                             items: { $ref: "#/UI/AlignedElement" } # { $ref: "#/pool_index" }
@@ -898,6 +897,7 @@ UI:
                     type: array
                     items: { $ref: "#/UI/Element/Decorator/Layer" }
                     description: "Layers above content, in drawing order"
+                blend: { $ref: "#/Entities/BlendMode" }
                 blur_radius: { type: number }
                 clip:
                     enum: [content, none]

@@ -17,6 +17,7 @@ extension Schema.Decorator: Decodable {
         case rectangleCornerRadius = "rect_corner_radius"
         case overlays
         case underlays
+        case blend
         case blurRadius = "blur_radius"
         case clip
 
@@ -89,6 +90,8 @@ extension Schema.Decorator: Decodable {
             shapeType: shapeType,
             overlays: legacyOverlays + overlays,
             underlays: legacyUnderlays + underlays,
+            blend: container.decodeIfPresent(Schema.BlendMode.self, forKey: .blend) ?? .default,
+
             blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius),
             clip: container.decodeIfPresent(Clip.self, forKey: .clip) ?? .content
         )

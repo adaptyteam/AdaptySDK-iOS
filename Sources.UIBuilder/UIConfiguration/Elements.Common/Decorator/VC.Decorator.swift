@@ -12,6 +12,7 @@ extension VC {
         let shapeType: ShapeType
         let overlays: [Layer]
         let underlays: [Layer]
+        let blend: BlendMode
         let blurRadius: Double?
         let clip: Clip
     }
