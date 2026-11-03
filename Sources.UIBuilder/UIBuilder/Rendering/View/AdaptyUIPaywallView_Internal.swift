@@ -39,7 +39,8 @@ package struct AdaptyUIPaywallView_Internal: View {
             let safeArea = safeAreaOverride ?? proxy.safeAreaInsets
             AdaptyUIFlowRendererView()
                 .withScreenSize(
-                    CGSize(
+                    // An override is not taken out of the proxy's size: that size is the whole screen.
+                    safeAreaOverride != nil ? proxy.size : CGSize(
                         width: proxy.size.width + safeArea.leading + safeArea.trailing,
                         height: proxy.size.height + safeArea.top + safeArea.bottom
                     )

@@ -95,6 +95,7 @@ let package = Package(
             exclude: [
                 "adapty.uibuilder.schema.yaml",
             ],
+            resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
             ]
