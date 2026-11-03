@@ -17,13 +17,17 @@ struct UIBuilderPricingTermsTests {
     func pricingTermsInJavaScript(plan: AdaptySubscriptionBillingPlan) throws {
         let isUpFront = plan == .upFront
         let priceFormatStyle = Decimal.FormatStyle.Currency(code: "EUR", locale: Locale(identifier: "de_DE"))
+        let periodFormatStyle = Date.ComponentsFormatStyle(style: .wide, fields: [.year, .month, .week, .day])
+            .locale(Locale(identifier: "de_DE"))
         let terms: AdaptySubscriptionPricingTerms
         if isUpFront {
             // Covers factory output, not StoreKit plan selection or fallback availability.
             terms = try #require(.upFront(
                 price: 100,
                 localizedPrice: "100,00 €",
-                subscriptionPeriod: .init(1, .year)
+                subscriptionPeriod: .init(1, .year),
+                priceFormatStyle: priceFormatStyle,
+                periodFormatStyle: periodFormatStyle
             ))
         } else {
             // Unknown identifiers are preserved by the mapper; this does not imply purchasability.
@@ -32,10 +36,14 @@ struct UIBuilderPricingTermsTests {
                 billingPrice: try #require(Decimal(string: "9.99")),
                 localizedBillingPrice: "9,99 €",
                 billingPeriod: .init(1, .month),
+                priceFormatStyle: priceFormatStyle,
+                periodFormatStyle: periodFormatStyle,
                 commitmentInfo: .init(
                     price: try #require(Decimal(string: "119.88")),
                     localizedPrice: "119,88 €",
-                    period: plan == .monthly ? .init(12, .month) : .init(1, .year)
+                    period: plan == .monthly ? .init(12, .month) : .init(1, .year),
+                    priceFormatStyle: priceFormatStyle,
+                    periodFormatStyle: periodFormatStyle
                 )
             )
         }

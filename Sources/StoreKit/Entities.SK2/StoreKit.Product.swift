@@ -15,7 +15,10 @@ extension StoreKit.Product {
         if #available(iOS 26.4, macOS 26.4, tvOS 26.4, watchOS 26.4, visionOS 26.4, *),
            let skPricingTerms = subscription.pricingTerms(for: billingPlan.asSKBillingPlanType)
         {
-            return skPricingTerms.asAdaptySubscriptionPricingTerms
+            return skPricingTerms.asAdaptySubscriptionPricingTerms(
+                priceFormatStyle: self.priceFormatStyle,
+                periodFormatStyle: self.subscriptionPeriodFormatStyle
+            )
         }
         #endif
 
@@ -24,7 +27,9 @@ extension StoreKit.Product {
         return AdaptySubscriptionPricingTerms.upFront(
             price: price,
             localizedPrice: displayPrice,
-            subscriptionPeriod: subscription.subscriptionPeriod.asAdaptySubscriptionPeriod
+            subscriptionPeriod: subscription.subscriptionPeriod.asAdaptySubscriptionPeriod,
+            priceFormatStyle: self.priceFormatStyle,
+            periodFormatStyle: self.subscriptionPeriodFormatStyle
         )
     }
 }

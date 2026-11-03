@@ -11,6 +11,7 @@ public struct AdaptySubscriptionPricingTerms: Sendable, Hashable {
     public let billingPrice: Decimal
     public let localizedBillingPrice: String
     public let billingPeriod: AdaptySubscriptionPeriod
+    public let localizedBillingPeriod: String?
     public let commitmentInfo: AdaptySubscriptionCommitmentInfo
 
     package init(
@@ -18,12 +19,15 @@ public struct AdaptySubscriptionPricingTerms: Sendable, Hashable {
         billingPrice: Decimal,
         localizedBillingPrice: String,
         billingPeriod: AdaptySubscriptionPeriod,
+        priceFormatStyle: Decimal.FormatStyle.Currency,
+        periodFormatStyle: Date.ComponentsFormatStyle,
         commitmentInfo: AdaptySubscriptionCommitmentInfo
     ) {
         self.billingPlan = billingPlan
         self.billingPrice = billingPrice
         self.localizedBillingPrice = localizedBillingPrice
         self.billingPeriod = billingPeriod
+        self.localizedBillingPeriod = periodFormatStyle.localized(period: billingPeriod)
         self.commitmentInfo = commitmentInfo
     }
 }
@@ -32,17 +36,23 @@ extension AdaptySubscriptionPricingTerms {
     static func upFront(
         price: Decimal,
         localizedPrice: String,
-        subscriptionPeriod:  AdaptySubscriptionPeriod
+        subscriptionPeriod:  AdaptySubscriptionPeriod,
+        priceFormatStyle: Decimal.FormatStyle.Currency,
+        periodFormatStyle: Date.ComponentsFormatStyle
     ) -> Self?{
         .init(
             billingPlan: .upFront,
             billingPrice: price,
             localizedBillingPrice: localizedPrice,
             billingPeriod: subscriptionPeriod,
+            priceFormatStyle: priceFormatStyle,
+            periodFormatStyle: periodFormatStyle,
             commitmentInfo: .init(
                 price: price,
                 localizedPrice: localizedPrice,
-                period: subscriptionPeriod
+                period: subscriptionPeriod,
+                priceFormatStyle: priceFormatStyle,
+                periodFormatStyle: periodFormatStyle
             )
         )
     }
