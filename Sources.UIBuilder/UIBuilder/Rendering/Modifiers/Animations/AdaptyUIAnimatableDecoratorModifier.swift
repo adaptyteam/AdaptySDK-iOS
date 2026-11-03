@@ -255,8 +255,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private func decorated(_ content: Content) -> some View {
         self.composed(
             self.decorator.overlays,
-            over: self.clippedContent(content)
-                .dropShadows(self.contentShadows)
+            over: self.blendedContent(self.clippedContent(content).dropShadows(self.contentShadows))
                 .background {
                     // One gate for every underlay: 4.0.0 lost the includeBackground
                     // modifier on the image branch, which is how the footer
@@ -281,8 +280,23 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     /// group stays off for plain layers: it changes edge antialiasing.
     @ViewBuilder
     private func isolatedIfBlended(_ view: some View) -> some View {
-        if (self.decorator.underlays + self.decorator.overlays).contains(where: { $0.blend != .normal }) {
+        if self.decorator.blend != .normal
+            || (self.decorator.underlays + self.decorator.overlays).contains(where: { $0.blend != .normal }) {
             view.compositingGroup()
+        } else {
+            view
+        }
+    }
+
+    /// The content is the layer between underlays and overlays: `decorator.blend`
+    /// blends it with the underlays. The group keeps the blend modes of nested
+    /// elements from replacing this one.
+    // ponytail: destination_in maps to normal here; a mask of the underlays by the
+    // content would draw the content twice.
+    @ViewBuilder
+    private func blendedContent(_ view: some View) -> some View {
+        if self.decorator.blend != .normal {
+            view.compositingGroup().blendMode(self.decorator.blend.swiftUIBlendMode)
         } else {
             view
         }

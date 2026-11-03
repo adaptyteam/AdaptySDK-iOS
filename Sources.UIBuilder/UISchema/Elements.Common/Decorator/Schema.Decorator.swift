@@ -91,7 +91,6 @@ extension Schema.Decorator: Decodable {
             overlays: legacyOverlays + overlays,
             underlays: legacyUnderlays + underlays,
             blend: container.decodeIfPresent(Schema.BlendMode.self, forKey: .blend) ?? .default,
-
             blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius),
             clip: container.decodeIfPresent(Clip.self, forKey: .clip) ?? .content
         )
