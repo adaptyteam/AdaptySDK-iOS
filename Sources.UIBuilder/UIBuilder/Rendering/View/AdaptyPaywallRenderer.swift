@@ -37,6 +37,24 @@ struct AdaptyUIFlowRendererView: View {
     @Environment(\.adaptyShowsDebugPlaceholders)
     private var showsDebugPlaceholders: Bool
 
+    /// The host app's direction: the safe-area insets were read in it (`AdaptyUIPaywallView_Internal`).
+    @Environment(\.layoutDirection)
+    private var hostLayoutDirection: LayoutDirection
+    @Environment(\.adaptySafeAreaInsets)
+    private var hostSafeArea: EdgeInsets
+
+    /// The insets in the flow's direction: leading and trailing swap when the flow and the host
+    /// disagree, so a side inset stays on its physical side.
+    private var flowSafeArea: EdgeInsets {
+        guard screensViewModel.isRightToLeft != (hostLayoutDirection == .rightToLeft) else { return hostSafeArea }
+        return EdgeInsets(
+            top: hostSafeArea.top,
+            leading: hostSafeArea.trailing,
+            bottom: hostSafeArea.bottom,
+            trailing: hostSafeArea.leading
+        )
+    }
+
     private var alertIsPresented: Binding<Bool> {
         Binding(
             get: { stateViewModel.alertDialog != nil },
@@ -60,6 +78,7 @@ struct AdaptyUIFlowRendererView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
             .clipped()
+            .withSafeArea(flowSafeArea)
             .environment(
                 \.layoutDirection,
                 screensViewModel.isRightToLeft ? .rightToLeft : .leftToRight
