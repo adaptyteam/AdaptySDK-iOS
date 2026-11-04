@@ -214,6 +214,12 @@ struct AdaptyUIAnimatablePropertiesModifier<Layers: ViewModifier>: ViewModifier 
     func body(content: Content) -> some View {
         transformed(
             content
+                // The decorator inside draws drop shadows before the transforms below.
+                .environment(\.adaptyShadowTransform, AdaptyUIShadowTransform(
+                    rotation: resolvedRotation,
+                    scaleX: resolvedScaleX,
+                    scaleY: resolvedScaleY
+                ))
                 .blur(radius: resolvedBlurRadius)
                 .elementBlend(blend)
                 .modifier(layers(resolvedBlurRadius))

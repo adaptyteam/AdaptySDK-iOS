@@ -183,15 +183,85 @@ private struct ResolvedShadow {
     let offset: CGSize
 }
 
+/// The rotation and scale an element applies to itself after its decorator is drawn.
+struct AdaptyUIShadowTransform: Equatable {
+    var rotation: Angle = .zero
+    var scaleX: CGFloat = 1.0
+    var scaleY: CGFloat = 1.0
+}
+
+private struct AdaptyUIShadowTransformKey: EnvironmentKey {
+    static let defaultValue = AdaptyUIShadowTransform()
+}
+
+extension EnvironmentValues {
+    /// Set by every element for its own decorator, so a parent's transform never
+    /// reaches a child's shadows.
+    var adaptyShadowTransform: AdaptyUIShadowTransform {
+        get { self[AdaptyUIShadowTransformKey.self] }
+        set { self[AdaptyUIShadowTransformKey.self] = newValue }
+    }
+}
+
+/// A drop shadow cast by a light fixed on the screen. The element rotates and
+/// scales after its decorator draws the shadow, so the offset and the blur are
+/// taken back through that transform: on screen they stay as configured.
+/// Animatable, so the shadow follows a rotation or scale animation frame by frame.
+private struct ScreenFixedDropShadow: ViewModifier, Animatable {
+    let color: Color
+    var radius: Double
+    var offset: CGSize
+    var rotation: Double // radians
+    var scaleX: CGFloat
+    var scaleY: CGFloat
+
+    nonisolated var animatableData: AnimatablePair<
+        AnimatablePair<Double, CGSize.AnimatableData>,
+        AnimatablePair<Double, AnimatablePair<CGFloat, CGFloat>>
+    > {
+        get { .init(.init(radius, offset.animatableData), .init(rotation, .init(scaleX, scaleY))) }
+        set {
+            radius = newValue.first.first
+            offset.animatableData = newValue.first.second
+            rotation = newValue.second.first
+            scaleX = newValue.second.second.first
+            scaleY = newValue.second.second.second
+        }
+    }
+
+    func body(content: Content) -> some View {
+        // The element rotates, then scales: undo the scale, then the rotation.
+        // A zero scale collapses the shadow anyway; it is left uncompensated.
+        let x = offset.width / (scaleX == 0 ? 1 : scaleX)
+        let y = offset.height / (scaleY == 0 ? 1 : scaleY)
+        let cos = Foundation.cos(rotation)
+        let sin = Foundation.sin(rotation)
+        let meanScale = (scaleX * scaleY).magnitude.squareRoot()
+        content.shadow(
+            color: color,
+            radius: meanScale == 0 ? radius : radius / meanScale,
+            x: x * cos + y * sin,
+            y: -x * sin + y * cos
+        )
+    }
+}
+
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 private extension View {
     /// A translucent layer shows its shadow through itself, as the pre-layer
     /// element shadow did.
-    func dropShadows(_ shadows: [ResolvedShadow]) -> some View {
+    func dropShadows(_ shadows: [ResolvedShadow], under transform: AdaptyUIShadowTransform) -> some View {
         // ponytail: chained .shadow also shadows the previous shadow; draw a copy
         // per shadow if a design stacks several drops on one layer.
         shadows.reduce(AnyView(self)) { view, shadow in
-            AnyView(view.shadow(color: shadow.color, radius: shadow.radius, x: shadow.offset.width, y: shadow.offset.height))
+            AnyView(view.modifier(ScreenFixedDropShadow(
+                color: shadow.color,
+                radius: shadow.radius,
+                offset: shadow.offset,
+                rotation: transform.rotation.radians,
+                scaleX: transform.scaleX,
+                scaleY: transform.scaleY
+            )))
         }
     }
 }
@@ -242,6 +312,8 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private var screenSize: CGSize
     @Environment(\.adaptySafeAreaInsets)
     private var safeArea: EdgeInsets
+    @Environment(\.adaptyShadowTransform)
+    private var shadowTransform: AdaptyUIShadowTransform
 
     func body(content: Content) -> some View {
         self.isolatedIfBlended(self.decorated(content))
@@ -255,7 +327,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     private func decorated(_ content: Content) -> some View {
         self.composed(
             self.decorator.overlays,
-            over: self.blendedContent(self.clippedContent(content).dropShadows(self.contentShadows))
+            over: self.blendedContent(self.clippedContent(content).dropShadows(self.contentShadows, under: self.shadowTransform))
                 .background {
                     // One gate for every underlay: 4.0.0 lost the includeBackground
                     // modifier on the image branch, which is how the footer
@@ -374,7 +446,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
                 EmptyView()
             }
         }
-        .dropShadows(self.resolvedShadows(layer, kind: .drop))
+        .dropShadows(self.resolvedShadows(layer, kind: .drop), under: self.shadowTransform)
     }
 
     @ViewBuilder
@@ -395,7 +467,7 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
         if let resolved {
             shape.swiftUIShapeStroke(self.withInnerShadows(resolved.shapeStyle, layer), lineWidth: lineWidth)
                 .clipShape(shape)
-                .dropShadows(self.resolvedShadows(layer, kind: .drop))
+                .dropShadows(self.resolvedShadows(layer, kind: .drop), under: self.shadowTransform)
         }
     }
 
