@@ -8,8 +8,14 @@
 import Foundation
 
 extension VC.Action {
-    private static let scheme = "sdk"
+    private static let scheme = "adapty-sdk"
     private static let host = "action"
+
+    /// Whether `url` carries an action of the configuration rather than an
+    /// address to open.
+    static func isActionURL(_ url: URL) -> Bool {
+        url.scheme?.lowercased() == scheme
+    }
 
     var asURL: URL? {
         var components = URLComponents()

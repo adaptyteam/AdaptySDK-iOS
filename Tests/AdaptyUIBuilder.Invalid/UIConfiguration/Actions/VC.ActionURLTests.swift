@@ -26,7 +26,7 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
 
         let url = try #require(action.asURL)
 
-        #expect(url.absoluteString == "sdk://global.action/close/paywall")
+        #expect(url.absoluteString == "adapty-sdk://global.action/close/paywall")
     }
 
     @Test("asURL encodes sorted nested params")
@@ -48,7 +48,7 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
         let url = try #require(action.asURL)
         let components = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false))
 
-        #expect(components.scheme == "sdk")
+        #expect(components.scheme == "adapty-sdk")
         #expect(components.host == "screen.action")
         #expect(components.path == "/submit")
         #expect(components.queryItems == [
@@ -63,7 +63,7 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
     @Test("init url decodes nested params")
     func decodesNestedParams() throws {
         let url = try #require(
-            URL(string: "sdk://screen.action/submit?message_s=hello&payload.empty&payload.enabled_b=true&payload.name_s=alex&payload.ratio_d=1.5")
+            URL(string: "adapty-sdk://screen.action/submit?message_s=hello&payload.empty&payload.enabled_b=true&payload.name_s=alex&payload.ratio_d=1.5")
         )
 
         let action = try Action(url: url)
@@ -120,7 +120,7 @@ private extension AdaptyUIConfigurationTests.VCActionURLTests {
 
     @Test("init url throws for empty path")
     func emptyPathThrows() throws {
-        let url = try #require(URL(string: "sdk://screen.action"))
+        let url = try #require(URL(string: "adapty-sdk://screen.action"))
 
         #expect(throws: DecodingError.self) {
             _ = try Action(url: url)

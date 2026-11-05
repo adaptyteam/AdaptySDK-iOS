@@ -96,6 +96,12 @@ public struct AdaptyUICustomElementContext {
     ///
     /// For the plain text alone use `String(value.characters)`.
     ///
+    /// A link that runs an action of the flow is carried as a URL and runs when
+    /// SwiftUI opens it through the `openURL` of the environment. Setting your
+    /// own `openURL` around a `Text` showing this string makes your handler
+    /// receive those URLs instead, and the action does not run; render the
+    /// string with `textView(_:)` in that case.
+    ///
     /// - Note: Inline images are carried as `NSTextAttachment` runs. A host
     ///   rendering this into `UILabel` or `UITextView` draws them; SwiftUI
     ///   `Text` drops attachments on every iOS version, so render the string
@@ -125,19 +131,22 @@ public struct AdaptyUICustomElementContext {
 
     /// View rendering the localized string declared under `id` in the `strings`
     /// of the element, keeping its formatting, fonts and locale.
+    ///
+    /// Links of the string that run an action of the flow keep working when the
+    /// app sets its own `openURL` around this view.
     public func textView(_ id: String) -> (some View)? { // TODO: consider removing
-        guard let ref = element.strings?[id] else {
-            return AdaptyUITextView?.none
-        }
-        return AdaptyUITextView(
-            .init(
-                value: ref,
-                horizontalAlign: .leading,
-                maxRows: nil,
-                overflowMode: [],
-                defaultTextAttributes: nil
+        element.strings?[id].map { ref in
+            AdaptyUITextView(
+                .init(
+                    value: ref,
+                    horizontalAlign: .leading,
+                    maxRows: nil,
+                    overflowMode: [],
+                    defaultTextAttributes: nil
+                )
             )
-        )
+            .handlingActionURLs(stateViewModel: stateViewModel, screen: screen)
+        }
     }
 
     // MARK: - Bindings and properties

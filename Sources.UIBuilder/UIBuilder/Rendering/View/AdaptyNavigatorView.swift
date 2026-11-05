@@ -270,12 +270,10 @@ struct AdaptyNavigatorView: View {
                 initialOffset: navigatorViewModel.contentSeedOffset,
                 onFinished: { navigatorViewModel.contentTransitionDidFinish() }
             )
-            .overrideOpenUrl { url in
-                stateViewModel.handle(
-                    url: url,
-                    screen: navigatorViewModel.currentScreenInstanceIfSingle
-                ) ? .handled : .discarded
-            }
+            .handlingActionURLs(
+                stateViewModel: stateViewModel,
+                screen: navigatorViewModel.currentScreenInstanceIfSingle
+            )
         }
         .environmentObject(navigatorViewModel)
         .environmentObject(navigatorViewModel.eventBus)
@@ -301,12 +299,10 @@ private struct AdaptyNavigatorScreensView: View {
             AdaptyScreenView(
                 screen: screenInstance.configuration
             )
-            .overrideOpenUrl { url in
-                stateViewModel.handle(
-                    url: url,
-                    screen: screenInstance.instance
-                ) ? .handled : .discarded
-            }
+            .handlingActionURLs(
+                stateViewModel: stateViewModel,
+                screen: screenInstance.instance
+            )
             .zIndex(navigatorViewModel.order * 1000.0 + screenInstance.zIndex)
             .environmentObject(screenInstance)
             .environment(\.adaptyScreenInstanceId, screenInstance.instance.id)
@@ -320,6 +316,19 @@ extension View {
             \.openURL,
             OpenURLAction(handler: handler)
         )
+    }
+
+    /// Runs an action of the configuration opened as a URL in the flow and
+    /// passes any other URL to the system, so that `Link` and `openURL` of an
+    /// app view inside the flow keep working.
+    func handlingActionURLs(
+        stateViewModel: AdaptyUIStateViewModel,
+        screen: VS.ScreenInstance?
+    ) -> some View {
+        overrideOpenUrl { url in
+            guard VC.Action.isActionURL(url) else { return .systemAction }
+            return stateViewModel.handle(url: url, screen: screen) ? .handled : .discarded
+        }
     }
 }
 
