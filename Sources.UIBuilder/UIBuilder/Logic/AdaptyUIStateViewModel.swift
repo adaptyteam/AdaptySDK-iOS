@@ -74,6 +74,9 @@ package final class AdaptyUIStateViewModel: ObservableObject {
             }
             return true
         } catch {
+            // TODO: This handler assumes every URL is a VC.Action, but Custom Element also
+            // sends external URLs through openURL. Non-sdk URLs should not be rejected with an error
+            // and left unhandled.
             Log.ui.error("#\(logId)# handle action url error: \(error)")
             return false
         }
