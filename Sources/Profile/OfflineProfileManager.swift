@@ -30,6 +30,7 @@ final class OfflineProfileManager {
             accessLevels: [:],
             subscriptions: [:],
             nonSubscriptions: [:],
+            virtualCurrencies: [:],
             version: 0
         ))
     }
@@ -85,6 +86,7 @@ private extension AdaptyProfile {
             accessLevels: accessLevels,
             subscriptions: subscriptions,
             nonSubscriptions: nonSubscriptions,
+            virtualCurrencies: virtualCurrencies,
             version: version
         )
     }

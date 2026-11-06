@@ -41,6 +41,9 @@ public struct AdaptyProfile: Sendable {
     /// The keys are product ids from the store. The values are arrays of information about consumables. Can be null if the customer has no purchases.
     public let nonSubscriptions: [String: [NonSubscription]]
 
+    /// Balances keyed by virtual currency identifiers. Empty when the server returns no virtual currencies.
+    public let virtualCurrencies: [AdaptyVirtualCurrency: AdaptyVirtualCurrencyBalance]
+
     package let version: Int
 }
 
@@ -66,6 +69,7 @@ extension AdaptyProfile: Hashable {
             && lhs.accessLevels == rhs.accessLevels
             && lhs.subscriptions == rhs.subscriptions
             && lhs.nonSubscriptions == rhs.nonSubscriptions
+            && lhs.virtualCurrencies == rhs.virtualCurrencies
             && lhs.version == rhs.version
     }
 
@@ -77,6 +81,7 @@ extension AdaptyProfile: Hashable {
         hasher.combine(accessLevels)
         hasher.combine(subscriptions)
         hasher.combine(nonSubscriptions)
+        hasher.combine(virtualCurrencies)
         hasher.combine(version)
     }
 }
@@ -86,7 +91,8 @@ extension AdaptyProfile: CustomStringConvertible {
         "(id: \(userId), "
             + "segmentId: \(segmentId), isTestuser: \(isTestUser), "
             + (codableCustomAttributes == nil ? "" : "customAttributes: \(customAttributes), ")
-            + "accessLevels: \(accessLevels), subscriptions: \(subscriptions), nonSubscriptions: \(nonSubscriptions))"
+            + "accessLevels: \(accessLevels), subscriptions: \(subscriptions), nonSubscriptions: \(nonSubscriptions), "
+            + "virtualCurrencies: \(virtualCurrencies))"
     }
 }
 
@@ -99,6 +105,7 @@ extension AdaptyProfile: Codable {
         case accessLevels = "paid_access_levels"
         case subscriptions
         case nonSubscriptions = "non_subscriptions"
+        case virtualCurrencies = "virtual_currencies"
         case version = "timestamp"
         case isTestUser = "is_test_user"
         case attributes
@@ -123,6 +130,8 @@ extension AdaptyProfile: Codable {
         accessLevels = try container.decodeIfPresent([String: AccessLevel].self, forKey: .accessLevels) ?? [:]
         subscriptions = try container.decodeIfPresent([String: Subscription].self, forKey: .subscriptions) ?? [:]
         nonSubscriptions = try container.decodeIfPresent([String: [NonSubscription]].self, forKey: .nonSubscriptions) ?? [:]
+        let balances = try container.decodeIfPresent([String: AdaptyVirtualCurrencyBalance].self, forKey: .virtualCurrencies) ?? [:]
+        virtualCurrencies = Dictionary(uniqueKeysWithValues: balances.map { (AdaptyVirtualCurrency($0.key), $0.value) })
         appliedExternalAttributionProviders = try container.decodeIfPresent([AdaptyExternalAttributionProvider].self, forKey: .appliedExternalAttributionProviders) ?? []
     }
 
@@ -142,6 +151,10 @@ extension AdaptyProfile: Codable {
         }
         if nonSubscriptions.isNotEmpty {
             try container.encode(nonSubscriptions, forKey: .nonSubscriptions)
+        }
+        if virtualCurrencies.isNotEmpty {
+            let balances = Dictionary(uniqueKeysWithValues: virtualCurrencies.map { ($0.key.rawValue, $0.value) })
+            try container.encode(balances, forKey: .virtualCurrencies)
         }
         if appliedExternalAttributionProviders.isNotEmpty {
             try container.encode(appliedExternalAttributionProviders, forKey: .appliedExternalAttributionProviders)

@@ -1731,11 +1731,21 @@ $defs:
         additionalProperties:
           type: array
           items: { $ref: "#/$defs/AdaptyProfile.NonSubscription" }
+      virtual_currencies:
+        type: object
+        additionalProperties: { $ref: "#/$defs/AdaptyVirtualCurrencyBalance" }
       timestamp: { type: integer }
       is_test_user: { type: boolean }
       applied_attribution_sources:
         type: array
         items: { type: string }
+
+  AdaptyVirtualCurrencyBalance: #response #event
+    type: object
+    required:
+      - available
+    properties:
+      available: { type: integer, minimum: 0 }
 
   AdaptyProfile.AccessLevel: #response
     type: object
