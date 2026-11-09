@@ -424,6 +424,7 @@ $requests:
   ### getLogLevel ###
   GetLogLevel.Request: #request
     type: object
+    description: "iOS Only"
     required: [method]
     properties:
       method: { const: "get_log_level" }
@@ -509,6 +510,7 @@ $requests:
   ### makePromotedPurchase ###
   MakePromotedPurchase.Request: #request
     type: object
+    description: "iOS Only"
     required: [method, product]
     properties:
       method: { const: "make_promoted_purchase" }
@@ -628,6 +630,7 @@ $requests:
   ### presentCodeRedemptionSheet ###
   PresentCodeRedemptionSheet.Request: #request
     type: object
+    description: "iOS Only"
     required: [method]
     properties:
       method: { const: "present_code_redemption_sheet" }
@@ -756,6 +759,7 @@ $requests:
   ### updateCollectingRefundDataConsent ###
   UpdateCollectingRefundDataConsent.Request: #request
     type: object
+    description: "iOS Only"
     required: [method, consent]
     properties:
       method: { const: "update_collecting_refund_data_consent" }
@@ -792,6 +796,7 @@ $requests:
   ### updateRefundPreference ###
   UpdateRefundPreference.Request: #request
     type: object
+    description: "iOS Only"
     required: [method, refund_preference]
     properties:
       method: { const: "update_refund_preference" }
@@ -954,6 +959,7 @@ $events:
 
   Event.DidReceivePromotedPurchase:
     type: object
+    description: "iOS Only"
     required: [id, product]
     properties:
       id: { const: "did_receive_promoted_purchase" }
@@ -1308,7 +1314,6 @@ $defs:
     properties:
       app_account_token: { $ref: "#/$defs/UUID", description: "iOS Only" }
       obfuscated_account_id: { type: string, description: "Android Only" }
-      obfuscated_profile_id: { type: string, description: "Android Only" }
 
   AdaptyPaywallProduct.Response: #response
     type: object
@@ -1349,8 +1354,8 @@ $defs:
     type: object
     required:
         - amount
-        - currency_code # iOS Only
-        - localized_string # iOS Only
+        - currency_code
+        - localized_string
     properties:
       amount: { type: number }
       currency_code: { type: string }
@@ -1768,7 +1773,7 @@ $defs:
       billing_issue_detected_at: { $ref: "#/$defs/Date" }
       starts_at: { $ref: "#/$defs/Date" }
       cancellation_reason: { type: string }
-      billing_plan_id: { type: string, description: "iOS Only" }
+      billing_plan_id: { type: string }
       commitment: { $ref: "#/$defs/AdaptyProfile.SubscriptionCommitmentInfo" }
       is_refund: { type: boolean }
 
@@ -1806,7 +1811,7 @@ $defs:
       - is_refund
       - is_sandbox
       - will_renew
-      - billing_plan_id # iOS Only
+      - billing_plan_id
     properties:
       store: { type: string }
       vendor_product_id: { type: string }
@@ -1829,7 +1834,7 @@ $defs:
       active_promotional_offer_id: { type: string }
       offer_id: { type: string }
       cancellation_reason: { type: string }
-      billing_plan_id: { type: string, description: "iOS Only" }
+      billing_plan_id: { type: string }
       commitment: { $ref: "#/$defs/AdaptyProfile.SubscriptionCommitmentInfo" }
 
   AdaptyProfile.SubscriptionCommitmentInfo: #response
