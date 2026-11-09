@@ -1982,6 +1982,7 @@ $defs:
         properties:
           type: { type: string, const: "custom" }
           value: { type: string }
+          arguments: { type: object }
 
   AdaptyUI.Permission: #event
     description:

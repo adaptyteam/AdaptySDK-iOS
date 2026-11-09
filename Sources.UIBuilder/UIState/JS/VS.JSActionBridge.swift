@@ -46,7 +46,7 @@ extension VS.JSActionDispatcher: JSActionBridge {
     }
 
     func userCustomAction(_ params: JSValue) {
-        userCustomAction(params.isObject ? params.toDictionary() : nil)
+        userCustomAction(params.isObject ? (params.toDictionary() as? [String: any Sendable]) : nil)
     }
 
     func purchaseProduct(_ params: JSValue) {

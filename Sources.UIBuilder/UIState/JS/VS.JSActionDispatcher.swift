@@ -81,13 +81,21 @@ extension VS.JSActionDispatcher {
     }
 
     @inlinable
-    func userCustomAction(_ params: [AnyHashable: Any]?) {
-        guard let userCustomId = params?["userCustomId"] as? String else {
+    func userCustomAction(_ params: [String: any Sendable]?) {
+        guard let params else {
+            Log.viewState.error(#"SDK.userCustomAction: corupted params"#)
+            return
+        }
+
+        guard let userCustomId = params["userCustomId"] as? String else {
             Log.viewState.error(#"SDK.userCustomAction: required parameter "userCustomId" is missing"#)
             return
         }
 
-        handler?.userCustomAction(id: userCustomId)
+        handler?.userCustomAction(
+            id: userCustomId,
+            arguments: params["arguments"] as? [String: any Sendable]
+        )
     }
 
     @inlinable

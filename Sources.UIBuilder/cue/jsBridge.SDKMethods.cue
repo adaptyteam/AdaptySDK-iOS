@@ -110,6 +110,7 @@ package jsBridge
 
 #UserCustomActionParameters: {
 	userCustomId!: string
+	arguments?: { [string]: #JSValue }
 }
 
 // SDK.purchaseProduct(...)

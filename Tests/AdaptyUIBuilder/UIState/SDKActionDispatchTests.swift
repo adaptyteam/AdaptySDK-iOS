@@ -140,7 +140,7 @@ private final class ActionHandler: AdaptyUIActionHandler {
     func jsException(_ message: String) { Issue.record("Unexpected JavaScript exception: \(message)") }
     func openUrl(url _: URL, openIn _: VC.Action.WebOpenInParameter) {}
     func openUrl(stringId _: String, openIn _: VC.Action.WebOpenInParameter) {}
-    func userCustomAction(id _: String) {}
+    func userCustomAction(id _: String, arguments _: [String: any Sendable]?) {}
     func purchaseProduct(productId _: String, service _: VC.Action.PaymentService, callback _: VS.JSAction?) {}
     func restorePurchases(callback _: VS.JSAction?) {}
     func closeAll() {}

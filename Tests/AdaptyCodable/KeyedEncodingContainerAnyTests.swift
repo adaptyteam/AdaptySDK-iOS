@@ -122,6 +122,7 @@ extension AdaptyCodableTests {
                     Int.min,
                     UInt.max,
                     123.45,
+                    NSNull(),
                     "ns_string",
                 ],
                 "dictionary": [
