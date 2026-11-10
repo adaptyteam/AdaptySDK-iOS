@@ -1,8 +1,8 @@
 package jsBridge
 
 #SDKMethods: {
-    
-    // 
+
+    //
     // CUE rule:
     // <js-method-name>: {
     //     arguments!: [<argument types>]
@@ -10,14 +10,14 @@ package jsBridge
     //
     // JS code:
     // SDK.<js-method-name>(<argument values>);
-    // 
-    
-    log: {   
-		// A string is shorthand for {message: string}. 
+    //
+
+    log: {
+		// A string is shorthand for {message: string}.
 		// Native code also coerces non-object JS values to strings.
 		arguments!: [string] | [#LogParameters]
 	}
-	
+
 	openUrl: {
 		arguments!: [#OpenUrlParameters]
 	}
@@ -49,7 +49,7 @@ package jsBridge
 	openScreen: {
 		arguments!: [#OpenScreenParameters]
 	}
-	
+
 	closeScreen: {
 		arguments!: [#CloseScreenParameters]
 	}
@@ -70,11 +70,11 @@ package jsBridge
 	showAppRate: {
 		arguments!: []
 	}
-	
+
 	showAlertDialog: {
 		arguments!: [#ShowAlertDialogParameters]
 	}
-	
+
 	showRequestPermission: {
 		arguments!: [#ShowRequestPermissionParameters]
 	}
@@ -82,7 +82,7 @@ package jsBridge
 	sendEvents: {
 		arguments!: [#SendEventsParameters]
 	}
-	
+
 	sendAnalyticsEvent: {
 		arguments!: [#SendAnalyticsEventParameters]
 	}
@@ -98,9 +98,9 @@ package jsBridge
 // SDK.openUrl(...)
 
 #OpenUrlParameters: {
-	openIn?: *"browser_out_app" | "browser_in_app"
-	url?:    string
-	
+	openIn?:   *"browser_out_app" | "browser_in_app"
+	url?:      string
+
 	if url == _|_ {
 		stringId!: string
 	}
@@ -129,9 +129,9 @@ package jsBridge
     result!:    #PurchaseResult
 }
 
-#PurchaseResult: "fail" | 
-                 "userCanceled" | 
-                 "success" | 
+#PurchaseResult: "fail" |
+                 "userCanceled" |
+                 "success" |
                  "pending"
 
 // SDK.webPurchaseProduct(...)
@@ -168,11 +168,11 @@ package jsBridge
 // SDK.openScreen(...)
 
 #OpenScreenParameters: {
-	type!:         string 
+	type!:         string
 	instanceId!:   string
 	transitionId!: string
 	navigatorId?:  *"default" | string
-	
+
 	// Dot-separated path. Native code drops empty components; absent means [].
 	contextPath?: string
 }
@@ -234,7 +234,7 @@ package jsBridge
     titleStringId?: string
     title?:         string
     style?:         *"default" | "cancel" | "destructive"
-    actionId?:      string 
+    actionId?:      string
 
     if title != _|_ {
         actionId?: *title | string
@@ -250,7 +250,7 @@ package jsBridge
 }
 
 // SDK.showRequestPermission(...)
- 
+
 #ShowRequestPermissionParameters: {
     permission?: string
     customArgs?: { [string]: string }
@@ -282,7 +282,8 @@ package jsBridge
 	instanceId?:      string
 	isBackendEvent?:  *true | bool
 	isCustomerEvent?: *false | bool
-	// UIState forwards the parameter dictionary, including these named fields.
-	// This covers JSON-compatible values; downstream analytics may filter them.
-	[string]: #JSValue
+	// Additional values are primitives or flat arrays; null is allowed only in arrays.
+	[string]: #AnalyticsEventParameterValue | [...(null | #AnalyticsEventParameterValue)]
 }
+
+#AnalyticsEventParameterValue: bool | number | string

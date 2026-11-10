@@ -1,18 +1,19 @@
 package jsBridge
 
-#JSValue: null | bool | number | string | #JSArray | #JSObject
-#JSArray: [...#JSValue] 
+#JSSimpleValue: null | bool | number | string
+#JSValue: #JSSimpleValue | #JSArray | #JSObject
+#JSArray: [...#JSValue]
 #JSObject: { [string]: #JSValue }
 
 //
 // JS code:
-// 
+//
 // foo(actionParameters) {
 //   ...
 // }
-// 
+//
 // or
-// 
+//
 // foo({_screen, <a>, <b>, <..>}) {
 //   ...
 // }
@@ -24,7 +25,7 @@ package jsBridge
 
 #ActionParameters: {
     "_screen"!: #ScreenInstance
-    [string]: #JSValue
+    [string & !="_screen"]: #JSValue
 }
 
 #ScreenInstance: {
@@ -37,13 +38,13 @@ package jsBridge
 
 //
 // JS code:
-// 
+//
 // foo(setterParameters) {
 //   ...
 // }
-// 
+//
 // or
-// 
+//
 // foo({_screen, name, value}}) {
 //   ...
 // }
