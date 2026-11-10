@@ -17,9 +17,6 @@ extension VS.JSState {
         let objectClass = context.objectForKeyedSubscript("Object")
         objectClass?.invokeMethod("freeze", withArguments: [env])
 
-//        #if DEBUG
-//        global.setValue(env, forProperty: "SDKEnv")
-//        #else
         if let objectClass, let descriptor = JSValue(newObjectIn: context) {
             descriptor.setValue(env, forProperty: "value")
             descriptor.setValue(false, forProperty: "writable")
@@ -27,7 +24,6 @@ extension VS.JSState {
             descriptor.setValue(false, forProperty: "enumerable")
             objectClass.invokeMethod("defineProperty", withArguments: [global, "SDKEnv", descriptor])
         }
-//        #endif
     }
 
     @inlinable
@@ -35,7 +31,7 @@ extension VS.JSState {
         guard products.isNotEmpty else { return }
         let global: JSValue = context.globalObject
 
-        let products = VC.Value(Dictionary(products.map { ($0.id, VC.Value($0.values)) }, uniquingKeysWith: { first, _ in first }))
+        let products = VC.Value(Dictionary(products.map { ($0.id, $0.value) }, uniquingKeysWith: { first, _ in first }))
             .toJSValue(in: context)
 
         let objectClass = context.objectForKeyedSubscript("Object")

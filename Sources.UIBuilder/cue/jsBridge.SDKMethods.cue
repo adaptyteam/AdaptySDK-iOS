@@ -208,7 +208,7 @@ package jsBridge
 }
 
 #TimerResponse: {
-    timerId: string
+    timerId!: string
 }
 
 // SDK.moveScroll(...)
@@ -237,7 +237,7 @@ package jsBridge
     actionId?:      string 
 
     if title != _|_ {
-        actionId: *title | string
+        actionId?: *title | string
     }
 }
 
@@ -246,7 +246,7 @@ package jsBridge
 }
 
 #ShowAlertDialogResponse: {
-    actionId: null | string
+    actionId?: string
 }
 
 // SDK.showRequestPermission(...)
@@ -262,10 +262,10 @@ package jsBridge
 }
 
 #ShowRequestPermissionResponse: {
-    permission: null | string
+    permission?: string
     customArgs?: { [string]: string }
     result!: bool
-    detailResult: null | string
+    detailResult?: string
 }
 
 // SDK.sendEvents(...)

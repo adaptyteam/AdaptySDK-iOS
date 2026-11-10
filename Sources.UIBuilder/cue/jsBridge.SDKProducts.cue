@@ -10,7 +10,9 @@ package jsBridge
 // UIState/JS/VS.JSState+setConstants.swift and UIState/AdaptyUIState.swift.
 // 
 #SDKProducts: {
-	[string]: #SDKProduct
+	[key=string]: #SDKProduct & {
+		flowProductId: key
+	}
 }
 
 #SDKProduct: *#SDKProductMetadata | #SDKLoadedProduct
@@ -37,32 +39,32 @@ package jsBridge
                        "uncategorised" |
                        string
 
-// Store fields are added together. Nullable fields are present even when null;
-// they are absent entirely from a metadata-only product.
+// Loaded products include store fields. regionCode and subscription are omitted
+// when unavailable; metadata-only products contain none of the store fields.
 #SDKLoadedProduct: {
 	#SDKProductMetadata
 
 	localizedDescription!: string
 	localizedTitle!:       string
 	isFamilyShareable!:    bool
-	regionCode!:           null | string
+	regionCode?:           string
 	price!:                #SDKProductPrice
-	subscription!:         null | #SDKProductSubscription
+	subscription?:         #SDKProductSubscription
 }
 
 #SDKProductPrice: {
 	amount!:          number
 	currencyCode!:    string
-	currencySymbol!:  null | string
+	currencySymbol?:  string
 	localizedString!: string
 }
 
 #SDKProductSubscription: {
 	groupIdentifier!: string
 	period!:          #SDKProductSubscriptionPeriod
-	localizedPeriod!: null | string
+	localizedPeriod?: string
 	pricingTerms!:    #SDKProductSubscriptionPricingTerms
-	offer!:           null | #SDKProductSubscriptionOffer
+	offer?:           #SDKProductSubscriptionOffer
 }
 
 #SDKProductSubscriptionPeriod: {
@@ -81,16 +83,16 @@ package jsBridge
 }
 
 #SDKProductSubscriptionOffer: {
-	id!:     null | string
+	id?:     string
 	type!:   "introductory" | "promotional" | "win_back" | string
 	phases!: [...#SDKProductSubscriptionOfferPhase]
 }
 
 #SDKProductSubscriptionOfferPhase: {
-	price!:                    null | #SDKProductPrice
+	price?:                    #SDKProductPrice
 	paymentMode!:              "pay_as_you_go" | "pay_up_front" | "free_trial" | "unknown"
 	period!:                   #SDKProductSubscriptionPeriod
 	numberOfPeriods!:          int
-	localizedPeriod!:          null | string
-	localizedNumberOfPeriods!: null | string
+	localizedPeriod?:          string
+	localizedNumberOfPeriods?: string
 }
