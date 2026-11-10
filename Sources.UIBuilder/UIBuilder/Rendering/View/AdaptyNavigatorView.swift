@@ -326,7 +326,7 @@ extension View {
         screen: VS.ScreenInstance?
     ) -> some View {
         overrideOpenUrl { url in
-            guard VC.Action.isActionURL(url) else { return .systemAction }
+            guard url.scheme == VC.Action.scheme else { return .systemAction }
             return stateViewModel.handle(url: url, screen: screen) ? .handled : .discarded
         }
     }
