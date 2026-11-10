@@ -6,6 +6,7 @@
 //
 
 import AdaptyLogger
+import CoreFoundation
 import Foundation
 import JavaScriptCore
 
@@ -67,7 +68,11 @@ extension VS.JSActionDispatcher {
 
         let openIn = (params["openIn"] as? String).flatMap(VC.Action.WebOpenInParameter.init) ?? .browserOutApp
 
-        if let url = (params["url"] as? String).flatMap(URL.init) {
+        if let value = params["url"] {
+            guard let url = (value as? String).flatMap(URL.init) else {
+                Log.viewState.error(#"SDK.openUrl: parameter "url" is not a valid URL"#)
+                return
+            }
             handler?.openUrl(url: url, openIn: openIn)
             return
         }
@@ -213,6 +218,29 @@ extension VS.JSActionDispatcher {
             return
         }
 
+        guard let timerId = params["id"] as? String else {
+            Log.viewState.error(#"SDK.setTimer: required parameter "timerId" is missing"#)
+            return
+        }
+
+        if let value = params["endAt"] {
+            guard let endAt = value as? NSNumber,
+                  endAt.doubleValue.isFinite
+            else {
+                Log.viewState.error(#"SDK.setTimer: parameter "endAt" must be a finite number"#)
+                return
+            }
+            handler?.setTimer(id: timerId, endAt: Date(timeIntervalSince1970: endAt.doubleValue / 1000), callback: callback)
+            return
+        }
+
+        guard let duration = params["duration"] as? NSNumber,
+              duration.doubleValue.isFinite
+        else {
+            Log.viewState.error(#"SDK.setTimer: required parameter "duration" must be a finite number"#)
+            return
+        }
+
         let behavior: VS.SetTimerBehavior? =
             if let value = params["behavior"] as? String {
                 .init(rawValue: value)
@@ -220,20 +248,7 @@ extension VS.JSActionDispatcher {
                 nil
             }
 
-        guard let timerId = params["id"] as? String else {
-            Log.viewState.error(#"SDK.setTimer: required parameter "timerId" is missing"#)
-            return
-        }
-
-        if let endAt = (params["endAt"] as? NSNumber)?.doubleValue {
-            handler?.setTimer(id: timerId, endAt: Date(timeIntervalSince1970: endAt / 1000), callback: callback)
-            return
-        }
-
-        if let duration = (params["duration"] as? NSNumber)?.doubleValue {
-            handler?.setTimer(id: timerId, duration: duration, behavior: behavior ?? .continue, callback: callback)
-            return
-        }
+        handler?.setTimer(id: timerId, duration: duration.doubleValue, behavior: behavior ?? .continue, callback: callback)
     }
 
     @inlinable
