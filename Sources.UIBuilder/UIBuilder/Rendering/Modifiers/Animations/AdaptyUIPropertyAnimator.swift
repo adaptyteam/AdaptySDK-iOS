@@ -24,6 +24,14 @@ extension VC.Animation.Timeline {
         }
     }
 
+    /// Time between the starts of two consecutive iterations of a loop.
+    fileprivate var loopPeriod: TimeInterval {
+        switch loop {
+        case .pingPong: duration * 2 + pingPongDelay + loopDelay
+        default: duration + loopDelay
+        }
+    }
+
     /// `completion` fires once a non-repeating animation has finished. Repeating
     /// animations have no end, so for them it fires right away.
     @MainActor
@@ -52,6 +60,7 @@ extension VC.Animation.Timeline {
                     token: nil,
                     timeline: self,
                     startDelay: startDelay,
+                    origin: .now() + startDelay,
                     loopCount: loopCount,
                     from: start,
                     to: end,
@@ -74,6 +83,7 @@ extension VC.Animation.Timeline {
                     token: nil,
                     timeline: self,
                     startDelay: startDelay,
+                    origin: .now() + startDelay,
                     loopCount: loopCount,
                     from: start,
                     to: end,
@@ -151,17 +161,46 @@ extension AdaptyUIAnimationToken {
 
 @MainActor
 enum AdaptyUIPropertyAnimator {
+    /// When the iteration after the one planned for `origin` starts. Loops are
+    /// scheduled from their planned starts, not from the moment the previous
+    /// iteration finished, so the time spent between completion callbacks does
+    /// not accumulate and loops started a fixed time apart stay that far apart.
+    /// An iteration that is already late starts right away and becomes the new
+    /// origin: missed iterations are not replayed back to back.
+    nonisolated static func nextIterationStart(
+        after origin: DispatchTime,
+        period: TimeInterval,
+        now: DispatchTime = .now()
+    ) -> DispatchTime {
+        let planned = origin + period
+        return planned < now ? now : planned
+    }
+
+    /// Runs `work` on the main queue at `deadline`. `asyncAfter` lets the system
+    /// defer a timer by about a tenth of its delay and fire nearby timers
+    /// together, which collapses loops meant to run with a fixed offset from each
+    /// other into one.
+    private static func run(at deadline: DispatchTime, _ work: @escaping @MainActor () -> Void) {
+        let timer = DispatchSource.makeTimerSource(flags: .strict, queue: .main)
+        timer.schedule(deadline: deadline, leeway: .nanoseconds(0))
+        timer.setEventHandler {
+            timer.cancel()
+            MainActor.assumeIsolated(work)
+        }
+        timer.resume()
+    }
+
     @discardableResult
     static func animatePingPongLoop<Value>(
         token: AdaptyUIAnimationToken?,
         timeline: VC.Animation.Timeline,
         startDelay: TimeInterval,
+        origin: DispatchTime,
         loopCount: Int?,
         from start: Value,
         to end: Value,
         updateBlock: @escaping (Value) -> Void
     ) -> AdaptyUIAnimationToken {
-        let loopDelay = timeline.loopDelay
         let pingPongDelay = timeline.pingPongDelay
 
         return timeline.withAsyncAnimation(
@@ -181,13 +220,15 @@ enum AdaptyUIPropertyAnimator {
                         let loopLeftCount = (loopCount ?? .max) - 1
 
                         if loopLeftCount > 0 {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + loopDelay) {
+                            let next = nextIterationStart(after: origin, period: timeline.loopPeriod)
+                            run(at: next) {
                                 guard token.isActive else { return }
 
                                 animatePingPongLoop(
                                     token: token,
                                     timeline: timeline,
                                     startDelay: 0.0,
+                                    origin: next,
                                     loopCount: loopLeftCount,
                                     from: start,
                                     to: end,
@@ -208,6 +249,7 @@ enum AdaptyUIPropertyAnimator {
         token: AdaptyUIAnimationToken?,
         timeline: VC.Animation.Timeline,
         startDelay: TimeInterval,
+        origin: DispatchTime,
         loopCount: Int?,
         from start: Value,
         to end: Value,
@@ -224,13 +266,15 @@ enum AdaptyUIPropertyAnimator {
                 let loopLeftCount = (loopCount ?? .max) - 1
 
                 if loopLeftCount > 0 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + timeline.loopDelay) {
+                    let next = nextIterationStart(after: origin, period: timeline.loopPeriod)
+                    run(at: next) {
                         guard token.isActive else { return }
 
                         animateBasicLoop(
                             token: token,
                             timeline: timeline,
                             startDelay: 0.0,
+                            origin: next,
                             loopCount: loopLeftCount,
                             from: start,
                             to: end,
