@@ -183,6 +183,15 @@ private struct ResolvedShadow {
     let offset: CGSize
 }
 
+private extension VC.Decorator.Layer {
+    /// The parser turns a legacy `background` into an image underlay with ID 0;
+    /// explicit layers take positive IDs.
+    var isLegacyBackground: Bool {
+        guard self.id == 0, case .image = self.kind else { return false }
+        return true
+    }
+}
+
 /// The rotation and scale an element applies to itself after its decorator is drawn.
 struct AdaptyUIShadowTransform: Equatable {
     var rotation: Angle = .zero
@@ -385,9 +394,25 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     /// Drop shadows of `effects` layers follow the content, as the element-level
     /// shadow did before layers.
     private var contentShadows: [ResolvedShadow] {
-        (self.decorator.underlays + self.decorator.overlays)
+        let declared = (self.decorator.underlays + self.decorator.overlays)
             .filter { if case .effects = $0.kind { true } else { false } }
             .flatMap { self.resolvedShadows($0, kind: .drop) }
+        guard !self.decorator.underlays.contains(where: \.isLegacyBackground),
+              let created = self.animationCreatedLegacyDrop
+        else { return declared }
+        return declared + [created]
+    }
+
+    /// A legacy `shadow` animation (`target_id` 0) on a decorator that declares no
+    /// legacy shadow creates one, as on Android. Like a declared legacy shadow, it is
+    /// cast by the legacy background, or by the content when there is none.
+    private var animationCreatedLegacyDrop: ResolvedShadow? {
+        guard let animated = self.animatedShadows[ShadowKey(kind: .drop, id: 0)],
+              !(self.decorator.underlays + self.decorator.overlays).contains(where: { layer in
+                  layer.effects.contains { $0.kind == .drop && $0.id == 0 }
+              })
+        else { return nil }
+        return self.resolvedShadow(animated, filling: nil, blurRadius: 0, offset: .zero)
     }
 
     @ViewBuilder
@@ -497,22 +522,37 @@ struct AdaptyUIAnimatableDecoratorModifier: ViewModifier {
     }
 
     private func resolvedShadows(_ layer: VC.Decorator.Layer, kind: VC.Decorator.Shadow.Kind) -> [ResolvedShadow] {
-        layer.effects.filter { $0.kind == kind }.map { shadow in
-            let animated = shadow.id.flatMap { animatedShadows[ShadowKey(kind: kind, id: $0)] }
-            let offset = animated?.offset ?? shadow.offset
-            return ResolvedShadow(
-                color: self.assetsViewModel.resolvedAsset(
-                    animated?.filling ?? shadow.filling,
-                    mode: self.colorScheme.toVCMode,
-                    screen: screen
-                ).asColorAsset ?? .clear,
-                radius: animated?.blurRadius ?? shadow.blurRadius,
-                offset: CGSize(
-                    width: offset.x.points(.horizontal, screenSize, safeArea),
-                    height: offset.y.points(.vertical, screenSize, safeArea)
-                )
+        let declared = layer.effects.filter { $0.kind == kind }.map { shadow in
+            self.resolvedShadow(
+                shadow.id.flatMap { animatedShadows[ShadowKey(kind: kind, id: $0)] },
+                filling: shadow.filling,
+                blurRadius: shadow.blurRadius,
+                offset: shadow.offset
             )
         }
+        guard kind == .drop, layer.isLegacyBackground, let created = self.animationCreatedLegacyDrop else { return declared }
+        return declared + [created]
+    }
+
+    private func resolvedShadow(
+        _ animated: ShadowOverride?,
+        filling: VC.AssetReference?,
+        blurRadius: Double,
+        offset: VC.Offset
+    ) -> ResolvedShadow {
+        let offset = animated?.offset ?? offset
+        return ResolvedShadow(
+            color: self.assetsViewModel.resolvedAsset(
+                animated?.filling ?? filling,
+                mode: self.colorScheme.toVCMode,
+                screen: screen
+            ).asColorAsset ?? .clear,
+            radius: animated?.blurRadius ?? blurRadius,
+            offset: CGSize(
+                width: offset.x.points(.horizontal, screenSize, safeArea),
+                height: offset.y.points(.vertical, screenSize, safeArea)
+            )
+        )
     }
 
     private func startAnimations(_ animations: [VC.Animation]) {

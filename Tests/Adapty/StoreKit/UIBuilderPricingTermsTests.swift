@@ -82,16 +82,16 @@ struct UIBuilderPricingTermsTests {
         try expectString(commitmentPrice.forProperty("currencySymbol"), equals: "€")
         try expectString(commitment.forProperty("period")?.forProperty("unit"), equals: plan == .monthly ? "month" : "year")
         try expectNumber(commitment.forProperty("period")?.forProperty("numberOfUnits"), equals: plan == .monthly ? 12 : 1)
-        #expect(context.evaluateScript("SDKProducts.yearly.subscription.offer === null")?.toBool() == true)
+        #expect(context.evaluateScript("Object.prototype.hasOwnProperty.call(SDKProducts.yearly.subscription, 'offer')")?.toBool() == false)
         #expect(context.exception == nil)
     }
 
     @MainActor
-    @Test("An absent subscription constant is serialized as JavaScript null")
+    @Test("An absent subscription constant is omitted from the JavaScript product")
     func absentSubscriptionInJavaScript() throws {
         let context = try #require(JSContext())
         VS.JSState.setProductConstants([product(subscription: nil)], final: true, in: context)
-        #expect(context.evaluateScript("SDKProducts.yearly.subscription === null")?.toBool() == true)
+        #expect(context.evaluateScript("Object.prototype.hasOwnProperty.call(SDKProducts.yearly, 'subscription')")?.toBool() == false)
         #expect(context.exception == nil)
     }
 

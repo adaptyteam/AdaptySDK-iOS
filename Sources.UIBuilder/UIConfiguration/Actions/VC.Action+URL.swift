@@ -8,7 +8,7 @@
 import Foundation
 
 extension VC.Action {
-    private static let scheme = "sdk"
+    static let scheme = "adapty-sdk"
     private static let host = "action"
 
     var asURL: URL? {

@@ -150,7 +150,7 @@ extension AdaptyUIBuilder.Action {
         switch self {
         case .close: .close
         case let .openURL(url, openIn): .openURL(url: url, in: openIn.toAdaptyWebPresentation)
-        case let .custom(id): .custom(id: id)
+        case let .custom(id, arguments): .custom(id: id, arguments: arguments)
         }
     }
 }

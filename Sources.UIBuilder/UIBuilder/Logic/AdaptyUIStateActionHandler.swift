@@ -180,9 +180,9 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    nonisolated func userCustomAction(id: String) {
+    nonisolated func userCustomAction(id: String, arguments: [String: any Sendable]?) {
         Task { @MainActor [weak self] in
-            self?.logic.reportDidPerformAction(.custom(id: id))
+            self?.logic.reportDidPerformAction(.custom(id: id, arguments: arguments))
         }
     }
 

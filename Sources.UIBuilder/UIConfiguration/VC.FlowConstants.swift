@@ -37,7 +37,7 @@ package extension VC {
 
 package extension VC.FlowConstants {
     struct ProductConstants: Sendable {
-        let values: [String: VC.Value]
+        let value: VC.Value
         let id: String
 
         package init(
@@ -49,14 +49,14 @@ package extension VC.FlowConstants {
             paywallName: String
         ) {
             id = flowProductId
-            values = [
+            value = .compact([
                 "flowProductId": VC.Value(flowProductId),
                 "adaptyProductId": VC.Value(adaptyProductId),
                 "adaptyAccessLevelId": VC.Value(adaptyAccessLevelId),
                 "adaptyProductType": VC.Value(adaptyProductType),
                 "paywallVariationId": VC.Value(paywallVariationId),
                 "paywallName": VC.Value(paywallName),
-            ]
+            ])
         }
 
         package init(
@@ -75,7 +75,7 @@ package extension VC.FlowConstants {
             subscription: ProductSubscriptionConstants?
         ) {
             id = flowProductId
-            values = [
+            value = .compact([
                 "flowProductId": VC.Value(flowProductId),
                 "adaptyProductId": VC.Value(adaptyProductId),
                 "adaptyAccessLevelId": VC.Value(adaptyAccessLevelId),
@@ -86,15 +86,15 @@ package extension VC.FlowConstants {
                 "localizedDescription": VC.Value(localizedDescription),
                 "localizedTitle": VC.Value(localizedTitle),
                 "isFamilyShareable": VC.Value(isFamilyShareable),
-                "regionCode": VC.Value(regionCode),
-                "price": VC.Value(price.values),
-                "subscription": VC.Value(subscription?.values),
-            ]
+                "regionCode": regionCode.map(VC.Value.init),
+                "price": price.value,
+                "subscription": subscription?.value,
+            ])
         }
     }
 
     struct PriceConstants: Sendable {
-        let values: [String: VC.Value]
+        let value: VC.Value
 
         package init(
             amount: Double,
@@ -115,17 +115,17 @@ package extension VC.FlowConstants {
             currencySymbol: String?,
             localizedString: String
         ) {
-            values = [
+            value = .compact([
                 "amount": VC.Value(amount),
                 "currencyCode": VC.Value(currencyCode),
-                "currencySymbol": VC.Value(currencySymbol),
+                "currencySymbol": currencySymbol.map(VC.Value.init),
                 "localizedString": VC.Value(localizedString),
-            ]
+            ])
         }
     }
 
     struct ProductSubscriptionConstants: Sendable {
-        let values: [String: VC.Value]
+        let value: VC.Value
         package init(
             groupIdentifier: String,
             period: SubscriptionPeriodConstants,
@@ -133,58 +133,61 @@ package extension VC.FlowConstants {
             pricingTerms: SubscriptionPricingTermsConstants,
             offer: SubscriptionOfferConstants?
         ) {
-            values = [
+            value = .compact([
                 "groupIdentifier": VC.Value(groupIdentifier),
-                "period": VC.Value(period.values),
-                "localizedPeriod": VC.Value(localizedPeriod),
-                "pricingTerms": VC.Value(pricingTerms.values),
-                "offer": VC.Value(offer?.values),
-            ]
+                "period": period.value,
+                "localizedPeriod": localizedPeriod.map(VC.Value.init),
+                "pricingTerms": pricingTerms.value,
+                "offer": offer?.value,
+            ])
         }
     }
 
     struct SubscriptionPricingTermsConstants: Sendable {
-        let values: [String: VC.Value]
+        let value: VC.Value
         package init(
             billingPlanId: String,
             billingPrice: PriceConstants,
             billingPeriod: SubscriptionPeriodConstants,
             commitmentInfo: SubscriptionCommitmentInfoConstants
         ) {
-            values = [
+            value = .compact([
                 "billingPlanId": VC.Value(billingPlanId),
-                "billingPrice": VC.Value(billingPrice.values),
-                "billingPeriod": VC.Value(billingPeriod.values),
-                "commitmentInfo": VC.Value(commitmentInfo.values),
-            ]
+                "billingPrice": billingPrice.value,
+                "billingPeriod": billingPeriod.value,
+                "commitmentInfo": commitmentInfo.value,
+            ])
         }
     }
 
     struct SubscriptionCommitmentInfoConstants: Sendable {
-        let values: [String: VC.Value]
-        package init(price: PriceConstants, period: SubscriptionPeriodConstants) {
-            values = [
-                "price": VC.Value(price.values),
-                "period": VC.Value(period.values),
-            ]
+        let value: VC.Value
+        package init(
+            price: PriceConstants,
+            period: SubscriptionPeriodConstants
+        ) {
+            value = .compact([
+                "price": price.value,
+                "period": period.value,
+            ])
         }
     }
 
     struct SubscriptionPeriodConstants: Sendable {
-        let values: [String: VC.Value]
+        let value: VC.Value
         package init(
             unit: String,
             numberOfUnits: Int
         ) {
-            values = [
+            value = .compact([
                 "unit": VC.Value(unit),
                 "numberOfUnits": VC.Value(numberOfUnits),
-            ]
+            ])
         }
     }
 
     struct SubscriptionOfferConstants: Sendable {
-        let values: [String: VC.Value]
+        let value: VC.Value
         package init(
             id: String?,
             type: String,
@@ -195,20 +198,32 @@ package extension VC.FlowConstants {
             localizedPeriod: String?,
             localizedNumberOfPeriods: String?
         ) {
-            values = [
+            value = .compact([
                 "id": VC.Value(id),
                 "type": VC.Value(type),
                 "phases": VC.Value([
-                    VC.Value([
-                        "price": VC.Value(price?.values),
+                    VC.Value.compact([
+                        "price": price?.value,
                         "paymentMode": VC.Value(paymentMode),
-                        "period": VC.Value(period.values),
+                        "period": period.value,
                         "numberOfPeriods": VC.Value(numberOfPeriods),
-                        "localizedPeriod": VC.Value(localizedPeriod),
-                        "localizedNumberOfPeriods": VC.Value(localizedNumberOfPeriods),
+                        "localizedPeriod": localizedPeriod.map(VC.Value.init),
+                        "localizedNumberOfPeriods": localizedNumberOfPeriods.map(VC.Value.init),
                     ]),
                 ]),
-            ]
+            ])
         }
+    }
+}
+
+
+private extension VC.Value {
+    static func compact(_ object: [String: VC.Value?]) -> VC.Value {
+
+        let compacted: [String: VC.Value] = object.compactMapValues { value in
+            guard let value, !value.isNil else { return nil }
+            return value
+        }
+        return VC.Value(compacted)
     }
 }
