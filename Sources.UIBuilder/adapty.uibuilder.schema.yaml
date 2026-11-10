@@ -1962,6 +1962,9 @@ Localization:
         ios_locale_id:
             type: string
             description: "Foundation locale identifier used for formatting on Apple platforms."
+        android_locale_id:
+            type: string
+            description: "Locale identifier used for formatting on Android."
         assets: { $ref: "#/Assets" }
         strings:
             type: array
