@@ -37,7 +37,7 @@ public extension AdaptyUI {
         /// User pressed any button with URL
         case openURL(url: URL, in: AdaptyWebPresentation)
         /// User pressed any button with custom action (e.g. login)
-        case custom(id: String)
+        case custom(id: String, arguments: [String: any Sendable]?)
     }
 }
 

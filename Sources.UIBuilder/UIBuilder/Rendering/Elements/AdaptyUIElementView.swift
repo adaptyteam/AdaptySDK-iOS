@@ -154,8 +154,10 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             AdaptyUILinearProgressView(linearProgress)
         case let .radialProgress(radialProgress, _):
             AdaptyUIRadialProgressView(radialProgress)
-        case let .custom(custom, _):
+        case let .custom(custom, props):
             AdaptyUICustomElementView(custom)
+                .applyScrollAnchor(props?.focusId)
+                .applyFocusId(props?.focusId)
         case let .unknown(value):
             AdaptyUIUnknownElementView(value: value)
         }

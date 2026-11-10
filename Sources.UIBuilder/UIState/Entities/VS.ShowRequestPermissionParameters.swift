@@ -24,12 +24,16 @@ extension VS {
 extension VS.ShowRequestPermissionResponse: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-        object.setValue(request.permission.toJSValue(in: context), forProperty: "permission")
+        if let permission = request.permission {
+            object.setValue(permission.toJSValue(in: context), forProperty: "permission")
+        }
         if let customArgs: [String: String] = request.customArgs {
             object.setValue(customArgs.toJSValue(in: context), forProperty: "customArgs")
         }
         object.setValue(result, forProperty: "result")
-        object.setValue(detailResult.toJSValue(in: context), forProperty: "detailResult")
+        if let detailResult {
+            object.setValue(detailResult.toJSValue(in: context), forProperty: "detailResult")
+        }
         return object
     }
 }
