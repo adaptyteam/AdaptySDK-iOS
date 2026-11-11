@@ -104,9 +104,8 @@ public extension Adapty {
 
             set(shared: sdk)
 
-            if configuration.adaptyAttributionEnabled {
-                AdaptyAttributionManager.activate(sdk)
-            }
+            AdaptyAttributionManager.activate(sdk, enabled: configuration.adaptyAttributionEnabled)
+
             LifecycleManager.shared.initialize()
             return sdk
         }
