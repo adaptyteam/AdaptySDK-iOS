@@ -187,7 +187,7 @@ public extension AdaptyUIBuilder {
         /// Sends a message from the app to the script of this flow.
         ///
         /// The script receives it in `handleSDKEvent` as an SDK event named
-        /// `app_msg` and decides what to do with it — set a variable, fire flow
+        /// `applicationMsg` and decides what to do with it — set a variable, fire flow
         /// events, anything else. Unlike a message from a custom element, this
         /// one carries neither a screen instance nor an element identity, so a
         /// script that needs to reach a specific screen has to name it itself;
