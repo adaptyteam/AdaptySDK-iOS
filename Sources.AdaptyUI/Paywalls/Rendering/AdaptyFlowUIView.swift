@@ -12,6 +12,7 @@ import AdaptyUIBuilder
 import SwiftUI
 import UIKit
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 package final class AdaptyFlowUIView: UIView {
     let id: String
     let configuration: AdaptyUI.FlowConfiguration
@@ -163,7 +164,7 @@ package final class AdaptyFlowUIView: UIView {
         parentVC.addSubSwiftUIView(
             AdaptyUIPaywallView_Internal(
                 showDebugOverlay: showDebugOverlay,
-                displayMissingTags: false
+                showsDebugPlaceholders: false
             )
             .environmentObjects(
                 stateViewModel: configuration.stateViewModel,
@@ -172,7 +173,8 @@ package final class AdaptyFlowUIView: UIView {
                 tagResolverViewModel: configuration.tagResolverViewModel,
                 timerViewModel: configuration.timerViewModel,
                 screensViewModel: configuration.screensViewModel,
-                assetsViewModel: configuration.assetsViewModel
+                assetsViewModel: configuration.assetsViewModel,
+                customElementsViewModel: configuration.customElementsViewModel
             ),
             to: self
         )

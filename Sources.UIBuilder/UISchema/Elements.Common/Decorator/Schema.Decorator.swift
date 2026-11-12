@@ -13,14 +13,19 @@ extension Schema {
 
 extension Schema.Decorator: Decodable {
     enum CodingKeys: String, CodingKey {
-        case backgroundAssetId = "background"
-        case rectangleCornerRadius = "rect_corner_radius"
-        case borderAssetId = "border"
-        case borderThickness = "thickness"
         case shapeType = "type"
-        case shadow
-        case innerShadow = "inner_shadow"
+        case rectangleCornerRadius = "rect_corner_radius"
+        case overlays
+        case underlays
+        case blend
         case blurRadius = "blur_radius"
+        case clip
+
+        case legacyBackgroundAssetId = "background"
+        case legacyBorderAssetId = "border"
+        case legacyBorderThickness = "thickness"
+        case legacyShadow = "shadow"
+        case legacyInnerShadow = "inner_shadow"
     }
 
     init(from decoder: Decoder) throws {
@@ -35,23 +40,87 @@ extension Schema.Decorator: Decodable {
                 shape
             }
 
-        let border: Schema.Border? =
-            if let assetReference = try container.decodeIfPresent(Schema.AssetReference.self, forKey: .borderAssetId) {
-                try .init(
-                    filling: assetReference,
-                    thickness: container.decodeIfPresent(Double.self, forKey: .borderThickness) ?? Schema.Border.defaultThickness
-                )
-            } else {
-                nil
+
+        var legacyOverlays: [Schema.Decorator.Layer] = []
+        var legacyUnderlays: [Schema.Decorator.Layer] = []
+
+        if let legacyBackgroundAssetId = try container.decodeIfPresent(Schema.AssetReference.self, forKey: .legacyBackgroundAssetId) {
+
+            var shadows = [Schema.Decorator.Shadow]()
+
+            if let dropShadow = try container.decodeIfPresent(Schema.Decorator.Shadow.self, forKey: .legacyShadow, configuration: .legacyDropShadow) {
+                shadows = [dropShadow]
             }
+            if let innerShadow = try container.decodeIfPresent(Schema.Decorator.Shadow.self, forKey: .legacyInnerShadow, configuration: .legacyInnerShadow) {
+                shadows += [innerShadow]
+            }
+
+            legacyUnderlays = [.init(
+                id: 0,
+                kind: .image(asset: legacyBackgroundAssetId, aspect: .fill),
+                blend: .default,
+                effects: shadows
+            )]
+
+        } else if let legacyShadow = try container.decodeIfPresent(Schema.Decorator.Shadow.self, forKey: .legacyShadow, configuration: .legacyDropShadow) {
+
+            legacyUnderlays = [.init(
+                id: 0,
+                kind: .effects,
+                blend: .default,
+                effects: [legacyShadow]
+            )]
+        }
+
+        if let legacyBorderAssetId = try container.decodeIfPresent(Schema.AssetReference.self, forKey: .legacyBorderAssetId) {
+            let thickness = try container.decodeIfPresent(Double.self, forKey: .legacyBorderThickness) ?? 1.0
+
+            legacyOverlays = [.init(
+                id: 0,
+                kind: .stroke(asset: legacyBorderAssetId, thickness: thickness),
+                blend: .default,
+                effects: []
+            )]
+        }
+
+        let underlays = try container.decodeLayers(forKey: .underlays)
+        let overlays = try container.decodeLayers(forKey: .overlays)
 
         try self.init(
             shapeType: shapeType,
-            background: container.decodeIfPresent(Schema.AssetReference.self, forKey: .backgroundAssetId),
-            border: border,
-            shadow: container.decodeIfPresent(Schema.Shadow.self, forKey: .shadow),
-            innerShadow: container.decodeIfPresent(Schema.Shadow.self, forKey: .innerShadow),
-            blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius)
+            overlays: legacyOverlays + overlays,
+            underlays: legacyUnderlays + underlays,
+            blend: container.decodeIfPresent(Schema.BlendMode.self, forKey: .blend) ?? .default,
+            blurRadius: container.decodeIfPresent(Double.self, forKey: .blurRadius),
+            clip: container.decodeIfPresent(Clip.self, forKey: .clip) ?? .content
         )
+    }
+}
+
+private enum LayerCodingKeys: String, CodingKey {
+    case kind = "type"
+}
+
+private extension KeyedDecodingContainer {
+    func decodeLayers(forKey key: Key) throws -> [Schema.Decorator.Layer] {
+        guard contains(key) else { return [] }
+        if try decodeNil(forKey: key) { return [] }
+
+        var array = try self.nestedUnkeyedContainer(forKey: key)
+
+        var layers = [Schema.Decorator.Layer]()
+        if let count = array.count {
+            layers.reserveCapacity(count)
+        }
+        while !array.isAtEnd {
+            let decoder = try array.superDecoder()
+            let layer = try decoder.container(keyedBy: LayerCodingKeys.self)
+            if let kind = try layer.decodeIfPresent(String.self, forKey: .kind),
+               Schema.Decorator.Layer.Kind.Value(rawValue: kind) == nil {
+                continue
+            }
+            layers.append(try Schema.Decorator.Layer(from: decoder))
+        }
+        return layers
     }
 }

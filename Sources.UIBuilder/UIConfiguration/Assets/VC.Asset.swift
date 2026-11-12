@@ -14,6 +14,7 @@ extension VC {
         case image(ImageData)
         case video(VideoData)
         case font(Font)
+        case data(DataAsset)
         case unknown(String)
     }
 }
@@ -26,6 +27,7 @@ extension VC.Asset {
         case let .image(v): v.customId
         case let .video(v): v.customId
         case let .font(v): v.customId
+        case let .data(v): v.customId
         case .unknown: nil
         }
     }

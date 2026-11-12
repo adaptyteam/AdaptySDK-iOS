@@ -24,4 +24,13 @@ extension VC.Unit {
             false
         }
     }
+
+    var isNegative: Bool {
+        switch self {
+        case let .point(value), let .screen(value):
+            value < 0.0
+        default:
+            false
+        }
+    }
 }

@@ -10,6 +10,7 @@
 import SwiftUI
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     private let element: VC.Element
     private let screenHolderBuilder: () -> ScreenHolderContent
@@ -35,6 +36,11 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                 )
                 .rangedFrame(box: box)
                 .alignmentBarrier()
+        case let .deck(deck, _):
+            AdaptyUIDeckView(
+                deck,
+                screenHolderBuilder: screenHolderBuilder
+            )
         case let .stack(stack, _):
             AdaptyUIStackView(
                 stack,
@@ -61,10 +67,23 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     screenHolderBuilder: screenHolderBuilder
                 )
             case .hug, .fill:
-                AdaptyUIFlexRowView(
-                    row,
-                    screenHolderBuilder: screenHolderBuilder
-                )
+                if let stack = row.asStack {
+                    AdaptyUIStackView(
+                        stack,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                } else {
+                    AdaptyUIWeightedView(
+                        axis: .horizontal,
+                        mainAxisSizing: row.width == .hug ? .hug : .fill,
+                        // The configuration has no cross-axis sizing yet; a row has
+                        // always hugged its height.
+                        crossAxisSizing: .hug,
+                        spacing: row.spacing,
+                        items: row.items,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                }
             }
         case let .column(column, _):
             switch column.height {
@@ -74,10 +93,23 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
                     screenHolderBuilder: screenHolderBuilder
                 )
             case .hug, .fill:
-                AdaptyUIFlexColumnView(
-                    column,
-                    screenHolderBuilder: screenHolderBuilder
-                )
+                if let stack = column.asStack {
+                    AdaptyUIStackView(
+                        stack,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                } else {
+                    AdaptyUIWeightedView(
+                        axis: .vertical,
+                        mainAxisSizing: column.height == .hug ? .hug : .fill,
+                        // The configuration has no cross-axis sizing yet; a column has
+                        // always filled its width.
+                        crossAxisSizing: .fill,
+                        spacing: column.spacing,
+                        items: column.items,
+                        screenHolderBuilder: screenHolderBuilder
+                    )
+                }
             }
         case let .section(section, _):
             AdaptyUISectionView(
@@ -122,6 +154,10 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
             AdaptyUILinearProgressView(linearProgress)
         case let .radialProgress(radialProgress, _):
             AdaptyUIRadialProgressView(radialProgress)
+        case let .custom(custom, props):
+            AdaptyUICustomElementView(custom)
+                .applyScrollAnchor(props?.focusId)
+                .applyFocusId(props?.focusId)
         case let .unknown(value):
             AdaptyUIUnknownElementView(value: value)
         }
@@ -141,6 +177,7 @@ struct AdaptyUIElementWithoutPropertiesView<ScreenHolderContent: View>: View {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIElementView<ScreenHolderContent: View>: View {
     private let elementIndex: VC.ElementIndex
     private let drawDecoratorBackground: Bool
@@ -177,15 +214,22 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
                 play: $playAnimations,
                 includeBackground: drawDecoratorBackground
             )
-            .modifier(ElementBackgroundModifier(
-                backgrounds: element.properties?.background,
-                screenHolderBuilder: screenHolderBuilder
-            ))
-            .modifier(ElementOverlayModifier(
-                overlays: element.properties?.overlay,
-                screenHolderBuilder: screenHolderBuilder
-            ))
-            .animatableProperties(element.properties, play: $playAnimations)
+            .animatableProperties(
+                element.properties,
+                play: $playAnimations,
+                blend: element.properties?.blend
+            ) { blurRadius in
+                ElementBackgroundModifier(
+                    backgrounds: element.properties?.background,
+                    screenHolderBuilder: screenHolderBuilder,
+                    blurRadius: blurRadius
+                )
+                .concat(ElementOverlayModifier(
+                    overlays: element.properties?.overlay,
+                    screenHolderBuilder: screenHolderBuilder,
+                    blurRadius: blurRadius
+                ))
+            }
             .padding(element.properties?.padding)
             .modifier(ElementInteractionEnabledModifier(element.properties?.interactionEnabled))
             .modifier(DebugOverlayModifier())
@@ -232,13 +276,17 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             includeCustom: includeCustom
         )
 
-        guard !pending.isEmpty else { return }
-
         for event in pending {
             processEvent(event, properties: properties)
         }
 
-        lastProcessedSequence = pending.last!.sequence
+        if !includeCustom {
+            // Arming: everything published so far was either replayed above
+            // or is a custom event this element must never receive.
+            lastProcessedSequence = eventBus.lastSequence
+        } else if let last = pending.last {
+            lastProcessedSequence = last.sequence
+        }
     }
 
     private func processEvent(_ event: AdaptyUIEventBus.Event, properties: VC.Element.Properties) {
@@ -249,6 +297,10 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             guard shouldFireHandler(eventHandler, for: event) else { continue }
             firingHandlers.append(eventHandler)
             combinedAnimations.append(contentsOf: eventHandler.animations)
+        }
+
+        if firingHandlers.isNotEmpty {
+            Log.ui.verbose("#EventBus# fire \(event.eventId) seq=\(event.sequence) element=\(elementIndex) handlers=\(firingHandlers.count)")
         }
 
         if !combinedAnimations.isEmpty {

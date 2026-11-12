@@ -37,7 +37,7 @@ public extension AdaptyUI {
         /// User pressed any button with URL
         case openURL(url: URL, in: AdaptyWebPresentation)
         /// User pressed any button with custom action (e.g. login)
-        case custom(id: String)
+        case custom(id: String, arguments: [String: any Sendable]?)
     }
 }
 
@@ -47,6 +47,7 @@ import UIKit
 
 /// Implement this protocol to respond to different events happening inside the purchase screen.
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public protocol AdaptyFlowControllerDelegate: AnyObject {
     /// This method is invoked when the paywall view was presented.
     ///
@@ -207,7 +208,7 @@ public typealias AdaptyTagResolver = AdaptyUITagResolver
 
 public typealias AdaptyAssetsResolver = AdaptyUIAssetsResolver
 
-public typealias AdaptyCustomAsset = AdaptyUICustomAsset
+public typealias AdaptyCustomAsset = AdaptyUIAsset
 
 public typealias AdaptySystemRequestsHandler = AdaptyUISystemRequestsHandler
 
@@ -283,6 +284,7 @@ public extension AdaptyUI {
 #if canImport(UIKit)
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public extension AdaptyUI {
     /// If you are using the [Paywall Builder](https://adapty.io/docs/3.0/adapty-paywall-builder), you can use this method to get a configuration object for your paywall.
     ///
@@ -304,6 +306,7 @@ public extension AdaptyUI {
         tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         assetsResolver: AdaptyUIAssetsResolver? = nil,
+        customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
     ) async throws -> FlowConfiguration {
         try await getFlowConfiguration(
@@ -317,6 +320,7 @@ public extension AdaptyUI {
             tagResolver: tagResolver,
             timerResolver: timerResolver,
             assetsResolver: assetsResolver,
+            customElementsResolver: customElementsResolver,
             systemRequestsHandler: systemRequestsHandler
         )
     }
@@ -332,6 +336,7 @@ public extension AdaptyUI {
         tagResolver: AdaptyUITagResolver? = nil,
         timerResolver: AdaptyTimerResolver? = nil,
         assetsResolver: AdaptyUIAssetsResolver? = nil,
+        customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil,
         systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
     ) async throws -> FlowConfiguration {
         guard AdaptyUI.isActivated else {
@@ -371,6 +376,7 @@ public extension AdaptyUI {
             tagResolver: tagResolver,
             timerResolver: timerResolver,
             assetsResolver: assetsResolver,
+            customElementsResolver: customElementsResolver,
             systemRequestsHandler: systemRequestsHandler
         )
     }
@@ -426,4 +432,18 @@ package extension Adapty.DeviceInfo {
         )
     }
 }
+
+@MainActor
+public extension AdaptyUI {
+    /// Sets the resolver that renders custom elements in every flow that does
+    /// not carry its own `customElementsResolver`.
+    ///
+    /// A resolver passed for a single flow replaces this one entirely rather
+    /// than merging with it, so a `custom_type` always resolves through exactly
+    /// one of the two. Compose them yourself when both are needed.
+    static func setCustomElementsResolver(_ resolver: (any AdaptyUICustomElementsResolver)?) {
+        AdaptyUIBuilder.setCustomElementsResolver(resolver)
+    }
+}
+
 #endif

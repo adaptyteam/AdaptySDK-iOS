@@ -18,7 +18,7 @@ public extension AdaptyUIBuilder {
     enum Action {
         case close
         case openURL(url: URL, in: WebPresentation)
-        case custom(id: String)
+        case custom(id: String, arguments: [String: any Sendable]?)
     }
 }
 

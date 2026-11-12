@@ -34,6 +34,7 @@ public extension AdaptyUI {
 
 #if canImport(UIKit)
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 package extension AdaptyFlowUIView {
     func toAdaptyUIView() -> AdaptyUI.FlowView {
         AdaptyUI.FlowView(
@@ -45,6 +46,7 @@ package extension AdaptyFlowUIView {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public extension AdaptyFlowController {
     func toAdaptyUIView() -> AdaptyUI.FlowView {
         AdaptyUI.FlowView(

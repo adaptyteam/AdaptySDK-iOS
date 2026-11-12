@@ -19,6 +19,7 @@ import UIKit
 
 extension UIViewController {
     var isOrContainsAdaptyController: Bool {
+        guard #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) else { return false }
         guard let presentedViewController = presentedViewController else {
             return self is AdaptyFlowController
         }
@@ -61,21 +62,6 @@ package extension AdaptyUI {
     @MainActor
     class Plugin {
 #if canImport(UIKit)
-        
-        private static var paywallControllers = [String: AdaptyFlowController]()
-        
-        private static func cachePaywallController(_ controller: AdaptyFlowController, id: String) {
-            paywallControllers[id] = controller
-        }
-        
-        private static func deleteCachedPaywallController(_ id: String) {
-            paywallControllers.removeValue(forKey: id)
-        }
-        
-        private static func cachedPaywallController(_ id: String) -> AdaptyFlowController? {
-            paywallControllers[id]
-        }
-        
         @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")
         private static var onboardingControllers = [String: AdaptyOnboardingController]()
 
@@ -96,6 +82,14 @@ package extension AdaptyUI {
 #endif
         
 #if canImport(UIKit)
+        /// Flow views are rendered on iOS 16 and later; on older versions every flow
+        /// view request fails with ``AdaptyUIError/platformNotSupported``. Tests turn
+        /// it off to reach that branch on a newer runtime.
+        @TaskLocal
+        package static var isFlowRenderingSupported: Bool = {
+            if #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) { true } else { false }
+        }()
+
         package static func createFlowView(
             flow: AdaptyFlow,
             locale: String?,
@@ -108,6 +102,10 @@ package extension AdaptyUI {
             observerModeResolver: AdaptyObserverModeResolver? = nil,
             systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
         ) async throws -> AdaptyUI.FlowView {
+            guard isFlowRenderingSupported, #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) else {
+                throw AdaptyUIError.platformNotSupported
+            }
+
             let configuration = try await AdaptyUI.getFlowConfiguration(
                 forFlow: flow,
                 locale: locale,
@@ -139,6 +137,10 @@ package extension AdaptyUI {
             presentationStyle: AdaptyUIViewPresentationStyle?
         ) async throws {
 #if canImport(UIKit)
+            guard isFlowRenderingSupported, #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) else {
+                throw AdaptyUIError.platformNotSupported
+            }
+
             guard let vc = cachedPaywallController(viewId) else {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
             }
@@ -169,6 +171,10 @@ package extension AdaptyUI {
             destroy: Bool
         ) async throws {
 #if canImport(UIKit)
+            guard isFlowRenderingSupported, #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) else {
+                throw AdaptyUIError.platformNotSupported
+            }
+
             guard let vc = cachedPaywallController(viewId) else {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
             }
@@ -190,6 +196,10 @@ package extension AdaptyUI {
             viewId: String
         ) async throws {
 #if canImport(UIKit)
+            guard isFlowRenderingSupported, #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) else {
+                throw AdaptyUIError.platformNotSupported
+            }
+
             guard let vc = cachedPaywallController(viewId) else {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
             }
@@ -210,6 +220,10 @@ package extension AdaptyUI {
             configuration: AdaptyUI.DialogConfiguration
         ) async throws -> DialogActionType {
 #if canImport(UIKit)
+            guard isFlowRenderingSupported, #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) else {
+                throw AdaptyUIError.platformNotSupported
+            }
+
             guard let vc = cachedPaywallController(viewId) else {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
             }
@@ -235,6 +249,27 @@ package extension AdaptyUI {
         case secondary
     }
 }
+
+#if canImport(UIKit)
+
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
+extension AdaptyUI.Plugin {
+    private static var paywallControllers = [String: AdaptyFlowController]()
+
+    private static func cachePaywallController(_ controller: AdaptyFlowController, id: String) {
+        paywallControllers[id] = controller
+    }
+
+    private static func deleteCachedPaywallController(_ id: String) {
+        paywallControllers.removeValue(forKey: id)
+    }
+
+    private static func cachedPaywallController(_ id: String) -> AdaptyFlowController? {
+        paywallControllers[id]
+    }
+}
+
+#endif
 
 @MainActor
 @available(*, deprecated, message: "Starting Adapty SDK 4.0.0, Onboarding Feature is deprecated. Please consider migrating to Flows")

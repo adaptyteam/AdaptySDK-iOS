@@ -9,6 +9,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIColumnView<ScreenHolderContent: View>: View {
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
@@ -92,6 +93,12 @@ struct AdaptyUIColumnView<ScreenHolderContent: View>: View {
                         AdaptyUIElementView(
                             column.items[idx].content,
                             screenHolderBuilder: screenHolderBuilder
+                        )
+                        // A weighted cell left with no height must not draw its
+                        // content over the neighbours.
+                        .collapsedCellClipped(
+                            column.items[idx].isWeight && weightsAvailableLength <= 0,
+                            axis: .vertical
                         )
                     }
                 }

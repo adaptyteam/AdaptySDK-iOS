@@ -94,6 +94,7 @@ let package = Package(
             path: "Sources.UIBuilder",
             exclude: [
                 "adapty.uibuilder.schema.yaml",
+                "cue",
             ],
             resources: [.copy("PrivacyInfo.xcprivacy")],
             swiftSettings: [
@@ -150,7 +151,7 @@ let package = Package(
             exclude: [
                 // TEMP: pre-existing breakage after `UIBuilder: tighten access modifiers,
                 // drop redundant Equatable/Hashable` — wait for follow-up fix.
-                "AdaptyUIBuilder",
+                "AdaptyUIBuilder.Invalid",
             ],
             swiftSettings: [
                 .swiftLanguageMode(.v6),
@@ -159,4 +160,3 @@ let package = Package(
     ],
     cxxLanguageStandard: .cxx20
 )
-

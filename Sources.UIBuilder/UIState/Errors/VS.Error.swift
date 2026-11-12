@@ -13,7 +13,6 @@ extension VS {
         case notFoundAsset(String)
         case wrongTypeAsset(String)
 
-        case jsGlobalObjectNotFound
         case jsPathToObjectIsEmpty
         case jsObjectNotFound(String)
         case jsMethodNotFound(String)

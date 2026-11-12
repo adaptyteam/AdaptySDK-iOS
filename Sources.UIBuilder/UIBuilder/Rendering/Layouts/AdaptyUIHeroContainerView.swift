@@ -19,6 +19,7 @@ private enum ScrollAnchor {
     static let footerBottom = "adapty.hero.footer.bottom"
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIHeroContainerView: View {
     @EnvironmentObject
     private var flowViewModel: AdaptyUIFlowViewModel
@@ -75,9 +76,9 @@ struct AdaptyUIHeroContainerView: View {
                             )
                         }
                         .ignoresSafeArea()
-                        .scrollIndicatorsHidden_compatible()
-                        // The scroll axis proposes no height to the content: the floors below need
-                        // this, and without it they would collapse to ~10pt inside a scroll.
+                        .scrollIndicators(.hidden)
+                        // The scroll axis has no height for the content, whatever the stacks in it
+                        // propose. See `AdaptyUIUnspecifiedProposalAxesKey`.
                         .declaringProposal(.vertical, unspecified: true)
                         .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
                         .onChange(of: stateViewModel.scrollCommand) { command in
@@ -182,6 +183,8 @@ struct AdaptyUIHeroContainerView: View {
             )
         }
         .frame(height: height)
+        // The cover has a height of its own, though it scrolls with the content.
+        .declaringProposal(.vertical, unspecified: false)
     }
 
     @State
@@ -227,7 +230,8 @@ struct AdaptyUIHeroContainerView: View {
             .padding(properties?.padding)
             .padding(.bottom, offsetY - bottomOverscrollHeight)
             .onAppear {
-                consumeAndProcessPendingEvents(properties: properties)
+                // Arming path: replay only sticky lifecycle events.
+                consumeAndProcessPendingEvents(properties: properties, includeCustom: false)
             }
             .onChange(of: eventBus.revision) { _ in
                 consumeAndProcessPendingEvents(properties: properties)
@@ -237,15 +241,18 @@ struct AdaptyUIHeroContainerView: View {
         }
     }
 
-    private func consumeAndProcessPendingEvents(properties: VC.Element.Properties?) {
+    private func consumeAndProcessPendingEvents(
+        properties: VC.Element.Properties?,
+        includeCustom: Bool = true
+    ) {
         guard let properties, properties.eventHandlers.isNotEmpty else { return }
 
         let pending = eventBus.consumePending(
             afterSequence: lastProcessedSequence,
             screenInstanceId: screenInstanceId,
-            currentTopScreenInstanceId: navigatorViewModel.currentScreenInstanceIfSingle?.id
+            currentTopScreenInstanceId: navigatorViewModel.currentScreenInstanceIfSingle?.id,
+            includeCustom: includeCustom
         )
-        guard !pending.isEmpty else { return }
 
         for event in pending {
             let combinedAnimations = properties.eventHandlers
@@ -253,6 +260,7 @@ struct AdaptyUIHeroContainerView: View {
                 .flatMap(\.animations)
 
             guard !combinedAnimations.isEmpty else { continue }
+            Log.ui.verbose("#EventBus# fire \(event.eventId) seq=\(event.sequence) hero")
 
             if playOnAppearAnimations == combinedAnimations {
                 playOnAppearAnimations = []
@@ -264,7 +272,12 @@ struct AdaptyUIHeroContainerView: View {
             }
         }
 
-        lastProcessedSequence = pending.last!.sequence
+        if !includeCustom {
+            // Arming: skip custom events published before this view mounted.
+            lastProcessedSequence = eventBus.lastSequence
+        } else if let last = pending.last {
+            lastProcessedSequence = last.sequence
+        }
     }
 
     @ViewBuilder
@@ -286,9 +299,9 @@ struct AdaptyUIHeroContainerView: View {
 
                 Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
             }
-            .scrollIndicatorsHidden_compatible()
-            // The scroll axis proposes no height to the content: the floors below need
-            // this, and without it they would collapse to ~10pt inside a scroll.
+            .scrollIndicators(.hidden)
+            // The scroll axis has no height for the content, whatever the stacks in it
+            // propose. See `AdaptyUIUnspecifiedProposalAxesKey`.
             .declaringProposal(.vertical, unspecified: true)
             .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
             .onChange(of: stateViewModel.scrollCommand) { command in
@@ -307,6 +320,7 @@ struct AdaptyUIHeroContainerView: View {
                 drawDecoratorBackground: drawFooterBackground
             )
             .fixedSize(horizontal: false, vertical: true)
+            .declaringProposal(.vertical, unspecified: true)
         }
     }
 }

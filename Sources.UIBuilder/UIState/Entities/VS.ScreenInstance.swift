@@ -14,16 +14,20 @@ extension VS {
         let navigatorId: String
         let configuration: VC.Screen
         let contextPath: [String]
+
+        var debugString: String {
+            "{instanceId: \(String(reflecting: id)), navigatorId: \(String(reflecting: navigatorId)), type: \(String(reflecting: configuration.id))}"
+        }
     }
 }
 
 extension VS.ScreenInstance: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-        object.setObject(id, forKeyedSubscript: "instanceId" as NSString)
-        object.setObject(navigatorId, forKeyedSubscript: "navigatorId" as NSString)
-        object.setObject(configuration.id, forKeyedSubscript: "type" as NSString)
-        object.setObject(contextPath.joined(separator: "."), forKeyedSubscript: "contextPath" as NSString)
+        object.setValue(id, forProperty: "instanceId")
+        object.setValue(navigatorId, forProperty: "navigatorId")
+        object.setValue(configuration.id, forProperty: "type")
+        object.setValue(contextPath.joined(separator: "."), forProperty: "contextPath")
         return object
     }
 }

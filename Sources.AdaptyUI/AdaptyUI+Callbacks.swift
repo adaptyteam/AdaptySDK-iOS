@@ -35,6 +35,7 @@ public extension AdaptyUI {
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exceeds.
     ///   - assetsResolver: if you are going to use custom assets functionality, pass the resolver function here.
     ///   - completion: A result containing the ``AdaptyUI.FlowConfiguration`` object. Use it with [AdaptyUI](https://github.com/adaptyteam/AdaptySDK-iOS-VisualPaywalls.git) library.
+    @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         locale: String? = nil,

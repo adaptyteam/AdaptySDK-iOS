@@ -19,9 +19,9 @@ struct CustomAssetsDecodingTests {
             "type": "color",
             "value": "#FF8000CC"
         }
-        """##).decode(AdaptyUICustomAsset.Identifiable.self)
+        """##).decode(AdaptyUIAsset.Identifiable.self)
 
-        guard case .asset(.color(.swiftUIColor(let color))) = asset.value else {
+        guard case .asset(.color(let color)) = asset.value else {
             Issue.record("Expected a custom color asset, got \(asset.value)")
             return
         }
@@ -48,7 +48,7 @@ struct CustomAssetsDecodingTests {
             ],
             "points": { "x0": 0.0, "y0": 0.0, "x1": 1.0, "y1": 0.0 }
         }
-        """##).decode(AdaptyUICustomAsset.Identifiable.self)
+        """##).decode(AdaptyUIAsset.Identifiable.self)
 
         guard case .asset(.gradient(.linear(let gradient, let startPoint, let endPoint))) = asset.value else {
             Issue.record("Expected a custom linear gradient asset, got \(asset.value)")

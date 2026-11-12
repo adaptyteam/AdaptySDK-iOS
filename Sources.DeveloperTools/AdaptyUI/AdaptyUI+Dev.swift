@@ -53,6 +53,7 @@ public extension AdaptyUI {
     /// device descriptor sent to the backend, so the backend selects the layout for the given
     /// device kind + resolution instead of the physical device's. Rendering still happens on the
     /// real screen.
+    @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
     static func dev_getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         deviceOverride: Dev_DeviceOverride?,

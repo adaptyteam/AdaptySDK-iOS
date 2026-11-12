@@ -11,5 +11,6 @@ extension VC.Animation {
     struct BorderParameters: Sendable {
         let color: Range<VC.AssetReference>?
         let thickness: Range<Double>?
+        let targetId: Int
     }
 }

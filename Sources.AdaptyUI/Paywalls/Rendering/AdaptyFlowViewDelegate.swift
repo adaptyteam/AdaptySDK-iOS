@@ -11,6 +11,7 @@ import Adapty
 import UIKit
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 package protocol AdaptyFlowViewDelegate: AnyObject {
     func flowViewDidAppear(_ view: AdaptyFlowUIView)
 

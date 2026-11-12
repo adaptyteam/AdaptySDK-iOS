@@ -11,8 +11,10 @@ import SwiftUI
 
 extension Double {
     var cgFloatValue: CGFloat { CGFloat(self) }
+    fileprivate var nonZero: Double? { self == 0 ? nil : self }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIRangedFrameModifier: ViewModifier {
     typealias Constraints = (min: Double?, max: Double?, shrink: Bool)
 
@@ -48,11 +50,13 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
             )
         case let .shrinkable(min, max):
             (
+                // `fixedSize` already gives the content its own length on this axis,
+                // so a zero `min` bounds nothing and needs no frame.
                 min: min.points(
                     screenSize: screenSize,
                     safeAreaStart: safeAreaStart,
                     safeAreaEnd: safeAreaEnd
-                ),
+                ).nonZero,
                 max: max?.points(
                     screenSize: screenSize,
                     safeAreaStart: safeAreaStart,
@@ -80,15 +84,27 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
         )
 
         self.framed(content, wConstraints, hConstraints)
-            .declaringProposal(.horizontal, unspecified: self.unspecifiedProposal(wConstraints))
-            .declaringProposal(.vertical, unspecified: self.unspecifiedProposal(hConstraints))
+            .declaringProposal(.horizontal, unspecified: self.unspecifiedProposal(self.box.width))
+            .declaringProposal(.vertical, unspecified: self.unspecifiedProposal(self.box.height))
+            .declaringHug(.horizontal, self.hugs(wConstraints))
+            .declaringHug(.vertical, self.hugs(hConstraints))
     }
 
-    /// A `shrink` length proposes an unspecified length to the content — that is what
-    /// `fixedSize` does — and any other constraint on the axis hands one down. An axis
-    /// the box constrains in no way declares nothing, so the content keeps whatever the
-    /// enclosing box declared. See `AdaptyUIUnspecifiedProposalAxesKey`.
-    private func unspecifiedProposal(_ constraints: Constraints) -> Bool? {
+    /// A `shrink` length proposes no length to the content — that is what
+    /// `fixedSize` does — and a fixed one hands its own down. `min` and `max` clamp
+    /// the box's proposal and pass no length on where it has none, so they declare
+    /// nothing, as an unconstrained axis does. See `AdaptyUIUnspecifiedProposalAxesKey`.
+    private func unspecifiedProposal(_ length: VC.Box.Length?) -> Bool? {
+        switch length {
+        case .shrinkable: true
+        case .fixed: false
+        default: nil
+        }
+    }
+
+    /// A `shrink` length hugs the content, any other constraint on the axis ends
+    /// the hug of a box further up. See `AdaptyUIHuggedAxesKey`.
+    private func hugs(_ constraints: Constraints) -> Bool? {
         if constraints.shrink {
             true
         } else if constraints.min != nil || constraints.max != nil {
@@ -117,26 +133,28 @@ struct AdaptyUIRangedFrameModifier: ViewModifier {
                     vertical: hConstraints.shrink
                 )
         } else {
-            content
-                .frame(
-                    minWidth: wConstraints.min?.cgFloatValue,
-                    maxWidth: wConstraints.max?.cgFloatValue,
-                    minHeight: hConstraints.min?.cgFloatValue,
-                    maxHeight: hConstraints.max?.cgFloatValue,
-                    alignment: .from(
-                        horizontal: self.box.horizontalAlignment.swiftuiValue(with: self.layoutDirection),
-                        vertical: self.box.verticalAlignment.swiftuiValue
-                    )
+            AdaptyUIBoxFrameLayout(
+                minWidth: wConstraints.min?.cgFloatValue,
+                maxWidth: wConstraints.max?.cgFloatValue,
+                minHeight: hConstraints.min?.cgFloatValue,
+                maxHeight: hConstraints.max?.cgFloatValue,
+                alignment: UnitPoint(
+                    x: self.box.horizontalAlignment.anchorFraction(with: self.layoutDirection),
+                    y: self.box.verticalAlignment.anchorFraction
                 )
-                .fixedSize(
-                    horizontal: wConstraints.shrink,
-                    vertical: hConstraints.shrink
-                )
+            ) {
+                content
+            }
+            .fixedSize(
+                horizontal: wConstraints.shrink,
+                vertical: hConstraints.shrink
+            )
         }
     }
 }
 
 extension View {
+    @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
     func rangedFrame(box: VC.Box) -> some View {
         modifier(AdaptyUIRangedFrameModifier(box: box))
     }

@@ -90,6 +90,10 @@ public extension UnkeyedEncodingContainer {
     }
 
     mutating func encodeAnyIfPresent(_ unknownValue: Any, skipNonEncodableValues: Bool = false) throws {
+        if unknownValue is NSNull {
+            try encodeNil()
+            return
+        }
         if isNil(unknownValue) { return }
         switch unknownValue {
         case let value as [String: Any]:

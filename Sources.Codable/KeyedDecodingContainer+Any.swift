@@ -8,10 +8,10 @@
 import Foundation
 
 public extension KeyedDecodingContainer<AnyCodingKey> {
-    func decodeDictionary() throws -> [String: Any] {
-        try [String: Any](
+    func decodeDictionary(omittingNullValues: Bool = false) throws -> [String: any Sendable] {
+        try [String: any Sendable](
             allKeys.compactMap {
-                guard let value = try decodeAnyIfPresent(forKey: $0)
+                guard let value = try decodeAnyIfPresent(forKey: $0, omittingNullValues: omittingNullValues)
                 else { return nil }
                 return ($0.stringValue, value)
             },
@@ -21,37 +21,37 @@ public extension KeyedDecodingContainer<AnyCodingKey> {
 }
 
 public extension KeyedDecodingContainer {
-    func decodeArray(forKey k: Key) throws -> [Any] {
+    func decodeArray(forKey k: Key, omittingNullValues: Bool = false) throws -> [any Sendable] {
         var container = try nestedUnkeyedContainer(forKey: k)
-        return try container.decodeArray()
+        return try container.decodeArray(omittingNullValues: omittingNullValues)
     }
 
-    func decodeArrayIfPresent(forKey k: Key) throws -> [Any]? {
+    func decodeArrayIfPresent(forKey k: Key, omittingNullValues: Bool = false) throws -> [any Sendable]? {
         guard contains(k) else { return nil }
-        return try decodeArray(forKey: k)
+        return try decodeArray(forKey: k, omittingNullValues: omittingNullValues)
     }
 
-    func decodeDictionary(forKey k: Key) throws -> [String: Any] {
+    func decodeDictionary(forKey k: Key, omittingNullValues: Bool = false) throws -> [String: any Sendable] {
         let container = try nestedContainer(keyedBy: AnyCodingKey.self, forKey: k)
-        return try container.decodeDictionary()
+        return try container.decodeDictionary(omittingNullValues: omittingNullValues)
     }
 
-    func decodeDictionaryIfPresent(forKey k: Key) throws -> [String: Any]? {
+    func decodeDictionaryIfPresent(forKey k: Key, omittingNullValues: Bool = false) throws -> [String: any Sendable]? {
         guard contains(k) else { return nil }
-        return try decodeDictionary(forKey: k)
+        return try decodeDictionary(forKey: k, omittingNullValues: omittingNullValues)
     }
 
-    func decodeAnyIfPresent(forKey k: Key) throws -> Any? {
+    func decodeAnyIfPresent(forKey k: Key, omittingNullValues: Bool = false) throws -> (any Sendable)? {
         guard contains(k) else { return nil }
 
         if try decodeNil(forKey: k) {
-            return nil
+            return omittingNullValues ? nil : NSNull()
         }
         if let container = try? nestedContainer(keyedBy: AnyCodingKey.self, forKey: k) {
-            return try container.decodeDictionary()
+            return try container.decodeDictionary(omittingNullValues: omittingNullValues)
         }
         if var container = try? nestedUnkeyedContainer(forKey: k) {
-            return try container.decodeArray()
+            return try container.decodeArray(omittingNullValues: omittingNullValues)
         }
         if let value = try? decode(Bool.self, forKey: k) {
             return value
@@ -88,25 +88,25 @@ public extension KeyedDecodingContainer {
 }
 
 public extension UnkeyedDecodingContainer {
-    mutating func decodeArray() throws -> [Any] {
-        var result = [Any]()
+    mutating func decodeArray(omittingNullValues: Bool = false) throws -> [any Sendable] {
+        var result = [any Sendable]()
         while !isAtEnd {
-            if let value = try decodeAnyIfPresent() {
+            if let value = try decodeAnyIfPresent(omittingNullValues: omittingNullValues) {
                 result.append(value)
             }
         }
         return result
     }
 
-    mutating func decodeAnyIfPresent() throws -> Any? {
+    mutating func decodeAnyIfPresent(omittingNullValues: Bool = false) throws -> (any Sendable)? {
         if try decodeNil() {
-            return nil
+            return omittingNullValues ? nil : NSNull()
         }
         if let container = try? nestedContainer(keyedBy: AnyCodingKey.self) {
-            return try container.decodeDictionary()
+            return try container.decodeDictionary(omittingNullValues: omittingNullValues)
         }
         if var container = try? nestedUnkeyedContainer() {
-            return try container.decodeArray()
+            return try container.decodeArray(omittingNullValues: omittingNullValues)
         }
         if let value = try? decode(Bool.self) {
             return value

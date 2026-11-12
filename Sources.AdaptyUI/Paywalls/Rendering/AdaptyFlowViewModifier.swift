@@ -24,6 +24,7 @@ public struct AdaptyLoadingPlaceholderView: View {
 
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertItem: Identifiable, Placeholder: View {
     @Environment(\.presentationMode) private var presentationMode
 
@@ -155,6 +156,7 @@ struct AdaptyFlowViewModifier<Placeholder, AlertItem>: ViewModifier where AlertI
 }
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public extension View {
     /// Presents a paywall when a binding to a Boolean value that you
     /// provide is true.

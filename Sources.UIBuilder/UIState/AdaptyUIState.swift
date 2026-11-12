@@ -14,11 +14,7 @@ package typealias VS = AdaptyUIState
 package final class AdaptyUIState: ObservableObject {
     let configuration: AdaptyUIConfiguration
 
-    private let name: String
-    private weak var actionHandler: AdaptyUIActionHandler?
-    private let isInspectable: Bool
-
-    private var jsState: VS.JSState
+    private let jsState: VS.JSState
 
     private(set) var started: Bool = false
 
@@ -31,9 +27,6 @@ package final class AdaptyUIState: ObservableObject {
         isInspectable: Bool = false
     ) {
         self.configuration = configuration
-        self.name = name
-        self.actionHandler = actionHandler
-        self.isInspectable = isInspectable
 
         jsState = .init(
             name: name,
@@ -42,10 +35,6 @@ package final class AdaptyUIState: ObservableObject {
             isInspectable: isInspectable
         )
 
-        subscribeToJSState()
-    }
-
-    private func subscribeToJSState() {
         jsState.objectWillChange
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
@@ -60,23 +49,9 @@ package final class AdaptyUIState: ObservableObject {
         jsState.evaluateScripts(configuration.scripts)
     }
 
-    func prepareForReuse() {
-        cancellables.removeAll()
-        started = false
-        jsState = .init(
-            name: name,
-            configuration: configuration,
-            actionHandler: actionHandler,
-            isInspectable: isInspectable
-        )
-        subscribeToJSState()
-        startOnce()
-        objectWillChange.send()
-    }
-
-    package func setProductsConstants(_ products: [VC.FlowConstants.ProductConstants]) {
+    package func setProductsConstants(eveentId: String, _ products: [VC.FlowConstants.ProductConstants]) {
         jsState.setProductConstants(products)
-        jsState.sendSDKEvent(.productsLoaded)
+        jsState.sendSDKEvent(.productsLoaded(id: eveentId))
     }
 
     func sendSDKEvent(_ event: VS.SDKEvent) {
@@ -117,5 +92,9 @@ package final class AdaptyUIState: ObservableObject {
 
     func execute(action: VS.JSAction, response: some JSValueConvertable) throws(VS.Error) {
         try jsState.execute(action: action, response: response)
+    }
+
+    func send(message: AppMessage) throws(VS.Error) {
+         jsState.sendSDKEvent(.appMessage(message: message))
     }
 }

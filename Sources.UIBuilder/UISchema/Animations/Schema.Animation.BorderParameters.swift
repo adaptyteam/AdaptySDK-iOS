@@ -11,12 +11,14 @@ extension Schema.Animation.BorderParameters: Decodable {
     enum CodingKeys: String, CodingKey {
         case color
         case thickness
+        case targetId = "target_id"
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         color = try container.decodeIfPresent(Schema.Animation.Range<Schema.AssetReference>.self, forKey: .color)
         thickness = try container.decodeIfPresent(Schema.Animation.Range<Double>.self, forKey: .thickness)
+        targetId = try container.decodeIfPresent(Int.self, forKey: .targetId) ?? 0
 
         if color == nil, thickness == nil {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "The color and thickness parameters cannot be absent together."))

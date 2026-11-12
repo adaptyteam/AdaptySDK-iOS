@@ -72,6 +72,7 @@ extension AdaptyPlugin {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 extension AdaptyPluginDelegate: AdaptyFlowControllerDelegate {
     func flowControllerDidAppear(
         _ controller: AdaptyFlowController

@@ -5,6 +5,7 @@
 //  Created by Aleksey Goncharov on 13.11.2024.
 //
 
+import AdaptyCodable
 import AdaptyUI
 import Foundation
 
@@ -12,6 +13,7 @@ extension AdaptyUI.Action: Encodable {
     private enum CodingKeys: String, CodingKey {
         case type
         case value
+        case arguments
         case openIn = "open_in"
     }
 
@@ -25,9 +27,10 @@ extension AdaptyUI.Action: Encodable {
             try container.encode("open_url", forKey: .type)
             try container.encode(url.absoluteString, forKey: .value)
             try container.encode(openIn, forKey: .openIn)
-        case .custom(let id):
+        case .custom(let id, let arguments):
             try container.encode("custom", forKey: .type)
             try container.encode(id, forKey: .value)
+            try container.encodeDictionaryIfPresent(arguments, skipNonEncodableValues: true, forKey: .arguments)
         }
     }
 

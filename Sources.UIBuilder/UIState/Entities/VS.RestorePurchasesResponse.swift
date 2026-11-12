@@ -18,16 +18,10 @@ package extension VS {
     }
 }
 
-extension VS.RestorePurchasesResult: JSValueConvertable {
-    func toJSValue(in context: JSContext) -> JSValue {
-        rawValue.toJSValue(in: context)
-    }
-}
-
 extension VS.RestorePurchasesResponse: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-        object.setObject(result.toJSValue(in: context), forKeyedSubscript: "result" as NSString)
+        object.setValue(result.rawValue, forProperty: "result")
         return object
     }
 }

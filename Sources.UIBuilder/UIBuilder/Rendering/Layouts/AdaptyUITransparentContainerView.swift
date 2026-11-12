@@ -15,6 +15,7 @@ private enum ScrollAnchor {
 }
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUITransparentContainerView: View {
     var screen: VC.Screen
 
@@ -48,9 +49,9 @@ struct AdaptyUITransparentContainerView: View {
 
             Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
         }
-        .scrollIndicatorsHidden_compatible()
-        // The scroll axis proposes no height to the content: the floors below need
-        // this, and without it they would collapse to ~10pt inside a scroll.
+        .scrollIndicators(.hidden)
+        // The scroll axis has no height for the content, whatever the stacks in it
+        // propose. See `AdaptyUIUnspecifiedProposalAxesKey`.
         .declaringProposal(.vertical, unspecified: true)
         .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
         .onAppear {

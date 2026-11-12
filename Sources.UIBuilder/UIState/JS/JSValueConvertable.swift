@@ -6,11 +6,34 @@
 //
 
 import AdaptyCodable
+import CoreFoundation
 import Foundation
 import JavaScriptCore
 
 protocol JSValueConvertable: Sendable {
     func toJSValue(in: JSContext) -> JSValue
+}
+
+extension NSNull: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        .init(nullIn: context)
+    }
+}
+
+extension NSString: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        .init(object: self as String, in: context)
+    }
+}
+
+extension NSNumber: JSValueConvertable {
+    func toJSValue(in context: JSContext) -> JSValue {
+        if CFGetTypeID(self) == CFBooleanGetTypeID() {
+            .init(bool: boolValue, in: context)
+        } else {
+            .init(double: doubleValue, in: context)
+        }
+    }
 }
 
 extension Bool: JSValueConvertable {
@@ -118,9 +141,16 @@ extension Dictionary: JSValueConvertable where Key == String, Value: JSValueConv
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
         for (key, value) in self {
-            let jsValue = value.toJSValue(in: context)
-            object.setObject(jsValue, forKeyedSubscript: key as NSString)
+            // Defining an own data property also preserves the literal "__proto__" key.
+            object.defineProperty(key, descriptor: [
+                JSPropertyDescriptorValueKey: value.toJSValue(in: context),
+                JSPropertyDescriptorWritableKey: true,
+                JSPropertyDescriptorEnumerableKey: true,
+                JSPropertyDescriptorConfigurableKey: true,
+            ])
         }
         return object
     }
 }
+
+

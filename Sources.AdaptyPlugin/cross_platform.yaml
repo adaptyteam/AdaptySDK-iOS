@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/4.3.2/schema"
+$id: "https://adapty.io/crossPlatform/4.4.0/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -1982,6 +1982,7 @@ $defs:
         properties:
           type: { type: string, const: "custom" }
           value: { type: string }
+          arguments: { type: object }
 
   AdaptyUI.Permission: #event
     description:

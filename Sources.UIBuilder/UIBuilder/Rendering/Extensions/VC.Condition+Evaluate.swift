@@ -3,8 +3,6 @@
 //  AdaptyUIBuilder
 //
 
-#if canImport(UIKit)
-
 import CoreGraphics
 import Foundation
 
@@ -47,5 +45,3 @@ extension VC.Condition {
         return true
     }
 }
-
-#endif

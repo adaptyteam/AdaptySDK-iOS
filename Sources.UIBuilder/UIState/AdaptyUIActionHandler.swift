@@ -11,7 +11,7 @@ protocol AdaptyUIActionHandler: AnyObject {
     func jsException(_: String)
     func openUrl(url: URL, openIn: VC.Action.WebOpenInParameter)
     func openUrl(stringId: String, openIn: VC.Action.WebOpenInParameter)
-    func userCustomAction(id: String)
+    func userCustomAction(id: String, arguments: [String: any Sendable]?)
     func purchaseProduct(productId: String, service: VC.Action.PaymentService, callback: VS.JSAction?)
     func restorePurchases(callback: VS.JSAction?)
     func closeAll()
@@ -63,19 +63,34 @@ package extension VS {
         }
 
         package let name: String
-        package let params: [String: any Sendable]
+        private let _params: [String: any Sendable]
+
+        package func params(with includingKeys: Set<ParamsInternalKeys> = []) -> [String: any Sendable] {
+            var params = _params
+            for internalkey in ParamsInternalKeys.allCases {
+                guard !includingKeys.contains(internalkey) else { continue }
+                params.removeValue(forKey: internalkey.rawValue)
+            }
+            return params
+        }
 
         package var screenInstanceId: String? {
-            params[ParamsInternalKeys.instanceId.rawValue] as? String
+            _params[ParamsInternalKeys.instanceId.rawValue] as? String
         }
 
-        package var isBackend: Bool {
-            params[ParamsInternalKeys.isBackendEvent.rawValue] as? Bool ?? true
+        var isBackend: Bool {
+            _params[ParamsInternalKeys.isBackendEvent.rawValue] as? Bool ?? true
         }
 
-        package var isCustomer: Bool {
-            params[ParamsInternalKeys.isCustomerEvent.rawValue] as? Bool ?? false
+        var isCustomer: Bool {
+            _params[ParamsInternalKeys.isCustomerEvent.rawValue] as? Bool ?? false
         }
+
+        init(name: String, params: [String : any Sendable]) {
+            self.name = name
+            self._params = params
+        }
+
     }
 }
 

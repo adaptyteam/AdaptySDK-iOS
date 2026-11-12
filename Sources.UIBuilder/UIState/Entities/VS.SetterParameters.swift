@@ -19,9 +19,9 @@ extension VS {
 extension VS.SetterParameters: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-        object.setObject(name, forKeyedSubscript: "name" as NSString)
-        object.setObject(value.toJSValue(in: context), forKeyedSubscript: "value" as NSString)
-        object.setObject(screenInstance.toJSValue(in: context), forKeyedSubscript: "_screen" as NSString)
+        object.setValue(name, forProperty: "name")
+        object.setValue(value.toJSValue(in: context), forProperty: "value")
+        object.setValue(screenInstance.toJSValue(in: context), forProperty: "_screen")
         return object
     }
 }

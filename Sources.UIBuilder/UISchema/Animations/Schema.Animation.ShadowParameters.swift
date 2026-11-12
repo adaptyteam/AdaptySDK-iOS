@@ -12,6 +12,7 @@ extension Schema.Animation.ShadowParameters: Decodable {
         case color
         case blurRadius = "blur_radius"
         case offset
+        case targetId = "target_id"
     }
 
     init(from decoder: Decoder) throws {
@@ -19,6 +20,7 @@ extension Schema.Animation.ShadowParameters: Decodable {
         color = try container.decodeIfPresent(Schema.Animation.Range<Schema.AssetReference>.self, forKey: .color)
         blurRadius = try container.decodeIfPresent(Schema.Animation.Range<Double>.self, forKey: .blurRadius)
         offset = try container.decodeIfPresent(Schema.Animation.Range<Schema.Offset>.self, forKey: .offset)
+        targetId = try container.decodeIfPresent(Int.self, forKey: .targetId) ?? 0
 
         if color == nil, blurRadius == nil, offset == nil {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "The color, blur_radius, and offset parameters cannot be absent at the same time."))

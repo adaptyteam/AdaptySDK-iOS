@@ -12,11 +12,11 @@ import Foundation
 import SwiftUI
 
 @MainActor
-package final class AdaptyUIStateHolder {
-    let state: AdaptyUIState
-
+package final class AdaptyUIStateHolder: ObservableObject {
+    private(set) var current: AdaptyUIState
     private let logId: String
     private let actionHandler: AdaptyUIStateActionHandler
+    private let isInspectable: Bool
     private var cancellables = Set<AnyCancellable>()
     private var lastProducts: [VC.FlowConstants.ProductConstants]?
 
@@ -28,40 +28,50 @@ package final class AdaptyUIStateHolder {
     ) {
         self.logId = logId
         self.actionHandler = actionHandler
-        self.state = AdaptyUIState(
+        self.isInspectable = isInspectable
+        self.current = AdaptyUIState(
             name: "AdaptyJSState_[\(logId)]",
             configuration: viewConfiguration,
             actionHandler: actionHandler,
             isInspectable: isInspectable
         )
 
-        actionHandler.registerState(state)
+        actionHandler.registerState(self)
+        subscribeToCurrent()
+    }
+
+    private func subscribeToCurrent() {
+        current.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
 
     package func start() {
-//        state.objectWillChange
-//            .sink { [weak self] _ in
-        // TODO: x propagate state
-//                if let state = self?.state {
-//                    print("#STATE_DEBUG# \(state.debug(filter: .withFunctionCode))")
-//                }
-//            }
-//            .store(in: &cancellables)
-
-        state.startOnce()
+        current.startOnce()
     }
 
     package func setProducts(_ products: [VC.FlowConstants.ProductConstants]) {
         lastProducts = products
-        state.setProductsConstants(products)
+        current.setProductsConstants(eveentId: logId + ".set", products)
     }
 
     package func prepareForReuse() {
         Log.ui.verbose("#\(logId)# prepareForReuse")
         actionHandler.clearPendingCallbacks()
-        state.prepareForReuse()
+        cancellables.removeAll()
+        current = AdaptyUIState(
+            name: "AdaptyJSState_[\(logId)]",
+            configuration: current.configuration,
+            actionHandler: actionHandler,
+            isInspectable: isInspectable
+        )
+        subscribeToCurrent()
+        current.startOnce()
+        objectWillChange.send()
         if let lastProducts {
-            state.setProductsConstants(lastProducts)
+            current.setProductsConstants(eveentId: logId + ".prepareForReuse", lastProducts)
         }
     }
 }
@@ -73,7 +83,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     private let flowViewModel: AdaptyUIFlowViewModel
 
     private let logic: AdaptyUIBuilderLogic
-    private weak var state: AdaptyUIState?
+    private weak var stateHolder: AdaptyUIStateHolder?
 
     package weak var stateViewModel: AdaptyUIStateViewModel? {
         didSet {
@@ -84,6 +94,8 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     }
 
     package weak var timerViewModel: AdaptyUITimerViewModel?
+    package weak var assetsViewModel: AdaptyUIAssetsViewModel?
+    package weak var tagResolverViewModel: AdaptyUITagResolverViewModel?
 
     package var systemRequestsHandler: AdaptyUISystemRequestsHandler?
 
@@ -105,10 +117,10 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         self.logic = logic
     }
 
-    func registerState(_ state: AdaptyUIState) {
-        self.state = state
-        screensViewModel.executeActions = { [weak state] actions, screen in
-            try? state?.execute(actions: actions, screenInstance: screen)
+    func registerState(_ stateHolder: AdaptyUIStateHolder) {
+        self.stateHolder = stateHolder
+        screensViewModel.executeActions = { [weak stateHolder] actions, screen in
+            try? stateHolder?.current.execute(actions: actions, screenInstance: screen)
         }
         screensViewModel.reportError = { [weak self] error in
             self?.logic.reportDidReceiveError(error)
@@ -135,8 +147,15 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    private func resolvedText(stringId: String) -> VC.RichText? {
-        try? state?.richText(stringId)
+    private func plainText(stringId: String) -> String? {
+        guard let assetsViewModel, let stateViewModel, let tagResolverViewModel else { return nil }
+        return assetsViewModel.plainText(
+            stringId,
+            screen: screensViewModel.topmostScreenInstance ?? AdaptyUIScreenInstanceKey.defaultValue,
+            stateViewModel: stateViewModel,
+            customTagResolver: tagResolverViewModel,
+            showsDebugPlaceholders: false // a placeholder would make a URL out of `<tag:…>`
+        )
     }
 
     nonisolated func openUrl(
@@ -145,8 +164,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
     ) {
         Task { @MainActor [weak self] in
             guard
-                let text = self?.resolvedText(stringId: stringId),
-                let str = text.asString,
+                let str = self?.plainText(stringId: stringId),
                 let url = URL(string: str)
             else {
                 self?.logic.reportDidReceiveError(.invalidActionURL(stringId))
@@ -162,9 +180,9 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         }
     }
 
-    nonisolated func userCustomAction(id: String) {
+    nonisolated func userCustomAction(id: String, arguments: [String: any Sendable]?) {
         Task { @MainActor [weak self] in
-            self?.logic.reportDidPerformAction(.custom(id: id))
+            self?.logic.reportDidPerformAction(.custom(id: id, arguments: arguments))
         }
     }
 
@@ -181,7 +199,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
         Task { @MainActor [weak self] in
             guard let self else { return }
-            self.state?.sendSDKEvent(.willPurchase(productId: productId))
+            self.stateHolder?.current.sendSDKEvent(.willPurchase(id: token ,productId: productId))
 
             self.productsViewModel.purchaseProduct(
                 id: productId,
@@ -189,12 +207,12 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
                 onFinish: { [weak self] result in
                     guard let self else { return }
 
-                    self.state?.sendSDKEvent(.didPurchase(productId: productId, result: result))
+                    self.stateHolder?.current.sendSDKEvent(.didPurchase(id: token, productId: productId, result: result))
 
                     guard let callback = self.pendingPurchaseCallbacks.removeValue(forKey: token) else { return }
 
                     do {
-                        try self.state?.execute(
+                        try self.stateHolder?.current.execute(
                             action: callback,
                             response: VS.PurchaseResponse(productId: productId, result: result)
                         )
@@ -213,18 +231,18 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
         Task { @MainActor [weak self] in
             guard let self else { return }
-            self.state?.sendSDKEvent(.willRestorePurchases)
+            self.stateHolder?.current.sendSDKEvent(.willRestorePurchases(id: token))
 
             self.productsViewModel.restorePurchases(
                 onFinish: { [weak self] result in
                     guard let self else { return }
 
-                    self.state?.sendSDKEvent(.didRestorePurchases(result: result))
+                    self.stateHolder?.current.sendSDKEvent(.didRestorePurchases(id: token, result: result))
 
                     guard let callback = self.pendingRestoreCallbacks.removeValue(forKey: token) else { return }
 
                     do {
-                        try self.state?.execute(
+                        try self.stateHolder?.current.execute(
                             action: callback,
                             response: VS.RestorePurchasesResponse(result: result)
                         )
@@ -344,9 +362,9 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         pendingAlertDialogCallback = nil
 
         guard let callback, screenInstance != nil else { return }
-        let response = VS.ShowAlertDialogParametersResponse(actionId: actionId)
+        let response = VS.ShowAlertDialogResponse(actionId: actionId)
         do {
-            try state?.execute(action: callback, response: response)
+            try stateHolder?.current.execute(action: callback, response: response)
         } catch {
             Log.ui.error("alertDialog callback error: \(error)")
         }
@@ -356,7 +374,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
         guard screensViewModel.topmostScreenInstance != nil else { return }
         let response = VS.TimerResponse(timerId: timerId)
         do {
-            try state?.execute(action: callback, response: response)
+            try stateHolder?.current.execute(action: callback, response: response)
         } catch {
             Log.ui.error("timer callback error: \(error)")
         }
@@ -381,14 +399,14 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
 
             guard let callback, self.screensViewModel.topmostScreenInstance != nil else { return }
 
-            let response = VS.ShowRequestPermissionParametersResponse(
+            let response = VS.ShowRequestPermissionResponse(
                 request: params,
                 result: result.isGranted,
                 detailResult: result.detail
             )
 
             do {
-                try self.state?.execute(
+                try self.stateHolder?.current.execute(
                     action: callback,
                     response: response
                 )
@@ -437,7 +455,7 @@ package final class AdaptyUIStateActionHandler: AdaptyUIActionHandler, AdaptyUIT
             if event.isCustomer {
                 self?.logic.reportCustomerAnalyticEvent(
                     name: event.name,
-                    params: event.params
+                    params: event.params(with: [.name, .instanceId])
                 )
             }
         }

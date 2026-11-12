@@ -12,20 +12,20 @@ import AdaptyUI
 import AdaptyUIBuilder
 import UIKit
 
-extension AdaptyUICustomAsset {
+extension AdaptyUIAsset {
     struct Identifiable {
         let id: String
         let value: Value
     }
 
     enum Value {
-        case asset(AdaptyUICustomAsset)
+        case asset(AdaptyUIAsset)
         case imageFlutterAssetId(String)
         case videoFlutterAssetId(String, resolution: CGSize?)
     }
 }
 
-extension AdaptyUICustomAsset.Identifiable: Decodable {
+extension AdaptyUIAsset.Identifiable: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case type

@@ -12,5 +12,6 @@ extension VC.Animation {
         let color: Range<VC.AssetReference>?
         let blurRadius: Range<Double>?
         let offset: Range<VC.Offset>?
+        let targetId: Int
     }
 }

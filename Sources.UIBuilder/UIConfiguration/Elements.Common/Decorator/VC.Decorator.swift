@@ -10,10 +10,10 @@ import Foundation
 extension VC {
     struct Decorator: Sendable {
         let shapeType: ShapeType
-        let background: AssetReference?
-        let border: Border?
-        let shadow: Shadow?
-        let innerShadow: Shadow?
+        let overlays: [Layer]
+        let underlays: [Layer]
+        let blend: BlendMode
         let blurRadius: Double?
+        let clip: Clip
     }
 }

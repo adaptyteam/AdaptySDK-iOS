@@ -14,22 +14,26 @@ extension VS {
         let customArgs: [String: String]?
     }
 
-    struct ShowRequestPermissionParametersResponse {
+    struct ShowRequestPermissionResponse {
         let request: ShowRequestPermissionParameters
         let result: Bool
         let detailResult: String?
     }
 }
 
-extension VS.ShowRequestPermissionParametersResponse: JSValueConvertable {
+extension VS.ShowRequestPermissionResponse: JSValueConvertable {
     func toJSValue(in context: JSContext) -> JSValue {
         let object = JSValue(newObjectIn: context)!
-        object.setObject(request.permission.toJSValue(in: context), forKeyedSubscript: "permission" as NSString)
-        if let customArgs: [String: String] = request.customArgs {
-            object.setObject(customArgs.toJSValue(in: context), forKeyedSubscript: "customArgs" as NSString)
+        if let permission = request.permission {
+            object.setValue(permission.toJSValue(in: context), forProperty: "permission")
         }
-        object.setObject(result.toJSValue(in: context), forKeyedSubscript: "result" as NSString)
-        object.setObject(detailResult.toJSValue(in: context), forKeyedSubscript: "detailResult" as NSString)
+        if let customArgs: [String: String] = request.customArgs {
+            object.setValue(customArgs.toJSValue(in: context), forProperty: "customArgs")
+        }
+        object.setValue(result, forProperty: "result")
+        if let detailResult {
+            object.setValue(detailResult.toJSValue(in: context), forProperty: "detailResult")
+        }
         return object
     }
 }

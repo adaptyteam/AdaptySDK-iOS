@@ -24,11 +24,13 @@ extension VC.Action {
         }
     }
 
-    var isSDK: Bool {
-        scope == .global && path.first == "SDK"
-    }
-
-    func paramsAsDictionary() -> [AnyHashable: Any]? {
-        params?.asObject
+    @inlinable
+    var sdkMethod: String? {
+       guard scope == .global,
+             path.count == 2,
+             path[0] == "SDK"
+        else { return nil }
+        return path[1]
     }
 }
+

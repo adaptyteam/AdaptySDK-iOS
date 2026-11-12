@@ -12,6 +12,7 @@ import AdaptyUIBuilder
 import SwiftUI
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
@@ -106,7 +107,7 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
 
         return AdaptyUIPaywallView_Internal(
             showDebugOverlay: false,
-            displayMissingTags: false
+            showsDebugPlaceholders: false
         )
         .environmentObjects(
             stateViewModel: flowConfiguration.stateViewModel,
@@ -115,7 +116,8 @@ public struct AdaptyFlowView<AlertItem>: View where AlertItem: Identifiable {
             tagResolverViewModel: flowConfiguration.tagResolverViewModel,
             timerViewModel: flowConfiguration.timerViewModel,
             screensViewModel: flowConfiguration.screensViewModel,
-            assetsViewModel: flowConfiguration.assetsViewModel
+            assetsViewModel: flowConfiguration.assetsViewModel,
+            customElementsViewModel: flowConfiguration.customElementsViewModel
         )
         .onAppear {
             flowConfiguration.reportOnAppear()

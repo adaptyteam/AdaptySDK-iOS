@@ -10,6 +10,7 @@
 import SwiftUI
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUILinearProgressView: View {
     @Environment(\.colorScheme)
     private var colorScheme: ColorScheme
@@ -168,6 +169,7 @@ struct AdaptyUILinearProgressView: View {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 extension View {
     @ViewBuilder
     func applyingCornerRadius(_ corner: VC.CornerRadius) -> some View {
@@ -175,10 +177,8 @@ extension View {
             self
         } else if corner.isSameRadius {
             clipShape(RoundedRectangle(cornerRadius: corner.topLeading))
-        } else if #available(iOS 16.0, macOS 13.0, *) {
-            clipShape(UnevenRoundedRectangle(cornerRadii: corner.systemRadii))
         } else {
-            clipShape(UnevenRoundedRectangleFallback(cornerRadii: corner))
+            clipShape(UnevenRoundedRectangle(cornerRadii: corner.systemRadii))
         }
     }
 }

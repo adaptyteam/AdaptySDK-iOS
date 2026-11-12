@@ -104,7 +104,7 @@ extension VC.Asset {
                     defaultLineHeight: font.defaultLineHeight
                 )
             )
-        case .unknown:
+        case .data, .unknown:
             nil
         }
     }

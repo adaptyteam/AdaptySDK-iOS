@@ -7,6 +7,6 @@
 
 package extension AdaptyUISchema {
     static let platform = "ios"
-    static let formatVersion: Version = "5.1.2"
-    static let builderVersion = "5_1"
+    static let formatVersion: Version = "5.2.0"
+    static let builderVersion = "5_2"
 }

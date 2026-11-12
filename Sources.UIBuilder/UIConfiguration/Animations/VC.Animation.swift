@@ -26,7 +26,7 @@ extension VC.Animation {
         case rotation(RotationParameters)
         case scale(ScaleParameters)
         case box(BoxParameters)
-        case background(Range<VC.AssetReference>)
+        case background(BackgroundParameters)
         case border(BorderParameters)
         case shadow(ShadowParameters)
         case innerShadow(ShadowParameters)

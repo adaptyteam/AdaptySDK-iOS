@@ -23,6 +23,29 @@ extension View {
     func alignmentBarrier() -> some View {
         modifier(AdaptyUIAlignmentBarrierModifier())
     }
+
+    /// Places this view in the size it measured, whatever frame its parent hands it.
+    ///
+    /// A geometry effect — `rotationEffect`, `scaleEffect`, `visualEffect` and the rest,
+    /// even at their identity values — rounds the frame of its content to whole pixels,
+    /// edge by edge. Where the content starts on half a pixel, as a row of a whole width
+    /// centred in an odd one does at @3x, the frame comes out a pixel narrower than the
+    /// content measured, and a text placed in it truncates. Placing the content with the
+    /// proposal it was measured with gives it its own size back; the effect still draws
+    /// it where it was.
+    func measuredPlacement() -> some View {
+        modifier(AdaptyUIMeasuredPlacementModifier())
+    }
+}
+
+private struct AdaptyUIMeasuredPlacementModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) {
+            AdaptyUIAlignmentBarrierLayout { content }
+        } else {
+            content
+        }
+    }
 }
 
 private struct AdaptyUIAlignmentBarrierModifier: ViewModifier {
@@ -37,8 +60,8 @@ private struct AdaptyUIAlignmentBarrierModifier: ViewModifier {
     }
 }
 
-/// Sizes and places its only subview exactly as the parent would have, and reports no
-/// explicit alignment guides of its own.
+/// Sizes its only subview as the parent would have, places it with the proposal it was
+/// measured with, and reports no explicit alignment guides of its own.
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 private struct AdaptyUIAlignmentBarrierLayout: Layout {
     func sizeThatFits(

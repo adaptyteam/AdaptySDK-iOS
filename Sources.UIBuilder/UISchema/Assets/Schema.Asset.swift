@@ -42,9 +42,10 @@ extension Schema.Asset: Decodable {
             self = try .asset(.image(Schema.ImageData(from: decoder)))
         case VC.VideoData.assetType:
             self = try .asset(.video(Schema.VideoData(from: decoder)))
+        case VC.DataAsset.assetType:
+            self = try .asset(.data(Schema.DataAsset(from: decoder)))
         default:
             self = try .unknown(type: type, fallbackAssetId: container.decodeIfPresent(String.self, forKey: .fallbackAssetId))
         }
     }
 }
-

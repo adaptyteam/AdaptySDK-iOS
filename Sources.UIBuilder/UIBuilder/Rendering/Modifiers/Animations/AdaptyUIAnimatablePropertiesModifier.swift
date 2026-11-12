@@ -59,16 +59,18 @@ private final class AdaptyUIAnimationCompletionGroup {
     }
 }
 
-struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
+struct AdaptyUIAnimatablePropertiesModifier<Layers: ViewModifier>: ViewModifier {
     private var play: Binding<[VC.Animation]>
     private let onFinished: (() -> Void)?
 
+    private let blend: VC.BlendMode?
+    // Element background/overlay, added outside the blended group but under the
+    // shared transforms. Takes the blur radius so they stay blurred with the element.
+    private let layers: (Double) -> Layers
+
     private let initialBlurRadius: Double
 
-    private let initialShadowFilling: VC.AssetReference?
     private let initialOffset: VC.Offset
-    private let initialShadowOffset: VC.Offset
-    private let initialShadowBlurRadius: Double
 
     @Environment(\.adaptyScreenSize)
     private var screenSize: CGSize
@@ -88,6 +90,12 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     private let initialRotation: Angle
     private let initialRotationAnchor: UnitPoint
+
+    /// Whether the content gets a rotation and a scale effect at all. A geometry effect
+    /// costs a layer and rounds the frame of its content to whole pixels, so an element
+    /// whose configuration neither sets nor animates one gets none.
+    private let rotates: Bool
+    private let scales: Bool
 
     private let initialOpacity: Double
 
@@ -115,7 +123,9 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
     init(
         _ properties: VC.Element.Properties,
-        play: Binding<[VC.Animation]>
+        play: Binding<[VC.Animation]>,
+        blend: VC.BlendMode?,
+        layers: @escaping (Double) -> Layers
     ) {
         self.initialOpacity = properties.opacity
 
@@ -130,12 +140,12 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
         self.initialBlurRadius = properties.decorator?.blurRadius ?? .zero
 
-        self.initialShadowFilling = properties.decorator?.shadow?.filling
-        self.initialShadowOffset = properties.decorator?.shadow?.offset ?? .zero
-        self.initialShadowBlurRadius = properties.decorator?.shadow?.blurRadius ?? .zero
+        (self.rotates, self.scales) = Self.transforms(properties)
 
         self.play = play
         self.onFinished = nil
+        self.blend = blend
+        self.layers = layers
     }
 
     init(
@@ -148,10 +158,8 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         initialRotationAnchor: UnitPoint,
         initialOffset: VC.Offset,
         initialBlurRadius: Double,
-        initialShadowFilling: VC.AssetReference?,
-        initialShadowOffset: VC.Offset,
-        initialShadowBlurRadius: Double,
-        onFinished: (() -> Void)?
+        onFinished: (() -> Void)?,
+        layers: @escaping (Double) -> Layers
     ) {
         self.initialOpacity = initialOpacity
 
@@ -166,12 +174,14 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
 
         self.initialBlurRadius = initialBlurRadius
 
-        self.initialShadowFilling = initialShadowFilling
-        self.initialShadowOffset = initialShadowOffset
-        self.initialShadowBlurRadius = initialShadowBlurRadius
+        // A transition may animate either of them.
+        self.rotates = true
+        self.scales = true
 
         self.play = play
         self.onFinished = onFinished
+        self.blend = nil
+        self.layers = layers
     }
 
     @State private var animatedOffsetX: CGFloat?
@@ -188,49 +198,59 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
         animatedBlurRadius ?? initialBlurRadius
     }
 
-    @State private var animatedShadowFilling: VC.AssetReference?
-    @State private var animatedShadowBlurRadius: Double?
-    @State private var animatedShadowOffset: CGSize?
 
-    private var resolvedShadowFilling: VC.AssetReference? {
-        animatedShadowFilling ?? initialShadowFilling
-    }
-
-    private var resolvedShadowBlurRadius: Double {
-        animatedShadowBlurRadius ?? initialShadowBlurRadius
-    }
-
-    private var resolvedShadowOffset: CGSize {
-        if let animatedShadowOffset {
-            CGSize(
-                width: animatedShadowOffset.width,
-                height: animatedShadowOffset.height
-            )
-        } else {
-            CGSize(
-                width: initialShadowOffset.x.points(.horizontal, screenSize, safeArea),
-                height: initialShadowOffset.y.points(.vertical, screenSize, safeArea)
-            )
+    /// Whether an element sets or animates a rotation and a scale.
+    static func transforms(_ properties: VC.Element.Properties) -> (rotates: Bool, scales: Bool) {
+        let animated = properties.eventHandlers.flatMap(\.animations).map(\.kind)
+        let rotates = properties.rotation != nil || animated.contains {
+            if case .rotation = $0 { true } else { false }
         }
+        let scales = properties.scale != nil || animated.contains {
+            if case .scale = $0 { true } else { false }
+        }
+        return (rotates, scales)
     }
 
     func body(content: Content) -> some View {
-        content
-            .blur(radius: resolvedBlurRadius)
-            .offset(resolvedOffset)
-            .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
-            .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
-            .shadow(
-                color: assetsViewModel.resolvedAsset(
-                    resolvedShadowFilling,
-                    mode: colorScheme.toVCMode,
-                    screen: screen
-                ).asColorAsset,
-                blurRadius: resolvedShadowBlurRadius,
-                offset: resolvedShadowOffset
-            )
-            .opacity(resolvedOpacity)
-            .onChange(of: play.wrappedValue) { startAnimations($0) }
+        transformed(
+            content
+                // The decorator inside draws drop shadows before the transforms below.
+                .environment(\.adaptyShadowTransform, AdaptyUIShadowTransform(
+                    rotation: resolvedRotation,
+                    scaleX: resolvedScaleX,
+                    scaleY: resolvedScaleY
+                ))
+                .blur(radius: resolvedBlurRadius)
+                .elementBlend(blend)
+                .modifier(layers(resolvedBlurRadius))
+                .offset(resolvedOffset)
+        )
+        .opacity(resolvedOpacity)
+        .onChange(of: play.wrappedValue) { startAnimations($0) }
+    }
+
+    /// The rotation and scale effects the element needs, with the content placed in
+    /// the size it measured under them. `rotates` and `scales` never change for an
+    /// element, so the branch it takes stays the same through its animations.
+    @ViewBuilder
+    private func transformed(_ view: some View) -> some View {
+        switch (rotates, scales) {
+        case (false, false):
+            view
+        case (true, false):
+            view
+                .measuredPlacement()
+                .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
+        case (false, true):
+            view
+                .measuredPlacement()
+                .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
+        case (true, true):
+            view
+                .measuredPlacement()
+                .rotationEffect(resolvedRotation, anchor: resolvedRotationAnchor)
+                .scaleEffect(x: resolvedScaleX, y: resolvedScaleY, anchor: resolvedScaleAnchor)
+        }
     }
 
     private func startAnimations(_ animations: [VC.Animation]) {
@@ -295,47 +315,7 @@ struct AdaptyUIAnimatablePropertiesModifier: ViewModifier {
                             self.animatedScaleY = $0.y
                         }
                     )
-                )
-            case let .shadow(value):
-                if let colorValue = value.color {
-                    animatedShadowFilling = colorValue.start
-                }
-
-                if let blurValue = value.blurRadius {
-                    animatedShadowBlurRadius = blurValue.start
-                }
-
-                if let offsetValue = value.offset {
-                    animatedShadowOffset = CGSize(
-                        width: offsetValue.start.x.points(.horizontal, screenSize, safeArea),
-                        height: offsetValue.start.y.points(.vertical, screenSize, safeArea)
-                    )
-                }
-
-                tokens.insert(
-                    timeline.animate(
-                        from: (value.color?.start, value.blurRadius?.start, value.offset?.start),
-                        to: (value.color?.end, value.blurRadius?.end, value.offset?.end),
-                        completion: completionGroup?.track(),
-                        updateBlock: { value in
-                            if let colorValue = value.0 {
-                                animatedShadowFilling = colorValue
-                            }
-
-                            if let blurValue = value.1 {
-                                animatedShadowBlurRadius = blurValue
-                            }
-
-                            if let offsetValue = value.2 {
-                                animatedShadowOffset = CGSize(
-                                    width: offsetValue.x.points(.horizontal, screenSize, safeArea),
-                                    height: offsetValue.y.points(.vertical, screenSize, safeArea)
-                                )
-                            }
-                        }
-                    )
-                )
-            case let .blur(value):
+                )            case let .blur(value):
                 animatedBlurRadius = value.start
                 tokens.insert(
                     timeline.animate(
@@ -363,15 +343,29 @@ extension View {
         _ properties: VC.Element.Properties?,
         play: Binding<[VC.Animation]>
     ) -> some View {
+        animatableProperties(properties, play: play, blend: nil) { _ in EmptyModifier() }
+    }
+
+    /// `blend` applies to the element after its blur; `layers` go on top of the
+    /// blended group, so they are not part of the blend source.
+    @ViewBuilder
+    func animatableProperties<Layers: ViewModifier>(
+        _ properties: VC.Element.Properties?,
+        play: Binding<[VC.Animation]>,
+        blend: VC.BlendMode?,
+        layers: @escaping (Double) -> Layers
+    ) -> some View {
         if let properties {
             modifier(
                 AdaptyUIAnimatablePropertiesModifier(
                     properties,
-                    play: play
+                    play: play,
+                    blend: blend,
+                    layers: layers
                 )
             )
         } else {
-            self
+            modifier(layers(.zero))
         }
     }
 
@@ -386,9 +380,6 @@ extension View {
         initialRotationAnchor: UnitPoint = .center,
         initialOffset: VC.Offset = .zero,
         initialBlurRadius: Double = .zero,
-        initialShadowFilling: VC.AssetReference? = nil,
-        initialShadowOffset: VC.Offset = .zero,
-        initialShadowBlurRadius: Double = .zero,
         onFinished: (() -> Void)? = nil
     ) -> some View {
         modifier(
@@ -402,12 +393,21 @@ extension View {
                 initialRotationAnchor: initialRotationAnchor,
                 initialOffset: initialOffset,
                 initialBlurRadius: initialBlurRadius,
-                initialShadowFilling: initialShadowFilling,
-                initialShadowOffset: initialShadowOffset,
-                initialShadowBlurRadius: initialShadowBlurRadius,
-                onFinished: onFinished
+                onFinished: onFinished,
+                layers: { _ in EmptyModifier() }
             )
         )
+    }
+
+    @ViewBuilder
+    fileprivate func elementBlend(_ blend: VC.BlendMode?) -> some View {
+        if let blend, blend != .normal {
+            // Without the group, layers that set their own blend mode (every
+            // decorator layer does) override this one.
+            self.compositingGroup().blendMode(blend.swiftUIBlendMode)
+        } else {
+            self
+        }
     }
 }
 

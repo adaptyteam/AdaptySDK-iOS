@@ -1,13 +1,13 @@
 # yaml-language-server: $schema=https://json-schema.org/draft/2020-12/schema
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/uibuilder/5.1.2/schema"
+$id: "https://adapty.io/uibuilder/5.2.0/schema"
 title: "AdaptyUI Configuration"
 type: object
 required: [format, screens, scripts]
 properties:
     format:
         type: string
-        const: "5.1.2"
+        const: "5.2.0"
     assets:
         title: "Default assets"
         $ref: "#/Assets"
@@ -93,6 +93,32 @@ Entities:
         enum:
             - hug
             - fill
+
+    BlendMode:
+        title: "Blend mode for an element or decorator layer"
+        type: string
+        enum:
+            - normal
+            - multiply
+            - screen
+            - overlay
+            - darken
+            - lighten
+            - color_dodge
+            - color_burn
+            - hard_light
+            - difference
+            - exclusion
+            - hue
+            - saturation
+            - color
+            - luminosity
+            - source_atop
+            - destination_over
+            - destination_out
+            - destination_in
+            - plus_lighter
+        default: normal
 
     Condition:
         title: Condition
@@ -326,40 +352,42 @@ Entities:
 
 Animation:
     type: object
-    allOf:
-        - properties:
-              interpolator:
-                  $ref: "#/Animation/Interpolator"
-                  default: ease_in_out
-              start_delay:
-                  type: integer
-                  default: 0
-                  description: milliseconds
-              duration:
-                  type: integer
-                  default: 300
-                  description: milliseconds
-              loop: { enum: [normal, ping_pong] }
-              loop_delay:
-                  type: integer
-                  default: 0
-                  description: milliseconds
-              ping_pong_delay:
-                  type: integer
-                  default: 0
-                  description: milliseconds
-              loop_count: { type: integer }
-        - oneOf:
-              - $ref: "#/Animation/Opacity"
-              - $ref: "#/Animation/Offset"
-              - $ref: "#/Animation/Rotation"
-              - $ref: "#/Animation/Scale"
-              - $ref: "#/Animation/Box"
-              - $ref: "#/Animation/Background"
-              - $ref: "#/Animation/Border"
-              - $ref: "#/Animation/Shadow"
-              - $ref: "#/Animation/Blur"
+    oneOf:
+      - $ref: "#/Animation/Opacity"
+      - $ref: "#/Animation/Offset"
+      - $ref: "#/Animation/Rotation"
+      - $ref: "#/Animation/Scale"
+      - $ref: "#/Animation/Box"
+      - $ref: "#/Animation/Background"
+      - $ref: "#/Animation/Border"
+      - $ref: "#/Animation/Shadow"
+      - $ref: "#/Animation/Blur"
     unevaluatedProperties: false
+
+    Timeline:
+        type: object
+        properties:
+            interpolator:
+                $ref: "#/Animation/Interpolator"
+                default: ease_in_out
+            start_delay:
+                type: integer
+                default: 0
+                description: milliseconds
+            duration:
+                type: integer
+                default: 300
+                description: milliseconds
+            loop: { enum: [normal, ping_pong] }
+            loop_delay:
+                type: integer
+                default: 0
+                description: milliseconds
+            ping_pong_delay:
+                type: integer
+                default: 0
+                description: milliseconds
+            loop_count: { type: integer }
 
     Interpolator:
         oneOf:
@@ -384,6 +412,8 @@ Animation:
 
     Opacity:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type]
         properties:
             type: { const: opacity }
@@ -398,6 +428,8 @@ Animation:
 
     Offset:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, offset]
         properties:
             type: { const: offset }
@@ -411,6 +443,8 @@ Animation:
 
     Rotation:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, angle]
         properties:
             type: { const: rotation }
@@ -425,6 +459,8 @@ Animation:
 
     Scale:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, scale]
         properties:
             type: { const: scale }
@@ -439,6 +475,8 @@ Animation:
 
     Box:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type]
         properties:
             type: { const: box }
@@ -464,9 +502,15 @@ Animation:
 
     Background:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, color]
         properties:
             type: { const: background }
+            target_id:
+                type: integer
+                default: 0
+                description: "Decorator layer ID. 0 targets the legacy background layer. Used only for element animations."
             color:
                 type: object
                 required: [start, end]
@@ -477,9 +521,15 @@ Animation:
 
     Border:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type]
         properties:
             type: { const: border }
+            target_id:
+                type: integer
+                default: 0
+                description: "Decorator stroke layer ID. 0 targets the legacy border layer."
         anyOf:
             - required: [color]
               properties:
@@ -502,9 +552,15 @@ Animation:
 
     Shadow:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type]
         properties:
             type: { enum: [shadow, inner_shadow] }
+            target_id:
+                type: integer
+                default: 0
+                description: "Decorator effect ID, selected together with the shadow kind. 0 targets the legacy shadow of that kind."
         anyOf:
             - required: [color]
               properties:
@@ -536,6 +592,8 @@ Animation:
 
     Blur:
         type: object
+        allOf:
+            - $ref: "#/Animation/Timeline"
         required: [type, blur_radius]
         properties:
             type: { const: blur }
@@ -735,6 +793,7 @@ UI:
                         - $ref: "#/UI/Slider"
                         - $ref: "#/UI/Button"
                         - $ref: "#/UI/Stack"
+                        - $ref: "#/UI/Deck"
                         - $ref: "#/UI/FlexStack"
                         - $ref: "#/UI/Box"
                         - $ref: "#/UI/Section"
@@ -751,6 +810,7 @@ UI:
                         - $ref: "#/UI/VerticalProgress"
                         - $ref: "#/UI/RadialProgress"
                         - $ref: "#/UI/TextProgress"
+                        - $ref: "#/UI/Custom"
                   - properties:
                         decorator: { $ref: "#/UI/Element/Decorator" }
                         padding: { $ref: "#/Entities/EdgeInsets", default: 0 }
@@ -758,6 +818,7 @@ UI:
                         rotation: { $ref: "#/Entities/Rotation" }
                         scale: { $ref: "#/Entities/Scale" }
                         opacity: { type: number, default: 1.0 }
+                        blend: { $ref: "#/Entities/BlendMode" }
                         background:
                             type: array
                             items: { $ref: "#/UI/AlignedElement" } # { $ref: "#/pool_index" }
@@ -829,7 +890,20 @@ UI:
                 border: { $ref: "#/AssetIdOrColor/Binding" }
                 shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
                 inner_shadow: { $ref: "#/UI/Element/Decorator/Shadow" }
+                underlays:
+                    type: array
+                    items: { $ref: "#/UI/Element/Decorator/Layer" }
+                    description: "Layers below content, in drawing order"
+                overlays:
+                    type: array
+                    items: { $ref: "#/UI/Element/Decorator/Layer" }
+                    description: "Layers above content, in drawing order"
+                blend: { $ref: "#/Entities/BlendMode" }
                 blur_radius: { type: number }
+                clip:
+                    enum: [content, none]
+                    default: content
+                    description: "Clips the decorator background, content and border to its shape. None allows content overflow while preserving shaped fills and strokes. Element backgrounds, overlays and outer shadow remain outside this mask."
             dependentSchemas:
                 border:
                     properties:
@@ -864,6 +938,78 @@ UI:
                         description: "A measure of how much to blur the shadow. Larger values result in more blur."
                     offset: { $ref: "#/Entities/Offset", default: [0, 0] }
                 unevaluatedProperties: false
+
+            Layer:
+                type: object
+                properties:
+                    id:
+                        type: integer
+                        minimum: 1
+                        description: "Optional animation target"
+                    blend: { $ref: "#/Entities/BlendMode" }
+                    effects:
+                        type: array
+                        items: { $ref: "#/UI/Element/Decorator/Effect" }
+                oneOf:
+                    - title: "Effects only"
+                      properties:
+                          type: { const: effects, default: effects }
+                    - title: "Image layer"
+                      required: [type, asset_id]
+                      properties:
+                          type: { const: image }
+                          asset_id: { $ref: "#/AssetIdOrColor/Binding" }
+                          aspect: { $ref: "#/Entities/AspectRatio", default: fill }
+                    - title: "Shape fill"
+                      required: [type, asset_id]
+                      properties:
+                          type: { const: fill }
+                          asset_id: { $ref: "#/AssetIdOrColor/Binding" }
+                    - title: "Shape stroke"
+                      required: [type, asset_id]
+                      properties:
+                          type: { const: stroke }
+                          asset_id: { $ref: "#/AssetIdOrColor/Binding" }
+                          thickness: { type: number, default: 1 }
+                unevaluatedProperties: false
+
+            Effect:
+                type: object
+                required: [color]
+                properties:
+                    id:
+                        type: integer
+                        minimum: 1
+                        description: "Optional animation target"
+                    type:
+                        enum: [drop_shadow, inner_shadow]
+                        default: drop_shadow
+                    color: { $ref: "#/AssetIdOrColor/Binding" }
+                    blur_radius: { type: number, default: 0 }
+                    offset: { $ref: "#/Entities/Offset", default: [0, 0] }
+                unevaluatedProperties: false
+
+    Custom:
+        type: object
+        required: [type, custom_id, custom_type]
+        properties:
+            type: { const: custom }
+            custom_id: { type: string }
+            custom_type: { type: string }
+            assets:
+                type: object
+                additionalProperties: { $ref: "#/AssetIdOrColor/Binding" }
+            strings:
+                type: object
+                additionalProperties: { $ref: "#/Localization/StringId/Binding" }
+            bindings:
+                type: object
+                additionalProperties: { $ref: "#/Script/DataBinding" }
+            payload:
+                type: string
+                description: "Opaque custom element payload. String contents are not validated as JSON."
+            fallback: { $ref: "#/UI/Element" } # { $ref: "#/pool_index" }
+
 
     AlignedElement:
         type: object
@@ -981,6 +1127,12 @@ UI:
                   required: [shrink]
                   properties:
                       shrink: { $ref: "#/Entities/Unit" }
+                      max: { $ref: "#/Entities/Unit" }
+                  unevaluatedProperties: false
+                - title: Set max only
+                  type: object
+                  required: [max]
+                  properties:
                       max: { $ref: "#/Entities/Unit" }
                   unevaluatedProperties: false
 
@@ -1208,7 +1360,7 @@ UI:
                 }
             min: { type: number }
             max: { type: number }
-            step: { type: number }
+            step: { type: number, default: 1.0 }
 
     Button:
         type: object
@@ -1243,6 +1395,67 @@ UI:
             type: { const: space }
             count: { type: integer, default: 1, minimum: 1 }
         unevaluatedProperties: false
+
+    Deck:
+        type: object
+        required: [type, items]
+        properties:
+            type: { const: deck }
+            width: { $ref: "#/Entities/AutoSizeMode", default: fill }
+            height: { $ref: "#/Entities/AutoSizeMode", default: fill }
+            items:
+                type: array
+                minItems: 1
+                items: { $ref: "#/UI/DeckItem" }
+
+    DeckItem:
+        type: object
+        required: [type, content]
+        properties:
+            type: { const: deck_item }
+            width: { $ref: "#/UI/DeckItemLength" }
+            height: { $ref: "#/UI/DeckItemLength" }
+            content: { $ref: "#/UI/Element" }
+        oneOf:
+            - title: "Anchor and position"
+              required: [anchor, position]
+              properties:
+                  anchor:
+                      $ref: "#/Entities/Point"
+                      description: "Anchor point inside the DeckItem, in normalized coordinates"
+                  position:
+                      $ref: "#/Entities/Point"
+                      description: "Position inside the Deck at which the DeckItem anchor is placed, in normalized coordinates"
+                  rtl:
+                      enum: [preserve, keep, mirror]
+                      default: preserve
+                      description: "preserve/keep: keep horizontal coordinates; mirror: mirror anchor.x and position.x in RTL"
+            - title: "Horizontal and vertical alignment"
+              properties:
+                  h_align: { $ref: "#/Entities/HorizontalAlignment", default: center }
+                  v_align: { $ref: "#/Entities/VerticalAlignment", default: center }
+              not:
+                  anyOf:
+                      - required: [anchor]
+                      - required: [position]
+                      - required: [rtl]
+        unevaluatedProperties: false
+
+    DeckItemLength:
+        oneOf:
+            - title: "Fixed length"
+              $ref: "#/Entities/Unit"
+              minimum: 0
+              properties:
+                  point: { minimum: 0 }
+                  screen: { minimum: 0 }
+                  value: { minimum: 0 }
+            - title: "Parent-relative length"
+              type: object
+              required: [parent]
+              properties:
+                  parent: { type: number, minimum: 0 }
+              unevaluatedProperties: false
 
     FlexStack:
         type: object
@@ -1471,7 +1684,7 @@ UI:
             page_control:
                 type: object
                 properties:
-                    layout: { enum: [overlaid, stacked] }
+                    layout: { enum: [overlaid, stacked], default: stacked }
                     v_align:
                         {
                             $ref: "#/Entities/VerticalAlignment",
@@ -1489,7 +1702,6 @@ UI:
                     start_delay: { type: number, default: 0 }
                     page_transition:
                         $ref: "#/UI/Pager/Transition"
-                        default: { type: slide }
                     repeat_transition: { $ref: "#/UI/Pager/Transition" }
                     after_interaction_delay: { type: number, default: 3000 }
                 unevaluatedProperties: false
@@ -1599,7 +1811,7 @@ UI:
             min: { type: number, default: 0 }
             max: { type: number, default: 1 }
             skip_animation_on_overflow: { type: boolean, default: false }
-            
+
     VerticalProgress:
         type: object
         required: [type, align, asset_id, value, duration]
@@ -1653,8 +1865,8 @@ UI:
                   max: { type: number, default: 1 }
                   skip_animation_on_overflow: { type: boolean, default: false }
             - $ref: "#/UI/Text/Attributes"
-    
-            
+
+
 ###### Rich Text ######
 
 RichText:
@@ -1747,6 +1959,12 @@ Localization:
     properties:
         id: { $ref: "#/Localization/Identifier" }
         is_right_to_left: { type: boolean, default: false }
+        ios_locale_id:
+            type: string
+            description: "Foundation locale identifier used for formatting on Apple platforms."
+        android_locale_id:
+            type: string
+            description: "Locale identifier used for formatting on Android."
         assets: { $ref: "#/Assets" }
         strings:
             type: array
@@ -1843,6 +2061,7 @@ Assets:
             - $ref: "#/Assets/Font"
             - $ref: "#/Assets/Image"
             - $ref: "#/Assets/Video"
+            - $ref: "#/Assets/Data"
         unevaluatedProperties: false
 
     Color:
@@ -1941,7 +2160,7 @@ Assets:
                   properties:
                       value: { type: string, contentEncoding: base64 }
                 - title: URL to image
-                  required: [url, preview_value]
+                  required: [url]
                   properties:
                       url: { type: string }
                       preview_value: { type: string, contentEncoding: base64 }
@@ -1956,6 +2175,28 @@ Assets:
             image: { $ref: "#/Assets/Image/Data", unevaluatedProperties: false }
             v_res: { type: integer }
             h_res: { type: integer }
+
+    Data:
+        title: Custom data asset
+        type: object
+        required: [type, format]
+        properties:
+            type: { const: data }
+            format:
+                title: User-defined data format
+                type: string
+                minLength: 1
+            value:
+                title: Base64 encoded data
+                type: string
+                contentEncoding: base64
+            url:
+                title: URL to data
+                type: string
+                minLength: 1
+        anyOf:
+            - required: [value]
+            - required: [url]
 
 AssetId:
     title: Asset identifier
@@ -2001,6 +2242,8 @@ Script:
                 description: "Path to Script method (dot-separated)"
             params:
                 type: object
+                additionalProperties:
+                    type: [string, boolean, number]
                 default: {}
                 description: "Parameters passed to the method"
             scope:
@@ -2349,7 +2592,7 @@ DateTime:
 
     Interval:
         description: >
-            Длительность или смещение. 
+            Длительность или смещение.
             Два формата:
             1) Объект с календарными/временными компонентами - учитывает календарь (месяц = 28–31 день,
             DST и т.д.).
@@ -2438,32 +2681,32 @@ Converters:
         type: string
         # pattern: ^%[+\-0 ]*(\d+)?(\.\d+)?d$
         examples: ["%d"]
-    
+
     DateTimeFormat:
         type: string
         examples: ["YYYY-MM-DD HH:mm:ss"]
 
     MapConverter:
-        title: Map converter 
+        title: Map converter
         description: return some value from array if input value equals index
         type: object
         required: [converter, converter_params]
         properties:
             converter: { const: map }
-            converter_params: 
+            converter_params:
                 type: array
                 items:
                     type: [string, number, boolean]
                 description: "Array of values to map"
-        
+
     IsEqualConverter:
-        title: Is equal converter 
+        title: Is equal converter
         description: return boolean value if input value equal to converter_param
         type: object
         required: [converter, converter_params]
         properties:
             converter: { const: is_equal }
-            converter_params: 
+            converter_params:
                 type: [string, number, boolean]
 
     NumberConverter:
@@ -2476,7 +2719,7 @@ Converters:
             format: { $ref: "#/Converters/NumberFormat", default: "%d"}
 
     PercentConverter:
-        title: Percent converter for value in range 0..1 
+        title: Percent converter for value in range 0..1
         description: convert number from range 0..1 to percentage string
         type: object
         required: [converter]
@@ -2513,4 +2756,3 @@ Converters:
             - properties:
                     converter: { enum: [total_days, total_hours, total_minutes, total_seconds, total_milliseconds] }
                     format: { $ref: "#/Converters/IntegerFormat", default: "%d"}
-        

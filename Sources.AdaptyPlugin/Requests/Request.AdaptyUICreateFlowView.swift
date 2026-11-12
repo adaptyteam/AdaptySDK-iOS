@@ -57,7 +57,7 @@ extension Request {
         let preloadProducts: Bool?
         let customTags: [String: String]?
         let customTimers: [String: Date]?
-        let customAssets: [AdaptyUICustomAsset.Identifiable]?
+        let customAssets: [AdaptyUIAsset.Identifiable]?
 
         enum CodingKeys: String, CodingKey {
             case flow
@@ -110,10 +110,10 @@ extension Request {
         }
 
         @MainActor
-        func assetsResolver() throws -> [String: AdaptyUICustomAsset]? {
+        func assetsResolver() throws -> [String: AdaptyUIAsset]? {
             guard let customAssets, !customAssets.isEmpty else { return nil }
 
-            var assetsResolver: [String: AdaptyUICustomAsset] = [:]
+            var assetsResolver: [String: AdaptyUIAsset] = [:]
             assetsResolver.reserveCapacity(customAssets.count)
 
             for asset in customAssets {

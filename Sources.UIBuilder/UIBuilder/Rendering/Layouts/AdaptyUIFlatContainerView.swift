@@ -17,6 +17,7 @@ private enum ScrollAnchor {
 }
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIFlatContainerView: View {
     @State
     private var footerSize: CGSize = .zero
@@ -49,9 +50,9 @@ struct AdaptyUIFlatContainerView: View {
                     Color.clear.frame(height: 0).id(ScrollAnchor.footerBottom)
                 }
             }
-            .scrollIndicatorsHidden_compatible()
-            // The scroll axis proposes no height to the content: the floors below need
-            // this, and without it they would collapse to ~10pt inside a scroll.
+            .scrollIndicators(.hidden)
+            // The scroll axis has no height for the content, whatever the stacks in it
+            // propose. See `AdaptyUIUnspecifiedProposalAxesKey`.
             .declaringProposal(.vertical, unspecified: true)
             .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
             .onChange(of: stateViewModel.scrollCommand) { command in
@@ -70,6 +71,7 @@ struct AdaptyUIFlatContainerView: View {
                 drawDecoratorBackground: drawFooterBackground
             )
             .fixedSize(horizontal: false, vertical: true)
+            .declaringProposal(.vertical, unspecified: true)
         }
     }
 
@@ -97,9 +99,9 @@ struct AdaptyUIFlatContainerView: View {
                         .keyboardBottomPadding()
                         .scrollProgressTracker(kind: .main, coordinateSpaceName: CoordinateSpace.adaptyGlobalName, viewportHeight: globalProxy.size.height)
                     }
-                    .scrollIndicatorsHidden_compatible()
-                    // The scroll axis proposes no height to the content: the floors below need
-                    // this, and without it they would collapse to ~10pt inside a scroll.
+                    .scrollIndicators(.hidden)
+                    // The scroll axis has no height for the content, whatever the stacks in it
+                    // propose. See `AdaptyUIUnspecifiedProposalAxesKey`.
                     .declaringProposal(.vertical, unspecified: true)
                     .scrollToFocusedField(using: scrollProxy, stateViewModel: stateViewModel)
                     .onChange(of: stateViewModel.scrollCommand) { command in

@@ -13,6 +13,7 @@ import SwiftUI
 import UIKit
 
 @MainActor
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public extension AdaptyFlowController {
     var flowPlacementId: String { configuration.flowPlacementId }
 
@@ -41,6 +42,7 @@ extension AdaptyUI.FlowConfiguration {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 public final class AdaptyFlowController: UIViewController {
     public var id: String { flowView.id }
 
@@ -116,6 +118,7 @@ public final class AdaptyFlowController: UIViewController {
     }
 }
 
+@available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 extension AdaptyFlowController: AdaptyFlowViewDelegate {
     package func flowViewDidAppear(_ view: AdaptyFlowUIView) {
         delegate?.flowControllerDidAppear(self)

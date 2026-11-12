@@ -45,6 +45,7 @@ extension Schema.ConfigurationBuilder {
 
 extension Schema.GridItem: DecodableWithConfiguration {
     static let typeForGridItem = "grid_item"
+
     enum CodingKeys: String, CodingKey {
         case type
         case fixed
@@ -61,7 +62,11 @@ extension Schema.GridItem: DecodableWithConfiguration {
             let type = try container.decode(String.self, forKey: .type)
 
             guard type == Self.typeForGridItem else {
-                throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "worng type for GridItem: \(type)"))
+                throw DecodingError.dataCorruptedError(
+                    forKey: .type,
+                    in: container,
+                    debugDescription: "Invalid GridItem type: \(type)"
+                )
             }
         }
 
