@@ -2242,6 +2242,8 @@ Script:
                 description: "Path to Script method (dot-separated)"
             params:
                 type: object
+                additionalProperties:
+                    type: [string, boolean, number]
                 default: {}
                 description: "Parameters passed to the method"
             scope:

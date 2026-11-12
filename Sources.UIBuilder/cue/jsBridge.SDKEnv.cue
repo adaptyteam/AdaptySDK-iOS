@@ -22,6 +22,7 @@ package jsBridge
 	deviceVendor!: "Apple" | string
 	deviceModel!:  string
 
+	// Missing native values are omitted, not serialized as null.
 	appBundleId?:      string
 	appVersion?:       string
 	appBuild?:         string

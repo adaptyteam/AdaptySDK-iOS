@@ -276,13 +276,17 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             includeCustom: includeCustom
         )
 
-        guard !pending.isEmpty else { return }
-
         for event in pending {
             processEvent(event, properties: properties)
         }
 
-        lastProcessedSequence = pending.last!.sequence
+        if !includeCustom {
+            // Arming: everything published so far was either replayed above
+            // or is a custom event this element must never receive.
+            lastProcessedSequence = eventBus.lastSequence
+        } else if let last = pending.last {
+            lastProcessedSequence = last.sequence
+        }
     }
 
     private func processEvent(_ event: AdaptyUIEventBus.Event, properties: VC.Element.Properties) {
@@ -293,6 +297,10 @@ struct AdaptyUIElementView<ScreenHolderContent: View>: View {
             guard shouldFireHandler(eventHandler, for: event) else { continue }
             firingHandlers.append(eventHandler)
             combinedAnimations.append(contentsOf: eventHandler.animations)
+        }
+
+        if firingHandlers.isNotEmpty {
+            Log.ui.verbose("#EventBus# fire \(event.eventId) seq=\(event.sequence) element=\(elementIndex) handlers=\(firingHandlers.count)")
         }
 
         if !combinedAnimations.isEmpty {

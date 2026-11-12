@@ -16,6 +16,11 @@ final class AdaptyUIEventBus: ObservableObject {
         let eventId: VC.EventHandler.EventId
         let transitionId: String?
         let screenInstanceId: String?
+
+        var isCustom: Bool {
+            if case .custom = eventId { return true }
+            return false
+        }
     }
 
     private var nextSequence: UInt = 1
@@ -24,25 +29,26 @@ final class AdaptyUIEventBus: ObservableObject {
     /// Elements consume pending events on mount.
     private(set) var pendingEvents: [Event] = []
 
-    /// Custom-event sequences staged for eviction. Drained synchronously on
-    /// the next publish, by which point SwiftUI has already processed the
-    /// revision change from the prior publish and the previously-mounted
-    /// subscribers have had their chance to consume.
-    private var customEventsToEvict: Set<UInt> = []
+    /// How many custom events the buffer keeps. A custom event must stay
+    /// buffered until mounted subscribers react to the revision change, and
+    /// several publishes can land before SwiftUI processes one
+    /// (`SDK.sendEvents` with a list of events), so nothing evicts it on the
+    /// next publish. Late-mounting subscribers skip it by their cursor
+    /// (see `lastSequence`), so keeping it longer replays nothing.
+    // ponytail: a fixed cap; a burst of more custom events than this between
+    // two SwiftUI updates loses the oldest ones.
+    static let customEventsLimit = 1024
 
     /// Incremented on each publish. Elements observe this via onChange.
     @Published private(set) var revision: UInt = 0
 
-    func publish(eventId: VC.EventHandler.EventId, transitionId: String?, screenInstanceId: String?) {
-        // Drain custom events staged by the previous publish. Doing it here
-        // (synchronously, before publishing the new event) replaces the racy
-        // DispatchQueue.main.async eviction that could fire before SwiftUI
-        // had processed the revision change.
-        if !customEventsToEvict.isEmpty {
-            pendingEvents.removeAll { customEventsToEvict.contains($0.sequence) }
-            customEventsToEvict.removeAll()
-        }
+    /// Sequence of the latest published event, `0` before the first one.
+    /// A subscriber that arms (first mount, section re-arm) moves its cursor
+    /// here, so custom events published before it armed are never delivered
+    /// to it, however long they stay buffered.
+    var lastSequence: UInt { nextSequence - 1 }
 
+    func publish(eventId: VC.EventHandler.EventId, transitionId: String?, screenInstanceId: String?) {
         let event = Event(
             sequence: nextSequence,
             eventId: eventId,
@@ -51,18 +57,16 @@ final class AdaptyUIEventBus: ObservableObject {
         )
         nextSequence += 1
         pendingEvents.append(event)
+        Log.ui.verbose("#EventBus# publish \(eventId) seq=\(event.sequence) screen=\(screenInstanceId ?? "nil")")
+        if event.isCustom,
+           pendingEvents.lazy.filter(\.isCustom).count > Self.customEventsLimit,
+           let oldest = pendingEvents.firstIndex(where: \.isCustom)
+        {
+            let dropped = pendingEvents.remove(at: oldest)
+            Log.ui.warn("#EventBus# drop \(dropped.eventId) seq=\(dropped.sequence): more than \(Self.customEventsLimit) custom events buffered")
+        }
         incrementFireCount(screenInstanceId: screenInstanceId, eventId: eventId)
         revision &+= 1
-
-        // Custom events are transient signals: deliver to currently-mounted
-        // listeners via the revision change above, then drop. Lifecycle events
-        // (onWillAppear/etc.) stay in the buffer so a late-mounting element can
-        // pick them up on first appear, but custom events shouldn't be replayed
-        // for elements that mount after publication. Stage for eviction at the
-        // top of the next publish.
-        if case .custom = eventId {
-            customEventsToEvict.insert(event.sequence)
-        }
     }
 
     /// Returns pending events matching the given context, newer than afterSequence.
@@ -72,8 +76,9 @@ final class AdaptyUIEventBus: ObservableObject {
     ///   mount / section-index re-arm), where only sticky lifecycle events
     ///   should be replayed. A `.custom` event still buffered at that point was
     ///   published while a different subtree was mounted and must not be
-    ///   replayed to one that mounts afterward — its eviction is merely deferred
-    ///   to the next `publish()`. See SDK-1088 (bottom-sheet overlay re-show).
+    ///   replayed to one that mounts afterward; such a caller also moves its
+    ///   cursor to `lastSequence`, so the live path skips that event too.
+    ///   See SDK-1088 (bottom-sheet overlay re-show).
     func consumePending(
         afterSequence: UInt,
         screenInstanceId: String?,
@@ -107,12 +112,9 @@ final class AdaptyUIEventBus: ObservableObject {
     /// Clear events that are no longer relevant.
     func clearPending(for screenInstanceId: String?) {
         if let screenInstanceId {
-            let cleared = Set(pendingEvents.lazy.filter { $0.screenInstanceId == screenInstanceId }.map(\.sequence))
             pendingEvents.removeAll { $0.screenInstanceId == screenInstanceId }
-            customEventsToEvict.subtract(cleared)
         } else {
             pendingEvents.removeAll()
-            customEventsToEvict.removeAll()
         }
     }
 

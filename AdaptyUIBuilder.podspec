@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'AdaptyUIBuilder'
-  s.version          = '4.4.0'
+  s.version          = '4.5.0-SNAPSHOT'
   s.summary      = 'Adapty UI Builder for iOS.'
   
   s.description    = <<-DESC
