@@ -333,6 +333,18 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
                 }
             )
         }
+        // A GeometryReader has no height of its own: where nothing proposes one
+        // (a scroll view, a footer measured by its content) it collapses. A fixed
+        // `page_height` is the viewport's ideal height then; a proposed height
+        // still wins, so bounded containers are laid out as before.
+        .frame(idealHeight: fixedViewportHeight)
+    }
+
+    /// `page_height` when it does not depend on the parent. `page_padding` top
+    /// and bottom lie inside it, so it is the whole viewport.
+    private var fixedViewportHeight: CGFloat? {
+        guard case let .fixed(unit) = pager.pageHeight else { return nil }
+        return unit.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom)
     }
 
     private func pageControlView(
