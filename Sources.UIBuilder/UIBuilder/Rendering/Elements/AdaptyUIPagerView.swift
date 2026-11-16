@@ -117,6 +117,7 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
     }
 
     @State private var offset = CGFloat.zero
+    @State private var viewportWidth = CGFloat.zero
     @State private var isHorizontalDrag: Bool?
     @State private var dragGuard = AdaptyUIPagerDragGuard()
     @State private var isInteracting = false
@@ -216,135 +217,80 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
         }
     }
 
-    /// View for the Pager
+    /// View for the Pager. `AdaptyUIPagerLayout` sizes the viewport and places the pages.
     private var pagerView: some View {
-        GeometryReader { proxy in
-            let pagePaddingLeading = pager.pagePadding.leading.points(
-                screenSize: screenSize.width,
-                safeAreaStart: safeArea.leading,
-                safeAreaEnd: safeArea.trailing
-            )
-
-            let pagePaddingTrailing = pager.pagePadding.trailing.points(
-                screenSize: screenSize.width,
-                safeAreaStart: safeArea.leading,
-                safeAreaEnd: safeArea.trailing
-            )
-
-            let pagePaddingTop = pager.pagePadding.top.points(
-                screenSize: screenSize.height,
-                safeAreaStart: safeArea.top,
-                safeAreaEnd: safeArea.bottom
-            )
-
-            let pagePaddingBottom = pager.pagePadding.bottom.points(
-                screenSize: screenSize.height,
-                safeAreaStart: safeArea.top,
-                safeAreaEnd: safeArea.bottom
-            )
-
-            let width = pager.pageWidth.valueWith(parent: proxy.size.width,
-                                                  screenSize: screenSize.width,
-                                                  safeAreaStart: safeArea.leading,
-                                                  safeAreaEnd: safeArea.trailing)
-                - pagePaddingLeading
-                - pagePaddingTrailing
-
-            let height = pager.pageHeight.valueWith(parent: proxy.size.height,
-                                                    screenSize: screenSize.height,
-                                                    safeAreaStart: safeArea.top,
-                                                    safeAreaEnd: safeArea.bottom)
-                - pagePaddingTop
-                - pagePaddingBottom
-
-            let firstPageInset = pager.firstPageInset?.valueWith(
-                parent: proxy.size.width,
-                screenSize: screenSize.width,
-                safeAreaStart: safeArea.leading,
-                safeAreaEnd: safeArea.trailing
-            )
-
-            let lastPageInset = pager.lastPageInset?.valueWith(
-                parent: proxy.size.width,
-                screenSize: screenSize.width,
-                safeAreaStart: safeArea.leading,
-                safeAreaEnd: safeArea.trailing
-            )
-
-            let pages = pager.content
-            HStack(spacing: pager.spacing) {
-                ForEach(0 ..< pages.count, id: \.self) { idx in
+        let pages = pager.content
+        let pagesHaveOwnHeight: Bool = switch pager.pageHeight {
+        case .fixed: true
+        case let .parent(fraction): fraction != 1
+        }
+        return AdaptyUIPagerLayout(
+            pager: pager,
+            screenSize: screenSize,
+            safeArea: safeArea,
+            currentPage: currentPage,
+            dragOffset: offset
+        ) {
+            ForEach(0 ..< pages.count, id: \.self) { idx in
+                AdaptyUIPagerPageSlot(exact: pagesHaveOwnHeight) {
                     AdaptyUIElementView(
                         pages[idx],
                         screenHolderBuilder: screenHolderBuilder
                     )
-                    .frame(width: max(width, 0), height: max(height, 0))
-                    .declaringProposal([.horizontal, .vertical], unspecified: false)
-                    .clipped()
-                    .padding(.leading, idx == 0 ? pagePaddingLeading : 0)
-                    .padding(.trailing, idx == pages.count - 1 ? pagePaddingTrailing : 0)
+                    // A page hands its width down; its height only when the pager gives one.
+                    .declaringProposal(.horizontal, unspecified: false)
+                    .declaringProposal(.vertical, unspecified: pagesHaveOwnHeight ? false : nil)
                 }
+                .clipped()
             }
-            .padding(.top, pagePaddingTop)
-            .environment(\.adaptyPagerDragGuard, dragGuard)
-            .offset(x: VC.Pager.pagesOffsetX(
-                currentPage: currentPage,
-                pageCount: pages.count,
-                pageWidth: width,
-                spacing: pager.spacing,
-                viewportWidth: proxy.size.width,
-                firstPageInset: firstPageInset,
-                lastPageInset: lastPageInset,
-                pagePaddingLeading: pagePaddingLeading
-            ) + offset)
-            .dragGesture(
-                condition: pager.interactionBehavior != .none,
-                onChanged: { value in
-                    dragGuard.didDrag = true
+        }
+        .environment(\.adaptyPagerDragGuard, dragGuard)
+        .onGeometrySizeChange { viewportWidth = $0.width }
+        .dragGesture(
+            condition: pager.interactionBehavior != .none,
+            onChanged: { value in
+                dragGuard.didDrag = true
 
-                    let isHorizontal = isHorizontalDrag
-                        ?? (abs(value.translation.width) >= abs(value.translation.height))
-                    isHorizontalDrag = isHorizontal
-                    guard isHorizontal else { return }
+                let isHorizontal = isHorizontalDrag
+                    ?? (abs(value.translation.width) >= abs(value.translation.height))
+                isHorizontalDrag = isHorizontal
+                guard isHorizontal else { return }
 
-                    offset = value.translation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
-                    isInteracting = true
-                    stopAutoScroll() // Stop the autoscroll while interacting
-                },
-                onEnded: { value in
-                    // Reset after the release has reached the button under the finger.
-                    Task { @MainActor in dragGuard.didDrag = false }
+                offset = value.translation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
+                isInteracting = true
+                stopAutoScroll() // Stop the autoscroll while interacting
+            },
+            onEnded: { value in
+                // Reset after the release has reached the button under the finger.
+                Task { @MainActor in dragGuard.didDrag = false }
 
-                    let wasHorizontal = isHorizontalDrag ?? false
-                    isHorizontalDrag = nil
-                    guard wasHorizontal else { return }
+                let wasHorizontal = isHorizontalDrag ?? false
+                isHorizontalDrag = nil
+                guard wasHorizontal else { return }
 
-                    withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
-                        offset = value.predictedEndTranslation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
+                let width = pageWidth(viewportWidth: viewportWidth)
+                withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
+                    offset = value.predictedEndTranslation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
+                    if width > 0 {
                         currentPage -= Int((offset / width).rounded())
-                        currentPage = max(0, min(currentPage, pager.content.count - 1))
-                        offset = 0
-                        isInteracting = false
+                    }
+                    currentPage = max(0, min(currentPage, pager.content.count - 1))
+                    offset = 0
+                    isInteracting = false
 
-                        if pager.interactionBehavior == .pauseAnimation {
-                            resumeAutoScrollAfterInteraction()
-                        }
+                    if pager.interactionBehavior == .pauseAnimation {
+                        resumeAutoScrollAfterInteraction()
                     }
                 }
-            )
-        }
-        // A GeometryReader has no height of its own: where nothing proposes one
-        // (a scroll view, a footer measured by its content) it collapses. A fixed
-        // `page_height` is the viewport's ideal height then; a proposed height
-        // still wins, so bounded containers are laid out as before.
-        .frame(idealHeight: fixedViewportHeight)
+            }
+        )
     }
 
-    /// `page_height` when it does not depend on the parent. `page_padding` top
-    /// and bottom lie inside it, so it is the whole viewport.
-    private var fixedViewportHeight: CGFloat? {
-        guard case let .fixed(unit) = pager.pageHeight else { return nil }
-        return unit.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom)
+    /// The page width in a viewport of this width, as `AdaptyUIPagerLayout` computes it.
+    private func pageWidth(viewportWidth: CGFloat) -> CGFloat {
+        pager.pageWidth.valueWith(parent: viewportWidth, screenSize: screenSize.width, safeAreaStart: safeArea.leading, safeAreaEnd: safeArea.trailing)
+            - pager.pagePadding.leading.points(screenSize: screenSize.width, safeAreaStart: safeArea.leading, safeAreaEnd: safeArea.trailing)
+            - pager.pagePadding.trailing.points(screenSize: screenSize.width, safeAreaStart: safeArea.leading, safeAreaEnd: safeArea.trailing)
     }
 
     private func pageControlView(
