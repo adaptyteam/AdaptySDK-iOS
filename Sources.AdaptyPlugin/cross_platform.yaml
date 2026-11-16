@@ -969,7 +969,7 @@ $events:
       id: { const: "flow_view_did_receive_analytic_event" }
       view: { $ref: "#/$defs/AdaptyUI.FlowView" }
       name: { type: string }
-      params: { type: object }
+      params: { $ref: "#/$defs/AdaptyUI.JSObject" }
 
   Event.DidLoadLatestProfile:
     type: object
@@ -1966,7 +1966,7 @@ $defs:
         - $ref: "#/$assets/Image"
         - $ref: "#/$assets/Video"
 
-  AdaptyUI.JSValue: #request
+  AdaptyUI.JSValue: #request #event
     description: "Any JSON value; mirrors #JSValue of the UIBuilder JS bridge"
     oneOf:
       - type: "null"
@@ -1977,7 +1977,7 @@ $defs:
         items: { $ref: "#/$defs/AdaptyUI.JSValue" }
       - $ref: "#/$defs/AdaptyUI.JSObject"
 
-  AdaptyUI.JSObject: #request
+  AdaptyUI.JSObject: #request #event
     type: object
     additionalProperties: { $ref: "#/$defs/AdaptyUI.JSValue" }
 
