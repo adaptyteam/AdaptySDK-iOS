@@ -135,6 +135,27 @@ $requests:
         properties:
           success: { const: true }
 
+  ### sendAppMessage ###
+  AdaptyUISendAppMessage.Request: #request
+    type: object
+    required: [method, id, payload]
+    properties:
+      method: { const: "adapty_ui_send_app_message" }
+      id: { type: string, description: "View Id" }
+      payload:
+        $ref: "#/$defs/AdaptyUI.JSObject"
+        description: "Message for the flow script, delivered as the `applicationMsg` SDK event"
+
+  AdaptyUISendAppMessage.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### presentOnboardingView ###
   AdaptyUIPresentOnboardingView.Request: #request
     type: object
@@ -1944,6 +1965,21 @@ $defs:
         - $ref: "#/$assets/ColorGradient"
         - $ref: "#/$assets/Image"
         - $ref: "#/$assets/Video"
+
+  AdaptyUI.JSValue: #request
+    description: "Any JSON value; mirrors #JSValue of the UIBuilder JS bridge"
+    oneOf:
+      - type: "null"
+      - type: boolean
+      - type: number
+      - type: string
+      - type: array
+        items: { $ref: "#/$defs/AdaptyUI.JSValue" }
+      - $ref: "#/$defs/AdaptyUI.JSObject"
+
+  AdaptyUI.JSObject: #request
+    type: object
+    additionalProperties: { $ref: "#/$defs/AdaptyUI.JSValue" }
 
   AdaptyUI.FlowView: #response #event
     type: object
