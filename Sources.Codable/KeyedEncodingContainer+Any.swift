@@ -53,6 +53,13 @@ public extension KeyedEncodingContainer {
             return
         }
         switch unknownValue {
+        case let number as NSNumber where !number.doubleValue.isFinite:
+            // NaN / Infinity can't be written to JSON: same rules as non-encodable values
+            if skipNonEncodableValues { return }
+            throw EncodingError.invalidValue(
+                unknownValue,
+                .init(codingPath: codingPath + [k], debugDescription: "Non-finite number: \(number)")
+            )
         case let value as [String: Any]:
             try encodeDictionary(value, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
         case let value as [Any]:
@@ -99,6 +106,16 @@ public extension UnkeyedEncodingContainer {
             return
         }
         switch unknownValue {
+        case let number as NSNumber where !number.doubleValue.isFinite:
+            // NaN / Infinity can't be written to JSON: same rules as non-encodable values
+            if skipNonEncodableValues {
+                try encodeNil()
+                return
+            }
+            throw EncodingError.invalidValue(
+                unknownValue,
+                .init(codingPath: codingPath, debugDescription: "Non-finite number: \(number)")
+            )
         case let value as [String: Any]:
             var container = nestedContainer(keyedBy: AnyCodingKey.self)
             try container.encodeDictionary(value, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues)

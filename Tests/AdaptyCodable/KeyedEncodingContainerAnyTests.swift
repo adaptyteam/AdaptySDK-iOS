@@ -190,6 +190,40 @@ extension AdaptyCodableTests {
             """##))
         }
 
+        private struct NonFiniteFixture: Encodable {
+            let skipNonEncodableValues: Bool
+
+            func encode(to encoder: any Encoder) throws {
+                var container = encoder.container(keyedBy: AnyCodingKey.self)
+                try container.encodeDictionary(
+                    [
+                        "value": 1.5,
+                        "nan": Double.nan,
+                        "inf": Double.infinity,
+                        "float_inf": -Float.infinity,
+                        "ns_nan": NSNumber(value: Double.nan),
+                        "array": [1, Double.nan, NSNumber(value: -Double.infinity), "x"] as [Any],
+                        "nested": ["nan": Double.nan, "value": 2] as [String: Any],
+                    ],
+                    skipNonEncodableValues: skipNonEncodableValues
+                )
+            }
+        }
+
+        @Test("NaN and Infinity follow the non encodable rules: skipped key, null array element, or error")
+        func encodeNonFiniteNumbers() throws {
+            #expect(try Json.encode(NonFiniteFixture(skipNonEncodableValues: true)) == Json(##"""
+            {
+              "value": 1.5,
+              "array": [1, null, null, "x"],
+              "nested": {"value": 2}
+            }
+            """##))
+            #expect(throws: EncodingError.self) {
+                _ = try Json.encode(NonFiniteFixture(skipNonEncodableValues: false))
+            }
+        }
+
         @Test("encode helpers throw for unsupported non encodable values")
         func encodeUnsupportedValuesThrows() throws {
             #expect {
