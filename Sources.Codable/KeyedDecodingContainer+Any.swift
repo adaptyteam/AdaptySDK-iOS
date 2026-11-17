@@ -100,7 +100,7 @@ public extension UnkeyedDecodingContainer {
 
     mutating func decodeAnyIfPresent(omittingNullValues: Bool = false) throws -> (any Sendable)? {
         if try decodeNil() {
-            return omittingNullValues ? nil : NSNull()
+            return NSNull() // array elements are positional, null is never omitted
         }
         if let container = try? nestedContainer(keyedBy: AnyCodingKey.self) {
             return try container.decodeDictionary(omittingNullValues: omittingNullValues)

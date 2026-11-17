@@ -9,51 +9,54 @@ import Foundation
 
 public extension KeyedEncodingContainer<AnyCodingKey> {
     @inlinable
-    mutating func encodeDictionary(_ dict: [String: Any], skipNonEncodableValues: Bool = false) throws {
+    mutating func encodeDictionary(_ dict: [String: Any], omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false) throws {
         for (key, value) in dict {
-            try encodeAnyIfPresent(value, skipNonEncodableValues: skipNonEncodableValues, forKey: AnyCodingKey(stringValue: key))
+            try encodeAnyIfPresent(value, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues, forKey: AnyCodingKey(stringValue: key))
         }
     }
 
     @inlinable
-    mutating func encodeDicttionaryIfPresent(_ dict: [String: Any]?, skipNonEncodableValues: Bool = false) throws {
+    mutating func encodeDicttionaryIfPresent(_ dict: [String: Any]?, omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false) throws {
         guard let dict else { return }
-        return try encodeDictionary(dict, skipNonEncodableValues: skipNonEncodableValues)
+        return try encodeDictionary(dict, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues)
     }
 }
 
 public extension KeyedEncodingContainer {
     @inlinable
-    mutating func encodeArray(_ array: [Any], skipNonEncodableValues: Bool = false, forKey k: Key) throws {
+    mutating func encodeArray(_ array: [Any], omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
         var container = nestedUnkeyedContainer(forKey: k)
-        try container.encodeArray(array, skipNonEncodableValues: skipNonEncodableValues)
+        try container.encodeArray(array, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues)
     }
 
     @inlinable
-    mutating func encodeArrayIfPresent(_ array: [Any]?, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
+    mutating func encodeArrayIfPresent(_ array: [Any]?, omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
         guard let array else { return }
-        try encodeArray(array, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
+        try encodeArray(array, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
     }
 
     @inlinable
-    mutating func encodeDictionary(_ dict: [String: Any], skipNonEncodableValues: Bool = false, forKey k: Key) throws {
+    mutating func encodeDictionary(_ dict: [String: Any], omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
         var container = nestedContainer(keyedBy: AnyCodingKey.self, forKey: k)
-        try container.encodeDictionary(dict, skipNonEncodableValues: skipNonEncodableValues)
+        try container.encodeDictionary(dict, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues)
     }
 
     @inlinable
-    mutating func encodeDictionaryIfPresent(_ dict: [String: Any]?, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
+    mutating func encodeDictionaryIfPresent(_ dict: [String: Any]?, omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
         guard let dict else { return }
-        try encodeDictionary(dict, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
+        try encodeDictionary(dict, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
     }
 
-    mutating func encodeAnyIfPresent(_ unknownValue: Any, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
-        if isNil(unknownValue) { return }
+    mutating func encodeAnyIfPresent(_ unknownValue: Any, omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false, forKey k: Key) throws {
+        if isNil(unknownValue) {
+            if !omittingNullValues { try encodeNil(forKey: k) }
+            return
+        }
         switch unknownValue {
         case let value as [String: Any]:
-            try encodeDictionary(value, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
+            try encodeDictionary(value, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
         case let value as [Any]:
-            try encodeArray(value, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
+            try encodeArray(value, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues, forKey: k)
         case let value as any Encodable:
             try encode(value, forKey: k)
         default:
@@ -77,31 +80,31 @@ public extension KeyedEncodingContainer {
 
 public extension UnkeyedEncodingContainer {
     @inlinable
-    mutating func encodeArray(_ array: [Any], skipNonEncodableValues: Bool = false) throws {
+    mutating func encodeArray(_ array: [Any], omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false) throws {
         for value in array {
-            try encodeAnyIfPresent(value, skipNonEncodableValues: skipNonEncodableValues)
+            try encodeAnyIfPresent(value, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues)
         }
     }
 
     @inlinable
-    mutating func encodeArrayIfPresent(_ array: [Any]?, skipNonEncodableValues: Bool = false) throws {
+    mutating func encodeArrayIfPresent(_ array: [Any]?, omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false) throws {
         guard let array else { return }
-        try encodeArray(array, skipNonEncodableValues: skipNonEncodableValues)
+        try encodeArray(array, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues)
     }
 
-    mutating func encodeAnyIfPresent(_ unknownValue: Any, skipNonEncodableValues: Bool = false) throws {
-        if unknownValue is NSNull {
+    mutating func encodeAnyIfPresent(_ unknownValue: Any, omittingNullValues: Bool = false, skipNonEncodableValues: Bool = false) throws {
+        // array elements are positional: any nil becomes null regardless of omittingNullValues
+        if isNil(unknownValue) {
             try encodeNil()
             return
         }
-        if isNil(unknownValue) { return }
         switch unknownValue {
         case let value as [String: Any]:
             var container = nestedContainer(keyedBy: AnyCodingKey.self)
-            try container.encodeDictionary(value, skipNonEncodableValues: skipNonEncodableValues)
+            try container.encodeDictionary(value, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues)
         case let value as [Any]:
             var container = nestedUnkeyedContainer()
-            try container.encodeArray(value, skipNonEncodableValues: skipNonEncodableValues)
+            try container.encodeArray(value, omittingNullValues: omittingNullValues, skipNonEncodableValues: skipNonEncodableValues)
         case let value as any Encodable:
             try encode(value)
         default:
@@ -110,6 +113,7 @@ public extension UnkeyedEncodingContainer {
                 return
             }
             if skipNonEncodableValues {
+                try encodeNil() // array elements are positional: write null instead of shifting the following elements
                 return
             }
             throw EncodingError.invalidValue(
