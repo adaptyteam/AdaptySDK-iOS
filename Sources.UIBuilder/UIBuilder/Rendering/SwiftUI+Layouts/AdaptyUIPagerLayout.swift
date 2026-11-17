@@ -19,7 +19,6 @@ import SwiftUI
 ///   fills takes the proposed height, a page sized by its content keeps it, and
 ///   where no height is proposed every page is measured by its content.
 ///
-/// With a stacked page control the viewport fills a proposed height instead.
 /// Pages shorter than the viewport are centred in it, as the Android SDK does.
 @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
 struct AdaptyUIPagerLayout: Layout {
@@ -86,12 +85,6 @@ struct AdaptyUIPagerLayout: Layout {
         nil
     }
 
-    /// A page control stacked above or below the pages; centred, it overlays them.
-    private var fillsProposedHeight: Bool {
-        guard let pageControl = pager.pageControl, pageControl.layout == .stacked else { return false }
-        return pageControl.verticalAlignment != .center
-    }
-
     func geometry(_ proposal: ProposedViewSize, _ subviews: Subviews) -> Geometry {
         let width = proposal.replacingUnspecifiedDimensions().width
         // The proposal is read as it is, as the GeometryReader did and the Android SDK
@@ -137,12 +130,6 @@ struct AdaptyUIPagerLayout: Layout {
             fallthrough
         default:
             let pageProposal = proposedHeight.map { $0 - vertical }
-            // With a page control stacked above or below the pages, the viewport fills
-            // the height proposed to it and the pages sit in its middle, as the Android
-            // SDK lays it out (a viewport of weight 1 next to the indicator).
-            if fillsProposedHeight, let proposedHeight {
-                return result(proposedHeight, exact: nil, pageProposal: pageProposal)
-            }
             let tallest = subviews.reduce(CGFloat.zero) { tallest, subview in
                 max(tallest, subview.sizeThatFits(ProposedViewSize(width: pageWidth, height: pageProposal)).height)
             }
