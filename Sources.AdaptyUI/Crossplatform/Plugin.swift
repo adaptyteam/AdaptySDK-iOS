@@ -217,6 +217,7 @@ package extension AdaptyUI {
         
         package static func sendAppMessage(
             viewId: String,
+            messageId: String,
             payload: [String: any Sendable]
         ) throws {
 #if canImport(UIKit)
@@ -228,7 +229,7 @@ package extension AdaptyUI {
                 throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
             }
 
-            configuration.sendAppMessage(payload)
+            configuration.sendAppMessage(id: messageId, payload)
 #else
             throw AdaptyUIError.platformNotSupported
 #endif
@@ -287,23 +288,25 @@ extension AdaptyUI.Plugin {
         paywallControllers[id]
     }
 
-    private final class WeakFlowConfiguration {
-        weak var value: AdaptyUI.FlowConfiguration?
-        init(_ value: AdaptyUI.FlowConfiguration) { self.value = value }
+    private final class WeakFlowView {
+        weak var value: AdaptyFlowUIView?
+        init(_ value: AdaptyFlowUIView) { self.value = value }
     }
 
     /// Flows embedded as platform views, by the view id the host assigned.
     /// Held weakly: the host owns the view and drops it without telling the plugin.
-    private static var platformViewConfigurations = [String: WeakFlowConfiguration]()
+    /// The view, not its configuration, is held, so an id stops resolving as soon
+    /// as its view is gone even if the configuration is retained elsewhere.
+    private static var platformViews = [String: WeakFlowView]()
 
-    package static func registerPlatformView(configuration: AdaptyUI.FlowConfiguration, id: String) {
-        platformViewConfigurations = platformViewConfigurations.filter { $0.value.value != nil }
-        platformViewConfigurations[id] = WeakFlowConfiguration(configuration)
+    package static func registerPlatformView(_ view: AdaptyFlowUIView, id: String) {
+        platformViews = platformViews.filter { $0.value.value != nil }
+        platformViews[id] = WeakFlowView(view)
     }
 
     /// A flow configuration behind a view id: a presented view first, then an embedded one.
     private static func flowConfiguration(_ id: String) -> AdaptyUI.FlowConfiguration? {
-        cachedPaywallController(id)?.configuration ?? platformViewConfigurations[id]?.value
+        cachedPaywallController(id)?.configuration ?? platformViews[id]?.value?.configuration
     }
 }
 
