@@ -62,36 +62,48 @@ struct SDKActionDispatchTests {
         }
     }
 
-    @Test("Timer parameters prefer endAt and default invalid behavior to continue", arguments: [
-        (Json(#"{"id":"t","endAt":2000000000000}"#), [2000000000.0], [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":0}"#), [0.0], [Double](), [String]()),
-        (Json(#"{"id":"t","duration":60}"#), [Double](), [60.0], ["continue"]),
-        (Json(#"{"id":"t","duration":0.25}"#), [Double](), [0.25], ["continue"]),
-        (Json(#"{"id":"t","duration":0}"#), [Double](), [0.0], ["continue"]),
-        (Json(#"{"id":"t","duration":-1}"#), [Double](), [-1.0], ["continue"]),
-        (Json(#"{"id":"t","duration":60,"behavior":"continue"}"#), [Double](), [60.0], ["continue"]),
-        (Json(#"{"id":"t","duration":60,"behavior":"restart"}"#), [Double](), [60.0], ["restart"]),
-        (Json(#"{"id":"t","duration":60,"behavior":"persisted"}"#), [Double](), [60.0], ["persisted"]),
-        (Json(#"{"id":"t","duration":60,"behavior":"custom"}"#), [Double](), [60.0], ["custom"]),
-        (Json(#"{"id":"t","endAt":2000000000000,"duration":60}"#), [2000000000.0], [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":2000000000000,"behavior":"persisted"}"#), [2000000000.0], [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":2000000000000,"duration":60,"behavior":"restart"}"#), [2000000000.0], [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":2000000000000,"duration":null}"#), [2000000000.0], [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":2000000000000,"behavior":null}"#), [2000000000.0], [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":"bad","duration":60}"#), [Double](), [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":null,"duration":60}"#), [Double](), [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":"bad"}"#), [Double](), [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":null}"#), [Double](), [Double](), [String]()),
-        (Json(#"{"id":"t","endAt":true}"#), [0.001], [Double](), [String]()),
-        (Json(#"{"id":"t","duration":true}"#), [Double](), [1.0], ["continue"]),
-        (Json(#"{"id":"t","duration":"60"}"#), [Double](), [Double](), [String]()),
-        (Json(#"{"id":"t","duration":null}"#), [Double](), [Double](), [String]()),
-        (Json(#"{"id":"t"}"#), [Double](), [Double](), [String]()),
-        (Json(#"{"id":"t","behavior":"restart"}"#), [Double](), [Double](), [String]()),
-        (Json(#"{"id":"t","duration":60,"behavior":"other"}"#), [Double](), [60.0], ["continue"]),
-        (Json(#"{"id":"t","duration":60,"behavior":null}"#), [Double](), [60.0], ["continue"]),
-        (Json(#"{"id":"t","duration":60,"behavior":1}"#), [Double](), [60.0], ["continue"]),
-    ])
+    private typealias TimerCase = (
+        params: Json,
+        expectedEndDates: [Double],
+        expectedDurations: [Double],
+        expectedBehaviors: [String]
+    )
+
+    nonisolated private static let timerCases: [TimerCase] = [
+        (Json(#"{"id":"t","endAt":2000000000000}"#), [2000000000.0], [], []),
+        (Json(#"{"id":"t","endAt":0}"#), [0.0], [], []),
+        (Json(#"{"id":"t","duration":60}"#), [], [60.0], ["continue"]),
+        (Json(#"{"id":"t","duration":0.25}"#), [], [0.25], ["continue"]),
+        (Json(#"{"id":"t","duration":0}"#), [], [0.0], ["continue"]),
+        (Json(#"{"id":"t","duration":-1}"#), [], [-1.0], ["continue"]),
+        (Json(#"{"id":"t","duration":60,"behavior":"continue"}"#), [], [60.0], ["continue"]),
+        (Json(#"{"id":"t","duration":60,"behavior":"restart"}"#), [], [60.0], ["restart"]),
+        (Json(#"{"id":"t","duration":60,"behavior":"persisted"}"#), [], [60.0], ["persisted"]),
+        (Json(#"{"id":"t","duration":60,"behavior":"custom"}"#), [], [60.0], ["custom"]),
+        (Json(#"{"id":"t","endAt":2000000000000,"duration":60}"#), [2000000000.0], [], []),
+        (Json(#"{"id":"t","endAt":2000000000000,"behavior":"persisted"}"#), [2000000000.0], [], []),
+        (Json(#"{"id":"t","endAt":2000000000000,"duration":60,"behavior":"restart"}"#), [2000000000.0], [], []),
+        (Json(#"{"id":"t","endAt":2000000000000,"duration":null}"#), [2000000000.0], [], []),
+        (Json(#"{"id":"t","endAt":2000000000000,"behavior":null}"#), [2000000000.0], [], []),
+        (Json(#"{"id":"t","endAt":"bad","duration":60}"#), [], [], []),
+        (Json(#"{"id":"t","endAt":null,"duration":60}"#), [], [], []),
+        (Json(#"{"id":"t","endAt":"bad"}"#), [], [], []),
+        (Json(#"{"id":"t","endAt":null}"#), [], [], []),
+        (Json(#"{"id":"t","endAt":true}"#), [0.001], [], []),
+        (Json(#"{"id":"t","duration":true}"#), [], [1.0], ["continue"]),
+        (Json(#"{"id":"t","duration":"60"}"#), [], [], []),
+        (Json(#"{"id":"t","duration":null}"#), [], [], []),
+        (Json(#"{"id":"t"}"#), [], [], []),
+        (Json(#"{"id":"t","behavior":"restart"}"#), [], [], []),
+        (Json(#"{"id":"t","duration":60,"behavior":"other"}"#), [], [60.0], ["continue"]),
+        (Json(#"{"id":"t","duration":60,"behavior":null}"#), [], [60.0], ["continue"]),
+        (Json(#"{"id":"t","duration":60,"behavior":1}"#), [], [60.0], ["continue"]),
+    ]
+
+    @Test(
+        "Timer parameters prefer endAt and default invalid behavior to continue",
+        arguments: SDKActionDispatchTests.timerCases
+    )
     func timerParameters(params: Json, expectedEndDates: [Double], expectedDurations: [Double], expectedBehaviors: [String]) throws {
         for useJavaScript in [false, true] {
             let handler = ActionHandler()

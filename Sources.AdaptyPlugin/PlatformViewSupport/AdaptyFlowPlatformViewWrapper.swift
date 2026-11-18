@@ -33,6 +33,7 @@
 
             super.init(frame: .zero)
 
+            AdaptyUI.Plugin.registerPlatformView(configuration: configuration, id: viewId)
             layout()
         }
 

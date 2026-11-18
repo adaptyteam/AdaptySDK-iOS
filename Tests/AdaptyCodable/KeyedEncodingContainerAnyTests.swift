@@ -102,7 +102,9 @@ extension AdaptyCodableTests {
                 "ns_int": Int.min,
                 "ns_uint": UInt.max,
                 "ns_double": 123.45,
+                "ns_null": NSNull(),
                 "ns_string": "ns_string",
+                "empty": NSNull(),
             ]))
         }
 
@@ -118,6 +120,8 @@ extension AdaptyCodableTests {
                     1,
                     "two",
                     ["flag": true],
+                    NSNull(),
+                    NSNull(),
                     true,
                     Int.min,
                     UInt.max,
@@ -127,8 +131,97 @@ extension AdaptyCodableTests {
                 ],
                 "dictionary": [
                     "name": "value",
+                    "missing": NSNull(),
                 ],
             ]))
+        }
+
+        private struct RoundTripFixture: Codable {
+            let value: [String: any Sendable]
+
+            init(from decoder: any Decoder) throws {
+                value = try decoder.container(keyedBy: AnyCodingKey.self).decodeDictionary()
+            }
+
+            func encode(to encoder: any Encoder) throws {
+                var container = encoder.container(keyedBy: AnyCodingKey.self)
+                try container.encodeDictionary(value)
+            }
+        }
+
+        @Test("decodeDictionary then encodeDictionary preserves nulls in dictionaries and arrays")
+        func decodeEncodeRoundTrip() throws {
+            let json = Json(##"""
+            {
+              "null": null,
+              "array": [123, null, "333"],
+              "nested": {"null": null, "items": [null, {"null": null}, [null]]}
+            }
+            """##)
+            let fixture = try json.decode(RoundTripFixture.self)
+
+            #expect(try Json.encode(fixture) == json)
+        }
+
+        private struct OmittingNullsFixture: Encodable {
+            func encode(to encoder: any Encoder) throws {
+                var container = encoder.container(keyedBy: AnyCodingKey.self)
+                try container.encodeDictionary(
+                    [
+                        "ns_null": NSNull(),
+                        "none": String?.none as Any,
+                        "value": 1,
+                        "array": [NSNull(), Int?.none as Any, 1, ["ns_null": NSNull(), "none": String?.none as Any]],
+                        "nested": ["ns_null": NSNull(), "none": String?.none as Any],
+                    ],
+                    omittingNullValues: true
+                )
+            }
+        }
+
+        @Test("Omitting nulls drops NSNull and Optional.none dictionary entries but keeps array elements as null")
+        func encodeOmittingNullValues() throws {
+            #expect(try Json.encode(OmittingNullsFixture()) == Json(##"""
+            {
+              "value": 1,
+              "array": [null, null, 1, {}],
+              "nested": {}
+            }
+            """##))
+        }
+
+        private struct NonFiniteFixture: Encodable {
+            let skipNonEncodableValues: Bool
+
+            func encode(to encoder: any Encoder) throws {
+                var container = encoder.container(keyedBy: AnyCodingKey.self)
+                try container.encodeDictionary(
+                    [
+                        "value": 1.5,
+                        "nan": Double.nan,
+                        "inf": Double.infinity,
+                        "float_inf": -Float.infinity,
+                        "ns_nan": NSNumber(value: Double.nan),
+                        "array": [1, Double.nan, NSNumber(value: -Double.infinity), "x"] as [Any],
+                        "nested": ["nan": Double.nan, "value": 2] as [String: Any],
+                    ],
+                    skipNonEncodableValues: skipNonEncodableValues
+                )
+            }
+        }
+
+        @Test("NaN and Infinity follow the non encodable rules: skipped key, null array element, or error")
+        func encodeNonFiniteNumbers() throws {
+            #expect(try Json.encode(NonFiniteFixture(skipNonEncodableValues: true)) == Json(##"""
+            {
+              "value": 1.5,
+              "array": [1, null, null, "x"],
+              "nested": {"value": 2}
+            }
+            """##))
+            #expect(throws: EncodingError.self) {
+                _ = try Json.encode(NonFiniteFixture(skipNonEncodableValues: false))
+            }
         }
 
         @Test("encode helpers throw for unsupported non encodable values")

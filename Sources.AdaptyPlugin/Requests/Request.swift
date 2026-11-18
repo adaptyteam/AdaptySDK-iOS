@@ -65,6 +65,7 @@ enum Request {
             AdaptyUIDestroyFlowView.self,
             AdaptyUIDismissFlowView.self,
             AdaptyUIPresentFlowView.self,
+            AdaptyUISendAppMessage.self,
 
             AdaptyUICreateOnboardingView.self,
             AdaptyUIDismissOnboardingView.self,
