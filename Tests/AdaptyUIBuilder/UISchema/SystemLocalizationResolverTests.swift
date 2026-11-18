@@ -34,7 +34,6 @@ struct SystemLocalizationResolverTests {
         ) == expected)
     }
 
-
     @Test("Backend examples from the specification", arguments: [
         (for: "pt-BR", from: ["en", "pt"], default: "en", result: "pt", backendResult: "pt"),
         (for: "pt_BR", from: ["en", "pt-br"], default: "en", result: "pt-br", backendResult: "pt-br"),

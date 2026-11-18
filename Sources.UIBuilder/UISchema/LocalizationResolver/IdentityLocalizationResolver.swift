@@ -8,7 +8,7 @@
 import Foundation
 
 struct IdentityLocalizationResolver: AdaptyUILocalizationResolver {
-    func resolve(for locales: [String], from source: AdaptyUILocalizationSource) -> String? {
-        return locales.first
+    func resolve(for locales: [String], from _: AdaptyUILocalizationSource) -> String? {
+        locales.first
     }
 }

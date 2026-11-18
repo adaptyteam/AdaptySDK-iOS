@@ -2065,12 +2065,13 @@ $defs:
 
   AdaptyUI.LocalizationStrategy: #request
     type: string
-    enum:
-      - default
-      - system
-      - legacy
-      - identity
-    description: "unknown values are treated as default"
+    minLength: 1
+    oneOf:
+      - enum: [default, system, legacy, identity]
+        description: "built-in resolver"
+      # reserved, not supported yet (rejected as a decoding error):
+      # - not: { enum: [default, system, legacy, identity] }
+      #   description: "id of a custom resolver implemented by the host"
 
   AdaptyUI.CustomTagsValues: #request
     type: object

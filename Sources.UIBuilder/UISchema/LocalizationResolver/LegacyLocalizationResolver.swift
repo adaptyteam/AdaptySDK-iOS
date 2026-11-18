@@ -31,7 +31,9 @@ struct LegacyLocalizationResolver: AdaptyUILocalizationResolver {
                 var key = replaceUnderscores
                     ? original.replacingOccurrences(of: "_", with: "-")
                     : original
-                if ignoresCase { key = key.lowercased() }
+                if ignoresCase {
+                    key = key.lowercased()
+                }
                 return (key, original)
             },
             uniquingKeysWith: { first, _ in first }
