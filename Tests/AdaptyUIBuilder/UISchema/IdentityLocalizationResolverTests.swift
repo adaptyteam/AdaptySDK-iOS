@@ -15,7 +15,7 @@ struct IdentityLocalizationResolverTests {
     ] as [(for: String, from: [String], default: String?)])
     func resolve(locale: String, locales: [String], defaultLocale: String?) {
         #expect(IdentityLocalizationResolver().resolve(
-            for: locale,
+            for: [locale],
             from: .init(locales: locales, defaultLocale: defaultLocale)
         ) == locale)
     }

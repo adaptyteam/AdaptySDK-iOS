@@ -290,6 +290,7 @@ public extension AdaptyUI {
     ///
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
+    ///   - preferredLocales: locale identifiers in order of preference. The best matching flow localization is used.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exeeds.
     ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products. Products that don't exactly match this flow's products are ignored and fetched anew.
     ///   - observerModeResolver: if you are going to use AdaptyUI in Observer Mode, pass the resolver function here.
@@ -298,7 +299,8 @@ public extension AdaptyUI {
     /// - Returns: an ``AdaptyPaywallConfiguration`` object.
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
-        locale: String? = nil,
+        preferredLocales: [String] = [],
+        localizationStrategy: AdaptyUILocalizationStrategy = .default,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
@@ -312,7 +314,8 @@ public extension AdaptyUI {
         try await getFlowConfiguration(
             forFlow: flow,
             device: .current,
-            locale: locale,
+            preferredLocales: preferredLocales,
+            localizationStrategy: localizationStrategy,
             customLayoutId: customLayoutId,
             loadTimeout: loadTimeout,
             products: products,
@@ -328,7 +331,8 @@ public extension AdaptyUI {
     package static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         device: Adapty.DeviceInfo,
-        locale: String? = nil,
+        preferredLocales: [String] = [],
+        localizationStrategy: AdaptyUILocalizationStrategy = .default,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
@@ -361,7 +365,8 @@ public extension AdaptyUI {
             flow: flow,
             device: device,
             customLayoutId: customLayoutId,
-            locale: locale,
+            preferredLocales: preferredLocales,
+            localizationStrategy: localizationStrategy,
             loadTimeout: loadTimeout
         )
 

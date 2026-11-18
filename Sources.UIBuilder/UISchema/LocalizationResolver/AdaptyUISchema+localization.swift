@@ -7,6 +7,24 @@
 
 import Foundation
 
+package extension AdaptyUISchema {
+    func preferredLocalizations(forPreferences: [LocaleId], strategy: AdaptyUILocalizationStrategy) async -> LocaleId? {
+         let resolver = switch strategy {
+         case .default where formatVersion.isLegacyVersion: LegacyLocalizationResolver()
+         case .default,
+              .system: SystemLocalizationResolver()
+         case .legacy: LegacyLocalizationResolver()
+         case .identity: IdentityLocalizationResolver()
+         case let .custom(resolver): resolver
+         }
+
+        return await resolver.resolve(
+            for: forPreferences,
+            from: .init(locales: allLocalIds, defaultLocale: defaultLocalId)
+        )
+    }
+}
+
 extension AdaptyUISchema {
     func localization(by localeId: LocaleId) -> Localization? {
         if let value = localizations[localeId] {

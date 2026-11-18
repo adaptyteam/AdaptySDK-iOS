@@ -6,22 +6,19 @@
 //
 
 
-public struct AdaptyUILocalizationSource {
+public struct AdaptyUILocalizationSource: Sendable {
     public let locales: [String]
     public let defaultLocale: String?
 }
 
-public protocol  AdaptyUILocalizationResolver {
-    func resolve(for: [String], from: AdaptyUILocalizationSource) -> String?
+public protocol  AdaptyUILocalizationResolver: Sendable {
+    func resolve(for: [String], from: AdaptyUILocalizationSource) async -> String?
 }
 
-
-extension AdaptyUILocalizationResolver {
-    public func resolve(for locale: String, from source: AdaptyUILocalizationSource) -> String? {
-        resolve(for: [locale], from: source)
-    }
-
-    func resolve(for locales: [LocaleId], from schema: AdaptyUISchema) -> LocaleId? {
-        resolve(for: locales, from: .init(locales: schema.allLocalIds, defaultLocale: schema.defaultLocalId))
-    }
+public enum AdaptyUILocalizationStrategy: Sendable {
+    case `default`
+    case legacy
+    case system
+    case identity
+    case custom(AdaptyUILocalizationResolver)
 }

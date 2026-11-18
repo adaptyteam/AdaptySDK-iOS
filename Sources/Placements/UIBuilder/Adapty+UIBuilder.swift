@@ -16,7 +16,8 @@ extension Adapty {
         flow: AdaptyFlow,
         device: DeviceInfo,
         customLayoutId: String?,
-        locale: String?,
+        preferredLocales: [String],
+        localizationStrategy: AdaptyUILocalizationStrategy,
         loadTimeout: TimeInterval? = nil
     ) async throws -> (flowLayout: AdaptyFlow.Layout, configuration: AdaptyUIConfiguration) {
         let loadTimeout = (loadTimeout.map(AdaptyDuration.seconds) ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
@@ -24,7 +25,8 @@ extension Adapty {
             flow: flow,
             device: device,
             customLayoutId: customLayoutId,
-            locale: locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale,
+            preferredLocales: preferredLocales.compactMap { $0.trimmed.nonEmptyOrNil },
+            localizationStrategy: localizationStrategy,
             loadTimeout: loadTimeout
         )
     }
@@ -33,7 +35,8 @@ extension Adapty {
         flow: AdaptyFlow,
         device: DeviceInfo,
         customLayoutId: String?,
-        locale: AdaptyLocale,
+        preferredLocales: [String],
+        localizationStrategy: AdaptyUILocalizationStrategy,
         loadTimeout: AdaptyDuration
     ) async throws(AdaptyError) -> (flowLayout: AdaptyFlow.Layout, configuration: AdaptyUIConfiguration) {
         guard
@@ -47,6 +50,11 @@ extension Adapty {
             loadTimeout: loadTimeout,
             decodingConfiguration: .init(device: device.kind)
         )
+
+        let locale = await schema.preferredLocalizations(
+            forPreferences: preferredLocales,
+            strategy: localizationStrategy
+        ).map { AdaptyLocale($0) } ?? .defaultPlacementLocale
 
         AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: locale.id)
 

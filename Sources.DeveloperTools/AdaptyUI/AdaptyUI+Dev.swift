@@ -49,7 +49,7 @@ public extension AdaptyUI {
         )
     }
 
-    /// Developer-only variant of `getFlowConfiguration(forFlow:locale:...)` that overrides the
+    /// Developer-only variant of `getFlowConfiguration(forFlow:preferredLocales:...)` that overrides the
     /// device descriptor sent to the backend, so the backend selects the layout for the given
     /// device kind + resolution instead of the physical device's. Rendering still happens on the
     /// real screen.
@@ -57,7 +57,8 @@ public extension AdaptyUI {
     static func dev_getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         deviceOverride: Dev_DeviceOverride?,
-        locale: String? = nil,
+        preferredLocales: [String] = [],
+        localizationStrategy: AdaptyUILocalizationStrategy = .default,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
@@ -80,7 +81,8 @@ public extension AdaptyUI {
         return try await getFlowConfiguration(
             forFlow: flow,
             device: device,
-            locale: locale,
+            preferredLocales: preferredLocales,
+            localizationStrategy: localizationStrategy,
             customLayoutId: customLayoutId,
             loadTimeout: loadTimeout,
             products: products,

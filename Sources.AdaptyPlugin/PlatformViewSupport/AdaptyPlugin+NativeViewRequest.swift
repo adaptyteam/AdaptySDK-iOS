@@ -37,7 +37,8 @@ public extension AdaptyPlugin {
 
         let configuration = try await AdaptyUI.getFlowConfiguration(
             forFlow: request.flow,
-            locale: request.locale,
+            preferredLocales: request.preferredLocales,
+            localizationStrategy: request.localizationStrategy,
             customLayoutId: request.customLayoutId,
             loadTimeout: request.loadTimeout,
             observerModeResolver: observerModeResolver,

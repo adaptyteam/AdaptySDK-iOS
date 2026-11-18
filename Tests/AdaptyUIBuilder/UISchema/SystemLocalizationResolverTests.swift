@@ -29,7 +29,7 @@ struct SystemLocalizationResolverTests {
     ] as [(for: String, from: [String], default: String?, result: String?)])
     func resolve(locale: String, locales: [String], defaultLocale: String?, expected: String?) {
         #expect(SystemLocalizationResolver().resolve(
-            for: locale,
+            for: [locale],
             from: .init(locales: locales, defaultLocale: defaultLocale)
         ) == expected)
     }
@@ -79,7 +79,7 @@ struct SystemLocalizationResolverTests {
     func backendExamples(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?, backendResult: LocaleId?) {
         let isSameResult = expected == backendResult
         #expect(SystemLocalizationResolver().resolve(
-            for: locale,
+            for: [locale],
             from: .init(locales: locales, defaultLocale: defaultLocale)
         ) == expected)
     }

@@ -27,7 +27,7 @@ struct FlowRenderingUnsupportedTests {
     @Test(
         "flow view requests report platformNotSupported where flows are not rendered",
         arguments: [
-            #"{"method": "adapty_ui_create_flow_view", "flow": {"placement": {"developer_id": "placement", "audience_name": "audience", "revision": 1, "ab_test_name": "test", "placement_audience_version_id": "version"}, "flow_id": "flow", "flow_name": "flow", "variation_id": "variation", "variations": []}}"#,
+            #"{"method": "adapty_ui_create_flow_view", "flow": {"placement": {"developer_id": "placement", "audience_name": "audience", "revision": 1, "ab_test_name": "test", "placement_audience_version_id": "version"}, "flow_id": "flow", "flow_name": "flow", "variation_id": "variation", "variations": []}, "preferred_locales": [], "localization_strategy": "default"}"#,
             #"{"method": "adapty_ui_present_flow_view", "id": "view"}"#,
             #"{"method": "adapty_ui_dismiss_flow_view", "id": "view", "destroy": true}"#,
             #"{"method": "adapty_ui_destroy_flow_view", "id": "view"}"#,
