@@ -12,8 +12,8 @@ import SwiftUI
 /// The viewport takes the width the parent proposes. Its height depends on how
 /// the page height is given:
 /// - a page height of its own — a fixed `page_height`, or `{parent: x}` with
-///   `x ≠ 1` under a proposed height — makes the viewport take the proposed height,
-///   or the fixed one where none is proposed, and every page gets exactly that;
+///   `x ≠ 1` under a proposed height — is the height of the viewport, and every
+///   page gets it less the page padding;
 /// - otherwise the pages are measured with the parent's proposal, less the page
 ///   padding, and the viewport is as tall as the tallest of them. A page that
 ///   fills takes the proposed height, a page sized by its content keeps it, and
@@ -122,10 +122,10 @@ struct AdaptyUIPagerLayout: Layout {
         switch pager.pageHeight {
         case let .fixed(unit):
             let fixed = unit.points(screenSize: screenSize.height, safeAreaStart: safeArea.top, safeAreaEnd: safeArea.bottom)
-            return result(proposedHeight ?? fixed, exact: fixed - vertical, pageProposal: nil)
+            return result(fixed, exact: fixed - vertical, pageProposal: nil)
         case let .parent(fraction) where fraction != 1:
             if let proposedHeight {
-                return result(proposedHeight, exact: proposedHeight * fraction - vertical, pageProposal: nil)
+                return result(proposedHeight * fraction, exact: proposedHeight * fraction - vertical, pageProposal: nil)
             }
             fallthrough
         default:
