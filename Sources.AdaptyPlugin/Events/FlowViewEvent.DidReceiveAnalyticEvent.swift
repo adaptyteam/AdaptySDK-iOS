@@ -26,7 +26,7 @@ extension FlowViewEvent {
             try container.encode(id, forKey: .id)
             try container.encode(view, forKey: .view)
             try container.encode(name, forKey: .name)
-            try container.encodeDictionary(params, skipNonEncodableValues: true, forKey: .params)
+            try container.encodeDictionary(params, omittingNullValues: true, skipNonEncodableValues: true, forKey: .params)
         }
     }
 }

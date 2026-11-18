@@ -60,6 +60,7 @@ final class AdaptyAttributionManager {
             let installInfo = await Environment.InstallInfo(
                 installTime: installTime,
                 appLaunchCount: appLaunchCount,
+                attributionEnabled: storage.onInstallAdaptyAttributionEnabled,
                 includedAnalyticIds: true
             )
 
@@ -106,7 +107,13 @@ final class AdaptyAttributionManager {
 @AdaptyActor
 extension AdaptyAttributionManager {
     static var shared: AdaptyAttributionManager?
-    static func activate(_ sdk: Adapty) {
+    static func activate(_ sdk: Adapty, enabled: Bool) {
+
+        if Environment.Application.appLaunchCount == 1 {
+            AdaptyAttributionStorage.setOnInstallAdaptyAttributionEnabled(enabled)
+        }
+
+        guard enabled else { return }
         shared = .init(sdk)
     }
 }

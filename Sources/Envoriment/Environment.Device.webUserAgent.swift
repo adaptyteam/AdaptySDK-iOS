@@ -15,23 +15,27 @@ private let log = Log.default
 
 extension Environment.Device {
     @AdaptyActor
-    private static var _userAgent: String??
+    private static var userAgentTask: Task<String?, Never>?
 
     @AdaptyActor
     static var webUserAgent: String? {
         get async {
-            if let result = _userAgent {
-                return result
+            // A single task is shared by all callers, so a caller that enters
+            // the actor while the first one is suspended doesn't create another web view.
+            if let task = userAgentTask {
+                return await task.value
             }
 
-            #if canImport(WebKit)
-            let result = await WKWebView().value(forKey: "userAgent").flatMap { $0 as? String }
-            #else
-            let result = nil
-            #endif
-
-            _userAgent = .some(result)
-            return result
+            let task = Task<String?, Never> { @MainActor in
+                #if canImport(WebKit)
+                // WKWebView is main-thread only: it is created, read and released on the main actor.
+                WKWebView().value(forKey: "userAgent") as? String
+                #else
+                nil
+                #endif
+            }
+            userAgentTask = task
+            return await task.value
         }
     }
 }

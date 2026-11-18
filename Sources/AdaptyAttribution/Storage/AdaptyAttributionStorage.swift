@@ -13,12 +13,21 @@ private let log = Log.storage
 final class AdaptyAttributionStorage {
     private enum Constants {
         static let version = "AdaptySDK_User_Acquisition_Version"
+        static let onInstallAdaptyAttributionEnabled = "AdaptySDK_OnInstallAdaptyAttributionEnabled"
         static let registrationInstallSaved = "AdaptySDK_User_Acquisition_saved"
         static let registrationInstallId = "AdaptySDK_User_Acquisition_install_id"
         static let registrationInstallPayload = "AdaptySDK_User_Acquisition_install_payload"
     }
 
     private static let userDefaults = Storage.userDefaults
+
+    private static var onInstallAdaptyAttributionEnabled: Bool? {
+        userDefaults.object(forKey: Constants.onInstallAdaptyAttributionEnabled) as? Bool
+    }
+
+    static func setOnInstallAdaptyAttributionEnabled(_ value: Bool) {
+        userDefaults.set(value, forKey: Constants.onInstallAdaptyAttributionEnabled)
+    }
 
     private static var version: Int = {
         let version = userDefaults.integer(forKey: Constants.version)
@@ -64,11 +73,16 @@ final class AdaptyAttributionStorage {
         userDefaults.removeObject(forKey: Constants.registrationInstallSaved)
         userDefaults.removeObject(forKey: Constants.registrationInstallId)
         userDefaults.removeObject(forKey: Constants.registrationInstallPayload)
+        userDefaults.removeObject(forKey: Constants.onInstallAdaptyAttributionEnabled)
     }
 }
 
 @AdaptyActor
 extension AdaptyAttributionStorage {
+    var onInstallAdaptyAttributionEnabled: Bool? {
+        Self.onInstallAdaptyAttributionEnabled
+    }
+
     var version: Int {
         Self.version
     }

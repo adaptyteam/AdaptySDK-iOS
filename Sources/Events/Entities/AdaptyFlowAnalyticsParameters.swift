@@ -73,7 +73,7 @@ extension VS.AnalyticEvent: AdaptyFlowAnalyticsPayload {
 
     package func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: AnyCodingKey.self)
-        try container.encodeDictionary(params())
+        try container.encodeDictionary(params(), omittingNullValues: true, skipNonEncodableValues: true)
 
         try container.encode(name, forKey: .init(CodingKeys.name))
         try container.encodeIfPresent(screenInstanceId, forKey: .init(CodingKeys.screenInstanceId))

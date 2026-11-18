@@ -230,7 +230,8 @@ struct AdaptyUIHeroContainerView: View {
             .padding(properties?.padding)
             .padding(.bottom, offsetY - bottomOverscrollHeight)
             .onAppear {
-                consumeAndProcessPendingEvents(properties: properties)
+                // Arming path: replay only sticky lifecycle events.
+                consumeAndProcessPendingEvents(properties: properties, includeCustom: false)
             }
             .onChange(of: eventBus.revision) { _ in
                 consumeAndProcessPendingEvents(properties: properties)
@@ -240,15 +241,18 @@ struct AdaptyUIHeroContainerView: View {
         }
     }
 
-    private func consumeAndProcessPendingEvents(properties: VC.Element.Properties?) {
+    private func consumeAndProcessPendingEvents(
+        properties: VC.Element.Properties?,
+        includeCustom: Bool = true
+    ) {
         guard let properties, properties.eventHandlers.isNotEmpty else { return }
 
         let pending = eventBus.consumePending(
             afterSequence: lastProcessedSequence,
             screenInstanceId: screenInstanceId,
-            currentTopScreenInstanceId: navigatorViewModel.currentScreenInstanceIfSingle?.id
+            currentTopScreenInstanceId: navigatorViewModel.currentScreenInstanceIfSingle?.id,
+            includeCustom: includeCustom
         )
-        guard !pending.isEmpty else { return }
 
         for event in pending {
             let combinedAnimations = properties.eventHandlers
@@ -256,6 +260,7 @@ struct AdaptyUIHeroContainerView: View {
                 .flatMap(\.animations)
 
             guard !combinedAnimations.isEmpty else { continue }
+            Log.ui.verbose("#EventBus# fire \(event.eventId) seq=\(event.sequence) hero")
 
             if playOnAppearAnimations == combinedAnimations {
                 playOnAppearAnimations = []
@@ -267,7 +272,12 @@ struct AdaptyUIHeroContainerView: View {
             }
         }
 
-        lastProcessedSequence = pending.last!.sequence
+        if !includeCustom {
+            // Arming: skip custom events published before this view mounted.
+            lastProcessedSequence = eventBus.lastSequence
+        } else if let last = pending.last {
+            lastProcessedSequence = last.sequence
+        }
     }
 
     @ViewBuilder

@@ -215,6 +215,25 @@ package extension AdaptyUI {
 #endif
         }
         
+        package static func sendAppMessage(
+            viewId: String,
+            payload: [String: any Sendable]
+        ) throws {
+#if canImport(UIKit)
+            guard isFlowRenderingSupported, #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) else {
+                throw AdaptyUIError.platformNotSupported
+            }
+
+            guard let configuration = flowConfiguration(viewId) else {
+                throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
+            }
+
+            configuration.sendAppMessage(payload)
+#else
+            throw AdaptyUIError.platformNotSupported
+#endif
+        }
+
         package static func showDialog(
             viewId: String,
             configuration: AdaptyUI.DialogConfiguration
@@ -266,6 +285,25 @@ extension AdaptyUI.Plugin {
 
     private static func cachedPaywallController(_ id: String) -> AdaptyFlowController? {
         paywallControllers[id]
+    }
+
+    private final class WeakFlowConfiguration {
+        weak var value: AdaptyUI.FlowConfiguration?
+        init(_ value: AdaptyUI.FlowConfiguration) { self.value = value }
+    }
+
+    /// Flows embedded as platform views, by the view id the host assigned.
+    /// Held weakly: the host owns the view and drops it without telling the plugin.
+    private static var platformViewConfigurations = [String: WeakFlowConfiguration]()
+
+    package static func registerPlatformView(configuration: AdaptyUI.FlowConfiguration, id: String) {
+        platformViewConfigurations = platformViewConfigurations.filter { $0.value.value != nil }
+        platformViewConfigurations[id] = WeakFlowConfiguration(configuration)
+    }
+
+    /// A flow configuration behind a view id: a presented view first, then an embedded one.
+    private static func flowConfiguration(_ id: String) -> AdaptyUI.FlowConfiguration? {
+        cachedPaywallController(id)?.configuration ?? platformViewConfigurations[id]?.value
     }
 }
 
