@@ -134,25 +134,26 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
     @ViewBuilder
     private func viewportWithPageControl(onPageDotTap: @escaping (Int) -> Void) -> some View {
         if let pageControl = pager.pageControl {
-            switch pageControl.layout {
-            case .overlaid:
+            // A stacked page control has no strip to sit in at the centre, so it
+            // overlays the pages there, as the Android SDK draws it.
+            switch (pageControl.layout, pageControl.verticalAlignment) {
+            case (.overlaid, _), (.stacked, .center):
                 ZStack(alignment: pageControl.verticalAlignment.swiftUIAlignment) {
                     pagerView
                     pageControlView(pageControl, onDotTap: onPageDotTap)
                         .padding(pageControl.padding)
                 }
-            case .stacked:
+            case (.stacked, .top):
                 VStack(spacing: 0.0) {
-                    switch pageControl.verticalAlignment {
-                    case .top:
-                        pageControlView(pageControl, onDotTap: onPageDotTap)
-                            .padding(pageControl.padding)
-                        pagerView
-                    default:
-                        pagerView
-                        pageControlView(pageControl, onDotTap: onPageDotTap)
-                            .padding(pageControl.padding)
-                    }
+                    pageControlView(pageControl, onDotTap: onPageDotTap)
+                        .padding(pageControl.padding)
+                    pagerView
+                }
+            case (.stacked, .bottom):
+                VStack(spacing: 0.0) {
+                    pagerView
+                    pageControlView(pageControl, onDotTap: onPageDotTap)
+                        .padding(pageControl.padding)
                 }
             }
         } else {
