@@ -1,13 +1,13 @@
 //
-//  LegacyLocaleTests.swift
+//  LegacyLocalizationResolverTests.swift
 //  AdaptyTests
 //
 
 @testable import AdaptyUIBuilder
 import Testing
 
-@Suite("Legacy locale selection", .tags(.logic))
-struct LegacyLocaleTests {
+@Suite("Legacy localization resolver", .tags(.logic))
+struct LegacyLocalizationResolverTests {
     @Test("Matches the legacy selection algorithm", arguments: [
         (for: "ZH_Hant_TW", from: ["zh", "zh-hant", "zh-hant-tw"], default: nil, result: "zh-hant-tw"),
         (for: "ZH_Hant_TW", from: ["zh", "zh-hant"], default: nil, result: "zh-hant"),
@@ -33,10 +33,9 @@ struct LegacyLocaleTests {
         (for: "", from: [""], default: "fr", result: "fr"),
     ] as [(for: LocaleId, from: [LocaleId], default: LocaleId?, result: LocaleId?)])
     func select(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?) {
-        #expect(LegacyLocale.select(
+        #expect(LegacyLocalizationResolver().resolve(
             for: locale,
-            from: locales,
-            default: defaultLocale
+            from: .init(locales: locales, defaultLocale: defaultLocale)
         ) == expected)
     }
 
@@ -82,10 +81,9 @@ struct LegacyLocaleTests {
         (for: "pt-BR", from: ["en", "pt-br", "pt-br"], default: "en", result: "pt-br"),
     ] as [(for: LocaleId, from: [LocaleId], default: LocaleId?, result: LocaleId?)])
     func backendExamples(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?) {
-        #expect(LegacyLocale.select(
+        #expect(LegacyLocalizationResolver().resolve(
             for: locale,
-            from: locales,
-            default: defaultLocale
+            from: .init(locales: locales, defaultLocale: defaultLocale)
         ) == expected)
     }
 }
