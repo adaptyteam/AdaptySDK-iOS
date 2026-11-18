@@ -30,7 +30,7 @@ extension AdaptyUI.Action: Encodable {
         case .custom(let id, let arguments):
             try container.encode("custom", forKey: .type)
             try container.encode(id, forKey: .value)
-            try container.encodeDictionaryIfPresent(arguments, skipNonEncodableValues: true, forKey: .arguments)
+            try container.encodeDictionaryIfPresent(arguments, omittingNullValues: true, skipNonEncodableValues: true, forKey: .arguments)
         }
     }
 
