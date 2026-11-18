@@ -12,12 +12,16 @@ public struct AdaptyUILocalizationSource {
 }
 
 public protocol  AdaptyUILocalizationResolver {
-    func resolve(for locale: String, from source: AdaptyUILocalizationSource) -> String?
+    func resolve(for: [String], from: AdaptyUILocalizationSource) -> String?
 }
 
 
 extension AdaptyUILocalizationResolver {
-    func resolve(for locale: LocaleId, from schema: AdaptyUISchema) -> LocaleId? {
-        resolve(for: locale, from: .init(locales: schema.allLocalIds, defaultLocale: schema.defaultLocalId))
+    public func resolve(for locale: String, from source: AdaptyUILocalizationSource) -> String? {
+        resolve(for: [locale], from: source)
+    }
+
+    func resolve(for locales: [LocaleId], from schema: AdaptyUISchema) -> LocaleId? {
+        resolve(for: locales, from: .init(locales: schema.allLocalIds, defaultLocale: schema.defaultLocalId))
     }
 }

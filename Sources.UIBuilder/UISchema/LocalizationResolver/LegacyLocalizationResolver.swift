@@ -16,6 +16,11 @@ struct LegacyLocalizationResolver: AdaptyUILocalizationResolver {
         self.replaceUnderscores = replaceUnderscores
     }
 
+    func resolve(for locales: [String], from source: AdaptyUILocalizationSource) -> String? {
+        guard let locale = locales.first else { return source.defaultLocale }
+        return resolve(for: locale, from: source)
+    }
+
     func resolve(for locale: String, from source: AdaptyUILocalizationSource) -> String? {
         var parts = locale.replacingOccurrences(of: "_", with: "-")
             .lowercased()

@@ -19,4 +19,15 @@ struct IdentityLocalizationResolverTests {
             from: .init(locales: locales, defaultLocale: defaultLocale)
         ) == locale)
     }
+
+    @Test("Returns the first preference", arguments: [
+        (for: ["de", "fr"], from: ["en"], default: "en", result: "de"),
+        (for: [], from: ["en"], default: "en", result: nil),
+    ] as [(for: [String], from: [String], default: String?, result: String?)])
+    func preferences(locales: [String], available: [String], defaultLocale: String?, expected: String?) {
+        #expect(IdentityLocalizationResolver().resolve(
+            for: locales,
+            from: .init(locales: available, defaultLocale: defaultLocale)
+        ) == expected)
+    }
 }

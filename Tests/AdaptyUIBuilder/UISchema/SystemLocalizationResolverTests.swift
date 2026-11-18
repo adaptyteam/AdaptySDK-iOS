@@ -83,4 +83,19 @@ struct SystemLocalizationResolverTests {
             from: .init(locales: locales, defaultLocale: defaultLocale)
         ) == expected)
     }
+
+    @Test("Picks the first matching preference", arguments: [
+        (for: ["de", "fr"], from: ["en", "fr"], default: "en", result: "fr"),
+        (for: ["fr", "en"], from: ["en", "fr"], default: "en", result: "fr"),
+        (for: ["de", "en-GB"], from: ["fr", "en"], default: "fr", result: "en"),
+        (for: ["de", "it"], from: ["en", "fr"], default: "fr", result: "fr"),
+        (for: [], from: ["en", "fr"], default: "fr", result: "fr"),
+        (for: [], from: ["en", "fr"], default: nil, result: nil),
+    ] as [(for: [String], from: [String], default: String?, result: String?)])
+    func preferences(locales: [String], available: [String], defaultLocale: String?, expected: String?) {
+        #expect(SystemLocalizationResolver().resolve(
+            for: locales,
+            from: .init(locales: available, defaultLocale: defaultLocale)
+        ) == expected)
+    }
 }

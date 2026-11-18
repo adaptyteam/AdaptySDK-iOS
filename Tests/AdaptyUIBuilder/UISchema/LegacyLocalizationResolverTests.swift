@@ -86,4 +86,17 @@ struct LegacyLocalizationResolverTests {
             from: .init(locales: locales, defaultLocale: defaultLocale)
         ) == expected)
     }
+
+    @Test("Uses only the first preference", arguments: [
+        (for: ["fr", "en"], from: ["en", "fr"], default: "en", result: "fr"),
+        (for: ["de", "fr"], from: ["en", "fr"], default: "en", result: "en"),
+        (for: [], from: ["en", "fr"], default: "fr", result: "fr"),
+        (for: [], from: ["en", "fr"], default: nil, result: nil),
+    ] as [(for: [String], from: [String], default: String?, result: String?)])
+    func preferences(locales: [String], available: [String], defaultLocale: String?, expected: String?) {
+        #expect(LegacyLocalizationResolver().resolve(
+            for: locales,
+            from: .init(locales: available, defaultLocale: defaultLocale)
+        ) == expected)
+    }
 }
