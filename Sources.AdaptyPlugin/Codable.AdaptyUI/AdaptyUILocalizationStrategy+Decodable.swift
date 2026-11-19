@@ -13,14 +13,12 @@ extension AdaptyUILocalizationStrategy: Decodable {
         let container = try decoder.singleValueContainer()
         let value = try container.decode(String.self)
         switch value {
-        case "default":
-            self = .default
+        case "auto":
+            self = .auto
         case "system":
             self = .system
         case "legacy":
             self = .legacy
-        case "identity":
-            self = .identity
         case "":
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Localization strategy must not be empty")
         default:

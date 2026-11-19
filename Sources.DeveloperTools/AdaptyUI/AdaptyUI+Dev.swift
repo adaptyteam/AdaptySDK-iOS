@@ -58,7 +58,7 @@ public extension AdaptyUI {
         forFlow flow: AdaptyFlow,
         deviceOverride: Dev_DeviceOverride?,
         preferredLocales: [String] = [],
-        localizationStrategy: AdaptyUILocalizationStrategy = .default,
+        localizationStrategy: AdaptyUILocalizationStrategy = .auto,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,

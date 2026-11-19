@@ -2067,10 +2067,10 @@ $defs:
     type: string
     minLength: 1
     oneOf:
-      - enum: [default, system, legacy, identity]
+      - enum: [auto, system, legacy]
         description: "built-in resolver"
       # reserved, not supported yet (rejected as a decoding error):
-      # - not: { enum: [default, system, legacy, identity] }
+      # - not: { enum: [auto, system, legacy] }
       #   description: "id of a custom resolver implemented by the host"
 
   AdaptyUI.CustomTagsValues: #request

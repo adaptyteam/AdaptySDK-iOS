@@ -15,9 +15,8 @@ public protocol AdaptyUILocalizationResolver: Sendable {
 }
 
 public enum AdaptyUILocalizationStrategy: Sendable {
-    case `default`
+    case auto
     case legacy
     case system
-    case identity
     case custom(AdaptyUILocalizationResolver)
 }

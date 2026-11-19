@@ -10,11 +10,10 @@ import Foundation
 package extension AdaptyUISchema {
     func preferredLocalizations(forPreferences: [LocaleId], strategy: AdaptyUILocalizationStrategy) async -> LocaleId? {
         let resolver = switch strategy {
-        case .default where formatVersion.isLegacyVersion: LegacyLocalizationResolver()
-        case .default,
+        case .auto where formatVersion.isLegacyVersion: LegacyLocalizationResolver()
+        case .auto,
              .system: SystemLocalizationResolver()
         case .legacy: LegacyLocalizationResolver()
-        case .identity: IdentityLocalizationResolver()
         case let .custom(resolver): resolver
         }
 

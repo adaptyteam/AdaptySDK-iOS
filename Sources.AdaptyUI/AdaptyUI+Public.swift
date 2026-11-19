@@ -300,7 +300,7 @@ public extension AdaptyUI {
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         preferredLocales: [String] = [],
-        localizationStrategy: AdaptyUILocalizationStrategy = .default,
+        localizationStrategy: AdaptyUILocalizationStrategy = .auto,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
@@ -332,7 +332,7 @@ public extension AdaptyUI {
         forFlow flow: AdaptyFlow,
         device: Adapty.DeviceInfo,
         preferredLocales: [String] = [],
-        localizationStrategy: AdaptyUILocalizationStrategy = .default,
+        localizationStrategy: AdaptyUILocalizationStrategy = .auto,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
