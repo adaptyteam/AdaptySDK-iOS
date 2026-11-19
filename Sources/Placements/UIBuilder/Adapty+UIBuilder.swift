@@ -25,7 +25,7 @@ extension Adapty {
             flow: flow,
             device: device,
             customLayoutId: customLayoutId,
-            preferredLocales: preferredLocales.compactMap { $0.trimmed.nonEmptyOrNil },
+            preferredLocales: preferredLocales.compactMap(\.trimmed.nonEmptyOrNil),
             localizationStrategy: localizationStrategy,
             loadTimeout: loadTimeout
         )
@@ -51,9 +51,9 @@ extension Adapty {
             decodingConfiguration: .init(device: device.kind)
         )
 
-        let locale = await schema.preferredLocalizations(
-            forPreferences: preferredLocales,
-            strategy: localizationStrategy
+        let locale = await localizationStrategy.resolve(
+            for: preferredLocales,
+            from: schema
         ).map { AdaptyLocale($0) } ?? .defaultPlacementLocale
 
         AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: locale.id)

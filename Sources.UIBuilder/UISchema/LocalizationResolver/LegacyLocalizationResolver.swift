@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LegacyLocalizationResolver: AdaptyUILocalizationResolver {
+struct LegacyLocalizationResolver {
     let ignoresCase: Bool
     let replaceUnderscores: Bool
 

@@ -7,7 +7,7 @@
 
 import AdaptyUIBuilder
 
-struct AdaptyUIPluginLocalizationResolver: AdaptyUILocalizationResolver {
+struct AdaptyUIPluginLocalizationResolver: AdaptyUICustomLocalizationResolver {
     let id: String
 
     func resolve(for locales: [String], from source: AdaptyUILocalizationSource) async -> String? {
@@ -27,10 +27,10 @@ struct AdaptyUIPluginLocalizationResolver: AdaptyUILocalizationResolver {
         // {
         //   "method": "<answer method>",
         //   "event_id": "hr_1",                  // required, string
-        //   "result": "ru"                       // optional, string; null -> SDK falls back to "en"
+        //   "result": "ru"                       // optional, string; null -> the fallback resolver chooses
         // }
         //
-        // Unknown `resolver_id`, an error or a flushed request -> `source.defaultLocale`.
-        source.defaultLocale
+        // Unknown `resolver_id`, an error or a flushed request -> nil (the fallback resolver chooses).
+        nil
     }
 }

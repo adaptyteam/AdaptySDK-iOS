@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SystemLocalizationResolver: AdaptyUILocalizationResolver {
+struct SystemLocalizationResolver {
     func resolve(for locales: [String], from source: AdaptyUILocalizationSource) -> String? {
         let noMatch = "zxx"
         guard !locales.isEmpty,
