@@ -24,12 +24,24 @@ final class HostRequestRegistry {
     }
 
     /// Emits a native→host request and suspends until the host responds (or the registry is flushed).
-    /// Returns `nil` when cancelled/flushed. (Ask-once flavor.)
+    /// With a `timeout` (seconds), a request the host leaves unanswered resolves with `nil`;
+    /// a late answer is then ignored as an unknown id.
+    /// Returns `nil` when cancelled/flushed/timed out. (Ask-once flavor.)
     func perform<Result>(
         _: Result.Type = Result.self,
+        timeout: TimeInterval? = nil,
         emit: (_ eventId: String) -> Void
     ) async -> Result? {
         let eventId = nextEventId()
+        let timeoutTask = timeout.map { timeout in
+            Task { [weak self] in
+                try? await Task.sleep(nanoseconds: UInt64(max(0, timeout) * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+                self?.resolve(eventId: eventId, with: nil)
+            }
+        }
+        defer { timeoutTask?.cancel() }
+
         let raw: (any Sendable)? = await withCheckedContinuation { continuation in
             pending[eventId] = continuation
             emit(eventId)
