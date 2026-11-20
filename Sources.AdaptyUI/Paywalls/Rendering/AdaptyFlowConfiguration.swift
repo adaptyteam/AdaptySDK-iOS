@@ -221,6 +221,12 @@ public extension AdaptyUI {
             stateViewModel.sendAppMessage(arguments)
         }
 
+        /// Same as ``sendAppMessage(_:)``, with the message id chosen by the
+        /// caller: cross-platform SDKs pass the id their wrapper generated.
+        package func sendAppMessage(id: String, _ arguments: [String: any Sendable]) {
+            stateViewModel.sendAppMessage(id: id, arguments)
+        }
+
         /// Resets the transient runtime state so this configuration can be
         /// presented again as a fresh flow. Intended for cross-platform SDKs
         /// that reuse a cached `FlowConfiguration`; otherwise prefer creating
