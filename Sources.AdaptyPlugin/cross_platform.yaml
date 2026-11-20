@@ -36,7 +36,6 @@ $requests:
         {
           type: array,
           items: { $ref: "#/$defs/AdaptyLocale" },
-          description: "locale identifiers in order of preference",
         }
       localization_strategy: { $ref: "#/$defs/AdaptyUI.LocalizationStrategy" }
       custom_layout_id:
@@ -1599,6 +1598,10 @@ $defs:
         type: object
         required: [grids, layouts]
         properties:
+          locales:
+            type: array
+            items: { type: string }
+          default_locale: { type: string }
           layouts:
             type: array
             items:

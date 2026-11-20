@@ -13,7 +13,7 @@ import Foundation
 public extension AdaptyUIBuilder {
     static func getPaywallConfiguration(
         forSchema schema: AdaptyUISchema,
-        localeId: LocaleId?,
+        localeId: LocaleId,
         products: [ProductResolver],
         tagResolver: AdaptyUITagResolver?,
         timerResolver: AdaptyUITimerResolver?,
@@ -53,17 +53,6 @@ public extension AdaptyUIBuilder {
             timerResolver: timerResolver,
             assetsResolver: assetsResolver,
             customElementsResolver: customElementsResolver
-        )
-    }
-}
-
-package extension AdaptyUISchema {
-    @available(*, deprecated,  message: "Don't use optional localeId")
-    func extractUIConfiguration(id: String, withLocaleId localeId: LocaleId?, envoriment: VC.EnvironmentConstants) throws -> AdaptyUIConfiguration {
-        try extractUIConfiguration(
-            id: id,
-            withLocaleId: localeId ?? defaultLocalId ?? "en",
-            envoriment: envoriment
         )
     }
 }

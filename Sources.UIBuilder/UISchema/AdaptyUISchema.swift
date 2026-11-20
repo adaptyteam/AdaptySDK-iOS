@@ -26,12 +26,8 @@ public struct AdaptyUISchema: Sendable {
 }
 
 public extension AdaptyUISchema {
-    var defaultLocalId: String? {
-        defaultLocalization?.id
-    }
-
-    var allLocalIds: [String] {
-        Array(localizations.keys)
+    var localizationSource: AdaptyUILocalizationSource {
+        .init(locales: Array(localizations.keys), defaultLocale: defaultLocalization?.id)
     }
 }
 

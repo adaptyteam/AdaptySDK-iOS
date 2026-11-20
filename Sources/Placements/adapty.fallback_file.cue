@@ -128,6 +128,8 @@ fallback_file: {
 }
 
 #FlowLayoutsConfiguration: {
+	locales?: [...string]
+	default_locale?: string
 	layouts!: [...#FlowLayout] & list.MinItems(1)
 	grids!: [...#FlowLayoutsGrid] & list.MinItems(1)
 }

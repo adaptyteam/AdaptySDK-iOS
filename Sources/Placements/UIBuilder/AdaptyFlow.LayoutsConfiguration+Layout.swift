@@ -9,7 +9,7 @@ import AdaptyUIBuilder
 import Foundation
 
 extension AdaptyFlow.LayoutsConfiguration {
-    package func getLayout(for info: Adapty.DeviceInfo, with customId: String?) throws(AdaptyError) -> AdaptyFlow.Layout? {
+    func getLayout(for info: Adapty.DeviceInfo, with customId: String?) throws(AdaptyError) -> Layout? {
         let grid: Grid
         if let customId {
             guard let value = getGrid(for: customId) else { return nil }
@@ -22,10 +22,7 @@ extension AdaptyFlow.LayoutsConfiguration {
         guard layouts.indices.contains(index) else { throw .isNoViewConfigurationInFlow() }
         let layout = layouts[index]
 
-        return .init(
-            versionId: versionId,
-            id: layout.id
-        )
+        return layout
     }
 
     private func getGrid(for customId: String) -> Grid? {

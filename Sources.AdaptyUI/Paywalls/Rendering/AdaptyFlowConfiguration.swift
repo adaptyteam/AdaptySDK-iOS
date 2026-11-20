@@ -57,7 +57,7 @@ public extension AdaptyUI {
         package init(
             logId: String,
             flow: AdaptyFlow,
-            flowLayout: AdaptyFlow.Layout,
+            flowLayoutVariant: AdaptyFlow.LayoutVariant,
             viewConfiguration: AdaptyUIConfiguration,
             products: [AdaptyPaywallProduct]?,
             productsPrefetch: Task<[AdaptyPaywallProduct], any Error>?,
@@ -91,7 +91,7 @@ public extension AdaptyUI {
             logic = AdaptyUILogic(
                 logId: logId,
                 flow: flow,
-                flowLayout: flowLayout,
+                flowLayoutVariant: flowLayoutVariant,
                 events: eventsHandler,
                 observerModeResolver: observerModeResolver,
                 productsPrefetch: productsPrefetch
