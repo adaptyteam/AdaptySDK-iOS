@@ -204,7 +204,7 @@ public extension AdaptyUI {
         /// Sends a message from the app to the script of this flow.
         ///
         /// The script receives it in `handleSDKEvent` as an SDK event named
-        /// `app_msg` and decides what to do with it — set a variable, fire flow
+        /// `applicationMsg` and decides what to do with it — set a variable, fire flow
         /// events, anything else. Unlike a message from a custom element, this
         /// one carries neither a screen instance nor an element identity, so a
         /// script that needs to reach a specific screen has to name it itself;
@@ -219,6 +219,12 @@ public extension AdaptyUI {
         /// runs from the moment this configuration is created.
         public func sendAppMessage(_ arguments: [String: any Sendable]) {
             stateViewModel.sendAppMessage(arguments)
+        }
+
+        /// Same as ``sendAppMessage(_:)``, with the message id chosen by the
+        /// caller: cross-platform SDKs pass the id their wrapper generated.
+        package func sendAppMessage(id: String, _ arguments: [String: any Sendable]) {
+            stateViewModel.sendAppMessage(id: id, arguments)
         }
 
         /// Resets the transient runtime state so this configuration can be

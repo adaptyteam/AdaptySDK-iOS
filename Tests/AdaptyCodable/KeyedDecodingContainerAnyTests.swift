@@ -142,7 +142,7 @@ extension AdaptyCodableTests {
             #expect(Json(deserilized: fixture.value) == Json(##"""
             {
               "nested": {"value": 42},
-              "items": [{}, [2]],
+              "items": [null, {}, [null, 2, null], null],
               "onlyNulls": {},
               "empty": {},
               "false": false,
@@ -153,7 +153,7 @@ extension AdaptyCodableTests {
             """##))
         }
 
-        @Test("Omitting nulls compacts arrays recursively without dropping non-null elements")
+        @Test("Omitting nulls keeps array elements and removes dictionary entries inside them")
         func arrayOmittingNullValues() throws {
             struct Fixture: Decodable {
                 let omitted: [any Sendable]
@@ -174,7 +174,7 @@ extension AdaptyCodableTests {
 
             #expect(Json(deserilized: fixture.preserved) == json)
             #expect(Json(deserilized: fixture.omitted) == Json(##"""
-            [false, 0, "", "null", {"value": 1}, [2], [], [], {}]
+            [null, false, null, 0, "", "null", {"value": 1}, [null, 2, null], [null, null], [], {}, null]
             """##))
         }
 
@@ -214,11 +214,11 @@ extension AdaptyCodableTests {
             #expect(Json(deserilized: preserved.array) == Json(##"[null, null]"##))
             #expect(Json(deserilized: preserved.dictionary) == Json(##"{"null": null}"##))
             #expect(try Json(deserilized: #require(preserved.any)) == Json(##"[null, {"null": null, "items": [null, 42]}, null]"##))
-            #expect(fixture.array.isEmpty)
+            #expect(Json(deserilized: fixture.array) == Json(##"[null, null]"##))
             #expect(fixture.dictionary.isEmpty)
-            #expect(try #require(fixture.optionalArray).isEmpty)
+            #expect(try Json(deserilized: #require(fixture.optionalArray)) == Json(##"[null, null]"##))
             #expect(try #require(fixture.optionalDictionary).isEmpty)
-            #expect(try Json(deserilized: #require(fixture.any)) == Json(##"[{"items": [42]}]"##))
+            #expect(try Json(deserilized: #require(fixture.any)) == Json(##"[null, {"items": [null, 42]}, null]"##))
             #expect(fixture.missingArray == nil)
             #expect(fixture.missingDictionary == nil)
         }
@@ -251,6 +251,28 @@ extension AdaptyCodableTests {
             #expect(fixture.preserved is NSNull)
             #expect(fixture.missingOmitted == nil)
             #expect(fixture.missingPreserved == nil)
+        }
+
+        @Test("Unkeyed decodeAnyIfPresent returns NSNull for a null element even when omitting nulls")
+        func unkeyedAnyOmittingNullValues() throws {
+            struct Fixture: Decodable {
+                let values: [(any Sendable)?]
+
+                init(from decoder: any Decoder) throws {
+                    var container = try decoder.unkeyedContainer()
+                    var values = [(any Sendable)?]()
+                    while !container.isAtEnd {
+                        try values.append(container.decodeAnyIfPresent(omittingNullValues: true))
+                    }
+                    self.values = values
+                }
+            }
+
+            let fixture = try Json(##"[123, null, "333", {"null": null}]"##).decode(Fixture.self)
+
+            #expect(fixture.values.count == 4)
+            #expect(fixture.values[1] is NSNull)
+            #expect(try Json(deserilized: #require(fixture.values[3])) == Json(##"{}"##))
         }
 
         @Test("decodeAnyIfPresent distinguishes missing keys from null")

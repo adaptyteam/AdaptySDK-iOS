@@ -215,6 +215,26 @@ package extension AdaptyUI {
 #endif
         }
         
+        package static func sendAppMessage(
+            viewId: String,
+            messageId: String,
+            payload: [String: any Sendable]
+        ) throws {
+#if canImport(UIKit)
+            guard isFlowRenderingSupported, #available(iOS 16.0, macOS 13.0, visionOS 1.0, *) else {
+                throw AdaptyUIError.platformNotSupported
+            }
+
+            guard let configuration = flowConfiguration(viewId) else {
+                throw AdaptyError(AdaptyUI.PluginError.viewNotFound(viewId))
+            }
+
+            configuration.sendAppMessage(id: messageId, payload)
+#else
+            throw AdaptyUIError.platformNotSupported
+#endif
+        }
+
         package static func showDialog(
             viewId: String,
             configuration: AdaptyUI.DialogConfiguration
@@ -266,6 +286,27 @@ extension AdaptyUI.Plugin {
 
     private static func cachedPaywallController(_ id: String) -> AdaptyFlowController? {
         paywallControllers[id]
+    }
+
+    private final class WeakFlowView {
+        weak var value: AdaptyFlowUIView?
+        init(_ value: AdaptyFlowUIView) { self.value = value }
+    }
+
+    /// Flows embedded as platform views, by the view id the host assigned.
+    /// Held weakly: the host owns the view and drops it without telling the plugin.
+    /// The view, not its configuration, is held, so an id stops resolving as soon
+    /// as its view is gone even if the configuration is retained elsewhere.
+    private static var platformViews = [String: WeakFlowView]()
+
+    package static func registerPlatformView(_ view: AdaptyFlowUIView, id: String) {
+        platformViews = platformViews.filter { $0.value.value != nil }
+        platformViews[id] = WeakFlowView(view)
+    }
+
+    /// A flow configuration behind a view id: a presented view first, then an embedded one.
+    private static func flowConfiguration(_ id: String) -> AdaptyUI.FlowConfiguration? {
+        cachedPaywallController(id)?.configuration ?? platformViews[id]?.value?.configuration
     }
 }
 

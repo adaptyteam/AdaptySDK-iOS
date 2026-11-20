@@ -20,6 +20,7 @@ extension Environment {
         let locale: AdaptyLocale
         let installTime: Date
         let appLaunchCount: Int
+        let attributionEnabled: Bool?
 
         enum CodingKeys: String, CodingKey {
             case bundleId = "bundle_id"
@@ -36,12 +37,14 @@ extension Environment {
             case time = "client_time"
             case locale
             case installTime = "install_time"
+            case attributionEnabled = "attribution_enabled"
         }
 
         @AdaptyActor
         init(
             installTime: Date,
             appLaunchCount: Int,
+            attributionEnabled: Bool? = nil,
             includedAnalyticIds: Bool
         ) async {
             bundleId = Application.bundleIdentifier
@@ -60,6 +63,7 @@ extension Environment {
             locale = System.locale
             self.installTime = installTime
             self.appLaunchCount = appLaunchCount
+            self.attributionEnabled = attributionEnabled
         }
 
         func encode(to encoder: any Encoder) throws {
@@ -80,6 +84,7 @@ extension Environment {
             try container.encode(Int(Date().timeIntervalSince1970), forKey: .time)
             try container.encode(locale.normalizedIdentifier, forKey: .locale)
             try container.encode(Int(installTime.timeIntervalSince1970), forKey: .installTime)
+            try container.encodeIfPresent(attributionEnabled, forKey: .attributionEnabled)
         }
     }
 }

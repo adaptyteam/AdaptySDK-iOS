@@ -196,12 +196,12 @@ package final class AdaptyUIStateViewModel: ObservableObject {
 
     /// Sends a message from the app itself to the flow, outside any element.
     ///
-    /// The script receives it as an SDK event named `app_msg`, without a screen
+    /// The script receives it as an SDK event named `applicationMsg`, without a screen
     /// instance and without an element identity: nothing on the app side of the
     /// call names either of them.
-    package func sendAppMessage(_ arguments: [String: any Sendable]) {
+    package func sendAppMessage(id: String? = nil, _ arguments: [String: any Sendable]) {
         do {
-            let message = try VS.AppMessage(id: Log.stamp, payload: arguments)
+            let message = try VS.AppMessage(id: id ?? Log.stamp, payload: arguments)
             try stateHolder.current.send(message: message)
         } catch {
             Log.ui.error("#\(logId)# sendAppMessage error: \(error)")
