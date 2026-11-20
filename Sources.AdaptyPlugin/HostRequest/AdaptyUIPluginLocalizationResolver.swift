@@ -6,31 +6,46 @@
 //
 
 import AdaptyUIBuilder
+import Foundation
 
+/// Asks the host's custom localization resolver `id` to choose a flow localization
+/// (`flow_view_did_ask_localization` -> `flow_view_did_answer_localization`).
+///
+/// `nil` lets the fallback resolver choose. That happens when no event handler is
+/// registered, when the host answers `null` (e.g. for an unknown `resolver_id`),
+/// when the request is flushed on teardown, and when the host does not answer
+/// within `timeout`. A non-null answer is returned as is, like any custom resolver:
+/// an id the schema does not have renders the schema's default localization.
 struct AdaptyUIPluginLocalizationResolver: AdaptyUICustomLocalizationResolver {
-    let id: String
+    /// The answer is a pure choice from the lists in the event, so a responsive
+    /// host replies within one channel round-trip (milliseconds). The limit only
+    /// caps how long a host that never answers (no handler, an older host
+    /// library, a hung callback) can delay flow view creation.
+    static let defaultTimeout: TimeInterval = 2
 
+    let id: String
+    let timeout: TimeInterval
+    /// Overrides `AdaptyPlugin.sharedEventHandler`; for tests.
+    let eventHandler: (any EventHandler)?
+
+    init(id: String, timeout: TimeInterval = Self.defaultTimeout, eventHandler: (any EventHandler)? = nil) {
+        self.id = id
+        self.timeout = timeout
+        self.eventHandler = eventHandler
+    }
+
+    @MainActor
     func resolve(for locales: [String], from source: AdaptyUILocalizationSource) async -> String? {
-        // TODO: ask the host
-        //
-        // native -> host event (`event_id` correlates the answer):
-        // {
-        //   "id": "<event name>",
-        //   "event_id": "hr_1",                  // required, string
-        //   "resolver_id": "<id>",               // required, string
-        //   "preferred_locales": ["en-US"],      // required, array of string, may be empty
-        //   "locales": ["en", "ru"],             // required, array of string, may be empty
-        //   "default_locale": "en"               // optional, string
-        // }
-        //
-        // host -> native request (resolves `event_id` via `HostRequestRegistry.shared.resolve`):
-        // {
-        //   "method": "<answer method>",
-        //   "event_id": "hr_1",                  // required, string
-        //   "result": "ru"                       // optional, string; null -> the fallback resolver chooses
-        // }
-        //
-        // Unknown `resolver_id`, an error or a flushed request -> nil (the fallback resolver chooses).
-        nil
+        guard let eventHandler = eventHandler ?? AdaptyPlugin.sharedEventHandler else { return nil }
+
+        return await HostRequestRegistry.shared.perform(String.self, timeout: timeout) { eventId in
+            eventHandler.handle(event: FlowViewEvent.DidAskLocalization(
+                eventId: eventId,
+                resolverId: id,
+                preferredLocales: locales,
+                locales: source.locales,
+                defaultLocale: source.defaultLocale
+            ))
+        }
     }
 }
