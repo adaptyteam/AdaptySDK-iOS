@@ -216,6 +216,14 @@ public typealias AdaptyPermission = AdaptyUIPermission
 
 public typealias AdaptyPermissionResult = AdaptyUIPermissionResult
 
+public typealias AdaptyLocalizationStrategy = AdaptyUILocalizationStrategy
+
+public typealias AdaptyLocalizationResolver = AdaptyUILocalizationResolver
+
+public typealias AdaptyCustomLocalizationResolver = AdaptyUICustomLocalizationResolver
+
+public typealias AdaptyLocalizationSource = AdaptyUILocalizationSource
+
 #endif
 
 public protocol AdaptyObserverModeResolver: Sendable {
@@ -291,6 +299,7 @@ public extension AdaptyUI {
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
     ///   - preferredLocales: locale identifiers in order of preference. The best matching flow localization is used.
+    ///   - localizationStrategy: how the flow localization is chosen from `preferredLocales`. See ``AdaptyLocalizationStrategy``.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exeeds.
     ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products. Products that don't exactly match this flow's products are ignored and fetched anew.
     ///   - observerModeResolver: if you are going to use AdaptyUI in Observer Mode, pass the resolver function here.
@@ -300,7 +309,7 @@ public extension AdaptyUI {
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         preferredLocales: [String] = [],
-        localizationStrategy: AdaptyUILocalizationStrategy = .auto,
+        localizationStrategy: AdaptyLocalizationStrategy = .auto,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
@@ -332,7 +341,7 @@ public extension AdaptyUI {
         forFlow flow: AdaptyFlow,
         device: Adapty.DeviceInfo,
         preferredLocales: [String] = [],
-        localizationStrategy: AdaptyUILocalizationStrategy = .auto,
+        localizationStrategy: AdaptyLocalizationStrategy = .auto,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
