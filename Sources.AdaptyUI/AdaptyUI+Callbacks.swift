@@ -31,7 +31,6 @@ public extension AdaptyUI {
     /// - Parameters:
     ///   - forFlow: the ``AdaptyFlow`` for which you want to get a configuration.
     ///   - preferredLocales: locale identifiers in order of preference. The best matching flow localization is used.
-    ///   - localizationStrategy: how the flow localization is chosen from `preferredLocales`. See ``AdaptyLocalizationStrategy``.
     ///   - customLayoutId: the identifier of a custom layout to use instead of the one resolved automatically for the current device.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exceeds.
     ///   - assetsResolver: if you are going to use custom assets functionality, pass the resolver function here.
@@ -40,7 +39,7 @@ public extension AdaptyUI {
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         preferredLocales: [String] = [],
-        localizationStrategy: AdaptyLocalizationStrategy = .auto,
+        localizationStrategy: AdaptyUILocalizationStrategy = .auto,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
