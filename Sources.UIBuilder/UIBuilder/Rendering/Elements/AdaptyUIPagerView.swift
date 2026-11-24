@@ -165,6 +165,48 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
         viewportWithPageControl {
             handlePageControlTap(index: $0)
         }
+        // A swipe starts anywhere in the pager, the page control included.
+        // SwiftUI hit-tests only drawn content, so without the shape a drag
+        // that started on a transparent part of a page did nothing.
+        .contentShape(Rectangle())
+        .dragGesture(
+            condition: pager.interactionBehavior != .none,
+            onChanged: { value in
+                dragGuard.didDrag = true
+
+                let isHorizontal = isHorizontalDrag
+                    ?? (abs(value.translation.width) >= abs(value.translation.height))
+                isHorizontalDrag = isHorizontal
+                guard isHorizontal else { return }
+
+                offset = value.translation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
+                isInteracting = true
+                stopAutoScroll() // Stop the autoscroll while interacting
+            },
+            onEnded: { value in
+                // Reset after the release has reached the button under the finger.
+                Task { @MainActor in dragGuard.didDrag = false }
+
+                let wasHorizontal = isHorizontalDrag ?? false
+                isHorizontalDrag = nil
+                guard wasHorizontal else { return }
+
+                let width = pageWidth(viewportWidth: viewportWidth)
+                withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
+                    offset = value.predictedEndTranslation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
+                    if width > 0 {
+                        currentPage -= Int((offset / width).rounded())
+                    }
+                    currentPage = max(0, min(currentPage, pager.content.count - 1))
+                    offset = 0
+                    isInteracting = false
+
+                    if pager.interactionBehavior == .pauseAnimation {
+                        resumeAutoScrollAfterInteraction()
+                    }
+                }
+            }
+        )
         .onAppear {
             currentPage = clampedPageIndexFromBinding
             startAutoScroll()
@@ -247,44 +289,6 @@ struct AdaptyUIPagerView<ScreenHolderContent: View>: View {
         }
         .environment(\.adaptyPagerDragGuard, dragGuard)
         .onGeometrySizeChange { viewportWidth = $0.width }
-        .dragGesture(
-            condition: pager.interactionBehavior != .none,
-            onChanged: { value in
-                dragGuard.didDrag = true
-
-                let isHorizontal = isHorizontalDrag
-                    ?? (abs(value.translation.width) >= abs(value.translation.height))
-                isHorizontalDrag = isHorizontal
-                guard isHorizontal else { return }
-
-                offset = value.translation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
-                isInteracting = true
-                stopAutoScroll() // Stop the autoscroll while interacting
-            },
-            onEnded: { value in
-                // Reset after the release has reached the button under the finger.
-                Task { @MainActor in dragGuard.didDrag = false }
-
-                let wasHorizontal = isHorizontalDrag ?? false
-                isHorizontalDrag = nil
-                guard wasHorizontal else { return }
-
-                let width = pageWidth(viewportWidth: viewportWidth)
-                withAnimation(pager.animation?.pageTransition.swiftUIAnimation ?? .easeInOut) {
-                    offset = value.predictedEndTranslation.width * (layoutDirection == .leftToRight ? 1.0 : -1.0)
-                    if width > 0 {
-                        currentPage -= Int((offset / width).rounded())
-                    }
-                    currentPage = max(0, min(currentPage, pager.content.count - 1))
-                    offset = 0
-                    isInteracting = false
-
-                    if pager.interactionBehavior == .pauseAnimation {
-                        resumeAutoScrollAfterInteraction()
-                    }
-                }
-            }
-        )
     }
 
     /// The page width in a viewport of this width, as `AdaptyUIPagerLayout` computes it.
