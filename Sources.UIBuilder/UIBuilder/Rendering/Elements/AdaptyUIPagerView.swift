@@ -34,20 +34,89 @@ extension VC.Transition {
     }
 }
 
+/// What the pager reads from a drag, whichever recognizer produced it.
+struct AdaptyUIPagerDragValue {
+    var translation: CGSize
+    var predictedEndTranslation: CGSize
+}
+
 extension View {
     @ViewBuilder
     func dragGesture(condition: Bool,
-                     onChanged: @escaping (DragGesture.Value) -> Void,
-                     onEnded: @escaping (DragGesture.Value) -> Void) -> some View
+                     onChanged: @escaping (AdaptyUIPagerDragValue) -> Void,
+                     onEnded: @escaping (AdaptyUIPagerDragValue) -> Void) -> some View
     {
-        if condition {
+        if !condition {
+            self
+        } else if #available(iOS 18.0, visionOS 2.0, *) {
+            gesture(AdaptyUIPagerPanGesture(onChanged: onChanged, onEnded: onEnded))
+        } else {
+            // A SwiftUI drag cannot hand a vertical swipe back to an enclosing
+            // scroll view: a scroll that starts on the pager does not move.
             simultaneousGesture(
                 DragGesture()
-                    .onChanged { onChanged($0) }
-                    .onEnded { onEnded($0) }
+                    .onChanged { onChanged(.init($0)) }
+                    .onEnded { onEnded(.init($0)) }
             )
-        } else {
-            self
+        }
+    }
+}
+
+private extension AdaptyUIPagerDragValue {
+    init(_ value: DragGesture.Value) {
+        self.init(translation: value.translation, predictedEndTranslation: value.predictedEndTranslation)
+    }
+}
+
+/// The pager's swipe as a UIKit pan, so that it takes part in UIKit gesture
+/// arbitration. It begins only on a horizontal movement; on a vertical one it
+/// fails at once and an enclosing scroll view, which waits for it, scrolls.
+/// This is how UIKit settles a horizontal scroll view inside a vertical one.
+@available(iOS 18.0, visionOS 2.0, *)
+struct AdaptyUIPagerPanGesture: UIGestureRecognizerRepresentable {
+    let onChanged: (AdaptyUIPagerDragValue) -> Void
+    let onEnded: (AdaptyUIPagerDragValue) -> Void
+
+    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator {
+        Coordinator()
+    }
+
+    func makeUIGestureRecognizer(context: Context) -> UIPanGestureRecognizer {
+        let pan = UIPanGestureRecognizer()
+        pan.delegate = context.coordinator
+        return pan
+    }
+
+    func handleUIGestureRecognizerAction(_ pan: UIPanGestureRecognizer, context: Context) {
+        // The axis is settled when the pan begins, so only the horizontal part counts.
+        let translation = pan.translation(in: pan.view).x
+        switch pan.state {
+        case .began, .changed:
+            onChanged(.init(translation: CGSize(width: translation, height: 0), predictedEndTranslation: .zero))
+        case .ended:
+            // Where a UIScrollView with the normal deceleration rate would stop.
+            let rate = UIScrollView.DecelerationRate.normal.rawValue
+            let projected = translation + pan.velocity(in: pan.view).x / 1000 * rate / (1 - rate)
+            onEnded(.init(translation: CGSize(width: translation, height: 0), predictedEndTranslation: CGSize(width: projected, height: 0)))
+        case .cancelled, .failed:
+            onEnded(.init(translation: CGSize(width: translation, height: 0), predictedEndTranslation: CGSize(width: translation, height: 0)))
+        default:
+            break
+        }
+    }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        func gestureRecognizerShouldBegin(_ recognizer: UIGestureRecognizer) -> Bool {
+            guard let pan = recognizer as? UIPanGestureRecognizer else { return true }
+            let velocity = pan.velocity(in: pan.view)
+            return abs(velocity.x) > abs(velocity.y)
+        }
+
+        func gestureRecognizer(
+            _: UIGestureRecognizer,
+            shouldBeRequiredToFailBy other: UIGestureRecognizer
+        ) -> Bool {
+            other is UIPanGestureRecognizer && other.view is UIScrollView
         }
     }
 }
