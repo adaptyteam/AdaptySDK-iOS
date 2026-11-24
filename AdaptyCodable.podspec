@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'AdaptyCodable'
-  s.version          = '4.5.0-SNAPSHOT'
+  s.version          = '4.5.0'
   s.summary          = 'Codable helpers used by the Adapty SDK.'
 
   s.description      = <<-DESC
