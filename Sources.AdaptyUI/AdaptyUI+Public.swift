@@ -216,14 +216,6 @@ public typealias AdaptyPermission = AdaptyUIPermission
 
 public typealias AdaptyPermissionResult = AdaptyUIPermissionResult
 
-public typealias AdaptyLocalizationStrategy = AdaptyUILocalizationStrategy
-
-public typealias AdaptyLocalizationResolver = AdaptyUILocalizationResolver
-
-public typealias AdaptyCustomLocalizationResolver = AdaptyUICustomLocalizationResolver
-
-public typealias AdaptyLocalizationSource = AdaptyUILocalizationSource
-
 #endif
 
 public protocol AdaptyObserverModeResolver: Sendable {
