@@ -64,9 +64,31 @@ extension EnvironmentValues {
     }
 }
 
+/// Narrows `adaptyScreenSize` to the area above an overlaid footer, height only.
+///
+/// Flat and hero append a footer-height filler below their scrolling content, so a
+/// `.screen` height inside it has to resolve against the screen less the footer or
+/// the footer is reserved twice.
+struct AdaptyUIScreenSizeAboveFooterModifier: ViewModifier {
+    @Environment(\.adaptyScreenSize)
+    private var screenSize: CGSize
+
+    let footerHeight: CGFloat
+
+    func body(content: Content) -> some View {
+        content.withScreenSize(
+            CGSize(width: screenSize.width, height: max(0, screenSize.height - footerHeight))
+        )
+    }
+}
+
 extension View {
     package func withScreenSize(_ value: CGSize) -> some View {
         environment(\.adaptyScreenSize, value)
+    }
+
+    func withScreenSizeAboveFooter(_ footerHeight: CGFloat) -> some View {
+        modifier(AdaptyUIScreenSizeAboveFooterModifier(footerHeight: footerHeight))
     }
 
     func withScreenInstance(_ value: VS.ScreenInstance) -> some View {
