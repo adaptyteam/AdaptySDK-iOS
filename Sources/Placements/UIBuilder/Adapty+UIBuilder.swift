@@ -49,18 +49,18 @@ extension Adapty {
             id: layout.id
         )
 
-        let flowRequestLocale: FlowRequestLocale =
-            if let localizationSource = layoutsConfiguration.localization {
-                .resolved(
-                    await localizationStrategy.resolve(
-                        for: preferredLocales,
-                        from: localizationSource,
-                        isLegacyVersion: false
-                    )
-                )
-            } else {
-                .unresolved
-            }
+        let flowRequestLocale: FlowRequestLocale = .unresolved
+//            if let localizationSource = layoutsConfiguration.localization {
+//                .resolved(
+//                    await localizationStrategy.resolve(
+//                        for: preferredLocales,
+//                        from: localizationSource,
+//                        isLegacyVersion: false
+//                    )
+//                )
+//            } else {
+//                .unresolved
+//            }
 
         let schema = try await getUISchema(
             flowId: flow.id,
