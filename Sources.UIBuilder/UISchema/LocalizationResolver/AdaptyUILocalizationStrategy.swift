@@ -7,10 +7,38 @@
 
 /// The localizations a flow offers, passed to an ``AdaptyUICustomLocalizationResolver``.
 public struct AdaptyUILocalizationSource: Sendable {
+    package static let globalDefaultLocale: String = "en"
+
     /// Identifiers of the flow's localizations, spelled as in the flow. Their order is not meaningful.
     public let locales: [String]
     /// Identifier of the flow's default localization, or `nil` when the flow has none.
     public let defaultLocale: String?
+
+    package init(locales: [String], defaultLocale: String?) {
+        self.locales = locales
+        self.defaultLocale = defaultLocale
+    }
+
+    var hasChoice: Bool {
+        if let defaultLocale {
+            Set(locales + [defaultLocale]).count > 1
+        } else {
+            Set(locales).count > 1
+        }
+    }
+
+    var defaultOrFirstLocale: String? {
+        defaultLocale ?? locales.first
+    }
+
+    func contains(_ locale: String) -> Bool {
+        locales.contains(locale) || locale == defaultLocale
+    }
+
+    var globalDefault: String? {
+        guard contains(AdaptyUILocalizationSource.globalDefaultLocale) else { return nil }
+        return AdaptyUILocalizationSource.globalDefaultLocale
+    }
 }
 
 /// A built-in way of choosing a flow localization from the preferred locales.
@@ -36,8 +64,8 @@ public enum AdaptyUILocalizationResolver: String, Sendable {
 public protocol AdaptyUICustomLocalizationResolver: Sendable {
     /// Returns the identifier of the localization to show the flow in.
     ///
-    /// The returned identifier is used as is. If the flow has no localization with it, the flow is shown
-    /// in its default localization and the fallback resolver is not asked.
+    /// The returned identifier must be one of the flow's localizations. An identifier the flow does not
+    /// have is ignored, and the fallback resolver chooses.
     ///
     /// Called while the flow configuration is created, possibly not on the main thread. Although the call
     /// is asynchronous, `getFlowConfiguration` waits for the answer, so any time spent here delays the
@@ -80,21 +108,33 @@ public struct AdaptyUILocalizationStrategy: Sendable {
         for preferences: [String],
         from schema: AdaptyUISchema
     ) async -> String? {
-        let source = AdaptyUILocalizationSource(
-            locales: schema.allLocalIds,
-            defaultLocale: schema.defaultLocalId
+        await resolve(
+            for: preferences,
+            from: schema.localizationSource,
+            isLegacyVersion: schema.formatVersion.isLegacyVersion
         )
+    }
 
-        if let locale = await customResolver?.resolve(for: preferences, from: source) {
+    package func resolve(
+        for preferences: [String],
+        from source: AdaptyUILocalizationSource,
+        isLegacyVersion: Bool
+    ) async -> String? {
+        guard source.hasChoice else { return source.defaultOrFirstLocale }
+        if let locale = await customResolver?.resolve(for: preferences, from: source), source.contains(locale) {
             return locale
         }
-
-        return switch resolver {
-        case .auto where schema.formatVersion.isLegacyVersion:
+        let resolved = switch resolver {
+        case .legacy,
+             .auto where isLegacyVersion:
             LegacyLocalizationResolver().resolve(for: preferences, from: source)
-        case .auto,
-             .system: SystemLocalizationResolver().resolve(for: preferences, from: source)
-        case .legacy: LegacyLocalizationResolver().resolve(for: preferences, from: source)
+        case .system,
+             .auto:
+            SystemLocalizationResolver().resolve(for: preferences, from: source)
         }
+
+        if let resolved { return resolved }
+
+        return source.globalDefault
     }
 }

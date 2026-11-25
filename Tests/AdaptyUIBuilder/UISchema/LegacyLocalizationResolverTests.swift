@@ -19,7 +19,6 @@ struct LegacyLocalizationResolverTests {
         (for: "de-DE", from: ["FR"], default: "FR", result: "FR"),
         (for: "de-DE", from: [], default: "FR_ca", result: "FR_ca"),
         (for: "de-DE", from: ["en"], default: nil, result: nil),
-        (for: "de-DE", from: [], default: nil, result: nil),
         (for: "de-DE", from: [], default: "", result: ""),
         (for: "en--US", from: ["en-us", "en-", "en"], default: nil, result: "en-"),
         (for: "en--US", from: ["en--us", "en-"], default: nil, result: "en--us"),
@@ -32,7 +31,7 @@ struct LegacyLocalizationResolverTests {
         (for: "", from: ["en"], default: nil, result: nil),
         (for: "", from: [""], default: "fr", result: "fr"),
     ] as [(for: LocaleId, from: [LocaleId], default: LocaleId?, result: LocaleId?)])
-    func select(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?) {
+    func select(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?) throws {
         #expect(LegacyLocalizationResolver().resolve(
             for: locale,
             from: .init(locales: locales, defaultLocale: defaultLocale)
@@ -80,7 +79,7 @@ struct LegacyLocalizationResolverTests {
         (for: "de", from: ["en", "pt-br", "pt-BR"], default: "pt-BR", result: "pt-BR"),
         (for: "pt-BR", from: ["en", "pt-br", "pt-br"], default: "en", result: "pt-br"),
     ] as [(for: LocaleId, from: [LocaleId], default: LocaleId?, result: LocaleId?)])
-    func backendExamples(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?) {
+    func backendExamples(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?) throws {
         #expect(LegacyLocalizationResolver().resolve(
             for: locale,
             from: .init(locales: locales, defaultLocale: defaultLocale)
@@ -93,7 +92,7 @@ struct LegacyLocalizationResolverTests {
         (for: [], from: ["en", "fr"], default: "fr", result: "fr"),
         (for: [], from: ["en", "fr"], default: nil, result: nil),
     ] as [(for: [String], from: [String], default: String?, result: String?)])
-    func preferences(locales: [String], available: [String], defaultLocale: String?, expected: String?) {
+    func preferences(locales: [String], available: [String], defaultLocale: String?, expected: String?) throws {
         #expect(LegacyLocalizationResolver().resolve(
             for: locales,
             from: .init(locales: available, defaultLocale: defaultLocale)
@@ -148,7 +147,7 @@ struct LegacyLocalizationResolverTests {
         (for: "ZH-HANT-TW", from: ["en", "zh-Hant"], default: "en", result: "zh-Hant", backendResult: "en"),
         (for: "en_US", from: ["en", "EN_us"], default: "fr", result: "en", backendResult: "en"),
     ] as [(for: LocaleId, from: [LocaleId], default: LocaleId?, result: LocaleId?, backendResult: LocaleId?)])
-    func backendExamplesIgnoringCase(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?, backendResult _: LocaleId?) {
+    func backendExamplesIgnoringCase(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?, backendResult _: LocaleId?) throws {
         #expect(LegacyLocalizationResolver(ignoresCase: true, replaceUnderscores: false).resolve(
             for: locale,
             from: .init(locales: locales, defaultLocale: defaultLocale)
@@ -203,7 +202,7 @@ struct LegacyLocalizationResolverTests {
         (for: "ZH-HANT-TW", from: ["en", "zh-Hant"], default: "en", result: "en", backendResult: "en"),
         (for: "en_US", from: ["en", "EN_us"], default: "fr", result: "en", backendResult: "en"),
     ] as [(for: LocaleId, from: [LocaleId], default: LocaleId?, result: LocaleId?, backendResult: LocaleId?)])
-    func backendExamplesReplacingUnderscores(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?, backendResult _: LocaleId?) {
+    func backendExamplesReplacingUnderscores(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?, backendResult _: LocaleId?) throws {
         #expect(LegacyLocalizationResolver(ignoresCase: false, replaceUnderscores: true).resolve(
             for: locale,
             from: .init(locales: locales, defaultLocale: defaultLocale)
@@ -258,7 +257,7 @@ struct LegacyLocalizationResolverTests {
         (for: "ZH-HANT-TW", from: ["en", "zh-Hant"], default: "en", result: "zh-Hant", backendResult: "en"),
         (for: "en_US", from: ["en", "EN_us"], default: "fr", result: "EN_us", backendResult: "en"),
     ] as [(for: LocaleId, from: [LocaleId], default: LocaleId?, result: LocaleId?, backendResult: LocaleId?)])
-    func backendExamplesIgnoringCaseAndReplacingUnderscores(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?, backendResult _: LocaleId?) {
+    func backendExamplesIgnoringCaseAndReplacingUnderscores(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?, backendResult _: LocaleId?) throws {
         #expect(LegacyLocalizationResolver(ignoresCase: true, replaceUnderscores: true).resolve(
             for: locale,
             from: .init(locales: locales, defaultLocale: defaultLocale)

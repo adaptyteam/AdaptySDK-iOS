@@ -84,13 +84,11 @@ struct PluginLocalizationResolverTests {
         _ = try await hostAnswer(eventId: event.eventId, result: "en").execute()
     }
 
-    @Test("an id the flow does not have is returned as is and renders the default localization")
-    func unknownLocaleRendersDefault() async throws {
+    @Test("an id the flow does not have is ignored and the fallback resolver chooses")
+    func unknownLocaleFallsBack() async throws {
         let host = AnsweringHost(answer: .result("xx"))
-        let schema = try Self.schema()
 
-        #expect(try await strategy(host: host).resolve(for: ["fr"], from: schema) == "xx")
-        #expect(schema.localization(by: "xx")?.id == "en")
+        #expect(try await strategy(host: host).resolve(for: ["fr"], from: Self.schema()) == "fr")
     }
 }
 

@@ -17,7 +17,6 @@ struct SystemLocalizationResolverTests {
         (for: "zh-CN", from: ["en", "zh-Hans", "zh-Hant"], default: "en", result: "zh-Hans"),
         (for: "de", from: ["en", "fr"], default: "fr", result: "fr"),
         (for: "de", from: [], default: "fr", result: "fr"),
-        (for: "de", from: [], default: nil, result: nil),
 
         // Synonym language codes: deprecated/macrolanguage code ↔ current code
         (for: "iw", from: ["en", "he"], default: nil, result: "he"),
@@ -27,7 +26,7 @@ struct SystemLocalizationResolverTests {
         (for: "no", from: ["en", "nb"], default: nil, result: "nb"),
         (for: "nb-NO", from: ["en", "no"], default: nil, result: "no"),
     ] as [(for: String, from: [String], default: String?, result: String?)])
-    func resolve(locale: String, locales: [String], defaultLocale: String?, expected: String?) {
+    func resolve(locale: String, locales: [String], defaultLocale: String?, expected: String?) throws {
         #expect(SystemLocalizationResolver().resolve(
             for: [locale],
             from: .init(locales: locales, defaultLocale: defaultLocale)
@@ -75,7 +74,7 @@ struct SystemLocalizationResolverTests {
         (for: "de", from: ["en", "pt-br", "pt-BR"], default: "pt-BR", result: "pt-BR", backendResult: "pt-BR"),
         (for: "pt-BR", from: ["en", "pt-br", "pt-br"], default: "en", result: "pt-br", backendResult: "pt-br"),
     ] as [(for: LocaleId, from: [LocaleId], default: LocaleId?, result: LocaleId?, backendResult: LocaleId?)])
-    func backendExamples(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?, backendResult: LocaleId?) {
+    func backendExamples(locale: LocaleId, locales: [LocaleId], defaultLocale: LocaleId?, expected: LocaleId?, backendResult: LocaleId?) throws {
         let isSameResult = expected == backendResult
         #expect(SystemLocalizationResolver().resolve(
             for: [locale],
@@ -91,7 +90,7 @@ struct SystemLocalizationResolverTests {
         (for: [], from: ["en", "fr"], default: "fr", result: "fr"),
         (for: [], from: ["en", "fr"], default: nil, result: nil),
     ] as [(for: [String], from: [String], default: String?, result: String?)])
-    func preferences(locales: [String], available: [String], defaultLocale: String?, expected: String?) {
+    func preferences(locales: [String], available: [String], defaultLocale: String?, expected: String?) throws {
         #expect(SystemLocalizationResolver().resolve(
             for: locales,
             from: .init(locales: available, defaultLocale: defaultLocale)

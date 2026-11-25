@@ -9,7 +9,7 @@ import Foundation
 
 extension Cache {
     @inlinable
-    static func read<Content: PlacementContent>(
+    static func readPlacement<Content: PlacementContent>(
         _ type: Content.Type,
         placementId: String,
         locale: AdaptyLocale?,
@@ -19,7 +19,7 @@ extension Cache {
     ) async -> AdaptyPlacement.Draw<Content>? {
         let crossPlacementState = CrossPlacementStorage.state(for: userId)
         if let variationId = crossPlacementState?.variationId(placementId: placementId) {
-            return Cache.readPlacement(
+            return Cache.readPlacementWithKnownVariation(
                 type,
                 placementId: placementId,
                 variationId: variationId,
@@ -28,7 +28,7 @@ extension Cache {
                 fallbackFile: fallbackFile
             )
         } else {
-            return Cache.readPlacementVariations(
+            return Cache.readPlacementWithUnknownVariation(
                 type,
                 placementId: placementId,
                 locale: locale,
@@ -39,7 +39,7 @@ extension Cache {
         }
     }
 
-    private static func readPlacementVariations<Content: PlacementContent>(
+    private static func readPlacementWithUnknownVariation<Content: PlacementContent>(
         _ type: Content.Type,
         placementId: String,
         locale: AdaptyLocale?,
@@ -94,7 +94,7 @@ extension Cache {
         return draw
     }
 
-    private static func readPlacement<Content: PlacementContent>(
+    private static func readPlacementWithKnownVariation<Content: PlacementContent>(
         _ type: Content.Type,
         placementId: String,
         variationId: String,

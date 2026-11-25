@@ -48,7 +48,7 @@ extension StorageCacheTests {
                     source: .fallback
                 )
 
-                let draw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.read(
+                let draw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.readPlacement(
                     AdaptyFlow.self,
                     placementId: placementId,
                     locale: nil,
@@ -92,7 +92,7 @@ extension StorageCacheTests {
                 isValidFlow: false
             )
 
-            let draw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.read(
+            let draw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.readPlacement(
                 AdaptyFlow.self,
                 placementId: placementId,
                 locale: nil,
@@ -131,7 +131,7 @@ extension StorageCacheTests {
                 source: .fallback
             )
 
-            let cachedDraw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.read(
+            let cachedDraw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.readPlacement(
                 AdaptyFlow.self,
                 placementId: placementId,
                 locale: nil,
@@ -179,7 +179,7 @@ extension StorageCacheTests {
                 source: .fallback
             )
 
-            let cachedDraw: AdaptyPlacement.Draw<AdaptyOnboarding>? = await Cache.read(
+            let cachedDraw: AdaptyPlacement.Draw<AdaptyOnboarding>? = await Cache.readPlacement(
                 AdaptyOnboarding.self,
                 placementId: placementId,
                 locale: locale,
@@ -215,7 +215,7 @@ extension StorageCacheTests {
                 source: .fallback
             )
 
-            let draw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.read(
+            let draw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.readPlacement(
                 AdaptyFlow.self,
                 placementId: placementId,
                 locale: nil,
@@ -243,7 +243,7 @@ extension StorageCacheTests {
                 source: .fallback
             )
 
-            let draw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.read(
+            let draw: AdaptyPlacement.Draw<AdaptyFlow>? = await Cache.readPlacement(
                 AdaptyFlow.self,
                 placementId: "missing-placement-\(id)",
                 locale: nil,

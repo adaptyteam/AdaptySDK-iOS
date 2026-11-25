@@ -14,8 +14,8 @@ import Foundation
 /// `nil` lets the fallback resolver choose. That happens when no event handler is
 /// registered, when the host answers `null` (e.g. for an unknown `resolver_id`),
 /// when the request is flushed on teardown, and when the host does not answer
-/// within `timeout`. A non-null answer is returned as is, like any custom resolver:
-/// an id the schema does not have renders the schema's default localization.
+/// within `timeout`. A non-null answer is handled like that of any custom resolver:
+/// an id the schema does not have is ignored, and the fallback resolver chooses.
 struct AdaptyUIPluginLocalizationResolver: AdaptyUICustomLocalizationResolver {
     /// The answer is a pure choice from the lists in the event, so a responsive
     /// host replies within one channel round-trip (milliseconds). The limit only
