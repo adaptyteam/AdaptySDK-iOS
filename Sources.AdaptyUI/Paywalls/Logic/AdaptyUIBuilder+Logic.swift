@@ -14,7 +14,7 @@ import Foundation
 final class AdaptyUILogic: AdaptyUIBuilderLogic {
     let logId: String
     let flow: AdaptyFlow
-    let flowLayout: AdaptyFlow.Layout
+    let flowLayoutVariant: AdaptyFlow.LayoutVariant
     let events: AdaptyEventsHandler
     let observerModeResolver: AdaptyObserverModeResolver?
     private var productsPrefetch: Task<[AdaptyPaywallProduct], any Error>?
@@ -22,14 +22,14 @@ final class AdaptyUILogic: AdaptyUIBuilderLogic {
     package init(
         logId: String,
         flow: AdaptyFlow,
-        flowLayout: AdaptyFlow.Layout,
+        flowLayoutVariant: AdaptyFlow.LayoutVariant,
         events: AdaptyEventsHandler,
         observerModeResolver: AdaptyObserverModeResolver?,
         productsPrefetch: Task<[AdaptyPaywallProduct], any Error>?
     ) {
         self.logId = logId
         self.flow = flow
-        self.flowLayout = flowLayout
+        self.flowLayoutVariant = flowLayoutVariant
         self.events = events
         self.observerModeResolver = observerModeResolver
         self.productsPrefetch = productsPrefetch
@@ -227,7 +227,7 @@ final class AdaptyUILogic: AdaptyUIBuilderLogic {
             try? await Adapty.logFlowAnalyticsViaAdaptyUI(
                 variationId: flow.variationId,
                 sessionId: sessionId,
-                flowLayout: flowLayout,
+                flowLayoutVariant: flowLayoutVariant,
                 params: event
             )
         }

@@ -19,14 +19,22 @@ private struct FetchFallbackUISchemaRequest: BackendRequest {
     init(
         apiKeyPrefix: String,
         flowId: String,
-        flowLayout: AdaptyFlow.Layout,
+        flowLayoutVariant: AdaptyFlow.LayoutVariant,
+        flowLocale: String?,
         disableServerCache: Bool,
         logParams: EventParameters?
     ) {
+
+        let path =
+            if let flowLocale {
+                "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayoutVariant.versionId)/layout/\(flowLayoutVariant.id)/\(flowLocale.base64URLEncoded)/config/"
+            } else {
+                "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayoutVariant.versionId)/layout/\(flowLayoutVariant.id)/config/"
+            }
+
         endpoint = HTTPEndpoint(
             method: .get,
-            path:
-            "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayout.versionId)/layout/\(flowLayout.id)/config/"
+            path: path
         )
 
         headers = HTTPHeaders()
@@ -43,20 +51,23 @@ extension Backend.MainExecutor {
     func fetchFallbackUISchema(
         apiKeyPrefix: String,
         flowId: String,
-        flowLayout: AdaptyFlow.Layout,
+        flowLayoutVariant: AdaptyFlow.LayoutVariant,
+        flowLocale: String?,
         disableServerCache: Bool,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(HTTPError) -> (schema: AdaptyUISchema, data: Data) {
         let request = FetchFallbackUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
             flowId: flowId,
-            flowLayout: flowLayout,
+            flowLayoutVariant: flowLayoutVariant,
+            flowLocale: flowLocale,
             disableServerCache: disableServerCache,
             logParams: [
                 "api_prefix": apiKeyPrefix,
                 "flow_id": flowId,
-                "flow_version_id": flowLayout.versionId,
-                "flow_layout_id": flowLayout.id,
+                "flow_version_id": flowLayoutVariant.versionId,
+                "flow_layout_id": flowLayoutVariant.id,
+                "flow_locale": flowLocale,
                 "builder_version": Adapty.uiBuilderVersion,
                 "builder_config_format_version": Adapty.uiSchemaVersion,
                 "disable_server_cache": disableServerCache,

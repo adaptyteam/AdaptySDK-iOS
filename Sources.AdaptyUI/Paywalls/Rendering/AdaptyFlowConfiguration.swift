@@ -57,7 +57,7 @@ public extension AdaptyUI {
         package init(
             logId: String,
             flow: AdaptyFlow,
-            flowLayout: AdaptyFlow.Layout,
+            flowLayoutVariant: AdaptyFlow.LayoutVariant,
             viewConfiguration: AdaptyUIConfiguration,
             products: [AdaptyPaywallProduct]?,
             productsPrefetch: Task<[AdaptyPaywallProduct], any Error>?,
@@ -91,7 +91,7 @@ public extension AdaptyUI {
             logic = AdaptyUILogic(
                 logId: logId,
                 flow: flow,
-                flowLayout: flowLayout,
+                flowLayoutVariant: flowLayoutVariant,
                 events: eventsHandler,
                 observerModeResolver: observerModeResolver,
                 productsPrefetch: productsPrefetch
@@ -219,6 +219,12 @@ public extension AdaptyUI {
         /// runs from the moment this configuration is created.
         public func sendAppMessage(_ arguments: [String: any Sendable]) {
             stateViewModel.sendAppMessage(arguments)
+        }
+
+        /// Same as ``sendAppMessage(_:)``, with the message id chosen by the
+        /// caller: cross-platform SDKs pass the id their wrapper generated.
+        package func sendAppMessage(id: String, _ arguments: [String: any Sendable]) {
+            stateViewModel.sendAppMessage(id: id, arguments)
         }
 
         /// Resets the transient runtime state so this configuration can be

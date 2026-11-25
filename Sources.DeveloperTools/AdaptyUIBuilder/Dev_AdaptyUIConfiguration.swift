@@ -54,7 +54,7 @@ public extension Dev_AdaptyUIConfiguration {
         let schema = try AdaptyUISchema(from: json, configuration: decodingConfiguration)
         let configuration = try schema.extractUIConfiguration(
             id: uuid,
-            withLocaleId: localeId ?? schema.defaultLocalId ?? "en",
+            withLocaleId: localeId ?? schema.localizationSource.defaultLocale ?? "en",
             envoriment: .init(
                 sdkVersion: environment.sdkVersion,
                 osName: environment.osName,

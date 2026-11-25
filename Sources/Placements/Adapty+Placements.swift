@@ -104,7 +104,7 @@ extension Adapty {
                     userId = createdUserId
                 }
 
-                if !isTestUser, let draw = await Cache.read(
+                if !isTestUser, let draw = await Cache.readPlacement(
                     type,
                     placementId: placementId,
                     locale: locale,
@@ -136,7 +136,7 @@ extension Adapty {
             canUseFallbackServer = error is TimeoutError
         }
 
-        if let draw = await Cache.read(
+        if let draw = await Cache.readPlacement(
             type,
             placementId: placementId,
             locale: locale,
