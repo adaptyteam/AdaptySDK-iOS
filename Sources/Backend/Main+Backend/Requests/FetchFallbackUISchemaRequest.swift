@@ -24,15 +24,21 @@ private struct FetchFallbackUISchemaRequest: BackendRequest {
         disableServerCache: Bool,
         logParams: EventParameters?
     ) {
+
+        let path =
+            if let flowLocale {
+                "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayoutVariant.versionId)/layout/\(flowLayoutVariant.id)/\(flowLocale.base64URLEncoded)/config/"
+            } else {
+                "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayoutVariant.versionId)/layout/\(flowLayoutVariant.id)/config/"
+            }
+
         endpoint = HTTPEndpoint(
             method: .get,
-            path:
-            "sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayoutVariant.versionId)/layout/\(flowLayoutVariant.id)/config/"
+            path: path
         )
 
         headers = HTTPHeaders()
             .setBuilderVersion(Adapty.uiBuilderVersion)
-            .setFlowLayoutLocale(flowLocale)
             .setBuilderConfigurationFormatVersion(Adapty.uiSchemaVersion)
 
         queryItems = QueryItems().setDisableServerCache(disableServerCache)
