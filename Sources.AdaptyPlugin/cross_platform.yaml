@@ -870,7 +870,7 @@ $requests:
       event_id: { type: string }
       result:
         type: string
-        description: "the chosen localization id; null or missing lets the fallback resolver choose"
+        description: "the chosen localization id, spelled exactly as in locales or default_locale; null, missing or any other id lets the fallback resolver choose"
 
   FlowViewDidAnswerLocalization.Response: #response
     type: object
@@ -2105,7 +2105,7 @@ $defs:
       custom_id:
         {
           type: string,
-          description: "id of a host resolver asked via flow_view_did_ask_localization before falling back to resolver",
+          description: "id of a host resolver asked via flow_view_did_ask_localization before falling back to resolver; not asked for a flow with a single localization",
         }
 
   AdaptyUI.CustomTagsValues: #request

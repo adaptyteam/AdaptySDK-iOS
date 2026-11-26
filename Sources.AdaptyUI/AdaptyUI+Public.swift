@@ -290,7 +290,7 @@ public extension AdaptyUI {
     ///
     /// - Parameters:
     ///   - forPaywall: the ``AdaptyPaywall`` for which you want to get a configuration.
-    ///   - preferredLocales: locale identifiers in order of preference. The best matching flow localization is used. If the list is empty, the flow's default localization is used.
+    ///   - preferredLocales: locale identifiers in order of preference; usually `Locale.preferredLanguages`. The best matching flow localization is used. If the list is empty, the flow's default localization is used.
     ///   - localizationStrategy: how the flow localization is chosen from `preferredLocales`. Defaults to ``AdaptyUILocalizationStrategy/auto``.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exeeds.
     ///   - products: optional ``AdaptyPaywallProducts`` array. Pass this value in order to optimize the display time of the products on the screen. If you pass `nil`, ``AdaptyUI`` will automatically fetch the required products. Products that don't exactly match this flow's products are ignored and fetched anew.
@@ -300,7 +300,7 @@ public extension AdaptyUI {
     /// - Returns: an ``AdaptyPaywallConfiguration`` object.
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
-        preferredLocales: [String] = [],
+        preferredLocales: [String],
         localizationStrategy: AdaptyUILocalizationStrategy = .auto,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
@@ -317,6 +317,35 @@ public extension AdaptyUI {
             device: .current,
             preferredLocales: preferredLocales,
             localizationStrategy: localizationStrategy,
+            customLayoutId: customLayoutId,
+            loadTimeout: loadTimeout,
+            products: products,
+            observerModeResolver: observerModeResolver,
+            tagResolver: tagResolver,
+            timerResolver: timerResolver,
+            assetsResolver: assetsResolver,
+            customElementsResolver: customElementsResolver,
+            systemRequestsHandler: systemRequestsHandler
+        )
+    }
+
+    @available(*, unavailable, message: "Pass preferredLocales: Locale.preferredLanguages to show the flow in the device's language, or [] to use the flow's default localization.")
+    static func getFlowConfiguration(
+        forFlow flow: AdaptyFlow,
+        locale: String? = nil,
+        customLayoutId: String? = nil,
+        loadTimeout: TimeInterval? = nil,
+        products: [AdaptyPaywallProduct]? = nil,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
+        tagResolver: AdaptyUITagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil,
+        assetsResolver: AdaptyUIAssetsResolver? = nil,
+        customElementsResolver: (any AdaptyUICustomElementsResolver)? = nil,
+        systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil
+    ) async throws -> FlowConfiguration {
+        try await getFlowConfiguration(
+            forFlow: flow,
+            preferredLocales: locale.map { [$0] } ?? [],
             customLayoutId: customLayoutId,
             loadTimeout: loadTimeout,
             products: products,

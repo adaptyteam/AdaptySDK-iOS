@@ -61,11 +61,13 @@ public enum AdaptyUILocalizationResolver: String, Sendable {
 
 /// Chooses a flow localization when the built-in resolvers do not fit, or adjusts their choice.
 /// Return `nil` to leave the choice to the fallback resolver.
+///
+/// Not called for a flow with a single localization: the flow is shown in it.
 public protocol AdaptyUICustomLocalizationResolver: Sendable {
     /// Returns the identifier of the localization to show the flow in.
     ///
-    /// The returned identifier must be one of the flow's localizations. An identifier the flow does not
-    /// have is ignored, and the fallback resolver chooses.
+    /// The returned identifier must be one of `locales` or `defaultLocale` of the source, spelled exactly
+    /// the same, case included. Any other identifier is ignored, and the fallback resolver chooses.
     ///
     /// Called while the flow configuration is created, possibly not on the main thread. Although the call
     /// is asynchronous, `getFlowConfiguration` waits for the answer, so any time spent here delays the
@@ -88,7 +90,8 @@ public struct AdaptyUILocalizationStrategy: Sendable {
     public static let legacy = AdaptyUILocalizationStrategy(.legacy)
     /// See ``AdaptyUILocalizationResolver/system``.
     public static let system = AdaptyUILocalizationStrategy(.system)
-    /// Asks `resolver` first and uses `fallbackResolver` when it returns `nil`.
+    /// Asks `resolver` first and uses `fallbackResolver` when it returns `nil` or an identifier the flow
+    /// does not have.
     public static func custom(resolver: AdaptyUICustomLocalizationResolver, fallbackResolver: AdaptyUILocalizationResolver = .auto) -> Self {
         .init(fallbackResolver, custom: resolver)
     }

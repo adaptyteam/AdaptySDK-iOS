@@ -57,7 +57,7 @@ public extension AdaptyUI {
     static func dev_getFlowConfiguration(
         forFlow flow: AdaptyFlow,
         deviceOverride: Dev_DeviceOverride?,
-        preferredLocales: [String] = [],
+        preferredLocales: [String],
         localizationStrategy: AdaptyUILocalizationStrategy = .auto,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
