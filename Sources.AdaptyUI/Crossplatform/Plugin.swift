@@ -92,7 +92,8 @@ package extension AdaptyUI {
 
         package static func createFlowView(
             flow: AdaptyFlow,
-            locale: String?,
+            preferredLocales: [String],
+            localizationStrategy: AdaptyUILocalizationStrategy,
             customLayoutId: String?,
             loadTimeout: TimeInterval?,
             preloadProducts: Bool,
@@ -108,7 +109,8 @@ package extension AdaptyUI {
 
             let configuration = try await AdaptyUI.getFlowConfiguration(
                 forFlow: flow,
-                locale: locale,
+                preferredLocales: preferredLocales,
+                localizationStrategy: localizationStrategy,
                 customLayoutId: customLayoutId,
                 loadTimeout: loadTimeout,
                 observerModeResolver: observerModeResolver,

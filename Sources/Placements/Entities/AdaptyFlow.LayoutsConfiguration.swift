@@ -11,11 +11,12 @@ import Foundation
 extension AdaptyFlow {
     struct LayoutsConfiguration {
         let versionId: String
+        let localization: AdaptyUILocalizationSource?
         let layouts: [Layout]
         let grids: [Grid]
     }
 
-    package struct Layout: Sendable, Identifiable {
+    package struct LayoutVariant: Sendable, Identifiable {
         package let versionId: String
         package let id: String
     }
@@ -43,6 +44,8 @@ extension AdaptyFlow.LayoutsConfiguration: Codable {
     }
 
     enum ContainerCodingKeys: String, CodingKey {
+        case locales
+        case defaultLocale = "default_locale"
         case layouts
         case grids
     }
@@ -54,6 +57,14 @@ extension AdaptyFlow.LayoutsConfiguration: Codable {
         let subContainer = try container.nestedContainer(keyedBy: ContainerCodingKeys.self, forKey: .container)
         layouts = try subContainer.decode([Layout].self, forKey: .layouts)
         grids = try subContainer.decode([Grid].self, forKey: .grids)
+        if let locales = try subContainer.decodeIfPresent([String].self, forKey: .locales) {
+            localization = .init(
+                locales: locales,
+                defaultLocale: try subContainer.decodeIfPresent(String.self, forKey: .defaultLocale)
+            )
+        } else {
+            localization = nil
+        }
     }
 
     func encode(to encoder: any Encoder) throws {
@@ -62,6 +73,10 @@ extension AdaptyFlow.LayoutsConfiguration: Codable {
         var subContainer = container.nestedContainer(keyedBy: ContainerCodingKeys.self, forKey: .container)
         try subContainer.encode(layouts, forKey: .layouts)
         try subContainer.encode(grids, forKey: .grids)
+        if let localization = self.localization {
+            try subContainer.encode(localization.locales, forKey: .locales)
+            try subContainer.encodeIfPresent(localization.defaultLocale, forKey: .defaultLocale)
+        }
     }
 }
 

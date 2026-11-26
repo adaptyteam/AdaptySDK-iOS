@@ -95,7 +95,7 @@ struct CategoriesListView: View {
             
             do {
                 let flow = try await Adapty.getFlow(placementId: AppConstants.placementId)
-                flowConfig = try await AdaptyUI.getFlowConfiguration(forFlow: flow)
+                flowConfig = try await AdaptyUI.getFlowConfiguration(forFlow: flow, preferredLocales: Locale.preferredLanguages)
             } catch {
                 Logger.log(.error, "getFlowAndConfig: \(error)")
                 alertError = .init(title: "getFlowAndConfig error!", error: error)

@@ -12,9 +12,8 @@ public extension AdaptyUI {
         package let id: String
         package let placementId: String
         package let variationId: String
-        /// The localization the view was actually built with. It is the requested
-        /// locale when one was passed and resolved, and the flow's default
-        /// localization otherwise.
+        /// The identifier of the localization the view was built with, as the
+        /// localization strategy chose it.
         package let locale: String?
 
         package init(id: String, placementId: String, variationId: String, locale: String? = nil) {

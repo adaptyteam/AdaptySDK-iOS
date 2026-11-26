@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-$id: "https://adapty.io/crossPlatform/4.4.1/schema"
+$id: "https://adapty.io/crossPlatform/4.5.0/schema"
 title: "Cross Platform Format"
 
 $requests:
@@ -27,10 +27,17 @@ $requests:
     required:
       - method
       - flow
+      - preferred_locales
+      - localization_strategy
     properties:
       method: { const: "adapty_ui_create_flow_view" }
       flow: { $ref: "#/$defs/AdaptyFlow" }
-      locale: { $ref: "#/$defs/AdaptyLocale" }
+      preferred_locales:
+        {
+          type: array,
+          items: { $ref: "#/$defs/AdaptyLocale" },
+        }
+      localization_strategy: { $ref: "#/$defs/AdaptyUI.LocalizationStrategy" }
       custom_layout_id:
         {
           type: string,
@@ -854,6 +861,27 @@ $requests:
         properties:
           success: { const: true }
 
+  ### flowViewDidAnswerLocalization ###
+  FlowViewDidAnswerLocalization.Request: #request
+    type: object
+    required: [method, event_id]
+    properties:
+      method: { const: "flow_view_did_answer_localization" }
+      event_id: { type: string }
+      result:
+        type: string
+        description: "the chosen localization id, spelled exactly as in locales or default_locale; null, missing or any other id lets the fallback resolver choose"
+
+  FlowViewDidAnswerLocalization.Response: #response
+    type: object
+    oneOf:
+      - required: [error]
+        properties:
+          error: { $ref: "#/$defs/AdaptyError" }
+      - required: [success]
+        properties:
+          success: { const: true }
+
   ### observerPurchaseDidStart ###
   ObserverPurchaseDidStart.Request: #request
     type: object
@@ -938,6 +966,28 @@ $events:
       custom_args:
         type: object
         additionalProperties: { type: string }
+
+  FlowViewEvent.DidAskLocalization:
+    type: object
+    description: "Sent during adapty_ui_create_flow_view, before the view exists, so it carries no view. Answer with flow_view_did_answer_localization; an unanswered request falls back after a timeout"
+    required: [id, event_id, resolver_id, preferred_locales, locales]
+    properties:
+      id: { const: "flow_view_did_ask_localization" }
+      event_id: { type: string }
+      resolver_id: { type: string, description: "custom_id from AdaptyUI.LocalizationStrategy" }
+      preferred_locales:
+        {
+          type: array,
+          items: { $ref: "#/$defs/AdaptyLocale" },
+          description: "preferred_locales of the create request, in order of preference",
+        }
+      locales:
+        {
+          type: array,
+          items: { type: string },
+          description: "localization ids available in the flow",
+        }
+      default_locale: { type: string, description: "the flow's default localization id" }
 
   FlowViewEvent.DidRequestAppReview:
     type: object
@@ -1594,6 +1644,10 @@ $defs:
         type: object
         required: [grids, layouts]
         properties:
+          locales:
+            type: array
+            items: { type: string }
+          default_locale: { type: string }
           layouts:
             type: array
             items:
@@ -2042,6 +2096,17 @@ $defs:
           - siri
           - music
       - type: string
+
+  AdaptyUI.LocalizationStrategy: #request
+    type: object
+    required: [resolver]
+    properties:
+      resolver: { enum: [auto, system, legacy] }
+      custom_id:
+        {
+          type: string,
+          description: "id of a host resolver asked via flow_view_did_ask_localization before falling back to resolver; not asked for a flow with a single localization",
+        }
 
   AdaptyUI.CustomTagsValues: #request
     type: object

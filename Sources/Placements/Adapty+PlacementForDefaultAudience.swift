@@ -77,7 +77,7 @@ public extension Adapty {
             )
         }()
 
-        if !isTestUser, let draw = await Cache.read(
+        if !isTestUser, let draw = await Cache.readPlacement(
             type,
             placementId: placementId,
             locale: locale,
@@ -103,7 +103,7 @@ public extension Adapty {
             lastError = error
         }
 
-        if let draw = await Cache.read(
+        if let draw = await Cache.readPlacement(
             type,
             placementId: placementId,
             locale: locale,

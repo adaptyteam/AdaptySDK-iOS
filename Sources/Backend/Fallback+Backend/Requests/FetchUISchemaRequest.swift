@@ -17,12 +17,20 @@ private struct FetchUISchemaRequest: BackendRequest {
     init(
         apiKeyPrefix: String,
         flowId: String,
-        flowLayout: AdaptyFlow.Layout,
+        flowLayoutVariant: AdaptyFlow.LayoutVariant,
+        flowLocale: String?,
         logParams: EventParameters
     ) {
+        let path =
+            if let flowLocale {
+                "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayoutVariant.versionId)/layout/\(flowLayoutVariant.id)/\(flowLocale.base64URLEncoded)/\(Adapty.uiBuilderVersion)/config.json"
+            } else {
+                "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayoutVariant.versionId)/layout/\(flowLayoutVariant.id)/\(Adapty.uiBuilderVersion)/config.json"
+            }
+
         endpoint = HTTPEndpoint(
             method: .get,
-            path: "/sdk/in-apps/\(apiKeyPrefix)/flow/\(flowId)/version/\(flowLayout.versionId)/layout/\(flowLayout.id)/\(Adapty.uiBuilderVersion)/config.json"
+            path: path
         )
 
         self.logParams = logParams
@@ -52,19 +60,22 @@ extension Backend.FallbackExecutor {
     func fetchUISchema(
         apiKeyPrefix: String,
         flowId: String,
-        flowLayout: AdaptyFlow.Layout,
+        flowLayoutVariant: AdaptyFlow.LayoutVariant,
+        flowLocale: String?,
         disableServerCache _: Bool,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(HTTPError) -> (schema: AdaptyUISchema, data: Data) {
         let request = FetchUISchemaRequest(
             apiKeyPrefix: apiKeyPrefix,
             flowId: flowId,
-            flowLayout: flowLayout,
+            flowLayoutVariant: flowLayoutVariant,
+            flowLocale: flowLocale,
             logParams: [
                 "api_prefix": apiKeyPrefix,
                 "flow_id": flowId,
-                "flow_version_id": flowLayout.versionId,
-                "flow_layout_id": flowLayout.id,
+                "flow_version_id": flowLayoutVariant.versionId,
+                "flow_layout_id": flowLayoutVariant.id,
+                "flow_locale": flowLocale,
                 "builder_version": Adapty.uiBuilderVersion,
                 "builder_schema_version": Adapty.uiSchemaVersion,
             ]
@@ -72,5 +83,15 @@ extension Backend.FallbackExecutor {
 
         let response: HTTPResponse<(schema: AdaptyUISchema, data: Data)> = try await perform(request, withDecoder: AdaptyUISchema.createDecoder(decodingConfiguration))
         return response.body
+    }
+}
+
+extension String {
+    /// base64url (RFC 4648 §5) of UTF-8 bytes, no padding: path-safe for any characters.
+    var base64URLEncoded: String {
+        Data(utf8).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
     }
 }

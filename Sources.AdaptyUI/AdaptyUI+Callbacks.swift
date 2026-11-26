@@ -30,7 +30,8 @@ public extension AdaptyUI {
     ///
     /// - Parameters:
     ///   - forFlow: the ``AdaptyFlow`` for which you want to get a configuration.
-    ///   - locale: the locale to use when resolving the flow's localized content. Pass `nil` to use the default locale.
+    ///   - preferredLocales: locale identifiers in order of preference; usually `Locale.preferredLanguages`. The best matching flow localization is used. If the list is empty, the flow's default localization is used.
+    ///   - localizationStrategy: how the flow localization is chosen from `preferredLocales`. Defaults to ``AdaptyUILocalizationStrategy/auto``.
     ///   - customLayoutId: the identifier of a custom layout to use instead of the one resolved automatically for the current device.
     ///   - loadTimeout: the `TimeInterval` value which limits the request time. Cached or Fallback result will be returned in case of timeout exceeds.
     ///   - assetsResolver: if you are going to use custom assets functionality, pass the resolver function here.
@@ -38,7 +39,8 @@ public extension AdaptyUI {
     @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
     static func getFlowConfiguration(
         forFlow flow: AdaptyFlow,
-        locale: String? = nil,
+        preferredLocales: [String],
+        localizationStrategy: AdaptyUILocalizationStrategy = .auto,
         customLayoutId: String? = nil,
         loadTimeout: TimeInterval? = nil,
         products: [AdaptyPaywallProduct]? = nil,
@@ -52,7 +54,8 @@ public extension AdaptyUI {
         withCompletion(completion) {
             try await AdaptyUI.getFlowConfiguration(
                 forFlow: flow,
-                locale: locale,
+                preferredLocales: preferredLocales,
+                localizationStrategy: localizationStrategy,
                 customLayoutId: customLayoutId,
                 loadTimeout: loadTimeout,
                 products: products,
@@ -63,6 +66,36 @@ public extension AdaptyUI {
                 systemRequestsHandler: systemRequestsHandler
             )
         }
+    }
+
+    @available(iOS 16.0, macOS 13.0, visionOS 1.0, *)
+    @available(*, unavailable, message: "Pass preferredLocales: Locale.preferredLanguages to show the flow in the device's language, or [] to use the flow's default localization.")
+    static func getFlowConfiguration(
+        forFlow flow: AdaptyFlow,
+        locale: String? = nil,
+        customLayoutId: String? = nil,
+        loadTimeout: TimeInterval? = nil,
+        products: [AdaptyPaywallProduct]? = nil,
+        observerModeResolver: AdaptyObserverModeResolver? = nil,
+        tagResolver: AdaptyUITagResolver? = nil,
+        timerResolver: AdaptyTimerResolver? = nil,
+        assetsResolver: AdaptyUIAssetsResolver? = nil,
+        systemRequestsHandler: AdaptyUISystemRequestsHandler? = nil,
+        _ completion: @escaping AdaptyResultCompletion<FlowConfiguration>
+    ) {
+        getFlowConfiguration(
+            forFlow: flow,
+            preferredLocales: locale.map { [$0] } ?? [],
+            customLayoutId: customLayoutId,
+            loadTimeout: loadTimeout,
+            products: products,
+            observerModeResolver: observerModeResolver,
+            tagResolver: tagResolver,
+            timerResolver: timerResolver,
+            assetsResolver: assetsResolver,
+            systemRequestsHandler: systemRequestsHandler,
+            completion
+        )
     }
 }
 

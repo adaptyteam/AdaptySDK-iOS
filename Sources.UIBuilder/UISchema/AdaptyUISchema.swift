@@ -11,6 +11,8 @@ import Foundation
 typealias Schema = AdaptyUISchema
 
 public struct AdaptyUISchema: Sendable {
+    public let localizationSource: AdaptyUILocalizationSource
+
     let formatVersion: Version
     let assets: [AssetIdentifier: Asset]
     let localizations: [LocaleId: Localization]
@@ -23,16 +25,6 @@ public struct AdaptyUISchema: Sendable {
     let showRestoreLoader: Bool
 
     let legacySelectedProducts: [String: String]?
-}
-
-public extension AdaptyUISchema {
-    var defaultLocalId: String? {
-        defaultLocalization?.id
-    }
-
-    var allLocalIds: [String] {
-        Array(localizations.keys)
-    }
 }
 
 extension AdaptyUISchema: DecodableWithConfiguration {
@@ -78,6 +70,7 @@ extension AdaptyUISchema: DecodableWithConfiguration {
         } else {
             defaultLocalization = nil
         }
+        localizationSource = .init(locales: localizationsArray.map(\.id), defaultLocale: defaultLocalization?.id)
 
         let screenKey: CodingKeys =
             if !container.contains(.screens), configuration.isLegacy {

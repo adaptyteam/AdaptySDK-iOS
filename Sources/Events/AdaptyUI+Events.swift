@@ -11,7 +11,7 @@ package extension Adapty {
     nonisolated static func logFlowAnalyticsViaAdaptyUI(
         variationId: String,
         sessionId: UUID,
-        flowLayout: AdaptyFlow.Layout,
+        flowLayoutVariant: AdaptyFlow.LayoutVariant,
         params: AdaptyFlowAnalyticsPayload
     ) async throws(AdaptyError) {
         try await trackEvent(
@@ -19,8 +19,8 @@ package extension Adapty {
                 .init(
                     variationId: variationId,
                     sessionId: sessionId,
-                    flowVersionId: flowLayout.versionId,
-                    flowLayoutId: flowLayout.id,
+                    flowVersionId: flowLayoutVariant.versionId,
+                    flowLayoutId: flowLayoutVariant.id,
                     payload: params
                 )
             )

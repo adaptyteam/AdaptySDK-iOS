@@ -51,7 +51,8 @@ extension Request {
         static let method = "adapty_ui_create_flow_view"
 
         let flow: AdaptyFlow
-        let locale: String?
+        let preferredLocales: [String]
+        let localizationStrategy: AdaptyUILocalizationStrategy
         let customLayoutId: String?
         let loadTimeout: TimeInterval?
         let preloadProducts: Bool?
@@ -61,7 +62,8 @@ extension Request {
 
         enum CodingKeys: String, CodingKey {
             case flow
-            case locale
+            case preferredLocales = "preferred_locales"
+            case localizationStrategy = "localization_strategy"
             case customLayoutId = "custom_layout_id"
             case loadTimeout = "load_timeout"
             case preloadProducts = "preload_products"
@@ -87,7 +89,8 @@ extension Request {
                 : nil
             let result: AdaptyUI.FlowView = try await AdaptyUI.Plugin.createFlowView(
                 flow: flow,
-                locale: locale,
+                preferredLocales: preferredLocales,
+                localizationStrategy: localizationStrategy,
                 customLayoutId: customLayoutId,
                 loadTimeout: loadTimeout,
                 preloadProducts: preloadProducts ?? false,

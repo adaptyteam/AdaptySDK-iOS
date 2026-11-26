@@ -16,15 +16,17 @@ extension Adapty {
         flow: AdaptyFlow,
         device: DeviceInfo,
         customLayoutId: String?,
-        locale: String?,
+        preferredLocales: [String],
+        localizationStrategy: AdaptyUILocalizationStrategy,
         loadTimeout: TimeInterval? = nil
-    ) async throws -> (flowLayout: AdaptyFlow.Layout, configuration: AdaptyUIConfiguration) {
+    ) async throws -> (flowLayoutVariant: AdaptyFlow.LayoutVariant, configuration: AdaptyUIConfiguration) {
         let loadTimeout = (loadTimeout.map(AdaptyDuration.seconds) ?? .defaultLoadPlacementTimeout).allowedLoadPlacementTimeout
         return try await activatedSDK.getUIConfiguration(
             flow: flow,
             device: device,
             customLayoutId: customLayoutId,
-            locale: locale.trimmed.nonEmptyOrNil.map { AdaptyLocale($0) } ?? .defaultPlacementLocale,
+            preferredLocales: preferredLocales.compactMap(\.trimmed.nonEmptyOrNil),
+            localizationStrategy: localizationStrategy,
             loadTimeout: loadTimeout
         )
     }
@@ -33,22 +35,53 @@ extension Adapty {
         flow: AdaptyFlow,
         device: DeviceInfo,
         customLayoutId: String?,
-        locale: AdaptyLocale,
+        preferredLocales: [String],
+        localizationStrategy: AdaptyUILocalizationStrategy,
         loadTimeout: AdaptyDuration
-    ) async throws(AdaptyError) -> (flowLayout: AdaptyFlow.Layout, configuration: AdaptyUIConfiguration) {
+    ) async throws(AdaptyError) -> (flowLayoutVariant: AdaptyFlow.LayoutVariant, configuration: AdaptyUIConfiguration) {
         guard
             let layoutsConfiguration = flow.layoutsConfiguration,
             let layout = try layoutsConfiguration.getLayout(for: device, with: customLayoutId)
         else { throw .isNoViewConfigurationInFlow() }
 
+        let layoutVariant = AdaptyFlow.LayoutVariant(
+            versionId: layoutsConfiguration.versionId,
+            id: layout.id
+        )
+
+        let flowRequestLocale: FlowRequestLocale = .unresolved
+//            if let localizationSource = layoutsConfiguration.localization {
+//                .resolved(
+//                    await localizationStrategy.resolve(
+//                        for: preferredLocales,
+//                        from: localizationSource,
+//                        isLegacyVersion: false
+//                    )
+//                )
+//            } else {
+//                .unresolved
+//            }
+
         let schema = try await getUISchema(
             flowId: flow.id,
-            flowLayout: layout,
+            flowLayoutVariant: layoutVariant,
+            flowRequestLocale: flowRequestLocale,
             loadTimeout: loadTimeout,
             decodingConfiguration: .init(device: device.kind)
         )
 
-        AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: locale.id)
+        let resolvedLocaleId: String =
+            switch flowRequestLocale {
+            case .resolved(let value):
+                value ?? AdaptyUILocalizationSource.globalDefaultLocale
+            case .unresolved:
+                await localizationStrategy.resolve(
+                    for: preferredLocales,
+                    from: schema
+                ) ?? AdaptyUILocalizationSource.globalDefaultLocale
+            }
+
+        AdaptyUIBuilder.sendImageUrlsToObserver(schema, forLocalId: resolvedLocaleId)
 
         let envoriment = await Environment.fetchUIBuilderEnvironment(flow: flow)
 
@@ -56,7 +89,7 @@ extension Adapty {
             do {
                 return try schema.extractUIConfiguration(
                     id: layout.id,
-                    withLocaleId: locale.id,
+                    withLocaleId: resolvedLocaleId,
                     envoriment: envoriment
                 )
             } catch {
@@ -65,19 +98,20 @@ extension Adapty {
         }
 
         let configuration = try await extractLocaleTask.valueWithThrowsTyped()
-        return (layout, configuration)
+        return (layoutVariant, configuration)
     }
 
     private func getUISchema(
         flowId: String,
-        flowLayout: AdaptyFlow.Layout,
+        flowLayoutVariant: AdaptyFlow.LayoutVariant,
+        flowRequestLocale: FlowRequestLocale,
         loadTimeout: AdaptyDuration,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async throws(AdaptyError) -> AdaptyUISchema {
         let isTestUser = profileManager?.isTestUser ?? false
-        let cacheKey = flowLayout.cacheKey
+        let cacheKey = flowLayoutVariant.cacheKey
 
-        if !isTestUser, let schema = await fetchLocalUISchema(cacheKey, decodingConfiguration: decodingConfiguration) {
+        if !isTestUser, let schema = await fetchLocalUISchema(cacheKey, flowRequestLocale: flowRequestLocale, decodingConfiguration) {
             return schema
         }
 
@@ -87,14 +121,15 @@ extension Adapty {
         do {
             (schema, data) = try await fetchBackendUISchema(
                 flowId: flowId,
-                flowLayout: flowLayout,
+                flowLayoutVariant: flowLayoutVariant,
+                flowRequestLocale: flowRequestLocale,
                 loadTimeout: loadTimeout,
                 disableServerCache: isTestUser,
                 decodingConfiguration: decodingConfiguration
             )
-            log.verbose("UI schema source = backend (\(flowLayout.id))")
+            log.verbose("UI schema source = backend (\(flowLayoutVariant.id))")
         } catch {
-            if isTestUser, let schema = await fetchLocalUISchema(cacheKey, decodingConfiguration: decodingConfiguration) {
+            if isTestUser, let schema = await fetchLocalUISchema(cacheKey, flowRequestLocale: flowRequestLocale, decodingConfiguration) {
                 return schema
             }
             throw error
@@ -105,6 +140,7 @@ extension Adapty {
                 try await Cache.write(
                     data,
                     key: cacheKey,
+                    locale: flowRequestLocale.value.map { AdaptyLocale($0) },
                     dataVersion: 0
                 )
             } catch {
@@ -117,10 +153,12 @@ extension Adapty {
 
     private func fetchLocalUISchema(
         _ key: Cache.ItemKey,
-        decodingConfiguration: AdaptyUISchema.DecodingConfiguration
+        flowRequestLocale: FlowRequestLocale,
+        _ decodingConfiguration: AdaptyUISchema.DecodingConfiguration
     ) async -> AdaptyUISchema? {
         if let schema = await Cache.read(
             key,
+            accept: flowRequestLocale.cacheReadAccept,
             decode: { _, data in
                 try AdaptyUISchema(from: data, configuration: decodingConfiguration)
             }
@@ -142,7 +180,8 @@ extension Adapty {
 
     private func fetchBackendUISchema(
         flowId: String,
-        flowLayout: AdaptyFlow.Layout,
+        flowLayoutVariant: AdaptyFlow.LayoutVariant,
+        flowRequestLocale: FlowRequestLocale,
         loadTimeout: AdaptyDuration,
         disableServerCache: Bool,
         decodingConfiguration: AdaptyUISchema.DecodingConfiguration
@@ -155,7 +194,8 @@ extension Adapty {
                 try await session.fetchUISchema(
                     apiKeyPrefix: apiKeyPrefix,
                     flowId: flowId,
-                    flowLayout: flowLayout,
+                    flowLayoutVariant: flowLayoutVariant,
+                    flowLocale: flowRequestLocale.value,
                     disableServerCache: disableServerCache,
                     decodingConfiguration: decodingConfiguration
                 )
@@ -170,12 +210,37 @@ extension Adapty {
             return try await httpSession.fetchFallbackUISchema(
                 apiKeyPrefix: apiKeyPrefix,
                 flowId: flowId,
-                flowLayout: flowLayout,
+                flowLayoutVariant: flowLayoutVariant,
+                flowLocale: flowRequestLocale.value,
                 disableServerCache: disableServerCache,
                 decodingConfiguration: decodingConfiguration
             )
         } catch {
             throw error.asAdaptyError
+        }
+    }
+}
+
+private extension Adapty {
+    enum FlowRequestLocale: Sendable {
+        case unresolved
+        case resolved(String?)
+
+        var value: String? {
+            switch self {
+            case .unresolved: return nil
+            case .resolved(let value): return value
+            }
+        }
+
+        @Sendable func cacheReadAccept(_ meta: Cache.Meta) -> Bool {
+            guard let existingLocale = meta.locale?.id else { return true }
+            switch self {
+            case .unresolved,
+                 .resolved(.none): return false
+            case .resolved(.some(let resolved)):
+                return resolved == existingLocale
+            }
         }
     }
 }
